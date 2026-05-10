@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FAQ — Design Antviz</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #0a0a0c; --bg2: #111116; --bg3: #18181f; --card: #16161d; --border: rgba(255,255,255,0.07); --accent: #6c63ff; --accent2: #a78bfa; --text: #f0f0f5; --muted: #777789; --success: #4ade80; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Onest', sans-serif; font-weight: 300; line-height: 1.65; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E"); pointer-events: none; }
+    nav.desktop-nav { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; height: 52px; width: calc(100% - 40px); max-width: 1100px; background: rgba(22,22,30,0.82); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 28px; box-shadow: 0 4px 30px rgba(0,0,0,.4); }
+    .logo { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: .9rem; letter-spacing: .04em; color: var(--text); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+    .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.6;transform:scale(1.3)} }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: .8rem; letter-spacing: .02em; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta { background: var(--accent) !important; color: #fff !important; padding: .4rem 1.1rem; border-radius: 50px; font-weight: 500 !important; }
+    .cart-badge { position: absolute; top: -6px; right: -10px; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); color: #fff; font-size: .65rem; font-weight: 700; display: none; align-items: center; justify-content: center; }
+    .cart-badge.show { display: flex; }
+    .cart-link { position: relative; }
+
+    .page-hero { padding: 110px 5vw 50px; position: relative; overflow: hidden; }
+    .breadcrumb { color: var(--muted); font-size: .78rem; margin-bottom: 1.2rem; }
+    .breadcrumb a { color: var(--muted); text-decoration: none; }
+    .section-label { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin-bottom: .75rem; font-weight: 500; }
+    .page-title { font-family: 'Unbounded', sans-serif; font-weight: 900; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.08; letter-spacing: -.03em; margin-bottom: 1rem; }
+    .page-title span { color: var(--accent2); }
+    .page-sub { color: var(--muted); font-size: 1rem; max-width: 480px; }
+
+    .faq-search-wrap { padding: 0 5vw 2rem; }
+    .faq-search { width: 100%; max-width: 600px; background: var(--card); border: 1px solid var(--border); border-radius: 50px; padding: .85rem 1.4rem; color: var(--text); font-family: 'Onest', sans-serif; font-size: .875rem; outline: none; transition: border-color .2s; }
+    .faq-search:focus { border-color: var(--accent); }
+
+    .faq-layout { display: grid; grid-template-columns: 240px 1fr; gap: 0; }
+    .faq-sidebar { padding: 0 2rem 4rem 5vw; position: sticky; top: 90px; height: fit-content; }
+    .sidebar-title { font-size: .68rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: .75rem; padding: 0 .5rem; }
+    .faq-cat-btn { display: flex; align-items: center; gap: .6rem; width: 100%; text-align: left; background: none; border: none; color: var(--muted); font-family: 'Onest', sans-serif; font-size: .84rem; padding: .65rem .8rem; border-radius: 12px; cursor: pointer; transition: background .18s, color .18s; margin-bottom: .2rem; }
+    .faq-cat-btn:hover { background: var(--bg3); color: var(--text); }
+    .faq-cat-btn.active { background: rgba(108,99,255,.12); color: var(--accent2); font-weight: 500; }
+    .faq-cat-btn .cat-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    .faq-content { padding: 0 5vw 4rem 0; }
+    .faq-section { margin-bottom: 2.5rem; }
+    .faq-section-title { font-family: 'Unbounded', sans-serif; font-weight: 600; font-size: .85rem; color: var(--muted); margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .faq-item { margin-bottom: .6rem; }
+    .faq-q { width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 1.1rem 1.4rem; display: flex; justify-content: space-between; align-items: center; cursor: pointer; text-align: left; font-family: 'Onest', sans-serif; font-weight: 500; font-size: .9rem; color: var(--text); transition: border-color .2s; gap: 1rem; }
+    .faq-q:hover { border-color: rgba(108,99,255,.3); }
+    .faq-toggle { width: 24px; height: 24px; flex-shrink: 0; border-radius: 8px; background: rgba(108,99,255,.1); border: 1px solid rgba(108,99,255,.2); display: flex; align-items: center; justify-content: center; color: var(--accent); font-size: 1.1rem; transition: transform .25s, background .2s; line-height: 1; }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); background: var(--accent); color: #fff; border-color: var(--accent); }
+    .faq-a { max-height: 0; overflow: hidden; color: var(--muted); font-size: .86rem; padding: 0 1.4rem; margin-left: 1px; border-left: 2px solid rgba(108,99,255,.2); transition: max-height .35s ease, padding .35s; }
+    .faq-item.open .faq-a { max-height: 300px; padding: .8rem 1.4rem; }
+    .no-results { color: var(--muted); font-size: .9rem; padding: 2rem 0; display: none; }
+    .no-results.show { display: block; }
+
+    .cta-banner { background: linear-gradient(135deg, rgba(108,99,255,.15) 0%, rgba(56,189,248,.08) 100%); border: 1px solid rgba(108,99,255,.25); border-radius: 24px; padding: 3rem; text-align: center; margin: 0 5vw 3rem; }
+    .cta-banner h2 { font-family: 'Unbounded', sans-serif; font-weight: 700; font-size: clamp(1.3rem,2.5vw,2rem); margin-bottom: .75rem; }
+    .cta-banner p { color: var(--muted); max-width: 380px; margin: 0 auto 2rem; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: .8rem 2rem; border-radius: 50px; font-family: 'Onest', sans-serif; font-size: .9rem; font-weight: 500; text-decoration: none; border: none; cursor: pointer; transition: transform .15s, box-shadow .2s; }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: var(--accent); color: #fff; box-shadow: 0 4px 20px rgba(108,99,255,.3); }
+    .btn-primary:hover { box-shadow: 0 6px 30px rgba(108,99,255,.5); }
+
+    footer { border-top: 1px solid var(--border); padding: 3rem 5vw; display: flex; gap: 2rem; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+    footer p { color: var(--muted); font-size: .8rem; }
+    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-links a { color: var(--muted); text-decoration: none; font-size: .8rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--text); }
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s ease, transform .6s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .mobile-nav-bar { display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 200; background: rgba(22,22,30,0.88); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,.12); border-radius: 28px; padding: 8px 4px; width: calc(100% - 24px); max-width: 500px; justify-content: space-around; align-items: center; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
+    .mobile-nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: var(--muted); font-size: .54rem; letter-spacing: 0; padding: 5px 4px; border-radius: 12px; transition: background .18s, color .18s; position: relative; }
+    .mobile-nav-item svg { width: 18px; height: 18px; }
+    .mobile-nav-item.active { color: var(--accent2); background: rgba(108,99,255,.13); }
+    .mobile-cart-badge { position: absolute; top: 2px; right: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); color: #fff; font-size: .55rem; font-weight: 700; display: none; align-items: center; justify-content: center; }
+    .mobile-cart-badge.show { display: flex; }
+
+    @media (max-width: 1024px) { .faq-layout { grid-template-columns: 1fr; } .faq-sidebar { display: none; } .faq-content { padding: 0 5vw 3rem; } }
+    @media (max-width: 1024px) {
+      nav.desktop-nav { display: none !important; }
+      .cta-banner { margin: 0 5vw 3rem; padding: 2rem; }
+      .mobile-nav-bar { display: flex !important; }
+      body { padding-bottom: 90px; }
+      footer { flex-direction: column; gap: 1rem; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="desktop-nav">
+  <a class="logo" href="index.html"><span class="logo-dot"></span>Design Antviz</a>
+  <div class="nav-links">
+    <a href="index.html">Главная</a>
+    <a href="services.html">Услуги</a>
+    <a href="pricing.html">Цены</a>
+    <a href="cart.html" class="cart-link">Корзина <span class="cart-badge" id="desktopCartBadge">0</span></a>
+    <a href="faq.html">FAQ</a>
+    <a href="contact.html" class="nav-cta">Заказать сайт</a>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="breadcrumb"><a href="index.html">Главная</a> / FAQ</div>
+  <p class="section-label">Вопросы и ответы</p>
+  <h1 class="page-title">Часто задаваемые<br /><span>вопросы</span></h1>
+  <p class="page-sub">Собрали ответы на самые популярные вопросы о наших сайтах, хостинге и работе с нами.</p>
+</div>
+
+<div class="faq-search-wrap">
+  <input class="faq-search" placeholder="🔍  Поиск по вопросам..." oninput="filterFaq(this.value)" />
+</div>
+
+<div class="faq-layout">
+  <aside class="faq-sidebar">
+    <div class="sidebar-title">Категории</div>
+    <button class="faq-cat-btn active" data-target="hosting"><span class="cat-icon">🌐</span>Хостинг</button>
+    <button class="faq-cat-btn" data-target="payment"><span class="cat-icon">💰</span>Оплата</button>
+    <button class="faq-cat-btn" data-target="domain"><span class="cat-icon">🔗</span>Домен</button>
+    <button class="faq-cat-btn" data-target="process"><span class="cat-icon">⚙️</span>Процесс</button>
+    <button class="faq-cat-btn" data-target="support"><span class="cat-icon">🔧</span>Поддержка</button>
+  </aside>
+
+  <main class="faq-content">
+    <div class="no-results" id="noResults">Ничего не найдено. Попробуйте другой запрос.</div>
+
+    <div class="faq-section reveal" id="hosting">
+      <div class="faq-section-title">🌐 Хостинг</div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Сколько стоит хостинг? <span class="faq-toggle">+</span></button><div class="faq-a">Хостинг на облачных серверах Microsoft (через GitHub) абсолютно бесплатен для статических сайтов. Лимит трафика настолько высокий, что для подавляющего большинства сайтов он никогда не будет достигнут.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Чем статический сайт отличается от обычного? <span class="faq-toggle">+</span></button><div class="faq-a">Статический сайт — это набор HTML, CSS и JS файлов без серверной части и базы данных. Он загружается мгновенно, практически не бывает уязвим к взломам, и не требует оплаты за сервер.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">SSL (HTTPS) включён? <span class="faq-toggle">+</span></button><div class="faq-a">Да, SSL-сертификат от Let's Encrypt выдаётся автоматически через платформу GitHub.</div></div>
+    </div>
+
+    <div class="faq-section reveal" id="payment">
+      <div class="faq-section-title">💰 Оплата</div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Как происходит оплата? <span class="faq-toggle">+</span></button><div class="faq-a">Оплата через ЮKassa — один из ведущих платёжных сервисов России. Поддерживаются СБП, банковские карты, T‑Pay, SberPay и другие методы.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Когда платить — до или после? <span class="faq-toggle">+</span></button><div class="faq-a">Оплата после согласования деталей и до начала работы. Обсуждаем в Telegram, вы оплачиваете — мы приступаем.</div></div>
+    </div>
+
+    <div class="faq-section reveal" id="domain">
+      <div class="faq-section-title">🔗 Домен</div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Обязательно ли покупать домен? <span class="faq-toggle">+</span></button><div class="faq-a">Нет. Без домена сайт будет доступен по техническому адресу GitHub — это бесплатно и работает.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Кто отвечает за домен? <span class="faq-toggle">+</span></button><div class="faq-a">Два варианта: 1) Мы покупаем домен на себя, подключаем и обслуживаем — 200 ₽ регистрация, 600 ₽/год. 2) Вы покупаете сами — мы бесплатно подключаем, но обслуживание на вас.</div></div>
+    </div>
+
+    <div class="faq-section reveal" id="process">
+      <div class="faq-section-title">⚙️ Процесс</div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Сколько времени занимает создание? <span class="faq-toggle">+</span></button><div class="faq-a">В среднем около 2 рабочих дней с момента получения информации и оплаты.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Как вы свяжетесь со мной? <span class="faq-toggle">+</span></button><div class="faq-a">После заявки пишем вам в Telegram. Можно и сами написать: @designantviz</div></div>
+    </div>
+
+    <div class="faq-section reveal" id="support">
+      <div class="faq-section-title">🔧 Поддержка</div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Что входит в поддержку за 200 ₽/месяц? <span class="faq-toggle">+</span></button><div class="faq-a">Правки в текстах и замена изображений. Без изменения структуры страниц.</div></div>
+      <div class="faq-item"><button class="faq-q" onclick="toggle(this)">Могу ли я сам редактировать сайт? <span class="faq-toggle">+</span></button><div class="faq-a">Да. Исходный код в вашем репозитории. Если знаете HTML/CSS — редактируйте сами.</div></div>
+    </div>
+  </main>
+</div>
+
+<div class="cta-banner reveal">
+  <h2>Остались вопросы?</h2>
+  <p>Напишите нам в Telegram — ответим и поможем определиться.</p>
+  <a href="https://t.me/designantviz" target="_blank" class="btn btn-primary">Написать в Telegram</a>
+</div>
+
+<footer>
+  <a class="logo" href="index.html"><span class="logo-dot"></span>Design Antviz</a>
+  <p>© 2025 Design Antviz. Все права защищены.</p>
+  <div class="footer-links"><a href="services.html">Услуги</a><a href="pricing.html">Цены</a><a href="cart.html">Корзина</a><a href="contact.html">Контакты</a></div>
+</footer>
+
+<nav class="mobile-nav-bar">
+  <a href="index.html" class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Главная</a>
+  <a href="services.html" class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><rect x="13" y="13" width="8" height="8" rx="1.5"/></svg>Услуги</a>
+  <a href="pricing.html" class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Цены</a>
+  <a href="faq.html" class="mobile-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/></svg>FAQ</a>
+  <a href="cart.html" class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg><span class="mobile-cart-badge" id="mobileCartBadge">0</span>Корзина</a>
+  <a href="contact.html" class="mobile-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Заказать</a>
+</nav>
+
+<script>
+  function getCart() { try { return JSON.parse(localStorage.getItem('antviz_cart') || '[]'); } catch(e) { return []; } }
+  function updateCartBadges() {
+    const cart = getCart();
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    ['desktopCartBadge', 'mobileCartBadge'].forEach(id => {
+      const badge = document.getElementById(id);
+      if (badge) { badge.textContent = totalItems; badge.classList.toggle('show', totalItems > 0); }
+    });
+  }
+  function toggle(btn) { btn.parentElement.classList.toggle('open'); }
+  document.querySelectorAll('.faq-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.faq-cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = document.getElementById(btn.dataset.target);
+      if (target) target.scrollIntoView({ behavior:'smooth', block:'start' });
+    });
+  });
+  function filterFaq(q) {
+    const query = q.toLowerCase().trim();
+    let anyVisible = false;
+    document.querySelectorAll('.faq-item').forEach(item => {
+      const match = !query || item.textContent.toLowerCase().includes(query);
+      item.style.display = match ? '' : 'none';
+      if (match) anyVisible = true;
+    });
+    document.querySelectorAll('.faq-section').forEach(sec => {
+      const vis = [...sec.querySelectorAll('.faq-item')].some(i => i.style.display !== 'none');
+      sec.style.display = vis ? '' : 'none';
+    });
+    document.getElementById('noResults').classList.toggle('show', !anyVisible);
+  }
+  const obs = new IntersectionObserver(e => { e.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible'); }); }, {threshold:.08});
+  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+  updateCartBadges();
+</script>
+</body>
+</html>

@@ -304,8 +304,9 @@
     return ok;
   }
 
-  async function submitForm() {
+ async function submitForm() {
     if (!validate()) return;
+    
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = 'Отправляем...';
@@ -318,29 +319,58 @@
     const tg = document.getElementById('tg').value.trim();
     const type = document.getElementById('siteType').value || '—';
     const desc = document.getElementById('desc').value.trim() || '—';
-    const domainMap = { we_buy: 'Покупаем мы', you_buy: 'Покупают сами', no_domain: 'Не нужен' };
+    
+    const domainMap = { 
+        we_buy: 'Покупаем мы', 
+        you_buy: 'Покупают сами', 
+        no_domain: 'Не нужен' 
+    };
 
     const cart = getCart();
     let cartText = '';
     if (cart.length > 0) {
-      cartText = '\n📦 *Корзина:*\n' + cart.map(item => `• ${item.name} × ${item.qty} (${item.pricePerPage}₽/стр, мин. ${item.minPages} стр)`).join('\n');
+        cartText = '\n\n📦 Корзина:\n';
+        cart.forEach(item => {
+            cartText += '• ' + item.name + ' × ' + item.qty + ' (' + item.pricePerPage + '₽/стр)\n';
+        });
     }
 
-    const text = `🆕 *Новая заявка — Design Antviz*\n\n👤 ${name}\n📞 ${phone}\n✈️ ${tg}\n📄 ${type}\n🌐 ${domainMap[selectedDomain]}\n💬 ${desc}\n📎 Файлов: ${uploadedFiles.length}${cartText}`;
+    const text = '🆕 Новая заявка — Design Antviz\n\n' +
+        '👤 Имя: ' + name + '\n' +
+        '📞 Телефон: ' + phone + '\n' +
+        '✈️ Telegram: ' + tg + '\n' +
+        '📄 Тип сайта: ' + type + '\n' +
+        '🌐 Домен: ' + domainMap[selectedDomain] + '\n' +
+        '💬 Описание: ' + desc + '\n' +
+        '📎 Файлов: ' + uploadedFiles.length +
+        cartText;
 
     try {
-      await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: CHAT_ID, text, parse_mode: 'Markdown' })
-      });
-    } catch(e) { console.warn(e); }
-
-    document.getElementById('formInner').style.display = 'none';
-    document.getElementById('successWrap').classList.add('show');
-  }
-
-  updateCartBadges();
-  showCartSummary();
+        const response = await fetch('https://api.telegram.org/bot' + BOT_TOKEN + '/sendMessage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: CHAT_ID,
+                text: text
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.ok) {
+            document.getElementById('formInner').style.display = 'none';
+            document.getElementById('successWrap').classList.add('show');
+        } else {
+            alert('Ошибка отправки: ' + JSON.stringify(data));
+            btn.disabled = false;
+            btn.textContent = 'Отправить заявку';
+        }
+    } catch(e) {
+        alert('Ошибка: ' + e.message);
+        btn.disabled = false;
+        btn.textContent = 'Отправить заявку';
+    }
+}
 </script>
 </body>
 </html>

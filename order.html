@@ -383,9 +383,8 @@
 
 <div class="toast" id="toast">В корзину ✓</div>
 
+<script src="https://forminit.com/sdk/v1/forminit.js"></script>
 <script>
-const BOT='8061250846:AAG_ZTnZCNoiKpQnVfO4NUfIckENbQx8AO8';
-const CID='8490970120';
 
 let selType='Лендинг', selPrice=225, selMin=5, selPages=5;
 let extras={domain:false,support:false,urgent:false};
@@ -512,20 +511,25 @@ async function submitForm(){
   btn.disabled=true; btn.textContent='Отправляем...';
   const name=document.getElementById('fname').value.trim();
   const tg=document.getElementById('ftg').value.trim();
-  const phone=document.getElementById('fphone').value.trim()||'—';
+  const phone=document.getElementById('fphone').value.trim();
   const desc=document.getElementById('fdesc').value.trim()||'—';
   const cart=getCart();
   let cartText='';
   if(cart.length){
     const total=cart.reduce((s,i)=>s+i.pricePerPage*i.pages*i.qty,0);
-    cartText='\n📦 *Корзина:*\n'+cart.map(i=>`• ${i.name} (${i.pricePerPage}₽ × ${i.pages}стр × ${i.qty} = ${(i.pricePerPage*i.pages*i.qty).toLocaleString('ru')}₽)`).join('\n')+`\n💰 Итого: ${total.toLocaleString('ru')} ₽`;
+    cartText='\nКорзина:\n'+cart.map(i=>`• ${i.name} (${i.pricePerPage}₽ × ${i.pages}стр × ${i.qty} = ${(i.pricePerPage*i.pages*i.qty).toLocaleString('ru')}₽)`).join('\n')+`\nИтого: ${total.toLocaleString('ru')} ₽`;
   }
   const extrasText=[extras.domain&&'домен',extras.support&&'поддержка',extras.urgent&&'срочность'].filter(Boolean).join(', ')||'нет';
-  const text=`🆕 *Новая заявка — Design Antviz*\n\n👤 ${name}\n📞 ${phone}\n✈️ ${tg}\n🔧 Доп: ${extrasText}\n💬 ${desc}\n📎 Файлов: ${uploadedFiles.length}${cartText}`;
+  const message=`Telegram: ${tg}\nДоп: ${extrasText}\nОписание: ${desc}${cartText}`;
+  const fd=new FormData();
+  fd.append('fi-sender-fullName',name);
+  if(phone)fd.append('fi-sender-phone',phone);
+  fd.append('fi-text-message',message);
+  uploadedFiles.forEach(f=>fd.append('fi-file-materials[]',f));
   try{
-    const r=await fetch(`https://api.telegram.org/bot${BOT}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CID,text,parse_mode:'Markdown'})});
-    const j=await r.json();
-    if(!j.ok)throw new Error(j.description);
+    const forminit=new Forminit();
+    const{error}=await forminit.submit('qsg2e4wubrf',fd);
+    if(error)throw new Error(error.message);
   }catch(e){
     btn.disabled=false;
     btn.innerHTML='Отправить заявку <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';

@@ -225,8 +225,28 @@
 </nav>
 
 <script type="module">
-  import { auth } from './firebase-config.js';
+  import { auth, db } from './firebase-config.js';
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  let maintOverlay = null;
+  onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
+    const on = snap.exists() && snap.data().enabled === true;
+    if (on && !maintOverlay) {
+      maintOverlay = document.createElement('div');
+      maintOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;text-align:center;padding:2rem;font-family:Onest,sans-serif;color:#f0f0f5';
+      maintOverlay.innerHTML = `
+        <div style="font-size:3.5rem">🔧</div>
+        <div style="font-family:Unbounded,sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div>
+        <div style="color:#777789;font-size:.9rem;max-width:380px;line-height:1.6">Сайт временно недоступен. Мы уже работаем над этим — скоро всё будет готово!</div>`;
+      document.body.appendChild(maintOverlay);
+      document.body.style.overflow = 'hidden';
+    } else if (!on && maintOverlay) {
+      maintOverlay.remove(); maintOverlay = null;
+      document.body.style.overflow = '';
+    }
+  });
+
   onAuthStateChanged(auth, user => {
     const np=document.getElementById('navProfile'), nl=document.getElementById('navLogin');
     if(user){if(np)np.style.display='flex';if(nl)nl.style.display='none';}

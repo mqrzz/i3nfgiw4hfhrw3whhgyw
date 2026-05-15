@@ -18,4 +18,4 @@ export const auth = getAuth(app);
 export const db = getFirestore(app);
 
 // ВАШ email — только для admin.html
-export const ADMIN_EMAIL = "ВСТАВЬ_СВОЮ_ПОЧТУ@gmail.com";
+export const ADMIN_EMAIL = "wbtipoofficialcom@gmail.com";

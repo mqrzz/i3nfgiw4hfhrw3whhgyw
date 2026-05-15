@@ -314,7 +314,7 @@
 <script type="module">
   import { auth, db } from './firebase-config.js';
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let currentUser = null;
   let agreeChecked = false, uploadedFiles = [];
@@ -324,7 +324,20 @@
   function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 
   // AUTH — redirect to login if not authenticated
-  onAuthStateChanged(auth, user => {
+  onAuthStateChanged(auth, async user => {
+    // Check maintenance
+    try{
+      const snap=await getDoc(doc(db,'settings','maintenance'));
+      if(snap.exists()&&snap.data().enabled===true){
+        document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:#f0f0f5;background:#0a0a0c;gap:1rem;text-align:center;padding:2rem">
+          <div style="font-size:3rem">🔧</div>
+          <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div>
+          <div style="color:#777789;font-size:.9rem;max-width:360px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div>
+          <a href="index.html" style="color:#a78bfa;text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a>
+        </div>`;
+        return;
+      }
+    }catch(e){}
     currentUser = user;
     const np = document.getElementById('navProfile');
     const nl = document.getElementById('navLogin');
@@ -391,10 +404,20 @@
     if(extras.domain)totalPrice+=200;if(extras.support)totalPrice+=500;if(extras.urgent)totalPrice=Math.round(totalPrice*1.3);
     if(cart.length)totalPrice=cart.reduce((s,i)=>s+i.pricePerPage*i.pages*i.qty,0);
     const extrasArr=Object.entries(extras).filter(([,v])=>v).map(([k])=>k);
+    // Convert uploaded files to base64
+    const attachments=[];
+    for(const file of uploadedFiles){
+      if(file.size>3*1024*1024) continue; // skip >3MB
+      try{
+        const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+        attachments.push({fileData:base64,fileName:file.name,fileType:file.type});
+      }catch(e){console.error('File encode error:',e);}
+    }
     try{
       await addDoc(collection(db,'orders'),{
         siteType:selTypeVal,tariff:selTariffName,pages:selPagesVal,totalPrice,extras:extrasArr,
         cart:cart.length?cart:null,description:document.getElementById('fdesc').value.trim()||'',
+        attachments:attachments.length?attachments:null,
         clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
         uid:currentUser.uid,status:0,createdAt:serverTimestamp()
       });

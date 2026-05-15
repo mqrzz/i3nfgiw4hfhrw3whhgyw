@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Админ — Design Antviz</title>
+  <link rel="icon" href="favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#07070a;--bg2:#0e0e13;--bg3:#141419;--card:#121217;--border:rgba(255,255,255,.07);--accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;--text:#f0f0f5;--muted:#666678;--success:#4ade80;--error:#f87171;--warn:#fbbf24}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;min-height:100vh}
+
+    .topbar{position:sticky;top:0;z-index:100;background:rgba(10,10,14,.96);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:.85rem 1.8rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+    .tbar-left{display:flex;align-items:center;gap:1.2rem}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.85rem;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:8px}
+    .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--error);box-shadow:0 0 10px var(--error)}
+    .admin-badge{background:rgba(248,113,113,.13);color:var(--error);border:1px solid rgba(248,113,113,.22);padding:.18rem .6rem;border-radius:50px;font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+    .tbar-right{display:flex;align-items:center;gap:1.4rem;flex-wrap:wrap}
+    .tstat{text-align:center}
+    .tstat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.95rem;color:var(--accent2)}
+    .tstat-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .btn-logout{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.76rem;padding:.38rem .85rem;border-radius:8px;cursor:pointer;transition:all .2s}
+    .btn-logout:hover{border-color:var(--error);color:var(--error)}
+
+    .layout{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 60px)}
+
+    /* LEFT */
+    .orders-panel{border-right:1px solid var(--border);overflow-y:auto;height:calc(100vh - 60px);position:sticky;top:60px}
+    .panel-hdr{padding:1rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.8rem;position:sticky;top:0;background:var(--bg2);z-index:10}
+    .panel-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem}
+    .filter-row{display:flex;gap:.35rem}
+    .filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.7rem;padding:.28rem .62rem;border-radius:7px;cursor:pointer;transition:all .16s}
+    .filter-btn.active{background:rgba(108,99,255,.15);color:var(--accent2);border-color:rgba(108,99,255,.28)}
+    .orders-list{padding:.7rem}
+
+    .orow{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:.9rem 1rem;margin-bottom:.55rem;cursor:pointer;transition:border-color .16s,background .16s}
+    .orow:hover{border-color:rgba(108,99,255,.28)}
+    .orow.sel{border-color:var(--accent);background:rgba(108,99,255,.07)}
+    .orow-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.35rem}
+    .orow-id{font-family:'Unbounded',sans-serif;font-size:.73rem;font-weight:600}
+    .orow-user{font-size:.73rem;color:var(--muted);margin-bottom:.18rem}
+    .orow-meta{display:flex;align-items:center;justify-content:space-between;gap:.4rem}
+    .orow-price{font-weight:600;font-size:.8rem}
+    .orow-date{font-size:.66rem;color:var(--muted)}
+    .sbadge{display:inline-flex;align-items:center;gap:.28rem;padding:.2rem .6rem;border-radius:50px;font-size:.66rem;font-weight:600;flex-shrink:0}
+    .s0{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.2)}
+    .s1{background:rgba(56,189,248,.12);color:var(--accent3);border:1px solid rgba(56,189,248,.2)}
+    .s2{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.2)}
+    .sdot{width:5px;height:5px;border-radius:50%;background:currentColor}
+    .empty-list{text-align:center;padding:2rem 1rem;color:var(--muted);font-size:.83rem}
+
+    /* RIGHT */
+    .detail-panel{overflow-y:auto;height:calc(100vh - 60px);position:sticky;top:60px}
+    .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:.7rem;padding:2rem;text-align:center;opacity:.5}
+    .detail-empty-icon{font-size:2.2rem}
+    .detail-body{padding:1.3rem;display:none}
+    .detail-body.show{display:block}
+    .dsec{margin-bottom:1.4rem}
+    .dsec-title{font-size:.63rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem;font-weight:500}
+    .did{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.25rem}
+    .dmeta{color:var(--muted);font-size:.78rem;display:flex;gap:.7rem;flex-wrap:wrap;align-items:center;margin-bottom:.8rem}
+    .ddesc{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.9rem;font-size:.83rem;line-height:1.6;color:var(--muted)}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+    .info-item{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.58rem .75rem}
+    .info-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:.18rem}
+    .info-val{font-size:.8rem;font-weight:500;word-break:break-all}
+    .status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin-bottom:.8rem}
+    .sbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.73rem;padding:.55rem .4rem;border-radius:9px;cursor:pointer;transition:all .16s;text-align:center;font-weight:500}
+    .sbtn:hover{border-color:rgba(108,99,255,.35);color:var(--text)}
+    .sbtn.sb0.active{background:rgba(251,191,36,.12);color:var(--warn);border-color:rgba(251,191,36,.28)}
+    .sbtn.sb1.active{background:rgba(56,189,248,.12);color:var(--accent3);border-color:rgba(56,189,248,.28)}
+    .sbtn.sb2.active{background:rgba(74,222,128,.12);color:var(--success);border-color:rgba(74,222,128,.28)}
+
+    /* ADMIN CHAT */
+    .achat{background:var(--bg3);border:1px solid var(--border);border-radius:13px;overflow:hidden}
+    .achat-hdr{padding:.7rem .95rem;border-bottom:1px solid var(--border);font-size:.78rem;font-weight:500}
+    .achat-msgs{max-height:200px;overflow-y:auto;padding:.7rem;display:flex;flex-direction:column;gap:.45rem}
+    .achat-msgs::-webkit-scrollbar{width:3px}
+    .achat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+    .msg{max-width:85%;display:flex;flex-direction:column;gap:.12rem}
+    .msg.mine{align-self:flex-end;align-items:flex-end}
+    .msg.theirs{align-self:flex-start;align-items:flex-start}
+    .msg-bubble{padding:.45rem .75rem;border-radius:11px;font-size:.78rem;line-height:1.5;word-break:break-word}
+    .msg.mine .msg-bubble{background:rgba(248,113,113,.18);color:#fff;border-bottom-right-radius:3px}
+    .msg.theirs .msg-bubble{background:var(--card);color:var(--text);border-bottom-left-radius:3px}
+    .msg-time{font-size:.6rem;color:var(--muted)}
+    .msg-file-link{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.08);border-radius:8px;padding:.38rem .6rem;font-size:.76rem;text-decoration:none;color:var(--text)}
+    .msg-file-link:hover{background:rgba(255,255,255,.13)}
+    .achat-row{padding:.55rem .7rem;border-top:1px solid var(--border);display:flex;gap:.45rem;align-items:flex-end}
+    .achat-inp{flex:1;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:.48rem .75rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.8rem;outline:none;resize:none}
+    .achat-inp:focus{border-color:var(--accent)}
+    .achat-icon-btn{width:32px;height:32px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .16s}
+    .achat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+    .achat-send{background:var(--accent);border:none;color:#fff}
+    .achat-send:hover{box-shadow:0 3px 12px rgba(108,99,255,.4)}
+    .achat-icon-btn svg{width:13px;height:13px}
+
+    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);z-index:500;padding:.55rem 1.2rem;border-radius:50px;font-size:.76rem;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.success{background:var(--success);color:#000}
+    .toast.error{background:var(--error);color:#fff}
+    .toast.info{background:var(--accent);color:#fff}
+
+    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+    .spinner{width:34px;height:34px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    @media(max-width:768px){
+      .layout{grid-template-columns:1fr}
+      .orders-panel,.detail-panel{height:auto;position:static}
+      .detail-panel{border-top:1px solid var(--border)}
+      .tstat{display:none}
+    }
+  </style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <p style="color:var(--muted);font-size:.8rem">Проверка доступа...</p>
+</div>
+
+<div id="appWrap" style="display:none">
+  <div class="topbar">
+    <div class="tbar-left">
+      <a href="index.html" class="logo"><span class="logo-dot"></span>Design Antviz</a>
+      <span class="admin-badge">Admin</span>
+    </div>
+    <div class="tbar-right">
+      <div class="tstat"><div class="tstat-num" id="sAll">0</div><div class="tstat-lbl">Заказов</div></div>
+      <div class="tstat"><div class="tstat-num" id="sPend" style="color:var(--warn)">0</div><div class="tstat-lbl">Ожидают</div></div>
+      <div class="tstat"><div class="tstat-num" id="sWork" style="color:var(--accent3)">0</div><div class="tstat-lbl">В работе</div></div>
+      <div class="tstat"><div class="tstat-num" id="sDone" style="color:var(--success)">0</div><div class="tstat-lbl">Готово</div></div>
+      <button class="btn-logout" onclick="doLogout()">Выйти</button>
+    </div>
+  </div>
+
+  <div class="layout">
+    <div class="orders-panel">
+      <div class="panel-hdr">
+        <div class="panel-title">Все заказы</div>
+        <div class="filter-row">
+          <button class="filter-btn active" onclick="setFilter(-1,this)">Все</button>
+          <button class="filter-btn" onclick="setFilter(0,this)">🟡</button>
+          <button class="filter-btn" onclick="setFilter(1,this)">🔵</button>
+          <button class="filter-btn" onclick="setFilter(2,this)">🟢</button>
+        </div>
+      </div>
+      <div class="orders-list" id="ordersList"><div class="empty-list">Загрузка...</div></div>
+    </div>
+
+    <div class="detail-panel">
+      <div class="detail-empty" id="detailEmpty">
+        <div class="detail-empty-icon">👈</div>
+        <p style="font-size:.83rem">Выберите заказ слева</p>
+      </div>
+      <div class="detail-body" id="detailBody">
+        <div class="dsec">
+          <div class="dsec-title">Заказ</div>
+          <div class="did" id="dId"></div>
+          <div class="dmeta" id="dMeta"></div>
+          <div class="ddesc" id="dDesc" style="display:none"></div>
+        </div>
+        <div class="dsec">
+          <div class="dsec-title">Клиент</div>
+          <div class="info-grid" id="dClient"></div>
+        </div>
+        <div class="dsec">
+          <div class="dsec-title">Детали</div>
+          <div class="info-grid" id="dInfo"></div>
+        </div>
+        <div class="dsec">
+          <div class="dsec-title">Изменить статус</div>
+          <div class="status-btns">
+            <button class="sbtn sb0" onclick="setStatus(0)">🟡 Ожидание</button>
+            <button class="sbtn sb1" onclick="setStatus(1)">🔵 В работе</button>
+            <button class="sbtn sb2" onclick="setStatus(2)">🟢 Готово</button>
+          </div>
+        </div>
+        <div class="dsec">
+          <div class="dsec-title">Чат с клиентом</div>
+          <div class="achat">
+            <div class="achat-hdr">💬 Переписка</div>
+            <div class="achat-msgs" id="achatMsgs"><div style="color:var(--muted);font-size:.76rem;text-align:center;padding:.5rem">Нет сообщений</div></div>
+            <div class="achat-row">
+              <input type="file" id="adminFileInput" style="display:none" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" onchange="adminSendFiles(this.files)"/>
+              <button class="achat-icon-btn" onclick="document.getElementById('adminFileInput').click()" title="Прикрепить файл">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+              </button>
+              <textarea class="achat-inp" id="achatInput" rows="1" placeholder="Ответить клиенту..."
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}"></textarea>
+              <button class="achat-icon-btn achat-send" onclick="adminSendMsg()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
+  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  let allOrders=[], currentFilter=-1, selOrderId=null, selClientUid=null, unsubChat=null;
+
+  function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
+  function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+  function fmtTime(ts){if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+  const sLabels=['Ожидание','В работе','Готово'];
+
+  function renderList(){
+    const filtered=currentFilter===-1?allOrders:allOrders.filter(o=>(o.status||0)===currentFilter);
+    const el=document.getElementById('ordersList');
+    if(!filtered.length){el.innerHTML='<div class="empty-list">Заказов нет</div>';return;}
+    el.innerHTML=filtered.map(o=>`<div class="orow${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
+      <div class="orow-head"><span class="orow-id">№ ${o.id.slice(0,8).toUpperCase()}</span><span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span></div>
+      <div class="orow-user">${o.clientName||o.clientEmail||'—'}</div>
+      <div class="orow-meta"><span class="orow-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span><span class="orow-date">${fmtDate(o.createdAt)}</span></div>
+    </div>`).join('');
+  }
+
+  function updateStats(){
+    document.getElementById('sAll').textContent=allOrders.length;
+    document.getElementById('sPend').textContent=allOrders.filter(o=>(o.status||0)===0).length;
+    document.getElementById('sWork').textContent=allOrders.filter(o=>o.status===1).length;
+    document.getElementById('sDone').textContent=allOrders.filter(o=>o.status===2).length;
+  }
+
+  window.setFilter=function(f,btn){
+    currentFilter=f;
+    document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  };
+
+  window.selectOrder=function(id){
+    selOrderId=id;
+    renderList();
+    const o=allOrders.find(x=>x.id===id);
+    if(!o)return;
+    selClientUid=o.uid;
+    document.getElementById('detailEmpty').style.display='none';
+    document.getElementById('detailBody').classList.add('show');
+    document.getElementById('dId').textContent='№ '+o.id.slice(0,8).toUpperCase();
+    document.getElementById('dMeta').innerHTML=`<span>${fmtDate(o.createdAt)}</span><span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>`;
+    const dd=document.getElementById('dDesc');
+    if(o.description){dd.textContent=o.description;dd.style.display='block';}else dd.style.display='none';
+    document.getElementById('dClient').innerHTML=`
+      <div class="info-item"><div class="info-lbl">Имя</div><div class="info-val">${o.clientName||'—'}</div></div>
+      <div class="info-item"><div class="info-lbl">Email</div><div class="info-val">${o.clientEmail||'—'}</div></div>`;
+    document.getElementById('dInfo').innerHTML=`
+      <div class="info-item"><div class="info-lbl">Тип</div><div class="info-val">${o.siteType||'—'}</div></div>
+      <div class="info-item"><div class="info-lbl">Тариф</div><div class="info-val">${o.tariff||'—'}</div></div>
+      <div class="info-item"><div class="info-lbl">Страниц</div><div class="info-val">${o.pages||'—'}</div></div>
+      <div class="info-item"><div class="info-lbl">Сумма</div><div class="info-val">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div></div>`;
+    document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('active',i===(o.status||0)));
+    if(unsubChat)unsubChat();
+    if(o.uid)loadChat(o.uid);
+    else document.getElementById('achatMsgs').innerHTML='<div style="color:var(--muted);font-size:.76rem;text-align:center;padding:.5rem">Клиент не зарегистрирован</div>';
+  };
+
+  window.setStatus=async function(s){
+    if(!selOrderId)return;
+    try{await updateDoc(doc(db,'orders',selOrderId),{status:s});toast('Статус обновлён ✓','success');}
+    catch(e){toast('Ошибка','error');}
+  };
+
+  function loadChat(uid){
+    const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
+    unsubChat=onSnapshot(q,snap=>{
+      const msgs=snap.docs.map(d=>d.data());
+      const el=document.getElementById('achatMsgs');
+      if(!msgs.length){el.innerHTML='<div style="color:var(--muted);font-size:.76rem;text-align:center;padding:.5rem">Нет сообщений</div>';return;}
+      el.innerHTML=msgs.map(m=>{
+        const isAdmin=m.sender==='admin';
+        if(m.type==='file') return`<div class="msg ${isAdmin?'mine':'theirs'}"><a class="msg-file-link" href="${m.fileUrl}" target="_blank">📎 ${m.fileName}</a><div class="msg-time">${isAdmin?'Вы':'Клиент'} · ${fmtTime(m.createdAt)}</div></div>`;
+        return`<div class="msg ${isAdmin?'mine':'theirs'}"><div class="msg-bubble">${m.text}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div></div>`;
+      }).join('');
+      el.scrollTop=el.scrollHeight;
+    });
+  }
+
+  window.adminSendMsg=async function(){
+    if(!selClientUid)return;
+    const inp=document.getElementById('achatInput');
+    const text=inp.value.trim();
+    if(!text)return;
+    inp.value='';
+    try{await addDoc(collection(db,'chats',selClientUid,'messages'),{text,sender:'admin',senderName:'Поддержка',type:'text',createdAt:serverTimestamp()});}
+    catch(e){toast('Ошибка отправки','error');}
+  };
+
+  window.adminSendFiles=async function(files){
+    if(!selClientUid||!files.length)return;
+    const storage=getStorage();
+    for(const file of Array.from(files)){
+      if(file.size>20*1024*1024){toast(file.name+' > 20 МБ','error');continue;}
+      try{
+        toast('Загружаю '+file.name+'...','info');
+        const r=sRef(storage,`chats/${selClientUid}/admin_${Date.now()}_${file.name}`);
+        await uploadBytes(r,file);
+        const url=await getDownloadURL(r);
+        await addDoc(collection(db,'chats',selClientUid,'messages'),{type:'file',fileUrl:url,fileName:file.name,sender:'admin',senderName:'Поддержка',createdAt:serverTimestamp()});
+        toast('Файл отправлен ✓','success');
+      }catch(e){toast('Ошибка загрузки','error');console.error(e);}
+    }
+    document.getElementById('adminFileInput').value='';
+  };
+
+  window.doLogout=async function(){
+    if(unsubChat)unsubChat();
+    await signOut(auth);
+    window.location.href='auth.html';
+  };
+
+  onAuthStateChanged(auth,user=>{
+    document.getElementById('loadingScreen').style.display='none';
+    if(!user||user.email!==ADMIN_EMAIL){
+      document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;font-family:'Onest',sans-serif;color:#f0f0f5;background:#07070a">
+        <div style="font-size:2rem">🚫</div>
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700">Нет доступа</div>
+        <div style="color:#777789;font-size:.83rem">Эта страница только для администратора</div>
+        <a href="index.html" style="color:#a78bfa;font-size:.83rem;text-decoration:none;margin-top:.5rem">← На главную</a>
+      </div>`;
+      return;
+    }
+    document.getElementById('appWrap').style.display='block';
+    const q=query(collection(db,'orders'),orderBy('createdAt','desc'));
+    onSnapshot(q,snap=>{
+      allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+      updateStats();renderList();
+      if(selOrderId){
+        const upd=allOrders.find(o=>o.id===selOrderId);
+        if(upd){
+          document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('active',i===(upd.status||0)));
+          document.getElementById('dMeta').innerHTML=`<span>${fmtDate(upd.createdAt)}</span><span class="sbadge s${upd.status||0}"><span class="sdot"></span>${sLabels[upd.status||0]}</span>`;
+        }
+      }
+    });
+  });
+</script>
+</body>
+</html>

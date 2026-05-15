@@ -315,7 +315,7 @@
 
 <script type="module">
   import { auth, db } from './firebase-config.js';
-  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  // Storage не используется — файлы идут base64 прямо в Firestore
   import { onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -373,7 +373,13 @@
     const div=document.createElement('div');
     div.className=`msg ${isMe?'mine':'theirs'}`;
     if(m.type==='file'){
-      div.innerHTML=`<a class="msg-file-link" href="${m.fileUrl}" target="_blank">📎 ${m.fileName}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+      const src=m.fileData||m.fileUrl||'#';
+      const isImg=m.fileType&&m.fileType.startsWith('image/');
+      if(isImg){
+        div.innerHTML=`<img src="${src}" alt="${m.fileName}" style="max-width:200px;max-height:180px;border-radius:8px;display:block;cursor:pointer" onclick="window.open(this.src)" /><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+      } else {
+        div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+      }
     } else {
       div.innerHTML=`<div class="msg-bubble">${m.text}</div><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
     }
@@ -406,17 +412,17 @@
 
   window.sendFiles=async function(files){
     if(!currentUser||!files.length)return;
-    const storage=getStorage();
     for(const file of Array.from(files)){
-      if(file.size>20*1024*1024){toast(file.name+' больше 20 МБ','error');continue;}
+      if(file.size>2*1024*1024){toast(file.name+' больше 2 МБ — сожми файл','error');continue;}
       try{
-        toast('Загружаю '+file.name+'...','info');
-        const r=sRef(storage,`chats/${currentUser.uid}/${Date.now()}_${file.name}`);
-        await uploadBytes(r,file);
-        const url=await getDownloadURL(r);
-        await addDoc(collection(db,'chats',currentUser.uid,'messages'),{type:'file',fileUrl:url,fileName:file.name,sender:'user',senderName:currentUser.displayName||'Пользователь',createdAt:serverTimestamp()});
+        toast('Отправляю '+file.name+'...','info');
+        const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+        await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
+          type:'file',fileData:base64,fileName:file.name,fileType:file.type,
+          sender:'user',senderName:currentUser.displayName||'Пользователь',createdAt:serverTimestamp()
+        });
         toast('Файл отправлен ✓','success');
-      }catch(e){toast('Ошибка загрузки: '+file.name,'error');console.error(e);}
+      }catch(e){toast('Ошибка: '+file.name,'error');console.error(e);}
     }
     document.getElementById('fileInput').value='';
   };
@@ -454,7 +460,8 @@
     document.getElementById('loadingScreen').style.display='none';
     document.getElementById('topNav').style.display='flex';
     document.getElementById('appLayout').style.display='flex';
-    document.getElementById('mobNav').style.display='flex';
+    // Мобильный нав — только на мобиле, CSS media query рулит
+    if(window.innerWidth<=900) document.getElementById('mobNav').style.display='flex';
     loadOrders(user.uid);
     loadChat(user.uid);
   });

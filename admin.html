@@ -206,7 +206,7 @@
 
 <script type="module">
   import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
-  import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+  // Файлы хранятся как base64 в Firestore — Storage не нужен
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -282,7 +282,12 @@
       if(!msgs.length){el.innerHTML='<div style="color:var(--muted);font-size:.76rem;text-align:center;padding:.5rem">Нет сообщений</div>';return;}
       el.innerHTML=msgs.map(m=>{
         const isAdmin=m.sender==='admin';
-        if(m.type==='file') return`<div class="msg ${isAdmin?'mine':'theirs'}"><a class="msg-file-link" href="${m.fileUrl}" target="_blank">📎 ${m.fileName}</a><div class="msg-time">${isAdmin?'Вы':'Клиент'} · ${fmtTime(m.createdAt)}</div></div>`;
+        if(m.type==='file'){
+          const src=m.fileData||m.fileUrl||'#';
+          const isImg=m.fileType&&m.fileType.startsWith('image/');
+          if(isImg) return`<div class="msg ${isAdmin?'mine':'theirs'}"><img src="${src}" alt="${m.fileName}" style="max-width:180px;max-height:160px;border-radius:7px;display:block;cursor:pointer" onclick="window.open(this.src)" /><div class="msg-time">${isAdmin?'Вы':'Клиент'} · ${fmtTime(m.createdAt)}</div></div>`;
+          return`<div class="msg ${isAdmin?'mine':'theirs'}"><a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName}</a><div class="msg-time">${isAdmin?'Вы':'Клиент'} · ${fmtTime(m.createdAt)}</div></div>`;
+        }
         return`<div class="msg ${isAdmin?'mine':'theirs'}"><div class="msg-bubble">${m.text}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div></div>`;
       }).join('');
       el.scrollTop=el.scrollHeight;
@@ -301,15 +306,15 @@
 
   window.adminSendFiles=async function(files){
     if(!selClientUid||!files.length)return;
-    const storage=getStorage();
     for(const file of Array.from(files)){
-      if(file.size>20*1024*1024){toast(file.name+' > 20 МБ','error');continue;}
+      if(file.size>2*1024*1024){toast(file.name+' больше 2 МБ','error');continue;}
       try{
-        toast('Загружаю '+file.name+'...','info');
-        const r=sRef(storage,`chats/${selClientUid}/admin_${Date.now()}_${file.name}`);
-        await uploadBytes(r,file);
-        const url=await getDownloadURL(r);
-        await addDoc(collection(db,'chats',selClientUid,'messages'),{type:'file',fileUrl:url,fileName:file.name,sender:'admin',senderName:'Поддержка',createdAt:serverTimestamp()});
+        toast('Отправляю '+file.name+'...','info');
+        const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+        await addDoc(collection(db,'chats',selClientUid,'messages'),{
+          type:'file',fileData:base64,fileName:file.name,fileType:file.type,
+          sender:'admin',senderName:'Поддержка',createdAt:serverTimestamp()
+        });
         toast('Файл отправлен ✓','success');
       }catch(e){toast('Ошибка загрузки','error');console.error(e);}
     }

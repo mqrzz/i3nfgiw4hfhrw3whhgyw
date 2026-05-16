@@ -590,7 +590,7 @@
         </div>`;
       }).join('');
     }
-  }  }
+  }
 
   /* ── SELECT ORDER ── */
   window.selectOrder=function(id){
@@ -752,7 +752,21 @@
   };
 
   /* ── INIT ── */
+  // Таймаут — если Firebase не отвечает 8 секунд, показываем ошибку
+  const loadTimeout = setTimeout(()=>{
+    const ls = document.getElementById('loadingScreen');
+    if(ls && ls.style.display !== 'none'){
+      ls.innerHTML = `<div style="text-align:center;padding:2rem">
+        <div style="font-size:2rem;margin-bottom:.8rem">⚠️</div>
+        <div style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:.5rem">Нет соединения</div>
+        <div style="color:#666678;font-size:.8rem;margin-bottom:1.2rem">Проверь интернет или настройки Firebase</div>
+        <button onclick="location.reload()" style="background:#6c63ff;border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.82rem;padding:.6rem 1.4rem;border-radius:50px;cursor:pointer">Обновить</button>
+      </div>`;
+    }
+  }, 8000);
+
   onAuthStateChanged(auth, async user=>{
+    clearTimeout(loadTimeout);
     document.getElementById('loadingScreen').style.display='none';
     if(!user||user.email!==ADMIN_EMAIL){
       document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;font-family:'Onest',sans-serif;color:#f0f0f5;background:#07070a"><div style="font-size:2.5rem">🚫</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.1rem">Нет доступа</div><div style="color:#666678;font-size:.85rem;margin-top:.2rem">Страница только для администратора</div><a href="index.html" style="color:#a78bfa;font-size:.85rem;text-decoration:none;margin-top:.5rem">← На главную</a></div>`;
@@ -766,7 +780,6 @@
     const ordQ=query(collection(db,'orders'),orderBy('createdAt','desc'));
     onSnapshot(ordQ, snap=>{
       allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
-      // Собрать юзеров из заказов
       allUsers={};
       allOrders.forEach(o=>{
         if(!o.uid) return;
@@ -775,18 +788,22 @@
       });
       updateStats();
       renderList();
-      // Обновить детальную панель если выбранный заказ изменился
       if(selOrderId){
         const upd=allOrders.find(o=>o.id===selOrderId);
         if(upd) showDetail(upd);
       }
-    }, err=>{ console.error('Orders snapshot error:',err); toast('Ошибка загрузки заказов','error'); });
+    }, err=>{
+      console.error('Orders snapshot error:',err);
+      if(err.code==='permission-denied') toast('Нет прав на чтение заказов. Проверь Firestore Rules.','error');
+      else toast('Ошибка загрузки заказов','error');
+    });
 
+    // ── Подписка на чаты — не блокируем основной поток ──
+    // Запускаем отдельно, ошибка здесь не должна ломать всё остальное
+    loadChatsIndex();
+  });
 
-    // ── Подписка на все чаты — видим всех пользователей, даже без заказов ──
-    // Слушаем каждый чат из коллекции chats/{uid}/messages
-    // Firestore не поддерживает onSnapshot на коллекцию-группу без индекса,
-    // поэтому сначала getDocs по корневым документам, потом snapshot на messages
+  async function loadChatsIndex(){
     try {
       const chatsRootSnap = await getDocs(collection(db,'chats'));
       chatsRootSnap.forEach(chatDoc => {
@@ -814,8 +831,13 @@
           renderList();
         });
       });
-    } catch(e){ console.warn('Chats watch error:',e); }
-  });
+    } catch(e){
+      console.warn('Chats watch error:',e);
+      if(e.code==='permission-denied'){
+        console.warn('Нет прав на чтение chats. Добавь в Firestore Rules разрешение для ADMIN_EMAIL.');
+      }
+    }
+  }
 </script>
 </body>
 </html>

@@ -438,10 +438,10 @@
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
     collection, query, orderBy, onSnapshot, doc, updateDoc,
-    addDoc, serverTimestamp, setDoc, getDoc
+    addDoc, serverTimestamp, setDoc, getDoc, getDocs
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  let allOrders=[], allUsers={};
+  let allOrders=[], allUsers={}, allChatUsers={};
   let currentTab='orders';
   let selOrderId=null, selClientUid=null;
   let unsubChat=null, unsubMaint=null;
@@ -551,24 +551,46 @@
           </div>
         </div>`).join('');
     } else {
-      let uids=Object.keys(allUsers);
-      if(q) uids=uids.filter(uid=>(allUsers[uid].name||'').toLowerCase().includes(q)||(allUsers[uid].email||'').toLowerCase().includes(q));
-      if(!uids.length){ el.innerHTML='<div class="list-empty">Нет пользователей</div>'; return; }
-      el.innerHTML=uids.map(uid=>{
-        const u=allUsers[uid];
+      // Мёрж: все кто писал в чат + те у кого есть заказы
+      const merged = {...allUsers};
+      Object.keys(allChatUsers).forEach(uid => {
+        if(!merged[uid]) merged[uid] = {...allChatUsers[uid]};
+        else {
+          merged[uid].lastMsg   = allChatUsers[uid].lastMsg;
+          merged[uid].lastMsgTs = allChatUsers[uid].lastMsgTs;
+          if(allChatUsers[uid].hasUnread) merged[uid].hasUnread = true;
+        }
+      });
+      let uids = Object.keys(merged);
+      uids.sort((a,b)=>{
+        if(merged[a].hasUnread !== merged[b].hasUnread) return merged[a].hasUnread ? -1 : 1;
+        const ta = merged[a].lastMsgTs?.seconds||0;
+        const tb = merged[b].lastMsgTs?.seconds||0;
+        return tb - ta;
+      });
+      if(q) uids = uids.filter(uid=>(merged[uid].name||'').toLowerCase().includes(q)||(merged[uid].email||'').toLowerCase().includes(q));
+      if(!uids.length){ el.innerHTML='<div class="list-empty">Нет диалогов</div>'; return; }
+      el.innerHTML = uids.map(uid=>{
+        const u = merged[uid];
+        const hasOrder = !!allUsers[uid];
         return`<div class="row-card${selClientUid===uid&&!selOrderId?' sel':''}" onclick="selectUserChat('${uid}')">
           <div class="row-head">
             <span class="row-name">${u.name||'Пользователь'}</span>
             ${u.hasUnread?'<div class="unread-dot"></div>':''}
           </div>
-          <div class="row-sub">${u.email||uid}</div>
+          <div class="row-sub" style="display:flex;align-items:center;gap:.4rem">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${u.email||uid}</span>
+            ${hasOrder
+              ?`<span style="font-size:.6rem;background:rgba(108,99,255,.12);color:var(--accent2);border-radius:4px;padding:.1rem .35rem;flex-shrink:0">${u.orderCount} зак.</span>`
+              :`<span style="font-size:.6rem;background:rgba(56,189,248,.1);color:var(--accent3);border-radius:4px;padding:.1rem .35rem;flex-shrink:0">Без заказа</span>`}
+          </div>
           <div class="row-foot">
-            <span class="row-meta">${u.orderCount||0} заказ(ов)</span>
+            <span class="row-meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${u.lastMsg||'Нет сообщений'}</span>
           </div>
         </div>`;
       }).join('');
     }
-  }
+  }  }
 
   /* ── SELECT ORDER ── */
   window.selectOrder=function(id){
@@ -759,6 +781,40 @@
         if(upd) showDetail(upd);
       }
     }, err=>{ console.error('Orders snapshot error:',err); toast('Ошибка загрузки заказов','error'); });
+
+
+    // ── Подписка на все чаты — видим всех пользователей, даже без заказов ──
+    // Слушаем каждый чат из коллекции chats/{uid}/messages
+    // Firestore не поддерживает onSnapshot на коллекцию-группу без индекса,
+    // поэтому сначала getDocs по корневым документам, потом snapshot на messages
+    try {
+      const chatsRootSnap = await getDocs(collection(db,'chats'));
+      chatsRootSnap.forEach(chatDoc => {
+        const uid  = chatDoc.id;
+        const data = chatDoc.data() || {};
+        const lastMsgQ = query(
+          collection(db,'chats',uid,'messages'),
+          orderBy('createdAt','desc')
+        );
+        onSnapshot(lastMsgQ, msgSnap => {
+          if(msgSnap.empty){
+            if(!allChatUsers[uid]) allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false,orderCount:0};
+            renderList(); return;
+          }
+          const last = msgSnap.docs[0].data();
+          const hasUnread = msgSnap.docs.some(d=>d.data().sender==='user'&&!d.data().read);
+          allChatUsers[uid] = {
+            name:      data.name  || last.senderName || 'Пользователь',
+            email:     data.email || '',
+            lastMsg:   last.type==='file'?'📎 Файл':(last.text||'').slice(0,60),
+            lastMsgTs: last.createdAt,
+            hasUnread,
+            orderCount: 0,
+          };
+          renderList();
+        });
+      });
+    } catch(e){ console.warn('Chats watch error:',e); }
   });
 </script>
 </body>

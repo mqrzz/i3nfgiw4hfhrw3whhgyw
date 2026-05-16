@@ -331,7 +331,6 @@
     <a href="order.html">Заказать</a>
     <a href="faq.html">FAQ</a>
     <a href="profile.html" class="active">Кабинет</a>
-    <button onclick="showSection('support')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Onest',sans-serif;font-size:.8rem;letter-spacing:.02em;transition:color .2s;padding:0" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--muted)'">Чат</button>
     <a href="order.html" class="nav-cta">Заказать сайт</a>
   </div>
 </nav>
@@ -371,12 +370,10 @@
       <div class="profile-info">
         <div class="profile-name" id="heroName">...</div>
         <div class="profile-email" id="heroEmail">...</div>
-        <div class="profile-since" id="heroSince">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-          Клиент Design Antviz
-        </div>
+
       </div>
       <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="showSection('support')">💬 Написать в чат</button>
         <button class="btn btn-ghost btn-sm" onclick="showSection('settings')">Настройки</button>
         <button class="btn btn-sm" style="background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.18)" onclick="doLogout()">Выйти</button>
       </div>
@@ -490,17 +487,6 @@
         </div>
       </div>
       <button class="btn btn-primary btn-sm" onclick="saveSettings()">Сохранить изменения</button>
-    </div>
-
-    <div class="card" style="border-color:rgba(108,99,255,.2)">
-      <div class="card-title">
-        <div class="card-title-left">
-          <div class="card-icon" style="background:rgba(108,99,255,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
-          🔔 Уведомления
-        </div>
-      </div>
-      <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.1rem;line-height:1.6">Получайте push-уведомления об изменении статуса заказов и новых сообщениях от поддержки — даже когда вкладка закрыта.</p>
-      <button class="btn btn-primary btn-sm" onclick="requestPushPermission()" id="pushBtn">Включить уведомления</button>
     </div>
 
     <div class="danger-card">
@@ -798,7 +784,6 @@
     const perm=await Notification.requestPermission();
     if(perm==='granted'){
       toast('Уведомления включены ✓','success');
-      document.getElementById('pushBtn').textContent='Уведомления включены ✓';
       sendNotif('Design Antviz','Уведомления включены! Будете в курсе статуса заказов 👋');
     } else {
       toast('Уведомления отклонены','error');
@@ -840,15 +825,6 @@
   }
 
   /* ── PUSH BANNER ── */
-  function showPushBanner(){
-    if(!('Notification' in window)||Notification.permission!=='default') return;
-    const b=document.createElement('div');
-    b.id='pushBanner';
-    b.style.cssText=`position:fixed;bottom:calc(var(--mobnav-h) + 1rem);left:50%;transform:translateX(-50%);z-index:400;background:#1a1a24;border:1px solid rgba(108,99,255,.35);border-radius:18px;padding:.9rem 1.2rem;display:flex;align-items:center;gap:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:360px;width:calc(100% - 2rem)`;
-    b.innerHTML=`<div style="font-size:1.4rem;flex-shrink:0">🔔</div><div style="flex:1;min-width:0"><div style="font-size:.8rem;font-weight:500;color:#f0f0f5;margin-bottom:.1rem">Включить уведомления?</div><div style="font-size:.72rem;color:#777789;line-height:1.4">О статусе заказов и сообщениях</div></div><div style="display:flex;gap:.4rem;flex-shrink:0"><button onclick="requestPushPermission();document.getElementById('pushBanner')?.remove()" style="background:var(--accent);border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.72rem;font-weight:500;padding:.4rem .8rem;border-radius:8px;cursor:pointer">Включить</button><button onclick="document.getElementById('pushBanner')?.remove()" style="background:#18181f;border:1px solid rgba(255,255,255,.07);color:#777789;font-family:'Onest',sans-serif;font-size:.72rem;padding:.4rem .65rem;border-radius:8px;cursor:pointer">×</button></div>`;
-    document.body.appendChild(b);
-    setTimeout(()=>document.getElementById('pushBanner')?.remove(),12000);
-  }
 
   /* ── INIT ── */
   onAuthStateChanged(auth, async user=>{
@@ -865,7 +841,6 @@
     document.getElementById('settingEmail').value=user.email;
 
     if(Notification.permission==='granted'){
-      document.getElementById('pushBtn').textContent='Уведомления включены ✓';
     }
 
     document.getElementById('loadingScreen').style.display='none';
@@ -875,7 +850,6 @@
     loadChat(user.uid);
     watchOrdersForPush(user.uid);
     watchChatForPush(user.uid);
-    setTimeout(showPushBanner,2500);
   });
 </script>
 </body>

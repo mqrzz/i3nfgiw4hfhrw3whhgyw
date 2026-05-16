@@ -535,7 +535,7 @@
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
     collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
-    doc, updateDoc, getDoc, deleteDoc, getDocs
+    doc, updateDoc, getDoc, deleteDoc, getDocs, setDoc
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let currentUser = null, unsubOrders = null, unsubChat = null;
@@ -694,6 +694,9 @@
     if(!text) return;
     inp.value=''; inp.style.height='auto';
     try{
+      await setDoc(doc(db,'chats',currentUser.uid),{
+        name:currentUser.displayName||'',email:currentUser.email||''
+      },{merge:true});
       await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
         text, sender:'user', senderName:currentUser.displayName||'Пользователь',
         type:'text', createdAt:serverTimestamp()

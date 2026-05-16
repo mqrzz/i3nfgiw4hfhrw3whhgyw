@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,584 +11,312 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#08080f;
-      --surface:#0f0f1a;
-      --surface2:#14141f;
-      --surface3:#1a1a2a;
-      --border:rgba(255,255,255,0.06);
-      --border-hover:rgba(108,99,255,0.35);
-      --accent:#6c63ff;
-      --accent2:#a78bfa;
-      --accent3:#38bdf8;
-      --accent-glow:rgba(108,99,255,0.25);
-      --text:#eeeef5;
-      --text2:#a0a0b8;
-      --muted:#565670;
-      --success:#22c55e;
-      --error:#ef4444;
-      --warn:#f59e0b;
-      --nav-h:64px;
-      --sidebar-w:240px;
+      --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;
+      --border:rgba(255,255,255,0.07);--accent:#6c63ff;--accent2:#a78bfa;
+      --accent3:#38bdf8;--text:#f0f0f5;--muted:#777789;
+      --success:#4ade80;--error:#f87171;--warn:#fbbf24;
+      --nav-h:72px;--mobnav-h:80px;
     }
     html{scroll-behavior:smooth}
-    body{
-      background:var(--bg);
-      color:var(--text);
-      font-family:'Onest',sans-serif;
-      font-weight:300;
-      line-height:1.6;
-      min-height:100vh;
-      overflow-x:hidden;
-    }
-
-    /* NOISE TEXTURE */
-    body::before{
-      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-      opacity:0.4;
-    }
-    body::after{
-      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-      background:
-        radial-gradient(ellipse 60% 40% at 90% -10%,rgba(108,99,255,.15) 0%,transparent 60%),
-        radial-gradient(ellipse 50% 35% at -10% 100%,rgba(56,189,248,.08) 0%,transparent 55%);
-    }
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;min-height:100vh;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(108,99,255,.12) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 80%,rgba(56,189,248,.06) 0%,transparent 55%);pointer-events:none}
 
     /* ── LOADING ── */
-    .loading-screen{
-      position:fixed;inset:0;z-index:2000;
-      background:var(--bg);
-      display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.2rem;
-    }
-    .loading-logo{
-      font-family:'Unbounded',sans-serif;font-weight:600;font-size:1rem;
-      letter-spacing:.08em;color:var(--text2);
-      display:flex;align-items:center;gap:10px;
-    }
-    .loading-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulseAnim 1.4s ease-in-out infinite}
-    @keyframes pulseAnim{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
-    .loading-bar{width:180px;height:2px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-top:.4rem}
-    .loading-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;animation:loadBar 1.8s ease-in-out infinite}
-    @keyframes loadBar{0%{width:0;transform:translateX(0)}50%{width:100%}100%{width:100%;transform:translateX(100%)}opacity:0}
+    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── MAINTENANCE ── */
-    .maint-screen{
-      position:fixed;inset:0;z-index:3000;background:var(--bg);
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      gap:1.2rem;text-align:center;padding:2rem;
-    }
-    .maint-icon{font-size:3rem}
-    .maint-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem}
-    .maint-sub{color:var(--text2);font-size:.88rem;max-width:360px;line-height:1.65}
-
-    /* ── DESKTOP NAVIGATION ── */
+    /* ── DESKTOP NAV (capsule — identical to index.html) ── */
     nav.desktop-nav{
-      position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:100;
+      position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;
       display:flex;align-items:center;justify-content:space-between;
-      padding:0 1.6rem;height:48px;
-      width:calc(100% - 40px);max-width:1140px;
-      background:rgba(14,14,24,0.85);backdrop-filter:blur(24px);
-      border:1px solid rgba(255,255,255,0.07);border-radius:100px;
-      box-shadow:0 2px 20px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.04);
+      padding:0 1.5rem;height:52px;
+      width:calc(100% - 40px);max-width:1100px;
+      background:rgba(22,22,30,0.88);backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,0.1);border-radius:28px;
+      box-shadow:0 4px 30px rgba(0,0,0,.4);
     }
-    .logo{
-      font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;
-      letter-spacing:.05em;color:var(--text);text-decoration:none;
-      display:flex;align-items:center;gap:9px;
-    }
-    .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent);animation:pulseAnim 2s ease-in-out infinite;flex-shrink:0}
-    .nav-links{display:flex;gap:1.4rem;align-items:center}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:.78rem;letter-spacing:.02em;transition:color .2s}
-    .nav-links a:hover{color:var(--text2)}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.04em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
+    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:pulse 2s infinite;flex-shrink:0}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.02em;transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
     .nav-links a.active{color:var(--text)}
-    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.36rem 1rem;border-radius:50px;font-weight:500!important;font-size:.76rem!important}
+    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
 
-    /* ── LAYOUT ── */
-    .app-layout{
-      display:grid;
-      grid-template-columns:var(--sidebar-w) 1fr;
+    /* ── MOBILE NAV BAR (capsule — identical to index.html) ── */
+    .mobile-nav-bar{
+      display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:200;
+      background:rgba(22,22,30,0.92);backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,.12);border-radius:28px;
+      padding:8px 6px;width:calc(100% - 24px);max-width:380px;
+      justify-content:space-around;align-items:center;
+      box-shadow:0 8px 40px rgba(0,0,0,.5);
+    }
+    .mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--muted);font-size:.6rem;letter-spacing:0;padding:6px 10px;border-radius:14px;transition:background .18s,color .18s;position:relative;border:none;background:none;cursor:pointer;font-family:'Onest',sans-serif}
+    .mobile-nav-item svg{width:20px;height:20px}
+    .mobile-nav-item.active{color:var(--accent2);background:rgba(108,99,255,.13)}
+    .mob-badge{position:absolute;top:2px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:.55rem;font-weight:700;display:none;align-items:center;justify-content:center}
+    .mob-badge.show{display:flex}
+
+    /* ── PAGE WRAP ── */
+    .page-wrap{
+      padding-top:calc(16px + 52px + 2.5rem);
+      padding-bottom:2.5rem;
       min-height:100vh;
-      padding-top:calc(14px + 48px + 20px);
-      max-width:1100px;
+      max-width:980px;
       margin:0 auto;
-      padding-left:1.5rem;
-      padding-right:1.5rem;
-      padding-bottom:2rem;
-      gap:1.5rem;
+      padding-left:2rem;
+      padding-right:2rem;
       position:relative;z-index:1;
     }
 
-    /* ── SIDEBAR ── */
-    .sidebar{
-      position:sticky;
-      top:calc(14px + 48px + 20px);
-      height:fit-content;
-      display:flex;flex-direction:column;gap:.5rem;
-    }
-    .sidebar-avatar-block{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:1.5rem;
-      margin-bottom:.5rem;
-      display:flex;flex-direction:column;align-items:center;
-      text-align:center;gap:.6rem;
+    /* ── SECTIONS ── */
+    .section{display:none}.section.active{display:block}
+
+    /* ── PROFILE HERO CARD ── */
+    .profile-hero{
+      background:linear-gradient(135deg,rgba(108,99,255,.1) 0%,rgba(167,139,250,.06) 50%,rgba(56,189,248,.04) 100%);
+      border:1px solid rgba(108,99,255,.2);border-radius:28px;
+      padding:2.4rem 2.5rem;margin-bottom:2rem;
+      display:flex;align-items:center;gap:2rem;flex-wrap:wrap;
       position:relative;overflow:hidden;
     }
-    .sidebar-avatar-block::before{
-      content:'';position:absolute;top:-40px;left:50%;transform:translateX(-50%);
-      width:120px;height:120px;
-      background:radial-gradient(circle,rgba(108,99,255,.2) 0%,transparent 70%);
-      pointer-events:none;
-    }
-    .sidebar-avatar{
-      width:68px;height:68px;border-radius:50%;
-      background:linear-gradient(135deg,#6c63ff,#a78bfa);
+    .profile-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(108,99,255,.18) 0%,transparent 70%);pointer-events:none}
+    .profile-avatar{
+      width:72px;height:72px;border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
       display:flex;align-items:center;justify-content:center;
-      font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.6rem;color:#fff;
-      box-shadow:0 0 0 3px rgba(108,99,255,.2),0 0 28px rgba(108,99,255,.3);
-      flex-shrink:0;position:relative;z-index:1;
+      font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.8rem;color:#fff;
+      flex-shrink:0;box-shadow:0 0 32px rgba(108,99,255,.4);
     }
-    .sidebar-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.88rem;line-height:1.3}
-    .sidebar-email{color:var(--muted);font-size:.72rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
-    .sidebar-badge{
-      display:inline-flex;align-items:center;gap:5px;
-      font-size:.65rem;color:var(--accent2);
-      background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.18);
-      padding:.2rem .6rem;border-radius:50px;
-    }
-    .nav-item{
-      display:flex;align-items:center;gap:.75rem;
-      padding:.75rem 1rem;border-radius:14px;
-      color:var(--muted);font-size:.83rem;
-      cursor:pointer;border:none;background:transparent;
-      transition:all .18s;text-decoration:none;
-      font-family:'Onest',sans-serif;font-weight:400;
-      width:100%;text-align:left;
-      position:relative;
-    }
-    .nav-item:hover{color:var(--text2);background:rgba(255,255,255,.04)}
-    .nav-item.active{
-      color:var(--text);
-      background:rgba(108,99,255,.1);
-      border:1px solid rgba(108,99,255,.15);
-    }
-    .nav-item.active .nav-item-icon{color:var(--accent2)}
-    .nav-item-icon{width:18px;height:18px;flex-shrink:0;color:var(--muted);transition:color .18s}
-    .nav-badge{
-      margin-left:auto;
-      background:var(--accent);color:#fff;
-      font-size:.6rem;font-weight:700;
-      width:18px;height:18px;border-radius:50%;
-      display:none;align-items:center;justify-content:center;
-    }
-    .nav-badge.show{display:flex}
-    .nav-divider{height:1px;background:var(--border);margin:.25rem 0}
-    .nav-logout{
-      display:flex;align-items:center;gap:.75rem;
-      padding:.7rem 1rem;border-radius:14px;
-      color:var(--muted);font-size:.8rem;
-      cursor:pointer;border:none;background:transparent;
-      transition:all .18s;font-family:'Onest',sans-serif;
-      width:100%;text-align:left;
-    }
-    .nav-logout:hover{color:var(--error);background:rgba(239,68,68,.06)}
+    .profile-info{flex:1;min-width:0}
+    .profile-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.35rem;line-height:1.2;margin-bottom:.3rem}
+    .profile-email{color:var(--muted);font-size:.82rem;margin-bottom:.6rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .profile-since{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;color:var(--accent2);background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);padding:.22rem .7rem;border-radius:50px}
 
-    /* ── MAIN CONTENT ── */
-    .main-content{min-width:0}
-    .section{display:none;animation:fadeSection .3s ease both}
-    .section.active{display:block}
-    @keyframes fadeSection{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    /* ── STATS ROW ── */
+    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+    .stat-card{
+      background:rgba(22,22,30,.7);backdrop-filter:blur(12px);
+      border:1px solid var(--border);border-radius:20px;
+      padding:1.4rem 1.2rem;text-align:center;
+      transition:border-color .2s,transform .15s;
+    }
+    .stat-card:hover{border-color:rgba(108,99,255,.25);transform:translateY(-2px)}
+    .stat-num{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2rem;line-height:1;color:var(--accent2);margin-bottom:.35rem}
+    .stat-num.blue{color:var(--accent3)}
+    .stat-num.green{color:var(--success)}
+    .stat-label{color:var(--muted);font-size:.72rem;letter-spacing:.04em}
 
-    /* ── CARDS ── */
+    /* ── GLASS CARD ── */
     .card{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:20px;
-      padding:1.6rem;
-      margin-bottom:1rem;
-      transition:border-color .2s;
+      background:rgba(22,22,30,.65);backdrop-filter:blur(16px);
+      border:1px solid var(--border);border-radius:22px;
+      padding:1.8rem;margin-bottom:1.25rem;
     }
-    .card:hover{border-color:rgba(108,99,255,.12)}
-    .card-header{
-      display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:1.3rem;gap:1rem;
-    }
-    .card-title{
-      display:flex;align-items:center;gap:.6rem;
-      font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;
-      letter-spacing:.01em;
-    }
-    .card-icon{
-      width:30px;height:30px;border-radius:9px;
-      background:rgba(108,99,255,.12);
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-    }
-    .card-icon svg{width:14px;height:14px;color:var(--accent2)}
+    .card-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem}
+    .card-title-left{display:flex;align-items:center;gap:.55rem}
+    .card-icon{width:32px;height:32px;border-radius:10px;background:rgba(108,99,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .card-icon svg{width:15px;height:15px;color:var(--accent2)}
 
-    /* ── STATS GRID ── */
-    .stats-grid{
-      display:grid;grid-template-columns:repeat(3,1fr);
-      gap:.75rem;margin-bottom:1rem;
+    /* ── CTA CARD ── */
+    .cta-card{
+      background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(167,139,250,.06));
+      border:1px solid rgba(108,99,255,.22);border-radius:22px;
+      padding:1.8rem;margin-bottom:1.25rem;
+      display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;
     }
-    .stat-tile{
-      background:var(--surface);
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:1.3rem 1rem;
-      text-align:center;
-      transition:all .18s;
-      position:relative;overflow:hidden;
-    }
-    .stat-tile::before{
-      content:'';position:absolute;top:0;left:0;right:0;height:2px;
-      background:linear-gradient(90deg,transparent,var(--tile-color,var(--accent)),transparent);
-      opacity:.5;
-    }
-    .stat-tile:hover{border-color:rgba(108,99,255,.2);transform:translateY(-2px)}
-    .stat-tile.blue{--tile-color:var(--accent3)}
-    .stat-tile.green{--tile-color:var(--success)}
-    .stat-val{
-      font-family:'Unbounded',sans-serif;font-weight:900;
-      font-size:2.2rem;line-height:1;
-      margin-bottom:.4rem;
-      background:linear-gradient(135deg,var(--tile-color,var(--accent2)),rgba(255,255,255,.7));
-      -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-    }
-    .stat-tile.blue .stat-val{background:linear-gradient(135deg,var(--accent3),rgba(255,255,255,.7));-webkit-background-clip:text;background-clip:text}
-    .stat-tile.green .stat-val{background:linear-gradient(135deg,var(--success),rgba(255,255,255,.7));-webkit-background-clip:text;background-clip:text}
-    .stat-label{color:var(--muted);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase}
-
-    /* ── QUICK ACTIONS ── */
-    .quick-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem}
-    .quick-action{
-      background:var(--surface);border:1px solid var(--border);border-radius:16px;
-      padding:1.1rem 1.2rem;display:flex;align-items:center;gap:.9rem;
-      text-decoration:none;cursor:pointer;
-      transition:all .2s;
-    }
-    .quick-action:hover{border-color:var(--border-hover);transform:translateY(-2px);background:var(--surface2)}
-    .quick-icon{
-      width:38px;height:38px;border-radius:12px;flex-shrink:0;
-      display:flex;align-items:center;justify-content:center;
-      font-size:1.1rem;
-    }
-    .quick-action-body{flex:1;min-width:0}
-    .quick-action-title{font-size:.82rem;font-weight:500;color:var(--text);margin-bottom:.1rem}
-    .quick-action-sub{font-size:.7rem;color:var(--muted)}
+    .cta-card-emoji{font-size:2rem;flex-shrink:0}
+    .cta-card-body{flex:1;min-width:0}
+    .cta-card-body h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;margin-bottom:.2rem}
+    .cta-card-body p{color:var(--muted);font-size:.8rem}
 
     /* ── ORDER CARDS ── */
-    .orders-list{display:flex;flex-direction:column;gap:.6rem}
-    .order-item{
-      background:var(--surface2);border:1px solid var(--border);border-radius:16px;
-      padding:1rem 1.2rem;transition:all .18s;
+    .orders-list{display:flex;flex-direction:column;gap:.75rem}
+    .order-card{
+      background:rgba(18,18,24,.6);backdrop-filter:blur(8px);
+      border:1px solid var(--border);border-radius:16px;
+      padding:1.1rem 1.4rem;
+      transition:border-color .2s,transform .15s;
     }
-    .order-item:hover{border-color:rgba(108,99,255,.2);background:var(--surface3)}
-    .order-top{display:flex;align-items:center;gap:.6rem;margin-bottom:.5rem;flex-wrap:wrap}
-    .order-id{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.76rem;color:var(--text)}
-    .order-row{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
-    .order-type{font-size:.76rem;color:var(--text2)}
-    .order-sep{width:3px;height:3px;border-radius:50%;background:var(--muted);flex-shrink:0}
-    .order-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.84rem;color:var(--text)}
-    .order-date{font-size:.7rem;color:var(--muted);margin-left:auto}
-    .order-desc{font-size:.76rem;color:var(--muted);margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);line-height:1.55}
-    .status-chip{
-      display:inline-flex;align-items:center;gap:.3rem;
-      padding:.18rem .55rem;border-radius:50px;font-size:.65rem;font-weight:600;flex-shrink:0;
-      margin-left:auto;
-    }
+    .order-card:hover{border-color:rgba(108,99,255,.3);transform:translateY(-1px)}
+    .order-head{display:flex;align-items:center;gap:.8rem;margin-bottom:.55rem;flex-wrap:wrap}
+    .order-id{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.78rem}
+    .order-meta-row{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+    .order-type{font-size:.78rem;color:var(--muted)}
+    .order-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.9rem}
+    .order-date{font-size:.72rem;color:var(--muted);margin-left:auto}
+    .order-desc{font-size:.78rem;color:var(--muted);margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);line-height:1.55}
+    .status-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.22rem .65rem;border-radius:50px;font-size:.68rem;font-weight:600;flex-shrink:0;margin-left:auto}
+    .status-0{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.2)}
+    .status-1{background:rgba(56,189,248,.12);color:var(--accent3);border:1px solid rgba(56,189,248,.2)}
+    .status-2{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.2)}
     .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .s0{background:rgba(245,158,11,.1);color:var(--warn);border:1px solid rgba(245,158,11,.2)}
-    .s1{background:rgba(56,189,248,.1);color:var(--accent3);border:1px solid rgba(56,189,248,.2)}
-    .s2{background:rgba(34,197,94,.1);color:var(--success);border:1px solid rgba(34,197,94,.2)}
-
-    /* ── EMPTY STATE ── */
-    .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    .empty-icon{font-size:2.4rem;margin-bottom:.8rem;opacity:.6}
-    .empty h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;color:var(--text2);margin-bottom:.3rem}
-    .empty p{font-size:.8rem;margin-bottom:1.3rem}
+    .empty-state{text-align:center;padding:3rem 1rem;color:var(--muted)}
+    .empty-icon{font-size:2.5rem;margin-bottom:.8rem}
+    .empty-state h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.95rem;color:var(--text);margin-bottom:.35rem}
+    .empty-state p{font-size:.82rem;margin-bottom:1.3rem}
 
     /* ── SECTION HEADER ── */
-    .page-header{margin-bottom:1.5rem}
-    .page-header h2{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem;margin-bottom:.25rem}
-    .page-header p{color:var(--text2);font-size:.82rem}
-    .page-header-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem}
-    .page-header-row .page-header{margin-bottom:0}
+    .section-hdr{margin-bottom:2rem}
+    .section-hdr h2{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.5rem;margin-bottom:.3rem}
+    .section-hdr p{color:var(--muted);font-size:.84rem}
+    .section-hdr-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
+    .section-hdr-row .section-hdr{margin-bottom:0}
 
     /* ── BUTTONS ── */
-    .btn{
-      display:inline-flex;align-items:center;gap:6px;
-      padding:.7rem 1.4rem;border-radius:50px;
-      font-family:'Onest',sans-serif;font-size:.82rem;font-weight:500;
-      text-decoration:none;cursor:pointer;border:none;
-      transition:transform .15s,box-shadow .2s,background .2s;
-    }
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:.75rem 1.6rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.86rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .15s,box-shadow .2s}
     .btn:hover{transform:translateY(-2px)}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(108,99,255,.28)}
-    .btn-primary:hover{box-shadow:0 6px 28px rgba(108,99,255,.45)}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(108,99,255,.3)}
+    .btn-primary:hover{box-shadow:0 6px 28px rgba(108,99,255,.48)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
     .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
-    .btn-danger{background:rgba(239,68,68,.08);color:var(--error);border:1px solid rgba(239,68,68,.18)}
-    .btn-danger:hover{background:rgba(239,68,68,.16)}
-    .btn-sm{padding:.4rem .9rem;font-size:.74rem;border-radius:50px}
-    .btn-xs{padding:.28rem .65rem;font-size:.68rem;border-radius:50px}
+    .btn-danger{background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.2)}
+    .btn-danger:hover{background:rgba(248,113,113,.2)}
+    .btn-sm{padding:.42rem .95rem;font-size:.76rem}
 
     /* ── CHAT ── */
-    .chat-container{
+    .chat-wrap{
       display:flex;flex-direction:column;
-      height:calc(100vh - 48px - 14px - 20px - 80px - 2rem);
-      min-height:440px;
-      background:var(--surface);border:1px solid var(--border);border-radius:20px;
-      overflow:hidden;
+      height:calc(100vh - 52px - 16px - 2.5rem - 80px - 2rem);
+      min-height:420px;
+      background:rgba(22,22,30,.65);backdrop-filter:blur(16px);
+      border:1px solid var(--border);border-radius:22px;overflow:hidden;
     }
-    .chat-topbar{
-      padding:.9rem 1.3rem;border-bottom:1px solid var(--border);
-      display:flex;align-items:center;gap:.85rem;flex-shrink:0;
-      background:rgba(15,15,26,.5);
-    }
-    .chat-av{
-      width:36px;height:36px;border-radius:50%;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
-      display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;
-    }
-    .chat-topbar-info h3{font-weight:500;font-size:.85rem}
-    .chat-topbar-info p{color:var(--muted);font-size:.68rem}
-    .online-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);margin-right:3px;box-shadow:0 0 6px var(--success)}
-    .chat-msgs{
-      flex:1;overflow-y:auto;
-      padding:1rem;display:flex;flex-direction:column;gap:.55rem;
-      scroll-behavior:smooth;
-    }
+    .chat-hdr{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.9rem;flex-shrink:0}
+    .chat-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .chat-hdr-info h3{font-weight:500;font-size:.88rem}
+    .chat-hdr-info p{color:var(--muted);font-size:.7rem}
+    .online-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);margin-right:3px}
+    .chat-msgs{flex:1;overflow-y:auto;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;scroll-behavior:smooth}
     .chat-msgs::-webkit-scrollbar{width:3px}
     .chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-    .msg{max-width:75%;display:flex;flex-direction:column;gap:.12rem}
+    .msg{max-width:78%;display:flex;flex-direction:column;gap:.14rem}
     .msg.mine{align-self:flex-end;align-items:flex-end}
     .msg.theirs{align-self:flex-start;align-items:flex-start}
-    .bubble{padding:.55rem .88rem;border-radius:16px;font-size:.83rem;line-height:1.5;word-break:break-word}
-    .msg.mine .bubble{
-      background:var(--accent);color:#fff;border-bottom-right-radius:4px;
-      box-shadow:0 2px 12px rgba(108,99,255,.3);
-    }
-    .msg.theirs .bubble{background:var(--surface3);color:var(--text);border-bottom-left-radius:4px}
-    .msg-time{font-size:.62rem;color:var(--muted)}
-    .msg-img{max-width:200px;max-height:190px;border-radius:10px;display:block;cursor:pointer;transition:opacity .2s}
-    .msg-img:hover{opacity:.8}
-    .msg-file{display:flex;align-items:center;gap:.4rem;background:var(--surface3);border-radius:10px;padding:.4rem .65rem;font-size:.76rem;text-decoration:none;color:var(--text);transition:background .2s}
-    .msg-file:hover{background:rgba(255,255,255,.1)}
-    .chat-input-row{
-      padding:.75rem;border-top:1px solid var(--border);
-      display:flex;gap:.5rem;align-items:flex-end;flex-shrink:0;
-    }
-    .chat-textarea{
-      flex:1;background:var(--surface2);
-      border:1px solid var(--border);border-radius:14px;
-      padding:.6rem .9rem;color:var(--text);
-      font-family:'Onest',sans-serif;font-size:.84rem;font-weight:300;
-      outline:none;resize:none;max-height:88px;
-      transition:border-color .2s;line-height:1.45;
-    }
-    .chat-textarea:focus{border-color:rgba(108,99,255,.4)}
-    .chat-textarea::placeholder{color:var(--muted)}
-    .chat-btn{
-      width:38px;height:38px;border-radius:12px;border:1px solid var(--border);
-      background:var(--surface2);color:var(--muted);cursor:pointer;
-      display:flex;align-items:center;justify-content:center;flex-shrink:0;
-      transition:all .18s;
-    }
-    .chat-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-    .chat-btn.send{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 3px 14px rgba(108,99,255,.35)}
-    .chat-btn.send:hover{box-shadow:0 4px 20px rgba(108,99,255,.5)}
-    .chat-btn svg{width:15px;height:15px}
+    .msg-bubble{padding:.58rem .9rem;border-radius:14px;font-size:.84rem;line-height:1.5;word-break:break-word}
+    .msg.mine .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+    .msg.theirs .msg-bubble{background:rgba(255,255,255,.07);color:var(--text);border-bottom-left-radius:4px}
+    .msg-time{font-size:.63rem;color:var(--muted)}
+    .msg-img{max-width:220px;max-height:200px;border-radius:10px;display:block;cursor:pointer;transition:opacity .2s}
+    .msg-img:hover{opacity:.85}
+    .msg-file-link{display:flex;align-items:center;gap:.48rem;background:rgba(255,255,255,.08);border-radius:10px;padding:.45rem .7rem;font-size:.78rem;text-decoration:none;color:var(--text);transition:background .2s}
+    .msg-file-link:hover{background:rgba(255,255,255,.15)}
+    .chat-row{padding:.75rem 1rem;border-top:1px solid var(--border);display:flex;gap:.55rem;align-items:flex-end;flex-shrink:0}
+    .chat-textarea{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:.6rem .9rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.86rem;font-weight:300;outline:none;resize:none;max-height:90px;transition:border-color .2s;line-height:1.45}
+    .chat-textarea:focus{border-color:var(--accent)}
+    .chat-icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
+    .chat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+    .chat-send{background:var(--accent);border:none;color:#fff}
+    .chat-send:hover{box-shadow:0 3px 16px rgba(108,99,255,.45)}
+    .chat-icon-btn svg{width:15px;height:15px}
+
+    /* ── LIGHTBOX ── */
+    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+    .lightbox.show{opacity:1;pointer-events:all}
+    .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+    .lightbox-close{position:fixed;top:1.2rem;right:1.5rem;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.4rem;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+    .lightbox-close:hover{background:rgba(255,255,255,.25)}
 
     /* ── SETTINGS ── */
-    .form-group{margin-bottom:1rem}
-    .form-label{display:block;font-size:.67rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
-    .form-input{
-      width:100%;background:var(--surface2);
-      border:1px solid var(--border);border-radius:12px;
-      padding:.72rem 1rem;color:var(--text);
-      font-family:'Onest',sans-serif;font-size:.86rem;font-weight:300;
-      outline:none;transition:border-color .2s,box-shadow .2s;
-    }
-    .form-input:focus{border-color:rgba(108,99,255,.45);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
-    .form-input:disabled{opacity:.3;cursor:default}
+    .form-group{margin-bottom:1.1rem}
+    .form-label{display:block;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+    .form-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s,box-shadow .2s}
+    .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.12)}
+    .form-input:disabled{opacity:.38;cursor:default}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-
-    /* ── PROFILE COMPLETION ── */
-    .completion-bar-wrap{
-      background:var(--surface2);border-radius:50px;height:4px;
-      margin:1rem 0 .4rem;overflow:hidden;
-    }
-    .completion-bar-fill{
-      height:100%;border-radius:50px;
-      background:linear-gradient(90deg,var(--accent),var(--accent2));
-      transition:width .6s ease;
-    }
-
-    /* ── TOGGLE ── */
-    .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:.8rem 0;border-bottom:1px solid var(--border)}
-    .toggle-row:last-child{border-bottom:none;padding-bottom:0}
-    .toggle-info h4{font-size:.84rem;font-weight:400;margin-bottom:.15rem}
-    .toggle-info p{font-size:.74rem;color:var(--muted)}
-    .toggle{
-      width:44px;height:24px;background:var(--surface3);border-radius:50px;
-      position:relative;cursor:pointer;flex-shrink:0;
-      border:1px solid var(--border);transition:background .2s,border-color .2s;
-    }
-    .toggle.on{background:var(--accent);border-color:var(--accent)}
-    .toggle::after{
-      content:'';position:absolute;top:2px;left:2px;
-      width:18px;height:18px;background:#fff;border-radius:50%;
-      transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.4);
-    }
-    .toggle.on::after{transform:translateX(20px)}
 
     /* ── DANGER ZONE ── */
     .danger-card{
-      background:rgba(239,68,68,.03);
-      border:1px solid rgba(239,68,68,.14);border-radius:20px;
-      padding:1.6rem;margin-bottom:1rem;
+      background:rgba(248,113,113,.04);
+      border:1px solid rgba(248,113,113,.18);border-radius:22px;
+      padding:1.8rem;margin-bottom:1.25rem;
     }
     .danger-card .card-title{color:var(--error)}
-    .danger-row{
-      display:flex;align-items:center;justify-content:space-between;
-      flex-wrap:wrap;gap:.8rem;padding:.9rem 0;
-      border-bottom:1px solid rgba(239,68,68,.08);
-    }
-    .danger-row:last-child{border-bottom:none;padding-bottom:0}
-    .danger-info h4{font-size:.84rem;font-weight:400;margin-bottom:.18rem}
-    .danger-info p{font-size:.74rem;color:var(--muted)}
+    .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(248,113,113,.1);margin-bottom:1rem}
+    .danger-row:last-child{padding-bottom:0;border-bottom:none;margin-bottom:0}
+    .danger-row-info h4{font-size:.86rem;font-weight:500;margin-bottom:.2rem}
+    .danger-row-info p{font-size:.78rem;color:var(--muted)}
 
     /* ── MODAL ── */
-    .modal-overlay{
-      position:fixed;inset:0;z-index:900;
-      background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
-      display:flex;align-items:center;justify-content:center;padding:1.5rem;
-      opacity:0;pointer-events:none;transition:opacity .2s;
-    }
+    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
     .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{
-      background:var(--surface);border:1px solid rgba(239,68,68,.2);
-      border-radius:24px;padding:2rem;max-width:420px;width:100%;
-      transform:translateY(16px);transition:transform .25s;
-    }
+    .modal{background:var(--bg2);border:1px solid rgba(248,113,113,.25);border-radius:24px;padding:2rem;max-width:420px;width:100%;transform:translateY(16px);transition:transform .2s}
     .modal-overlay.show .modal{transform:translateY(0)}
-    .modal-icon{font-size:2.4rem;margin-bottom:.8rem;text-align:center}
-    .modal h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.5rem;text-align:center}
-    .modal p{color:var(--text2);font-size:.82rem;line-height:1.65;text-align:center;margin-bottom:1.4rem}
-    .modal-btns{display:flex;gap:.6rem}
+    .modal-icon{font-size:2.5rem;margin-bottom:.8rem;text-align:center}
+    .modal h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:.6rem;text-align:center}
+    .modal p{color:var(--muted);font-size:.84rem;line-height:1.6;text-align:center;margin-bottom:1.5rem}
+    .modal-confirm-input{width:100%;margin-bottom:1.2rem}
+    .modal-btns{display:flex;gap:.75rem}
     .modal-btns .btn{flex:1;justify-content:center}
 
-    /* ── LIGHTBOX ── */
-    .lightbox{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-    .lightbox.show{opacity:1;pointer-events:all}
-    .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;object-fit:contain}
-    .lightbox-close{position:fixed;top:1.2rem;right:1.4rem;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.2rem;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
     /* ── TOAST ── */
-    .toast{
-      position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(10px);
-      z-index:700;padding:.55rem 1.3rem;border-radius:50px;
-      font-size:.76rem;font-weight:500;
-      opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap;
-    }
+    .toast{position:fixed;bottom:calc(var(--mobnav-h) + 1rem);left:50%;transform:translateX(-50%) translateY(20px);z-index:600;padding:.6rem 1.3rem;border-radius:50px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--success);color:#000}
     .toast.error{background:var(--error);color:#fff}
     .toast.info{background:var(--accent);color:#fff}
 
-    /* ── CTA BANNER ── */
-    .cta-banner{
-      background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(56,189,248,.05));
-      border:1px solid rgba(108,99,255,.18);border-radius:20px;
-      padding:1.4rem 1.5rem;
-      display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;
-      margin-bottom:1rem;
-    }
-    .cta-emoji{font-size:1.8rem;flex-shrink:0}
-    .cta-body{flex:1;min-width:0}
-    .cta-body h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.85rem;margin-bottom:.2rem}
-    .cta-body p{color:var(--text2);font-size:.78rem}
+    /* ── MAINTENANCE ── */
+    .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;text-align:center;padding:2rem}
+    .maint-icon{font-size:3.5rem}
+    .maint-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem}
+    .maint-sub{color:var(--muted);font-size:.9rem;max-width:380px;line-height:1.6}
 
-    /* ── MOBILE NAV ── */
-    .mobile-nav{
-      display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:200;
-      background:rgba(12,12,22,.92);backdrop-filter:blur(24px);
-      border:1px solid rgba(255,255,255,.1);border-radius:26px;
-      padding:6px 4px;width:calc(100% - 24px);max-width:390px;
-      justify-content:space-around;align-items:center;
-      box-shadow:0 8px 40px rgba(0,0,0,.6);
-    }
-    .mob-item{
-      display:flex;flex-direction:column;align-items:center;gap:2px;
-      text-decoration:none;color:var(--muted);font-size:.58rem;letter-spacing:.02em;
-      padding:7px 12px;border-radius:16px;transition:all .18s;
-      position:relative;border:none;background:none;cursor:pointer;
-      font-family:'Onest',sans-serif;
-    }
-    .mob-item svg{width:20px;height:20px}
-    .mob-item.active{color:var(--accent2);background:rgba(108,99,255,.12)}
-    .mob-badge{position:absolute;top:2px;right:6px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:.55rem;font-weight:700;display:none;align-items:center;justify-content:center}
-    .mob-badge.show{display:flex}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .5s ease both}
 
-    /* ── RESPONSIVE ── */
+    /* ── MOBILE ── */
     @media(max-width:1024px){
       nav.desktop-nav{display:none!important}
-      .mobile-nav{display:flex!important}
-      .app-layout{
-        grid-template-columns:1fr;
-        padding-top:1.25rem;
-        padding-bottom:calc(12px + 64px + 1rem);
+      .mobile-nav-bar{display:flex!important}
+      .page-wrap{
+        padding-top:1.5rem;
+        padding-bottom:calc(var(--mobnav-h) + 2rem);
         padding-left:1rem;padding-right:1rem;
-        gap:0;
       }
-      .sidebar{display:none!important}
-      .stats-grid{grid-template-columns:1fr 1fr}
-      .stats-grid .stat-tile:last-child{grid-column:span 2}
+      .chat-wrap{height:calc(100svh - var(--mobnav-h) - 1.5rem - 140px);min-height:340px}
+      .stats-row{grid-template-columns:1fr 1fr}
+      .stats-row .stat-card:last-child{grid-column:span 2}
       .form-row{grid-template-columns:1fr}
-      .chat-container{height:calc(100svh - 64px - 12px - 1.25rem - 120px);min-height:360px}
-      .toast{bottom:calc(64px + 12px + 1rem)}
-      .quick-row{grid-template-columns:1fr 1fr}
+      .profile-hero{padding:1.6rem;gap:1.2rem}
+      .profile-avatar{width:56px;height:56px;font-size:1.4rem}
+      .profile-name{font-size:1.1rem}
+      .toast{bottom:calc(var(--mobnav-h) + 2rem)}
     }
     @media(max-width:480px){
-      .quick-row{grid-template-columns:1fr}
-      .stats-grid{grid-template-columns:1fr 1fr}
-      .order-date{margin-left:0;flex-basis:100%}
-      .page-header h2{font-size:1.1rem}
+      .section-hdr h2{font-size:1.25rem}
+      .stats-row{grid-template-columns:1fr 1fr}
     }
   </style>
 </head>
 <body>
 
-<!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
-  <div class="loading-logo">
-    <div class="loading-dot"></div>
-    Design Antviz
-  </div>
-  <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+  <div class="spinner"></div>
+  <p style="color:var(--muted);font-size:.8rem">Загрузка...</p>
 </div>
 
-<!-- MAINTENANCE -->
 <div class="maint-screen" id="maintScreen" style="display:none">
   <div class="maint-icon">🔧</div>
   <div class="maint-title">Технические работы</div>
-  <div class="maint-sub">Временно недоступно. Уже работаем — скоро всё будет готово!</div>
+  <div class="maint-sub">Сайт временно недоступен. Уже работаем — скоро всё будет готово!</div>
 </div>
 
-<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
   <img id="lightboxImg" src="" alt=""/>
 </div>
 
-<!-- DELETE MODAL -->
+<!-- DELETE ACCOUNT MODAL -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal">
     <div class="modal-icon">⚠️</div>
     <h3>Удалить аккаунт?</h3>
-    <p>Это действие необратимо. Все заказы и история чата будут удалены навсегда. Введите ваш email для подтверждения:</p>
-    <input class="form-input" id="deleteConfirmInput" type="email" placeholder="Ваш email" style="margin-bottom:1.2rem"/>
+    <p>Это действие необратимо. Все ваши заказы и история чата будут удалены навсегда. Введите ваш email для подтверждения:</p>
+    <input class="form-input modal-confirm-input" id="deleteConfirmInput" type="email" placeholder="Ваш email"/>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeDeleteModal()">Отмена</button>
       <button class="btn btn-danger" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">Удалить</button>
@@ -602,301 +331,208 @@
     <a href="index.html">Главная</a>
     <a href="order.html">Заказать</a>
     <a href="faq.html">FAQ</a>
-    <a href="profile.html" class="active">Кабинет</a>
+    <a href="profile.html" class="active" style="color:var(--text)">Кабинет</a>
     <a href="order.html" class="nav-cta">Заказать сайт</a>
   </div>
 </nav>
 
-<!-- MOBILE NAV -->
-<nav class="mobile-nav">
-  <a href="index.html" class="mob-item">
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav-bar">
+  <a href="index.html" class="mobile-nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
     Главная
   </a>
-  <button class="mob-item active" onclick="showSection('dashboard')" id="mnav-dashboard">
+  <button class="mobile-nav-item active" onclick="showSection('dashboard')" id="mnav-dashboard">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>
     Кабинет
   </button>
-  <a href="order.html" class="mob-item">
+  <a href="order.html" class="mobile-nav-item">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
     Заказать
   </a>
-  <button class="mob-item" onclick="showSection('support')" id="mnav-support">
+  <button class="mobile-nav-item" onclick="showSection('support')" id="mnav-support">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-    <span class="mob-badge" id="mobChatBadge"></span>
     Чат
   </button>
-  <button class="mob-item" onclick="showSection('settings')" id="mnav-settings">
+  <button class="mobile-nav-item" onclick="showSection('settings')" id="mnav-settings">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
     Профиль
   </button>
 </nav>
 
-<!-- APP -->
-<div class="app-layout" id="appWrap" style="display:none">
+<!-- MAIN APP -->
+<div class="page-wrap" id="appWrap" style="display:none">
 
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sidebar-avatar-block">
-      <div class="sidebar-avatar" id="sideAvatar">А</div>
-      <div class="sidebar-name" id="sideName">...</div>
-      <div class="sidebar-email" id="sideEmail">...</div>
-      <div class="sidebar-badge">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-        Верифицирован
+  <!-- ── DASHBOARD ── -->
+  <div class="section active fade-up" id="section-dashboard">
+
+    <div class="profile-hero">
+      <div class="profile-avatar" id="heroAvatar">А</div>
+      <div class="profile-info">
+        <div class="profile-name" id="heroName">...</div>
+        <div class="profile-email" id="heroEmail">...</div>
+        <div class="profile-since" id="heroSince">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          Клиент Design Antviz
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="showSection('settings')">Настройки</button>
+        <button class="btn btn-sm" style="background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.18)" onclick="doLogout()">Выйти</button>
       </div>
     </div>
 
-    <button class="nav-item active" onclick="showSection('dashboard')" id="snav-dashboard">
-      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>
-      Дашборд
-    </button>
-    <button class="nav-item" onclick="showSection('orders')" id="snav-orders">
-      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-      Мои заказы
-    </button>
-    <button class="nav-item" onclick="showSection('support')" id="snav-support">
-      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Чат поддержки
-      <span class="nav-badge" id="navChatBadge"></span>
-    </button>
-    <button class="nav-item" onclick="showSection('settings')" id="snav-settings">
-      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      Настройки
-    </button>
-
-    <div class="nav-divider"></div>
-
-    <a href="order.html" class="nav-item" style="color:var(--accent2)">
-      <svg class="nav-item-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--accent2)"><path d="M12 5v14M5 12h14"/></svg>
-      Новый заказ
-    </a>
-
-    <div class="nav-divider"></div>
-
-    <button class="nav-logout" onclick="doLogout()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      Выйти из аккаунта
-    </button>
-  </aside>
-
-  <!-- MAIN -->
-  <main class="main-content">
-
-    <!-- DASHBOARD -->
-    <div class="section active" id="section-dashboard">
-      <div class="page-header">
-        <h2 id="heroGreeting">Добро пожаловать 👋</h2>
-        <p style="color:var(--text2);font-size:.82rem" id="heroEmail">...</p>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-num" id="statTotal">—</div>
+        <div class="stat-label">Всего заказов</div>
       </div>
-
-      <div class="stats-grid">
-        <div class="stat-tile">
-          <div class="stat-val" id="statTotal">—</div>
-          <div class="stat-label">Всего заказов</div>
-        </div>
-        <div class="stat-tile blue">
-          <div class="stat-val" id="statActive">—</div>
-          <div class="stat-label">В работе</div>
-        </div>
-        <div class="stat-tile green">
-          <div class="stat-val" id="statDone">—</div>
-          <div class="stat-label">Завершено</div>
-        </div>
+      <div class="stat-card">
+        <div class="stat-num blue" id="statActive">—</div>
+        <div class="stat-label">В работе</div>
       </div>
-
-      <div class="quick-row">
-        <a href="order.html" class="quick-action">
-          <div class="quick-icon" style="background:rgba(108,99,255,.12)">🚀</div>
-          <div class="quick-action-body">
-            <div class="quick-action-title">Новый заказ</div>
-            <div class="quick-action-sub">Оформить за 2 мин</div>
-          </div>
-        </a>
-        <div class="quick-action" onclick="showSection('support')">
-          <div class="quick-icon" style="background:rgba(56,189,248,.1)">💬</div>
-          <div class="quick-action-body">
-            <div class="quick-action-title">Написать нам</div>
-            <div class="quick-action-sub">Ответим за час</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
-            Последние заказы
-          </div>
-          <button class="btn btn-ghost btn-xs" onclick="showSection('orders')">Все →</button>
-        </div>
-        <div class="orders-list" id="dashOrders">
-          <p style="color:var(--muted);font-size:.8rem">Загрузка...</p>
-        </div>
-      </div>
-
-      <div class="cta-banner">
-        <div class="cta-emoji">✨</div>
-        <div class="cta-body">
-          <h3>Готовы к новому проекту?</h3>
-          <p>Создаём сайты под ключ — ответим в течение часа</p>
-        </div>
-        <a href="order.html" class="btn btn-primary btn-sm">Заказать</a>
+      <div class="stat-card">
+        <div class="stat-num green" id="statDone">—</div>
+        <div class="stat-label">Завершено</div>
       </div>
     </div>
 
-    <!-- ORDERS -->
-    <div class="section" id="section-orders">
-      <div class="page-header-row">
-        <div class="page-header">
-          <h2>Мои заказы</h2>
-          <p>История всех ваших заявок</p>
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-left">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+          Последние заказы
         </div>
-        <a href="order.html" class="btn btn-primary btn-sm" style="align-self:flex-start">+ Новый заказ</a>
+        <button class="btn btn-ghost btn-sm" onclick="showSection('orders')">Все заказы →</button>
       </div>
-      <div class="orders-list" id="ordersList">
-        <p style="color:var(--muted);font-size:.8rem;padding:.5rem">Загрузка...</p>
-      </div>
-    </div>
-
-    <!-- SUPPORT -->
-    <div class="section" id="section-support">
-      <div class="page-header" style="margin-bottom:1rem">
-        <h2>Чат поддержки</h2>
-        <p>Задайте вопрос — ответим как можно скорее. Можно прикрепить файлы и изображения.</p>
-      </div>
-      <div class="chat-container">
-        <div class="chat-topbar">
-          <div class="chat-av">🛠</div>
-          <div class="chat-topbar-info">
-            <h3>Команда Design Antviz</h3>
-            <p><span class="online-dot"></span>Служба поддержки</p>
-          </div>
-        </div>
-        <div class="chat-msgs" id="chatMsgs"></div>
-        <div class="chat-input-row">
-          <input type="file" id="fileInput" style="display:none" multiple accept="image/*,.pdf,.doc,.docx,.zip,.rar,.psd,.fig" onchange="sendFiles(this.files)"/>
-          <button class="chat-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить файл">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-          </button>
-          <textarea class="chat-textarea" id="chatInput" placeholder="Напишите сообщение..." rows="1"
-            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
-            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,88)+'px'"></textarea>
-          <button class="chat-btn send" onclick="sendMsg()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
+      <div class="orders-list" id="dashOrders">
+        <p style="color:var(--muted);font-size:.82rem">Загрузка...</p>
       </div>
     </div>
 
-    <!-- SETTINGS -->
-    <div class="section" id="section-settings">
-      <div class="page-header">
-        <h2>Настройки профиля</h2>
-        <p>Управляйте аккаунтом и предпочтениями</p>
+    <div class="cta-card">
+      <div class="cta-card-emoji">🚀</div>
+      <div class="cta-card-body">
+        <h3>Готовы к новому проекту?</h3>
+        <p>Оформите заказ — ответим в течение часа</p>
       </div>
+      <a href="order.html" class="btn btn-primary btn-sm">Заказать</a>
+    </div>
 
-      <!-- PROFILE CARD -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-            Личные данные
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">Имя</label>
-            <input class="form-input" type="text" id="settingName"/>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input class="form-input" id="settingEmail" disabled/>
-          </div>
-        </div>
-        <div style="margin-bottom:1rem">
-          <label class="form-label">Заполненность профиля</label>
-          <div class="completion-bar-wrap">
-            <div class="completion-bar-fill" id="completionBar" style="width:60%"></div>
-          </div>
-          <p style="font-size:.7rem;color:var(--muted)" id="completionText">60% — добавьте телефон для полного профиля</p>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="saveSettings()">Сохранить изменения</button>
+  </div>
+
+  <!-- ── ORDERS ── -->
+  <div class="section" id="section-orders">
+    <div class="section-hdr-row">
+      <div class="section-hdr">
+        <h2>Мои заказы</h2>
+        <p>История всех ваших заявок</p>
       </div>
+      <a href="order.html" class="btn btn-primary btn-sm" style="align-self:flex-start">+ Новый заказ</a>
+    </div>
+    <div class="orders-list" id="ordersList">
+      <p style="color:var(--muted);font-size:.82rem;padding:.5rem">Загрузка...</p>
+    </div>
+  </div>
 
-      <!-- NOTIFICATIONS CARD -->
-      <div class="card" style="border-color:rgba(108,99,255,.15)">
-        <div class="card-header">
-          <div class="card-title">
-            <div class="card-icon" style="background:rgba(108,99,255,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
-            Уведомления
-          </div>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <h4>Push-уведомления</h4>
-            <p>Статусы заказов и сообщения от поддержки</p>
-          </div>
-          <div class="toggle" id="pushToggle" onclick="handlePushToggle()"></div>
+  <!-- ── SUPPORT ── -->
+  <div class="section" id="section-support">
+    <div class="section-hdr" style="margin-bottom:1.4rem">
+      <h2>Чат поддержки</h2>
+      <p>Задайте вопрос — ответим как можно скорее. Можно прикрепить файлы и изображения.</p>
+    </div>
+    <div class="chat-wrap" id="chatWrap">
+      <div class="chat-hdr">
+        <div class="chat-av">🛠</div>
+        <div class="chat-hdr-info">
+          <h3>Команда Design Antviz</h3>
+          <p><span class="online-dot"></span>Служба поддержки</p>
         </div>
       </div>
+      <div class="chat-msgs" id="chatMsgs"></div>
+      <div class="chat-row">
+        <input type="file" id="fileInput" style="display:none" multiple accept="image/*,.pdf,.doc,.docx,.zip,.rar,.psd,.fig" onchange="sendFiles(this.files)"/>
+        <button class="chat-icon-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить файл">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <textarea class="chat-textarea" id="chatInput" placeholder="Напишите сообщение..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+        <button class="chat-icon-btn chat-send" onclick="sendMsg()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
-      <!-- APPEARANCE CARD -->
-      <div class="card">
-        <div class="card-header">
-          <div class="card-title">
-            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
-            Внешний вид
-          </div>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <h4>Анимации интерфейса</h4>
-            <p>Плавные переходы и эффекты</p>
-          </div>
-          <div class="toggle on" id="animToggle" onclick="this.classList.toggle('on')"></div>
-        </div>
-        <div class="toggle-row">
-          <div class="toggle-info">
-            <h4>Компактный режим</h4>
-            <p>Уменьшить отступы и размеры</p>
-          </div>
-          <div class="toggle" id="compactToggle" onclick="this.classList.toggle('on')"></div>
+  <!-- ── SETTINGS ── -->
+  <div class="section" id="section-settings">
+    <div class="section-hdr">
+      <h2>Настройки профиля</h2>
+      <p>Управляйте своим аккаунтом</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-left">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          Личные данные
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Имя</label>
+          <input class="form-input" type="text" id="settingName"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input class="form-input" id="settingEmail" disabled/>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Сохранить изменения</button>
+    </div>
 
-      <!-- DANGER ZONE -->
-      <div class="danger-card">
-        <div class="card-title" style="color:var(--error);margin-bottom:1rem">
-          <div class="card-icon" style="background:rgba(239,68,68,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:var(--error)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-          Опасная зона
+    <div class="card" style="border-color:rgba(108,99,255,.2)">
+      <div class="card-title">
+        <div class="card-title-left">
+          <div class="card-icon" style="background:rgba(108,99,255,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+          🔔 Уведомления
         </div>
-        <div class="danger-row">
-          <div class="danger-info">
-            <h4>Выйти из аккаунта</h4>
-            <p>Завершить текущую сессию на этом устройстве</p>
-          </div>
-          <button class="btn btn-danger btn-sm" onclick="doLogout()">Выйти</button>
+      </div>
+      <p style="color:var(--muted);font-size:.82rem;margin-bottom:1.1rem;line-height:1.6">Получайте push-уведомления об изменении статуса заказов и новых сообщениях от поддержки — даже когда вкладка закрыта.</p>
+      <button class="btn btn-primary btn-sm" onclick="requestPushPermission()" id="pushBtn">Включить уведомления</button>
+    </div>
+
+    <div class="danger-card">
+      <div class="card-title" style="color:var(--error);margin-bottom:1rem">Опасная зона</div>
+
+      <div class="danger-row">
+        <div class="danger-row-info">
+          <h4>Выйти из аккаунта</h4>
+          <p>Завершить текущую сессию на этом устройстве</p>
         </div>
-        <div class="danger-row">
-          <div class="danger-info">
-            <h4>Удалить аккаунт</h4>
-            <p>Безвозвратно удалить аккаунт, заказы и историю чата</p>
-          </div>
-          <button class="btn btn-danger btn-sm" onclick="openDeleteModal()">Удалить аккаунт</button>
+        <button class="btn btn-danger btn-sm" onclick="doLogout()">Выйти</button>
+      </div>
+
+      <div class="danger-row">
+        <div class="danger-row-info">
+          <h4>Удалить аккаунт</h4>
+          <p>Безвозвратно удалить аккаунт, все заказы и историю чата</p>
         </div>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteModal()">Удалить аккаунт</button>
       </div>
     </div>
 
-  </main>
-</div><!-- /app-layout -->
+  </div>
+
+</div><!-- /page-wrap -->
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
   import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
   import {
-    onAuthStateChanged, signOut, updateProfile, deleteUser
+    onAuthStateChanged, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import {
     collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
@@ -904,7 +540,7 @@
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let currentUser = null, unsubOrders = null, unsubChat = null;
-  let lastOrderStatuses = {}, unreadChat = 0, chatOpen = false;
+  let lastOrderStatuses = {}, lastChatAdminCount = 0;
 
   /* ── UTILS ── */
   function toast(msg, type='info'){
@@ -938,29 +574,13 @@
   /* ── SECTION NAV ── */
   window.showSection = function(name){
     document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.mob-item,.nav-item').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.mobile-nav-item').forEach(b=>b.classList.remove('active'));
     const sec=document.getElementById('section-'+name);
-    if(sec) sec.classList.add('active');
+    if(sec){ sec.classList.add('active'); sec.classList.add('fade-up'); }
     const mb=document.getElementById('mnav-'+name);
     if(mb) mb.classList.add('active');
-    const sb=document.getElementById('snav-'+name);
-    if(sb) sb.classList.add('active');
     window.scrollTo({top:0,behavior:'smooth'});
-    if(name==='support'){
-      chatOpen=true;
-      setUnread(0);
-    } else {
-      chatOpen=false;
-    }
   };
-
-  function setUnread(n){
-    unreadChat=n;
-    const nb=document.getElementById('navChatBadge');
-    const mb=document.getElementById('mobChatBadge');
-    if(nb){ nb.textContent=n||''; nb.classList.toggle('show',n>0); }
-    if(mb){ mb.textContent=n||''; mb.classList.toggle('show',n>0); }
-  }
 
   /* ── MAINTENANCE ── */
   async function checkMaintenance(){
@@ -978,14 +598,13 @@
   /* ── ORDER CARD ── */
   function orderCard(o, mini=false){
     const s=o.status||0;
-    return`<div class="order-item">
-      <div class="order-top">
+    return`<div class="order-card">
+      <div class="order-head">
         <span class="order-id">№ ${o.id.slice(0,8).toUpperCase()}</span>
-        <span class="status-chip s${s}"><span class="status-dot"></span>${statusLabels[s]}</span>
+        <span class="status-badge status-${s}"><span class="status-dot"></span>${statusLabels[s]}</span>
       </div>
-      <div class="order-row">
+      <div class="order-meta-row">
         <span class="order-type">${o.siteType||'Сайт'} · ${o.tariff||'Стандарт'}</span>
-        <span class="order-sep"></span>
         <span class="order-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
         <span class="order-date">${fmtDate(o.createdAt)}</span>
       </div>
@@ -996,10 +615,10 @@
   function renderOrders(orders, id, limit=999){
     const el=document.getElementById(id);
     if(!orders.length){
-      el.innerHTML=`<div class="empty">
+      el.innerHTML=`<div class="empty-state">
         <div class="empty-icon">📋</div>
         <h3>Заказов пока нет</h3>
-        <p>Оформите первый — займёт 2 минуты</p>
+        <p>Оформите первый заказ — займёт 2 минуты</p>
         <a href="order.html" class="btn btn-primary btn-sm">Заказать сайт</a>
       </div>`;
       return;
@@ -1007,9 +626,18 @@
     el.innerHTML=orders.slice(0,limit).map(o=>orderCard(o,id==='dashOrders')).join('');
   }
 
+  /* ── LOAD ORDERS ──
+     ВАЖНО: В Firestore нужен составной индекс:
+     Коллекция: orders | Поля: uid ASC, createdAt DESC
+     Ссылка для создания будет в консоли браузера при первом запросе.
+  ── */
   function loadOrders(uid){
     if(unsubOrders) unsubOrders();
-    const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
+    const q=query(
+      collection(db,'orders'),
+      where('uid','==',uid),
+      orderBy('createdAt','desc')
+    );
     unsubOrders=onSnapshot(q, snap=>{
       const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
       document.getElementById('statTotal').textContent=orders.length;
@@ -1019,8 +647,9 @@
       renderOrders(orders,'ordersList');
     }, err=>{
       console.error('Orders error:',err);
+      // Если ошибка индекса — Firestore выкинет ссылку в консоль автоматически
       if(err.code==='failed-precondition'){
-        console.warn('Нужен индекс Firestore: orders → uid ASC + createdAt DESC');
+        console.warn('Нужен составной индекс Firestore: orders → uid ASC + createdAt DESC. Ссылка выше.');
         toast('Ошибка индекса БД. Смотри консоль.','error');
       }
     });
@@ -1038,10 +667,10 @@
       if(isImg){
         div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||'img'}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')" /><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
       } else {
-        div.innerHTML=`<a class="msg-file" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+        div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
       }
     } else {
-      div.innerHTML=`<div class="bubble">${m.text||''}</div><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+      div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
     }
     container.appendChild(div);
     container.scrollTop=container.scrollHeight;
@@ -1050,19 +679,12 @@
   function loadChat(uid){
     if(unsubChat) unsubChat();
     const container=document.getElementById('chatMsgs');
-    container.innerHTML=`<div class="msg theirs"><div class="bubble">Привет! 👋 Задайте любой вопрос по заказу или нашим услугам.</div><div class="msg-time">Design Antviz</div></div>`;
+    container.innerHTML=`<div class="msg theirs"><div class="msg-bubble">Привет! 👋 Задайте любой вопрос по заказу или нашим услугам.</div><div class="msg-time">Design Antviz</div></div>`;
     const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
-    let init=true;
     unsubChat=onSnapshot(q, snap=>{
       snap.docChanges().forEach(change=>{
-        if(change.type==='added'){
-          appendMsg(change.doc.data());
-          if(!init&&change.doc.data().sender==='admin'&&!chatOpen){
-            setUnread(unreadChat+1);
-          }
-        }
+        if(change.type==='added') appendMsg(change.doc.data());
       });
-      if(init) init=false;
     }, err=>console.error('Chat error:',err));
   }
 
@@ -1108,9 +730,8 @@
     try{
       await updateProfile(currentUser,{displayName:name});
       await updateDoc(doc(db,'users',currentUser.uid),{name}).catch(()=>{});
-      document.getElementById('sideAvatar').textContent=name[0].toUpperCase();
-      document.getElementById('sideName').textContent=name;
-      document.getElementById('heroGreeting').textContent='Привет, '+name+' 👋';
+      document.getElementById('heroName').textContent=name;
+      document.getElementById('heroAvatar').textContent=name[0].toUpperCase();
       toast('Сохранено ✓','success');
     }catch(e){ toast('Ошибка сохранения','error'); }
   };
@@ -1122,22 +743,62 @@
     window.location.href='auth.html';
   };
 
-  /* ── PUSH ── */
-  window.handlePushToggle=async function(){
-    if(!('Notification' in window)){ toast('Браузер не поддерживает уведомления','error'); return; }
-    const tog=document.getElementById('pushToggle');
-    if(Notification.permission==='granted'){
-      tog.classList.toggle('on');
-      toast(tog.classList.contains('on')?'Уведомления включены ✓':'Уведомления выключены','info');
-      return;
+  /* ── DELETE ACCOUNT ── */
+  window.openDeleteModal=function(){
+    document.getElementById('deleteConfirmInput').value='';
+    document.getElementById('deleteModal').classList.add('show');
+    setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),200);
+  };
+  window.closeDeleteModal=function(){
+    document.getElementById('deleteModal').classList.remove('show');
+  };
+  window.confirmDeleteAccount=async function(){
+    if(!currentUser) return;
+    const inputEmail=document.getElementById('deleteConfirmInput').value.trim();
+    if(inputEmail!==currentUser.email){
+      toast('Email не совпадает','error'); return;
     }
+    const btn=document.getElementById('deleteConfirmBtn');
+    btn.textContent='Удаляю...'; btn.disabled=true;
+    try{
+      // 1. Удалить все заказы пользователя
+      const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
+      for(const d of ordSnap.docs) await deleteDoc(d.ref).catch(()=>{});
+
+      // 2. Удалить сообщения чата
+      const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
+      for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});
+      await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
+
+      // 3. Удалить профиль пользователя из users
+      await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
+
+      // 4. Удалить Firebase Auth аккаунт
+      await deleteUser(currentUser);
+
+      window.location.href='auth.html';
+    }catch(e){
+      console.error('Delete account error:',e);
+      if(e.code==='auth/requires-recent-login'){
+        toast('Выйдите и войдите снова, затем повторите','error');
+      } else {
+        toast('Ошибка удаления. Попробуйте позже.','error');
+      }
+      btn.textContent='Удалить'; btn.disabled=false;
+    }
+  };
+
+  /* ── PUSH NOTIFICATIONS ── */
+  window.requestPushPermission=async function(){
+    if(!('Notification' in window)){ toast('Браузер не поддерживает уведомления','error'); return; }
+    if(Notification.permission==='granted'){ toast('Уведомления уже включены ✓','success'); return; }
     const perm=await Notification.requestPermission();
     if(perm==='granted'){
-      tog.classList.add('on');
       toast('Уведомления включены ✓','success');
+      document.getElementById('pushBtn').textContent='Уведомления включены ✓';
       sendNotif('Design Antviz','Уведомления включены! Будете в курсе статуса заказов 👋');
     } else {
-      toast('Разрешение отклонено','error');
+      toast('Уведомления отклонены','error');
     }
   };
 
@@ -1175,40 +836,16 @@
     });
   }
 
-  /* ── DELETE ── */
-  window.openDeleteModal=function(){
-    document.getElementById('deleteConfirmInput').value='';
-    document.getElementById('deleteModal').classList.add('show');
-    setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),200);
-  };
-  window.closeDeleteModal=function(){
-    document.getElementById('deleteModal').classList.remove('show');
-  };
-  window.confirmDeleteAccount=async function(){
-    if(!currentUser) return;
-    const inputEmail=document.getElementById('deleteConfirmInput').value.trim();
-    if(inputEmail!==currentUser.email){ toast('Email не совпадает','error'); return; }
-    const btn=document.getElementById('deleteConfirmBtn');
-    btn.textContent='Удаляю...'; btn.disabled=true;
-    try{
-      const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
-      for(const d of ordSnap.docs) await deleteDoc(d.ref).catch(()=>{});
-      const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
-      for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});
-      await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
-      await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
-      await deleteUser(currentUser);
-      window.location.href='auth.html';
-    }catch(e){
-      console.error('Delete account error:',e);
-      if(e.code==='auth/requires-recent-login'){
-        toast('Выйдите и войдите снова, затем повторите','error');
-      } else {
-        toast('Ошибка удаления. Попробуйте позже.','error');
-      }
-      btn.textContent='Удалить'; btn.disabled=false;
-    }
-  };
+  /* ── PUSH BANNER ── */
+  function showPushBanner(){
+    if(!('Notification' in window)||Notification.permission!=='default') return;
+    const b=document.createElement('div');
+    b.id='pushBanner';
+    b.style.cssText=`position:fixed;bottom:calc(var(--mobnav-h) + 1rem);left:50%;transform:translateX(-50%);z-index:400;background:#1a1a24;border:1px solid rgba(108,99,255,.35);border-radius:18px;padding:.9rem 1.2rem;display:flex;align-items:center;gap:.85rem;box-shadow:0 8px 32px rgba(0,0,0,.5);max-width:360px;width:calc(100% - 2rem)`;
+    b.innerHTML=`<div style="font-size:1.4rem;flex-shrink:0">🔔</div><div style="flex:1;min-width:0"><div style="font-size:.8rem;font-weight:500;color:#f0f0f5;margin-bottom:.1rem">Включить уведомления?</div><div style="font-size:.72rem;color:#777789;line-height:1.4">О статусе заказов и сообщениях</div></div><div style="display:flex;gap:.4rem;flex-shrink:0"><button onclick="requestPushPermission();document.getElementById('pushBanner')?.remove()" style="background:var(--accent);border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.72rem;font-weight:500;padding:.4rem .8rem;border-radius:8px;cursor:pointer">Включить</button><button onclick="document.getElementById('pushBanner')?.remove()" style="background:#18181f;border:1px solid rgba(255,255,255,.07);color:#777789;font-family:'Onest',sans-serif;font-size:.72rem;padding:.4rem .65rem;border-radius:8px;cursor:pointer">×</button></div>`;
+    document.body.appendChild(b);
+    setTimeout(()=>document.getElementById('pushBanner')?.remove(),12000);
+  }
 
   /* ── INIT ── */
   onAuthStateChanged(auth, async user=>{
@@ -1218,26 +855,24 @@
 
     currentUser=user;
     const name=user.displayName||'Пользователь';
-
-    document.getElementById('heroGreeting').textContent='Привет, '+name+' 👋';
+    document.getElementById('heroName').textContent=name;
     document.getElementById('heroEmail').textContent=user.email;
-    document.getElementById('sideAvatar').textContent=name[0].toUpperCase();
-    document.getElementById('sideName').textContent=name;
-    document.getElementById('sideEmail').textContent=user.email;
+    document.getElementById('heroAvatar').textContent=name[0].toUpperCase();
     document.getElementById('settingName').value=name;
     document.getElementById('settingEmail').value=user.email;
 
     if(Notification.permission==='granted'){
-      document.getElementById('pushToggle').classList.add('on');
+      document.getElementById('pushBtn').textContent='Уведомления включены ✓';
     }
 
     document.getElementById('loadingScreen').style.display='none';
-    document.getElementById('appWrap').style.display='grid';
+    document.getElementById('appWrap').style.display='block';
 
     loadOrders(user.uid);
     loadChat(user.uid);
     watchOrdersForPush(user.uid);
     watchChatForPush(user.uid);
+    setTimeout(showPushBanner,2500);
   });
 </script>
 </body>

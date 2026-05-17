@@ -15,16 +15,16 @@
       --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
       --text:#f0f0f5;--muted:#666678;--muted2:#999aaa;
       --success:#4ade80;--error:#f87171;--warn:#fbbf24;
-      --topbar-h:60px;
+      --topbar-h:54px;
     }
     html,body{height:100%;overflow:hidden}
     body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300}
-    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 60% 40% at 100% 0%,rgba(108,99,255,.07) 0%,transparent 60%);pointer-events:none}
 
     /* ── LOADING ── */
-    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
-    .spinner{width:32px;height:32px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
+    .spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.35)}}
 
     /* ── TOPBAR ── */
     .topbar{
@@ -33,226 +33,161 @@
       background:rgba(9,9,13,.97);backdrop-filter:blur(24px);
       border-bottom:1px solid var(--border);
       display:flex;align-items:center;justify-content:space-between;
-      padding:0 1.4rem;gap:1rem;
+      padding:0 1.2rem;gap:.8rem;
     }
-    .tbar-left{display:flex;align-items:center;gap:1rem;flex-shrink:0}
-    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.88rem;letter-spacing:.03em;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:9px}
-    .logo-dot{width:7px;height:7px;border-radius:50%;background:var(--error);box-shadow:0 0 10px var(--error);animation:pulse 2s infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-    .admin-badge{background:rgba(248,113,113,.12);color:var(--error);border:1px solid rgba(248,113,113,.2);padding:.18rem .65rem;border-radius:50px;font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+    .tbar-left{display:flex;align-items:center;gap:.9rem;flex-shrink:0}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;letter-spacing:.03em;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:8px}
+    .logo-dot{width:6px;height:6px;border-radius:50%;background:var(--error);box-shadow:0 0 9px var(--error);animation:pulse 2s infinite}
+    .admin-badge{background:rgba(248,113,113,.12);color:var(--error);border:1px solid rgba(248,113,113,.2);padding:.14rem .6rem;border-radius:50px;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
 
-    .tbar-center{display:flex;align-items:center;gap:.6rem;flex:1;justify-content:center;overflow:hidden}
-    .tstat-pill{
-      display:flex;align-items:center;gap:.5rem;
-      background:var(--bg3);border:1px solid var(--border);
-      border-radius:50px;padding:.3rem .9rem;
-      font-size:.72rem;white-space:nowrap;
-    }
-    .tstat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.82rem}
-    .tstat-lbl{color:var(--muted);font-size:.65rem}
-    .tstat-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+    .tbar-center{display:flex;align-items:center;gap:.5rem;flex:1;justify-content:center;overflow:hidden}
+    .tstat-pill{display:flex;align-items:center;gap:.45rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.26rem .85rem;font-size:.68rem;white-space:nowrap;cursor:default}
+    .tstat-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+    .tstat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.78rem}
+    .tstat-lbl{color:var(--muted);font-size:.63rem}
 
-    .tbar-right{display:flex;align-items:center;gap:.75rem;flex-shrink:0}
-
-    /* MAINTENANCE TOGGLE */
-    .maint-toggle{
-      display:flex;align-items:center;gap:.55rem;
-      background:var(--bg3);border:1px solid var(--border);
-      border-radius:50px;padding:.32rem .9rem;
-      font-size:.74rem;color:var(--muted);cursor:pointer;
-      transition:all .2s;user-select:none;white-space:nowrap;
-    }
+    .tbar-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
+    .maint-toggle{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.72rem;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap}
     .maint-toggle.on{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3);color:var(--warn)}
-    .toggle-track{width:30px;height:17px;background:var(--bg2);border-radius:50px;position:relative;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
-    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:11px;height:11px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
-    .maint-toggle.on .toggle-track{background:rgba(251,191,36,.15)}
+    .toggle-track{width:28px;height:15px;background:var(--bg2);border-radius:50px;position:relative;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
+    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:9px;height:9px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
     .maint-toggle.on .toggle-track::after{transform:translateX(13px);background:var(--warn)}
-
-    .btn-topbar{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.74rem;padding:.34rem .85rem;border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .btn-topbar{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.72rem;padding:.3rem .8rem;border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap}
     .btn-topbar:hover{border-color:var(--error);color:var(--error)}
 
     /* ── 3-COL LAYOUT ── */
-    .layout{
-      display:grid;
-      grid-template-columns:300px 1fr 360px;
-      height:calc(100vh - var(--topbar-h));
-      margin-top:var(--topbar-h);
-      position:relative;z-index:1;
-    }
+    .layout{display:grid;grid-template-columns:290px 1fr 340px;height:calc(100vh - var(--topbar-h));margin-top:var(--topbar-h);position:relative;z-index:1}
 
     /* ── SCROLLBARS ── */
     ::-webkit-scrollbar{width:3px;height:3px}
-    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
 
-    /* ═══════════════════════════
-       COL 1 — SIDEBAR LIST
-    ═══════════════════════════ */
-    .col-list{
-      border-right:1px solid var(--border);
-      display:flex;flex-direction:column;
-      background:var(--bg2);overflow:hidden;
-    }
-    .col-hdr{
-      padding:.9rem 1rem;border-bottom:1px solid var(--border);
-      display:flex;align-items:center;justify-content:space-between;gap:.6rem;
-      flex-shrink:0;
-    }
-    .col-hdr-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.78rem}
-    .tab-row{display:flex;gap:.3rem}
-    .tab-btn{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Onest',sans-serif;font-size:.7rem;padding:.28rem .65rem;border-radius:8px;cursor:pointer;transition:all .16s}
+    /* ── COL 1: SIDEBAR ── */
+    .col-list{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
+    .col-hdr{padding:.75rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-shrink:0}
+    .col-hdr-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.75rem}
+    .tab-row{display:flex;gap:.25rem}
+    .tab-btn{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Onest',sans-serif;font-size:.67rem;padding:.25rem .6rem;border-radius:7px;cursor:pointer;transition:all .15s}
     .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
     .tab-btn.active{background:rgba(108,99,255,.14);color:var(--accent2);border-color:rgba(108,99,255,.25)}
-
-    /* Search */
-    .search-wrap{padding:.65rem 1rem;border-bottom:1px solid var(--border);flex-shrink:0}
-    .search-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:.46rem .75rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.78rem;outline:none;transition:border-color .2s}
+    .search-wrap{padding:.55rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
+    .search-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.42rem .7rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.76rem;outline:none;transition:border-color .18s}
     .search-input:focus{border-color:rgba(108,99,255,.4)}
     .search-input::placeholder{color:var(--muted)}
+    .list-scroll{flex:1;overflow-y:auto;padding:.5rem}
+    .list-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.78rem}
 
-    .list-scroll{flex:1;overflow-y:auto;padding:.6rem}
-    .list-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.8rem}
+    .row-card{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.72rem .9rem;margin-bottom:.4rem;cursor:pointer;transition:border-color .16s,background .16s}
+    .row-card:hover{border-color:rgba(108,99,255,.22);background:rgba(108,99,255,.03)}
+    .row-card.sel{border-color:rgba(108,99,255,.45);background:rgba(108,99,255,.07)}
+    .row-head{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-bottom:.22rem}
+    .row-id{font-family:'Unbounded',sans-serif;font-size:.67rem;font-weight:600}
+    .row-name{font-size:.78rem;font-weight:500}
+    .row-sub{font-size:.68rem;color:var(--muted);margin-bottom:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .row-foot{display:flex;align-items:center;justify-content:space-between;gap:.35rem}
+    .row-meta{font-size:.65rem;color:var(--muted)}
+    .row-price{font-family:'Unbounded',sans-serif;font-size:.68rem;font-weight:600;color:var(--accent2)}
+    .unread-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);flex-shrink:0;box-shadow:0 0 5px var(--accent2)}
 
-    /* Row card */
-    .row-card{
-      background:var(--bg3);border:1px solid var(--border);border-radius:12px;
-      padding:.8rem 1rem;margin-bottom:.45rem;cursor:pointer;
-      transition:border-color .18s,background .18s;
-    }
-    .row-card:hover{border-color:rgba(108,99,255,.25);background:rgba(108,99,255,.04)}
-    .row-card.sel{border-color:rgba(108,99,255,.5);background:rgba(108,99,255,.08)}
-    .row-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.28rem}
-    .row-id{font-family:'Unbounded',sans-serif;font-size:.7rem;font-weight:600}
-    .row-name{font-size:.8rem;font-weight:500}
-    .row-sub{font-size:.7rem;color:var(--muted);margin-bottom:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .row-foot{display:flex;align-items:center;justify-content:space-between;gap:.4rem}
-    .row-meta{font-size:.68rem;color:var(--muted)}
-    .row-price{font-family:'Unbounded',sans-serif;font-size:.72rem;font-weight:600;color:var(--accent2)}
-    .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);flex-shrink:0;box-shadow:0 0 6px var(--accent2)}
+    .sbadge{display:inline-flex;align-items:center;gap:.2rem;padding:.13rem .48rem;border-radius:50px;font-size:.59rem;font-weight:600;flex-shrink:0}
+    .s0{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
+    .s1{background:rgba(56,189,248,.12);color:var(--accent3);border:1px solid rgba(56,189,248,.18)}
+    .s2{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.18)}
+    .sdot{width:3px;height:3px;border-radius:50%;background:currentColor}
 
-    /* Status badges */
-    .sbadge{display:inline-flex;align-items:center;gap:.22rem;padding:.16rem .52rem;border-radius:50px;font-size:.62rem;font-weight:600;flex-shrink:0}
-    .s0{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.2)}
-    .s1{background:rgba(56,189,248,.12);color:var(--accent3);border:1px solid rgba(56,189,248,.2)}
-    .s2{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.2)}
-    .sdot{width:4px;height:4px;border-radius:50%;background:currentColor}
+    /* Review stars in list */
+    .star-row{font-size:.72rem;color:var(--warn);letter-spacing:-.05em}
 
-    /* ═══════════════════════════
-       COL 2 — ORDER DETAIL
-    ═══════════════════════════ */
-    .col-detail{
-      display:flex;flex-direction:column;
-      border-right:1px solid var(--border);
-      overflow:hidden;
-      background:var(--bg);
-    }
-    .detail-empty{
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      height:100%;color:var(--muted);gap:.7rem;padding:2rem;text-align:center;
-    }
-    .detail-empty-icon{font-size:2.8rem;opacity:.35;margin-bottom:.3rem}
-    .detail-empty p{font-size:.84rem;opacity:.6}
-    .detail-empty .hint{font-size:.74rem;color:var(--muted);margin-top:-.3rem}
-
-    .detail-hdr{
-      padding:1rem 1.5rem;border-bottom:1px solid var(--border);
-      display:flex;align-items:center;gap:.9rem;flex-shrink:0;
-      background:var(--bg2);
-    }
-    .detail-hdr-id{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.92rem;flex:1;min-width:0}
-    .detail-scroll{flex:1;overflow-y:auto;padding:1.4rem 1.5rem}
-
-    /* Section divider */
-    .dsec{margin-bottom:1.5rem}
-    .dsec-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.7rem;font-weight:500}
-
-    /* Info grid */
-    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
-    .info-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.65rem .85rem}
-    .info-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.22rem}
-    .info-val{font-size:.82rem;font-weight:500;word-break:break-word}
-
-    /* Description box */
-    .desc-box{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1rem 1.1rem;font-size:.82rem;line-height:1.65;color:var(--muted2)}
+    /* ── COL 2: DETAIL ── */
+    .col-detail{display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden;background:var(--bg)}
+    .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:.6rem;padding:2rem;text-align:center}
+    .detail-empty-icon{font-size:2.5rem;opacity:.3;margin-bottom:.2rem}
+    .detail-empty p{font-size:.82rem;opacity:.55}
+    .detail-hdr{padding:.85rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;flex-shrink:0;background:var(--bg2)}
+    .detail-hdr-id{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.88rem;flex:1;min-width:0}
+    .detail-scroll{flex:1;overflow-y:auto;padding:1.2rem 1.3rem}
+    .dsec{margin-bottom:1.3rem}
+    .dsec-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem;font-weight:500}
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
+    .info-cell{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem}
+    .info-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem}
+    .info-val{font-size:.8rem;font-weight:500;word-break:break-word}
+    .desc-box{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.9rem 1rem;font-size:.8rem;line-height:1.65;color:var(--muted2)}
 
     /* Status buttons */
-    .status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
-    .sbtn{
-      background:var(--bg3);border:1px solid var(--border);
-      color:var(--muted);font-family:'Onest',sans-serif;font-size:.76rem;
-      padding:.65rem .4rem;border-radius:11px;cursor:pointer;
-      transition:all .18s;text-align:center;font-weight:500;
-    }
+    .status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
+    .sbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.74rem;padding:.6rem .3rem;border-radius:10px;cursor:pointer;transition:all .16s;text-align:center;font-weight:500}
     .sbtn:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
     .sbtn.sb0.cur{background:rgba(251,191,36,.1);color:var(--warn);border-color:rgba(251,191,36,.3)}
     .sbtn.sb1.cur{background:rgba(56,189,248,.1);color:var(--accent3);border-color:rgba(56,189,248,.3)}
     .sbtn.sb2.cur{background:rgba(74,222,128,.1);color:var(--success);border-color:rgba(74,222,128,.3)}
 
-    /* Attachment thumbnails */
-    .attach-grid{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.7rem}
-    .attach-thumb{width:72px;height:72px;border-radius:9px;object-fit:cover;cursor:pointer;border:1px solid var(--border);transition:border-color .2s,transform .15s}
-    .attach-thumb:hover{border-color:var(--accent2);transform:scale(1.03)}
+    /* Timeline dates */
+    .date-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.55rem}
+    .date-inp-wrap label{display:block;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem}
+    .date-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.48rem .7rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.76rem;outline:none;transition:border-color .18s}
+    .date-inp:focus{border-color:rgba(108,99,255,.4)}
 
-    /* ═══════════════════════════
-       COL 3 — CHAT
-    ═══════════════════════════ */
+    /* Attach */
+    .attach-grid{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem}
+    .attach-thumb{width:66px;height:66px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid var(--border);transition:border-color .18s,transform .13s}
+    .attach-thumb:hover{border-color:var(--accent2);transform:scale(1.04)}
+
+    /* Analytics */
+    .analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1rem}
+    .a-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem}
+    .a-card-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.35rem}
+    .a-card-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.35rem;color:var(--accent2)}
+    .a-card-sub{font-size:.66rem;color:var(--muted);margin-top:.18rem}
+    .a-card.green .a-card-num{color:var(--success)}
+    .a-card.blue .a-card-num{color:var(--accent3)}
+    .a-card.warn .a-card-num{color:var(--warn)}
+
+    /* Reviews */
+    .review-item{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.85rem 1rem;margin-bottom:.5rem}
+    .review-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;gap:.5rem}
+    .review-stars{color:var(--warn);font-size:.85rem;letter-spacing:-.04em}
+    .review-name{font-size:.76rem;font-weight:500}
+    .review-date{font-size:.65rem;color:var(--muted);margin-left:auto}
+    .review-text{font-size:.78rem;color:var(--muted2);line-height:1.55}
+
+    /* ── COL 3: CHAT ── */
     .col-chat{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
     .chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:.6rem;padding:2rem;text-align:center}
-    .chat-empty-icon{font-size:2.8rem;opacity:.35;margin-bottom:.3rem}
-
-    .chat-hdr{
-      padding:.85rem 1.1rem;border-bottom:1px solid var(--border);
-      display:flex;align-items:center;gap:.8rem;flex-shrink:0;background:var(--bg2);
-    }
-    .chat-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;font-weight:700;color:#fff}
+    .chat-hdr{padding:.8rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem;flex-shrink:0;background:var(--bg2)}
+    .chat-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0;font-weight:700;color:#fff}
     .chat-hdr-info{flex:1;min-width:0}
-    .chat-hdr-name{font-weight:500;font-size:.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .chat-hdr-sub{font-size:.68rem;color:var(--muted)}
-
-    .chat-msgs{flex:1;overflow-y:auto;padding:.9rem 1rem;display:flex;flex-direction:column;gap:.55rem;scroll-behavior:smooth}
-    .msg{max-width:86%;display:flex;flex-direction:column;gap:.12rem}
+    .chat-hdr-name{font-weight:500;font-size:.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-hdr-sub{font-size:.66rem;color:var(--muted)}
+    .chat-msgs{flex:1;overflow-y:auto;padding:.85rem .95rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth}
+    .msg{max-width:85%;display:flex;flex-direction:column;gap:.1rem}
     .msg.mine{align-self:flex-end;align-items:flex-end}
     .msg.theirs{align-self:flex-start;align-items:flex-start}
-    .msg-bubble{padding:.5rem .82rem;border-radius:13px;font-size:.8rem;line-height:1.5;word-break:break-word}
-    .msg.mine .msg-bubble{background:rgba(248,113,113,.2);color:#fff;border:1px solid rgba(248,113,113,.15);border-bottom-right-radius:3px}
+    .msg-bubble{padding:.48rem .78rem;border-radius:12px;font-size:.79rem;line-height:1.5;word-break:break-word}
+    .msg.mine .msg-bubble{background:rgba(248,113,113,.18);color:#fff;border:1px solid rgba(248,113,113,.14);border-bottom-right-radius:3px}
     .msg.theirs .msg-bubble{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:3px}
-    .msg-time{font-size:.6rem;color:var(--muted)}
-    .msg-img{max-width:190px;max-height:160px;border-radius:9px;display:block;cursor:pointer;transition:opacity .2s;border:1px solid var(--border)}
-    .msg-img:hover{opacity:.82}
-    .msg-file-link{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:9px;padding:.4rem .65rem;font-size:.76rem;text-decoration:none;color:var(--text);transition:background .2s;word-break:break-all}
+    .msg-time{font-size:.59rem;color:var(--muted)}
+    .msg-img{max-width:180px;max-height:150px;border-radius:8px;display:block;cursor:pointer;transition:opacity .18s;border:1px solid var(--border)}
+    .msg-img:hover{opacity:.8}
+    .msg-file-link{display:flex;align-items:center;gap:.38rem;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;padding:.38rem .6rem;font-size:.74rem;text-decoration:none;color:var(--text);transition:background .18s;word-break:break-all}
     .msg-file-link:hover{background:rgba(255,255,255,.12)}
-
-    .chat-row{
-      padding:.65rem .85rem;border-top:1px solid var(--border);
-      display:flex;gap:.45rem;align-items:flex-end;flex-shrink:0;
-      background:var(--bg2);
-    }
-    .chat-inp{
-      flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);
-      border-radius:11px;padding:.52rem .8rem;color:var(--text);
-      font-family:'Onest',sans-serif;font-size:.82rem;outline:none;
-      resize:none;max-height:80px;transition:border-color .2s;line-height:1.45;
-    }
+    .chat-row{padding:.6rem .8rem;border-top:1px solid var(--border);display:flex;gap:.42rem;align-items:flex-end;flex-shrink:0;background:var(--bg2)}
+    .chat-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:.5rem .75rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.8rem;outline:none;resize:none;max-height:76px;transition:border-color .18s;line-height:1.45}
     .chat-inp:focus{border-color:rgba(108,99,255,.45)}
-    .chat-icon-btn{
-      width:34px;height:34px;border-radius:9px;
-      background:rgba(255,255,255,.04);border:1px solid var(--border);
-      color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;
-      flex-shrink:0;transition:all .18s;
-    }
+    .chat-icon-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .17s}
     .chat-icon-btn svg{width:13px;height:13px}
     .chat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
     .chat-send{background:var(--accent);border-color:var(--accent);color:#fff}
-    .chat-send:hover{box-shadow:0 3px 14px rgba(108,99,255,.45);border-color:var(--accent)!important;color:#fff!important}
+    .chat-send:hover{box-shadow:0 3px 12px rgba(108,99,255,.42);border-color:var(--accent)!important;color:#fff!important}
 
     /* ── LIGHTBOX ── */
-    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
     .lightbox.show{opacity:1;pointer-events:all}
-    .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-    .lightbox-close{position:fixed;top:1.2rem;right:1.5rem;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.4rem;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
-    .lightbox-close:hover{background:rgba(255,255,255,.25)}
+    .lightbox img{max-width:92vw;max-height:90vh;border-radius:10px;object-fit:contain}
+    .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.14);border:none;color:#fff;font-size:1.2rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
     /* ── TOAST ── */
-    .toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);z-index:500;padding:.55rem 1.3rem;border-radius:50px;font-size:.76rem;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+    .toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%) translateY(16px);z-index:500;padding:.5rem 1.2rem;border-radius:50px;font-size:.75rem;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--success);color:#000}
     .toast.error{background:var(--error);color:#fff}
@@ -260,17 +195,13 @@
     .toast.warn{background:var(--warn);color:#000}
 
     /* ── MOBILE ── */
-    @media(max-width:1100px){
-      .layout{grid-template-columns:260px 1fr 320px}
-      .tstat-pill{display:none}
-    }
+    @media(max-width:1100px){.layout{grid-template-columns:250px 1fr 300px}.tstat-pill{display:none}}
     @media(max-width:900px){
       html,body{overflow:auto}
       .layout{grid-template-columns:1fr;grid-template-rows:auto auto auto;height:auto;overflow:visible}
-      .col-list,.col-detail,.col-chat{height:60vh;min-height:320px;border-right:none;border-bottom:1px solid var(--border)}
+      .col-list,.col-detail,.col-chat{height:60vh;min-height:300px;border-right:none;border-bottom:1px solid var(--border)}
       .col-chat{border-bottom:none}
-      .tstat-pill{display:none}
-      .tbar-center{display:none}
+      .tstat-pill,.tbar-center{display:none}
     }
   </style>
 </head>
@@ -278,11 +209,11 @@
 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:.78rem;margin-top:.2rem">Проверка доступа...</p>
+  <p style="color:var(--muted);font-size:.76rem;margin-top:.25rem">Проверка доступа...</p>
 </div>
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
   <img id="lightboxImg" src="" alt=""/>
 </div>
 
@@ -294,30 +225,13 @@
       <a href="index.html" class="logo"><span class="logo-dot"></span>Design Antviz</a>
       <span class="admin-badge">Admin</span>
     </div>
-
     <div class="tbar-center">
-      <div class="tstat-pill">
-        <span class="tstat-dot" style="background:var(--muted)"></span>
-        <span class="tstat-num" id="sAll">0</span>
-        <span class="tstat-lbl">всего</span>
-      </div>
-      <div class="tstat-pill">
-        <span class="tstat-dot" style="background:var(--warn)"></span>
-        <span class="tstat-num" id="sPend" style="color:var(--warn)">0</span>
-        <span class="tstat-lbl">ожидают</span>
-      </div>
-      <div class="tstat-pill">
-        <span class="tstat-dot" style="background:var(--accent3)"></span>
-        <span class="tstat-num" id="sWork" style="color:var(--accent3)">0</span>
-        <span class="tstat-lbl">в работе</span>
-      </div>
-      <div class="tstat-pill">
-        <span class="tstat-dot" style="background:var(--success)"></span>
-        <span class="tstat-num" id="sDone" style="color:var(--success)">0</span>
-        <span class="tstat-lbl">готово</span>
-      </div>
+      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--muted)"></span><span class="tstat-num" id="sAll">0</span><span class="tstat-lbl">всего</span></div>
+      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--warn)"></span><span class="tstat-num" id="sPend" style="color:var(--warn)">0</span><span class="tstat-lbl">ожидают</span></div>
+      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--accent3)"></span><span class="tstat-num" id="sWork" style="color:var(--accent3)">0</span><span class="tstat-lbl">в работе</span></div>
+      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--success)"></span><span class="tstat-num" id="sDone" style="color:var(--success)">0</span><span class="tstat-lbl">готово</span></div>
+      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--accent2)"></span><span class="tstat-num" id="sRevenue" style="color:var(--accent2)">0 ₽</span><span class="tstat-lbl">выручка</span></div>
     </div>
-
     <div class="tbar-right">
       <button class="maint-toggle" id="maintToggle" onclick="toggleMaintenance()">
         <div class="toggle-track"></div>
@@ -336,22 +250,24 @@
         <div class="tab-row">
           <button class="tab-btn active" onclick="switchTab('orders',this)">Заказы</button>
           <button class="tab-btn" onclick="switchTab('chats',this)">Чаты</button>
+          <button class="tab-btn" onclick="switchTab('reviews',this)">Отзывы</button>
+          <button class="tab-btn" onclick="switchTab('analytics',this)">📊</button>
         </div>
       </div>
-      <div class="search-wrap">
-        <input class="search-input" id="searchInput" type="text" placeholder="Поиск по имени, email, заказу..." oninput="renderList()"/>
+      <div class="search-wrap" id="searchWrap">
+        <input class="search-input" id="searchInput" type="text" placeholder="Поиск..." oninput="renderList()"/>
       </div>
       <div class="list-scroll" id="listScroll">
         <div class="list-empty">Загрузка...</div>
       </div>
     </div>
 
-    <!-- ══ COL 2: ORDER DETAIL ══ -->
+    <!-- ══ COL 2: DETAIL ══ -->
     <div class="col-detail">
       <div class="detail-empty" id="detailEmpty">
         <div class="detail-empty-icon">📋</div>
         <p>Выберите заказ слева</p>
-        <span class="hint">чтобы увидеть детали и изменить статус</span>
+        <span style="font-size:.72rem;color:var(--muted);opacity:.55">Детали и управление статусом</span>
       </div>
       <div style="display:none;flex-direction:column;height:100%;overflow:hidden" id="detailWrap">
         <div class="detail-hdr">
@@ -360,8 +276,9 @@
         </div>
         <div class="detail-scroll">
 
+          <!-- Status -->
           <div class="dsec">
-            <div class="dsec-lbl">Изменить статус</div>
+            <div class="dsec-lbl">Статус заказа</div>
             <div class="status-btns">
               <button class="sbtn sb0" onclick="setStatus(0)">⏳ Ожидание</button>
               <button class="sbtn sb1" onclick="setStatus(1)">🔵 В работе</button>
@@ -369,24 +286,49 @@
             </div>
           </div>
 
+          <!-- Timeline dates -->
+          <div class="dsec">
+            <div class="dsec-lbl">Даты timeline (видит клиент)</div>
+            <div class="date-inputs">
+              <div class="date-inp-wrap">
+                <label>Взят в работу</label>
+                <input type="date" class="date-inp" id="dateStarted" onchange="saveDate('startedAt',this.value)"/>
+              </div>
+              <div class="date-inp-wrap">
+                <label>Готово</label>
+                <input type="date" class="date-inp" id="dateDone" onchange="saveDate('doneAt',this.value)"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Client -->
           <div class="dsec">
             <div class="dsec-lbl">Клиент</div>
             <div class="info-grid" id="dClient"></div>
           </div>
 
+          <!-- Order params -->
           <div class="dsec">
             <div class="dsec-lbl">Параметры заказа</div>
             <div class="info-grid" id="dInfo"></div>
           </div>
 
+          <!-- Description -->
           <div class="dsec" id="dDescSec" style="display:none">
-            <div class="dsec-lbl">Описание / ТЗ</div>
+            <div class="dsec-lbl">ТЗ / Описание</div>
             <div class="desc-box" id="dDesc"></div>
           </div>
 
+          <!-- Attachments -->
           <div class="dsec" id="dAttachSec" style="display:none">
-            <div class="dsec-lbl">Вложения заказа</div>
+            <div class="dsec-lbl">Вложения клиента</div>
             <div class="attach-grid" id="dAttach"></div>
+          </div>
+
+          <!-- Review for this order -->
+          <div class="dsec" id="dReviewSec" style="display:none">
+            <div class="dsec-lbl">Отзыв клиента</div>
+            <div id="dReviewContent"></div>
           </div>
 
         </div>
@@ -396,9 +338,8 @@
     <!-- ══ COL 3: CHAT ══ -->
     <div class="col-chat">
       <div class="chat-empty" id="chatEmpty">
-        <div class="chat-empty-icon">💬</div>
-        <p style="font-size:.84rem;opacity:.6">Выберите клиента для чата</p>
-        <p style="font-size:.74rem;color:var(--muted);margin-top:-.2rem;opacity:.5">Чат откроется при выборе заказа</p>
+        <div style="font-size:2.5rem;opacity:.25;margin-bottom:.4rem">💬</div>
+        <p style="font-size:.82rem;opacity:.55">Выберите клиента для чата</p>
       </div>
       <div style="display:none;flex-direction:column;height:100%;overflow:hidden" id="chatWrap">
         <div class="chat-hdr">
@@ -410,18 +351,14 @@
         </div>
         <div class="chat-msgs" id="chatMsgs"></div>
         <div class="chat-row">
-          <!-- ФИКС: файлы хранятся в Firestore как base64, Firebase Storage не используется.
-               Права Storage Rules не нужны — данные идут напрямую в Firestore. -->
-          <input type="file" id="adminFileInput" style="display:none" multiple
-            accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig"
-            onchange="adminSendFiles(this.files)"/>
-          <button class="chat-icon-btn" onclick="document.getElementById('adminFileInput').click()" title="Прикрепить файл">
+          <input type="file" id="adminFileInput" style="display:none" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" onchange="adminSendFiles(this.files)"/>
+          <button class="chat-icon-btn" onclick="document.getElementById('adminFileInput').click()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
           </button>
           <textarea class="chat-inp" id="chatInp" rows="1" placeholder="Ответить клиенту..."
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}"
-            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
-          <button class="chat-icon-btn chat-send" onclick="adminSendMsg()" title="Отправить">
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,76)+'px'"></textarea>
+          <button class="chat-icon-btn chat-send" onclick="adminSendMsg()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
@@ -434,410 +371,463 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
-  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    collection, query, orderBy, onSnapshot, doc, updateDoc,
-    addDoc, serverTimestamp, setDoc, getDoc, getDocs
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, query, orderBy, onSnapshot, doc, updateDoc,
+  addDoc, serverTimestamp, setDoc, getDoc, getDocs, Timestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  let allOrders=[], allUsers={}, allChatUsers={};
-  let currentTab='orders';
-  let selOrderId=null, selClientUid=null;
-  let unsubChat=null, unsubMaint=null;
-  let maintEnabled=false;
+/* ── STATE ── */
+let allOrders=[], allUsers={}, allChatUsers={}, allReviews=[];
+let currentTab='orders';
+let selOrderId=null, selClientUid=null;
+let unsubChat=null, unsubMaint=null;
+let maintEnabled=false;
 
-  /* ── UTILS ── */
-  function toast(msg,type='info'){
-    const t=document.getElementById('toast');
-    t.textContent=msg; t.className=`toast ${type} show`;
-    setTimeout(()=>t.className='toast',3400);
+/* ── UTILS ── */
+function toast(msg,type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.className='toast',3400);
+}
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});
+}
+function fmtDateTime(ts){
+  if(!ts) return '—';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+}
+function fmtTime(ts){
+  if(!ts) return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+}
+function tsToInputDate(ts){
+  if(!ts) return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toISOString().split('T')[0];
+}
+const sLabels=['Ожидание','В работе','Готово'];
+function initials(name){ return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function stars(n){ return '★'.repeat(n)+'☆'.repeat(5-n); }
+
+/* ── LIGHTBOX ── */
+window.openLightbox=function(src){ document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('show'); };
+window.closeLightbox=function(){ document.getElementById('lightbox').classList.remove('show'); document.getElementById('lightboxImg').src=''; };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
+
+/* ── MAINTENANCE ── */
+function watchMaintenance(){
+  unsubMaint=onSnapshot(doc(db,'settings','maintenance'), snap=>{
+    maintEnabled=snap.exists()&&snap.data().enabled===true;
+    document.getElementById('maintToggle').classList.toggle('on',maintEnabled);
+    document.getElementById('maintLabel').textContent=maintEnabled?'Сайт закрыт':'Техработы';
+  }, err=>console.error('Maintenance error:',err));
+}
+window.toggleMaintenance=async function(){
+  try{
+    const newVal=!maintEnabled;
+    await setDoc(doc(db,'settings','maintenance'),{enabled:newVal},{merge:true});
+    toast(newVal?'🔧 Сайт закрыт':'✅ Сайт открыт', newVal?'warn':'success');
+  }catch(e){
+    if(e.code==='permission-denied') toast('Нет прав. Проверь Firestore Rules для settings/maintenance','error');
+    else toast('Ошибка: '+e.message,'error');
   }
-  function fmtDate(ts){
-    if(!ts) return '—';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});
-  }
-  function fmtDateTime(ts){
-    if(!ts) return '—';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-  }
-  function fmtTime(ts){
-    if(!ts) return '';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-  }
-  const sLabels=['Ожидание','В работе','Готово'];
-  function initials(name){ return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+};
 
-  /* ── LIGHTBOX ── */
-  window.openLightbox=function(src){
-    document.getElementById('lightboxImg').src=src;
-    document.getElementById('lightbox').classList.add('show');
-  };
-  window.closeLightbox=function(){
-    document.getElementById('lightbox').classList.remove('show');
-    document.getElementById('lightboxImg').src='';
-  };
-  document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
+/* ── TABS ── */
+window.switchTab=function(tab,btn){
+  currentTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('searchInput').value='';
+  document.getElementById('searchWrap').style.display=(tab==='analytics')?'none':'block';
+  renderList();
+};
 
-  /* ── MAINTENANCE ──
-     ФИКС: setDoc гарантирует создание документа если его нет.
-     Firestore Rules должны разрешать write на settings/maintenance для ADMIN_EMAIL:
-       match /settings/{doc} {
-         allow read: if true;
-         allow write: if request.auth != null && request.auth.token.email == "wbtipoofficialcom@gmail.com";
-       }
-  ── */
-  function watchMaintenance(){
-    unsubMaint=onSnapshot(doc(db,'settings','maintenance'), snap=>{
-      maintEnabled = snap.exists() && snap.data().enabled===true;
-      document.getElementById('maintToggle').classList.toggle('on', maintEnabled);
-      document.getElementById('maintLabel').textContent = maintEnabled ? 'Сайт закрыт' : 'Техработы';
-    }, err=>{ console.error('Maintenance watch error:',err); });
-  }
+/* ── STATS ── */
+function updateStats(){
+  document.getElementById('sAll').textContent=allOrders.length;
+  document.getElementById('sPend').textContent=allOrders.filter(o=>(o.status||0)===0).length;
+  document.getElementById('sWork').textContent=allOrders.filter(o=>o.status===1).length;
+  document.getElementById('sDone').textContent=allOrders.filter(o=>o.status===2).length;
+  const rev=allOrders.filter(o=>o.status===2).reduce((s,o)=>s+(o.totalPrice||0),0);
+  document.getElementById('sRevenue').textContent=rev.toLocaleString('ru')+' ₽';
+}
 
-  window.toggleMaintenance=async function(){
-    try{
-      const newVal=!maintEnabled;
-      await setDoc(doc(db,'settings','maintenance'),{enabled:newVal},{merge:true});
-      toast(newVal ? '🔧 Сайт закрыт на техработы' : '✅ Сайт открыт', newVal ? 'warn' : 'success');
-    }catch(e){
-      console.error('toggleMaintenance error:',e);
-      if(e.code==='permission-denied'){
-        toast('Нет прав. Проверь Firestore Rules для settings/maintenance','error');
-      } else {
-        toast('Ошибка: '+e.message,'error');
-      }
-    }
-  };
+/* ── RENDER LIST ── */
+function renderList(){
+  const el=document.getElementById('listScroll');
+  const q=(document.getElementById('searchInput').value||'').toLowerCase().trim();
 
-  /* ── TAB SWITCH ── */
-  window.switchTab=function(tab,btn){
-    currentTab=tab;
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('searchInput').value='';
-    renderList();
-  };
+  if(currentTab==='orders'){
+    let orders=allOrders;
+    if(q) orders=orders.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q)||(o.siteType||'').toLowerCase().includes(q));
+    if(!orders.length){ el.innerHTML='<div class="list-empty">Нет заказов</div>'; return; }
+    el.innerHTML=orders.map(o=>`
+      <div class="row-card${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
+        <div class="row-head">
+          <span class="row-id">№ ${o.id.slice(0,8).toUpperCase()}</span>
+          <span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>
+        </div>
+        <div class="row-sub">${o.clientName||'—'} · ${o.clientEmail||'—'}</div>
+        <div class="row-foot">
+          <span class="row-meta">${o.siteType||'Сайт'} · ${fmtDate(o.createdAt)}</span>
+          <span class="row-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
+        </div>
+      </div>`).join('');
 
-  /* ── STATS ── */
-  function updateStats(){
-    document.getElementById('sAll').textContent=allOrders.length;
-    document.getElementById('sPend').textContent=allOrders.filter(o=>(o.status||0)===0).length;
-    document.getElementById('sWork').textContent=allOrders.filter(o=>o.status===1).length;
-    document.getElementById('sDone').textContent=allOrders.filter(o=>o.status===2).length;
-  }
-
-  /* ── RENDER LIST ── */
-  function renderList(){
-    const el=document.getElementById('listScroll');
-    const q=(document.getElementById('searchInput').value||'').toLowerCase().trim();
-    if(currentTab==='orders'){
-      let orders=allOrders;
-      if(q) orders=orders.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q)||(o.siteType||'').toLowerCase().includes(q));
-      if(!orders.length){ el.innerHTML='<div class="list-empty">Нет заказов</div>'; return; }
-      el.innerHTML=orders.map(o=>`
-        <div class="row-card${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
-          <div class="row-head">
-            <span class="row-id">№ ${o.id.slice(0,8).toUpperCase()}</span>
-            <span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>
-          </div>
-          <div class="row-sub">${o.clientName||'—'} · ${o.clientEmail||'—'}</div>
-          <div class="row-foot">
-            <span class="row-meta">${o.siteType||'Сайт'} · ${fmtDate(o.createdAt)}</span>
-            <span class="row-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
-          </div>
-        </div>`).join('');
-    } else {
-      // Мёрж: все кто писал в чат + те у кого есть заказы
-      const merged = {...allUsers};
-      Object.keys(allChatUsers).forEach(uid => {
-        if(!merged[uid]) merged[uid] = {...allChatUsers[uid]};
-        else {
-          merged[uid].lastMsg   = allChatUsers[uid].lastMsg;
-          merged[uid].lastMsgTs = allChatUsers[uid].lastMsgTs;
-          if(allChatUsers[uid].hasUnread) merged[uid].hasUnread = true;
-        }
-      });
-      let uids = Object.keys(merged);
-      uids.sort((a,b)=>{
-        if(merged[a].hasUnread !== merged[b].hasUnread) return merged[a].hasUnread ? -1 : 1;
-        const ta = merged[a].lastMsgTs?.seconds||0;
-        const tb = merged[b].lastMsgTs?.seconds||0;
-        return tb - ta;
-      });
-      if(q) uids = uids.filter(uid=>(merged[uid].name||'').toLowerCase().includes(q)||(merged[uid].email||'').toLowerCase().includes(q));
-      if(!uids.length){ el.innerHTML='<div class="list-empty">Нет диалогов</div>'; return; }
-      el.innerHTML = uids.map(uid=>{
-        const u = merged[uid];
-        const hasOrder = !!allUsers[uid];
-        return`<div class="row-card${selClientUid===uid&&!selOrderId?' sel':''}" onclick="selectUserChat('${uid}')">
-          <div class="row-head">
-            <span class="row-name">${u.name||'Пользователь'}</span>
-            ${u.hasUnread?'<div class="unread-dot"></div>':''}
-          </div>
-          <div class="row-sub" style="display:flex;align-items:center;gap:.4rem">
-            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${u.email||uid}</span>
-            ${hasOrder
-              ?`<span style="font-size:.6rem;background:rgba(108,99,255,.12);color:var(--accent2);border-radius:4px;padding:.1rem .35rem;flex-shrink:0">${u.orderCount} зак.</span>`
-              :`<span style="font-size:.6rem;background:rgba(56,189,248,.1);color:var(--accent3);border-radius:4px;padding:.1rem .35rem;flex-shrink:0">Без заказа</span>`}
-          </div>
-          <div class="row-foot">
-            <span class="row-meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">${u.lastMsg||'Нет сообщений'}</span>
-          </div>
-        </div>`;
-      }).join('');
-    }
-  }
-
-  /* ── SELECT ORDER ── */
-  window.selectOrder=function(id){
-    selOrderId=id; selClientUid=null;
-    const o=allOrders.find(x=>x.id===id);
-    if(!o) return;
-    selClientUid=o.uid||null;
-    renderList();
-    showDetail(o);
-    if(selClientUid) openChat(selClientUid, o.clientName||'Клиент', o.clientEmail||'');
-  };
-
-  window.selectUserChat=function(uid){
-    selOrderId=null; selClientUid=uid;
-    const u=allUsers[uid];
-    renderList();
-    document.getElementById('detailEmpty').style.display='flex';
-    document.getElementById('detailWrap').style.display='none';
-    openChat(uid, u?.name||'Пользователь', u?.email||'');
-  };
-
-  /* ── SHOW DETAIL ── */
-  function showDetail(o){
-    document.getElementById('detailEmpty').style.display='none';
-    const wrap=document.getElementById('detailWrap');
-    wrap.style.display='flex';
-
-    document.getElementById('dId').textContent='№ '+o.id.slice(0,8).toUpperCase();
-    document.getElementById('dStatusBadge').innerHTML=`<span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>`;
-
-    document.getElementById('dClient').innerHTML=`
-      <div class="info-cell"><div class="info-lbl">Имя</div><div class="info-val">${o.clientName||'—'}</div></div>
-      <div class="info-cell"><div class="info-lbl">Email</div><div class="info-val">${o.clientEmail||'—'}</div></div>`;
-
-    document.getElementById('dInfo').innerHTML=`
-      <div class="info-cell"><div class="info-lbl">Тип сайта</div><div class="info-val">${o.siteType||'—'}</div></div>
-      <div class="info-cell"><div class="info-lbl">Тариф</div><div class="info-val">${o.tariff||'—'}</div></div>
-      <div class="info-cell"><div class="info-lbl">Страниц</div><div class="info-val">${o.pages||'—'}</div></div>
-      <div class="info-cell"><div class="info-lbl">Сумма</div><div class="info-val" style="color:var(--accent2);font-weight:600">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div></div>
-      <div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Дата заказа</div><div class="info-val">${fmtDateTime(o.createdAt)}</div></div>`;
-
-    const descSec=document.getElementById('dDescSec');
-    if(o.description){ descSec.style.display='block'; document.getElementById('dDesc').textContent=o.description; }
-    else { descSec.style.display='none'; }
-
-    // Вложения заказа
-    const attachSec=document.getElementById('dAttachSec');
-    const attachGrid=document.getElementById('dAttach');
-    if(o.attachments&&o.attachments.length){
-      const imgs=o.attachments.filter(a=>a.fileType&&a.fileType.startsWith('image/'));
-      const files=o.attachments.filter(a=>!a.fileType||!a.fileType.startsWith('image/'));
-      let html='';
-      imgs.forEach(a=>{ html+=`<img class="attach-thumb" src="${a.fileData}" alt="${a.fileName||'img'}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')"/>`; });
-      files.forEach(a=>{ html+=`<a class="msg-file-link" href="${a.fileData}" download="${a.fileName||'file'}">📎 ${a.fileName||'Файл'}</a>`; });
-      if(html){ attachSec.style.display='block'; attachGrid.innerHTML=html; }
-      else { attachSec.style.display='none'; }
-    } else { attachSec.style.display='none'; }
-
-    // Подсветить текущий статус
-    document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===(o.status||0)));
-  }
-
-  /* ── SET STATUS ── */
-  window.setStatus=async function(s){
-    if(!selOrderId) return;
-    try{
-      await updateDoc(doc(db,'orders',selOrderId),{status:s});
-      toast('Статус → '+sLabels[s]+' ✓','success');
-    }catch(e){ toast('Ошибка обновления статуса','error'); console.error(e); }
-  };
-
-  /* ── CHAT ── */
-  function appendMsg(m){
-    const container=document.getElementById('chatMsgs');
-    const isAdmin=m.sender==='admin';
-    const div=document.createElement('div');
-    div.className=`msg ${isAdmin?'mine':'theirs'}`;
-
-    if(m.type==='file'){
-      const src=m.fileData||m.fileUrl||'';
-      const isImg=m.fileType&&m.fileType.startsWith('image/');
-      if(isImg){
-        // ФИКС: правильный рендер изображений через тег <img>
-        div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||'img'}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')" /><div class="msg-time">${isAdmin?'Вы':'('+( m.senderName||'Клиент')+')'} · ${fmtTime(m.createdAt)}</div>`;
-      } else {
-        // ФИКС: правильный рендер файлов как кликабельных ссылок
-        div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName||'file'}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
-      }
-    } else {
-      div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
-    }
-    container.appendChild(div);
-    container.scrollTop=container.scrollHeight;
-  }
-
-  function openChat(uid,name,email){
-    if(unsubChat) unsubChat();
-    document.getElementById('chatEmpty').style.display='none';
-    const wrap=document.getElementById('chatWrap');
-    wrap.style.display='flex';
-    document.getElementById('chatClientName').textContent=name;
-    document.getElementById('chatClientEmail').textContent=email;
-    document.getElementById('chatAv').textContent=initials(name);
-    const msgs=document.getElementById('chatMsgs');
-    msgs.innerHTML='';
-    const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
-    unsubChat=onSnapshot(q, snap=>{
-      snap.docChanges().forEach(ch=>{ if(ch.type==='added') appendMsg(ch.doc.data()); });
-    }, err=>{ console.error('Admin chat error:',err); toast('Ошибка загрузки чата','error'); });
-  }
-
-  window.adminSendMsg=async function(){
-    if(!selClientUid) return;
-    const inp=document.getElementById('chatInp');
-    const text=inp.value.trim();
-    if(!text) return;
-    inp.value=''; inp.style.height='auto';
-    try{
-      await addDoc(collection(db,'chats',selClientUid,'messages'),{
-        text, sender:'admin', senderName:'Поддержка', type:'text', createdAt:serverTimestamp()
-      });
-    }catch(e){ toast('Ошибка отправки','error'); console.error(e); }
-  };
-
-  /* ФИКС: файлы хранятся как base64 в Firestore, не в Storage.
-     Поэтому проблема прав Storage Rules здесь не актуальна.
-     Если файл > 3 МБ — предупреждение. Для больших файлов нужен Storage. */
-  window.adminSendFiles=async function(files){
-    if(!selClientUid||!files.length) return;
-    for(const file of Array.from(files)){
-      if(file.size>3*1024*1024){ toast(file.name+' > 3 МБ — не отправлен','error'); continue; }
-      try{
-        toast('Отправляю '+file.name+'...','info');
-        const base64=await new Promise((res,rej)=>{
-          const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-        });
-        await addDoc(collection(db,'chats',selClientUid,'messages'),{
-          type:'file', fileData:base64, fileName:file.name, fileType:file.type,
-          sender:'admin', senderName:'Поддержка', createdAt:serverTimestamp()
-        });
-        toast(file.name+' отправлен ✓','success');
-      }catch(e){
-        console.error('adminSendFiles error:',e);
-        if(e.code==='permission-denied'){
-          toast('Нет прав на запись в chats. Проверь Firestore Rules.','error');
-        } else {
-          toast('Ошибка: '+file.name,'error');
-        }
-      }
-    }
-    document.getElementById('adminFileInput').value='';
-  };
-
-  window.doLogout=async function(){
-    if(unsubChat) unsubChat();
-    if(unsubMaint) unsubMaint();
-    await signOut(auth);
-    window.location.href='auth.html';
-  };
-
-  /* ── INIT ── */
-  // Таймаут — если Firebase не отвечает 8 секунд, показываем ошибку
-  const loadTimeout = setTimeout(()=>{
-    const ls = document.getElementById('loadingScreen');
-    if(ls && ls.style.display !== 'none'){
-      ls.innerHTML = `<div style="text-align:center;padding:2rem">
-        <div style="font-size:2rem;margin-bottom:.8rem">⚠️</div>
-        <div style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:.5rem">Нет соединения</div>
-        <div style="color:#666678;font-size:.8rem;margin-bottom:1.2rem">Проверь интернет или настройки Firebase</div>
-        <button onclick="location.reload()" style="background:#6c63ff;border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.82rem;padding:.6rem 1.4rem;border-radius:50px;cursor:pointer">Обновить</button>
-      </div>`;
-    }
-  }, 8000);
-
-  onAuthStateChanged(auth, async user=>{
-    clearTimeout(loadTimeout);
-    document.getElementById('loadingScreen').style.display='none';
-    if(!user||user.email!==ADMIN_EMAIL){
-      document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;font-family:'Onest',sans-serif;color:#f0f0f5;background:#07070a"><div style="font-size:2.5rem">🚫</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.1rem">Нет доступа</div><div style="color:#666678;font-size:.85rem;margin-top:.2rem">Страница только для администратора</div><a href="index.html" style="color:#a78bfa;font-size:.85rem;text-decoration:none;margin-top:.5rem">← На главную</a></div>`;
-      return;
-    }
-
-    document.getElementById('appWrap').style.display='block';
-    watchMaintenance();
-
-    // Подписка на заказы
-    const ordQ=query(collection(db,'orders'),orderBy('createdAt','desc'));
-    onSnapshot(ordQ, snap=>{
-      allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
-      allUsers={};
-      allOrders.forEach(o=>{
-        if(!o.uid) return;
-        if(!allUsers[o.uid]) allUsers[o.uid]={name:o.clientName||'Пользователь',email:o.clientEmail||'',orderCount:0,hasUnread:false};
-        allUsers[o.uid].orderCount=allOrders.filter(x=>x.uid===o.uid).length;
-      });
-      updateStats();
-      renderList();
-      if(selOrderId){
-        const upd=allOrders.find(o=>o.id===selOrderId);
-        if(upd) showDetail(upd);
-      }
-    }, err=>{
-      console.error('Orders snapshot error:',err);
-      if(err.code==='permission-denied') toast('Нет прав на чтение заказов. Проверь Firestore Rules.','error');
-      else toast('Ошибка загрузки заказов','error');
+  } else if(currentTab==='chats'){
+    const merged={...allUsers};
+    Object.keys(allChatUsers).forEach(uid=>{
+      if(!merged[uid]) merged[uid]={...allChatUsers[uid]};
+      else{ merged[uid].lastMsg=allChatUsers[uid].lastMsg; merged[uid].lastMsgTs=allChatUsers[uid].lastMsgTs; if(allChatUsers[uid].hasUnread) merged[uid].hasUnread=true; }
     });
+    let uids=Object.keys(merged);
+    uids.sort((a,b)=>{
+      if(merged[a].hasUnread!==merged[b].hasUnread) return merged[a].hasUnread?-1:1;
+      return (merged[b].lastMsgTs?.seconds||0)-(merged[a].lastMsgTs?.seconds||0);
+    });
+    if(q) uids=uids.filter(uid=>(merged[uid].name||'').toLowerCase().includes(q)||(merged[uid].email||'').toLowerCase().includes(q));
+    if(!uids.length){ el.innerHTML='<div class="list-empty">Нет диалогов</div>'; return; }
+    el.innerHTML=uids.map(uid=>{
+      const u=merged[uid];
+      return`<div class="row-card${selClientUid===uid&&!selOrderId?' sel':''}" onclick="selectUserChat('${uid}')">
+        <div class="row-head">
+          <span class="row-name">${u.name||'Пользователь'}</span>
+          ${u.hasUnread?'<div class="unread-dot"></div>':''}
+        </div>
+        <div class="row-sub">${u.email||uid}</div>
+        <div class="row-foot">
+          <span class="row-meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px">${u.lastMsg||'Нет сообщений'}</span>
+        </div>
+      </div>`;
+    }).join('');
 
-    // ── Подписка на чаты — не блокируем основной поток ──
-    // Запускаем отдельно, ошибка здесь не должна ломать всё остальное
-    loadChatsIndex();
+  } else if(currentTab==='reviews'){
+    let revs=allReviews;
+    if(q) revs=revs.filter(r=>(r.clientName||'').toLowerCase().includes(q)||(r.text||'').toLowerCase().includes(q));
+    if(!revs.length){ el.innerHTML='<div class="list-empty">Нет отзывов</div>'; return; }
+    el.innerHTML=revs.map(r=>`
+      <div class="review-item">
+        <div class="review-top">
+          <span class="review-name">${r.clientName||'Аноним'}</span>
+          <span class="star-row">${stars(r.stars||0)}</span>
+          <span class="review-date">${fmtDate(r.createdAt)}</span>
+        </div>
+        ${r.text?`<div class="review-text">${r.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}
+      </div>`).join('');
+
+  } else if(currentTab==='analytics'){
+    renderAnalytics();
+  }
+}
+
+/* ── ANALYTICS ── */
+function renderAnalytics(){
+  const el=document.getElementById('listScroll');
+  const done=allOrders.filter(o=>o.status===2);
+  const totalRev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
+  const avgRev=done.length?Math.round(totalRev/done.length):0;
+  const avgStars=allReviews.length?(allReviews.reduce((s,r)=>s+(r.stars||0),0)/allReviews.length).toFixed(1):0;
+  const byType={};
+  allOrders.forEach(o=>{ const t=o.siteType||'Другое'; byType[t]=(byType[t]||0)+1; });
+  const byTypeSorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+  el.innerHTML=`
+    <div style="padding:.4rem .1rem">
+      <div class="analytics-grid">
+        <div class="a-card green">
+          <div class="a-card-lbl">Выручка</div>
+          <div class="a-card-num">${totalRev.toLocaleString('ru')} ₽</div>
+          <div class="a-card-sub">${done.length} закрытых заказов</div>
+        </div>
+        <div class="a-card blue">
+          <div class="a-card-lbl">Средний чек</div>
+          <div class="a-card-num">${avgRev.toLocaleString('ru')} ₽</div>
+          <div class="a-card-sub">по завершённым</div>
+        </div>
+        <div class="a-card">
+          <div class="a-card-lbl">Рейтинг</div>
+          <div class="a-card-num">${avgStars} ★</div>
+          <div class="a-card-sub">${allReviews.length} отзывов</div>
+        </div>
+        <div class="a-card warn">
+          <div class="a-card-lbl">В очереди</div>
+          <div class="a-card-num">${allOrders.filter(o=>(o.status||0)===0).length}</div>
+          <div class="a-card-sub">ожидают ответа</div>
+        </div>
+      </div>
+      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:.8rem 0 .5rem">Популярные типы</div>
+      ${byTypeSorted.map(([t,n])=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:.45rem .55rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:.35rem;font-size:.76rem">
+          <span>${t}</span>
+          <span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.7rem;color:var(--accent2)">${n}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+/* ── SELECT ORDER ── */
+window.selectOrder=function(id){
+  selOrderId=id; selClientUid=null;
+  const o=allOrders.find(x=>x.id===id);
+  if(!o) return;
+  selClientUid=o.uid||null;
+  renderList();
+  showDetail(o);
+  if(selClientUid) openChat(selClientUid,o.clientName||'Клиент',o.clientEmail||'');
+};
+window.selectUserChat=function(uid){
+  selOrderId=null; selClientUid=uid;
+  const u=allUsers[uid];
+  renderList();
+  document.getElementById('detailEmpty').style.display='flex';
+  document.getElementById('detailWrap').style.display='none';
+  openChat(uid,u?.name||'Пользователь',u?.email||'');
+};
+
+/* ── SHOW DETAIL ── */
+function showDetail(o){
+  document.getElementById('detailEmpty').style.display='none';
+  const wrap=document.getElementById('detailWrap');
+  wrap.style.display='flex';
+  document.getElementById('dId').textContent='№ '+o.id.slice(0,8).toUpperCase();
+  document.getElementById('dStatusBadge').innerHTML=`<span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>`;
+  document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===(o.status||0)));
+
+  // Date inputs
+  document.getElementById('dateStarted').value=tsToInputDate(o.startedAt);
+  document.getElementById('dateDone').value=tsToInputDate(o.doneAt);
+
+  document.getElementById('dClient').innerHTML=`
+    <div class="info-cell"><div class="info-lbl">Имя</div><div class="info-val">${o.clientName||'—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Email</div><div class="info-val">${o.clientEmail||'—'}</div></div>`;
+  document.getElementById('dInfo').innerHTML=`
+    <div class="info-cell"><div class="info-lbl">Тип</div><div class="info-val">${o.siteType||'—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Тариф</div><div class="info-val">${o.tariff||'—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Страниц</div><div class="info-val">${o.pages||'—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Сумма</div><div class="info-val" style="color:var(--accent2);font-weight:600">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div></div>
+    <div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Создан</div><div class="info-val">${fmtDateTime(o.createdAt)}</div></div>`;
+
+  const descSec=document.getElementById('dDescSec');
+  if(o.description){ descSec.style.display='block'; document.getElementById('dDesc').textContent=o.description; }
+  else descSec.style.display='none';
+
+  const attachSec=document.getElementById('dAttachSec');
+  const attachGrid=document.getElementById('dAttach');
+  if(o.attachments&&o.attachments.length){
+    const imgs=o.attachments.filter(a=>a.fileType&&a.fileType.startsWith('image/'));
+    const files=o.attachments.filter(a=>!a.fileType||!a.fileType.startsWith('image/'));
+    let html='';
+    imgs.forEach(a=>{ html+=`<img class="attach-thumb" src="${a.fileData}" alt="${a.fileName||'img'}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')"/>`; });
+    files.forEach(a=>{ html+=`<a class="msg-file-link" href="${a.fileData}" download="${a.fileName||'file'}">📎 ${a.fileName||'Файл'}</a>`; });
+    if(html){ attachSec.style.display='block'; attachGrid.innerHTML=html; } else attachSec.style.display='none';
+  } else attachSec.style.display='none';
+
+  // Review for this order
+  const revSec=document.getElementById('dReviewSec');
+  const rev=allReviews.find(r=>r.orderId===o.id);
+  if(rev){
+    revSec.style.display='block';
+    document.getElementById('dReviewContent').innerHTML=`
+      <div class="review-item" style="margin:0">
+        <div class="review-top">
+          <span class="star-row">${stars(rev.stars||0)}</span>
+          <span class="review-date">${fmtDate(rev.createdAt)}</span>
+        </div>
+        ${rev.text?`<div class="review-text">${rev.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}
+      </div>`;
+  } else revSec.style.display='none';
+}
+
+/* ── SET STATUS ── */
+window.setStatus=async function(s){
+  if(!selOrderId) return;
+  try{
+    const upd={status:s};
+    // Auto-set dates if not already set
+    const o=allOrders.find(x=>x.id===selOrderId);
+    if(s===1&&!o?.startedAt) upd.startedAt=serverTimestamp();
+    if(s===2&&!o?.doneAt) upd.doneAt=serverTimestamp();
+    await updateDoc(doc(db,'orders',selOrderId),upd);
+    toast('Статус → '+sLabels[s]+' ✓','success');
+  }catch(e){ toast('Ошибка статуса','error'); console.error(e); }
+};
+
+/* ── SAVE DATE ── */
+window.saveDate=async function(field,val){
+  if(!selOrderId||!val) return;
+  try{
+    const d=new Date(val+'T12:00:00');
+    await updateDoc(doc(db,'orders',selOrderId),{[field]:Timestamp.fromDate(d)});
+    toast('Дата сохранена ✓','success');
+  }catch(e){ toast('Ошибка сохранения даты','error'); console.error(e); }
+};
+
+/* ── CHAT ── */
+function appendMsg(m){
+  const container=document.getElementById('chatMsgs');
+  const isAdmin=m.sender==='admin';
+  const div=document.createElement('div');
+  div.className=`msg ${isAdmin?'mine':'theirs'}`;
+  if(m.type==='file'){
+    const src=m.fileData||m.fileUrl||'';
+    const isImg=m.fileType&&m.fileType.startsWith('image/');
+    if(isImg){
+      div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||'img'}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
+    } else {
+      div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName||'file'}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
+    }
+  } else {
+    div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
+  }
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+}
+
+function openChat(uid,name,email){
+  if(unsubChat) unsubChat();
+  document.getElementById('chatEmpty').style.display='none';
+  const wrap=document.getElementById('chatWrap');
+  wrap.style.display='flex';
+  document.getElementById('chatClientName').textContent=name;
+  document.getElementById('chatClientEmail').textContent=email;
+  document.getElementById('chatAv').textContent=initials(name);
+  const msgs=document.getElementById('chatMsgs');
+  msgs.innerHTML='';
+  const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
+  unsubChat=onSnapshot(q, snap=>{
+    snap.docChanges().forEach(ch=>{ if(ch.type==='added') appendMsg(ch.doc.data()); });
+  }, err=>{ toast('Ошибка чата','error'); console.error(err); });
+}
+
+window.adminSendMsg=async function(){
+  if(!selClientUid) return;
+  const inp=document.getElementById('chatInp');
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value=''; inp.style.height='auto';
+  try{
+    await addDoc(collection(db,'chats',selClientUid,'messages'),{
+      text,sender:'admin',senderName:'Поддержка',type:'text',createdAt:serverTimestamp()
+    });
+  }catch(e){ toast('Ошибка отправки','error'); console.error(e); }
+};
+
+window.adminSendFiles=async function(files){
+  if(!selClientUid||!files.length) return;
+  for(const file of Array.from(files)){
+    if(file.size>3*1024*1024){ toast(file.name+' > 3 МБ','error'); continue; }
+    try{
+      toast('Отправляю '+file.name+'...','info');
+      const base64=await new Promise((res,rej)=>{
+        const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
+      });
+      await addDoc(collection(db,'chats',selClientUid,'messages'),{
+        type:'file',fileData:base64,fileName:file.name,fileType:file.type,
+        sender:'admin',senderName:'Поддержка',createdAt:serverTimestamp()
+      });
+      toast(file.name+' отправлен ✓','success');
+    }catch(e){
+      if(e.code==='permission-denied') toast('Нет прав на запись в chats','error');
+      else toast('Ошибка: '+file.name,'error');
+    }
+  }
+  document.getElementById('adminFileInput').value='';
+};
+
+window.doLogout=async function(){
+  if(unsubChat) unsubChat();
+  if(unsubMaint) unsubMaint();
+  await signOut(auth);
+  window.location.href='auth.html';
+};
+
+/* ── INIT ── */
+const loadTimeout=setTimeout(()=>{
+  const ls=document.getElementById('loadingScreen');
+  if(ls&&ls.style.display!=='none'){
+    ls.innerHTML=`<div style="text-align:center;padding:2rem">
+      <div style="font-size:2rem;margin-bottom:.8rem">⚠️</div>
+      <div style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.92rem;margin-bottom:.5rem">Нет соединения</div>
+      <div style="color:#666678;font-size:.78rem;margin-bottom:1.2rem">Проверь интернет или настройки Firebase</div>
+      <button onclick="location.reload()" style="background:#6c63ff;border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.8rem;padding:.55rem 1.3rem;border-radius:50px;cursor:pointer">Обновить</button>
+    </div>`;
+  }
+},8000);
+
+onAuthStateChanged(auth, async user=>{
+  clearTimeout(loadTimeout);
+  document.getElementById('loadingScreen').style.display='none';
+  if(!user||user.email!==ADMIN_EMAIL){
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;font-family:'Onest',sans-serif;color:#f0f0f5;background:#07070a">
+      <div style="font-size:2.2rem">🚫</div>
+      <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1rem">Нет доступа</div>
+      <div style="color:#666678;font-size:.82rem">Страница только для администратора</div>
+      <a href="index.html" style="color:#a78bfa;font-size:.82rem;text-decoration:none;margin-top:.4rem">← На главную</a>
+    </div>`;
+    return;
+  }
+
+  document.getElementById('appWrap').style.display='block';
+  watchMaintenance();
+
+  // Orders
+  const ordQ=query(collection(db,'orders'),orderBy('createdAt','desc'));
+  onSnapshot(ordQ, snap=>{
+    allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    allUsers={};
+    allOrders.forEach(o=>{
+      if(!o.uid) return;
+      if(!allUsers[o.uid]) allUsers[o.uid]={name:o.clientName||'Пользователь',email:o.clientEmail||'',orderCount:0,hasUnread:false};
+      allUsers[o.uid].orderCount=allOrders.filter(x=>x.uid===o.uid).length;
+    });
+    updateStats();
+    renderList();
+    if(selOrderId){ const upd=allOrders.find(o=>o.id===selOrderId); if(upd) showDetail(upd); }
+  }, err=>{
+    if(err.code==='permission-denied') toast('Нет прав на заказы. Проверь Firestore Rules.','error');
+    else toast('Ошибка загрузки заказов','error');
+    console.error(err);
   });
 
-  async function loadChatsIndex(){
-    try {
-      const chatsRootSnap = await getDocs(collection(db,'chats'));
-      chatsRootSnap.forEach(chatDoc => {
-        const uid  = chatDoc.id;
-        const data = chatDoc.data() || {};
-        const lastMsgQ = query(
-          collection(db,'chats',uid,'messages'),
-          orderBy('createdAt','desc')
-        );
-        onSnapshot(lastMsgQ, msgSnap => {
-          if(msgSnap.empty){
-            if(!allChatUsers[uid]) allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false,orderCount:0};
-            renderList(); return;
-          }
-          const last = msgSnap.docs[0].data();
-          const hasUnread = msgSnap.docs.some(d=>d.data().sender==='user'&&!d.data().read);
-          allChatUsers[uid] = {
-            name:      data.name  || last.senderName || 'Пользователь',
-            email:     data.email || '',
-            lastMsg:   last.type==='file'?'📎 Файл':(last.text||'').slice(0,60),
-            lastMsgTs: last.createdAt,
-            hasUnread,
-            orderCount: 0,
-          };
-          renderList();
-        });
+  // Reviews
+  onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')), snap=>{
+    allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(currentTab==='reviews'||currentTab==='analytics') renderList();
+    if(selOrderId){ const o=allOrders.find(x=>x.id===selOrderId); if(o) showDetail(o); }
+  }, err=>console.warn('Reviews error:',err));
+
+  // Chats index
+  loadChatsIndex();
+});
+
+async function loadChatsIndex(){
+  try{
+    const chatsRootSnap=await getDocs(collection(db,'chats'));
+    chatsRootSnap.forEach(chatDoc=>{
+      const uid=chatDoc.id;
+      const data=chatDoc.data()||{};
+      const lastMsgQ=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','desc'));
+      onSnapshot(lastMsgQ, msgSnap=>{
+        if(msgSnap.empty){
+          if(!allChatUsers[uid]) allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false};
+          renderList(); return;
+        }
+        const last=msgSnap.docs[0].data();
+        const hasUnread=msgSnap.docs.some(d=>d.data().sender==='user'&&!d.data().read);
+        allChatUsers[uid]={name:data.name||last.senderName||'Пользователь',email:data.email||'',lastMsg:last.type==='file'?'📎 Файл':(last.text||'').slice(0,55),lastMsgTs:last.createdAt,hasUnread,orderCount:0};
+        renderList();
       });
-    } catch(e){
-      console.warn('Chats watch error:',e);
-      if(e.code==='permission-denied'){
-        console.warn('Нет прав на чтение chats. Добавь в Firestore Rules разрешение для ADMIN_EMAIL.');
-      }
-    }
+    });
+  }catch(e){
+    console.warn('Chats error:',e);
+    if(e.code==='permission-denied') console.warn('Нет прав на chats. Добавь разрешение в Firestore Rules.');
   }
+}
 </script>
 </body>
 </html>

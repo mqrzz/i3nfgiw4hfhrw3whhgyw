@@ -3,319 +3,604 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Личный кабинет — Design Antviz</title>
+  <title>Кабинет — Design Antviz</title>
   <link rel="icon" href="favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;
-      --border:rgba(255,255,255,0.07);--accent:#6c63ff;--accent2:#a78bfa;
-      --accent3:#38bdf8;--text:#f0f0f5;--muted:#777789;
+      --bg:#0a0a0c;--bg2:#0f0f14;--bg3:#17171e;--card:#131318;
+      --border:rgba(255,255,255,0.065);--border-hi:rgba(255,255,255,0.13);
+      --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
+      --text:#ededf2;--muted:#666678;--muted2:#999aab;
       --success:#4ade80;--error:#f87171;--warn:#fbbf24;
-      --nav-h:72px;--mobnav-h:80px;
+      --nav-h:52px;--mobnav-h:72px;
+      --r:20px;--r-lg:26px;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;min-height:100vh;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(108,99,255,.12) 0%,transparent 60%),radial-gradient(ellipse 40% 30% at 10% 80%,rgba(56,189,248,.06) 0%,transparent 55%);pointer-events:none}
+    body{
+      background:var(--bg);color:var(--text);
+      font-family:'Onest',sans-serif;font-weight:300;
+      line-height:1.6;min-height:100vh;overflow-x:hidden;
+    }
+    /* subtle noise grain */
+    body::before{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      opacity:.5;
+    }
+    body::after{
+      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:
+        radial-gradient(ellipse 55% 40% at 90% 5%, rgba(108,99,255,.09) 0%, transparent 65%),
+        radial-gradient(ellipse 35% 25% at 5% 90%, rgba(56,189,248,.05) 0%, transparent 60%);
+    }
 
-    /* ── LOADING ── */
-    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
-    .spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* ── DESKTOP NAV (capsule — identical to index.html) ── */
+    /* ══════════ NAV (desktop capsule) ══════════ */
     nav.desktop-nav{
-      position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;
+      position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:200;
       display:flex;align-items:center;justify-content:space-between;
-      padding:0 1.5rem;height:52px;
-      width:calc(100% - 40px);max-width:1100px;
-      background:rgba(22,22,30,0.88);backdrop-filter:blur(20px);
-      border:1px solid rgba(255,255,255,0.1);border-radius:28px;
-      box-shadow:0 4px 30px rgba(0,0,0,.4);
+      padding:0 1.4rem;height:var(--nav-h);
+      width:calc(100% - 32px);max-width:1080px;
+      background:rgba(15,15,20,0.9);backdrop-filter:blur(24px);
+      border:1px solid var(--border-hi);border-radius:30px;
+      box-shadow:0 2px 24px rgba(0,0,0,.35);
     }
-    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.04em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
-    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:pulse 2s infinite;flex-shrink:0}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-    .nav-links{display:flex;gap:1.5rem;align-items:center}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.02em;transition:color .2s}
-    .nav-links a:hover{color:var(--text)}
-    .nav-links a.active{color:var(--text)}
-    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
+    .logo{
+      font-family:'Unbounded',sans-serif;font-weight:600;font-size:.85rem;
+      letter-spacing:.04em;color:var(--text);text-decoration:none;
+      display:flex;align-items:center;gap:9px;
+    }
+    .logo-dot{
+      width:7px;height:7px;border-radius:50%;
+      background:var(--accent);box-shadow:0 0 10px var(--accent);
+      animation:pulse 2s infinite;
+    }
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.35)}}
+    .nav-links{display:flex;gap:1.4rem;align-items:center}
+    .nav-links a{
+      color:var(--muted);text-decoration:none;
+      font-size:.78rem;letter-spacing:.02em;transition:color .18s;
+    }
+    .nav-links a:hover,.nav-links a.active{color:var(--text)}
+    .nav-links a.active{font-weight:500}
 
-    /* ── MOBILE NAV BAR (capsule — identical to index.html) ── */
+    /* ══════════ MOBILE NAV ══════════ */
     .mobile-nav-bar{
-      display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:200;
-      background:rgba(22,22,30,0.92);backdrop-filter:blur(24px);
-      border:1px solid rgba(255,255,255,.12);border-radius:28px;
-      padding:8px 6px;width:calc(100% - 24px);max-width:380px;
+      display:none;position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:200;
+      background:rgba(15,15,20,0.94);backdrop-filter:blur(28px);
+      border:1px solid var(--border-hi);border-radius:24px;
+      padding:6px 4px;width:calc(100% - 20px);max-width:370px;
       justify-content:space-around;align-items:center;
-      box-shadow:0 8px 40px rgba(0,0,0,.5);
+      box-shadow:0 6px 32px rgba(0,0,0,.45);
     }
-    .mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--muted);font-size:.6rem;letter-spacing:0;padding:6px 10px;border-radius:14px;transition:background .18s,color .18s;position:relative;border:none;background:none;cursor:pointer;font-family:'Onest',sans-serif}
-    .mobile-nav-item svg{width:20px;height:20px}
-    .mobile-nav-item.active{color:var(--accent2);background:rgba(108,99,255,.13)}
-    .mob-badge{position:absolute;top:2px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:.55rem;font-weight:700;display:none;align-items:center;justify-content:center}
-    .mob-badge.show{display:flex}
+    .mob-btn{
+      display:flex;flex-direction:column;align-items:center;gap:3px;
+      text-decoration:none;color:var(--muted);font-size:.58rem;
+      padding:7px 12px;border-radius:14px;
+      transition:background .17s,color .17s;
+      background:none;border:none;cursor:pointer;
+      font-family:'Onest',sans-serif;position:relative;
+    }
+    .mob-btn svg{width:19px;height:19px;stroke-width:1.7}
+    .mob-btn.active{color:var(--accent2);background:rgba(108,99,255,.12)}
+    .mob-notif{
+      position:absolute;top:3px;right:6px;
+      width:7px;height:7px;border-radius:50%;
+      background:var(--error);display:none;
+    }
+    .mob-notif.show{display:block}
 
-    /* ── PAGE WRAP ── */
+    /* ══════════ LAYOUT ══════════ */
     .page-wrap{
-      padding-top:calc(16px + 52px + 2.5rem);
-      padding-bottom:2.5rem;
-      min-height:100vh;
-      max-width:980px;
-      margin:0 auto;
-      padding-left:2rem;
-      padding-right:2rem;
+      max-width:920px;margin:0 auto;
+      padding: calc(var(--nav-h) + 14px + 2rem) 1.5rem calc(var(--mobnav-h) + 1.5rem);
       position:relative;z-index:1;
     }
 
-    /* ── SECTIONS ── */
-    .section{display:none}.section.active{display:block}
+    /* ══════════ LOADING ══════════ */
+    .loading-screen{
+      position:fixed;inset:0;z-index:999;background:var(--bg);
+      display:flex;align-items:center;justify-content:center;
+      flex-direction:column;gap:.9rem;
+    }
+    .spinner{
+      width:32px;height:32px;border:2px solid var(--border-hi);
+      border-top-color:var(--accent);border-radius:50%;
+      animation:spin .75s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* ── PROFILE HERO CARD ── */
+    /* ══════════ SECTIONS ══════════ */
+    .section{display:none}.section.active{display:block;animation:fadeIn .3s ease}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+    /* ══════════ IN-APP STATUS BANNER ══════════ */
+    .status-banner{
+      position:fixed;top:calc(var(--nav-h) + 22px);left:50%;
+      transform:translateX(-50%) translateY(-10px);
+      z-index:300;
+      background:var(--card);border:1px solid var(--border-hi);
+      border-radius:50px;padding:.5rem 1.2rem .5rem .8rem;
+      display:flex;align-items:center;gap:.65rem;
+      font-size:.8rem;font-weight:500;
+      box-shadow:0 8px 32px rgba(0,0,0,.4);
+      opacity:0;pointer-events:none;transition:opacity .3s,transform .3s;
+      white-space:nowrap;
+    }
+    .status-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
+    .banner-icon{font-size:1rem}
+    .banner-close{
+      background:none;border:none;color:var(--muted);
+      cursor:pointer;font-size:.85rem;margin-left:.3rem;padding:0;
+      line-height:1;transition:color .15s;
+    }
+    .banner-close:hover{color:var(--text)}
+
+    /* ══════════ PROFILE HERO — redesigned ══════════ */
     .profile-hero{
-      background:linear-gradient(135deg,rgba(108,99,255,.1) 0%,rgba(167,139,250,.06) 50%,rgba(56,189,248,.04) 100%);
-      border:1px solid rgba(108,99,255,.2);border-radius:28px;
-      padding:2.4rem 2.5rem;margin-bottom:2rem;
-      display:flex;align-items:center;gap:2rem;flex-wrap:wrap;
+      display:grid;grid-template-columns:auto 1fr auto;
+      align-items:center;gap:1.4rem;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--r-lg);
+      padding:1.8rem 2rem;
+      margin-bottom:1.4rem;
       position:relative;overflow:hidden;
     }
-    .profile-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(108,99,255,.18) 0%,transparent 70%);pointer-events:none}
-    .profile-avatar{
-      width:72px;height:72px;border-radius:50%;
-      background:linear-gradient(135deg,var(--accent),var(--accent2));
+    .profile-hero::before{
+      content:'';position:absolute;top:0;right:0;
+      width:280px;height:100%;
+      background:linear-gradient(to left, rgba(108,99,255,.06), transparent);
+      pointer-events:none;
+    }
+
+    /* Avatar with upload */
+    .avatar-wrap{position:relative;flex-shrink:0}
+    .avatar{
+      width:68px;height:68px;border-radius:18px;
+      background:var(--bg3);border:2px solid var(--border-hi);
       display:flex;align-items:center;justify-content:center;
-      font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.8rem;color:#fff;
-      flex-shrink:0;box-shadow:0 0 32px rgba(108,99,255,.4);
+      font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.6rem;
+      color:var(--accent2);overflow:hidden;cursor:pointer;
+      position:relative;transition:border-color .2s;
     }
-    .profile-info{flex:1;min-width:0}
-    .profile-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.35rem;line-height:1.2;margin-bottom:.3rem}
-    .profile-email{color:var(--muted);font-size:.82rem;margin-bottom:.6rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .profile-since{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;color:var(--accent2);background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);padding:.22rem .7rem;border-radius:50px}
-
-    /* ── STATS ROW ── */
-    .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
-    .stat-card{
-      background:rgba(22,22,30,.7);backdrop-filter:blur(12px);
-      border:1px solid var(--border);border-radius:20px;
-      padding:1.4rem 1.2rem;text-align:center;
-      transition:border-color .2s,transform .15s;
+    .avatar:hover{border-color:var(--accent)}
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
+    .avatar-overlay{
+      position:absolute;inset:0;background:rgba(0,0,0,.55);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transition:opacity .2s;border-radius:16px;
     }
-    .stat-card:hover{border-color:rgba(108,99,255,.25);transform:translateY(-2px)}
-    .stat-num{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2rem;line-height:1;color:var(--accent2);margin-bottom:.35rem}
-    .stat-num.blue{color:var(--accent3)}
-    .stat-num.green{color:var(--success)}
-    .stat-label{color:var(--muted);font-size:.72rem;letter-spacing:.04em}
+    .avatar:hover .avatar-overlay{opacity:1}
+    .avatar-overlay svg{width:20px;height:20px;stroke:#fff;stroke-width:1.8}
+    .avatar-input{display:none}
 
-    /* ── GLASS CARD ── */
+    .profile-text .name{
+      font-family:'Unbounded',sans-serif;font-weight:600;
+      font-size:1.2rem;line-height:1.2;margin-bottom:.2rem;
+    }
+    .profile-text .email{color:var(--muted);font-size:.8rem;margin-bottom:.5rem}
+    .profile-text .since{
+      display:inline-flex;align-items:center;gap:5px;
+      font-size:.68rem;color:var(--muted2);
+      background:var(--bg3);border:1px solid var(--border);
+      padding:.18rem .6rem;border-radius:50px;
+    }
+    .profile-actions{display:flex;flex-direction:column;gap:.5rem;align-items:flex-end}
+
+    /* ══════════ STATS — compact row ══════════ */
+    .stats-row{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      gap:.75rem;margin-bottom:1.4rem;
+    }
+    .stat{
+      background:var(--card);border:1px solid var(--border);
+      border-radius:var(--r);padding:1.1rem 1rem;
+      display:flex;align-items:center;gap:.9rem;
+      transition:border-color .2s;
+    }
+    .stat:hover{border-color:var(--border-hi)}
+    .stat-icon{
+      width:36px;height:36px;border-radius:10px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+    }
+    .stat-icon svg{width:17px;height:17px}
+    .stat-icon.purple{background:rgba(108,99,255,.12);color:var(--accent2)}
+    .stat-icon.blue{background:rgba(56,189,248,.1);color:var(--accent3)}
+    .stat-icon.green{background:rgba(74,222,128,.1);color:var(--success)}
+    .stat-body .num{
+      font-family:'Unbounded',sans-serif;font-weight:700;
+      font-size:1.5rem;line-height:1;
+    }
+    .stat-body .lbl{color:var(--muted);font-size:.68rem;margin-top:.18rem}
+
+    /* ══════════ CARD SHELL ══════════ */
     .card{
-      background:rgba(22,22,30,.65);backdrop-filter:blur(16px);
-      border:1px solid var(--border);border-radius:22px;
-      padding:1.8rem;margin-bottom:1.25rem;
+      background:var(--card);border:1px solid var(--border);
+      border-radius:var(--r);padding:1.5rem;margin-bottom:1rem;
     }
-    .card-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem}
-    .card-title-left{display:flex;align-items:center;gap:.55rem}
-    .card-icon{width:32px;height:32px;border-radius:10px;background:rgba(108,99,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .card-icon svg{width:15px;height:15px;color:var(--accent2)}
-
-    /* ── CTA CARD ── */
-    .cta-card{
-      background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(167,139,250,.06));
-      border:1px solid rgba(108,99,255,.22);border-radius:22px;
-      padding:1.8rem;margin-bottom:1.25rem;
-      display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap;
+    .card-hdr{
+      display:flex;align-items:center;justify-content:space-between;
+      margin-bottom:1.2rem;gap:.8rem;
     }
-    .cta-card-emoji{font-size:2rem;flex-shrink:0}
-    .cta-card-body{flex:1;min-width:0}
-    .cta-card-body h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;margin-bottom:.2rem}
-    .cta-card-body p{color:var(--muted);font-size:.8rem}
+    .card-hdr-left{display:flex;align-items:center;gap:.6rem}
+    .card-ico{
+      width:28px;height:28px;border-radius:8px;flex-shrink:0;
+      display:flex;align-items:center;justify-content:center;
+      background:rgba(108,99,255,.1);
+    }
+    .card-ico svg{width:14px;height:14px;stroke:var(--accent2);stroke-width:1.8}
+    .card-title{
+      font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;
+    }
 
-    /* ── ORDER CARDS ── */
-    .orders-list{display:flex;flex-direction:column;gap:.75rem}
+    /* ══════════ ORDER CARDS — redesigned ══════════ */
+    .orders-list{display:flex;flex-direction:column;gap:.6rem}
     .order-card{
-      background:rgba(18,18,24,.6);backdrop-filter:blur(8px);
       border:1px solid var(--border);border-radius:16px;
-      padding:1.1rem 1.4rem;
-      transition:border-color .2s,transform .15s;
+      padding:1rem 1.1rem;cursor:pointer;
+      transition:border-color .18s,background .18s;
+      background:rgba(255,255,255,.018);
     }
-    .order-card:hover{border-color:rgba(108,99,255,.3);transform:translateY(-1px)}
-    .order-head{display:flex;align-items:center;gap:.8rem;margin-bottom:.55rem;flex-wrap:wrap}
-    .order-id{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.78rem}
-    .order-meta-row{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
-    .order-type{font-size:.78rem;color:var(--muted)}
-    .order-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.9rem}
-    .order-date{font-size:.72rem;color:var(--muted);margin-left:auto}
-    .order-desc{font-size:.78rem;color:var(--muted);margin-top:.6rem;padding-top:.6rem;border-top:1px solid var(--border);line-height:1.55}
-    .status-badge{display:inline-flex;align-items:center;gap:.3rem;padding:.22rem .65rem;border-radius:50px;font-size:.68rem;font-weight:600;flex-shrink:0;margin-left:auto}
-    .status-0{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.2)}
-    .status-1{background:rgba(56,189,248,.12);color:var(--accent3);border:1px solid rgba(56,189,248,.2)}
-    .status-2{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.2)}
-    .status-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .empty-state{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    .empty-icon{font-size:2.5rem;margin-bottom:.8rem}
-    .empty-state h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.95rem;color:var(--text);margin-bottom:.35rem}
-    .empty-state p{font-size:.82rem;margin-bottom:1.3rem}
+    .order-card:hover{border-color:var(--border-hi);background:rgba(255,255,255,.03)}
+    .order-top{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem}
+    .order-num{
+      font-family:'Unbounded',sans-serif;font-weight:600;
+      font-size:.75rem;color:var(--text);
+    }
+    .order-meta{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;color:var(--muted);font-size:.75rem}
+    .order-dot{width:3px;height:3px;border-radius:50%;background:var(--border-hi);flex-shrink:0}
+    .order-price{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.8rem;color:var(--text);margin-left:auto}
+    .status-pill{
+      display:inline-flex;align-items:center;gap:.28rem;
+      padding:.18rem .6rem;border-radius:50px;font-size:.65rem;font-weight:600;
+      flex-shrink:0;
+    }
+    .sp-dot{width:4px;height:4px;border-radius:50%;background:currentColor}
+    .s0{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
+    .s1{background:rgba(56,189,248,.1);color:var(--accent3);border:1px solid rgba(56,189,248,.18)}
+    .s2{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.18)}
 
-    /* ── SECTION HEADER ── */
-    .section-hdr{margin-bottom:2rem}
-    .section-hdr h2{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.5rem;margin-bottom:.3rem}
-    .section-hdr p{color:var(--muted);font-size:.84rem}
-    .section-hdr-row{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:2rem}
-    .section-hdr-row .section-hdr{margin-bottom:0}
+    /* Order expand area */
+    .order-expand{display:none;margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+    .order-expand.open{display:block}
+    .order-desc{font-size:.77rem;color:var(--muted2);line-height:1.55;margin-bottom:.8rem}
 
-    /* ── BUTTONS ── */
-    .btn{display:inline-flex;align-items:center;gap:7px;padding:.75rem 1.6rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.86rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .15s,box-shadow .2s}
-    .btn:hover{transform:translateY(-2px)}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(108,99,255,.3)}
-    .btn-primary:hover{box-shadow:0 6px 28px rgba(108,99,255,.48)}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
-    .btn-danger{background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.2)}
-    .btn-danger:hover{background:rgba(248,113,113,.2)}
-    .btn-sm{padding:.42rem .95rem;font-size:.76rem}
+    /* Timeline inside order */
+    .order-timeline{display:flex;flex-direction:column;gap:0}
+    .tl-item{display:flex;gap:.7rem;position:relative;padding-bottom:.85rem}
+    .tl-item:last-child{padding-bottom:0}
+    .tl-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+    .tl-node{
+      width:22px;height:22px;border-radius:50%;border:2px solid var(--border-hi);
+      display:flex;align-items:center;justify-content:center;
+      font-size:.55rem;font-weight:700;background:var(--bg3);flex-shrink:0;
+    }
+    .tl-node.done{border-color:var(--success);color:var(--success);background:rgba(74,222,128,.08)}
+    .tl-node.active{border-color:var(--accent2);color:var(--accent2);background:rgba(108,99,255,.1)}
+    .tl-node.pending{border-color:var(--border);color:var(--muted)}
+    .tl-line{flex:1;width:1px;background:var(--border);margin:4px 0}
+    .tl-body{padding-top:2px}
+    .tl-label{font-size:.77rem;font-weight:500;margin-bottom:.08rem}
+    .tl-date{font-size:.68rem;color:var(--muted)}
 
-    /* ── CHAT ── */
+    /* Estimated delivery */
+    .delivery-row{
+      display:flex;align-items:center;gap:.5rem;
+      background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.15);
+      border-radius:10px;padding:.5rem .75rem;font-size:.75rem;
+      color:var(--accent2);margin-bottom:.8rem;
+    }
+    .delivery-row svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;flex-shrink:0}
+
+    /* Download receipt button */
+    .order-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+
+    /* ══════════ EMPTY STATE ══════════ */
+    .empty{
+      text-align:center;padding:3rem 1rem;color:var(--muted);
+    }
+    .empty-icon{font-size:2.2rem;margin-bottom:.75rem}
+    .empty h3{
+      font-family:'Unbounded',sans-serif;font-weight:600;
+      font-size:.9rem;color:var(--text);margin-bottom:.3rem;
+    }
+    .empty p{font-size:.8rem;margin-bottom:1.2rem}
+
+    /* ══════════ CHAT ══════════ */
     .chat-wrap{
       display:flex;flex-direction:column;
-      height:calc(100vh - 52px - 16px - 2.5rem - 80px - 2rem);
-      min-height:420px;
-      background:rgba(22,22,30,.65);backdrop-filter:blur(16px);
-      border:1px solid var(--border);border-radius:22px;overflow:hidden;
+      height:calc(100vh - var(--nav-h) - 14px - 2rem - var(--mobnav-h) - 4rem);
+      min-height:400px;
+      background:var(--card);border:1px solid var(--border);
+      border-radius:var(--r);overflow:hidden;
     }
-    .chat-hdr{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.9rem;flex-shrink:0}
-    .chat-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-    .chat-hdr-info h3{font-weight:500;font-size:.88rem}
-    .chat-hdr-info p{color:var(--muted);font-size:.7rem}
-    .online-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);margin-right:3px}
-    .chat-msgs{flex:1;overflow-y:auto;padding:1.1rem;display:flex;flex-direction:column;gap:.65rem;scroll-behavior:smooth}
-    .chat-msgs::-webkit-scrollbar{width:3px}
-    .chat-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
-    .msg{max-width:78%;display:flex;flex-direction:column;gap:.14rem}
+    .chat-hdr{
+      padding:.85rem 1.2rem;border-bottom:1px solid var(--border);
+      display:flex;align-items:center;gap:.8rem;flex-shrink:0;
+    }
+    .chat-av{
+      width:34px;height:34px;border-radius:50%;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex;align-items:center;justify-content:center;font-size:.95rem;flex-shrink:0;
+    }
+    .chat-hdr-info h3{font-weight:500;font-size:.84rem}
+    .chat-hdr-info p{color:var(--muted);font-size:.67rem}
+    .online-dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--success);margin-right:3px}
+    .chat-msgs{
+      flex:1;overflow-y:auto;padding:1rem;
+      display:flex;flex-direction:column;gap:.55rem;scroll-behavior:smooth;
+    }
+    .chat-msgs::-webkit-scrollbar{width:2px}
+    .chat-msgs::-webkit-scrollbar-thumb{background:var(--border-hi);border-radius:2px}
+    .msg{max-width:75%;display:flex;flex-direction:column;gap:.1rem}
     .msg.mine{align-self:flex-end;align-items:flex-end}
     .msg.theirs{align-self:flex-start;align-items:flex-start}
-    .msg-bubble{padding:.58rem .9rem;border-radius:14px;font-size:.84rem;line-height:1.5;word-break:break-word}
-    .msg.mine .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
-    .msg.theirs .msg-bubble{background:rgba(255,255,255,.07);color:var(--text);border-bottom-left-radius:4px}
-    .msg-time{font-size:.63rem;color:var(--muted)}
-    .msg-img{max-width:220px;max-height:200px;border-radius:10px;display:block;cursor:pointer;transition:opacity .2s}
-    .msg-img:hover{opacity:.85}
-    .msg-file-link{display:flex;align-items:center;gap:.48rem;background:rgba(255,255,255,.08);border-radius:10px;padding:.45rem .7rem;font-size:.78rem;text-decoration:none;color:var(--text);transition:background .2s}
-    .msg-file-link:hover{background:rgba(255,255,255,.15)}
-    .chat-row{padding:.75rem 1rem;border-top:1px solid var(--border);display:flex;gap:.55rem;align-items:flex-end;flex-shrink:0}
-    .chat-textarea{flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:.6rem .9rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.86rem;font-weight:300;outline:none;resize:none;max-height:90px;transition:border-color .2s;line-height:1.45}
-    .chat-textarea:focus{border-color:var(--accent)}
-    .chat-icon-btn{width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:border-color .2s,color .2s}
-    .chat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
-    .chat-send{background:var(--accent);border:none;color:#fff}
-    .chat-send:hover{box-shadow:0 3px 16px rgba(108,99,255,.45)}
-    .chat-icon-btn svg{width:15px;height:15px}
-
-    /* ── LIGHTBOX ── */
-    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
-    .lightbox.show{opacity:1;pointer-events:all}
-    .lightbox img{max-width:92vw;max-height:90vh;border-radius:12px;object-fit:contain;box-shadow:0 20px 60px rgba(0,0,0,.8)}
-    .lightbox-close{position:fixed;top:1.2rem;right:1.5rem;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:1.4rem;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
-    .lightbox-close:hover{background:rgba(255,255,255,.25)}
-
-    /* ── SETTINGS ── */
-    .form-group{margin-bottom:1.1rem}
-    .form-label{display:block;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
-    .form-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s,box-shadow .2s}
-    .form-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.12)}
-    .form-input:disabled{opacity:.38;cursor:default}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-
-    /* ── DANGER ZONE ── */
-    .danger-card{
-      background:rgba(248,113,113,.04);
-      border:1px solid rgba(248,113,113,.18);border-radius:22px;
-      padding:1.8rem;margin-bottom:1.25rem;
+    .msg-bubble{
+      padding:.5rem .85rem;border-radius:14px;
+      font-size:.82rem;line-height:1.5;word-break:break-word;
     }
-    .danger-card .card-title{color:var(--error)}
-    .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(248,113,113,.1);margin-bottom:1rem}
-    .danger-row:last-child{padding-bottom:0;border-bottom:none;margin-bottom:0}
-    .danger-row-info h4{font-size:.86rem;font-weight:500;margin-bottom:.2rem}
-    .danger-row-info p{font-size:.78rem;color:var(--muted)}
+    .msg.mine .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+    .msg.theirs .msg-bubble{background:var(--bg3);color:var(--text);border-bottom-left-radius:4px}
+    .msg-time{font-size:.61rem;color:var(--muted)}
+    .msg-img{max-width:200px;max-height:180px;border-radius:10px;display:block;cursor:pointer;transition:opacity .2s}
+    .msg-img:hover{opacity:.85}
+    .msg-file-link{
+      display:flex;align-items:center;gap:.4rem;
+      background:rgba(255,255,255,.07);border-radius:8px;
+      padding:.38rem .6rem;font-size:.76rem;text-decoration:none;color:var(--text);
+      transition:background .2s;
+    }
+    .msg-file-link:hover{background:rgba(255,255,255,.12)}
+    .chat-row{
+      padding:.65rem .85rem;border-top:1px solid var(--border);
+      display:flex;gap:.45rem;align-items:flex-end;flex-shrink:0;
+    }
+    .chat-textarea{
+      flex:1;background:var(--bg3);border:1px solid var(--border);
+      border-radius:10px;padding:.55rem .8rem;
+      color:var(--text);font-family:'Onest',sans-serif;font-size:.83rem;font-weight:300;
+      outline:none;resize:none;max-height:80px;transition:border-color .18s;line-height:1.45;
+    }
+    .chat-textarea:focus{border-color:rgba(108,99,255,.4)}
+    .chat-icon-btn{
+      width:34px;height:34px;border-radius:50%;
+      border:1px solid var(--border);background:rgba(255,255,255,.03);
+      color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;
+      flex-shrink:0;transition:border-color .18s,color .18s;
+    }
+    .chat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+    .chat-send{background:var(--accent);border-color:var(--accent);color:#fff}
+    .chat-send:hover{box-shadow:0 2px 12px rgba(108,99,255,.4);border-color:var(--accent)!important;color:#fff!important}
+    .chat-icon-btn svg{width:14px;height:14px}
 
-    /* ── MODAL ── */
-    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s}
+    /* ══════════ LIGHTBOX ══════════ */
+    .lightbox{
+      position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.93);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;pointer-events:none;transition:opacity .22s;
+    }
+    .lightbox.show{opacity:1;pointer-events:all}
+    .lightbox img{max-width:90vw;max-height:88vh;border-radius:10px;object-fit:contain}
+    .lb-close{
+      position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.12);
+      border:none;color:#fff;font-size:1.2rem;width:38px;height:38px;border-radius:50%;
+      cursor:pointer;display:flex;align-items:center;justify-content:center;
+    }
+
+    /* ══════════ SETTINGS ══════════ */
+    .section-hdr{margin-bottom:1.4rem}
+    .section-hdr h2{
+      font-family:'Unbounded',sans-serif;font-weight:700;
+      font-size:1.3rem;margin-bottom:.2rem;
+    }
+    .section-hdr p{color:var(--muted);font-size:.8rem}
+    .form-group{margin-bottom:.9rem}
+    .form-label{
+      display:block;font-size:.65rem;letter-spacing:.07em;
+      text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;
+    }
+    .form-input{
+      width:100%;background:var(--bg3);border:1px solid var(--border);
+      border-radius:10px;padding:.68rem .9rem;color:var(--text);
+      font-family:'Onest',sans-serif;font-size:.86rem;font-weight:300;
+      outline:none;transition:border-color .18s,box-shadow .18s;
+    }
+    .form-input:focus{border-color:rgba(108,99,255,.4);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+    .form-input:disabled{opacity:.32;cursor:default}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+
+    /* ══════════ DANGER ZONE ══════════ */
+    .danger-card{
+      background:rgba(248,113,113,.03);
+      border:1px solid rgba(248,113,113,.14);border-radius:var(--r);
+      padding:1.5rem;margin-bottom:1rem;
+    }
+    .danger-title{
+      font-family:'Unbounded',sans-serif;font-weight:600;
+      font-size:.78rem;color:var(--error);margin-bottom:1rem;
+    }
+    .danger-row{
+      display:flex;align-items:center;justify-content:space-between;
+      flex-wrap:wrap;gap:.8rem;
+      padding-bottom:.9rem;border-bottom:1px solid rgba(248,113,113,.08);
+      margin-bottom:.9rem;
+    }
+    .danger-row:last-child{padding-bottom:0;border-bottom:none;margin-bottom:0}
+    .danger-row h4{font-size:.84rem;font-weight:500;margin-bottom:.18rem}
+    .danger-row p{font-size:.76rem;color:var(--muted)}
+
+    /* ══════════ BUTTONS ══════════ */
+    .btn{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:.65rem 1.35rem;border-radius:50px;
+      font-family:'Onest',sans-serif;font-size:.82rem;font-weight:500;
+      text-decoration:none;cursor:pointer;border:none;
+      transition:transform .13s,box-shadow .18s,opacity .15s;
+    }
+    .btn:hover{transform:translateY(-1px)}
+    .btn:active{transform:translateY(0)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 3px 14px rgba(108,99,255,.28)}
+    .btn-primary:hover{box-shadow:0 5px 22px rgba(108,99,255,.42)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--border-hi);color:var(--text)}
+    .btn-danger{background:rgba(248,113,113,.09);color:var(--error);border:1px solid rgba(248,113,113,.2)}
+    .btn-danger:hover{background:rgba(248,113,113,.16)}
+    .btn-xs{padding:.3rem .75rem;font-size:.7rem}
+    .btn-sm{padding:.42rem .95rem;font-size:.75rem}
+
+    /* ══════════ REVIEW MODAL ══════════ */
+    .modal-overlay{
+      position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.72);
+      backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;
+      padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .2s;
+    }
     .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:var(--bg2);border:1px solid rgba(248,113,113,.25);border-radius:24px;padding:2rem;max-width:420px;width:100%;transform:translateY(16px);transition:transform .2s}
+    .modal{
+      background:var(--bg2);border:1px solid var(--border-hi);
+      border-radius:var(--r-lg);padding:2rem;
+      max-width:400px;width:100%;
+      transform:translateY(14px);transition:transform .22s;
+    }
     .modal-overlay.show .modal{transform:translateY(0)}
-    .modal-icon{font-size:2.5rem;margin-bottom:.8rem;text-align:center}
-    .modal h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.05rem;margin-bottom:.6rem;text-align:center}
-    .modal p{color:var(--muted);font-size:.84rem;line-height:1.6;text-align:center;margin-bottom:1.5rem}
-    .modal-confirm-input{width:100%;margin-bottom:1.2rem}
-    .modal-btns{display:flex;gap:.75rem}
+    .modal-icon{font-size:2.2rem;margin-bottom:.7rem;text-align:center}
+    .modal h3{
+      font-family:'Unbounded',sans-serif;font-weight:700;
+      font-size:1rem;margin-bottom:.5rem;text-align:center;
+    }
+    .modal p{color:var(--muted);font-size:.82rem;text-align:center;margin-bottom:1.2rem;line-height:1.55}
+    .modal-input{width:100%;margin-bottom:1rem}
+    .modal-btns{display:flex;gap:.6rem}
     .modal-btns .btn{flex:1;justify-content:center}
 
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:calc(var(--mobnav-h) + 1rem);left:50%;transform:translateX(-50%) translateY(20px);z-index:600;padding:.6rem 1.3rem;border-radius:50px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+    /* Stars rating */
+    .stars-row{display:flex;justify-content:center;gap:.35rem;margin-bottom:1rem}
+    .star{
+      font-size:1.8rem;cursor:pointer;
+      filter:grayscale(1) opacity(.4);
+      transition:filter .15s,transform .12s;
+    }
+    .star.on{filter:none}
+    .star:hover{transform:scale(1.15)}
+    .review-textarea{
+      width:100%;background:var(--bg3);border:1px solid var(--border);
+      border-radius:10px;padding:.65rem .9rem;color:var(--text);
+      font-family:'Onest',sans-serif;font-size:.83rem;font-weight:300;
+      outline:none;resize:vertical;min-height:80px;
+      transition:border-color .18s;margin-bottom:1rem;
+    }
+    .review-textarea:focus{border-color:rgba(108,99,255,.4)}
+
+    /* Delete confirm */
+    .delete-overlay .modal{border-color:rgba(248,113,113,.22)}
+
+    /* ══════════ TOAST ══════════ */
+    .toast{
+      position:fixed;bottom:calc(var(--mobnav-h) + .9rem);left:50%;
+      transform:translateX(-50%) translateY(14px);z-index:700;
+      padding:.55rem 1.2rem;border-radius:50px;
+      font-size:.77rem;font-weight:500;
+      opacity:0;transition:opacity .28s,transform .28s;
+      pointer-events:none;white-space:nowrap;
+    }
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--success);color:#000}
     .toast.error{background:var(--error);color:#fff}
     .toast.info{background:var(--accent);color:#fff}
 
-    /* ── MAINTENANCE ── */
-    .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;text-align:center;padding:2rem}
-    .maint-icon{font-size:3.5rem}
-    .maint-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem}
-    .maint-sub{color:var(--muted);font-size:.9rem;max-width:380px;line-height:1.6}
+    /* ══════════ MAINTENANCE ══════════ */
+    .maint-screen{
+      position:fixed;inset:0;z-index:2000;background:var(--bg);
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      gap:1rem;text-align:center;padding:2rem;
+    }
 
-    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-    .fade-up{animation:fadeUp .5s ease both}
-
-    /* ── MOBILE ── */
-    @media(max-width:1024px){
+    /* ══════════ RESPONSIVE ══════════ */
+    @media(max-width:900px){
       nav.desktop-nav{display:none!important}
       .mobile-nav-bar{display:flex!important}
       .page-wrap{
-        padding-top:1.5rem;
-        padding-bottom:calc(var(--mobnav-h) + 2rem);
-        padding-left:1rem;padding-right:1rem;
+        padding-top:1.4rem;
+        padding-bottom:calc(var(--mobnav-h) + 1.5rem);
+        padding-left:.9rem;padding-right:.9rem;
       }
-      .chat-wrap{height:calc(100svh - var(--mobnav-h) - 1.5rem - 140px);min-height:340px}
+      .profile-hero{grid-template-columns:auto 1fr;gap:1rem}
+      .profile-actions{
+        flex-direction:row;align-items:center;
+        grid-column:1/-1;
+      }
       .stats-row{grid-template-columns:1fr 1fr}
-      .stats-row .stat-card:last-child{grid-column:span 2}
+      .stats-row .stat:last-child{grid-column:span 2}
       .form-row{grid-template-columns:1fr}
-      .profile-hero{padding:1.6rem;gap:1.2rem}
-      .profile-avatar{width:56px;height:56px;font-size:1.4rem}
-      .profile-name{font-size:1.1rem}
-      .toast{bottom:calc(var(--mobnav-h) + 2rem)}
+      .chat-wrap{height:calc(100svh - var(--mobnav-h) - 1.4rem - 120px);min-height:340px}
+      .toast{bottom:calc(var(--mobnav-h) + 1.5rem)}
+      .status-banner{top:1rem}
     }
     @media(max-width:480px){
-      .section-hdr h2{font-size:1.25rem}
+      .profile-hero{padding:1.3rem}
       .stats-row{grid-template-columns:1fr 1fr}
+      .stats-row .stat:last-child{grid-column:span 2}
     }
   </style>
 </head>
 <body>
 
+<!-- LOADING -->
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:.8rem">Загрузка...</p>
+  <p style="color:var(--muted);font-size:.78rem;margin-top:.3rem">Загрузка кабинета...</p>
 </div>
 
+<!-- MAINTENANCE -->
 <div class="maint-screen" id="maintScreen" style="display:none">
-  <div class="maint-icon">🔧</div>
-  <div class="maint-title">Технические работы</div>
-  <div class="maint-sub">Сайт временно недоступен. Уже работаем — скоро всё будет готово!</div>
+  <div style="font-size:3rem">🔧</div>
+  <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem">Технические работы</div>
+  <div style="color:var(--muted);font-size:.88rem;max-width:360px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div>
 </div>
 
+<!-- IN-APP STATUS BANNER -->
+<div class="status-banner" id="statusBanner">
+  <span class="banner-icon" id="bannerIcon">✅</span>
+  <span id="bannerText">Статус заказа изменился</span>
+  <button class="banner-close" onclick="closeBanner()">✕</button>
+</div>
+
+<!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
+  <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
   <img id="lightboxImg" src="" alt=""/>
 </div>
 
-<!-- DELETE ACCOUNT MODAL -->
-<div class="modal-overlay" id="deleteModal">
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <div class="modal-icon">⭐</div>
+    <h3>Оставить отзыв</h3>
+    <p>Расскажите, как прошла работа над проектом — это помогает нам становиться лучше</p>
+    <div class="stars-row" id="starsRow">
+      <span class="star" data-v="1" onclick="setStar(1)">★</span>
+      <span class="star" data-v="2" onclick="setStar(2)">★</span>
+      <span class="star" data-v="3" onclick="setStar(3)">★</span>
+      <span class="star" data-v="4" onclick="setStar(4)">★</span>
+      <span class="star" data-v="5" onclick="setStar(5)">★</span>
+    </div>
+    <textarea class="review-textarea" id="reviewText" placeholder="Напишите пару слов о сотрудничестве..."></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-ghost" onclick="closeReview()">Позже</button>
+      <button class="btn btn-primary" onclick="submitReview()">Отправить</button>
+    </div>
+  </div>
+</div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay delete-overlay" id="deleteModal">
   <div class="modal">
     <div class="modal-icon">⚠️</div>
     <h3>Удалить аккаунт?</h3>
-    <p>Это действие необратимо. Все ваши заказы и история чата будут удалены навсегда. Введите ваш email для подтверждения:</p>
-    <input class="form-input modal-confirm-input" id="deleteConfirmInput" type="email" placeholder="Ваш email"/>
+    <p>Это необратимо. Все заказы и история чата будут удалены. Введите ваш email для подтверждения:</p>
+    <input class="form-input modal-input" id="deleteConfirmInput" type="email" placeholder="Ваш email"/>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeDeleteModal()">Отмена</button>
       <button class="btn btn-danger" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">Удалить</button>
@@ -331,130 +616,131 @@
     <a href="order.html">Заказать</a>
     <a href="faq.html">FAQ</a>
     <a href="profile.html" class="active">Кабинет</a>
-    <a href="order.html" class="nav-cta">Заказать сайт</a>
   </div>
 </nav>
 
-<!-- MOBILE BOTTOM NAV -->
+<!-- MOBILE NAV -->
 <nav class="mobile-nav-bar">
-  <a href="index.html" class="mobile-nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
+  <a href="index.html" class="mob-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/></svg>
     Главная
   </a>
-  <button class="mobile-nav-item active" onclick="showSection('dashboard')" id="mnav-dashboard">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="9" rx="2"/><rect x="14" y="3" width="7" height="5" rx="2"/><rect x="14" y="12" width="7" height="9" rx="2"/><rect x="3" y="16" width="7" height="5" rx="2"/></svg>
-    Кабинет
+  <button class="mob-btn active" onclick="showSection('dashboard')" id="mnav-dashboard">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+    Обзор
   </button>
-  <a href="order.html" class="mobile-nav-item">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg>
+  <a href="order.html" class="mob-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg>
     Заказать
   </a>
-  <button class="mobile-nav-item" onclick="showSection('support')" id="mnav-support">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+  <button class="mob-btn" onclick="showSection('support')" id="mnav-support">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
     Чат
+    <span class="mob-notif" id="chatNotifDot"></span>
   </button>
-  <button class="mobile-nav-item" onclick="showSection('settings')" id="mnav-settings">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    Профиль
+  <button class="mob-btn" onclick="showSection('settings')" id="mnav-settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+    Настройки
   </button>
 </nav>
 
-<!-- MAIN APP -->
+<!-- APP -->
 <div class="page-wrap" id="appWrap" style="display:none">
 
-  <!-- ── DASHBOARD ── -->
-  <div class="section active fade-up" id="section-dashboard">
+  <!-- ─── DASHBOARD ─── -->
+  <div class="section active" id="section-dashboard">
 
+    <!-- Profile hero -->
     <div class="profile-hero">
-      <div class="profile-avatar" id="heroAvatar">А</div>
-      <div class="profile-info">
-        <div class="profile-name" id="heroName">...</div>
-        <div class="profile-email" id="heroEmail">...</div>
-
-      </div>
-      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-        <button class="btn btn-primary btn-sm" onclick="showSection('support')">💬 Написать в чат</button>
-        <button class="btn btn-ghost btn-sm" onclick="showSection('settings')">Настройки</button>
-        <button class="btn btn-sm" style="background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.18)" onclick="doLogout()">Выйти</button>
-      </div>
-    </div>
-
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-num" id="statTotal">—</div>
-        <div class="stat-label">Всего заказов</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num blue" id="statActive">—</div>
-        <div class="stat-label">В работе</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num green" id="statDone">—</div>
-        <div class="stat-label">Завершено</div>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">
-        <div class="card-title-left">
-          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
-          Последние заказы
+      <div class="avatar-wrap">
+        <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
+          <span id="avatarLetter">А</span>
+          <div class="avatar-overlay">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
         </div>
-        <button class="btn btn-ghost btn-sm" onclick="showSection('orders')">Все заказы →</button>
+        <input type="file" id="avatarInput" class="avatar-input" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
+      </div>
+      <div class="profile-text">
+        <div class="name" id="heroName">...</div>
+        <div class="email" id="heroEmail">...</div>
+        <div class="since"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:10px;height:10px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span id="heroSince">...</span></div>
+      </div>
+      <div class="profile-actions">
+        <button class="btn btn-ghost btn-sm" onclick="showSection('support')">💬 Чат</button>
+        <button class="btn btn-sm" style="background:rgba(248,113,113,.08);color:var(--error);border:1px solid rgba(248,113,113,.15)" onclick="doLogout()">Выйти</button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat">
+        <div class="stat-icon purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+        <div class="stat-body"><div class="num" id="statTotal">—</div><div class="lbl">Всего заказов</div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+        <div class="stat-body"><div class="num" id="statActive">—</div><div class="lbl">В работе</div></div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="stat-body"><div class="num" id="statDone">—</div><div class="lbl">Завершено</div></div>
+      </div>
+    </div>
+
+    <!-- Recent orders -->
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+          <span class="card-title">Последние заказы</span>
+        </div>
+        <button class="btn btn-ghost btn-xs" onclick="showSection('orders')">Все →</button>
       </div>
       <div class="orders-list" id="dashOrders">
-        <p style="color:var(--muted);font-size:.82rem">Загрузка...</p>
+        <p style="color:var(--muted);font-size:.8rem">Загрузка...</p>
       </div>
-    </div>
-
-    <div class="cta-card">
-      <div class="cta-card-emoji">🚀</div>
-      <div class="cta-card-body">
-        <h3>Готовы к новому проекту?</h3>
-        <p>Оформите заказ — ответим в течение часа</p>
-      </div>
-      <a href="order.html" class="btn btn-primary btn-sm">Заказать</a>
     </div>
 
   </div>
 
-  <!-- ── ORDERS ── -->
+  <!-- ─── ORDERS ─── -->
   <div class="section" id="section-orders">
-    <div class="section-hdr-row">
-      <div class="section-hdr">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.4rem">
+      <div class="section-hdr" style="margin:0">
         <h2>Мои заказы</h2>
         <p>История всех ваших заявок</p>
       </div>
-      <a href="order.html" class="btn btn-primary btn-sm" style="align-self:flex-start">+ Новый заказ</a>
+      <a href="order.html" class="btn btn-primary btn-sm">+ Новый заказ</a>
     </div>
     <div class="orders-list" id="ordersList">
-      <p style="color:var(--muted);font-size:.82rem;padding:.5rem">Загрузка...</p>
+      <p style="color:var(--muted);font-size:.8rem;padding:.4rem">Загрузка...</p>
     </div>
   </div>
 
-  <!-- ── SUPPORT ── -->
+  <!-- ─── SUPPORT ─── -->
   <div class="section" id="section-support">
-    <div class="section-hdr" style="margin-bottom:1.4rem">
-      <h2>Чат поддержки</h2>
-      <p>Задайте вопрос — ответим как можно скорее. Можно прикрепить файлы и изображения.</p>
+    <div class="section-hdr" style="margin-bottom:1rem">
+      <h2>Чат с командой</h2>
+      <p>Задайте вопрос — ответим как можно скорее</p>
     </div>
-    <div class="chat-wrap" id="chatWrap">
+    <div class="chat-wrap">
       <div class="chat-hdr">
         <div class="chat-av">🛠</div>
         <div class="chat-hdr-info">
-          <h3>Команда Design Antviz</h3>
-          <p><span class="online-dot"></span>Служба поддержки</p>
+          <h3>Design Antviz</h3>
+          <p><span class="online-dot"></span>Поддержка</p>
         </div>
       </div>
       <div class="chat-msgs" id="chatMsgs"></div>
       <div class="chat-row">
         <input type="file" id="fileInput" style="display:none" multiple accept="image/*,.pdf,.doc,.docx,.zip,.rar,.psd,.fig" onchange="sendFiles(this.files)"/>
-        <button class="chat-icon-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить файл">
+        <button class="chat-icon-btn" onclick="document.getElementById('fileInput').click()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
         </button>
         <textarea class="chat-textarea" id="chatInput" placeholder="Напишите сообщение..." rows="1"
           onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
-          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
         <button class="chat-icon-btn chat-send" onclick="sendMsg()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
@@ -462,18 +748,18 @@
     </div>
   </div>
 
-  <!-- ── SETTINGS ── -->
+  <!-- ─── SETTINGS ─── -->
   <div class="section" id="section-settings">
     <div class="section-hdr">
-      <h2>Настройки профиля</h2>
-      <p>Управляйте своим аккаунтом</p>
+      <h2>Настройки</h2>
+      <p>Управляйте профилем и аккаунтом</p>
     </div>
 
     <div class="card">
-      <div class="card-title">
-        <div class="card-title-left">
-          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
-          Личные данные
+      <div class="card-hdr">
+        <div class="card-hdr-left">
+          <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <span class="card-title">Личные данные</span>
         </div>
       </div>
       <div class="form-row">
@@ -486,29 +772,26 @@
           <input class="form-input" id="settingEmail" disabled/>
         </div>
       </div>
-      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Сохранить изменения</button>
+      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Сохранить</button>
     </div>
 
     <div class="danger-card">
-      <div class="card-title" style="color:var(--error);margin-bottom:1rem">Опасная зона</div>
-
+      <div class="danger-title">Опасная зона</div>
       <div class="danger-row">
-        <div class="danger-row-info">
+        <div>
           <h4>Выйти из аккаунта</h4>
-          <p>Завершить текущую сессию на этом устройстве</p>
+          <p>Завершить текущую сессию</p>
         </div>
         <button class="btn btn-danger btn-sm" onclick="doLogout()">Выйти</button>
       </div>
-
       <div class="danger-row">
-        <div class="danger-row-info">
+        <div>
           <h4>Удалить аккаунт</h4>
-          <p>Безвозвратно удалить аккаунт, все заказы и историю чата</p>
+          <p>Безвозвратно удалить всё — заказы и историю</p>
         </div>
-        <button class="btn btn-danger btn-sm" onclick="openDeleteModal()">Удалить аккаунт</button>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteModal()">Удалить</button>
       </div>
     </div>
-
   </div>
 
 </div><!-- /page-wrap -->
@@ -516,341 +799,462 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
-  import {
-    onAuthStateChanged, signOut, updateProfile, deleteUser, reauthenticateWithCredential, EmailAuthProvider
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import {
-    collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
-    doc, updateDoc, getDoc, deleteDoc, getDocs, setDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from './firebase-config.js';
+import {
+  onAuthStateChanged, signOut, updateProfile, deleteUser
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp,
+  doc, updateDoc, getDoc, deleteDoc, getDocs, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  let currentUser = null, unsubOrders = null, unsubChat = null;
-  let lastOrderStatuses = {}, lastChatAdminCount = 0;
+/* ── STATE ── */
+let currentUser = null, unsubOrders = null, unsubChat = null;
+let lastStatuses = {}, reviewOrderId = null, reviewStars = 0;
+let bannerTimer = null;
 
-  /* ── UTILS ── */
-  function toast(msg, type='info'){
-    const t=document.getElementById('toast');
-    t.textContent=msg; t.className=`toast ${type} show`;
-    setTimeout(()=>t.className='toast', 3200);
-  }
-  function fmtDate(ts){
-    if(!ts) return '—';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});
-  }
-  function fmtTime(ts){
-    if(!ts) return '';
-    const d=ts.toDate?ts.toDate():new Date(ts);
-    return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-  }
-  const statusLabels=['Ожидание','В работе','Готово'];
+/* ── UTILS ── */
+function toast(msg, type='info'){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  setTimeout(()=>t.className='toast', 3200);
+}
+function fmtDate(ts){
+  if(!ts) return '—';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});
+}
+function fmtTime(ts){
+  if(!ts) return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+}
+const STATUS_LABELS=['Ожидание','В работе','Готово'];
+const STATUS_ICONS=['⏳','🔵','✅'];
 
-  /* ── LIGHTBOX ── */
-  window.openLightbox = function(src){
-    document.getElementById('lightboxImg').src=src;
-    document.getElementById('lightbox').classList.add('show');
-  };
-  window.closeLightbox = function(){
-    document.getElementById('lightbox').classList.remove('show');
-    document.getElementById('lightboxImg').src='';
-  };
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeDeleteModal();}});
+/* ── IN-APP BANNER ── */
+function showBanner(text, icon='✅'){
+  clearTimeout(bannerTimer);
+  document.getElementById('bannerText').textContent=text;
+  document.getElementById('bannerIcon').textContent=icon;
+  document.getElementById('statusBanner').classList.add('show');
+  bannerTimer=setTimeout(closeBanner, 6000);
+}
+window.closeBanner=()=>document.getElementById('statusBanner').classList.remove('show');
 
-  /* ── SECTION NAV ── */
-  window.showSection = function(name){
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.mobile-nav-item').forEach(b=>b.classList.remove('active'));
-    const sec=document.getElementById('section-'+name);
-    if(sec){ sec.classList.add('active'); sec.classList.add('fade-up'); }
-    const mb=document.getElementById('mnav-'+name);
-    if(mb) mb.classList.add('active');
-    window.scrollTo({top:0,behavior:'smooth'});
-  };
+/* ── SECTION NAV ── */
+window.showSection=function(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.mob-btn').forEach(b=>b.classList.remove('active'));
+  const sec=document.getElementById('section-'+name);
+  if(sec) sec.classList.add('active');
+  const mb=document.getElementById('mnav-'+name);
+  if(mb) mb.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(name==='support') document.getElementById('chatNotifDot').classList.remove('show');
+};
 
-  /* ── MAINTENANCE ── */
-  async function checkMaintenance(){
+/* ── MAINTENANCE ── */
+async function checkMaintenance(){
+  try{
+    const snap=await getDoc(doc(db,'settings','maintenance'));
+    if(snap.exists()&&snap.data().enabled===true){
+      document.getElementById('loadingScreen').style.display='none';
+      document.getElementById('maintScreen').style.display='flex';
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+/* ── AVATAR UPLOAD ── */
+window.handleAvatarUpload=async function(file){
+  if(!file) return;
+  if(file.size>3*1024*1024){ toast('Файл больше 3 МБ','error'); return; }
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    const dataUrl=e.target.result;
+    const avatarEl=document.getElementById('heroAvatar');
+    // Show image in avatar
+    let img=avatarEl.querySelector('img');
+    if(!img){ img=document.createElement('img'); document.getElementById('avatarLetter').style.display='none'; avatarEl.insertBefore(img, avatarEl.firstChild); }
+    img.src=dataUrl;
+    // Save to Firestore
     try{
-      const snap=await getDoc(doc(db,'settings','maintenance'));
-      if(snap.exists()&&snap.data().enabled===true){
-        document.getElementById('loadingScreen').style.display='none';
-        document.getElementById('maintScreen').style.display='flex';
-        return true;
-      }
-    }catch(e){}
-    return false;
-  }
+      await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl}).catch(()=>{});
+      toast('Фото обновлено ✓','success');
+    }catch(e){ console.error(e); }
+  };
+  reader.readAsDataURL(file);
+};
 
-  /* ── ORDER CARD ── */
-  function orderCard(o, mini=false){
-    const s=o.status||0;
-    return`<div class="order-card">
-      <div class="order-head">
-        <span class="order-id">№ ${o.id.slice(0,8).toUpperCase()}</span>
-        <span class="status-badge status-${s}"><span class="status-dot"></span>${statusLabels[s]}</span>
+/* ── DELIVERY ESTIMATE ── */
+function getEstimate(pages, extras=[]){
+  let days = Math.max(1, Math.ceil(pages / 3));
+  if(extras.includes('urgent')) days = 1;
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  return d.toLocaleDateString('ru',{day:'numeric',month:'long'});
+}
+
+/* ── ORDER CARD ── */
+function orderCard(o, mini=false){
+  const s=o.status||0;
+  const pgs=o.pages||1;
+  const extrasArr=o.extras||[];
+  const estDate=s<2?getEstimate(pgs,extrasArr):'';
+  const tl=buildTimeline(o);
+
+  return `<div class="order-card" onclick="toggleOrder(this)">
+    <div class="order-top">
+      <span class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</span>
+      <div class="order-meta">
+        <span>${o.siteType||'Сайт'}</span>
+        <span class="order-dot"></span>
+        <span>${o.tariff||'Стандарт'}</span>
+        <span class="order-dot"></span>
+        <span>${fmtDate(o.createdAt)}</span>
       </div>
-      <div class="order-meta-row">
-        <span class="order-type">${o.siteType||'Сайт'} · ${o.tariff||'Стандарт'}</span>
-        <span class="order-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
-        <span class="order-date">${fmtDate(o.createdAt)}</span>
+      <span class="order-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:.5rem">
+      <span class="status-pill s${s}"><span class="sp-dot"></span>${STATUS_LABELS[s]}</span>
+    </div>
+    ${!mini?`
+    <div class="order-expand">
+      ${s<2&&estDate?`<div class="delivery-row"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Примерный срок: <strong style="color:var(--text)">${estDate}</strong></div>`:''}
+      ${o.description?`<div class="order-desc">${o.description}</div>`:''}
+      ${tl}
+      <div class="order-actions">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();printReceipt(${JSON.stringify(o).replace(/"/g,'&quot;')})">🖨 Квитанция</button>
+        ${s===2&&!o.reviewed?`<button class="btn btn-xs" style="background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.2)" onclick="event.stopPropagation();openReview('${o.id}')">⭐ Оставить отзыв</button>`:''}
       </div>
-      ${!mini&&o.description?`<div class="order-desc">${o.description}</div>`:''}
+    </div>`:''}
+  </div>`;
+}
+
+function buildTimeline(o){
+  const s=o.status||0;
+  const steps=[
+    {label:'Заявка создана',date:fmtDate(o.createdAt),state:s>=0?'done':'pending'},
+    {label:'Взят в работу',date:o.startedAt?fmtDate(o.startedAt):'',state:s>=1?'done':s===0?'pending':'pending'},
+    {label:'Готово',date:o.doneAt?fmtDate(o.doneAt):'',state:s>=2?'done':'pending'},
+  ];
+  if(s===1) steps[1].state='active';
+  return `<div class="order-timeline">${steps.map((st,i)=>`
+    <div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-node ${st.state}">${st.state==='done'?'✓':i+1}</div>
+        ${i<steps.length-1?'<div class="tl-line"></div>':''}
+      </div>
+      <div class="tl-body">
+        <div class="tl-label" style="color:${st.state==='pending'?'var(--muted)':'var(--text)'}">${st.label}</div>
+        ${st.date?`<div class="tl-date">${st.date}</div>`:'<div class="tl-date" style="color:var(--muted)">Ожидается</div>'}
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+window.toggleOrder=function(el){
+  const exp=el.querySelector('.order-expand');
+  if(!exp) return;
+  exp.classList.toggle('open');
+};
+
+/* ── PRINT RECEIPT ── */
+window.printReceipt=function(o){
+  const w=window.open('','_blank','width=600,height=700');
+  const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Design Antviz</title>
+  <style>
+    body{font-family:system-ui,sans-serif;max-width:520px;margin:40px auto;padding:0 20px;color:#111;font-size:14px}
+    h1{font-size:20px;margin-bottom:4px}
+    .sub{color:#666;font-size:12px;margin-bottom:24px}
+    table{width:100%;border-collapse:collapse}
+    td{padding:8px 0;border-bottom:1px solid #eee}
+    td:last-child{text-align:right;font-weight:600}
+    .total td{font-size:16px;font-weight:700;border-bottom:none;padding-top:14px}
+    .footer{margin-top:32px;font-size:11px;color:#999;border-top:1px solid #eee;padding-top:16px}
+    @media print{body{margin:20px}}
+  </style></head><body>
+  <h1>Design Antviz</h1>
+  <div class="sub">Квитанция по заказу</div>
+  <table>
+    <tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr>
+    <tr><td>Дата</td><td>${date}</td></tr>
+    <tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr>
+    <tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr>
+    <tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr>
+    <tr><td>Тариф</td><td>${o.tariff||'—'}</td></tr>
+    <tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>
+    ${(o.extras||[]).length?`<tr><td>Дополнения</td><td>${o.extras.join(', ')}</td></tr>`:''}
+    <tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr>
+  </table>
+  <div class="footer">Design Antviz · designantviz.ru · © ${new Date().getFullYear()}</div>
+  <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  w.document.close();
+};
+
+/* ── RENDER ORDERS ── */
+function renderOrders(orders, id, limit=999){
+  const el=document.getElementById(id);
+  if(!orders.length){
+    el.innerHTML=`<div class="empty">
+      <div class="empty-icon">📋</div>
+      <h3>Заказов пока нет</h3>
+      <p>Оформите первый заказ — займёт 2 минуты</p>
+      <a href="order.html" class="btn btn-primary btn-sm">Заказать сайт</a>
     </div>`;
+    return;
   }
+  const mini=id==='dashOrders';
+  el.innerHTML=orders.slice(0,limit).map(o=>orderCard(o,mini)).join('');
+}
 
-  function renderOrders(orders, id, limit=999){
-    const el=document.getElementById(id);
-    if(!orders.length){
-      el.innerHTML=`<div class="empty-state">
-        <div class="empty-icon">📋</div>
-        <h3>Заказов пока нет</h3>
-        <p>Оформите первый заказ — займёт 2 минуты</p>
-        <a href="order.html" class="btn btn-primary btn-sm">Заказать сайт</a>
-      </div>`;
-      return;
-    }
-    el.innerHTML=orders.slice(0,limit).map(o=>orderCard(o,id==='dashOrders')).join('');
-  }
+/* ── LOAD ORDERS ── */
+function loadOrders(uid){
+  if(unsubOrders) unsubOrders();
+  const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
+  unsubOrders=onSnapshot(q, snap=>{
+    const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    document.getElementById('statTotal').textContent=orders.length;
+    document.getElementById('statActive').textContent=orders.filter(o=>o.status===1).length;
+    document.getElementById('statDone').textContent=orders.filter(o=>o.status===2).length;
+    renderOrders(orders,'dashOrders',3);
+    renderOrders(orders,'ordersList');
 
-  /* ── LOAD ORDERS ──
-     ВАЖНО: В Firestore нужен составной индекс:
-     Коллекция: orders | Поля: uid ASC, createdAt DESC
-     Ссылка для создания будет в консоли браузера при первом запросе.
-  ── */
-  function loadOrders(uid){
-    if(unsubOrders) unsubOrders();
-    const q=query(
-      collection(db,'orders'),
-      where('uid','==',uid),
-      orderBy('createdAt','desc')
-    );
-    unsubOrders=onSnapshot(q, snap=>{
-      const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
-      document.getElementById('statTotal').textContent=orders.length;
-      document.getElementById('statActive').textContent=orders.filter(o=>o.status===1).length;
-      document.getElementById('statDone').textContent=orders.filter(o=>o.status===2).length;
-      renderOrders(orders,'dashOrders',3);
-      renderOrders(orders,'ordersList');
-    }, err=>{
-      console.error('Orders error:',err);
-      // Если ошибка индекса — Firestore выкинет ссылку в консоль автоматически
-      if(err.code==='failed-precondition'){
-        console.warn('Нужен составной индекс Firestore: orders → uid ASC + createdAt DESC. Ссылка выше.');
-        toast('Ошибка индекса БД. Смотри консоль.','error');
-      }
-    });
-  }
-
-  /* ── CHAT ── */
-  function appendMsg(m){
-    const container=document.getElementById('chatMsgs');
-    const isMe=m.sender==='user';
-    const div=document.createElement('div');
-    div.className=`msg ${isMe?'mine':'theirs'}`;
-    if(m.type==='file'){
-      const src=m.fileData||m.fileUrl||'';
-      const isImg=m.fileType&&m.fileType.startsWith('image/');
-      if(isImg){
-        div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||'img'}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')" /><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-      } else {
-        div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-      }
-    } else {
-      div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-    }
-    container.appendChild(div);
-    container.scrollTop=container.scrollHeight;
-  }
-
-  function loadChat(uid){
-    if(unsubChat) unsubChat();
-    const container=document.getElementById('chatMsgs');
-    container.innerHTML=`<div class="msg theirs"><div class="msg-bubble">Привет! 👋 Задайте любой вопрос по заказу или нашим услугам.</div><div class="msg-time">Design Antviz</div></div>`;
-    const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
-    unsubChat=onSnapshot(q, snap=>{
-      snap.docChanges().forEach(change=>{
-        if(change.type==='added') appendMsg(change.doc.data());
-      });
-    }, err=>console.error('Chat error:',err));
-  }
-
-  window.sendMsg=async function(){
-    if(!currentUser) return;
-    const inp=document.getElementById('chatInput');
-    const text=inp.value.trim();
-    if(!text) return;
-    inp.value=''; inp.style.height='auto';
-    try{
-      await setDoc(doc(db,'chats',currentUser.uid),{
-        name:currentUser.displayName||'',email:currentUser.email||''
-      },{merge:true});
-      await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-        text, sender:'user', senderName:currentUser.displayName||'Пользователь',
-        type:'text', createdAt:serverTimestamp()
-      });
-    }catch(e){ toast('Ошибка отправки','error'); console.error(e); }
-  };
-
-  window.sendFiles=async function(files){
-    if(!currentUser||!files.length) return;
-    for(const file of Array.from(files)){
-      if(file.size>3*1024*1024){ toast(file.name+' больше 3 МБ','error'); continue; }
-      try{
-        toast('Отправляю '+file.name+'...','info');
-        const base64=await new Promise((res,rej)=>{
-          const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-        });
-        await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-          type:'file', fileData:base64, fileName:file.name, fileType:file.type,
-          sender:'user', senderName:currentUser.displayName||'Пользователь',
-          createdAt:serverTimestamp()
-        });
-        toast('Файл отправлен ✓','success');
-      }catch(e){ toast('Ошибка: '+file.name,'error'); console.error(e); }
-    }
-    document.getElementById('fileInput').value='';
-  };
-
-  /* ── SETTINGS ── */
-  window.saveSettings=async function(){
-    if(!currentUser) return;
-    const name=document.getElementById('settingName').value.trim();
-    if(!name){ toast('Введите имя','error'); return; }
-    try{
-      await updateProfile(currentUser,{displayName:name});
-      await updateDoc(doc(db,'users',currentUser.uid),{name}).catch(()=>{});
-      document.getElementById('heroName').textContent=name;
-      document.getElementById('heroAvatar').textContent=name[0].toUpperCase();
-      toast('Сохранено ✓','success');
-    }catch(e){ toast('Ошибка сохранения','error'); }
-  };
-
-  window.doLogout=async function(){
-    if(unsubOrders) unsubOrders();
-    if(unsubChat) unsubChat();
-    await signOut(auth);
-    window.location.href='auth.html';
-  };
-
-  /* ── DELETE ACCOUNT ── */
-  window.openDeleteModal=function(){
-    document.getElementById('deleteConfirmInput').value='';
-    document.getElementById('deleteModal').classList.add('show');
-    setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),200);
-  };
-  window.closeDeleteModal=function(){
-    document.getElementById('deleteModal').classList.remove('show');
-  };
-  window.confirmDeleteAccount=async function(){
-    if(!currentUser) return;
-    const inputEmail=document.getElementById('deleteConfirmInput').value.trim();
-    if(inputEmail!==currentUser.email){
-      toast('Email не совпадает','error'); return;
-    }
-    const btn=document.getElementById('deleteConfirmBtn');
-    btn.textContent='Удаляю...'; btn.disabled=true;
-    try{
-      // 1. Удалить все заказы пользователя
-      const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
-      for(const d of ordSnap.docs) await deleteDoc(d.ref).catch(()=>{});
-
-      // 2. Удалить сообщения чата
-      const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
-      for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});
-      await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
-
-      // 3. Удалить профиль пользователя из users
-      await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
-
-      // 4. Удалить Firebase Auth аккаунт
-      await deleteUser(currentUser);
-
-      window.location.href='auth.html';
-    }catch(e){
-      console.error('Delete account error:',e);
-      if(e.code==='auth/requires-recent-login'){
-        toast('Выйдите и войдите снова, затем повторите','error');
-      } else {
-        toast('Ошибка удаления. Попробуйте позже.','error');
-      }
-      btn.textContent='Удалить'; btn.disabled=false;
-    }
-  };
-
-  /* ── PUSH NOTIFICATIONS ── */
-  window.requestPushPermission=async function(){
-    if(!('Notification' in window)){ toast('Браузер не поддерживает уведомления','error'); return; }
-    if(Notification.permission==='granted'){ toast('Уведомления уже включены ✓','success'); return; }
-    const perm=await Notification.requestPermission();
-    if(perm==='granted'){
-      toast('Уведомления включены ✓','success');
-      sendNotif('Design Antviz','Уведомления включены! Будете в курсе статуса заказов 👋');
-    } else {
-      toast('Уведомления отклонены','error');
-    }
-  };
-
-  function sendNotif(title, body){
-    if(!('Notification' in window)||Notification.permission!=='granted') return;
-    if(document.visibilityState==='visible') return;
-    try{ new Notification(title,{body,icon:'favicon.png'}); }catch(e){}
-  }
-
-  function watchOrdersForPush(uid){
-    const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
-    onSnapshot(q,snap=>{
-      snap.docs.forEach(d=>{
-        const o=d.data(); const prev=lastOrderStatuses[d.id]; const cur=o.status??0;
+    // Check status changes → in-app banner + review prompt
+    snap.docChanges().forEach(ch=>{
+      if(ch.type==='modified'){
+        const o={id:ch.doc.id,...ch.doc.data()};
+        const prev=lastStatuses[ch.doc.id];
+        const cur=o.status??0;
         if(prev!==undefined&&prev!==cur){
-          const labels=['⏳ Ожидание','🔵 В работе','✅ Готово'];
-          sendNotif('Статус заказа изменился',`Заказ №${d.id.slice(0,8).toUpperCase()}: ${labels[cur]}`);
+          showBanner(`Заказ №${o.id.slice(0,8).toUpperCase()}: ${STATUS_ICONS[cur]} ${STATUS_LABELS[cur]}`, STATUS_ICONS[cur]);
+          // Auto-open review prompt when done
+          if(cur===2&&!o.reviewed) setTimeout(()=>openReview(o.id), 2000);
         }
-        lastOrderStatuses[d.id]=cur;
-      });
+        lastStatuses[ch.doc.id]=cur;
+      } else if(ch.type==='added'){
+        const o={id:ch.doc.id,...ch.doc.data()};
+        lastStatuses[ch.doc.id]=o.status??0;
+      }
     });
-  }
+  }, err=>console.error('Orders error:',err));
+}
 
-  function watchChatForPush(uid){
-    const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
-    let init=true;
-    onSnapshot(q,snap=>{
-      if(init){ init=false; return; }
-      snap.docChanges().forEach(ch=>{
-        if(ch.type==='added'&&ch.doc.data().sender==='admin'){
-          const m=ch.doc.data();
-          sendNotif('💬 Новое сообщение от поддержки',m.text?m.text.slice(0,80):'Прикреплён файл');
-        }
-      });
+/* ── REVIEW ── */
+window.openReview=function(orderId){
+  reviewOrderId=orderId; reviewStars=0;
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
+  document.getElementById('reviewText').value='';
+  document.getElementById('reviewModal').classList.add('show');
+};
+window.closeReview=function(){
+  document.getElementById('reviewModal').classList.remove('show');
+};
+window.setStar=function(n){
+  reviewStars=n;
+  document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));
+};
+window.submitReview=async function(){
+  if(!reviewStars){ toast('Выберите оценку','error'); return; }
+  if(!currentUser||!reviewOrderId) return;
+  try{
+    await addDoc(collection(db,'reviews'),{
+      uid:currentUser.uid,orderId:reviewOrderId,
+      stars:reviewStars,text:document.getElementById('reviewText').value.trim(),
+      clientName:currentUser.displayName||'',clientEmail:currentUser.email,
+      createdAt:serverTimestamp()
     });
-  }
+    await updateDoc(doc(db,'orders',reviewOrderId),{reviewed:true}).catch(()=>{});
+    closeReview();
+    toast('Спасибо за отзыв! ✓','success');
+  }catch(e){ console.error(e); toast('Ошибка отправки','error'); }
+};
 
-  /* ── PUSH BANNER ── */
-
-  /* ── INIT ── */
-  onAuthStateChanged(auth, async user=>{
-    if(!user){ window.location.href='auth.html'; return; }
-    const maintOn=await checkMaintenance();
-    if(maintOn) return;
-
-    currentUser=user;
-    const name=user.displayName||'Пользователь';
-    document.getElementById('heroName').textContent=name;
-    document.getElementById('heroEmail').textContent=user.email;
-    document.getElementById('heroAvatar').textContent=name[0].toUpperCase();
-    document.getElementById('settingName').value=name;
-    document.getElementById('settingEmail').value=user.email;
-
-    if(Notification.permission==='granted'){
+/* ── CHAT ── */
+function appendMsg(m){
+  const container=document.getElementById('chatMsgs');
+  const isMe=m.sender==='user';
+  const div=document.createElement('div');
+  div.className=`msg ${isMe?'mine':'theirs'}`;
+  if(m.type==='file'){
+    const src=m.fileData||m.fileUrl||'';
+    const isImg=m.fileType&&m.fileType.startsWith('image/');
+    if(isImg){
+      div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||'img'}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')" /><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+    } else {
+      div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
     }
+  } else {
+    div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+  }
+  container.appendChild(div);
+  container.scrollTop=container.scrollHeight;
+}
 
-    document.getElementById('loadingScreen').style.display='none';
-    document.getElementById('appWrap').style.display='block';
+function loadChat(uid){
+  if(unsubChat) unsubChat();
+  const container=document.getElementById('chatMsgs');
+  container.innerHTML=`<div class="msg theirs"><div class="msg-bubble">Привет! 👋 Задайте любой вопрос по заказу или нашим услугам.</div><div class="msg-time">Design Antviz</div></div>`;
+  let chatInit=true;
+  const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
+  unsubChat=onSnapshot(q, snap=>{
+    snap.docChanges().forEach(ch=>{
+      if(ch.type==='added'){
+        appendMsg(ch.doc.data());
+        // Notif dot on mobile if not on support tab and after init
+        if(!chatInit&&ch.doc.data().sender==='admin'){
+          const activeSection=document.querySelector('.section.active');
+          if(!activeSection||activeSection.id!=='section-support'){
+            document.getElementById('chatNotifDot').classList.add('show');
+          }
+        }
+      }
+    });
+    chatInit=false;
+  }, err=>console.error('Chat error:',err));
+}
 
-    loadOrders(user.uid);
-    loadChat(user.uid);
-    watchOrdersForPush(user.uid);
-    watchChatForPush(user.uid);
-  });
+window.sendMsg=async function(){
+  if(!currentUser) return;
+  const inp=document.getElementById('chatInput');
+  const text=inp.value.trim();
+  if(!text) return;
+  inp.value=''; inp.style.height='auto';
+  try{
+    await setDoc(doc(db,'chats',currentUser.uid),{name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
+    await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
+      text,sender:'user',senderName:currentUser.displayName||'Пользователь',
+      type:'text',createdAt:serverTimestamp()
+    });
+  }catch(e){ toast('Ошибка отправки','error'); console.error(e); }
+};
+
+window.sendFiles=async function(files){
+  if(!currentUser||!files.length) return;
+  for(const file of Array.from(files)){
+    if(file.size>3*1024*1024){ toast(file.name+' больше 3 МБ','error'); continue; }
+    try{
+      toast('Отправляю '+file.name+'...','info');
+      const base64=await new Promise((res,rej)=>{
+        const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
+      });
+      await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
+        type:'file',fileData:base64,fileName:file.name,fileType:file.type,
+        sender:'user',senderName:currentUser.displayName||'Пользователь',
+        createdAt:serverTimestamp()
+      });
+      toast('Файл отправлен ✓','success');
+    }catch(e){ toast('Ошибка: '+file.name,'error'); console.error(e); }
+  }
+  document.getElementById('fileInput').value='';
+};
+
+/* ── SETTINGS ── */
+window.saveSettings=async function(){
+  if(!currentUser) return;
+  const name=document.getElementById('settingName').value.trim();
+  if(!name){ toast('Введите имя','error'); return; }
+  try{
+    await updateProfile(currentUser,{displayName:name});
+    await updateDoc(doc(db,'users',currentUser.uid),{name}).catch(()=>{});
+    document.getElementById('heroName').textContent=name;
+    const letter=name[0].toUpperCase();
+    document.getElementById('avatarLetter').textContent=letter;
+    toast('Сохранено ✓','success');
+  }catch(e){ toast('Ошибка сохранения','error'); }
+};
+
+window.doLogout=async function(){
+  if(unsubOrders) unsubOrders();
+  if(unsubChat) unsubChat();
+  await signOut(auth);
+  window.location.href='auth.html';
+};
+
+/* ── DELETE ── */
+window.openDeleteModal=function(){
+  document.getElementById('deleteConfirmInput').value='';
+  document.getElementById('deleteModal').classList.add('show');
+  setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),200);
+};
+window.closeDeleteModal=function(){
+  document.getElementById('deleteModal').classList.remove('show');
+};
+window.confirmDeleteAccount=async function(){
+  if(!currentUser) return;
+  if(document.getElementById('deleteConfirmInput').value.trim()!==currentUser.email){
+    toast('Email не совпадает','error'); return;
+  }
+  const btn=document.getElementById('deleteConfirmBtn');
+  btn.textContent='Удаляю...'; btn.disabled=true;
+  try{
+    const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
+    for(const d of ordSnap.docs) await deleteDoc(d.ref).catch(()=>{});
+    const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
+    for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});
+    await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
+    await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
+    await deleteUser(currentUser);
+    window.location.href='auth.html';
+  }catch(e){
+    if(e.code==='auth/requires-recent-login') toast('Выйдите и войдите снова, затем повторите','error');
+    else toast('Ошибка удаления. Попробуйте позже.','error');
+    btn.textContent='Удалить'; btn.disabled=false;
+  }
+};
+
+/* ── LIGHTBOX ── */
+window.openLightbox=function(src){ document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('show'); };
+window.closeLightbox=function(){ document.getElementById('lightbox').classList.remove('show'); document.getElementById('lightboxImg').src=''; };
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeLightbox(); closeDeleteModal(); closeReview(); } });
+
+/* ── PUSH NOTIFICATIONS ── */
+function sendPush(title, body){
+  if(!('Notification' in window)||Notification.permission!=='granted') return;
+  if(document.visibilityState==='visible') return;
+  try{ new Notification(title,{body,icon:'favicon.png'}); }catch(e){}
+}
+
+/* ── INIT ── */
+onAuthStateChanged(auth, async user=>{
+  if(!user){ window.location.href='auth.html'; return; }
+  if(await checkMaintenance()) return;
+
+  currentUser=user;
+  const name=user.displayName||'Пользователь';
+  document.getElementById('heroName').textContent=name;
+  document.getElementById('heroEmail').textContent=user.email;
+  document.getElementById('avatarLetter').textContent=name[0].toUpperCase();
+  document.getElementById('settingName').value=name;
+  document.getElementById('settingEmail').value=user.email;
+
+  // Since date
+  try{
+    const snap=await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()&&snap.data().createdAt){
+      document.getElementById('heroSince').textContent='с нами с '+fmtDate(snap.data().createdAt);
+    } else {
+      document.getElementById('heroSince').textContent='новый клиент';
+    }
+    // Load saved avatar
+    if(snap.exists()&&snap.data().avatarDataUrl){
+      const av=document.getElementById('heroAvatar');
+      document.getElementById('avatarLetter').style.display='none';
+      const img=document.createElement('img');
+      img.src=snap.data().avatarDataUrl;
+      av.insertBefore(img,av.firstChild);
+    }
+  }catch(e){ document.getElementById('heroSince').textContent=''; }
+
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('appWrap').style.display='block';
+
+  loadOrders(user.uid);
+  loadChat(user.uid);
+});
 </script>
 </body>
 </html>

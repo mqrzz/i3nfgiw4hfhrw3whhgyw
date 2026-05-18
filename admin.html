@@ -10,240 +10,279 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#07070a;--bg2:#0d0d12;--bg3:#131319;--card:#111116;
+      --bg:#07070a;--bg2:#0d0d12;--bg3:#131319;--card:#0f0f15;
       --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.11);
       --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
       --text:#f0f0f5;--muted:#666678;--muted2:#999aaa;
       --success:#4ade80;--error:#f87171;--warn:#fbbf24;
-      --topbar-h:54px;
+      --topbar-h:52px;
     }
     html,body{height:100%;overflow:hidden}
     body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300}
-
-    /* ── LOADING ── */
+ 
+    /* LOADING */
     .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
-    .spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .75s linear infinite}
+    .spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.55;transform:scale(1.35)}}
-
-    /* ── TOPBAR ── */
-    .topbar{
-      position:fixed;top:0;left:0;right:0;z-index:200;
-      height:var(--topbar-h);
-      background:rgba(9,9,13,.97);backdrop-filter:blur(24px);
-      border-bottom:1px solid var(--border);
-      display:flex;align-items:center;justify-content:space-between;
-      padding:0 1.2rem;gap:.8rem;
-    }
-    .tbar-left{display:flex;align-items:center;gap:.9rem;flex-shrink:0}
-    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;letter-spacing:.03em;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:8px}
-    .logo-dot{width:6px;height:6px;border-radius:50%;background:var(--error);box-shadow:0 0 9px var(--error);animation:pulse 2s infinite}
-    .admin-badge{background:rgba(248,113,113,.12);color:var(--error);border:1px solid rgba(248,113,113,.2);padding:.14rem .6rem;border-radius:50px;font-size:.6rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
-
-    .tbar-center{display:flex;align-items:center;gap:.5rem;flex:1;justify-content:center;overflow:hidden}
-    .tstat-pill{display:flex;align-items:center;gap:.45rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.26rem .85rem;font-size:.68rem;white-space:nowrap;cursor:default}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
+ 
+    /* TOPBAR */
+    .topbar{position:fixed;top:0;left:0;right:0;z-index:200;height:var(--topbar-h);
+      background:rgba(8,8,12,.97);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);
+      display:flex;align-items:center;justify-content:space-between;padding:0 1.1rem;gap:.8rem}
+    .tbar-left{display:flex;align-items:center;gap:.85rem;flex-shrink:0}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.8rem;letter-spacing:.03em;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:7px}
+    .logo-dot{width:6px;height:6px;border-radius:50%;background:var(--error);box-shadow:0 0 8px var(--error);animation:pulse 2s infinite}
+    .admin-badge{background:rgba(248,113,113,.12);color:var(--error);border:1px solid rgba(248,113,113,.2);padding:.12rem .55rem;border-radius:50px;font-size:.58rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase}
+    .tbar-center{display:flex;align-items:center;gap:.45rem;flex:1;justify-content:center;overflow:hidden;flex-wrap:nowrap}
+    .tstat{display:flex;align-items:center;gap:.38rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.22rem .72rem;font-size:.66rem;white-space:nowrap;cursor:default}
     .tstat-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-    .tstat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.78rem}
-    .tstat-lbl{color:var(--muted);font-size:.63rem}
-
-    .tbar-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0}
-    .maint-toggle{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.72rem;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap}
-    .maint-toggle.on{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.3);color:var(--warn)}
-    .toggle-track{width:28px;height:15px;background:var(--bg2);border-radius:50px;position:relative;transition:background .2s;border:1px solid var(--border);flex-shrink:0}
-    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:9px;height:9px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
-    .maint-toggle.on .toggle-track::after{transform:translateX(13px);background:var(--warn)}
-    .btn-topbar{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.72rem;padding:.3rem .8rem;border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap}
+    .tstat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.76rem}
+    .tstat-lbl{color:var(--muted);font-size:.61rem}
+    .tbar-right{display:flex;align-items:center;gap:.55rem;flex-shrink:0}
+    .maint-btn{display:flex;align-items:center;gap:.45rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.25rem .78rem;font-size:.7rem;color:var(--muted);cursor:pointer;transition:all .2s;user-select:none;white-space:nowrap}
+    .maint-btn.on{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.28);color:var(--warn)}
+    .toggle-track{width:26px;height:14px;background:var(--bg2);border-radius:50px;position:relative;border:1px solid var(--border);flex-shrink:0;transition:background .2s}
+    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:8px;height:8px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+    .maint-btn.on .toggle-track::after{transform:translateX(12px);background:var(--warn)}
+    .btn-topbar{background:none;border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.7rem;padding:.28rem .75rem;border-radius:8px;cursor:pointer;transition:all .2s;white-space:nowrap}
     .btn-topbar:hover{border-color:var(--error);color:var(--error)}
-
-    /* ── 3-COL LAYOUT ── */
-    .layout{display:grid;grid-template-columns:290px 1fr 340px;height:calc(100vh - var(--topbar-h));margin-top:var(--topbar-h);position:relative;z-index:1}
-
-    /* ── SCROLLBARS ── */
+ 
+    /* LAYOUT */
+    .layout{display:grid;grid-template-columns:280px 1fr 330px;height:calc(100vh - var(--topbar-h));margin-top:var(--topbar-h);position:relative;z-index:1}
+ 
+    /* SCROLLBARS */
     ::-webkit-scrollbar{width:3px;height:3px}
     ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.07);border-radius:2px}
-
-    /* ── COL 1: SIDEBAR ── */
+ 
+    /* COL 1 */
     .col-list{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2);overflow:hidden}
-    .col-hdr{padding:.75rem .9rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.5rem;flex-shrink:0}
-    .col-hdr-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.75rem}
-    .tab-row{display:flex;gap:.25rem}
-    .tab-btn{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Onest',sans-serif;font-size:.67rem;padding:.25rem .6rem;border-radius:7px;cursor:pointer;transition:all .15s}
+    .col-hdr{padding:.68rem .85rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:.45rem;flex-shrink:0}
+    .col-hdr-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.73rem}
+    .tab-row{display:flex;gap:.2rem;flex-wrap:wrap}
+    .tab-btn{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Onest',sans-serif;font-size:.65rem;padding:.22rem .55rem;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
     .tab-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
     .tab-btn.active{background:rgba(108,99,255,.14);color:var(--accent2);border-color:rgba(108,99,255,.25)}
-    .search-wrap{padding:.55rem .9rem;border-bottom:1px solid var(--border);flex-shrink:0}
-    .search-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.42rem .7rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.76rem;outline:none;transition:border-color .18s}
+    .search-wrap{padding:.5rem .85rem;border-bottom:1px solid var(--border);flex-shrink:0}
+    .search-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.4rem .65rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.74rem;outline:none;transition:border-color .18s}
     .search-input:focus{border-color:rgba(108,99,255,.4)}
     .search-input::placeholder{color:var(--muted)}
-    .list-scroll{flex:1;overflow-y:auto;padding:.5rem}
-    .list-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.78rem}
-
-    .row-card{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.72rem .9rem;margin-bottom:.4rem;cursor:pointer;transition:border-color .16s,background .16s}
+    .list-scroll{flex:1;overflow-y:auto;padding:.45rem}
+    .list-empty{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.76rem}
+ 
+    .row-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.68rem .85rem;margin-bottom:.35rem;cursor:pointer;transition:border-color .16s,background .16s}
     .row-card:hover{border-color:rgba(108,99,255,.22);background:rgba(108,99,255,.03)}
     .row-card.sel{border-color:rgba(108,99,255,.45);background:rgba(108,99,255,.07)}
-    .row-head{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-bottom:.22rem}
-    .row-id{font-family:'Unbounded',sans-serif;font-size:.67rem;font-weight:600}
-    .row-name{font-size:.78rem;font-weight:500}
-    .row-sub{font-size:.68rem;color:var(--muted);margin-bottom:.2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .row-foot{display:flex;align-items:center;justify-content:space-between;gap:.35rem}
-    .row-meta{font-size:.65rem;color:var(--muted)}
-    .row-price{font-family:'Unbounded',sans-serif;font-size:.68rem;font-weight:600;color:var(--accent2)}
+    .row-head{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-bottom:.2rem}
+    .row-id{font-family:'Unbounded',sans-serif;font-size:.64rem;font-weight:600}
+    .row-name{font-size:.77rem;font-weight:500}
+    .row-sub{font-size:.67rem;color:var(--muted);margin-bottom:.18rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .row-foot{display:flex;align-items:center;justify-content:space-between;gap:.3rem}
+    .row-meta{font-size:.63rem;color:var(--muted)}
+    .row-price{font-family:'Unbounded',sans-serif;font-size:.66rem;font-weight:600;color:var(--accent2)}
     .unread-dot{width:7px;height:7px;border-radius:50%;background:var(--accent2);flex-shrink:0;box-shadow:0 0 5px var(--accent2)}
-
-    .sbadge{display:inline-flex;align-items:center;gap:.2rem;padding:.13rem .48rem;border-radius:50px;font-size:.59rem;font-weight:600;flex-shrink:0}
-    .s0{background:rgba(251,191,36,.12);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
-    .s1{background:rgba(56,189,248,.12);color:var(--accent3);border:1px solid rgba(56,189,248,.18)}
-    .s2{background:rgba(74,222,128,.12);color:var(--success);border:1px solid rgba(74,222,128,.18)}
+ 
+    .sbadge{display:inline-flex;align-items:center;gap:.18rem;padding:.11rem .44rem;border-radius:50px;font-size:.57rem;font-weight:600;flex-shrink:0;white-space:nowrap}
     .sdot{width:3px;height:3px;border-radius:50%;background:currentColor}
-
-    /* Review stars in list */
-    .star-row{font-size:.72rem;color:var(--warn);letter-spacing:-.05em}
-
-    /* ── COL 2: DETAIL ── */
+    .s0{background:rgba(102,102,120,.12);color:var(--muted2);border:1px solid rgba(102,102,120,.2)}
+    .s1{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
+    .s2{background:rgba(56,189,248,.1);color:var(--accent3);border:1px solid rgba(56,189,248,.18)}
+    .s3{background:rgba(167,139,250,.1);color:var(--accent2);border:1px solid rgba(167,139,250,.18)}
+    .s4{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
+    .s5{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.18)}
+    .pay-badge{display:inline-flex;align-items:center;padding:.11rem .44rem;border-radius:50px;font-size:.55rem;font-weight:700;flex-shrink:0}
+    .pb-yes{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.2)}
+    .pb-no{background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.2)}
+    .star-row{font-size:.7rem;color:var(--warn);letter-spacing:-.04em}
+ 
+    /* COL 2 DETAIL */
     .col-detail{display:flex;flex-direction:column;border-right:1px solid var(--border);overflow:hidden;background:var(--bg)}
     .detail-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:.6rem;padding:2rem;text-align:center}
-    .detail-empty-icon{font-size:2.5rem;opacity:.3;margin-bottom:.2rem}
-    .detail-empty p{font-size:.82rem;opacity:.55}
-    .detail-hdr{padding:.85rem 1.3rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;flex-shrink:0;background:var(--bg2)}
-    .detail-hdr-id{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.88rem;flex:1;min-width:0}
-    .detail-scroll{flex:1;overflow-y:auto;padding:1.2rem 1.3rem}
-    .dsec{margin-bottom:1.3rem}
-    .dsec-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem;font-weight:500}
-    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.45rem}
-    .info-cell{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.6rem .8rem}
-    .info-lbl{font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem}
-    .info-val{font-size:.8rem;font-weight:500;word-break:break-word}
-    .desc-box{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.9rem 1rem;font-size:.8rem;line-height:1.65;color:var(--muted2)}
-
-    /* Status buttons */
-    .status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}
-    .sbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.74rem;padding:.6rem .3rem;border-radius:10px;cursor:pointer;transition:all .16s;text-align:center;font-weight:500}
+    .detail-wrap{display:none;flex-direction:column;height:100%;overflow:hidden}
+    .detail-hdr{padding:.78rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.75rem;flex-shrink:0;background:var(--bg2)}
+    .detail-hdr-id{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.86rem;flex:1}
+    .detail-scroll{flex:1;overflow-y:auto;padding:1.1rem 1.2rem}
+ 
+    .dsec{margin-bottom:1.2rem}
+    .dsec-lbl{font-size:.57rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.55rem;font-weight:500}
+ 
+    /* STATUS BUTTONS 6 */
+    .status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.38rem}
+    .sbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.7rem;padding:.55rem .25rem;border-radius:9px;cursor:pointer;transition:all .16s;text-align:center;font-weight:500;line-height:1.3}
     .sbtn:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
-    .sbtn.sb0.cur{background:rgba(251,191,36,.1);color:var(--warn);border-color:rgba(251,191,36,.3)}
-    .sbtn.sb1.cur{background:rgba(56,189,248,.1);color:var(--accent3);border-color:rgba(56,189,248,.3)}
-    .sbtn.sb2.cur{background:rgba(74,222,128,.1);color:var(--success);border-color:rgba(74,222,128,.3)}
-
-    /* Timeline dates */
-    .date-inputs{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;margin-top:.55rem}
-    .date-inp-wrap label{display:block;font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.25rem}
-    .date-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.48rem .7rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.76rem;outline:none;transition:border-color .18s}
+    .sbtn.sb0.cur{background:rgba(102,102,120,.12);color:var(--muted2);border-color:rgba(102,102,120,.3)}
+    .sbtn.sb1.cur{background:rgba(251,191,36,.1);color:var(--warn);border-color:rgba(251,191,36,.3)}
+    .sbtn.sb2.cur{background:rgba(56,189,248,.1);color:var(--accent3);border-color:rgba(56,189,248,.3)}
+    .sbtn.sb3.cur{background:rgba(167,139,250,.1);color:var(--accent2);border-color:rgba(167,139,250,.3)}
+    .sbtn.sb4.cur{background:rgba(251,191,36,.1);color:var(--warn);border-color:rgba(251,191,36,.3)}
+    .sbtn.sb5.cur{background:rgba(74,222,128,.1);color:var(--success);border-color:rgba(74,222,128,.3)}
+ 
+    /* PAYMENT TOGGLE */
+    .pay-toggle-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.65rem .85rem;cursor:pointer;transition:border-color .18s;user-select:none}
+    .pay-toggle-row:hover{border-color:var(--border2)}
+    .pay-toggle-row.paid{border-color:rgba(74,222,128,.3);background:rgba(74,222,128,.05)}
+    .pay-label{font-size:.8rem;font-weight:500}
+    .pay-toggle-row.paid .pay-label{color:var(--success)}
+    .pay-pill-sm{padding:.2rem .6rem;border-radius:50px;font-size:.65rem;font-weight:700}
+    .pay-toggle-row:not(.paid) .pay-pill-sm{background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.2)}
+    .pay-toggle-row.paid .pay-pill-sm{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.2)}
+ 
+    /* STATUS COMMENT */
+    .comment-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.52rem .78rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:300;outline:none;resize:none;min-height:60px;transition:border-color .18s;line-height:1.5}
+    .comment-inp:focus{border-color:rgba(108,99,255,.4)}
+    .comment-inp::placeholder{color:var(--muted)}
+    .save-comment-btn{margin-top:.4rem;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.22);color:var(--accent2);font-family:'Onest',sans-serif;font-size:.72rem;padding:.32rem .82rem;border-radius:7px;cursor:pointer;transition:all .18s}
+    .save-comment-btn:hover{background:rgba(108,99,255,.2)}
+ 
+    /* SUBSTEPS EDITOR */
+    .substep-list{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.45rem}
+    .substep-row{display:flex;align-items:center;gap:.45rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.42rem .65rem}
+    .substep-check{width:15px;height:15px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+    .substep-text{flex:1;font-size:.76rem;color:var(--text)}
+    .substep-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem;padding:.1rem .2rem;line-height:1;transition:color .15s}
+    .substep-del:hover{color:var(--error)}
+    .substep-add-row{display:flex;gap:.35rem}
+    .substep-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.4rem .65rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.75rem;outline:none;transition:border-color .18s}
+    .substep-inp:focus{border-color:rgba(108,99,255,.4)}
+    .substep-inp::placeholder{color:var(--muted)}
+    .add-substep-btn{background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);color:var(--accent2);font-family:'Onest',sans-serif;font-size:.72rem;padding:.38rem .75rem;border-radius:8px;cursor:pointer;white-space:nowrap;transition:all .18s}
+    .add-substep-btn:hover{background:rgba(108,99,255,.2)}
+ 
+    /* DATE INPUTS */
+    .date-grid{display:grid;grid-template-columns:1fr 1fr;gap:.38rem}
+    .date-inp-wrap label{display:block;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.22rem}
+    .date-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.45rem .65rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.74rem;outline:none;transition:border-color .18s}
     .date-inp:focus{border-color:rgba(108,99,255,.4)}
-
-    /* Attach */
-    .attach-grid{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem}
-    .attach-thumb{width:66px;height:66px;border-radius:8px;object-fit:cover;cursor:pointer;border:1px solid var(--border);transition:border-color .18s,transform .13s}
+ 
+    /* SITE DELIVERY FIELDS */
+    .site-fields{display:flex;flex-direction:column;gap:.38rem}
+    .site-field-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.45rem .65rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.76rem;outline:none;transition:border-color .18s}
+    .site-field-inp:focus{border-color:rgba(108,99,255,.4)}
+    .site-field-inp::placeholder{color:var(--muted)}
+    .site-field-label{display:block;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.2rem}
+    .save-site-btn{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:var(--success);font-family:'Onest',sans-serif;font-size:.72rem;padding:.32rem .82rem;border-radius:7px;cursor:pointer;transition:all .18s;margin-top:.4rem}
+    .save-site-btn:hover{background:rgba(74,222,128,.18)}
+ 
+    /* INFO GRID */
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.38rem}
+    .info-cell{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.55rem .75rem}
+    .info-lbl{font-size:.56rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.15rem}
+    .info-val{font-size:.78rem;font-weight:500;word-break:break-word}
+    .desc-box{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.85rem .95rem;font-size:.78rem;line-height:1.65;color:var(--muted2)}
+    .attach-grid{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.55rem}
+    .attach-thumb{width:60px;height:60px;border-radius:7px;object-fit:cover;cursor:pointer;border:1px solid var(--border);transition:border-color .18s,transform .13s}
     .attach-thumb:hover{border-color:var(--accent2);transform:scale(1.04)}
-
-    /* Analytics */
-    .analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-bottom:1rem}
-    .a-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.9rem 1rem}
-    .a-card-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.35rem}
-    .a-card-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.35rem;color:var(--accent2)}
-    .a-card-sub{font-size:.66rem;color:var(--muted);margin-top:.18rem}
+ 
+    /* ANALYTICS */
+    .analytics-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.85rem}
+    .a-card{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.85rem .95rem}
+    .a-card-lbl{font-size:.58rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.3rem}
+    .a-card-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem;color:var(--accent2)}
+    .a-card-sub{font-size:.64rem;color:var(--muted);margin-top:.15rem}
     .a-card.green .a-card-num{color:var(--success)}
     .a-card.blue .a-card-num{color:var(--accent3)}
     .a-card.warn .a-card-num{color:var(--warn)}
-
-    /* Reviews */
-    .review-item{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.85rem 1rem;margin-bottom:.5rem}
-    .review-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:.35rem;gap:.5rem}
-    .review-stars{color:var(--warn);font-size:.85rem;letter-spacing:-.04em}
-    .review-name{font-size:.76rem;font-weight:500}
-    .review-date{font-size:.65rem;color:var(--muted);margin-left:auto}
-    .review-text{font-size:.78rem;color:var(--muted2);line-height:1.55}
-
-    /* ── COL 3: CHAT ── */
+ 
+    /* REVIEWS */
+    .review-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.8rem .95rem;margin-bottom:.45rem}
+    .review-top{display:flex;align-items:center;flex-wrap:wrap;gap:.4rem;margin-bottom:.3rem}
+    .review-stars{color:var(--warn);font-size:.82rem;letter-spacing:-.04em}
+    .review-name{font-size:.75rem;font-weight:500}
+    .review-date{font-size:.63rem;color:var(--muted);margin-left:auto}
+    .review-text{font-size:.76rem;color:var(--muted2);line-height:1.55}
+ 
+    /* COL 3 CHAT */
     .col-chat{display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
     .chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:.6rem;padding:2rem;text-align:center}
-    .chat-hdr{padding:.8rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.7rem;flex-shrink:0;background:var(--bg2)}
-    .chat-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.82rem;flex-shrink:0;font-weight:700;color:#fff}
+    .chat-wrap-inner{display:none;flex-direction:column;height:100%;overflow:hidden}
+    .chat-hdr{padding:.75rem .95rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.65rem;flex-shrink:0;background:var(--bg2)}
+    .chat-av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.78rem;flex-shrink:0;font-weight:700;color:#fff}
     .chat-hdr-info{flex:1;min-width:0}
-    .chat-hdr-name{font-weight:500;font-size:.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .chat-hdr-sub{font-size:.66rem;color:var(--muted)}
-    .chat-msgs{flex:1;overflow-y:auto;padding:.85rem .95rem;display:flex;flex-direction:column;gap:.5rem;scroll-behavior:smooth}
-    .msg{max-width:85%;display:flex;flex-direction:column;gap:.1rem}
+    .chat-hdr-name{font-weight:500;font-size:.81rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-hdr-sub{font-size:.64rem;color:var(--muted)}
+    .chat-msgs{flex:1;overflow-y:auto;padding:.8rem .9rem;display:flex;flex-direction:column;gap:.45rem;scroll-behavior:smooth}
+    .msg{max-width:86%;display:flex;flex-direction:column;gap:.08rem}
     .msg.mine{align-self:flex-end;align-items:flex-end}
     .msg.theirs{align-self:flex-start;align-items:flex-start}
-    .msg-bubble{padding:.48rem .78rem;border-radius:12px;font-size:.79rem;line-height:1.5;word-break:break-word}
+    .msg-bubble{padding:.45rem .76px;border-radius:12px;font-size:.77rem;line-height:1.5;word-break:break-word;padding:.45rem .75rem}
     .msg.mine .msg-bubble{background:rgba(248,113,113,.18);color:#fff;border:1px solid rgba(248,113,113,.14);border-bottom-right-radius:3px}
     .msg.theirs .msg-bubble{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:3px}
-    .msg-time{font-size:.59rem;color:var(--muted)}
-    .msg-img{max-width:180px;max-height:150px;border-radius:8px;display:block;cursor:pointer;transition:opacity .18s;border:1px solid var(--border)}
+    .msg-time{font-size:.58rem;color:var(--muted)}
+    .msg-img{max-width:170px;max-height:140px;border-radius:7px;display:block;cursor:pointer;transition:opacity .18s;border:1px solid var(--border)}
     .msg-img:hover{opacity:.8}
-    .msg-file-link{display:flex;align-items:center;gap:.38rem;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:8px;padding:.38rem .6rem;font-size:.74rem;text-decoration:none;color:var(--text);transition:background .18s;word-break:break-all}
+    .msg-file-link{display:flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:7px;padding:.35rem .58rem;font-size:.72rem;text-decoration:none;color:var(--text)}
     .msg-file-link:hover{background:rgba(255,255,255,.12)}
-    .chat-row{padding:.6rem .8rem;border-top:1px solid var(--border);display:flex;gap:.42rem;align-items:flex-end;flex-shrink:0;background:var(--bg2)}
-    .chat-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:.5rem .75rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.8rem;outline:none;resize:none;max-height:76px;transition:border-color .18s;line-height:1.45}
+    .chat-row{padding:.58rem .75rem;border-top:1px solid var(--border);display:flex;gap:.38rem;align-items:flex-end;flex-shrink:0;background:var(--bg2)}
+    .chat-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:9px;padding:.48rem .72rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.78rem;outline:none;resize:none;max-height:72px;transition:border-color .18s;line-height:1.45}
     .chat-inp:focus{border-color:rgba(108,99,255,.45)}
-    .chat-icon-btn{width:32px;height:32px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .17s}
-    .chat-icon-btn svg{width:13px;height:13px}
+    .chat-icon-btn{width:30px;height:30px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .17s}
+    .chat-icon-btn svg{width:12px;height:12px}
     .chat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
     .chat-send{background:var(--accent);border-color:var(--accent);color:#fff}
-    .chat-send:hover{box-shadow:0 3px 12px rgba(108,99,255,.42);border-color:var(--accent)!important;color:#fff!important}
-
-    /* ── LIGHTBOX ── */
-    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
+    .chat-send:hover{box-shadow:0 3px 10px rgba(108,99,255,.4);border-color:var(--accent)!important;color:#fff!important}
+ 
+    /* LIGHTBOX */
+    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.93);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
     .lightbox.show{opacity:1;pointer-events:all}
-    .lightbox img{max-width:92vw;max-height:90vh;border-radius:10px;object-fit:contain}
-    .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.14);border:none;color:#fff;font-size:1.2rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:1.4rem;left:50%;transform:translateX(-50%) translateY(16px);z-index:500;padding:.5rem 1.2rem;border-radius:50px;font-size:.75rem;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap}
+    .lightbox img{max-width:92vw;max-height:90vh;border-radius:9px;object-fit:contain}
+    .lb-close{position:fixed;top:.9rem;right:1.1rem;background:rgba(255,255,255,.14);border:none;color:#fff;font-size:1.1rem;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
+ 
+    /* TOAST */
+    .toast{position:fixed;bottom:1.3rem;left:50%;transform:translateX(-50%) translateY(14px);z-index:500;padding:.48rem 1.1rem;border-radius:50px;font-size:.73rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--success);color:#000}
     .toast.error{background:var(--error);color:#fff}
     .toast.info{background:var(--accent);color:#fff}
     .toast.warn{background:var(--warn);color:#000}
-
-    /* ── MOBILE ── */
-    @media(max-width:1100px){.layout{grid-template-columns:250px 1fr 300px}.tstat-pill{display:none}}
-    @media(max-width:900px){
+ 
+    @media(max-width:1100px){.layout{grid-template-columns:240px 1fr 290px}.tstat{display:none}}
+    @media(max-width:860px){
       html,body{overflow:auto}
       .layout{grid-template-columns:1fr;grid-template-rows:auto auto auto;height:auto;overflow:visible}
-      .col-list,.col-detail,.col-chat{height:60vh;min-height:300px;border-right:none;border-bottom:1px solid var(--border)}
+      .col-list,.col-detail,.col-chat{height:60vh;min-height:280px;border-right:none;border-bottom:1px solid var(--border)}
       .col-chat{border-bottom:none}
-      .tstat-pill,.tbar-center{display:none}
+      .tbar-center{display:none}
     }
   </style>
 </head>
 <body>
-
+ 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:.76rem;margin-top:.25rem">Проверка доступа...</p>
+  <p style="color:var(--muted);font-size:.74rem;margin-top:.25rem">Проверка доступа...</p>
 </div>
-
+ 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
   <img id="lightboxImg" src="" alt=""/>
 </div>
-
+ 
 <div id="appWrap" style="display:none">
-
-  <!-- TOPBAR -->
+ 
   <div class="topbar">
     <div class="tbar-left">
       <a href="index.html" class="logo"><span class="logo-dot"></span>Design Antviz</a>
       <span class="admin-badge">Admin</span>
     </div>
     <div class="tbar-center">
-      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--muted)"></span><span class="tstat-num" id="sAll">0</span><span class="tstat-lbl">всего</span></div>
-      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--warn)"></span><span class="tstat-num" id="sPend" style="color:var(--warn)">0</span><span class="tstat-lbl">ожидают</span></div>
-      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--accent3)"></span><span class="tstat-num" id="sWork" style="color:var(--accent3)">0</span><span class="tstat-lbl">в работе</span></div>
-      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--success)"></span><span class="tstat-num" id="sDone" style="color:var(--success)">0</span><span class="tstat-lbl">готово</span></div>
-      <div class="tstat-pill"><span class="tstat-dot" style="background:var(--accent2)"></span><span class="tstat-num" id="sRevenue" style="color:var(--accent2)">0 ₽</span><span class="tstat-lbl">выручка</span></div>
+      <div class="tstat"><span class="tstat-dot" style="background:var(--muted)"></span><span class="tstat-num" id="sAll">0</span><span class="tstat-lbl">всего</span></div>
+      <div class="tstat"><span class="tstat-dot" style="background:var(--warn)"></span><span class="tstat-num" id="sPend" style="color:var(--warn)">0</span><span class="tstat-lbl">новых</span></div>
+      <div class="tstat"><span class="tstat-dot" style="background:var(--accent3)"></span><span class="tstat-num" id="sWork" style="color:var(--accent3)">0</span><span class="tstat-lbl">в работе</span></div>
+      <div class="tstat"><span class="tstat-dot" style="background:var(--success)"></span><span class="tstat-num" id="sDone" style="color:var(--success)">0</span><span class="tstat-lbl">готово</span></div>
+      <div class="tstat"><span class="tstat-dot" style="background:var(--accent2)"></span><span class="tstat-num" id="sRevenue" style="color:var(--accent2)">0 ₽</span><span class="tstat-lbl">выручка</span></div>
     </div>
     <div class="tbar-right">
-      <button class="maint-toggle" id="maintToggle" onclick="toggleMaintenance()">
+      <button class="maint-btn" id="maintBtn" onclick="toggleMaintenance()">
         <div class="toggle-track"></div>
         <span id="maintLabel">Техработы</span>
       </button>
       <button class="btn-topbar" onclick="doLogout()">Выйти</button>
     </div>
   </div>
-
+ 
   <div class="layout">
-
-    <!-- ══ COL 1: LIST ══ -->
+ 
+    <!-- COL 1 LIST -->
     <div class="col-list">
       <div class="col-hdr">
         <div class="col-hdr-title">Клиенты</div>
@@ -257,91 +296,123 @@
       <div class="search-wrap" id="searchWrap">
         <input class="search-input" id="searchInput" type="text" placeholder="Поиск..." oninput="renderList()"/>
       </div>
-      <div class="list-scroll" id="listScroll">
-        <div class="list-empty">Загрузка...</div>
-      </div>
+      <div class="list-scroll" id="listScroll"><div class="list-empty">Загрузка...</div></div>
     </div>
-
-    <!-- ══ COL 2: DETAIL ══ -->
+ 
+    <!-- COL 2 DETAIL -->
     <div class="col-detail">
       <div class="detail-empty" id="detailEmpty">
-        <div class="detail-empty-icon">📋</div>
-        <p>Выберите заказ слева</p>
-        <span style="font-size:.72rem;color:var(--muted);opacity:.55">Детали и управление статусом</span>
+        <div style="font-size:2.5rem;opacity:.25;margin-bottom:.4rem">📋</div>
+        <p style="font-size:.8rem;opacity:.5">Выберите заказ</p>
       </div>
-      <div style="display:none;flex-direction:column;height:100%;overflow:hidden" id="detailWrap">
+      <div class="detail-wrap" id="detailWrap">
         <div class="detail-hdr">
           <div class="detail-hdr-id" id="dId"></div>
           <div id="dStatusBadge"></div>
         </div>
         <div class="detail-scroll">
-
-          <!-- Status -->
+ 
+          <!-- 6 STATUS BUTTONS -->
           <div class="dsec">
             <div class="dsec-lbl">Статус заказа</div>
             <div class="status-btns">
-              <button class="sbtn sb0" onclick="setStatus(0)">⏳ Ожидание</button>
-              <button class="sbtn sb1" onclick="setStatus(1)">🔵 В работе</button>
-              <button class="sbtn sb2" onclick="setStatus(2)">✅ Готово</button>
+              <button class="sbtn sb0" onclick="setStatus(0)">📋<br/>Новая заявка</button>
+              <button class="sbtn sb1" onclick="setStatus(1)">💬<br/>Обсуждение</button>
+              <button class="sbtn sb2" onclick="setStatus(2)">🔵<br/>В работе</button>
+              <button class="sbtn sb3" onclick="setStatus(3)">👀<br/>На проверке</button>
+              <button class="sbtn sb4" onclick="setStatus(4)">✏️<br/>Правки</button>
+              <button class="sbtn sb5" onclick="setStatus(5)">✅<br/>Готово</button>
             </div>
           </div>
-
-          <!-- Timeline dates -->
+ 
+          <!-- PAYMENT -->
           <div class="dsec">
-            <div class="dsec-lbl">Даты timeline (видит клиент)</div>
-            <div class="date-inputs">
-              <div class="date-inp-wrap">
-                <label>Взят в работу</label>
-                <input type="date" class="date-inp" id="dateStarted" onchange="saveDate('startedAt',this.value)"/>
-              </div>
-              <div class="date-inp-wrap">
-                <label>Готово</label>
-                <input type="date" class="date-inp" id="dateDone" onchange="saveDate('doneAt',this.value)"/>
-              </div>
+            <div class="dsec-lbl">Оплата</div>
+            <div class="pay-toggle-row" id="payToggleRow" onclick="togglePayment()">
+              <span class="pay-label" id="payLabel">Не оплачен</span>
+              <span class="pay-pill-sm" id="payPill">✕ НЕ ОПЛАЧЕН</span>
             </div>
           </div>
-
-          <!-- Client -->
+ 
+          <!-- STATUS COMMENT -->
+          <div class="dsec">
+            <div class="dsec-lbl">Комментарий к статусу (видит клиент)</div>
+            <textarea class="comment-inp" id="commentInp" placeholder="Например: Ждём материалы от вас..."></textarea>
+            <button class="save-comment-btn" onclick="saveComment()">Сохранить комментарий</button>
+          </div>
+ 
+          <!-- SUBSTEPS -->
+          <div class="dsec">
+            <div class="dsec-lbl">Подпункты этапа (видит клиент)</div>
+            <div class="substep-list" id="substepList"></div>
+            <div class="substep-add-row">
+              <input class="substep-inp" id="substepInp" type="text" placeholder="Новый подпункт..."/>
+              <button class="add-substep-btn" onclick="addSubstep()">+ Добавить</button>
+            </div>
+          </div>
+ 
+          <!-- TIMELINE DATES -->
+          <div class="dsec">
+            <div class="dsec-lbl">Даты timeline</div>
+            <div class="date-grid">
+              <div class="date-inp-wrap"><label>Взят в работу</label><input type="date" class="date-inp" id="dateStarted" onchange="saveDate('startedAt',this.value)"/></div>
+              <div class="date-inp-wrap"><label>Готово</label><input type="date" class="date-inp" id="dateDone" onchange="saveDate('doneAt',this.value)"/></div>
+            </div>
+          </div>
+ 
+          <!-- SITE DELIVERY -->
+          <div class="dsec">
+            <div class="dsec-lbl">Готовый сайт (показывается клиенту при статусе «Готово»)</div>
+            <div class="site-fields">
+              <div><label class="site-field-label">Домен</label><input class="site-field-inp" id="siteDomain" type="text" placeholder="designantviz.ru"/></div>
+              <div><label class="site-field-label">Ссылка на сайт</label><input class="site-field-inp" id="siteUrl" type="url" placeholder="https://designantviz.ru"/></div>
+              <div><label class="site-field-label">Фавикон URL</label><input class="site-field-inp" id="siteFaviconUrl" type="url" placeholder="https://designantviz.ru/favicon.png"/></div>
+              <div><label class="site-field-label">Страницы (каждая с новой строки)</label><textarea class="site-field-inp" id="sitePages" rows="4" placeholder="Главная&#10;О нас&#10;Услуги&#10;Контакты" style="resize:vertical"></textarea></div>
+            </div>
+            <button class="save-site-btn" onclick="saveSiteDelivery()">💾 Сохранить и уведомить клиента</button>
+          </div>
+ 
+          <!-- CLIENT INFO -->
           <div class="dsec">
             <div class="dsec-lbl">Клиент</div>
             <div class="info-grid" id="dClient"></div>
           </div>
-
-          <!-- Order params -->
+ 
+          <!-- ORDER PARAMS -->
           <div class="dsec">
             <div class="dsec-lbl">Параметры заказа</div>
             <div class="info-grid" id="dInfo"></div>
           </div>
-
-          <!-- Description -->
+ 
+          <!-- DESCRIPTION -->
           <div class="dsec" id="dDescSec" style="display:none">
             <div class="dsec-lbl">ТЗ / Описание</div>
             <div class="desc-box" id="dDesc"></div>
           </div>
-
-          <!-- Attachments -->
+ 
+          <!-- ATTACHMENTS -->
           <div class="dsec" id="dAttachSec" style="display:none">
             <div class="dsec-lbl">Вложения клиента</div>
             <div class="attach-grid" id="dAttach"></div>
           </div>
-
-          <!-- Review for this order -->
+ 
+          <!-- REVIEW -->
           <div class="dsec" id="dReviewSec" style="display:none">
             <div class="dsec-lbl">Отзыв клиента</div>
             <div id="dReviewContent"></div>
           </div>
-
+ 
         </div>
       </div>
     </div>
-
-    <!-- ══ COL 3: CHAT ══ -->
+ 
+    <!-- COL 3 CHAT -->
     <div class="col-chat">
       <div class="chat-empty" id="chatEmpty">
-        <div style="font-size:2.5rem;opacity:.25;margin-bottom:.4rem">💬</div>
-        <p style="font-size:.82rem;opacity:.55">Выберите клиента для чата</p>
+        <div style="font-size:2.4rem;opacity:.22;margin-bottom:.4rem">💬</div>
+        <p style="font-size:.8rem;opacity:.5">Выберите клиента</p>
       </div>
-      <div style="display:none;flex-direction:column;height:100%;overflow:hidden" id="chatWrap">
+      <div class="chat-wrap-inner" id="chatWrapInner">
         <div class="chat-hdr">
           <div class="chat-av" id="chatAv">?</div>
           <div class="chat-hdr-info">
@@ -357,19 +428,19 @@
           </button>
           <textarea class="chat-inp" id="chatInp" rows="1" placeholder="Ответить клиенту..."
             onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();adminSendMsg()}"
-            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,76)+'px'"></textarea>
+            oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,72)+'px'"></textarea>
           <button class="chat-icon-btn chat-send" onclick="adminSendMsg()">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
           </button>
         </div>
       </div>
     </div>
-
+ 
   </div>
 </div>
-
+ 
 <div class="toast" id="toast"></div>
-
+ 
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from './firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -377,200 +448,118 @@ import {
   collection, query, orderBy, onSnapshot, doc, updateDoc,
   addDoc, serverTimestamp, setDoc, getDoc, getDocs, Timestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-/* ── STATE ── */
-let allOrders=[], allUsers={}, allChatUsers={}, allReviews=[];
-let currentTab='orders';
-let selOrderId=null, selClientUid=null;
-let unsubChat=null, unsubMaint=null;
-let maintEnabled=false;
-
-/* ── UTILS ── */
-function toast(msg,type='info'){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className=`toast ${type} show`;
-  setTimeout(()=>t.className='toast',3400);
-}
-function fmtDate(ts){
-  if(!ts) return '—';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});
-}
-function fmtDateTime(ts){
-  if(!ts) return '—';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-}
-function fmtTime(ts){
-  if(!ts) return '';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-}
-function tsToInputDate(ts){
-  if(!ts) return '';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  return d.toISOString().split('T')[0];
-}
-const sLabels=['Ожидание','В работе','Готово'];
-function initials(name){ return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
-function stars(n){ return '★'.repeat(n)+'☆'.repeat(5-n); }
-
-/* ── LIGHTBOX ── */
-window.openLightbox=function(src){ document.getElementById('lightboxImg').src=src; document.getElementById('lightbox').classList.add('show'); };
-window.closeLightbox=function(){ document.getElementById('lightbox').classList.remove('show'); document.getElementById('lightboxImg').src=''; };
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
-
-/* ── MAINTENANCE ── */
-function watchMaintenance(){
-  unsubMaint=onSnapshot(doc(db,'settings','maintenance'), snap=>{
-    maintEnabled=snap.exists()&&snap.data().enabled===true;
-    document.getElementById('maintToggle').classList.toggle('on',maintEnabled);
-    document.getElementById('maintLabel').textContent=maintEnabled?'Сайт закрыт':'Техработы';
-  }, err=>console.error('Maintenance error:',err));
-}
+ 
+const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
+ 
+let allOrders=[], allChatUsers={}, allReviews=[];
+let currentTab='orders', selOrderId=null, selClientUid=null;
+let unsubChat=null, maintEnabled=false;
+let currentSubsteps=[], currentPaid=false;
+ 
+/* UTILS */
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3400);}
+function fmtDate(ts){if(!ts) return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDateTime(ts){if(!ts) return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function fmtTime(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function tsToInput(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toISOString().split('T')[0];}
+function initials(name){return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+ 
+/* LIGHTBOX */
+window.openLightbox=function(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('show');};
+window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('show');document.getElementById('lightboxImg').src='';};
+document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
+ 
+/* MAINTENANCE */
+onSnapshot(doc(db,'settings','maintenance'), snap=>{
+  maintEnabled=snap.exists()&&snap.data().enabled===true;
+  document.getElementById('maintBtn').classList.toggle('on',maintEnabled);
+  document.getElementById('maintLabel').textContent=maintEnabled?'Сайт закрыт':'Техработы';
+},err=>console.warn('Maint:',err));
 window.toggleMaintenance=async function(){
-  try{
-    const newVal=!maintEnabled;
-    await setDoc(doc(db,'settings','maintenance'),{enabled:newVal},{merge:true});
-    toast(newVal?'🔧 Сайт закрыт':'✅ Сайт открыт', newVal?'warn':'success');
-  }catch(e){
-    if(e.code==='permission-denied') toast('Нет прав. Проверь Firestore Rules для settings/maintenance','error');
-    else toast('Ошибка: '+e.message,'error');
-  }
+  try{await setDoc(doc(db,'settings','maintenance'),{enabled:!maintEnabled},{merge:true});toast(!maintEnabled?'🔧 Сайт закрыт':'✅ Сайт открыт',!maintEnabled?'warn':'success');}
+  catch(e){toast('Ошибка: '+e.message,'error');}
 };
-
-/* ── TABS ── */
-window.switchTab=function(tab,btn){
-  currentTab=tab;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('searchInput').value='';
-  document.getElementById('searchWrap').style.display=(tab==='analytics')?'none':'block';
-  renderList();
-};
-
-/* ── STATS ── */
+ 
+/* TABS */
+window.switchTab=function(tab,btn){currentTab=tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('searchInput').value='';document.getElementById('searchWrap').style.display=tab==='analytics'?'none':'block';renderList();};
+ 
+/* STATS */
 function updateStats(){
   document.getElementById('sAll').textContent=allOrders.length;
   document.getElementById('sPend').textContent=allOrders.filter(o=>(o.status||0)===0).length;
-  document.getElementById('sWork').textContent=allOrders.filter(o=>o.status===1).length;
-  document.getElementById('sDone').textContent=allOrders.filter(o=>o.status===2).length;
-  const rev=allOrders.filter(o=>o.status===2).reduce((s,o)=>s+(o.totalPrice||0),0);
+  document.getElementById('sWork').textContent=allOrders.filter(o=>o.status>=1&&o.status<=4).length;
+  document.getElementById('sDone').textContent=allOrders.filter(o=>o.status===5).length;
+  const rev=allOrders.filter(o=>o.status===5).reduce((s,o)=>s+(o.totalPrice||0),0);
   document.getElementById('sRevenue').textContent=rev.toLocaleString('ru')+' ₽';
 }
-
-/* ── RENDER LIST ── */
+ 
+/* RENDER LIST */
 function renderList(){
   const el=document.getElementById('listScroll');
   const q=(document.getElementById('searchInput').value||'').toLowerCase().trim();
-
+ 
   if(currentTab==='orders'){
-    let orders=allOrders;
-    if(q) orders=orders.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q)||(o.siteType||'').toLowerCase().includes(q));
-    if(!orders.length){ el.innerHTML='<div class="list-empty">Нет заказов</div>'; return; }
-    el.innerHTML=orders.map(o=>`
+    let list=allOrders;
+    if(q) list=list.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q));
+    if(!list.length){el.innerHTML='<div class="list-empty">Нет заказов</div>';return;}
+    el.innerHTML=list.map(o=>`
       <div class="row-card${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
-        <div class="row-head">
-          <span class="row-id">№ ${o.id.slice(0,8).toUpperCase()}</span>
-          <span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>
-        </div>
+        <div class="row-head"><span class="row-id">№ ${o.id.slice(0,8).toUpperCase()}</span><span class="sbadge s${o.status||0}"><span class="sdot"></span>${S_LABELS[o.status||0]}</span></div>
         <div class="row-sub">${o.clientName||'—'} · ${o.clientEmail||'—'}</div>
         <div class="row-foot">
           <span class="row-meta">${o.siteType||'Сайт'} · ${fmtDate(o.createdAt)}</span>
-          <span class="row-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
+          <div style="display:flex;align-items:center;gap:.3rem">
+            <span class="pay-badge ${o.paid?'pb-yes':'pb-no'}">${o.paid?'✓':'✕'}</span>
+            <span class="row-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
+          </div>
         </div>
       </div>`).join('');
-
+ 
   } else if(currentTab==='chats'){
-    const merged={...allUsers};
-    Object.keys(allChatUsers).forEach(uid=>{
-      if(!merged[uid]) merged[uid]={...allChatUsers[uid]};
-      else{ merged[uid].lastMsg=allChatUsers[uid].lastMsg; merged[uid].lastMsgTs=allChatUsers[uid].lastMsgTs; if(allChatUsers[uid].hasUnread) merged[uid].hasUnread=true; }
-    });
-    let uids=Object.keys(merged);
-    uids.sort((a,b)=>{
-      if(merged[a].hasUnread!==merged[b].hasUnread) return merged[a].hasUnread?-1:1;
-      return (merged[b].lastMsgTs?.seconds||0)-(merged[a].lastMsgTs?.seconds||0);
-    });
-    if(q) uids=uids.filter(uid=>(merged[uid].name||'').toLowerCase().includes(q)||(merged[uid].email||'').toLowerCase().includes(q));
-    if(!uids.length){ el.innerHTML='<div class="list-empty">Нет диалогов</div>'; return; }
-    el.innerHTML=uids.map(uid=>{
-      const u=merged[uid];
-      return`<div class="row-card${selClientUid===uid&&!selOrderId?' sel':''}" onclick="selectUserChat('${uid}')">
-        <div class="row-head">
-          <span class="row-name">${u.name||'Пользователь'}</span>
-          ${u.hasUnread?'<div class="unread-dot"></div>':''}
-        </div>
-        <div class="row-sub">${u.email||uid}</div>
-        <div class="row-foot">
-          <span class="row-meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px">${u.lastMsg||'Нет сообщений'}</span>
-        </div>
-      </div>`;
-    }).join('');
-
+    let uids=Object.keys(allChatUsers);
+    uids.sort((a,b)=>{if(allChatUsers[a].hasUnread!==allChatUsers[b].hasUnread) return allChatUsers[a].hasUnread?-1:1;return (allChatUsers[b].lastMsgTs?.seconds||0)-(allChatUsers[a].lastMsgTs?.seconds||0);});
+    if(q) uids=uids.filter(uid=>(allChatUsers[uid].name||'').toLowerCase().includes(q)||(allChatUsers[uid].email||'').toLowerCase().includes(q));
+    if(!uids.length){el.innerHTML='<div class="list-empty">Нет диалогов</div>';return;}
+    el.innerHTML=uids.map(uid=>{const u=allChatUsers[uid];return`<div class="row-card${selClientUid===uid&&!selOrderId?' sel':''}" onclick="selectUserChat('${uid}')">
+      <div class="row-head"><span class="row-name">${u.name||'Пользователь'}</span>${u.hasUnread?'<div class="unread-dot"></div>':''}</div>
+      <div class="row-sub">${u.email||uid}</div>
+      <div class="row-foot"><span class="row-meta" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">${u.lastMsg||'Нет сообщений'}</span></div>
+    </div>`;}).join('');
+ 
   } else if(currentTab==='reviews'){
-    let revs=allReviews;
-    if(q) revs=revs.filter(r=>(r.clientName||'').toLowerCase().includes(q)||(r.text||'').toLowerCase().includes(q));
-    if(!revs.length){ el.innerHTML='<div class="list-empty">Нет отзывов</div>'; return; }
-    el.innerHTML=revs.map(r=>`
-      <div class="review-item">
-        <div class="review-top">
-          <span class="review-name">${r.clientName||'Аноним'}</span>
-          <span class="star-row">${stars(r.stars||0)}</span>
-          <span class="review-date">${fmtDate(r.createdAt)}</span>
-        </div>
-        ${r.text?`<div class="review-text">${r.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}
-      </div>`).join('');
-
+    let list=allReviews;
+    if(q) list=list.filter(r=>(r.clientName||'').toLowerCase().includes(q)||(r.text||'').toLowerCase().includes(q));
+    if(!list.length){el.innerHTML='<div class="list-empty">Нет отзывов</div>';return;}
+    el.innerHTML=list.map(r=>`<div class="review-item"><div class="review-top"><span class="review-name">${r.clientName||'Аноним'}</span><span class="review-stars">${stars(r.stars||0)}</span><span class="review-date">${fmtDate(r.createdAt)}</span></div>${r.text?`<div class="review-text">${r.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}</div>`).join('');
+ 
   } else if(currentTab==='analytics'){
     renderAnalytics();
   }
 }
-
-/* ── ANALYTICS ── */
+ 
+/* ANALYTICS */
 function renderAnalytics(){
   const el=document.getElementById('listScroll');
-  const done=allOrders.filter(o=>o.status===2);
+  const done=allOrders.filter(o=>o.status===5);
   const totalRev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
   const avgRev=done.length?Math.round(totalRev/done.length):0;
   const avgStars=allReviews.length?(allReviews.reduce((s,r)=>s+(r.stars||0),0)/allReviews.length).toFixed(1):0;
-  const byType={};
-  allOrders.forEach(o=>{ const t=o.siteType||'Другое'; byType[t]=(byType[t]||0)+1; });
+  const byType={};allOrders.forEach(o=>{const t=o.siteType||'Другое';byType[t]=(byType[t]||0)+1;});
   const byTypeSorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);
-  el.innerHTML=`
-    <div style="padding:.4rem .1rem">
-      <div class="analytics-grid">
-        <div class="a-card green">
-          <div class="a-card-lbl">Выручка</div>
-          <div class="a-card-num">${totalRev.toLocaleString('ru')} ₽</div>
-          <div class="a-card-sub">${done.length} закрытых заказов</div>
-        </div>
-        <div class="a-card blue">
-          <div class="a-card-lbl">Средний чек</div>
-          <div class="a-card-num">${avgRev.toLocaleString('ru')} ₽</div>
-          <div class="a-card-sub">по завершённым</div>
-        </div>
-        <div class="a-card">
-          <div class="a-card-lbl">Рейтинг</div>
-          <div class="a-card-num">${avgStars} ★</div>
-          <div class="a-card-sub">${allReviews.length} отзывов</div>
-        </div>
-        <div class="a-card warn">
-          <div class="a-card-lbl">В очереди</div>
-          <div class="a-card-num">${allOrders.filter(o=>(o.status||0)===0).length}</div>
-          <div class="a-card-sub">ожидают ответа</div>
-        </div>
-      </div>
-      <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:.8rem 0 .5rem">Популярные типы</div>
-      ${byTypeSorted.map(([t,n])=>`
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:.45rem .55rem;background:var(--bg3);border:1px solid var(--border);border-radius:8px;margin-bottom:.35rem;font-size:.76rem">
-          <span>${t}</span>
-          <span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.7rem;color:var(--accent2)">${n}</span>
-        </div>`).join('')}
-    </div>`;
+  el.innerHTML=`<div style="padding:.35rem .05rem">
+    <div class="analytics-grid">
+      <div class="a-card green"><div class="a-card-lbl">Выручка</div><div class="a-card-num">${totalRev.toLocaleString('ru')} ₽</div><div class="a-card-sub">${done.length} закрытых</div></div>
+      <div class="a-card blue"><div class="a-card-lbl">Средний чек</div><div class="a-card-num">${avgRev.toLocaleString('ru')} ₽</div><div class="a-card-sub">по завершённым</div></div>
+      <div class="a-card"><div class="a-card-lbl">Рейтинг</div><div class="a-card-num">${avgStars} ★</div><div class="a-card-sub">${allReviews.length} отзывов</div></div>
+      <div class="a-card warn"><div class="a-card-lbl">В очереди</div><div class="a-card-num">${allOrders.filter(o=>(o.status||0)===0).length}</div><div class="a-card-sub">ожидают ответа</div></div>
+    </div>
+    <div style="font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:.75rem 0 .45rem">Популярные типы</div>
+    ${byTypeSorted.map(([t,n])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:.42rem .52rem;background:var(--bg3);border:1px solid var(--border);border-radius:7px;margin-bottom:.3rem;font-size:.74rem"><span>${t}</span><span style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.68rem;color:var(--accent2)">${n}</span></div>`).join('')}
+  </div>`;
 }
-
-/* ── SELECT ORDER ── */
+ 
+/* SELECT ORDER */
 window.selectOrder=function(id){
   selOrderId=id; selClientUid=null;
   const o=allOrders.find(x=>x.id===id);
@@ -582,252 +571,264 @@ window.selectOrder=function(id){
 };
 window.selectUserChat=function(uid){
   selOrderId=null; selClientUid=uid;
-  const u=allUsers[uid];
+  const u=allChatUsers[uid];
   renderList();
   document.getElementById('detailEmpty').style.display='flex';
   document.getElementById('detailWrap').style.display='none';
   openChat(uid,u?.name||'Пользователь',u?.email||'');
 };
-
-/* ── SHOW DETAIL ── */
+ 
+/* SHOW DETAIL */
 function showDetail(o){
   document.getElementById('detailEmpty').style.display='none';
-  const wrap=document.getElementById('detailWrap');
-  wrap.style.display='flex';
+  document.getElementById('detailWrap').style.display='flex';
   document.getElementById('dId').textContent='№ '+o.id.slice(0,8).toUpperCase();
-  document.getElementById('dStatusBadge').innerHTML=`<span class="sbadge s${o.status||0}"><span class="sdot"></span>${sLabels[o.status||0]}</span>`;
+  document.getElementById('dStatusBadge').innerHTML=`<span class="sbadge s${o.status||0}"><span class="sdot"></span>${S_LABELS[o.status||0]}</span>`;
   document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===(o.status||0)));
-
-  // Date inputs
-  document.getElementById('dateStarted').value=tsToInputDate(o.startedAt);
-  document.getElementById('dateDone').value=tsToInputDate(o.doneAt);
-
+ 
+  // Payment
+  currentPaid=o.paid||false;
+  renderPayToggle();
+ 
+  // Comment
+  document.getElementById('commentInp').value=o.statusComment||'';
+ 
+  // Substeps
+  currentSubsteps=JSON.parse(JSON.stringify(o.substeps||[]));
+  renderSubsteps();
+ 
+  // Dates
+  document.getElementById('dateStarted').value=tsToInput(o.startedAt);
+  document.getElementById('dateDone').value=tsToInput(o.doneAt);
+ 
+  // Site delivery
+  document.getElementById('siteDomain').value=o.siteDomain||'';
+  document.getElementById('siteUrl').value=o.siteUrl||'';
+  document.getElementById('siteFaviconUrl').value=o.siteFaviconUrl||'';
+  document.getElementById('sitePages').value=o.sitePages||'';
+ 
+  // Client
   document.getElementById('dClient').innerHTML=`
     <div class="info-cell"><div class="info-lbl">Имя</div><div class="info-val">${o.clientName||'—'}</div></div>
     <div class="info-cell"><div class="info-lbl">Email</div><div class="info-val">${o.clientEmail||'—'}</div></div>`;
+ 
+  // Params
   document.getElementById('dInfo').innerHTML=`
     <div class="info-cell"><div class="info-lbl">Тип</div><div class="info-val">${o.siteType||'—'}</div></div>
     <div class="info-cell"><div class="info-lbl">Тариф</div><div class="info-val">${o.tariff||'—'}</div></div>
     <div class="info-cell"><div class="info-lbl">Страниц</div><div class="info-val">${o.pages||'—'}</div></div>
     <div class="info-cell"><div class="info-lbl">Сумма</div><div class="info-val" style="color:var(--accent2);font-weight:600">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div></div>
-    <div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Создан</div><div class="info-val">${fmtDateTime(o.createdAt)}</div></div>`;
-
+    <div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Создан</div><div class="info-val">${fmtDateTime(o.createdAt)}</div></div>
+    ${o.revisionRequested?`<div class="info-cell" style="grid-column:span 2;background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.2)"><div class="info-lbl" style="color:var(--warn)">Запрос правок</div><div class="info-val">Клиент запросил правки</div></div>`:''} `;
+ 
+  // Description
   const descSec=document.getElementById('dDescSec');
-  if(o.description){ descSec.style.display='block'; document.getElementById('dDesc').textContent=o.description; }
-  else descSec.style.display='none';
-
+  if(o.description){descSec.style.display='block';document.getElementById('dDesc').textContent=o.description;}else descSec.style.display='none';
+ 
+  // Attachments
   const attachSec=document.getElementById('dAttachSec');
   const attachGrid=document.getElementById('dAttach');
   if(o.attachments&&o.attachments.length){
     const imgs=o.attachments.filter(a=>a.fileType&&a.fileType.startsWith('image/'));
     const files=o.attachments.filter(a=>!a.fileType||!a.fileType.startsWith('image/'));
     let html='';
-    imgs.forEach(a=>{ html+=`<img class="attach-thumb" src="${a.fileData}" alt="${a.fileName||'img'}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')"/>`; });
-    files.forEach(a=>{ html+=`<a class="msg-file-link" href="${a.fileData}" download="${a.fileName||'file'}">📎 ${a.fileName||'Файл'}</a>`; });
-    if(html){ attachSec.style.display='block'; attachGrid.innerHTML=html; } else attachSec.style.display='none';
+    imgs.forEach(a=>{html+=`<img class="attach-thumb" src="${a.fileData}" alt="${a.fileName||''}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')"/>`;});
+    files.forEach(a=>{html+=`<a class="msg-file-link" href="${a.fileData}" download="${a.fileName||'file'}">📎 ${a.fileName||'Файл'}</a>`;});
+    if(html){attachSec.style.display='block';attachGrid.innerHTML=html;}else attachSec.style.display='none';
   } else attachSec.style.display='none';
-
-  // Review for this order
+ 
+  // Review
   const revSec=document.getElementById('dReviewSec');
   const rev=allReviews.find(r=>r.orderId===o.id);
   if(rev){
     revSec.style.display='block';
-    document.getElementById('dReviewContent').innerHTML=`
-      <div class="review-item" style="margin:0">
-        <div class="review-top">
-          <span class="star-row">${stars(rev.stars||0)}</span>
-          <span class="review-date">${fmtDate(rev.createdAt)}</span>
-        </div>
-        ${rev.text?`<div class="review-text">${rev.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}
-      </div>`;
+    document.getElementById('dReviewContent').innerHTML=`<div class="review-item" style="margin:0"><div class="review-top"><span class="review-stars">${stars(rev.stars||0)}</span><span class="review-date">${fmtDate(rev.createdAt)}</span></div>${rev.text?`<div class="review-text">${rev.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}</div>`;
   } else revSec.style.display='none';
 }
-
-/* ── SET STATUS ── */
+ 
+/* PAYMENT */
+function renderPayToggle(){
+  const row=document.getElementById('payToggleRow');
+  const lbl=document.getElementById('payLabel');
+  const pill=document.getElementById('payPill');
+  row.classList.toggle('paid',currentPaid);
+  lbl.textContent=currentPaid?'Оплачен':'Не оплачен';
+  pill.textContent=currentPaid?'✓ ОПЛАЧЕН':'✕ НЕ ОПЛАЧЕН';
+}
+window.togglePayment=async function(){
+  if(!selOrderId) return;
+  currentPaid=!currentPaid;
+  renderPayToggle();
+  try{await updateDoc(doc(db,'orders',selOrderId),{paid:currentPaid});toast(currentPaid?'✓ Отмечен как оплачен':'Отмечен как неоплачен',currentPaid?'success':'info');}
+  catch(e){toast('Ошибка','error');}
+};
+ 
+/* STATUS */
 window.setStatus=async function(s){
   if(!selOrderId) return;
   try{
     const upd={status:s};
-    // Auto-set dates if not already set
     const o=allOrders.find(x=>x.id===selOrderId);
-    if(s===1&&!o?.startedAt) upd.startedAt=serverTimestamp();
-    if(s===2&&!o?.doneAt) upd.doneAt=serverTimestamp();
+    if(s>=2&&!o?.startedAt) upd.startedAt=serverTimestamp();
+    if(s===5&&!o?.doneAt) upd.doneAt=serverTimestamp();
     await updateDoc(doc(db,'orders',selOrderId),upd);
-    toast('Статус → '+sLabels[s]+' ✓','success');
-  }catch(e){ toast('Ошибка статуса','error'); console.error(e); }
+    toast('Статус → '+S_LABELS[s]+' ✓','success');
+  }catch(e){toast('Ошибка статуса','error');}
 };
-
-/* ── SAVE DATE ── */
+ 
+/* COMMENT */
+window.saveComment=async function(){
+  if(!selOrderId) return;
+  const text=document.getElementById('commentInp').value.trim();
+  try{await updateDoc(doc(db,'orders',selOrderId),{statusComment:text});toast('Комментарий сохранён ✓','success');}
+  catch(e){toast('Ошибка','error');}
+};
+ 
+/* SUBSTEPS */
+function renderSubsteps(){
+  const el=document.getElementById('substepList');
+  if(!currentSubsteps.length){el.innerHTML='<div style="font-size:.74rem;color:var(--muted);padding:.2rem 0">Нет подпунктов</div>';return;}
+  el.innerHTML=currentSubsteps.map((ss,i)=>`
+    <div class="substep-row">
+      <input type="checkbox" class="substep-check" ${ss.done?'checked':''} onchange="toggleSubstep(${i},this.checked)"/>
+      <span class="substep-text">${ss.label}</span>
+      <button class="substep-del" onclick="deleteSubstep(${i})">✕</button>
+    </div>`).join('');
+}
+window.toggleSubstep=async function(i,done){
+  currentSubsteps[i].done=done;
+  if(done) currentSubsteps[i].date=new Date().toLocaleDateString('ru',{day:'numeric',month:'short'});
+  else delete currentSubsteps[i].date;
+  renderSubsteps();
+  if(selOrderId) await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});
+};
+window.addSubstep=async function(){
+  const inp=document.getElementById('substepInp');
+  const label=inp.value.trim();
+  if(!label) return;
+  currentSubsteps.push({label,done:false});
+  inp.value='';
+  renderSubsteps();
+  if(selOrderId) await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});
+};
+window.deleteSubstep=async function(i){
+  currentSubsteps.splice(i,1);
+  renderSubsteps();
+  if(selOrderId) await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});
+};
+ 
+/* DATE */
 window.saveDate=async function(field,val){
   if(!selOrderId||!val) return;
-  try{
-    const d=new Date(val+'T12:00:00');
-    await updateDoc(doc(db,'orders',selOrderId),{[field]:Timestamp.fromDate(d)});
-    toast('Дата сохранена ✓','success');
-  }catch(e){ toast('Ошибка сохранения даты','error'); console.error(e); }
+  try{const d=new Date(val+'T12:00:00');await updateDoc(doc(db,'orders',selOrderId),{[field]:Timestamp.fromDate(d)});toast('Дата сохранена ✓','success');}
+  catch(e){toast('Ошибка','error');}
 };
-
-/* ── CHAT ── */
+ 
+/* SITE DELIVERY */
+window.saveSiteDelivery=async function(){
+  if(!selOrderId) return;
+  const domain=document.getElementById('siteDomain').value.trim();
+  const url=document.getElementById('siteUrl').value.trim();
+  const faviconUrl=document.getElementById('siteFaviconUrl').value.trim();
+  const pages=document.getElementById('sitePages').value.trim();
+  try{
+    await updateDoc(doc(db,'orders',selOrderId),{siteDomain:domain,siteUrl:url,siteFaviconUrl:faviconUrl,sitePages:pages,deliveryShown:false});
+    // Notify client in chat
+    if(selClientUid&&domain){
+      await addDoc(collection(db,'chats',selClientUid,'messages'),{
+        text:`🎉 Ваш сайт готов!\n🌐 ${domain}\n${url?'Ссылка: '+url:''}`.trim(),
+        sender:'admin',senderName:'Design Antviz',type:'text',createdAt:serverTimestamp()
+      });
+    }
+    toast('Сохранено и клиент уведомлён ✓','success');
+  }catch(e){toast('Ошибка сохранения','error');console.error(e);}
+};
+ 
+/* CHAT */
 function appendMsg(m){
   const container=document.getElementById('chatMsgs');
   const isAdmin=m.sender==='admin';
-  const div=document.createElement('div');
-  div.className=`msg ${isAdmin?'mine':'theirs'}`;
-  if(m.type==='file'){
-    const src=m.fileData||m.fileUrl||'';
-    const isImg=m.fileType&&m.fileType.startsWith('image/');
-    if(isImg){
-      div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||'img'}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
-    } else {
-      div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName||'file'}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
-    }
-  } else {
-    div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
-  }
-  container.appendChild(div);
-  container.scrollTop=container.scrollHeight;
+  const div=document.createElement('div');div.className=`msg ${isAdmin?'mine':'theirs'}`;
+  if(m.type==='file'){const src=m.fileData||m.fileUrl||'';const isImg=m.fileType&&m.fileType.startsWith('image/');
+    if(isImg) div.innerHTML=`<img class="msg-img" src="${src}" alt="${m.fileName||''}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
+    else div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName||'file'}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;
+  } else {div.innerHTML=`<div class="msg-bubble">${m.text||''}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)}</div>`;}
+  container.appendChild(div);container.scrollTop=container.scrollHeight;
 }
-
+ 
 function openChat(uid,name,email){
   if(unsubChat) unsubChat();
   document.getElementById('chatEmpty').style.display='none';
-  const wrap=document.getElementById('chatWrap');
-  wrap.style.display='flex';
+  const wrap=document.getElementById('chatWrapInner');wrap.style.display='flex';
   document.getElementById('chatClientName').textContent=name;
   document.getElementById('chatClientEmail').textContent=email;
   document.getElementById('chatAv').textContent=initials(name);
-  const msgs=document.getElementById('chatMsgs');
-  msgs.innerHTML='';
+  document.getElementById('chatMsgs').innerHTML='';
   const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
-  unsubChat=onSnapshot(q, snap=>{
-    snap.docChanges().forEach(ch=>{ if(ch.type==='added') appendMsg(ch.doc.data()); });
-  }, err=>{ toast('Ошибка чата','error'); console.error(err); });
+  unsubChat=onSnapshot(q,snap=>{snap.docChanges().forEach(ch=>{if(ch.type==='added') appendMsg(ch.doc.data());});},err=>console.error('Chat:',err));
 }
-
+ 
 window.adminSendMsg=async function(){
   if(!selClientUid) return;
-  const inp=document.getElementById('chatInp');
-  const text=inp.value.trim();
-  if(!text) return;
-  inp.value=''; inp.style.height='auto';
-  try{
-    await addDoc(collection(db,'chats',selClientUid,'messages'),{
-      text,sender:'admin',senderName:'Поддержка',type:'text',createdAt:serverTimestamp()
-    });
-  }catch(e){ toast('Ошибка отправки','error'); console.error(e); }
+  const inp=document.getElementById('chatInp');const text=inp.value.trim();if(!text) return;
+  inp.value='';inp.style.height='auto';
+  try{await addDoc(collection(db,'chats',selClientUid,'messages'),{text,sender:'admin',senderName:'Поддержка',type:'text',createdAt:serverTimestamp()});}
+  catch(e){toast('Ошибка','error');}
 };
-
 window.adminSendFiles=async function(files){
   if(!selClientUid||!files.length) return;
   for(const file of Array.from(files)){
-    if(file.size>3*1024*1024){ toast(file.name+' > 3 МБ','error'); continue; }
-    try{
-      toast('Отправляю '+file.name+'...','info');
-      const base64=await new Promise((res,rej)=>{
-        const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-      });
-      await addDoc(collection(db,'chats',selClientUid,'messages'),{
-        type:'file',fileData:base64,fileName:file.name,fileType:file.type,
-        sender:'admin',senderName:'Поддержка',createdAt:serverTimestamp()
-      });
-      toast(file.name+' отправлен ✓','success');
-    }catch(e){
-      if(e.code==='permission-denied') toast('Нет прав на запись в chats','error');
-      else toast('Ошибка: '+file.name,'error');
-    }
+    if(file.size>3*1024*1024){toast(file.name+' > 3 МБ','error');continue;}
+    try{const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+      await addDoc(collection(db,'chats',selClientUid,'messages'),{type:'file',fileData:base64,fileName:file.name,fileType:file.type,sender:'admin',senderName:'Поддержка',createdAt:serverTimestamp()});
+      toast(file.name+' ✓','success');}catch(e){toast('Ошибка','error');}
   }
   document.getElementById('adminFileInput').value='';
 };
-
-window.doLogout=async function(){
-  if(unsubChat) unsubChat();
-  if(unsubMaint) unsubMaint();
-  await signOut(auth);
-  window.location.href='auth.html';
-};
-
-/* ── INIT ── */
-const loadTimeout=setTimeout(()=>{
-  const ls=document.getElementById('loadingScreen');
-  if(ls&&ls.style.display!=='none'){
-    ls.innerHTML=`<div style="text-align:center;padding:2rem">
-      <div style="font-size:2rem;margin-bottom:.8rem">⚠️</div>
-      <div style="font-family:'Unbounded',sans-serif;font-weight:600;font-size:.92rem;margin-bottom:.5rem">Нет соединения</div>
-      <div style="color:#666678;font-size:.78rem;margin-bottom:1.2rem">Проверь интернет или настройки Firebase</div>
-      <button onclick="location.reload()" style="background:#6c63ff;border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.8rem;padding:.55rem 1.3rem;border-radius:50px;cursor:pointer">Обновить</button>
-    </div>`;
-  }
-},8000);
-
+ 
+window.doLogout=async function(){if(unsubChat) unsubChat();await signOut(auth);window.location.href='auth.html';};
+ 
+/* INIT */
+const loadTimeout=setTimeout(()=>{const ls=document.getElementById('loadingScreen');if(ls&&ls.style.display!=='none') ls.innerHTML=`<div style="text-align:center;padding:2rem"><div style="font-size:2rem;margin-bottom:.8rem">⚠️</div><div style="font-family:'Unbounded',sans-serif;font-size:.9rem;margin-bottom:.5rem">Нет соединения</div><div style="color:#666678;font-size:.76rem;margin-bottom:1.1rem">Проверь интернет или Firebase</div><button onclick="location.reload()" style="background:#6c63ff;border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.78rem;padding:.52rem 1.2rem;border-radius:50px;cursor:pointer">Обновить</button></div>`;},8000);
+ 
 onAuthStateChanged(auth, async user=>{
   clearTimeout(loadTimeout);
   document.getElementById('loadingScreen').style.display='none';
   if(!user||user.email!==ADMIN_EMAIL){
-    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;font-family:'Onest',sans-serif;color:#f0f0f5;background:#07070a">
-      <div style="font-size:2.2rem">🚫</div>
-      <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1rem">Нет доступа</div>
-      <div style="color:#666678;font-size:.82rem">Страница только для администратора</div>
-      <a href="index.html" style="color:#a78bfa;font-size:.82rem;text-decoration:none;margin-top:.4rem">← На главную</a>
-    </div>`;
+    document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;flex-direction:column;gap:1rem;font-family:'Onest',sans-serif;color:#f0f0f5;background:#07070a"><div style="font-size:2.2rem">🚫</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1rem">Нет доступа</div><a href="index.html" style="color:#a78bfa;font-size:.82rem;text-decoration:none;margin-top:.4rem">← На главную</a></div>`;
     return;
   }
-
   document.getElementById('appWrap').style.display='block';
-  watchMaintenance();
-
+ 
   // Orders
-  const ordQ=query(collection(db,'orders'),orderBy('createdAt','desc'));
-  onSnapshot(ordQ, snap=>{
+  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')), snap=>{
     allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
-    allUsers={};
-    allOrders.forEach(o=>{
-      if(!o.uid) return;
-      if(!allUsers[o.uid]) allUsers[o.uid]={name:o.clientName||'Пользователь',email:o.clientEmail||'',orderCount:0,hasUnread:false};
-      allUsers[o.uid].orderCount=allOrders.filter(x=>x.uid===o.uid).length;
-    });
-    updateStats();
-    renderList();
-    if(selOrderId){ const upd=allOrders.find(o=>o.id===selOrderId); if(upd) showDetail(upd); }
-  }, err=>{
-    if(err.code==='permission-denied') toast('Нет прав на заказы. Проверь Firestore Rules.','error');
-    else toast('Ошибка загрузки заказов','error');
-    console.error(err);
-  });
-
+    updateStats(); renderList();
+    if(selOrderId){const upd=allOrders.find(o=>o.id===selOrderId);if(upd) showDetail(upd);}
+  }, err=>{toast('Нет прав на заказы','error');console.error(err);});
+ 
   // Reviews
   onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')), snap=>{
     allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));
     if(currentTab==='reviews'||currentTab==='analytics') renderList();
-    if(selOrderId){ const o=allOrders.find(x=>x.id===selOrderId); if(o) showDetail(o); }
-  }, err=>console.warn('Reviews error:',err));
-
+    if(selOrderId){const o=allOrders.find(x=>x.id===selOrderId);if(o) showDetail(o);}
+  }, err=>console.warn('Reviews:',err));
+ 
   // Chats index
-  loadChatsIndex();
-});
-
-async function loadChatsIndex(){
   try{
-    const chatsRootSnap=await getDocs(collection(db,'chats'));
-    chatsRootSnap.forEach(chatDoc=>{
-      const uid=chatDoc.id;
-      const data=chatDoc.data()||{};
-      const lastMsgQ=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','desc'));
-      onSnapshot(lastMsgQ, msgSnap=>{
-        if(msgSnap.empty){
-          if(!allChatUsers[uid]) allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false};
-          renderList(); return;
-        }
+    const chatDocs=await getDocs(collection(db,'chats'));
+    chatDocs.forEach(chatDoc=>{
+      const uid=chatDoc.id;const data=chatDoc.data()||{};
+      onSnapshot(query(collection(db,'chats',uid,'messages'),orderBy('createdAt','desc')), msgSnap=>{
+        if(msgSnap.empty){allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false};renderList();return;}
         const last=msgSnap.docs[0].data();
         const hasUnread=msgSnap.docs.some(d=>d.data().sender==='user'&&!d.data().read);
-        allChatUsers[uid]={name:data.name||last.senderName||'Пользователь',email:data.email||'',lastMsg:last.type==='file'?'📎 Файл':(last.text||'').slice(0,55),lastMsgTs:last.createdAt,hasUnread,orderCount:0};
+        allChatUsers[uid]={name:data.name||last.senderName||'Пользователь',email:data.email||'',lastMsg:last.type==='file'?'📎 Файл':(last.text||'').slice(0,55),lastMsgTs:last.createdAt,hasUnread};
         renderList();
       });
     });
-  }catch(e){
-    console.warn('Chats error:',e);
-    if(e.code==='permission-denied') console.warn('Нет прав на chats. Добавь разрешение в Firestore Rules.');
-  }
-}
+  }catch(e){console.warn('Chats index:',e);}
+});
 </script>
 </body>
 </html>

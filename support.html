@@ -23,6 +23,7 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @keyframes botTyping{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-4px)}}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
     /* NAV */
     nav.desktop-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;
@@ -50,7 +51,7 @@
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
     .spinner{width:28px;height:28px;border:2px solid var(--border-hi);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 
-    /* LAYOUT: nav + chat fills remaining height */
+    /* LAYOUT */
     .chat-layout{
       position:fixed;
       top:var(--nav-h);
@@ -75,7 +76,8 @@
       background:var(--bg2);
       flex-shrink:0;
     }
-    .chat-av{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .chat-av{width:40px;height:40px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .chat-av img{width:100%;height:100%;object-fit:cover}
     .chat-hdr-info{flex:1}
     .chat-hdr-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.88rem}
     .chat-hdr-sub{font-size:.7rem;color:var(--muted);display:flex;align-items:center;gap:.35rem;margin-top:.1rem}
@@ -102,20 +104,64 @@
     .msg-bubble{padding:.55rem .95rem;border-radius:16px;font-size:.83rem;line-height:1.55;word-break:break-word}
     .msg.mine .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:4px}
     .msg.theirs .msg-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px}
-    .msg-time{font-size:.6rem;color:var(--muted)}
+    .msg-time{font-size:.6rem;color:var(--muted);margin-top:2px}
+
+    /* SYSTEM MESSAGE */
+    .system-msg{
+      align-self:center;
+      max-width:85%;
+      text-align:center;
+      padding:.5rem 1rem;
+      background:rgba(255,255,255,0.03);
+      border-radius:12px;
+      font-size:.72rem;
+      color:var(--muted2);
+      animation:fadeIn .4s ease;
+      line-height:1.5;
+    }
+
+    /* INLINE BUTTONS (in bot messages) */
+    .inline-buttons{
+      display:flex;
+      flex-wrap:wrap;
+      gap:.4rem;
+      margin-top:.6rem;
+    }
+    .inline-btn{
+      background:rgba(108,99,255,0.1);
+      border:1px solid rgba(108,99,255,0.25);
+      color:var(--accent2);
+      font-family:'Onest',sans-serif;
+      font-size:.75rem;
+      font-weight:400;
+      padding:.4rem .9rem;
+      border-radius:10px;
+      cursor:pointer;
+      transition:all .18s;
+      white-space:nowrap;
+      letter-spacing:.01em;
+    }
+    .inline-btn:hover{
+      background:rgba(108,99,255,0.2);
+      border-color:rgba(108,99,255,0.45);
+      color:#c4b5fd;
+      transform:translateY(-1px);
+    }
+    .inline-btn.back-btn{
+      background:rgba(255,255,255,0.04);
+      border-color:rgba(255,255,255,0.12);
+      color:var(--muted2);
+    }
+    .inline-btn.back-btn:hover{
+      background:rgba(255,255,255,0.08);
+      color:var(--text);
+    }
 
     /* BOT TYPING */
     .typing-indicator{align-self:flex-start;display:flex;align-items:center;gap:4px;padding:.55rem .85rem;background:var(--bg3);border:1px solid var(--border);border-radius:16px;border-bottom-left-radius:4px;animation:fadeUp .2s ease}
     .typing-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:botTyping 1.2s infinite}
     .typing-dot:nth-child(2){animation-delay:.2s}
     .typing-dot:nth-child(3){animation-delay:.4s}
-
-    /* QUICK REPLIES */
-    .quick-replies{display:flex;flex-wrap:wrap;gap:.42rem;padding:.65rem 1.2rem;border-top:1px solid var(--border);flex-shrink:0;background:var(--bg)}
-    .qr-btn{background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.2);color:var(--accent2);
-      font-family:'Onest',sans-serif;font-size:.76rem;padding:.38rem .85rem;border-radius:50px;cursor:pointer;
-      transition:background .15s,border-color .15s;white-space:nowrap}
-    .qr-btn:hover{background:rgba(108,99,255,.16);border-color:rgba(108,99,255,.35)}
 
     /* INPUT ROW */
     .chat-input-row{
@@ -202,7 +248,9 @@
     <a href="profile.html" class="back-link">
       <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
     </a>
-    <div class="chat-av">🛠</div>
+    <div class="chat-av">
+      <img src="favicon.png" alt="Design Antviz" onerror="this.style.display='none';this.parentElement.innerHTML='DA'"/>
+    </div>
     <div class="chat-hdr-info">
       <div class="chat-hdr-name">Design Antviz</div>
       <div class="chat-hdr-sub"><span class="online-dot"></span>Поддержка · отвечаем быстро</div>
@@ -210,15 +258,6 @@
   </div>
 
   <div class="chat-msgs" id="chatMsgs"></div>
-
-  <!-- Quick replies from bot -->
-  <div class="quick-replies" id="quickReplies" style="display:none">
-    <button class="qr-btn" onclick="sendQuickReply('📦 Статус моего заказа')">📦 Статус заказа</button>
-    <button class="qr-btn" onclick="sendQuickReply('💳 Как оплатить?')">💳 Оплата</button>
-    <button class="qr-btn" onclick="sendQuickReply('⏱ Сколько времени займёт разработка?')">⏱ Сроки</button>
-    <button class="qr-btn" onclick="sendQuickReply('✏️ Хочу внести правки в заказ')">✏️ Правки</button>
-    <button class="qr-btn" onclick="sendQuickReply('📞 Хочу пообщаться с менеджером')">📞 Менеджер</button>
-  </div>
 
   <div class="chat-input-row">
     <input type="file" id="fileInput" style="display:none" multiple accept="image/*,.pdf,.doc,.docx,.zip,.rar,.psd,.fig" onchange="sendFiles(this.files)"/>
@@ -239,18 +278,49 @@
 <script type="module">
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc, updateDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser=null, unsubChat=null, chatInited=false;
 
-// Bot replies — if no admin responds within 8 seconds, bot replies
-const BOT_REPLIES={
-  'статус':['Сейчас посмотрю статус вашего заказа! Актуальную информацию вы также видите в разделе «Мои заказы» в личном кабинете 📦'],
-  'оплат':['Принимаем оплату через СБП, банковские карты, T‑Pay и SberPay. После подтверждения заказа менеджер пришлёт реквизиты. 💳'],
-  'сроки':['Сроки зависят от объёма проекта. Лендинг — от 3 дней, многостраничный сайт — от 1 недели. Уточним точные сроки после обсуждения ТЗ. ⏱'],
-  'правк':['Конечно! Укажите, что именно хотите изменить, и мы внесём правки в ближайшее время ✏️'],
-  'менеджер':['Передаю ваш запрос менеджеру. Он ответит в течение нескольких минут. Если срочно — напишите в Telegram @design_antviz 📞'],
-  'default':['Получил ваше сообщение! Менеджер ответит совсем скоро 👋','Спасибо за сообщение! Обработаю и отвечу в ближайшее время ✨','Понял вас! Отвечу как можно скорее 🚀'],
+// Topics configuration
+const TOPICS = {
+  'status': {
+    label: 'Статус заказа',
+    reply: 'Уточните номер заказа или название проекта — я проверю статус. Актуальную информацию вы также можете посмотреть в разделе «Мои заказы» в личном кабинете.'
+  },
+  'payment': {
+    label: 'Оплата',
+    reply: 'Принимаем оплату через СБП, банковские карты, T-Pay и SberPay. После подтверждения заказа менеджер пришлёт реквизиты. Если возникли сложности — опишите ситуацию.'
+  },
+  'timeline': {
+    label: 'Сроки разработки',
+    reply: 'Сроки зависят от объёма проекта. Лендинг — от 3 дней, многостраничный сайт — от 1 недели, интернет-магазин — от 2 недель. Уточним точные сроки после обсуждения ТЗ.'
+  },
+  'edits': {
+    label: 'Правки в заказ',
+    reply: 'Опишите, что именно хотите изменить — мы внесём правки в ближайшее время. Если правок много, менеджер свяжется для уточнения.'
+  },
+  'manager': {
+    label: 'Связаться с менеджером',
+    reply: 'Передаю ваш запрос менеджеру. Он ответит в течение нескольких минут. Если срочно — напишите в Telegram @design_antviz.'
+  },
+  'other': {
+    label: 'Другой вопрос',
+    reply: 'Опишите ваш вопрос подробнее — я передам его нужному специалисту.'
+  }
+};
+
+const BOT_REPLIES = {
+  'статус': [TOPICS.status.reply],
+  'оплат': [TOPICS.payment.reply],
+  'сроки': [TOPICS.timeline.reply],
+  'правк': [TOPICS.edits.reply],
+  'менеджер': [TOPICS.manager.reply],
+  'default': [
+    'Получил ваше сообщение! Менеджер ответит совсем скоро.',
+    'Спасибо за сообщение! Обработаю и отвечу в ближайшее время.',
+    'Понял вас! Отвечу как можно скорее.'
+  ],
 };
 
 function getDefaultMsg(){return BOT_REPLIES.default[Math.floor(Math.random()*BOT_REPLIES.default.length)];}
@@ -258,6 +328,102 @@ function getBotReply(text){const t=(text||'').toLowerCase();for(const[key,replie
 
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtTime(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+
+// Append inline buttons to the last bot message
+function appendInlineButtons(buttons){
+  const container = document.getElementById('chatMsgs');
+  const lastMsg = container.querySelector('.msg.theirs:last-of-type');
+  if(!lastMsg) return;
+  
+  // Remove existing inline buttons
+  const existing = lastMsg.querySelector('.inline-buttons');
+  if(existing) existing.remove();
+  
+  const btnContainer = document.createElement('div');
+  btnContainer.className = 'inline-buttons';
+  
+  buttons.forEach(btn => {
+    const button = document.createElement('button');
+    button.className = `inline-btn ${btn.isBack ? 'back-btn' : ''}`;
+    button.textContent = btn.label;
+    button.onclick = btn.action;
+    btnContainer.appendChild(button);
+  });
+  
+  lastMsg.querySelector('.msg-bubble').appendChild(btnContainer);
+  container.scrollTop = container.scrollHeight;
+}
+
+// Show topic selection
+function showTopics(){
+  const container = document.getElementById('chatMsgs');
+  
+  // Remove all inline buttons from previous messages
+  container.querySelectorAll('.inline-buttons').forEach(el => el.remove());
+  
+  // Add bot message with topic buttons
+  const div = document.createElement('div');
+  div.className = 'msg theirs';
+  div.innerHTML = `<div class="msg-bubble">Выберите тему обращения:</div><div class="msg-time">Бот · сейчас</div>`;
+  container.appendChild(div);
+  
+  const buttons = Object.entries(TOPICS).map(([key, topic]) => ({
+    label: topic.label,
+    action: () => selectTopic(key)
+  }));
+  
+  appendInlineButtons(buttons);
+}
+
+// Handle topic selection
+async function selectTopic(topicKey){
+  const topic = TOPICS[topicKey];
+  if(!topic) return;
+  
+  // Hide all existing inline buttons
+  document.querySelectorAll('.inline-buttons').forEach(el => el.remove());
+  
+  // Add user message (topic selection)
+  const container = document.getElementById('chatMsgs');
+  const userDiv = document.createElement('div');
+  userDiv.className = 'msg mine';
+  userDiv.innerHTML = `<div class="msg-bubble">${topic.label}</div><div class="msg-time">Вы · сейчас</div>`;
+  container.appendChild(userDiv);
+  container.scrollTop = container.scrollHeight;
+  
+  // Save to Firestore
+  try{
+    await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
+      text: topic.label, sender: 'user', senderName: currentUser.displayName || 'Пользователь', type: 'text', createdAt: serverTimestamp()
+    });
+  }catch(e){}
+  
+  // Show typing
+  showTyping();
+  await new Promise(r => setTimeout(r, 800 + Math.random() * 600));
+  hideTyping();
+  
+  // Bot reply
+  const botDiv = document.createElement('div');
+  botDiv.className = 'msg theirs';
+  botDiv.innerHTML = `<div class="msg-bubble">${topic.reply}</div><div class="msg-time">Бот · сейчас</div>`;
+  container.appendChild(botDiv);
+  container.scrollTop = container.scrollHeight;
+  
+  // Save bot reply
+  try{
+    await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
+      text: topic.reply, sender: 'bot', senderName: 'Бот', type: 'text', createdAt: serverTimestamp()
+    });
+  }catch(e){}
+  
+  // Add back button
+  appendInlineButtons([{
+    label: '← Выбрать другую тему',
+    isBack: true,
+    action: showTopics
+  }]);
+}
 
 function appendMsg(m, markRead=false){
   const container=document.getElementById('chatMsgs');
@@ -277,6 +443,15 @@ function appendMsg(m, markRead=false){
   container.scrollTop=container.scrollHeight;
 }
 
+function addSystemMessage(text){
+  const container = document.getElementById('chatMsgs');
+  const div = document.createElement('div');
+  div.className = 'system-msg';
+  div.textContent = text;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
 function showTyping(){
   const container=document.getElementById('chatMsgs');
   const el=document.createElement('div');
@@ -291,14 +466,12 @@ let botReplyTimer=null;
 async function scheduleAutoReply(userText){
   clearTimeout(botReplyTimer);
   botReplyTimer=setTimeout(async()=>{
-    // Only reply if no admin message came recently
-    const replyText=getBotReply(userText);
     showTyping();
     await new Promise(r=>setTimeout(r,1200+Math.random()*800));
     hideTyping();
     try{
       await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-        text:replyText,sender:'bot',senderName:'Бот',type:'text',createdAt:serverTimestamp()
+        text: getBotReply(userText), sender: 'bot', senderName: 'Бот', type: 'text', createdAt: serverTimestamp()
       });
     }catch(e){}
   },6000);
@@ -308,21 +481,35 @@ function loadChat(uid){
   if(unsubChat) unsubChat();
   const container=document.getElementById('chatMsgs');
   container.innerHTML='';
+  
+  // System message about privacy
+  addSystemMessage('Диалоги автоматически удаляются через 7 дней. Это сделано для вашей конфиденциальности.');
+  
   // Welcome message
   const welcome=document.createElement('div');
   welcome.className='msg theirs';
-  welcome.innerHTML=`<div class="msg-bubble">Привет! 👋 Я бот Design Antviz. Выберите тему или напишите вопрос — менеджер ответит в ближайшее время.</div><div class="msg-time">Бот · сейчас</div>`;
+  welcome.innerHTML=`<div class="msg-bubble">Здравствуйте! Я бот поддержки Design Antviz. Выберите тему обращения — я помогу или передам вопрос менеджеру.</div><div class="msg-time">Бот · сейчас</div>`;
   container.appendChild(welcome);
-  // Show quick replies after welcome
-  setTimeout(()=>{document.getElementById('quickReplies').style.display='flex';},400);
+  container.scrollTop = container.scrollHeight;
+  
+  // Show topic buttons
+  setTimeout(() => {
+    const buttons = Object.entries(TOPICS).map(([key, topic]) => ({
+      label: topic.label,
+      action: () => selectTopic(key)
+    }));
+    appendInlineButtons(buttons);
+  }, 300);
 
   const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'));
   unsubChat=onSnapshot(q,snap=>{
     snap.docChanges().forEach(ch=>{
-      if(ch.type==='added') appendMsg(ch.doc.data());
-      // Mark admin messages as read
-      if(ch.type==='added'&&ch.doc.data().sender==='admin'&&!ch.doc.data().readByUser){
-        updateDoc(ch.doc.ref,{readByUser:true}).catch(()=>{});
+      if(ch.type==='added') {
+        appendMsg(ch.doc.data());
+        // Mark admin messages as read
+        if(ch.doc.data().sender==='admin'&&!ch.doc.data().readByUser){
+          updateDoc(ch.doc.ref,{readByUser:true}).catch(()=>{});
+        }
       }
     });
   },e=>console.error(e));
@@ -334,7 +521,10 @@ window.sendMsg=async function(){
   const text=inp.value.trim();
   if(!text) return;
   inp.value='';inp.style.height='auto';
-  document.getElementById('quickReplies').style.display='none';
+  
+  // Remove all inline buttons when user types manually
+  document.querySelectorAll('.inline-buttons').forEach(el => el.remove());
+  
   try{
     await setDoc(doc(db,'chats',currentUser.uid),{name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
     await addDoc(collection(db,'chats',currentUser.uid,'messages'),{text,sender:'user',senderName:currentUser.displayName||'Пользователь',type:'text',createdAt:serverTimestamp()});
@@ -342,14 +532,9 @@ window.sendMsg=async function(){
   }catch(e){toast('Ошибка отправки','error');}
 };
 
-window.sendQuickReply=function(text){
-  document.getElementById('chatInput').value=text;
-  sendMsg();
-};
-
 window.sendFiles=async function(files){
   if(!currentUser||!files.length) return;
-  document.getElementById('quickReplies').style.display='none';
+  document.querySelectorAll('.inline-buttons').forEach(el => el.remove());
   for(const file of Array.from(files)){
     if(file.size>3*1024*1024){toast(file.name+' > 3 МБ','error');continue;}
     try{

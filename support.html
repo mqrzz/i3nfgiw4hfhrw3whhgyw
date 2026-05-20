@@ -138,66 +138,71 @@
     .bot-btn.back:hover{color:var(--text);border-color:var(--border-hi)}
 
     /* ── LIQUID GLASS INPUT ZONE ── */
+    /* Transparent wrapper so messages bleed through underneath */
     .chat-input-wrap{
       position:relative;
       flex-shrink:0;
-      padding:.75rem 1rem 1rem;
+      /* no background — pill floats above messages */
+      padding:.5rem 1rem .85rem;
     }
-    /* The floating glass bar */
+    /* Floating pill — compact, with side margins so it doesn't hug edges */
     .chat-input-bar{
-      display:flex;align-items:flex-end;gap:.5rem;
+      display:flex;align-items:center;gap:.3rem;
       background:var(--glass-bg);
       backdrop-filter:blur(var(--glass-blur));
       -webkit-backdrop-filter:blur(var(--glass-blur));
       border:1px solid var(--glass-border);
-      border-radius:26px;
-      padding:.6rem .6rem .6rem .85rem;
+      border-radius:999px;
+      /* tight padding keeps it slim like TG/ChatGPT */
+      padding:.36rem .36rem .36rem .72rem;
       box-shadow:var(--glass-shadow);
-      transition:box-shadow .2s,border-color .2s;
+      transition:box-shadow .22s,border-color .22s;
     }
     .chat-input-bar:focus-within{
-      border-color:rgba(108,99,255,.35);
-      box-shadow:0 8px 36px rgba(0,0,0,.5), 0 0 0 3px rgba(108,99,255,.09), 0 1.5px 0 rgba(255,255,255,.07) inset;
+      border-color:rgba(108,99,255,.4);
+      box-shadow:0 10px 40px rgba(0,0,0,.55),
+                 0 0 0 3px rgba(108,99,255,.1),
+                 0 1px 0 rgba(255,255,255,.08) inset;
     }
 
-    /* Attach button — glassy pill */
+    /* Attach — just an icon, no background box */
     .attach-btn{
-      width:34px;height:34px;border-radius:50%;
-      background:rgba(255,255,255,.07);
-      border:1px solid rgba(255,255,255,.1);
+      width:28px;height:28px;border-radius:50%;
+      background:none;border:none;
       color:var(--muted);cursor:pointer;
       display:flex;align-items:center;justify-content:center;
-      flex-shrink:0;transition:background .15s,color .15s,transform .12s;
+      flex-shrink:0;transition:color .15s,transform .12s;
+      padding:0;
     }
-    .attach-btn:hover{background:rgba(255,255,255,.13);color:var(--text);transform:scale(1.06)}
-    .attach-btn:active{transform:scale(.96)}
-    .attach-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2}
+    .attach-btn:hover{color:var(--text);transform:scale(1.12)}
+    .attach-btn:active{transform:scale(.9)}
+    .attach-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:2}
 
-    /* Textarea */
+    /* Textarea — single-line feel, grows only when needed */
     .chat-textarea{
       flex:1;background:transparent;border:none;
-      color:var(--text);font-family:'Onest',sans-serif;font-size:.86rem;font-weight:300;
-      outline:none;resize:none;max-height:120px;line-height:1.52;
-      padding:.28rem 0;
+      color:var(--text);font-family:'Onest',sans-serif;font-size:.85rem;font-weight:300;
+      outline:none;resize:none;max-height:110px;line-height:1.5;
+      padding:.22rem 0;
       caret-color:var(--accent2);
     }
     .chat-textarea::placeholder{color:var(--muted)}
 
-    /* Send button */
+    /* Send — compact round button, glows purple */
     .send-btn{
-      width:36px;height:36px;border-radius:50%;
+      width:32px;height:32px;border-radius:50%;
       background:linear-gradient(140deg,var(--accent),#8b5cf6);
       border:none;color:#fff;cursor:pointer;
       display:flex;align-items:center;justify-content:center;
       flex-shrink:0;
-      box-shadow:0 3px 12px rgba(108,99,255,.4);
-      transition:box-shadow .18s,transform .12s,opacity .15s;
-      opacity:.5;
+      box-shadow:0 2px 10px rgba(108,99,255,.38);
+      transition:box-shadow .18s,transform .12s,opacity .18s;
+      opacity:.45;
     }
     .send-btn.active{opacity:1}
-    .send-btn:hover{box-shadow:0 5px 18px rgba(108,99,255,.55);transform:scale(1.07)}
-    .send-btn:active{transform:scale(.94)}
-    .send-btn svg{width:15px;height:15px;transform:translateX(1px)}
+    .send-btn.active:hover{box-shadow:0 4px 16px rgba(108,99,255,.55);transform:scale(1.08)}
+    .send-btn:active{transform:scale(.9)}
+    .send-btn svg{width:14px;height:14px;transform:translateX(1px)}
 
     /* ── FILE / IMG ── */
     .msg-img{max-width:200px;max-height:180px;border-radius:12px;display:block;cursor:pointer;transition:opacity .18s;border:1px solid var(--border)}

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Заказать сайт — Design Antviz</title>
+  <title>Заказать сайт — Antviz</title>
   <link rel="icon" href="favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -19,21 +19,13 @@
     .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:pulse 2s infinite;flex-shrink:0}
     .nav-links{display:flex;gap:1.5rem;align-items:center}
     .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.02em;transition:color .2s}
+    .nav-links a:hover,.nav-links a.active{color:var(--text)}
     .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
-    .mobile-nav-bar{display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(22,22,30,0.92);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:8px 6px;width:calc(100% - 24px);max-width:380px;justify-content:space-around;align-items:center;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+    .mobile-nav-bar{display:none;position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:200;background:rgba(22,22,30,0.92);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.12);border-radius:28px;padding:8px 6px;width:calc(100% - 24px);max-width:360px;justify-content:space-around;align-items:center;box-shadow:0 8px 40px rgba(0,0,0,.5)}
     .mobile-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--muted);font-size:.6rem;padding:6px 10px;border-radius:14px;transition:background .18s,color .18s}
     .mobile-nav-item svg{width:20px;height:20px}
     .mobile-nav-item.active{color:var(--accent2);background:rgba(108,99,255,.13)}
-    /* CART */
-    .nav-cart-btn{background:none;border:none;cursor:pointer;color:var(--muted);position:relative;display:flex;align-items:center;padding:0;transition:color .2s}
-    .nav-cart-btn:hover{color:var(--text)}
     @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-    .nav-links a:hover,.nav-links a.active{color:var(--text)}
-
-    /* CART */
-    .nav-cart-btn{background:none;border:none;cursor:pointer;color:var(--muted);position:relative;display:flex;align-items:center;padding:0;transition:color .2s}
-    .nav-cart-btn:hover{color:var(--text)}
-    .nav-cart-btn svg{width:19px;height:19px}
     .cart-badge{position:absolute;top:-5px;right:-7px;width:16px;height:16px;border-radius:50%;background:var(--accent);color:#fff;font-size:.58rem;font-weight:700;display:none;align-items:center;justify-content:center}
     .cart-badge.show{display:flex}
     .cart-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:flex-start;justify-content:flex-end;padding:78px 18px 18px}
@@ -189,11 +181,10 @@
   <a class="logo" href="index.html"><span class="logo-dot"></span>Design Antviz</a>
   <div class="nav-links">
     <a href="index.html">Главная</a>
-    <a href="order.html" class="active">Заказать</a>
     <a href="faq.html">FAQ</a>
     <a href="profile.html" class="nav-auth-btn" id="navProfile" style="display:none">Кабинет</a>
     <a href="auth.html" class="nav-auth-btn" id="navLogin" style="display:none">Войти</a>
-    <a href="order.html" class="nav-cta">Заказать сайт</a>
+    <a href="order.html" class="nav-cta active">Заказать сайт</a>
   </div>
 </nav>
 
@@ -354,7 +345,7 @@
   // CART
   const getCart=()=>{try{return JSON.parse(localStorage.getItem('antviz_cart')||'[]')}catch{return[]}};
   const saveCart=c=>{localStorage.setItem('antviz_cart',JSON.stringify(c));updateBadges();renderCart();};
-  function updateBadges(){const n=getCart().reduce((s,i)=>s+i.qty,0);const b=document.getElementById('deskCartBadge');if(b){b.textContent=n;b.classList.toggle('show',n>0);}}
+  function updateBadges(){const n=getCart().reduce((s,i)=>s+i.qty,0);['deskCartBadge','mobileCartBadge'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=n;b.classList.toggle('show',n>0);}});}
   window.toggleCart=()=>document.getElementById('cartOverlay').classList.toggle('show');
   document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('cartOverlay').classList.remove('show');});
 

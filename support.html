@@ -55,13 +55,13 @@
     }
     @media(max-width:768px){.chat-layout{top:0;border:none;bottom:0}}
 
-    /* Chat header — мессенджер стиль */
+    /* Chat header — как в мессенджере: без линии сверху, скруглённый */
     .chat-hdr{
-      padding:.7rem 1.1rem;border-bottom:1px solid var(--border);
+      padding:.7rem 1.1rem;
       display:flex;align-items:center;gap:.7rem;
-      background:rgba(17,17,22,0.92);backdrop-filter:blur(24px);flex-shrink:0;
+      flex-shrink:0;
     }
-    /* Кнопка назад — круглая, отдельно слева */
+    /* Кнопка назад — круглая */
     .back-link{
       width:36px;height:36px;border-radius:50%;
       background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
@@ -71,21 +71,27 @@
     }
     .back-link:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:var(--text)}
     .back-link svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2}
-    /* Центральная часть хедера — аватар + инфо вместе, как в мессенджере */
-    .chat-hdr-body{display:flex;align-items:center;gap:.75rem;flex:1}
-    .chat-av{
-      width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;
-      background:linear-gradient(135deg,rgba(108,99,255,.3),rgba(167,139,250,.2));
-      border:2px solid rgba(108,99,255,.3);
-      display:flex;align-items:center;justify-content:center;
-      box-shadow:0 0 0 3px rgba(108,99,255,.08);
+
+    /* Основная плашка хедера — скруглённая, без свечения */
+    .chat-hdr-body{
+      display:flex;align-items:center;gap:.75rem;flex:1;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:16px;
+      padding:.55rem .9rem;
+      cursor:default;
     }
-    .chat-av img{width:100%;height:100%;object-fit:contain;padding:6px}
-    .chat-hdr-info{flex:1}
-    .chat-hdr-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.84rem}
-    .chat-hdr-sub{font-size:.68rem;color:var(--muted);display:flex;align-items:center;gap:.35rem;margin-top:.1rem}
-    .online-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;
-      box-shadow:0 0 6px var(--success);animation:pulse 2.5s infinite}
+    .chat-av{
+      width:36px;height:36px;border-radius:50%;overflow:hidden;flex-shrink:0;
+      background:linear-gradient(135deg,rgba(108,99,255,.3),rgba(167,139,250,.2));
+      border:2px solid rgba(108,99,255,.2);
+      display:flex;align-items:center;justify-content:center;
+    }
+    .chat-av img{width:100%;height:100%;object-fit:contain;padding:5px}
+    .chat-hdr-info{flex:1;min-width:0}
+    .chat-hdr-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-hdr-sub{font-size:.66rem;color:var(--muted);display:flex;align-items:center;gap:.35rem;margin-top:.08rem}
+    .online-dot{width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;flex-shrink:0}
 
     .chat-msgs{
       flex:1;overflow-y:auto;
@@ -227,6 +233,7 @@
 </nav>
 
 <div class="chat-layout" id="appWrap" style="display:none">
+  <!-- Хедер как в мессенджере: кнопка назад + скруглённая плашка с инфой -->
   <div class="chat-hdr">
     <a href="profile.html" class="back-link" title="Назад">
       <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
@@ -281,6 +288,8 @@ let unsubChat = null;
 let userOrders = [];
 let flowState = 'topic';
 let initialLoadDone = false;
+let welcomeShown = false;   // ← флаг: показано ли приветствие в этой сессии
+let hasUserMessages = false; // ← были ли уже сообщения от пользователя в чате
 
 /* ── helpers ── */
 function toast(msg, type='info'){
@@ -318,6 +327,19 @@ async function purgeOldMessages(uid){
     const cutoff=Timestamp.fromMillis(Date.now()-THREE_DAYS_MS);
     const snap=await getDocs(query(collection(db,'chats',uid,'messages'),where('createdAt','<',cutoff)));
     for(const d of snap.docs) deleteDoc(d.ref).catch(()=>{});
+  }catch(e){}
+}
+
+/* ── Удаление приветствия бота ── */
+async function removeWelcomeMessages(){
+  if(!currentUser) return;
+  try{
+    const snap = await getDocs(query(
+      collection(db,'chats',currentUser.uid,'messages'),
+      where('flowTag','==','welcome')
+    ));
+    for(const d of snap.docs) deleteDoc(d.ref).catch(()=>{});
+    welcomeShown = false;
   }catch(e){}
 }
 
@@ -453,6 +475,9 @@ function hideTyping(){document.getElementById('typingIndicator')?.remove();}
 async function doSendUserMsg(text){
   if(!currentUser||!text) return;
   try{
+    // Если пользователь что-то отправил (даже кнопкой) — удаляем приветствие
+    if(welcomeShown) await removeWelcomeMessages();
+
     await setDoc(doc(db,'chats',currentUser.uid),
       {name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
     await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
@@ -464,6 +489,9 @@ async function doSendUserMsg(text){
 
 /* ── BOT FLOW ── */
 async function showWelcome(){
+  // Удаляем старые приветствия перед показом нового
+  await removeWelcomeMessages();
+  welcomeShown = true;
   await saveBotMsg('Привет! Я бот Антвизик.\nЧем могу помочь? Выберите тему:', 'welcome');
 }
 
@@ -506,31 +534,29 @@ async function openFreeChat(){
 /* ── Firestore live listener ── */
 function listenChat(uid){
   if(unsubChat) unsubChat();
-  // Грузим только последние 100 сообщений — не тащим весь чат
   const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(100));
   unsubChat=onSnapshot(q,snap=>{
     snap.docChanges().forEach(ch=>{
       if(ch.type==='added'){
         const m={...ch.doc.data(), _id:ch.doc.id};
-        // Skip if already rendered
         if(document.querySelector(`[data-id="${m._id}"]`)) return;
 
         if(m.sender==='bot'){
           renderBotWithButtons(m);
+          if(m.flowTag==='welcome') welcomeShown = true;
         } else if(m.sender==='admin'||m.sender==='user'){
           renderMsg(m);
+          if(m.sender==='user') hasUserMessages = true;
         }
         if(m.sender==='admin'&&!m.readByUser)
           updateDoc(ch.doc.ref,{readByUser:true}).catch(()=>{});
 
-        // After all initial messages loaded, scroll to bottom
         scrollBottom(!initialLoadDone);
       }
     });
 
     if(!initialLoadDone){
       initialLoadDone=true;
-      // Small delay to ensure DOM is painted
       setTimeout(()=>scrollBottom(true), 80);
     }
   },e=>console.error(e));
@@ -544,6 +570,9 @@ window.sendMsg=async function(){
   if(!text) return;
   inp.value=''; inp.style.height='auto';
   document.getElementById('sendBtn').classList.remove('active');
+
+  // При любой ручной отправке — удаляем приветствие
+  if(welcomeShown) await removeWelcomeMessages();
 
   if(flowState==='topic'){
     await saveBotMsg('Для навигации используйте кнопки выше.\nЕсли хотите написать менеджеру — нажмите «Написать вопрос».', 'hint');
@@ -608,14 +637,23 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('appWrap').style.display='flex';
 
-  // Start listener — renders all saved messages including bot
+  // Проверяем, есть ли вообще сообщения в чате
+  const chatSnap = await getDocs(collection(db,'chats',user.uid,'messages'));
+  
+  // Проверяем, есть ли сообщения от пользователя
+  hasUserMessages = false;
+  chatSnap.forEach(doc => {
+    if(doc.data().sender === 'user') hasUserMessages = true;
+  });
+
+  // Запускаем слушатель
   listenChat(user.uid);
 
-  // Check if chat is empty, if so show welcome
-  try{
-    const snap=await getDocs(collection(db,'chats',user.uid,'messages'));
-    if(snap.empty) await showWelcome();
-  }catch(e){ await showWelcome(); }
+  // Если чат пустой или нет сообщений от пользователя — показываем приветствие
+  if(chatSnap.empty || !hasUserMessages) {
+    await showWelcome();
+  }
+  // Если есть сообщения от пользователя — не показываем, ждём следующего захода
 });
 </script>
 </body>

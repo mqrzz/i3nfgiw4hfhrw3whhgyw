@@ -202,7 +202,7 @@
     <nav class="antviz-footer__links">
       <a href="order.html">Заказать</a>
       <a href="faq.html">FAQ</a>
-      <a href="faq.html#rules">Правила</a>
+      <a href="faq.html">Правила</a>
       <a href="support.html">Поддержка</a>
     </nav>
   </div>

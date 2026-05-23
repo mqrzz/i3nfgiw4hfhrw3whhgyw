@@ -510,9 +510,9 @@ window.submitReview = async function(){
 window.printReceipt = function(o){const w=window.open('','_blank','width=600,height=700');const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Design Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${(o.extras||[]).length?`<tr><td>Дополнения</td><td>${o.extras.join(', ')}</td></tr>`:''}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr><tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><scr`+'ipt>window.onload=()=>window.print()</'+'script></body></html>`);w.document.close();};
 
 function watchChatBadge(uid){
-  const q = query(collection(db,'chats',uid,'messages'),orderBy('createdAt','desc'));
+  const q = collection(db,'chats',uid,'messages');
   unsubChat = onSnapshot(q, snap=>{
-    const hasUnread = snap.docs.some(d=>d.data().sender==='admin'&&!d.data().readByUser);
+    const hasUnread = snap.docs.some(d=>{const m=d.data();return m.sender==='admin'&&!m.readByUser;});
     document.getElementById('navChatBadge').style.display = hasUnread?'':'none';
   }, ()=>{});
 }

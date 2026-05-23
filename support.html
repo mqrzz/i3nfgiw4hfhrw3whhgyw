@@ -628,10 +628,12 @@ onAuthStateChanged(auth,async user=>{
   await purgeOldMessages(user.uid);
 
   try{
+    // No orderBy to avoid composite index requirement
     const snap=await getDocs(
-      query(collection(db,'orders'),where('uid','==',user.uid),orderBy('createdAt','desc'))
+      query(collection(db,'orders'),where('uid','==',user.uid))
     );
-    userOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    userOrders=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
   }catch(e){}
 
   document.getElementById('loadingScreen').style.display='none';

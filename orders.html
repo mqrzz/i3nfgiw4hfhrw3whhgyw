@@ -540,7 +540,11 @@ function loadOrders(uid){
         if(o.status===5&&!o.deliveryShown){setTimeout(()=>{showDeliveryPopup(o);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});},1500);}
       }
     });
-  }, err=>console.error('Orders:',err));
+  }, err=>{
+    console.error('Orders error:',err);
+    // Show empty state even on error (e.g. missing Firestore index or rules)
+    renderOrders([]);
+  });
 }
 
 document.addEventListener('keydown', e=>{if(e.key==='Escape'){closeReview();closeDelivery();}});

@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta name="yandex-verification" content="4a92c5772cf23963" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Antviz — Создание сайтов</title>
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;--border:rgba(255,255,255,0.07);--accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;--text:#f0f0f5;--muted:#777789;--success:#4ade80;--error:#f87171}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
+    nav.desktop-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;width:calc(100% - 40px);max-width:1100px;background:rgba(22,22,30,0.85);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:28px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.04em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
+    .logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);animation:pulse 2s infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.02em;transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
+    .nav-cart{position:relative;display:flex;align-items:center}
+    .nav-cart svg{width:20px;height:20px}
+    .cart-badge{position:absolute;top:-6px;right:-8px;width:17px;height:17px;border-radius:50%;background:var(--accent);color:#fff;font-size:.6rem;font-weight:700;display:none;align-items:center;justify-content:center}
+    .cart-badge.show{display:flex}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:.8rem 2rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.9rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .15s,box-shadow .2s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(108,99,255,.3)}
+    .btn-primary:hover{box-shadow:0 6px 30px rgba(108,99,255,.5)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+    .hero{min-height:100svh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 5vw 80px;position:relative;overflow:hidden}
+    .hero-glow{position:absolute;width:800px;height:800px;background:radial-gradient(circle,rgba(108,99,255,.16) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.3);padding:.35rem 1rem;border-radius:50px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--accent2);margin-bottom:2rem;animation:fadeUp .8s ease both}
+    .hero h1{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(2.4rem,7vw,5.5rem);line-height:1.05;letter-spacing:-0.03em;max-width:800px;animation:fadeUp .9s .1s ease both}
+    .hero h1 span{color:var(--accent2)}
+    .hero p{max-width:520px;color:var(--muted);font-size:1.05rem;margin:1.5rem auto 2.5rem;animation:fadeUp .9s .2s ease both}
+    .hero-btns{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;animation:fadeUp .9s .3s ease both}
+    .hero-stats{display:flex;gap:3rem;margin-top:4rem;animation:fadeUp .9s .4s ease both;flex-wrap:wrap;justify-content:center}
+    .hero-stat-num{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2rem;color:var(--accent2)}
+    .hero-stat-label{color:var(--muted);font-size:.78rem;margin-top:.2rem}
+    .hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);color:var(--muted);font-size:.72rem;letter-spacing:.08em;text-align:center;animation:bounce 2s infinite}
+    .hero-scroll::before{content:'';display:block;width:1px;height:36px;background:linear-gradient(to bottom,transparent,var(--muted));margin:0 auto 6px}
+    @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(6px)}}
+    section{padding:100px 5vw;position:relative}
+    .section-label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;font-weight:500}
+    .section-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.8rem,4vw,3rem);line-height:1.15;letter-spacing:-.02em;margin-bottom:1rem}
+    .section-sub{color:var(--muted);max-width:520px;font-size:1rem;line-height:1.7;margin-bottom:3rem}
+    .portfolio-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-top:3rem}
+    .portfolio-card{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;transition:transform .2s,box-shadow .2s}
+    .portfolio-card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.4)}
+    .portfolio-thumb{height:180px;display:flex;align-items:center;justify-content:center;font-size:2.5rem;position:relative;overflow:hidden}
+    .portfolio-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(10,10,12,.8))}
+    .portfolio-tag{position:absolute;top:12px;left:12px;z-index:1;background:rgba(108,99,255,.85);color:#fff;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;padding:.2rem .6rem;border-radius:50px;font-weight:600}
+    .portfolio-info{padding:1.2rem 1.4rem}
+    .portfolio-info h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.88rem;margin-bottom:.3rem}
+    .portfolio-info p{color:var(--muted);font-size:.78rem}
+    .portfolio-meta{display:flex;gap:.5rem;margin-top:.75rem;flex-wrap:wrap}
+    .meta-tag{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-size:.68rem;padding:.2rem .55rem;border-radius:6px}
+    .timeline{margin-top:3rem;display:flex;flex-direction:column}
+    .timeline-item{display:grid;grid-template-columns:56px 1fr;gap:1.5rem;position:relative;padding-bottom:2.5rem}
+    .timeline-item:last-child{padding-bottom:0}
+    .tl-line{position:absolute;left:27px;top:56px;width:2px;height:calc(100% - 20px);background:linear-gradient(to bottom,rgba(108,99,255,.4),rgba(108,99,255,.05))}
+    .tl-dot{width:56px;height:56px;border-radius:50%;background:var(--bg3);border:1px solid rgba(108,99,255,.25);display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-weight:700;font-size:.85rem;color:var(--accent2);flex-shrink:0;position:relative;z-index:1}
+    .tl-body{padding-top:.8rem}
+    .tl-body h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:.4rem}
+    .tl-body p{color:var(--muted);font-size:.875rem}
+    .tl-time{display:inline-flex;align-items:center;gap:4px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.15);color:var(--accent2);font-size:.68rem;padding:.2rem .6rem;border-radius:50px;margin-top:.5rem;font-weight:500}
+    .calc-wrap{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem;margin-top:3rem}
+    .calc-row{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:1.5rem}
+    .calc-group{margin-bottom:1.5rem}
+    .calc-group label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}
+    .calc-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.9rem;outline:none;-webkit-appearance:none;cursor:pointer;transition:border-color .2s}
+    .calc-select:focus{border-color:var(--accent)}
+    .pages-row{display:flex;align-items:center;gap:1rem;margin-top:.6rem}
+    .pages-slider{flex:1;-webkit-appearance:none;height:4px;background:var(--bg3);border-radius:2px;outline:none;cursor:pointer}
+    .pages-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 3px rgba(108,99,255,.2)}
+    .pages-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem;min-width:40px;text-align:center;color:var(--accent2)}
+    .calc-extras{display:flex;flex-wrap:wrap;gap:.75rem}
+    .calc-extra{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem;cursor:pointer;font-size:.82rem;transition:border-color .2s,background .2s,color .2s;user-select:none}
+    .calc-extra:hover{border-color:rgba(108,99,255,.3)}
+    .calc-extra.on{border-color:var(--accent2);background:rgba(108,99,255,.1);color:var(--accent2)}
+    .calc-result{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:var(--bg2);border:1px solid rgba(108,99,255,.2);border-radius:16px;padding:1.5rem;margin-top:1.5rem}
+    .calc-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2.2rem;color:var(--accent2)}
+    .ms-block{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;background:linear-gradient(135deg,rgba(56,189,248,.06) 0%,rgba(108,99,255,.06) 100%);border:1px solid rgba(56,189,248,.15);border-radius:24px;padding:3rem;margin-top:3rem;overflow:hidden;position:relative}
+    .ms-block::before{content:'';position:absolute;top:-80px;right:-80px;width:300px;height:300px;background:radial-gradient(circle,rgba(56,189,248,.1) 0%,transparent 70%);pointer-events:none}
+    .ms-logo-wrap{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem}
+    .ms-logo-wrap img{height:52px;object-fit:contain}
+    .ms-logo-wrap .gh-img{filter:invert(1) brightness(2)}
+    .ms-plus{color:var(--muted);font-size:1.2rem}
+    .ms-block h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem;margin-bottom:.75rem}
+    .ms-block p{color:var(--muted);font-size:.9rem;line-height:1.7}
+    .ms-perks{display:flex;flex-direction:column;gap:.75rem}
+    .ms-perk{display:flex;align-items:flex-start;gap:.75rem;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:14px;padding:1rem 1.2rem}
+    .ms-perk-icon{font-size:1.3rem;flex-shrink:0}
+    .ms-perk h4{font-weight:500;font-size:.88rem;margin-bottom:.2rem}
+    .ms-perk p{color:var(--muted);font-size:.78rem}
+    .reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:3rem}
+    .review-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.8rem;position:relative}
+    .review-stars{color:#fbbf24;font-size:1rem;letter-spacing:2px;margin-bottom:1rem}
+    .review-text{color:var(--muted);font-size:.875rem;line-height:1.7;margin-bottom:1.2rem}
+    .review-author{display:flex;align-items:center;gap:.75rem}
+    .review-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+    .review-name{font-weight:500;font-size:.875rem}
+    .review-meta{color:var(--muted);font-size:.72rem}
+    .review-quote{position:absolute;top:1.5rem;right:1.5rem;font-size:2rem;color:rgba(108,99,255,.15);font-family:Georgia,serif;line-height:1}
+    .payment-logos{display:flex;gap:1rem;flex-wrap:wrap;margin-top:2rem}
+    .pay-badge{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.75rem 1.2rem;display:flex;align-items:center;gap:8px;font-size:.82rem;transition:border-color .2s}
+    .pay-badge:hover{border-color:rgba(108,99,255,.3)}
+    .pay-badge img{height:22px;object-fit:contain}
+    .cta-section{text-align:center;padding:100px 5vw 140px}
+    .cta-section .section-title{max-width:600px;margin:0 auto 1rem}
+    .cta-section p{color:var(--muted);max-width:420px;margin:0 auto 2.5rem}
+
+    .compare-wrap{overflow-x:auto;margin-top:2rem}
+    .compare-table{width:100%;border-collapse:collapse;font-size:.875rem}
+    .compare-table th{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.75rem;padding:1rem 1.2rem;text-align:left;border-bottom:2px solid var(--border)}
+    .compare-table th.col-us{color:var(--accent2);background:rgba(108,99,255,.06);border-bottom-color:rgba(108,99,255,.3)}
+    .compare-table th.col-them{color:var(--muted)}
+    .compare-table td{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);vertical-align:middle}
+    .compare-table td:first-child{color:var(--muted);font-size:.82rem;width:30%}
+    .compare-table td.col-us{background:rgba(108,99,255,.04)}
+    .compare-table tr:last-child td{border-bottom:none}
+    .c-good{color:var(--success);font-weight:500}
+    .c-bad{color:var(--muted)}
+    .c-neutral{color:#fbbf24}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}    .mobile-cart-badge{position:absolute;top:2px;right:4px;width:14px;height:14px;border-radius:50%;background:var(--accent);color:#fff;font-size:.55rem;font-weight:700;display:none;align-items:center;justify-content:center}
+    .mobile-cart-badge.show{display:flex}
+    @media(max-width:1024px){
+      nav.desktop-nav{display:none!important}
+      section{padding:60px 5vw}
+      .hero{padding:80px 5vw 80px;min-height:auto}
+      .hero-stats{gap:2rem;margin-top:3rem}
+      .calc-row{grid-template-columns:1fr}
+      .ms-block{grid-template-columns:1fr;gap:2rem;padding:2rem}      .footer-links{justify-content:center}
+      .cta-section{padding-bottom:100px}
+    }
+
+    /* COOKIE BANNER */
+    .cookie-banner{
+      position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);
+      z-index:500;
+      display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;
+      background:rgba(22,22,30,0.95);backdrop-filter:blur(20px);
+      border:1px solid rgba(255,255,255,0.12);border-radius:16px;
+      padding:.9rem 1.2rem;
+      max-width:600px;width:calc(100% - 32px);
+      box-shadow:0 8px 40px rgba(0,0,0,.5);
+      opacity:0;pointer-events:none;
+      transition:opacity .35s,transform .35s;
+      font-family:'Onest',sans-serif;
+    }
+    .cookie-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
+    .cookie-text{color:#999aab;font-size:.78rem;flex:1;line-height:1.55}
+    .cookie-text a{color:#a78bfa;text-decoration:none}
+    .cookie-text a:hover{text-decoration:underline}
+    .cookie-btn{background:#6c63ff;border:none;color:#fff;font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:.5rem 1.1rem;border-radius:50px;cursor:pointer;white-space:nowrap;transition:box-shadow .2s}
+    .cookie-btn:hover{box-shadow:0 4px 14px rgba(108,99,255,.4)}
+    @media(max-width:600px){
+      .cookie-banner{bottom:80px;flex-direction:column;align-items:flex-start;gap:.7rem}
+    }
+
+  </style>
+</head>
+<body>
+<nav class="desktop-nav">
+  <a class="logo" href="index.html"><span class="logo-dot"></span>Design Antviz</a>
+  <div class="nav-links">
+    <a href="index.html">Главная</a>
+    <a href="faq.html">FAQ</a>
+    <a href="profile.html" class="nav-auth-btn" id="navProfile" style="display:none">Кабинет</a>
+    <a href="auth.html" class="nav-auth-btn" id="navLogin" style="display:none">Войти</a>
+    <a href="order.html" class="nav-cta">Заказать сайт</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><span class="logo-dot" style="width:6px;height:6px;"></span>Ваш код · Ваши правила</div>
+  <h1>Сайты, которые<br /><span>принадлежат только вам</span></h1>
+  <p>Создаём уникальные статические сайты на чистом коде. Размещаем на бесплатной облачной инфраструктуре Microsoft. Никаких конструкторов.</p>
+  <div class="hero-btns">
+    <a href="order.html" class="btn btn-primary">Заказать сайт <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <a href="#calc" class="btn btn-ghost">Рассчитать цену</a>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-num">~2 дня</div><div class="hero-stat-label">средний срок</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">0 ₽</div><div class="hero-stat-label">хостинг навсегда</div></div>
+    <div class="hero-stat"><div class="hero-stat-num">от 200 ₽</div><div class="hero-stat-label">за страницу</div></div>
+  </div>
+  <div class="hero-scroll">скролл</div>
+</section>
+
+<section id="portfolio">
+  <p class="section-label reveal">Работы</p>
+  <h2 class="section-title reveal">Примеры сайтов</h2>
+  <p class="section-sub reveal">Каждый сайт — уникальный дизайн с нуля под задачи клиента. Нажмите ниже на любой пример сайта, чтобы перейти на страницу демонстрации.</p>
+  <div class="portfolio-grid">
+    <a href="project1" class="portfolio-card reveal" style="text-decoration:none;color:inherit;">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg,#1a1040,#2d1b69);">
+        <span style="z-index:1;">💼</span>
+        <div class="portfolio-tag">Лендинг</div>
+      </div>
+      <div class="portfolio-info">
+        <h3>Юридические услуги</h3>
+        <p>Строгий деловой стиль, форма обратной связи, блок с командой</p>
+        <div class="portfolio-meta"><span class="meta-tag">3 страницы</span><span class="meta-tag">Адаптив</span><span class="meta-tag">Форма</span></div>
+      </div>
+    </a>
+    <a href="project2" class="portfolio-card reveal" style="text-decoration:none;color:inherit;">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg,#0f2820,#0d4a2e);">
+        <span style="z-index:1;">💆</span>
+        <div class="portfolio-tag">Лендинг</div>
+      </div>
+      <div class="portfolio-info">
+        <h3>Студия массажа</h3>
+        <p>Акцент на атмосфере, блок с услугами и ценами, форма записи</p>
+        <div class="portfolio-meta"><span class="meta-tag">4 страницы</span><span class="meta-tag">Адаптив</span><span class="meta-tag">Форма</span></div>
+      </div>
+    </a>
+    <a href="project3" class="portfolio-card reveal" style="text-decoration:none;color:inherit;">
+      <div class="portfolio-thumb" style="background:linear-gradient(135deg,#1a0a2e,#3d1a6e);">
+        <span style="z-index:1;">🎨</span>
+        <div class="portfolio-tag">Портфолио</div>
+      </div>
+      <div class="portfolio-info">
+        <h3>Дизайнер-фрилансер</h3>
+        <p>Портфолио с галереей работ, анимации, тёмная тема</p>
+        <div class="portfolio-meta"><span class="meta-tag">2 страницы</span><span class="meta-tag">Анимации</span><span class="meta-tag">Галерея</span></div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<section id="timeline" style="background:var(--bg2);">
+  <p class="section-label reveal">Процесс</p>
+  <h2 class="section-title reveal">Как мы работаем</h2>
+  <p class="section-sub reveal">От заявки до готового сайта — прозрачно и без лишних слов.</p>
+  <div class="timeline">
+    <div class="timeline-item reveal"><div class="tl-dot">01</div><div class="tl-line"></div><div class="tl-body"><h3>Оставляете заявку</h3><p>Собираете заказ в конструкторе или пишете в Telegram. 5 минут.</p><span class="tl-time">⏱ 5 минут</span></div></div>
+    <div class="timeline-item reveal"><div class="tl-dot">02</div><div class="tl-line"></div><div class="tl-body"><h3>Обсуждаем детали</h3><p>Уточняем стиль, контент, пожелания. Согласовали — оплата через ЮKassa.</p><span class="tl-time">⏱ 1–2 часа</span></div></div>
+    <div class="timeline-item reveal"><div class="tl-dot">03</div><div class="tl-line"></div><div class="tl-body"><h3>Создаём сайт</h3><p>Верстаем HTML/CSS/JS вручную. Уникальный дизайн, адаптив, никаких шаблонов.</p><span class="tl-time">⏱ ~2 дня</span></div></div>
+    <div class="timeline-item reveal"><div class="tl-dot">04</div><div class="tl-line"></div><div class="tl-body"><h3>Публикуем на GitHub</h3><p>Размещаем на серверах Microsoft — бесплатно, SSL автоматически. Подключаем домен .ru.</p><span class="tl-time">⏱ 30 минут</span></div></div>
+    <div class="timeline-item reveal"><div class="tl-dot">05</div><div class="tl-body"><h3>Сдаём и поддерживаем</h3><p>Финальные правки, передача доступов. Дальше — поддержка 500 ₽/мес или самостоятельно.</p><span class="tl-time">⏱ сразу</span></div></div>
+  </div>
+</section>
+
+<section id="calc">
+  <p class="section-label reveal">Калькулятор</p>
+  <h2 class="section-title reveal">Рассчитайте стоимость</h2>
+  <p class="section-sub reveal">Настройте параметры — цена обновляется в реальном времени.</p>
+  <div class="calc-wrap reveal">
+    <div class="calc-row">
+      <div class="calc-group">
+        <label>Тариф</label>
+        <select class="calc-select" id="calcTariff" onchange="calcUpdate()">
+          <option value="250:1">Базовый — 250 ₽/стр</option>
+          <option value="225:5" selected>Стандарт — 225 ₽/стр (мин. 5 стр)</option>
+          <option value="200:10">Премиум — 200 ₽/стр (мин. 10 стр)</option>
+        </select>
+      </div>
+      <div class="calc-group">
+        <label>Тип сайта</label>
+        <select class="calc-select" id="calcType">
+          <option>Лендинг</option><option>Многостраничный</option><option>Портфолио</option><option>Блог</option><option>Другое</option>
+        </select>
+      </div>
+    </div>
+    <div class="calc-group">
+      <label>Количество страниц: <span id="pagesLabel" style="color:var(--accent2);font-weight:600;">5</span></label>
+      <div class="pages-row">
+        <input type="range" class="pages-slider" id="pagesSlider" min="1" max="30" value="5" oninput="calcUpdate()" />
+        <span class="pages-num" id="pagesNum">5</span>
+      </div>
+    </div>
+    <div class="calc-group">
+      <label>Дополнения</label>
+      <div class="calc-extras">
+        <div class="calc-extra" id="extraDomain" onclick="toggleExtra(this)">🌐 Домен .ru <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+200 ₽</span></div>
+        <div class="calc-extra" id="extraSupport" onclick="toggleExtra(this)">🔧 Поддержка 1 мес <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+500 ₽</span></div>
+        <div class="calc-extra" id="extraUrgent" onclick="toggleExtra(this)">⚡ Срочность <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+30%</span></div>
+      </div>
+    </div>
+    <div class="calc-result">
+      <div>
+        <div style="color:var(--muted);font-size:.72rem;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.06em;">Итого</div>
+        <div class="calc-price" id="calcPrice">1 125 ₽</div>
+        <div style="color:var(--muted);font-size:.75rem;margin-top:.2rem;" id="calcBreakdown">225 ₽ × 5 стр</div>
+      </div>
+      <a href="order.html" class="btn btn-primary" style="white-space:nowrap;">Заказать →</a>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--bg2);">
+  <p class="section-label reveal">Технология</p>
+  <h2 class="section-title reveal">Почему Microsoft + GitHub</h2>
+  <p class="section-sub reveal">Ваш сайт работает на мировой инфраструктуре Microsoft — бесплатно и навсегда.</p>
+  <div class="ms-block reveal">
+    <div>
+      <div class="ms-logo-wrap">
+  <img src="github-logo.png" alt="GitHub" class="gh-img" />
+</div>
+      <h3>Бесплатный хостинг от Microsoft</h3>
+      <p>GitHub Pages — это облачная платформа Microsoft. Ваш сайт работает на мировой инфраструктуре: 99.9% uptime, автоматический SSL, CDN по всему миру. Абсолютно бесплатно для статических сайтов.</p>
+      <p style="margin-top:.75rem;color:var(--muted);font-size:.9rem;">Код в вашем репозитории — вы владеете им полностью. Скачайте, передайте другому разработчику или редактируйте сами.</p>
+    </div>
+    <div class="ms-perks">
+      <div class="ms-perk"><div class="ms-perk-icon">🔒</div><div><h4>SSL автоматически</h4><p>HTTPS из коробки, сертификат Let's Encrypt. Никаких настроек.</p></div></div>
+      <div class="ms-perk"><div class="ms-perk-icon">⚡</div><div><h4>Скорость загрузки</h4><p>Статические файлы с CDN — сайт грузится мгновенно по всему миру.</p></div></div>
+      <div class="ms-perk"><div class="ms-perk-icon">♾️</div><div><h4>Работает вечно</h4><p>Нет абонентской платы. Сайт работает, пока существует GitHub.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="compare" style="background:var(--bg2);">
+  <p class="section-label reveal">Сравнение</p>
+  <h2 class="section-title reveal">Мы vs Tilda / Wix</h2>
+  <p class="section-sub reveal">Почему статический сайт на чистом коде — лучший выбор для большинства задач.</p>
+  <div class="compare-wrap reveal">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th>Параметр</th>
+          <th class="col-us">Design Antviz</th>
+          <th class="col-them">Tilda / Wix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Хостинг</td><td class="col-us"><span class="c-good">✓ Бесплатно навсегда</span></td><td class="col-them"><span class="c-bad">от 300 ₽/мес</span></td></tr>
+        <tr><td>Дизайн</td><td class="col-us"><span class="c-good">✓ Уникальный, с нуля</span></td><td class="col-them"><span class="c-bad">Шаблоны, все похожи</span></td></tr>
+        <tr><td>Скорость загрузки</td><td class="col-us"><span class="c-good">✓ Максимальная</span></td><td class="col-them"><span class="c-bad">Медленнее из-за платформы</span></td></tr>
+        <tr><td>Владение кодом</td><td class="col-us"><span class="c-good">✓ Код полностью ваш</span></td><td class="col-them"><span class="c-bad">Код принадлежит платформе</span></td></tr>
+        <tr><td>Зависимость</td><td class="col-us"><span class="c-good">✓ Никакой</span></td><td class="col-them"><span class="c-bad">Привязаны к сервису</span></td></tr>
+        <tr><td>SSL (HTTPS)</td><td class="col-us"><span class="c-good">✓ Бесплатно</span></td><td class="col-them"><span class="c-neutral">Только на платных тарифах</span></td></tr>
+        <tr><td>Реклама на сайте</td><td class="col-us"><span class="c-good">✓ Нет</span></td><td class="col-them"><span class="c-bad">Есть на бесплатных тарифах</span></td></tr>
+        <tr><td>Абонентская плата</td><td class="col-us"><span class="c-good">✓ Нет</span></td><td class="col-them"><span class="c-bad">Обязательно каждый месяц</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="reviews">
+  <p class="section-label reveal">Отзывы</p>
+  <h2 class="section-title reveal">Что говорят клиенты</h2>
+  <p class="section-sub reveal">Работаем с малым бизнесом, фрилансерами и частными лицами.</p>
+  <div class="reviews-grid">
+    <div class="review-card reveal"><div class="review-quote">"</div><div class="review-stars">★★★★★</div><p class="review-text">Заказал лендинг для мастерской. Сделали за 2 дня, всё чётко. Дизайн получился лучше, чем ожидал.</p><div class="review-author"><div class="review-avatar" style="background:linear-gradient(135deg,#1a1040,#3d1b69);">🔨</div><div><div class="review-name">Алексей М.</div><div class="review-meta">Лендинг · 3 страницы</div></div></div></div>
+    <div class="review-card reveal"><div class="review-quote">"</div><div class="review-stars">★★★★★</div><p class="review-text">Нужен был сайт-портфолио быстро и недорого. Адаптив идеальный, анимации приятные. Рекомендую!</p><div class="review-author"><div class="review-avatar" style="background:linear-gradient(135deg,#0f2820,#0d4a2e);">🎨</div><div><div class="review-name">Мария К.</div><div class="review-meta">Портфолио · 2 страницы</div></div></div></div>
+    <div class="review-card reveal"><div class="review-quote">"</div><div class="review-stars">★★★★☆</div><p class="review-text">Цена честная, никаких скрытых платежей. Хостинг бесплатный — большой плюс для небольшого бизнеса.</p><div class="review-author"><div class="review-avatar" style="background:linear-gradient(135deg,#1a0a2e,#3d1a6e);">🛍️</div><div><div class="review-name">Дмитрий О.</div><div class="review-meta">Блог · 4 страницы</div></div></div></div>
+  </div>
+</section>
+
+<section style="background:var(--bg2);">
+  <p class="section-label reveal">Оплата</p>
+  <h2 class="section-title reveal">Удобные способы оплаты</h2>
+  <p class="section-sub reveal">Через ЮKassa — один из ведущих платёжных сервисов России.</p>
+  <div class="payment-logos reveal">
+    <!-- ЛОГОТИПЫ ОПЛАТЫ: sbp-logo.png, cards-logo.png, tpay-logo.png, sberpay-logo.png
+         Размер меняется в CSS строке: .pay-badge img{height:14px} — меняйте число. -->
+    <div class="pay-badge"><img src="sbp-logo.png" alt="СБП" /><span>СБП</span></div>
+    <div class="pay-badge"><img src="cards-logo.png" alt="Карты" /><span>Банковские карты</span></div>
+    <div class="pay-badge"><img src="tpay-logo.png" alt="T-Pay" /><span>T‑Pay</span></div>
+    <div class="pay-badge"><img src="sberpay-logo.png" alt="SberPay" /><span>SberPay</span></div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <p class="section-label reveal">Начать</p>
+  <h2 class="section-title reveal">Готовы к своему сайту?</h2>
+  <p class="reveal">Соберите заказ в конструкторе за 2 минуты — ответим в Telegram.</p>
+  <a href="order.html" class="btn btn-primary reveal">Собрать заказ <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+</section>
+
+
+<!-- COOKIE BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+  <div class="cookie-text">🍪 Мы используем файлы cookie для улучшения работы сайта. Продолжая использование, вы соглашаетесь с нашей <a href="faq.html#rules">политикой</a>.</div>
+  <button class="cookie-btn" onclick="acceptCookies()">Принять</button>
+</div>
+
+
+<script>
+function getCart(){try{return JSON.parse(localStorage.getItem('antviz_cart')||'[]')}catch(e){return[]}}
+function updateCartBadges(){const n=getCart().reduce((s,i)=>s+i.qty,0);['desktopCartBadge','mobileCartBadge'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=n;b.classList.toggle('show',n>0)}})}
+function toggleExtra(el){el.classList.toggle('on');calcUpdate()}
+function calcUpdate(){
+  const[price,min]=document.getElementById('calcTariff').value.split(':').map(Number);
+  const slider=document.getElementById('pagesSlider');
+  slider.min=min;
+  if(parseInt(slider.value)<min)slider.value=min;
+  const pages=parseInt(slider.value);
+  document.getElementById('pagesLabel').textContent=pages;
+  document.getElementById('pagesNum').textContent=pages;
+  let total=price*pages;
+  let bd=`${price} ₽ × ${pages} стр`;
+  const ex=[];
+  if(document.getElementById('extraDomain').classList.contains('on')){total+=200;ex.push('+200 ₽ домен')}
+  if(document.getElementById('extraSupport').classList.contains('on')){total+=500;ex.push('+500 ₽ поддержка')}
+  if(document.getElementById('extraUrgent').classList.contains('on')){total=Math.round(total*1.3);ex.push('+30% срочность')}
+  if(ex.length)bd+=' · '+ex.join(' · ');
+  document.getElementById('calcPrice').textContent=total.toLocaleString('ru')+' ₽';
+  document.getElementById('calcBreakdown').textContent=bd;
+}
+const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+updateCartBadges();calcUpdate();
+// COOKIE BANNER
+(function(){
+  if(!localStorage.getItem('cookie_accepted')){
+    setTimeout(()=>document.getElementById('cookieBanner').classList.add('show'),800);
+  }
+})();
+window.acceptCookies=function(){
+  localStorage.setItem('cookie_accepted','1');
+  const b=document.getElementById('cookieBanner');
+  b.style.transform='translateX(-50%) translateY(120px)';
+  b.style.opacity='0';
+  setTimeout(()=>b.remove(),400);
+};
+</script>
+
+<script type="module">
+  import { auth, db } from './firebase-config.js';
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { doc, onSnapshot, collection, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  // ── MAINTENANCE OVERLAY ──
+  let maintOverlay = null;
+  onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
+    const on = snap.exists() && snap.data().enabled === true;
+    if (on && !maintOverlay) {
+      maintOverlay = document.createElement('div');
+      maintOverlay.id = 'maintOverlay';
+      maintOverlay.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#0a0a0c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2rem;text-align:center;padding:2rem;font-family:Onest,sans-serif;color:#f0f0f5';
+      maintOverlay.innerHTML = `
+        <div style="font-size:3.5rem">🔧</div>
+        <div style="font-family:Unbounded,sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div>
+        <div style="color:#777789;font-size:.9rem;max-width:380px;line-height:1.6">Сайт временно недоступен. Мы уже работаем над этим — скоро всё будет готово!</div>`;
+      document.body.appendChild(maintOverlay);
+      document.body.style.overflow = 'hidden';
+    } else if (!on && maintOverlay) {
+      maintOverlay.remove(); maintOverlay = null;
+      document.body.style.overflow = '';
+    }
+  });
+
+  // ── AUTH NAV ──
+  onAuthStateChanged(auth, user => {
+    const np = document.getElementById('navProfile');
+    const nl = document.getElementById('navLogin');
+    if(user){
+      if(np) np.style.display='inline-flex';
+      if(nl) nl.style.display='none';
+    } else {
+      if(np) np.style.display='none';
+      if(nl) nl.style.display='inline-flex';
+    }
+  });
+</script>
+
+<script src="footer.js" data-page="home"></script>
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Правила сервиса — Antviz</title>
+  <link rel="icon" href="favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;--border:rgba(255,255,255,0.07);--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#777789;--success:#4ade80}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
+
+    nav.desktop-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;width:calc(100% - 40px);max-width:1100px;background:rgba(22,22,30,0.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:28px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.04em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
+    .logo img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.02em;transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
+    @media(max-width:1024px){nav.desktop-nav{display:none!important}}
+
+    .page-wrap{padding:100px 5vw 80px;max-width:760px;margin:0 auto;position:relative;z-index:1}
+    .breadcrumb{color:var(--muted);font-size:.78rem;margin-bottom:1.5rem}
+    .breadcrumb a{color:var(--muted);text-decoration:none}
+    .breadcrumb a:hover{color:var(--text)}
+    .section-label{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;font-weight:500}
+    .page-title{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(2rem,5vw,3.2rem);line-height:1.08;letter-spacing:-.03em;margin-bottom:.75rem}
+    .page-title span{color:var(--accent2)}
+    .page-meta{color:var(--muted);font-size:.8rem;margin-bottom:3rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+    .page-meta-dot{width:4px;height:4px;border-radius:50%;background:rgba(108,99,255,.4)}
+
+    /* Навигация по разделам */
+    .toc{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.2rem 1.5rem;margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:.5rem}
+    .toc a{color:var(--muted);font-size:.72rem;text-decoration:none;border:1px solid var(--border);border-radius:50px;padding:.22rem .7rem;transition:border-color .18s,color .18s}
+    .toc a:hover{border-color:rgba(108,99,255,.4);color:var(--text)}
+
+    .doc-block{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem;margin-bottom:1rem}
+    .doc-section{margin-bottom:2.2rem;scroll-margin-top:80px}
+    .doc-section:last-child{margin-bottom:0}
+    .doc-h{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;color:var(--accent2);margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem}
+    .doc-h-num{width:26px;height:26px;border-radius:8px;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:var(--accent);flex-shrink:0}
+    .doc-p{color:var(--muted);font-size:.875rem;line-height:1.75;margin-bottom:.7rem}
+    .doc-p:last-child{margin-bottom:0}
+    .doc-ul{list-style:none;display:flex;flex-direction:column;gap:.45rem;margin-bottom:.7rem}
+    .doc-ul li{color:var(--muted);font-size:.875rem;padding-left:1.3rem;position:relative;line-height:1.65}
+    .doc-ul li::before{content:'—';position:absolute;left:0;color:rgba(108,99,255,.4)}
+    strong.hl{color:var(--text)}
+    .doc-divider{height:1px;background:var(--border);margin:1.8rem 0}
+
+    /* Таблица цен */
+    .price-table{width:100%;border-collapse:collapse;margin-bottom:.7rem}
+    .price-table th{font-family:'Unbounded',sans-serif;font-size:.65rem;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);padding:.6rem 1rem;text-align:left;border-bottom:1px solid var(--border)}
+    .price-table td{padding:.7rem 1rem;font-size:.84rem;color:var(--muted);border-bottom:1px solid rgba(255,255,255,.04)}
+    .price-table tr:last-child td{border-bottom:none}
+    .price-table td:last-child{color:var(--accent2);font-weight:500;white-space:nowrap}
+    .price-table tr:hover td{background:rgba(255,255,255,.02)}
+
+    .highlight-box{background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.15);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.9rem}
+    .highlight-box .doc-p{color:var(--text);font-size:.83rem}
+    .warn-box{background:rgba(248,113,113,.05);border:1px solid rgba(248,113,113,.18);border-radius:12px;padding:1rem 1.2rem;margin-bottom:.9rem}
+    .warn-box .doc-p{color:#fca5a5;font-size:.83rem}
+
+    .contact-card{background:var(--bg3);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1rem}
+    .contact-card-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem}
+    .contact-card-val{font-weight:500;font-size:.88rem}
+    .contact-card a{color:var(--accent2);text-decoration:none}
+    .contact-card a:hover{text-decoration:underline}
+
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+    @media(max-width:1024px){.page-wrap{padding:80px 5vw 100px}.doc-block{padding:1.5rem}.price-table th,.price-table td{padding:.5rem .7rem}}
+  </style>
+</head>
+<body>
+
+<nav class="desktop-nav">
+  <a class="logo" href="index.html"><img src="favicon.png" alt="Antviz">Antviz</a>
+  <div class="nav-links">
+    <a href="index.html">Главная</a>
+    <a href="faq.html">FAQ</a>
+    <a href="profile.html" class="nav-auth-btn" id="navProfile" style="display:none">Кабинет</a>
+    <a href="auth.html" class="nav-auth-btn" id="navLogin" style="display:none">Войти</a>
+    <a href="order.html" class="nav-cta">Заказать сайт</a>
+  </div>
+</nav>
+
+<div class="page-wrap">
+  <div class="breadcrumb"><a href="index.html">Главная</a> / <a href="faq.html">FAQ</a> / Правила сервиса</div>
+  <p class="section-label">Правовые документы</p>
+  <h1 class="page-title">Правила<br/><span>сервиса</span></h1>
+  <div class="page-meta">
+    <span>Редакция от 1 июня 2025 г.</span>
+    <span class="page-meta-dot"></span>
+    <span>Antviz</span>
+  </div>
+
+  <!-- Быстрая навигация -->
+  <div class="toc reveal">
+    <a href="#s1">Общее</a>
+    <a href="#s2">Предмет</a>
+    <a href="#s3">Заказ</a>
+    <a href="#s4">Цены</a>
+    <a href="#s5">Сроки</a>
+    <a href="#s6">Правки</a>
+    <a href="#s7">Возврат</a>
+    <a href="#s8">Права</a>
+    <a href="#s9">Конфиденциальность</a>
+    <a href="#s10">Ответственность</a>
+    <a href="#s11">Споры</a>
+    <a href="#s12">Изменения</a>
+  </div>
+
+  <div class="doc-block reveal">
+
+    <div class="doc-section" id="s1">
+      <div class="doc-h"><span class="doc-h-num">1</span>Общие положения</div>
+      <p class="doc-p">Настоящие правила регулируют отношения между <strong class="hl">Antviz</strong> (далее — «Исполнитель») и заказчиком услуг (далее — «Клиент»).</p>
+      <p class="doc-p">Оформляя заказ или регистрируясь на сайте, Клиент подтверждает согласие с настоящими Правилами, <a href="privacy.html" style="color:var(--accent2);text-decoration:none">Политикой конфиденциальности</a> и <a href="terms.html" style="color:var(--accent2);text-decoration:none">Пользовательским соглашением</a>.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s2">
+      <div class="doc-h"><span class="doc-h-num">2</span>Предмет договора</div>
+      <p class="doc-p">Исполнитель оказывает услуги по разработке статических сайтов на HTML/CSS/JS и их размещению на платформе Cloudflare Pages.</p>
+      <p class="doc-p">Итоговым результатом является готовый сайт, опубликованный по адресу Cloudflare Pages или на домене Клиента, с передачей исходного кода в GitHub-репозиторий.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s3">
+      <div class="doc-h"><span class="doc-h-num">3</span>Порядок оформления заказа</div>
+      <ul class="doc-ul">
+        <li>Клиент регистрируется на сайте и заполняет форму заказа</li>
+        <li>Исполнитель связывается через чат поддержки в личном кабинете</li>
+        <li>После согласования объёма и стоимости Клиент производит оплату</li>
+        <li>Работа начинается после поступления оплаты и получения необходимых материалов</li>
+        <li>Результат передаётся через личный кабинет</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s4">
+      <div class="doc-h"><span class="doc-h-num">4</span>Стоимость и оплата</div>
+      <table class="price-table">
+        <thead>
+          <tr><th>Услуга</th><th>Условие</th><th>Цена</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Базовый тариф</td><td>Любое количество страниц</td><td>250 ₽/стр</td></tr>
+          <tr><td>Стандарт</td><td>От 5 страниц</td><td>225 ₽/стр</td></tr>
+          <tr><td>Премиум</td><td>От 10 страниц</td><td>200 ₽/стр</td></tr>
+          <tr><td>Домен .ru — регистрация</td><td>Разовый платёж</td><td>200 ₽</td></tr>
+          <tr><td>Домен .ru — продление</td><td>Ежегодно</td><td>600 ₽/год</td></tr>
+          <tr><td>Поддержка</td><td>Тексты и изображения</td><td>500 ₽/мес</td></tr>
+          <tr><td>Срочное выполнение</td><td>1 рабочий день</td><td>+30%</td></tr>
+        </tbody>
+      </table>
+      <p class="doc-p">Оплата принимается через ЮKassa: СБП, банковские карты, T-Pay, SberPay. Все цены в рублях.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s5">
+      <div class="doc-h"><span class="doc-h-num">5</span>Сроки выполнения</div>
+      <ul class="doc-ul">
+        <li>Стандартный срок — ~2 рабочих дня с момента оплаты и получения всех материалов</li>
+        <li>Срочный заказ — 1 рабочий день (+30% к стоимости)</li>
+        <li>Если Клиент не предоставил материалы — срок приостанавливается до их получения</li>
+        <li>О задержках Исполнитель уведомляет в чате поддержки</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s6">
+      <div class="doc-h"><span class="doc-h-num">6</span>Правки и доработки</div>
+      <ul class="doc-ul">
+        <li>В стоимость включены до 3 итераций правок</li>
+        <li>Правки должны быть переданы в течение 7 календарных дней после сдачи работы</li>
+        <li>По истечении 7 дней без обратной связи заказ считается принятым</li>
+        <li>Изменение концепции или дизайна после начала работы — дополнительная оплата</li>
+        <li>Правки сверх 3 итераций — по договорённости</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s7">
+      <div class="doc-h"><span class="doc-h-num">7</span>Возврат средств</div>
+      <div class="highlight-box">
+        <p class="doc-p">Мы стараемся решать спорные ситуации честно. Напишите в чат — разберёмся.</p>
+      </div>
+      <ul class="doc-ul">
+        <li><strong class="hl">До начала работы</strong> — возврат 100% суммы по запросу</li>
+        <li><strong class="hl">После начала работы</strong> — возврат пропорционально невыполненному объёму, по договорённости</li>
+        <li><strong class="hl">После сдачи готового сайта</strong> — возврат не производится</li>
+        <li>Заявки принимаются через чат поддержки в личном кабинете</li>
+        <li>Возврат — на тот же счёт, что и оплата, в течение 10 рабочих дней</li>
+      </ul>
+      <div class="warn-box">
+        <p class="doc-p">Возврат невозможен, если Клиент самостоятельно внёс изменения в сайт и утверждает, что работа выполнена некачественно.</p>
+      </div>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s8">
+      <div class="doc-h"><span class="doc-h-num">8</span>Права на результат</div>
+      <ul class="doc-ul">
+        <li>После полной оплаты Клиент получает исключительные права на исходный код сайта</li>
+        <li>Исполнитель вправе использовать сайт в портфолио без конфиденциальных данных Клиента</li>
+        <li>Клиент гарантирует, что предоставленные материалы не нарушают авторские права третьих лиц</li>
+        <li>Исполнитель не несёт ответственности за нарушения, допущенные по вине Клиента</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s9">
+      <div class="doc-h"><span class="doc-h-num">9</span>Конфиденциальность</div>
+      <p class="doc-p">Исполнитель обязуется не передавать персональные данные Клиента третьим лицам. Данные используются исключительно для выполнения заказа и работы сервиса.</p>
+      <p class="doc-p">Подробнее — в <a href="privacy.html" style="color:var(--accent2);text-decoration:none">Политике конфиденциальности</a>.</p>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s10">
+      <div class="doc-h"><span class="doc-h-num">10</span>Ограничение ответственности</div>
+      <ul class="doc-ul">
+        <li>Исполнитель не несёт ответственности за доступность платформы Cloudflare Pages</li>
+        <li>Исполнитель не несёт ответственности за последствия изменений, внесённых Клиентом самостоятельно</li>
+        <li>Максимальная ответственность Исполнителя ограничена суммой оплаченного заказа</li>
+      </ul>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s11">
+      <div class="doc-h"><span class="doc-h-num">11</span>Разрешение споров</div>
+      <p class="doc-p">Споры решаются путём переговоров через чат поддержки. При невозможности достичь согласия — в порядке, предусмотренном законодательством РФ.</p>
+      <div class="contact-card">
+        <div>
+          <div class="contact-card-label">Чат поддержки</div>
+          <div class="contact-card-val"><a href="support.html">Личный кабинет → Поддержка</a></div>
+        </div>
+        <div>
+          <div class="contact-card-label">Telegram</div>
+          <div class="contact-card-val"><a href="https://t.me/antviz_official" target="_blank">@antviz_official</a></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="doc-divider"></div>
+
+    <div class="doc-section" id="s12">
+      <div class="doc-h"><span class="doc-h-num">12</span>Изменения правил</div>
+      <p class="doc-p">Исполнитель вправе вносить изменения в правила. Актуальная версия всегда доступна на этой странице с указанием даты редакции.</p>
+    </div>
+
+  </div>
+
+  <div style="display:flex;gap:.7rem;flex-wrap:wrap;margin-top:1.5rem;position:relative;z-index:1">
+    <a href="privacy.html" style="display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.78rem;text-decoration:none;border:1px solid var(--border);border-radius:50px;padding:.4rem 1rem;transition:border-color .2s,color .2s" onmouseover="this.style.borderColor='rgba(108,99,255,.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+      Политика конфиденциальности →
+    </a>
+    <a href="terms.html" style="display:inline-flex;align-items:center;gap:.4rem;color:var(--muted);font-size:.78rem;text-decoration:none;border:1px solid var(--border);border-radius:50px;padding:.4rem 1rem;transition:border-color .2s,color .2s" onmouseover="this.style.borderColor='rgba(108,99,255,.4)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+      Пользовательское соглашение →
+    </a>
+  </div>
+</div>
+
+<script type="module">
+  import { auth } from './firebase-config.js';
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  onAuthStateChanged(auth, user => {
+    const np=document.getElementById('navProfile'), nl=document.getElementById('navLogin');
+    if(user){if(np)np.style.display='flex';if(nl)nl.style.display='none';}
+    else{if(np)np.style.display='none';if(nl)nl.style.display='flex';}
+  });
+</script>
+<script>
+  const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.05});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+<script src="footer.js" data-page="auth"></script>
+</body>
+</html>

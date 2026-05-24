@@ -168,6 +168,41 @@
   </style>
 </head>
 <body>
+
+  <script>
+(async function geoRedirect() {
+  if (sessionStorage.getItem('geo_checked')) return;
+  sessionStorage.setItem('geo_checked', '1');
+
+  const REDIRECT_URL = 'https://global.antviz.ru';
+
+  function redirect() {
+    window.location.replace(REDIRECT_URL);
+  }
+
+  // Попытка 1: api.country.is
+  try {
+    const res = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.country && data.country !== 'RU') { redirect(); return; }
+      return;
+    }
+  } catch (_) {}
+
+  // Попытка 2: фоллбэк
+  try {
+    const res = await fetch('https://ipwho.is/?fields=country_code', { signal: AbortSignal.timeout(4000) });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.country_code && data.country_code !== 'RU') { redirect(); return; }
+      return;
+    }
+  } catch (_) {}
+})();
+</script>
+
+  
 <nav class="desktop-nav">
   <a class="logo" href="index.html"><span class="logo-dot"></span>Design Antviz</a>
   <div class="nav-links">

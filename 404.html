@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>404 — Страница не найдена · Antviz</title>
+  <link rel="icon" href="favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;--border:rgba(255,255,255,0.07);--accent:#6c63ff;--accent2:#a78bfa;--text:#f0f0f5;--muted:#777789}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
+    body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
+
+    /* Навбар */
+    nav.desktop-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;width:calc(100% - 40px);max-width:1100px;background:rgba(22,22,30,0.88);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:28px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
+    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.04em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
+    .logo img{width:26px;height:26px;border-radius:7px;object-fit:cover}
+    .nav-links{display:flex;gap:1.5rem;align-items:center}
+    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;letter-spacing:.02em;transition:color .2s}
+    .nav-links a:hover{color:var(--text)}
+    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
+    @media(max-width:1024px){nav.desktop-nav{display:none!important}}
+
+    /* Основной блок */
+    .hero{flex:1;display:flex;align-items:center;justify-content:center;padding:120px 5vw 80px;position:relative;z-index:1}
+    .hero-inner{text-align:center;max-width:560px}
+
+    /* Большой 404 */
+    .err-number{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(7rem,22vw,14rem);line-height:.9;letter-spacing:-.05em;position:relative;display:inline-block;margin-bottom:1rem;user-select:none}
+    .err-number-text{
+      background:linear-gradient(135deg,rgba(108,99,255,.18) 0%,rgba(167,139,250,.1) 50%,rgba(108,99,255,.05) 100%);
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
+      background-clip:text;
+      filter:drop-shadow(0 0 60px rgba(108,99,255,.2));
+    }
+    /* Обводка поверх */
+    .err-number::after{
+      content:'404';
+      position:absolute;
+      inset:0;
+      font-family:'Unbounded',sans-serif;
+      font-weight:900;
+      font-size:inherit;
+      line-height:inherit;
+      letter-spacing:inherit;
+      -webkit-text-stroke:1px rgba(108,99,255,.25);
+      -webkit-text-fill-color:transparent;
+      pointer-events:none;
+    }
+
+    .err-badge{
+      display:inline-flex;align-items:center;gap:.45rem;
+      background:rgba(108,99,255,.08);
+      border:1px solid rgba(108,99,255,.2);
+      border-radius:50px;padding:.3rem .9rem;
+      font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+      color:var(--accent2);margin-bottom:1.4rem;
+      animation:fadeUp .6s ease both;
+    }
+    .err-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--accent2);animation:blink 1.8s infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    .err-title{
+      font-family:'Unbounded',sans-serif;font-weight:900;
+      font-size:clamp(1.4rem,4vw,2.2rem);
+      line-height:1.15;letter-spacing:-.03em;
+      margin-bottom:.9rem;
+      animation:fadeUp .65s .1s ease both;
+    }
+    .err-title span{color:var(--accent2)}
+
+    .err-desc{
+      color:var(--muted);font-size:.93rem;
+      max-width:400px;margin:0 auto 2.5rem;
+      line-height:1.7;
+      animation:fadeUp .65s .18s ease both;
+    }
+
+    .err-actions{
+      display:flex;align-items:center;justify-content:center;
+      gap:.75rem;flex-wrap:wrap;
+      animation:fadeUp .65s .26s ease both;
+    }
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:.78rem 1.7rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.88rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .15s,box-shadow .2s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 20px rgba(108,99,255,.3)}
+    .btn-primary:hover{box-shadow:0 6px 30px rgba(108,99,255,.5)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:rgba(108,99,255,.4);color:var(--text)}
+
+    /* Подсказки */
+    .err-links{
+      margin-top:3rem;
+      display:flex;align-items:center;justify-content:center;
+      flex-wrap:wrap;gap:.5rem;
+      animation:fadeUp .65s .34s ease both;
+    }
+    .err-links-label{color:var(--muted);font-size:.75rem;width:100%;text-align:center;margin-bottom:.3rem}
+    .err-link{
+      color:var(--muted);font-size:.78rem;text-decoration:none;
+      border:1px solid var(--border);border-radius:50px;
+      padding:.28rem .85rem;transition:border-color .18s,color .18s;
+    }
+    .err-link:hover{border-color:rgba(108,99,255,.4);color:var(--text)}
+
+    /* Декоративные частицы */
+    .particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+    .particle{position:absolute;border-radius:50%;animation:float linear infinite;opacity:0}
+    @keyframes float{
+      0%  {transform:translateY(100vh) scale(0);opacity:0}
+      10% {opacity:1}
+      90% {opacity:.3}
+      100%{transform:translateY(-10vh) scale(1.2);opacity:0}
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0;transform:translateY(18px)}
+      to  {opacity:1;transform:translateY(0)}
+    }
+
+    @media(max-width:600px){
+      .err-actions{flex-direction:column;align-items:stretch;max-width:280px;margin:0 auto}
+      .btn{justify-content:center}
+    }
+  </style>
+</head>
+<body>
+
+<nav class="desktop-nav">
+  <a class="logo" href="index.html"><img src="favicon.png" alt="Antviz">Antviz</a>
+  <div class="nav-links">
+    <a href="index.html">Главная</a>
+    <a href="faq.html">FAQ</a>
+    <a href="profile.html" class="nav-auth-btn" id="navProfile" style="display:none">Кабинет</a>
+    <a href="auth.html" class="nav-auth-btn" id="navLogin" style="display:none">Войти</a>
+    <a href="order.html" class="nav-cta">Заказать сайт</a>
+  </div>
+</nav>
+
+<!-- Декоративные частицы -->
+<div class="particles" id="particles"></div>
+
+<div class="hero">
+  <div class="hero-inner">
+
+    <div class="err-number">
+      <span class="err-number-text">404</span>
+    </div>
+
+    <div class="err-badge">
+      <span class="err-badge-dot"></span>
+      Страница не найдена
+    </div>
+
+    <h1 class="err-title">Такого адреса<br/><span>не существует</span></h1>
+
+    <p class="err-desc">Возможно, ссылка устарела, в адресе есть опечатка или страница была удалена. Но не переживайте — мы поможем вернуться.</p>
+
+    <div class="err-actions">
+      <a href="index.html" class="btn btn-primary">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+        На главную
+      </a>
+      <a href="order.html" class="btn btn-ghost">
+        Заказать сайт
+      </a>
+    </div>
+
+    <div class="err-links">
+      <div class="err-links-label">Или перейдите в один из разделов</div>
+      <a href="faq.html" class="err-link">FAQ</a>
+      <a href="order.html" class="err-link">Заказ</a>
+      <a href="support.html" class="err-link">Поддержка</a>
+      <a href="profile.html" class="err-link">Кабинет</a>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+  import { auth } from './firebase-config.js';
+  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  onAuthStateChanged(auth, user => {
+    const np=document.getElementById('navProfile'), nl=document.getElementById('navLogin');
+    if(user){if(np)np.style.display='flex';if(nl)nl.style.display='none';}
+    else{if(np)np.style.display='none';if(nl)nl.style.display='flex';}
+  });
+</script>
+
+<script>
+  // Частицы
+  const container = document.getElementById('particles');
+  const colors = ['rgba(108,99,255,', 'rgba(167,139,250,', 'rgba(56,189,248,'];
+  for(let i = 0; i < 18; i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 2;
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    p.style.cssText = `
+      width:${size}px;height:${size}px;
+      left:${Math.random()*100}%;
+      background:${color}${Math.random()*.4+.1});
+      animation-duration:${Math.random()*12+8}s;
+      animation-delay:${Math.random()*10}s;
+    `;
+    container.appendChild(p);
+  }
+</script>
+
+<script src="footer.js" data-page="auth"></script>
+</body>
+</html>

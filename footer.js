@@ -254,7 +254,7 @@
 
     const mobileNav = showMobileNav ? `
 <nav class="antviz-mobile-nav">
-  ${nav('home',    'index',   'Главная',  '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/>')}
+  ${nav('home',    '/',   'Главная',  '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/>')}
   ${nav('order',   'order',   'Заказать', '<path d="M12 5v14M5 12h14"/>')}
   ${nav('faq',     'faq',     'FAQ',      '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/>')}
   ${nav('profile', 'profile', 'Кабинет',  '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>')}

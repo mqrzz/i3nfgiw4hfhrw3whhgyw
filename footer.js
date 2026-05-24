@@ -364,7 +364,7 @@
       </div>
       <div class="antviz-footer__status">
         <span class="antviz-footer__status-dot"></span>
-        Принимаем заказы · Ответим в течение 2 часов
+        *META PLATFORMS INC. (ВКЛЮЧАЯ INSTAGRAM И THREADS) ПРИЗНАНА ЭКСТРЕМИСТСКОЙ ОРГАНИЗАЦИЕЙ И ЕЕ ДЕЯТЕЛЬНОСТЬ ЗАПРЕЩЕНА НА ТЕРРИТОРИИ РФ.
       </div>
     </div>
 

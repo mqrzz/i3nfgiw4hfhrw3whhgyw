@@ -169,10 +169,17 @@
 </head>
 <body>
 
-  <script>
+
+
+  
+
+<script>
 (async function geoRedirect() {
 
-  const REDIRECT_URL = 'https://global.antviz.ru';
+  const REDIRECT_URL = 'https://geo.antviz.ru';
+
+  // Список стран для перенаправления
+  const BLOCKED_COUNTRIES = ['DE', 'IR', 'AF', 'IQ', 'UA', 'NG', 'NE', 'MX', 'SA'];
 
   function redirect() {
     window.location.replace(REDIRECT_URL);
@@ -183,22 +190,32 @@
     const res = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) });
     if (res.ok) {
       const data = await res.json();
-      if (data.country && data.country !== 'RU') { redirect(); return; }
+      if (data.country && BLOCKED_COUNTRIES.includes(data.country)) {
+        redirect();
+        return;
+      }
       return;
     }
   } catch (_) {}
 
-  // Попытка 2: фоллбэк
+  // Попытка 2: фоллбэк ipwho.is
   try {
     const res = await fetch('https://ipwho.is/?fields=country_code', { signal: AbortSignal.timeout(4000) });
     if (res.ok) {
       const data = await res.json();
-      if (data.country_code && data.country_code !== 'RU') { redirect(); return; }
+      if (data.country_code && BLOCKED_COUNTRIES.includes(data.country_code)) {
+        redirect();
+        return;
+      }
       return;
     }
   } catch (_) {}
 })();
 </script>
+
+  
+
+  
 
   
 <nav class="desktop-nav">

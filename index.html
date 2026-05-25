@@ -169,54 +169,7 @@
 </head>
 <body>
 
-
-
-  
-
-<script>
-(async function geoRedirect() {
-
-  const REDIRECT_URL = 'https://geo.antviz.ru';
-
-  // Список стран для перенаправления
-  const BLOCKED_COUNTRIES = ['DE', 'IR', 'AF', 'IQ', 'UA', 'NG', 'NE', 'MX', 'SA'];
-
-  function redirect() {
-    window.location.replace(REDIRECT_URL);
-  }
-
-  // Попытка 1: api.country.is
-  try {
-    const res = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.country && BLOCKED_COUNTRIES.includes(data.country)) {
-        redirect();
-        return;
-      }
-      return;
-    }
-  } catch (_) {}
-
-  // Попытка 2: фоллбэк ipwho.is
-  try {
-    const res = await fetch('https://ipwho.is/?fields=country_code', { signal: AbortSignal.timeout(4000) });
-    if (res.ok) {
-      const data = await res.json();
-      if (data.country_code && BLOCKED_COUNTRIES.includes(data.country_code)) {
-        redirect();
-        return;
-      }
-      return;
-    }
-  } catch (_) {}
-})();
-</script>
-
-  
-
-  
-
+  <script src="/GEOBLOCK.js"></script>
   
 <nav class="desktop-nav">
   <a class="logo" href="/"><span class="logo-dot"></span>Design Antviz</a>

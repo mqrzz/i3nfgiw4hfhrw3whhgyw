@@ -223,7 +223,7 @@
 </div>
 
 <nav class="desktop-nav">
-  <a class="logo" href="/"><img src="../img/favicon.png" alt="Antviz" style="width:26px;height:26px;border-radius:7px;object-fit:cover">Antviz</a>
+  <a class="logo" href="/"><img src="../img/favicon.png" alt="Antviz" style="width:24px;height:24px;border-radius:6px;object-fit:cover;vertical-align:middle;margin-right:6px">Antviz</a>
   <div class="nav-links">
     <a href="/">Главная</a>
     <a href="../faq">FAQ</a>
@@ -639,23 +639,23 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('appWrap').style.display='flex';
 
-  // dd
+  // Проверяем, есть ли вообще сообщения в чате
   const chatSnap = await getDocs(collection(db,'chats',user.uid,'messages'));
   
-  // dd
+  // Проверяем, есть ли сообщения от пользователя
   hasUserMessages = false;
   chatSnap.forEach(doc => {
     if(doc.data().sender === 'user') hasUserMessages = true;
   });
 
-  // dd
+  // Запускаем слушатель
   listenChat(user.uid);
 
-  // dd
+  // Если чат пустой или нет сообщений от пользователя — показываем приветствие
   if(chatSnap.empty || !hasUserMessages) {
     await showWelcome();
   }
-  // dd
+  // Если есть сообщения от пользователя — не показываем, ждём следующего захода
 });
 </script>
 </body>

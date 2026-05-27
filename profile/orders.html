@@ -264,7 +264,7 @@
 
 <!-- NAV -->
 <nav class="desktop-nav">
-  <a class="logo" href="/"><img src="../img/favicon.png" alt="Antviz" style="width:26px;height:26px;border-radius:7px;object-fit:cover">Antviz</a>
+  <a class="logo" href="/"><img src="../img/favicon.png" alt="Antviz" style="width:24px;height:24px;border-radius:6px;object-fit:cover;vertical-align:middle;margin-right:6px">Antviz</a>
   <div class="nav-links">
     <a href="/">Главная</a>
     <a href="../faq">FAQ</a>
@@ -351,8 +351,8 @@ const INFO_STROKE = ['var(--muted2)','var(--warn)','var(--accent3)','var(--accen
 const CHECK_SVG = `<svg class="check-icon" viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>`;
 
 let currentUser = null, unsubOrders = null, unsubChat = null;
-let isInitialLoad = true;
 let lastStatuses = {}, reviewOrderId = null, reviewStars = 0, bannerTimer = null;
+let isInitialLoad = true;
 
 function toast(msg, type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
@@ -594,37 +594,27 @@ function loadOrders(uid){
     const orders = snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     renderOrders(orders);
-
-    // Ключ для localStorage — чтобы браузер помнил какие попапы уже показаны
-    const seenKey = (id) => 'antviz_delivery_seen_' + id;
-
     snap.docChanges().forEach(ch=>{
       if(ch.type==='modified'){
         const o={id:ch.doc.id,...ch.doc.data()};
         const prev=lastStatuses[ch.doc.id];const cur=o.status??0;
         if(prev!==undefined&&prev!==cur){
           showBanner(STATUS_LABELS[cur]);
-          // Показываем попап только если его ещё не видели (Firestore + localStorage)
-          if(cur===5&&!o.deliveryShown&&!localStorage.getItem(seenKey(ch.doc.id))){
-            localStorage.setItem(seenKey(ch.doc.id),'1');
-            setTimeout(()=>showDeliveryPopup(o),800);
-            updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});
-          }
+          if(cur===5&&!o.deliveryShown){const lsKey='antviz_delivery_seen_'+ch.doc.id;if(!localStorage.getItem(lsKey)){localStorage.setItem(lsKey,'1');setTimeout(()=>showDeliveryPopup(o),800);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});}}
           if(cur===5&&!o.reviewed) setTimeout(()=>openReview(o.id),4500);
         }
         lastStatuses[ch.doc.id]=cur;
       } else if(ch.type==='added'){
         const o={id:ch.doc.id,...ch.doc.data()};lastStatuses[ch.doc.id]=o.status??0;
-        // При первоначальной загрузке НЕ показываем попап — только если заказ реально новый
-        if(!isInitialLoad&&o.status===5&&!o.deliveryShown&&!localStorage.getItem(seenKey(ch.doc.id))){
-          localStorage.setItem(seenKey(ch.doc.id),'1');
+        // При первой загрузке не показываем попап — только для реально новых заказов
+        const lsKey='antviz_delivery_seen_'+ch.doc.id;
+        if(!isInitialLoad&&o.status===5&&!o.deliveryShown&&!localStorage.getItem(lsKey)){
+          localStorage.setItem(lsKey,'1');
           setTimeout(()=>{showDeliveryPopup(o);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});},1500);
         }
       }
     });
-
-    // После первой загрузки снимаем флаг
-    if(isInitialLoad) { isInitialLoad = false; }
+    if(isInitialLoad) isInitialLoad=false;
   }, err=>{
     console.error('Orders error:',err);
     // Show empty state even on error (e.g. missing Firestore index or rules)

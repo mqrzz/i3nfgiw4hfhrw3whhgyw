@@ -242,7 +242,7 @@
     }
   `;
 
-  function buildFooter(activePage) {
+  function buildFooter(activePage, b) {
     const showMobileNav = !NO_MOBILE_NAV_PAGES.includes(activePage);
     const year = new Date().getFullYear();
 
@@ -254,10 +254,10 @@
 
     const mobileNav = showMobileNav ? `
 <nav class="antviz-mobile-nav">
-  ${nav('home',    '/',   'Главная',  '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/>')}
-  ${nav('order',   'order',   'Заказать', '<path d="M12 5v14M5 12h14"/>')}
-  ${nav('faq',     'faq',     'FAQ',      '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/>')}
-  ${nav('profile', 'profile', 'Кабинет',  '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>')}
+  ${nav('home',    b || '/',       'Главная',  '<path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/>')}
+  ${nav('order',   b + 'order',    'Заказать', '<path d="M12 5v14M5 12h14"/>')}
+  ${nav('faq',     b + 'faq',      'FAQ',      '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".5" fill="currentColor"/>')}
+  ${nav('profile', b + 'profile',  'Кабинет',  '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>')}
 </nav>` : '';
 
     /* ── SVG-логотипы соцсетей (Bootstrap Icons) ── */
@@ -305,8 +305,8 @@
 
       <!-- Бренд -->
       <div class="antviz-footer__brand">
-        <a href="/" class="antviz-footer__logo">
-          <img src="img/favicon.png" alt="Antviz">
+        <a href="${b || '/'}" class="antviz-footer__logo">
+          <img src="${b}img/favicon.png" alt="Antviz">
           Antviz
         </a>
         <p class="antviz-footer__desc">Делаем сайты под ключ — быстро, красиво, без лишнего. Никаких конструкторов, только ручной код.</p>
@@ -319,11 +319,11 @@
       <div>
         <div class="antviz-footer__col-title">Навигация</div>
         <nav class="antviz-footer__col-links">
-          <a href="/">Главная</a>
-          <a href="order">Заказать сайт</a>
-          <a href="faq">FAQ</a>
-          <a href="faq#rules">Правила</a>
-          <a href="profile/support">Поддержка</a>
+          <a href="${b || '/'}">Главная</a>
+          <a href="${b}order">Заказать сайт</a>
+          <a href="${b}faq">FAQ</a>
+          <a href="${b}rules">Правила</a>
+          <a href="${b}profile/support">Поддержка</a>
         </nav>
       </div>
 
@@ -331,11 +331,11 @@
       <div>
         <div class="antviz-footer__col-title">Услуги</div>
         <nav class="antviz-footer__col-links">
-          <a href="order">Лендинг от 250 ₽</a>
-          <a href="order">Многостраничный сайт</a>
-          <a href="order">Портфолио</a>
-          <a href="order">Поддержка сайта</a>
-          <a href="order">Домен .ru</a>
+          <a href="${b}order">Лендинг от 250 ₽</a>
+          <a href="${b}order">Многостраничный сайт</a>
+          <a href="${b}order">Портфолио</a>
+          <a href="${b}order">Поддержка сайта</a>
+          <a href="${b}order">Домен .ru</a>
         </nav>
       </div>
 
@@ -345,8 +345,8 @@
         <nav class="antviz-footer__col-links">
           <a href="https://t.me/antviz_official" target="_blank" rel="noopener">Telegram</a>
           <a href="https://instagram.com/antviz_official" target="_blank" rel="noopener">Instagram</a>
-          <a href="profile">Личный кабинет</a>
-          <a href="profile/support">Чат поддержки</a>
+          <a href="${b}profile">Личный кабинет</a>
+          <a href="${b}profile/support">Чат поддержки</a>
         </nav>
       </div>
 
@@ -358,8 +358,9 @@
       <div class="antviz-footer__bottom-left">
         <p class="antviz-footer__copy">© ${year} Antviz. Все права защищены.</p>
         <div class="antviz-footer__legal">
-          <a href="privacy">Политика конфиденциальности</a>
-          <a href="terms">Пользовательское соглашение</a>
+          <a href="${b}privacy">Политика конфиденциальности</a>
+          <a href="${b}terms">Пользовательское соглашение</a>
+          <a href="${b}rules">Правила сервиса</a>
         </div>
       </div>
       <div class="antviz-footer__status">
@@ -377,12 +378,16 @@ ${mobileNav}`;
   const script = document.currentScript;
   const activePage = script ? (script.getAttribute('data-page') || '') : '';
 
+  // Определяем базовый путь: если страница в поддиректории — используем ../
+  const depth = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
+  const base = depth > 0 ? '../' : '';
+
   const style = document.createElement('style');
   style.textContent = CSS;
   document.head.appendChild(style);
 
   const wrapper = document.createElement('div');
-  wrapper.innerHTML = buildFooter(activePage);
+  wrapper.innerHTML = buildFooter(activePage, base);
   while (wrapper.firstChild) {
     document.body.appendChild(wrapper.firstChild);
   }

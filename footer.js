@@ -166,18 +166,6 @@
       font-size: .68rem;
       color: #3a3a4a;
     }
-    .antviz-footer__status-dot {
-      width: 5px;
-      height: 5px;
-      border-radius: 50%;
-      background: #4ade80;
-      flex-shrink: 0;
-      animation: statusPulse 2.5s infinite;
-    }
-    @keyframes statusPulse {
-      0%,100% { opacity:1 }
-      50%      { opacity:.4 }
-    }
 
     /* Мобильный навбар */
     .antviz-mobile-nav {
@@ -364,7 +352,6 @@
         </div>
       </div>
       <div class="antviz-footer__status">
-        <span class="antviz-footer__status-dot"></span>
         *META PLATFORMS INC. (ВКЛЮЧАЯ INSTAGRAM И THREADS) ПРИЗНАНА ЭКСТРЕМИСТСКОЙ ОРГАНИЗАЦИЕЙ И ЕЕ ДЕЯТЕЛЬНОСТЬ ЗАПРЕЩЕНА НА ТЕРРИТОРИИ РФ.
       </div>
     </div>

@@ -254,6 +254,26 @@
     .toast.info{background:var(--accent);color:#fff}
     .toast.warn{background:var(--warn);color:#000}
 
+    /* PROMO */
+    .promo-form{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.9rem;margin-bottom:.65rem}
+    .promo-row{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:.4rem}
+    .promo-inp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.42rem .65rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.74rem;outline:none;transition:border-color .18s}
+    .promo-inp:focus{border-color:rgba(108,99,255,.4)}
+    .promo-inp::placeholder{color:var(--muted)}
+    .promo-select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.42rem .65rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.74rem;outline:none}
+    .promo-create-btn{width:100%;background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.28);color:var(--accent2);font-family:'Onest',sans-serif;font-size:.74rem;padding:.42rem;border-radius:8px;cursor:pointer;transition:background .18s}
+    .promo-create-btn:hover{background:rgba(108,99,255,.25)}
+    .promo-item{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.68rem .85rem;margin-bottom:.35rem;display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+    .promo-code{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.72rem;letter-spacing:.05em;color:var(--accent2)}
+    .promo-info{font-size:.68rem;color:var(--muted);margin-top:.1rem}
+    .promo-del{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#f87171;font-family:'Onest',sans-serif;font-size:.6rem;padding:.22rem .5rem;border-radius:6px;cursor:pointer;flex-shrink:0}
+
+    /* TICKETS */
+    .ticket-status-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.62rem;padding:.2rem .5rem;border-radius:6px;cursor:pointer;transition:all .15s}
+    .ticket-status-btn:hover{border-color:var(--success);color:var(--success)}
+    .ticket-reply-inp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.38rem .6rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.72rem;outline:none;margin-top:.4rem;transition:border-color .18s}
+    .ticket-reply-inp:focus{border-color:rgba(108,99,255,.4)}
+
     @media(max-width:1200px){.layout{grid-template-columns:260px 1fr 310px}.tstat{display:none}}
     @media(max-width:860px){
       html,body{overflow:auto}
@@ -314,6 +334,8 @@
           <button class="tab-btn" onclick="switchTab('reviews',this)">Отзывы</button>
           <button class="tab-btn" onclick="switchTab('analytics',this)">📊</button>
           <button class="tab-btn" onclick="switchTab('archive',this)">📦</button>
+          <button class="tab-btn" onclick="switchTab('promos',this)">🏷</button>
+          <button class="tab-btn" onclick="switchTab('tickets',this)">🎫</button>
         </div>
       </div>
       <div class="search-wrap" id="searchWrap">
@@ -442,6 +464,7 @@
             <div class="chat-hdr-name" id="chatClientName">Клиент</div>
             <div class="chat-hdr-sub" id="chatClientEmail"></div>
           </div>
+          <button onclick="archiveCurrentChat()" title="Архивировать чат" style="background:rgba(108,99,255,.08);border:1px solid rgba(108,99,255,.18);color:#a78bfa;font-family:'Onest',sans-serif;font-size:.65rem;padding:.28rem .6rem;border-radius:7px;cursor:pointer;flex-shrink:0;transition:background .18s;margin-right:.3rem" onmouseover="this.style.background='rgba(108,99,255,.16)'" onmouseout="this.style.background='rgba(108,99,255,.08)'">📦 В архив</button>
           <button onclick="clearAdminChat()" title="Очистить чат" style="background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#f87171;font-family:'Onest',sans-serif;font-size:.65rem;padding:.28rem .6rem;border-radius:7px;cursor:pointer;flex-shrink:0;transition:background .18s" onmouseover="this.style.background='rgba(248,113,113,.16)'" onmouseout="this.style.background='rgba(248,113,113,.08)'">🗑 Очистить</button>
         </div>
         <div class="chat-msgs" id="chatMsgs"></div>
@@ -541,7 +564,7 @@ window.toggleMaintenance=async function(){
 };
 
 /* TABS */
-window.switchTab=function(tab,btn){currentTab=tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('searchInput').value='';document.getElementById('searchWrap').style.display=(tab==='analytics')?'none':'block';renderList();};
+window.switchTab=async function(tab,btn){currentTab=tab;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.getElementById('searchInput').value='';document.getElementById('searchWrap').style.display=(tab==='analytics'||tab==='promos'||tab==='tickets')?'none':'block';if(tab==='promos'){await loadPromos();}if(tab==='tickets'){await loadTickets();}renderList();};
 
 /* STATS */
 function updateStats(){
@@ -611,6 +634,8 @@ function renderList(){
 
   } else if(currentTab==='chats'){
     let uids=Object.keys(allChatUsers);
+    // Скрываем архивные чаты — показываем только активные или с непрочитанными
+    uids=uids.filter(uid=>!allChatUsers[uid].archived||allChatUsers[uid].hasUnread);
     uids.sort((a,b)=>{if(allChatUsers[a].hasUnread!==allChatUsers[b].hasUnread) return allChatUsers[a].hasUnread?-1:1;return (allChatUsers[b].lastMsgTs?.seconds||0)-(allChatUsers[a].lastMsgTs?.seconds||0);});
     if(q) uids=uids.filter(uid=>(allChatUsers[uid].name||'').toLowerCase().includes(q)||(allChatUsers[uid].email||'').toLowerCase().includes(q));
     if(!uids.length){el.innerHTML='<div class="list-empty">Нет диалогов</div>';return;}
@@ -628,8 +653,139 @@ function renderList(){
 
   } else if(currentTab==='analytics'){
     renderAnalytics();
+  } else if(currentTab==='promos'){
+    renderPromos();
+  } else if(currentTab==='tickets'){
+    renderTickets();
   }
 }
+
+/* PROMOS */
+let allPromos = [];
+
+async function loadPromos(){
+  try{
+    const snap = await getDocs(collection(db,'promoCodes'));
+    allPromos = snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){ allPromos=[]; }
+}
+
+function renderPromos(){
+  const el=document.getElementById('listScroll');
+  el.innerHTML=`
+    <div style="padding:.35rem .05rem">
+      <div class="promo-form">
+        <div style="font-size:.63rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.55rem;font-weight:500">Создать промокод</div>
+        <div class="promo-row">
+          <input class="promo-inp" id="pCode" type="text" placeholder="КОД (напр. SALE20)" style="text-transform:uppercase"/>
+          <select class="promo-select" id="pType">
+            <option value="percent">Процент (%)</option>
+            <option value="fixed">Фиксированная (₽)</option>
+          </select>
+        </div>
+        <div class="promo-row">
+          <input class="promo-inp" id="pValue" type="number" placeholder="Размер скидки" min="1"/>
+          <input class="promo-inp" id="pExpires" type="date" title="Срок действия (необязательно)"/>
+        </div>
+        <input class="promo-inp" id="pUid" type="text" placeholder="UID пользователя (или пусто — для всех)" style="margin-bottom:.4rem;width:100%"/>
+        <button class="promo-create-btn" onclick="createPromo()">+ Создать промокод</button>
+      </div>
+      <div style="font-size:.63rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.45rem">Активные промокоды (${allPromos.filter(p=>p.active).length})</div>
+      ${allPromos.length ? allPromos.map(p=>`
+        <div class="promo-item">
+          <div>
+            <div class="promo-code">${p.code}</div>
+            <div class="promo-info">
+              ${p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`}
+              ${p.expiresAt?' · до '+p.expiresAt.toDate().toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'}):''}
+              ${p.forUid?' · для: '+p.forUid.slice(0,12)+'...':' · для всех'}
+              ${p.active?'':' · <span style="color:var(--error)">отключён</span>'}
+            </div>
+          </div>
+          <div style="display:flex;gap:.35rem;flex-shrink:0">
+            <button onclick="togglePromo('${p.id}',${!p.active})" class="promo-del" style="background:${p.active?'rgba(74,222,128,.08)':'rgba(108,99,255,.08)'};border-color:${p.active?'rgba(74,222,128,.2)':'rgba(108,99,255,.2)'};color:${p.active?'var(--success)':'var(--accent2)'}">${p.active?'Откл':'Вкл'}</button>
+            <button class="promo-del" onclick="deletePromo('${p.id}')">🗑</button>
+          </div>
+        </div>`).join('') : '<div class="list-empty">Нет промокодов</div>'}
+    </div>`;
+}
+
+window.createPromo=async function(){
+  const code=document.getElementById('pCode').value.trim().toUpperCase();
+  const type=document.getElementById('pType').value;
+  const value=+document.getElementById('pValue').value;
+  const expires=document.getElementById('pExpires').value;
+  const uid=document.getElementById('pUid').value.trim();
+  if(!code||!value){toast('Заполните код и размер скидки','error');return;}
+  try{
+    const data={code,discountType:type,discountValue:value,active:true,createdAt:serverTimestamp()};
+    if(expires) data.expiresAt=Timestamp.fromDate(new Date(expires+'T23:59:59'));
+    if(uid) data.forUid=uid;
+    await addDoc(collection(db,'promoCodes'),data);
+    toast('Промокод создан ✓','success');
+    await loadPromos(); renderPromos();
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.deletePromo=async function(id){
+  if(!confirm('Удалить промокод?')) return;
+  try{await deleteDoc(doc(db,'promoCodes',id));toast('Удалён','info');await loadPromos();renderPromos();}
+  catch(e){toast('Ошибка','error');}
+};
+
+window.togglePromo=async function(id,active){
+  try{await updateDoc(doc(db,'promoCodes',id),{active});toast(active?'Активирован':'Отключён',active?'success':'info');await loadPromos();renderPromos();}
+  catch(e){toast('Ошибка','error');}
+};
+
+/* TICKETS */
+let allTickets = [];
+
+async function loadTickets(){
+  try{
+    const snap = await getDocs(collection(db,'tickets'));
+    allTickets = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  }catch(e){ allTickets=[]; }
+}
+
+function renderTickets(){
+  const el=document.getElementById('listScroll');
+  if(!allTickets.length){ el.innerHTML='<div class="list-empty">Нет заявок</div>'; return; }
+  el.innerHTML=allTickets.map(t=>`
+    <div class="row-card" style="cursor:default">
+      <div class="row-head">
+        <span class="row-name">${t.title}</span>
+        <span class="sbadge ${t.status==='done'?'s5':'s2'}">${t.status==='done'?'Готово':'Открыта'}</span>
+      </div>
+      <div class="row-sub">${t.userName||'—'} · ${t.userEmail||'—'}</div>
+      ${t.description?`<div style="font-size:.7rem;color:var(--muted2);margin:.25rem 0;line-height:1.4">${t.description}</div>`:''}
+      ${t.adminReply?`<div style="font-size:.7rem;color:var(--accent2);margin:.2rem 0">💬 ${t.adminReply}</div>`:''}
+      <div style="display:flex;gap:.35rem;margin-top:.45rem;flex-wrap:wrap">
+        <input class="ticket-reply-inp" id="tr_${t.id}" type="text" placeholder="Ответить клиенту..." value="${t.adminReply||''}"/>
+      </div>
+      <div style="display:flex;gap:.35rem;margin-top:.35rem">
+        <button class="ticket-status-btn" onclick="saveTicketReply('${t.id}')">💾 Сохранить ответ</button>
+        <button class="ticket-status-btn" style="border-color:rgba(74,222,128,.3);color:var(--success)" onclick="setTicketDone('${t.id}')">✓ Закрыть</button>
+        <button class="ticket-status-btn" style="border-color:rgba(248,113,113,.2);color:#f87171" onclick="deleteTicket('${t.id}')">🗑</button>
+      </div>
+    </div>`).join('');
+}
+
+window.saveTicketReply=async function(id){
+  const val=document.getElementById('tr_'+id)?.value.trim()||'';
+  try{await updateDoc(doc(db,'tickets',id),{adminReply:val});toast('Ответ сохранён ✓','success');await loadTickets();renderTickets();}
+  catch(e){toast('Ошибка','error');}
+};
+window.setTicketDone=async function(id){
+  try{await updateDoc(doc(db,'tickets',id),{status:'done'});toast('Заявка закрыта ✓','success');await loadTickets();renderTickets();}
+  catch(e){toast('Ошибка','error');}
+};
+window.deleteTicket=async function(id){
+  if(!confirm('Удалить заявку?')) return;
+  try{await deleteDoc(doc(db,'tickets',id));toast('Удалена','info');await loadTickets();renderTickets();}
+  catch(e){toast('Ошибка','error');}
+};
 
 /* ANALYTICS */
 function renderAnalytics(){
@@ -863,16 +1019,20 @@ function openChat(uid,name,email){
   document.getElementById('chatMsgs').innerHTML='';
   // Отмечаем сообщения пользователя как прочитанные сразу при открытии
   markUserMsgsRead(uid);
-  const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(100));
+  const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(200));
   unsubChat=onSnapshot(q,snap=>{
     snap.docChanges().forEach(ch=>{
       if(ch.type==='added'){
         const m=ch.doc.data();
-        appendMsg(m);
+        // Пропускаем если уже есть в DOM
+        if(document.querySelector(`[data-msg-id="${ch.doc.id}"]`)) return;
+        appendMsg(m, ch.doc.id);
         // Помечаем входящие как прочитанные
         if(m.sender==='user'&&!m.read){
           updateDoc(ch.doc.ref,{read:true}).catch(()=>{});
         }
+      } else if(ch.type==='removed'){
+        document.querySelector(`[data-msg-id="${ch.doc.id}"]`)?.remove();
       }
     });
   },err=>console.error('Chat:',err));
@@ -915,6 +1075,28 @@ window.adminSendFiles=async function(files){
       toast(file.name+' ✓','success');}catch(e){toast('Ошибка','error');}
   }
   document.getElementById('adminFileInput').value='';
+};
+
+window.deleteChatMsg=async function(msgId){
+  if(!msgId||!selClientUid) return;
+  try{
+    await deleteDoc(doc(db,'chats',selClientUid,'messages',msgId));
+    toast('Сообщение удалено','info');
+  }catch(e){toast('Ошибка удаления','error');}
+};
+
+window.archiveCurrentChat=async function(){
+  if(!selClientUid){toast('Сначала выберите чат','error');return;}
+  try{
+    // Помечаем чат как архивный — появится снова когда клиент напишет новое сообщение
+    await setDoc(doc(db,'chats',selClientUid),{archived:true,archivedAt:serverTimestamp()},{merge:true});
+    toast('Чат перемещён в архив','success');
+    // Закрываем панель чата
+    document.getElementById('chatWrapInner').style.display='none';
+    document.getElementById('chatEmpty').style.display='flex';
+    selClientUid=null; selOrderId=null;
+    renderList();
+  }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
 window.doLogout=async function(){if(unsubChat) unsubChat();await signOut(auth);window.location.href='auth';};
@@ -1049,13 +1231,24 @@ onAuthStateChanged(auth, async user=>{
     const chatDocs=await getDocs(collection(db,'chats'));
     chatDocs.forEach(chatDoc=>{
       const uid=chatDoc.id;const data=chatDoc.data()||{};
+      // Слушаем изменения самого документа чата (для поля archived)
+      onSnapshot(doc(db,'chats',uid), chatDocSnap=>{
+        const chatData=chatDocSnap.data()||{};
+        if(allChatUsers[uid]) allChatUsers[uid].archived=chatData.archived||false;
+      });
       onSnapshot(query(collection(db,'chats',uid,'messages'),orderBy('createdAt','desc')), msgSnap=>{
-        if(msgSnap.empty){allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false,unreadCount:0};renderList();return;}
+        if(msgSnap.empty){allChatUsers[uid]={name:data.name||'Пользователь',email:data.email||'',lastMsg:'',lastMsgTs:null,hasUnread:false,unreadCount:0,archived:data.archived||false};renderList();return;}
         const last=msgSnap.docs[0].data();
-        // Непрочитанные = сообщения от пользователя без поля read:true
         const hasUnread=msgSnap.docs.some(d=>{const m=d.data();return m.sender==='user'&&m.read!==true;});
         const unreadCount=msgSnap.docs.filter(d=>{const m=d.data();return m.sender==='user'&&m.read!==true;}).length;
-        allChatUsers[uid]={name:data.name||last.senderName||'Пользователь',email:data.email||'',lastMsg:last.type==='file'?'📎 Файл':(last.text||'').slice(0,55),lastMsgTs:last.createdAt,hasUnread,unreadCount};
+        // Если клиент написал новое сообщение — убираем из архива
+        const wasArchived=allChatUsers[uid]?.archived||false;
+        let archived=data.archived||false;
+        if(wasArchived&&hasUnread){
+          archived=false;
+          setDoc(doc(db,'chats',uid),{archived:false},{merge:true}).catch(()=>{});
+        }
+        allChatUsers[uid]={name:data.name||last.senderName||'Пользователь',email:data.email||'',lastMsg:last.type==='file'?'📎 Файл':(last.text||'').slice(0,55),lastMsgTs:last.createdAt,hasUnread,unreadCount,archived};
         renderList();
       });
     });

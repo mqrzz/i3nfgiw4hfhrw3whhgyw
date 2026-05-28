@@ -223,12 +223,26 @@
     </div>
   </div>
 
+  <!-- PROMO CODE -->
+  <div class="card" id="promoCard" style="margin-bottom:1.1rem">
+    <div class="card-title"><span class="step-badge" style="background:var(--accent2)">🏷</span> Промокод</div>
+    <div style="display:flex;gap:.55rem">
+      <input class="form-input" id="promoInput" type="text" placeholder="Введите промокод..." style="text-transform:uppercase;letter-spacing:.06em"/>
+      <button class="btn btn-ghost btn-sm" id="promoApplyBtn" onclick="applyPromo()" style="white-space:nowrap;flex-shrink:0">Применить</button>
+    </div>
+    <div id="promoMsg" style="font-size:.74rem;margin-top:.45rem;display:none"></div>
+  </div>
+
   <!-- PRICE BAR -->
   <div class="price-bar">
     <div>
       <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.18rem">Итого</div>
-      <div class="pb-price" id="totalPrice">1 125 ₽</div>
+      <div style="display:flex;align-items:baseline;gap:.55rem">
+        <div class="pb-price" id="totalPrice">1 125 ₽</div>
+        <div id="priceOriginal" style="font-size:.8rem;color:var(--muted);text-decoration:line-through;display:none"></div>
+      </div>
       <div class="pb-breakdown" id="totalBreakdown">225 ₽ × 5 стр</div>
+      <div id="promoDiscount" style="font-size:.72rem;color:var(--success);margin-top:.15rem;display:none"></div>
     </div>
     <button class="btn btn-primary" onclick="addToCart()">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>В корзину
@@ -363,7 +377,39 @@
   };
   window.updatePages=()=>{selPagesVal=+document.getElementById('pagesSlider').value;document.getElementById('pagesLbl').textContent=selPagesVal;document.getElementById('pagesDisp').textContent=selPagesVal;updateTotal();};
   window.toggleExtra=el=>{const k=el.id.replace('extra','').toLowerCase();extras[k]=!extras[k];el.classList.toggle('on',extras[k]);el.querySelector('.extra-check').textContent=extras[k]?'✓':'';updateTotal();};
-  function updateTotal(){let base=selPriceVal*selPagesVal,add=0,parts=[`${selPriceVal} ₽ × ${selPagesVal} стр`];if(extras.domain){add+=200;parts.push('+200 ₽ домен');}if(extras.support){add+=500;parts.push('+500 ₽ поддержка');}if(extras.urgent){const u=Math.round((base+add)*.3);add+=u;parts.push('+30% срочность');}const total=base+add;document.getElementById('totalPrice').textContent=total.toLocaleString('ru')+' ₽';document.getElementById('totalBreakdown').textContent=parts.join(' · ');}
+  // PROMO
+  let promoData = null; // { type: 'percent'|'fixed', value: number, code: string }
+
+  window.applyPromo = async function(){
+    const code = document.getElementById('promoInput').value.trim().toUpperCase();
+    const msgEl = document.getElementById('promoMsg');
+    if(!code){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Введите промокод'; return; }
+    const btn = document.getElementById('promoApplyBtn');
+    btn.disabled=true; btn.textContent='Проверяем...';
+    try{
+      const { getDocs: _getDocs, collection: _col, query: _query, where: _where } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      const snap = await _getDocs(_query(_col(db,'promoCodes'),_where('code','==',code),_where('active','==',true)));
+      if(snap.empty){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Промокод не найден или не активен'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+      const promo = snap.docs[0].data();
+      // Проверяем срок действия
+      if(promo.expiresAt && promo.expiresAt.toDate && promo.expiresAt.toDate() < new Date()){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Срок действия промокода истёк'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+      // Проверяем для конкретного пользователя
+      if(promo.forUid && currentUser && promo.forUid !== currentUser.uid){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+      promoData = { type: promo.discountType, value: promo.discountValue, code };
+      const label = promo.discountType==='percent' ? `-${promo.discountValue}%` : `-${promo.discountValue} ₽`;
+      msgEl.style.display='block'; msgEl.style.color='var(--success)'; msgEl.textContent=`✓ Промокод применён: ${label}`;
+      btn.textContent='✓ Применён'; btn.style.color='var(--success)'; btn.style.borderColor='var(--success)';
+    }catch(e){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Ошибка проверки промокода'; btn.disabled=false; btn.textContent='Применить'; }
+    updateTotal();
+  };
+
+  function calcDiscount(base){
+    if(!promoData) return 0;
+    if(promoData.type==='percent') return Math.round(base * promoData.value / 100);
+    return Math.min(promoData.value, base);
+  }
+
+  function updateTotal(){let base=selPriceVal*selPagesVal,add=0,parts=[`${selPriceVal} ₽ × ${selPagesVal} стр`];if(extras.domain){add+=200;parts.push('+200 ₽ домен');}if(extras.support){add+=500;parts.push('+500 ₽ поддержка');}if(extras.urgent){const u=Math.round((base+add)*.3);add+=u;parts.push('+30% срочность');}const subtotal=base+add;const discount=calcDiscount(subtotal);const total=subtotal-discount;document.getElementById('totalPrice').textContent=total.toLocaleString('ru')+' ₽';document.getElementById('totalBreakdown').textContent=parts.join(' · ');const origEl=document.getElementById('priceOriginal');const discEl=document.getElementById('promoDiscount');if(discount>0){origEl.style.display='block';origEl.textContent=subtotal.toLocaleString('ru')+' ₽';discEl.style.display='block';discEl.textContent=`Скидка по промокоду: -${discount.toLocaleString('ru')} ₽`;}else{origEl.style.display='none';discEl.style.display='none';}}
   window.addToCart=()=>{const name=`${selTypeVal} · ${selTariffName}`;const cart=getCart();const ex=cart.find(i=>i.name===name&&i.pages===selPagesVal);if(ex)ex.qty++;else cart.push({name,pricePerPage:selPriceVal,pages:selPagesVal,qty:1});saveCart(cart);toast('Добавлено в корзину ✓','success');setTimeout(()=>document.getElementById('cartOverlay').classList.add('show'),350);};
 
   window.toggleAgree=()=>{agreeChecked=!agreeChecked;document.getElementById('agreeBox').classList.toggle('checked',agreeChecked);document.getElementById('agreeBox').classList.remove('errbdr');document.getElementById('err-agree').classList.remove('show');};
@@ -416,7 +462,7 @@
     }
     try{
       await addDoc(collection(db,'orders'),{
-        siteType:selTypeVal,tariff:selTariffName,pages:selPagesVal,totalPrice,extras:extrasArr,
+        siteType:selTypeVal,tariff:selTariffName,pages:selPagesVal,totalPrice,extras:extrasArr,promoCode:promoData?promoData.code:null,discountApplied:promoData?calcDiscount(totalPrice+(promoData?calcDiscount(totalPrice):0)):0,
         cart:cart.length?cart:null,description:document.getElementById('fdesc').value.trim()||'',
         attachments:attachments.length?attachments:null,
         clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,

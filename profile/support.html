@@ -200,28 +200,6 @@
     .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;object-fit:contain}
     .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.1rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
 
-    /* TICKET FORM */
-    .ticket-fab{position:fixed;bottom:90px;right:1.1rem;z-index:150;background:linear-gradient(140deg,var(--accent),#8b5cf6);border:none;color:#fff;width:48px;height:48px;border-radius:50%;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 18px rgba(108,99,255,.45);display:none;align-items:center;justify-content:center;transition:transform .15s,box-shadow .2s}
-    .ticket-fab:hover{transform:scale(1.08);box-shadow:0 6px 24px rgba(108,99,255,.6)}
-    .ticket-fab.show{display:flex}
-    .ticket-modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .22s}
-    .ticket-modal.show{opacity:1;pointer-events:all}
-    .ticket-sheet{background:var(--bg2);border:1px solid var(--glass-border);border-radius:20px 20px 0 0;padding:1.5rem 1.2rem 2rem;width:100%;max-width:560px;transform:translateY(40px);transition:transform .28s cubic-bezier(.34,1.4,.64,1)}
-    .ticket-modal.show .ticket-sheet{transform:translateY(0)}
-    .ticket-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
-    .ticket-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.65rem .9rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.84rem;font-weight:300;outline:none;transition:border-color .2s;margin-bottom:.65rem}
-    .ticket-inp:focus{border-color:rgba(108,99,255,.45)}
-    .ticket-inp::placeholder{color:var(--muted)}
-    .ticket-ta{resize:vertical;min-height:80px}
-    .ticket-submit{width:100%;background:var(--accent);border:none;color:#fff;border-radius:50px;padding:.78rem;font-family:'Onest',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:box-shadow .2s,transform .14s}
-    .ticket-submit:hover{box-shadow:0 4px 18px rgba(108,99,255,.45);transform:translateY(-1px)}
-    .tickets-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.75rem}
-    .ticket-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:.75rem .9rem;font-size:.8rem}
-    .ticket-item-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:.2rem}
-    .ticket-item-title{font-weight:500}
-    .t-open{background:rgba(56,189,248,.1);color:var(--accent3);border:1px solid rgba(56,189,248,.2);padding:.08rem .45rem;border-radius:50px;font-size:.58rem;font-weight:600}
-    .t-done{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.2);padding:.08rem .45rem;border-radius:50px;font-size:.58rem;font-weight:600}
-
     .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;
       padding:.5rem 1.2rem;border-radius:50px;font-size:.76rem;font-weight:500;
       opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px)}
@@ -291,22 +269,6 @@
   </div>
 </div>
 
-<!-- TICKET FAB -->
-<button class="ticket-fab" id="ticketFab" onclick="openTicketModal()" title="Создать заявку">🎫</button>
-
-<!-- TICKET MODAL -->
-<div class="ticket-modal" id="ticketModal" onclick="if(event.target===this)closeTicketModal()">
-  <div class="ticket-sheet">
-    <div class="ticket-title">
-      🎫 Заявка на доработку
-      <button onclick="closeTicketModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem">✕</button>
-    </div>
-    <input class="ticket-inp" id="ticketTitle" type="text" placeholder="Что нужно сделать? (кратко)"/>
-    <textarea class="ticket-inp ticket-ta" id="ticketDesc" placeholder="Опишите подробнее: что изменить, добавить или исправить..."></textarea>
-    <button class="ticket-submit" onclick="submitTicket()">Отправить заявку →</button>
-    <div class="tickets-list" id="ticketsList"></div>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -660,58 +622,6 @@ window.closeLightbox=function(){
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
 
 /* ── Bootstrap ── */
-/* ── TICKETS ── */
-let userHasSupport = false;
-let userTickets = [];
-
-window.openTicketModal = function(){
-  document.getElementById('ticketModal').classList.add('show');
-  renderTickets();
-};
-window.closeTicketModal = function(){
-  document.getElementById('ticketModal').classList.remove('show');
-};
-window.submitTicket = async function(){
-  const title = document.getElementById('ticketTitle').value.trim();
-  const desc = document.getElementById('ticketDesc').value.trim();
-  if(!title){ toast('Введите название заявки','error'); return; }
-  try{
-    await addDoc(collection(db,'tickets'),{
-      title, description: desc||'',
-      uid: currentUser.uid,
-      userName: currentUser.displayName||'Пользователь',
-      userEmail: currentUser.email||'',
-      status: 'open',
-      createdAt: serverTimestamp()
-    });
-    document.getElementById('ticketTitle').value = '';
-    document.getElementById('ticketDesc').value = '';
-    toast('Заявка отправлена ✓','success');
-    await loadTickets();
-    renderTickets();
-  }catch(e){ toast('Ошибка: '+e.message,'error'); }
-};
-async function loadTickets(){
-  try{
-    const snap = await getDocs(query(collection(db,'tickets'),where('uid','==',currentUser.uid)));
-    userTickets = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  }catch(e){ userTickets=[]; }
-}
-function renderTickets(){
-  const el = document.getElementById('ticketsList');
-  if(!userTickets.length){ el.innerHTML='<div style="font-size:.74rem;color:var(--muted);text-align:center;padding:.8rem 0">Заявок пока нет</div>'; return; }
-  el.innerHTML = userTickets.map(t=>`
-    <div class="ticket-item">
-      <div class="ticket-item-head">
-        <span class="ticket-item-title">${t.title}</span>
-        <span class="${t.status==='done'?'t-done':'t-open'}">${t.status==='done'?'Готово':'Открыта'}</span>
-      </div>
-      ${t.description?`<div style="color:var(--muted);font-size:.74rem">${t.description}</div>`:''}
-      ${t.adminReply?`<div style="color:var(--accent2);font-size:.74rem;margin-top:.3rem">💬 ${t.adminReply}</div>`:''}
-    </div>`).join('');
-}
-
 onAuthStateChanged(auth,async user=>{
   if(!user){ window.location.href='../auth'; return; }
   currentUser=user;
@@ -732,30 +642,27 @@ onAuthStateChanged(auth,async user=>{
 
   // Проверяем, есть ли вообще сообщения в чате
   const chatSnap = await getDocs(collection(db,'chats',user.uid,'messages'));
-  
-  // Проверяем, есть ли сообщения от пользователя
+
+  // Проверяем сообщения
   hasUserMessages = false;
-  chatSnap.forEach(doc => {
-    if(doc.data().sender === 'user') hasUserMessages = true;
+  let hasAdminMessages = false;
+  chatSnap.forEach(d => {
+    const s = d.data().sender;
+    if(s === 'user') hasUserMessages = true;
+    if(s === 'admin') hasAdminMessages = true;
   });
 
   // Запускаем слушатель
   listenChat(user.uid);
 
-  // Если чат пустой или нет сообщений от пользователя — показываем приветствие
-  if(chatSnap.empty || !hasUserMessages) {
+  // Если есть сообщения от админа — сразу открытый чат, бот не мешает
+  if(hasAdminMessages){
+    flowState = 'open';
+  } else if(chatSnap.empty || !hasUserMessages){
     await showWelcome();
   }
 
-  // Проверяем куплена ли поддержка
-  try{
-    const ordersSnap = await getDocs(query(collection(db,'orders'),where('uid','==',user.uid),where('status','==',5)));
-    userHasSupport = ordersSnap.docs.some(d=>{const extras=d.data().extras||[];return extras.includes('support');});
-    if(userHasSupport){
-      document.getElementById('ticketFab').classList.add('show');
-      await loadTickets();
-    }
-  }catch(e){}
+
 });
 </script>
 </body>

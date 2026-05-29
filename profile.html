@@ -318,6 +318,12 @@
           <div class="menu-text"><div class="menu-title">Новый заказ</div><div class="menu-sub">Оформить заявку на сайт</div></div>
           <span class="menu-arrow">›</span>
         </a>
+        <a href="profile/tickets" class="menu-item" id="menuTickets">
+          <div class="menu-ico ico-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div>
+          <div class="menu-text"><div class="menu-title">Обслуживание сайта</div><div class="menu-sub" id="menuTicketsSub">Заявки на доработку</div></div>
+          <span class="menu-badge" id="menuTicketsBadge" style="display:none">!</span>
+          <span class="menu-arrow">›</span>
+        </a>
         <a href="profile/settings" class="menu-item">
           <div class="menu-ico ico-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
           <div class="menu-text"><div class="menu-title">Настройки</div><div class="menu-sub">Профиль и аккаунт</div></div>
@@ -402,6 +408,26 @@ function loadOrderStats(uid){
     if(active>0){badge.textContent=active;badge.style.display='';}else badge.style.display='none';
     document.getElementById('menuOrdersSub').textContent=active>0?`${active} активных`:'История всех заявок';
   },err=>console.error('Orders:',err));
+}
+
+async function watchSupportStatus(uid){
+  try{
+    const snap = await getDocs(query(collection(db,'orders'),where('uid','==',uid)));
+    const orders = snap.docs.map(d=>({id:d.id,...d.data()}));
+    // Ищем активное обслуживание
+    const activeSupport = orders.find(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
+    const sub = document.getElementById('menuTicketsSub');
+    const badge = document.getElementById('menuTicketsBadge');
+    if(activeSupport){
+      const exp = activeSupport.supportExpiresAt.toDate();
+      const daysLeft = Math.ceil((exp-new Date())/(1000*60*60*24));
+      sub.textContent = daysLeft<=2 ? `⚠️ Истекает через ${daysLeft} дн.` : `Активно · осталось ${daysLeft} дн.`;
+      sub.style.color = daysLeft<=2 ? 'var(--warn)' : '';
+      if(daysLeft<=2){badge.style.display='';badge.textContent='!';}
+    } else {
+      sub.textContent = 'Заявки на доработку';
+    }
+  }catch(e){}
 }
 
 function watchChatBadge(uid){
@@ -492,6 +518,7 @@ onAuthStateChanged(auth,async user=>{
   loadOrderStats(user.uid);
   watchChatBadge(user.uid);
   watchNotifications(user.uid);
+  watchSupportStatus(user.uid);
 });
 </script>
 

@@ -991,24 +991,12 @@ window.activateSupport = async function(orderId, uid){
         read:false,createdAt:serverTimestamp()
       });
       await addDoc(collection(db,'chats',uid,'messages'),{
-        text:'✅ Обслуживание активировано!
-Теперь вы можете создавать заявки на доработку в личном кабинете → Обслуживание сайта.',
+        text: `✅ Обслуживание активировано!
+Теперь вы можете создавать заявки на доработку в личном кабинете → Обслуживание сайта.`,
         sender:'admin',senderName:'Поддержка',type:'text',read:true,createdAt:serverTimestamp()
       });
     }
     toast('Обслуживание активировано ✓','success');
-  }catch(e){toast('Ошибка: '+e.message,'error');}
-};
-
-window.renewSupport = async function(orderId){
-  try{
-    const snap = await updateDoc(doc(db,'orders',orderId),{});
-    const oSnap = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({getDoc,doc:_d})=>getDoc(_d(db,'orders',orderId)));
-    const o = oSnap.data();
-    const curExp = o.supportExpiresAt?.toDate ? o.supportExpiresAt.toDate() : new Date();
-    const newExp = new Date(Math.max(curExp,new Date()).getTime()+30*24*60*60*1000);
-    await updateDoc(doc(db,'orders',orderId),{supportExpiresAt:Timestamp.fromDate(newExp),supportActive:true});
-    toast('Продлено на 30 дней ✓','success');
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 

@@ -268,6 +268,23 @@
     .promo-info{font-size:.68rem;color:var(--muted);margin-top:.1rem}
     .promo-del{background:rgba(248,113,113,.08);border:1px solid rgba(248,113,113,.18);color:#f87171;font-family:'Onest',sans-serif;font-size:.6rem;padding:.22rem .5rem;border-radius:6px;cursor:pointer;flex-shrink:0}
 
+    /* SUPPORT BLOCK */
+    .support-block{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.85rem .95rem}
+    .support-block.active{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.04)}
+    .support-block.expiring{border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.04)}
+    .support-status{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+    .support-label{font-size:.78rem;font-weight:500}
+    .support-days{font-size:.68rem;color:var(--muted);margin-bottom:.5rem}
+    .support-prog{height:4px;background:var(--bg2);border-radius:2px;overflow:hidden;margin-bottom:.6rem}
+    .support-prog-fill{height:100%;border-radius:2px;background:var(--success);transition:width .3s}
+    .support-inp{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:.38rem .6rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.72rem;outline:none;margin-bottom:.35rem;transition:border-color .18s}
+    .support-inp:focus{border-color:rgba(108,99,255,.4)}
+    .support-inp::placeholder{color:var(--muted)}
+    .support-btn{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:var(--success);font-family:'Onest',sans-serif;font-size:.68rem;padding:.3rem .65rem;border-radius:7px;cursor:pointer;transition:background .18s;white-space:nowrap}
+    .support-btn:hover{background:rgba(74,222,128,.18)}
+    .support-btn-send{background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.22);color:var(--accent2);font-family:'Onest',sans-serif;font-size:.68rem;padding:.3rem .65rem;border-radius:7px;cursor:pointer;transition:background .18s;white-space:nowrap}
+    .support-btn-send:hover{background:rgba(108,99,255,.2)}
+
     /* TICKETS */
     .ticket-status-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.62rem;padding:.2rem .5rem;border-radius:6px;cursor:pointer;transition:all .15s}
     .ticket-status-btn:hover{border-color:var(--success);color:var(--success)}
@@ -439,6 +456,12 @@
           <div class="dsec" id="dAttachSec" style="display:none">
             <div class="dsec-lbl">Вложения клиента</div>
             <div class="attach-grid" id="dAttach"></div>
+          </div>
+
+          <!-- SUPPORT -->
+          <div class="dsec" id="dSupportSec">
+            <div class="dsec-lbl">Обслуживание сайта</div>
+            <div id="dSupportBlock"></div>
           </div>
 
           <!-- REVIEW -->
@@ -886,6 +909,9 @@ function showDetail(o){
     if(html){attachSec.style.display='block';attachGrid.innerHTML=html;}else attachSec.style.display='none';
   } else attachSec.style.display='none';
 
+  // Support
+  renderSupportBlock(o);
+
   // Review
   const revSec=document.getElementById('dReviewSec');
   const rev=allReviews.find(r=>r.orderId===o.id);
@@ -894,6 +920,125 @@ function showDetail(o){
     document.getElementById('dReviewContent').innerHTML=`<div class="review-item" style="margin:0"><div class="review-top"><span class="review-stars">${stars(rev.stars||0)}</span><span class="review-date">${fmtDate(rev.createdAt)}</span></div>${rev.text?`<div class="review-text">${rev.text}</div>`:'<div class="review-text" style="opacity:.4">Без комментария</div>'}</div>`;
   } else revSec.style.display='none';
 }
+
+/* SUPPORT */
+function renderSupportBlock(o){
+  const el = document.getElementById('dSupportBlock');
+  if(!el) return;
+  const now = new Date();
+  const hasSupport = o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > now;
+  const isExpiring = hasSupport && (o.supportExpiresAt.toDate()-now)/(1000*60*60*24) < 2;
+
+  if(hasSupport){
+    const exp = o.supportExpiresAt.toDate();
+    const start = o.supportStartedAt?.toDate ? o.supportStartedAt.toDate() : new Date(exp-30*24*60*60*1000);
+    const total = 30*24*60*60*1000;
+    const left = exp - now;
+    const daysLeft = Math.ceil(left/(1000*60*60*24));
+    const pct = Math.max(0,Math.min(100,left/total*100));
+    el.innerHTML=`
+      <div class="support-block ${isExpiring?'expiring':'active'}">
+        <div class="support-status">
+          <span class="support-label">${isExpiring?'⚠️ Истекает скоро':'✅ Активно'}</span>
+          <span class="sbadge s5" style="font-size:.6rem">до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</span>
+        </div>
+        <div class="support-days">Осталось ${daysLeft} дн.</div>
+        <div class="support-prog"><div class="support-prog-fill" style="width:${pct}%;background:${isExpiring?'var(--warn)':'var(--success)'}"></div></div>
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+          <button class="support-btn" onclick="renewSupport('${o.id}')">🔄 Продлить ещё на 30 дней</button>
+          ${isExpiring?`<button class="support-btn-send" onclick="sendExpiryNotif('${o.uid||''}')">🔔 Уведомить клиента</button>`:''}
+        </div>
+        <div style="margin-top:.5rem">
+          <input class="support-inp" id="payLinkInp_${o.id}" type="url" placeholder="Ссылка на оплату продления (необязательно)"/>
+          <button class="support-btn-send" onclick="sendPayLink('${o.id}','${o.uid||''}')">📤 Отправить ссылку в чат</button>
+        </div>
+      </div>`;
+  } else {
+    // Есть ли запрос от пользователя?
+    const hasRequest = o.supportRequested;
+    el.innerHTML=`
+      <div class="support-block">
+        <div class="support-status">
+          <span class="support-label" style="color:var(--muted)">${hasRequest?'📩 Запрос на подключение':'Не подключено'}</span>
+        </div>
+        ${hasRequest?`<div class="support-days" style="color:var(--warn);margin-bottom:.5rem">Клиент запросил обслуживание</div>`:''}
+        <div style="display:flex;gap:.35rem;flex-wrap:wrap">
+          <button class="support-btn" onclick="activateSupport('${o.id}','${o.uid||''}')">✅ Активировать (оплачено)</button>
+        </div>
+        <div style="margin-top:.5rem">
+          <input class="support-inp" id="payLinkInp_${o.id}" type="url" placeholder="Ссылка на оплату (500 ₽)"/>
+          <button class="support-btn-send" onclick="sendPayLink('${o.id}','${o.uid||''}')">📤 Отправить ссылку клиенту</button>
+        </div>
+      </div>`;
+  }
+}
+
+window.activateSupport = async function(orderId, uid){
+  try{
+    const now = new Date();
+    const exp = new Date(now.getTime()+30*24*60*60*1000);
+    await updateDoc(doc(db,'orders',orderId),{
+      supportActive:true,
+      supportStartedAt:serverTimestamp(),
+      supportExpiresAt:Timestamp.fromDate(exp),
+      supportRequested:false
+    });
+    // Уведомление клиенту
+    if(uid){
+      await addDoc(collection(db,'notifications',uid,'items'),{
+        title:'✅ Обслуживание активировано',
+        text:`Обслуживание сайта подключено на 30 дней. Вы можете создавать заявки на доработку в разделе «Обслуживание сайта».`,
+        read:false,createdAt:serverTimestamp()
+      });
+      await addDoc(collection(db,'chats',uid,'messages'),{
+        text:'✅ Обслуживание активировано!
+Теперь вы можете создавать заявки на доработку в личном кабинете → Обслуживание сайта.',
+        sender:'admin',senderName:'Поддержка',type:'text',read:true,createdAt:serverTimestamp()
+      });
+    }
+    toast('Обслуживание активировано ✓','success');
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.renewSupport = async function(orderId){
+  try{
+    const snap = await updateDoc(doc(db,'orders',orderId),{});
+    const oSnap = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({getDoc,doc:_d})=>getDoc(_d(db,'orders',orderId)));
+    const o = oSnap.data();
+    const curExp = o.supportExpiresAt?.toDate ? o.supportExpiresAt.toDate() : new Date();
+    const newExp = new Date(Math.max(curExp,new Date()).getTime()+30*24*60*60*1000);
+    await updateDoc(doc(db,'orders',orderId),{supportExpiresAt:Timestamp.fromDate(newExp),supportActive:true});
+    toast('Продлено на 30 дней ✓','success');
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.sendPayLink = async function(orderId, uid){
+  const inp = document.getElementById('payLinkInp_'+orderId);
+  const link = inp?.value.trim();
+  if(!link){toast('Введите ссылку на оплату','error');return;}
+  if(!uid){toast('UID клиента не найден','error');return;}
+  try{
+    await addDoc(collection(db,'chats',uid,'messages'),{
+      text:`💳 Ссылка для оплаты обслуживания сайта (500 ₽/месяц):
+${link}`,
+      sender:'admin',senderName:'Поддержка',type:'text',read:true,createdAt:serverTimestamp()
+    });
+    toast('Ссылка отправлена в чат ✓','success');
+    if(inp) inp.value='';
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.sendExpiryNotif = async function(uid){
+  if(!uid){toast('UID не найден','error');return;}
+  try{
+    await addDoc(collection(db,'notifications',uid,'items'),{
+      title:'⚠️ Обслуживание заканчивается',
+      text:'До окончания обслуживания осталось менее 2 дней. Свяжитесь с нами для продления.',
+      read:false,createdAt:serverTimestamp()
+    });
+    toast('Уведомление отправлено ✓','success');
+  }catch(e){toast('Ошибка','error');}
+};
 
 /* PAYMENT */
 function renderPayToggle(){
@@ -1024,12 +1169,14 @@ function openChat(uid,name,email){
     snap.docChanges().forEach(ch=>{
       if(ch.type==='added'){
         const m=ch.doc.data();
-        // Пропускаем если уже есть в DOM
         if(document.querySelector(`[data-msg-id="${ch.doc.id}"]`)) return;
         appendMsg(m, ch.doc.id);
-        // Помечаем входящие как прочитанные
         if(m.sender==='user'&&!m.read){
           updateDoc(ch.doc.ref,{read:true}).catch(()=>{});
+        }
+        // Если клиент написал запрос на обслуживание — помечаем заказ
+        if(m.supportRequest&&m.supportOrderId){
+          updateDoc(doc(db,'orders',m.supportOrderId),{supportRequested:true}).catch(()=>{});
         }
       } else if(ch.type==='removed'){
         document.querySelector(`[data-msg-id="${ch.doc.id}"]`)?.remove();
@@ -1211,6 +1358,31 @@ onAuthStateChanged(auth, async user=>{
     return;
   }
   document.getElementById('appWrap').style.display='block';
+
+  // Автопроверка истекающих обслуживаний
+  async function checkExpiringSupports(){
+    try{
+      const snap = await getDocs(collection(db,'orders'));
+      const now = new Date();
+      for(const d of snap.docs){
+        const o = d.data();
+        if(!o.supportActive||!o.supportExpiresAt||!o.uid) continue;
+        const exp = o.supportExpiresAt.toDate();
+        if(exp < now){ await updateDoc(d.ref,{supportActive:false}).catch(()=>{}); continue; }
+        const daysLeft = (exp-now)/(1000*60*60*24);
+        // Если < 2 дней и ещё не отправлено уведомление сегодня
+        if(daysLeft<2&&!o.expiryNotifSent){
+          await addDoc(collection(db,'notifications',o.uid,'items'),{
+            title:'⚠️ Обслуживание заканчивается',
+            text:`До окончания обслуживания осталось менее 2 дней. Обратитесь в поддержку для продления.`,
+            read:false,createdAt:serverTimestamp()
+          }).catch(()=>{});
+          await updateDoc(d.ref,{expiryNotifSent:true}).catch(()=>{});
+        }
+      }
+    }catch(e){}
+  }
+  checkExpiringSupports();
 
   // Orders
   onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')), snap=>{

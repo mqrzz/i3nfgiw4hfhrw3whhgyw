@@ -200,6 +200,9 @@
     .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;object-fit:contain}
     .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.1rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
 
+    .new-topic-btn{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:150;background:rgba(22,22,30,0.92);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.12);border-radius:50px;padding:.5rem 1.2rem;font-family:'Onest',sans-serif;font-size:.78rem;color:var(--muted);cursor:pointer;display:none;align-items:center;gap:.5rem;transition:all .2s;white-space:nowrap}
+    .new-topic-btn.show{display:flex}
+    .new-topic-btn:hover{color:var(--text);border-color:rgba(255,255,255,.25)}
     .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;
       padding:.5rem 1.2rem;border-radius:50px;font-size:.76rem;font-weight:500;
       opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap;backdrop-filter:blur(12px)}
@@ -208,6 +211,22 @@
     .toast.error{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--error)}
     .toast.info{background:rgba(108,99,255,.18);border:1px solid rgba(108,99,255,.35);color:var(--accent2)}
 
+  
+    /* NAV USER DROPDOWN */
+    .nav-user{position:relative;display:flex}
+    .nav-user-btn{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:.32rem .75rem .32rem .42rem;cursor:pointer;transition:background .18s;font-family:'Onest',sans-serif;font-size:.78rem;color:var(--text,#f0f0f5);font-weight:400}
+    .nav-user-btn:hover{background:rgba(255,255,255,.1)}
+    .nav-user-avatar{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#6c63ff,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+    .nav-user-avatar img{width:100%;height:100%;object-fit:cover}
+    .nav-user-name{max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .nav-dropdown{position:absolute;top:calc(100% + 10px);right:0;background:rgba(22,22,30,0.97);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:.4rem;min-width:170px;box-shadow:0 8px 32px rgba(0,0,0,.5);opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .18s,transform .18s;z-index:300}
+    .nav-dropdown.open{opacity:1;pointer-events:all;transform:translateY(0)}
+    .nav-dd-item{display:flex;align-items:center;gap:8px;padding:.52rem .75rem;border-radius:9px;font-size:.78rem;color:rgba(240,240,245,.7);text-decoration:none;cursor:pointer;transition:background .15s,color .15s;font-family:'Onest',sans-serif;border:none;background:none;width:100%;text-align:left}
+    .nav-dd-item:hover{background:rgba(255,255,255,.07);color:#f0f0f5}
+    .nav-dd-item svg{width:14px;height:14px;flex-shrink:0;opacity:.6}
+    .nav-dd-divider{height:1px;background:rgba(255,255,255,.07);margin:.3rem .4rem}
+    .nav-dd-item.danger{color:rgba(248,113,113,.75)}
+    .nav-dd-item.danger:hover{background:rgba(248,113,113,.08);color:#f87171}
   </style>
 </head>
 <body>
@@ -225,10 +244,9 @@
 <nav class="desktop-nav">
   <a class="logo" href="/"><img src="../img/favicon.png" alt="Antviz" style="width:24px;height:24px;border-radius:6px;object-fit:cover;vertical-align:middle;margin-right:6px">Antviz</a>
   <div class="nav-links">
-    <a href="/">Главная</a>
     <a href="../faq">FAQ</a>
     <a href="../profile">Кабинет</a>
-    <a href="../order" class="nav-cta">Заказать сайт</a>
+    
   </div>
 </nav>
 
@@ -241,8 +259,8 @@
     <div class="chat-hdr-body">
       <div class="chat-av"><img src="../img/favicon.png" alt="Support"/></div>
       <div class="chat-hdr-info">
-        <div class="chat-hdr-name">Design Antviz</div>
-        <div class="chat-hdr-sub"><span class="online-dot"></span>Поддержка · онлайн</div>
+        <div class="chat-hdr-name">Antviz</div>
+        <div class="chat-hdr-sub"><span class="online-dot"></span>Поддержка</div>
       </div>
     </div>
   </div>
@@ -270,6 +288,9 @@
 </div>
 
 
+<button class="new-topic-btn" id="newTopicBtn" onclick="startNewTopic()">
+  ✦ Новая тема
+</button>
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -528,11 +549,25 @@ async function handleTopic(topic){
 
 async function openFreeChat(){
   flowState='open';
+  document.getElementById('newTopicBtn')?.classList.add('show');
   await saveBotMsg('Напишите ваш вопрос — менеджер ответит в ближайшее время.\nДля быстрой навигации используйте кнопки выше.', 'free');
   document.getElementById('chatInput').focus();
 }
 
 /* ── Firestore live listener ── */
+window.startNewTopic = async function(){
+  // Сбрасываем состояние и показываем приветствие заново
+  flowState = 'topic';
+  document.getElementById('newTopicBtn').classList.remove('show');
+  const msgs = document.getElementById('chatMsgs');
+  // Добавляем разделитель
+  const sep = document.createElement('div');
+  sep.style.cssText = 'text-align:center;color:var(--muted);font-size:.68rem;padding:.6rem;opacity:.6';
+  sep.textContent = '─── Новая тема ───';
+  msgs.appendChild(sep);
+  await showWelcome();
+};
+
 function listenChat(uid){
   if(unsubChat) unsubChat();
   const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(100));
@@ -581,6 +616,7 @@ window.sendMsg=async function(){
   }
 
   flowState='open';
+  document.getElementById('newTopicBtn')?.classList.add('show');
   try{
     await setDoc(doc(db,'chats',currentUser.uid),
       {name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
@@ -622,8 +658,35 @@ window.closeLightbox=function(){
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
 
 /* ── Bootstrap ── */
-onAuthStateChanged(auth,async user=>{
+
+  // NAV DROPDOWN
+  window.toggleNavDropdown = function(){
+    document.getElementById('navDropdown')?.classList.toggle('open');
+  };
+  document.addEventListener('click', e=>{
+    const btn = document.getElementById('navUserBtn');
+    const dd = document.getElementById('navDropdown');
+    if(dd&&btn&&!btn.contains(e.target)&&!dd.contains(e.target)) dd.classList.remove('open');
+  });
+  window.navSignOut = async function(){
+    const {signOut} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+    await signOut(auth); window.location.href='/';
+  };
+  // Заполняем имя и аватар (onAuthStateChanged уже есть в этих страницах)
+  function initNavUser(user){
+    const name=user.displayName||user.email?.split('@')[0]||'Профиль';
+    const nameEl=document.getElementById('navUserName');
+    const avatarEl=document.getElementById('navAvatar');
+    if(nameEl) nameEl.textContent=name;
+    if(avatarEl){
+      if(user.photoURL) avatarEl.innerHTML=`<img src="${user.photoURL}" alt="">`;
+      else avatarEl.textContent=name[0].toUpperCase();
+    }
+  }
+
+  onAuthStateChanged(auth,async user=>{
   if(!user){ window.location.href='../auth'; return; }
+  initNavUser(user);
   currentUser=user;
 
   await purgeOldMessages(user.uid);
@@ -658,6 +721,7 @@ onAuthStateChanged(auth,async user=>{
   // Если есть сообщения от админа — сразу открытый чат, бот не мешает
   if(hasAdminMessages){
     flowState = 'open';
+    document.getElementById('newTopicBtn')?.classList.add('show');
   } else if(chatSnap.empty || !hasUserMessages){
     await showWelcome();
   }

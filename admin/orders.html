@@ -725,8 +725,8 @@ window.activateSupport=async(orderId,uid)=>{
   await updateDoc(doc(db,'orders',orderId),{supportActive:true,supportStartedAt:serverTimestamp(),supportExpiresAt:Timestamp.fromDate(exp),supportRequested:false});
   if(uid){
     await addDoc(collection(db,'notifications',uid,'items'),{title:'✅ Обслуживание активировано',text:'Обслуживание подключено на 30 дней. Создавайте заявки в разделе «Обслуживание сайта».',read:false,createdAt:serverTimestamp()});
-    await addDoc(collection(db,'chats',uid,'messages'),{text:'✅ Обслуживание активировано!
-Создавайте заявки в личном кабинете → Обслуживание сайта.',sender:'admin',senderName:'Поддержка',type:'text',read:true,createdAt:serverTimestamp()});
+    
+    await addDoc(collection(db,'chats',uid,'messages'),{text:'✅ Обслуживание активировано! Создавайте заявки в личном кабинете → Обслуживание сайта.',sender:'admin',senderName:'Поддержка',type:'text',read:true,createdAt:serverTimestamp()});
   }
   toast('Активировано ✓','success');
 };

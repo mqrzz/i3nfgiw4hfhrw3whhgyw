@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Отзывы — Antviz Admin</title>
+  <link rel="icon" href="../img/favicon.png"/>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;700;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#07070a;--bg2:#0d0d12;--bg3:#131319;--card:#0f0f15;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+      --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
+      --text:#f0f0f5;--muted:#666678;--muted2:#999aaa;
+      --success:#4ade80;--error:#f87171;--warn:#fbbf24;
+      --sidebar-w:240px;--topbar-h:60px;
+    }
+    html,body{height:100%;font-size:16px}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;display:flex;flex-direction:column}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    ::-webkit-scrollbar{width:4px;height:4px}
+    ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+
+    /* LOADING */
+    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+    .spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+
+    /* SIDEBAR */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s}
+    .sidebar-logo{padding:1.4rem 1.2rem 1rem;display:flex;align-items:center;gap:10px;text-decoration:none;border-bottom:1px solid var(--border)}
+    .sidebar-logo img{width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0}
+    .sidebar-logo-text{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.82rem;color:var(--text)}
+    .sidebar-logo-badge{background:rgba(248,113,113,.15);color:var(--error);border:1px solid rgba(248,113,113,.2);padding:.08rem .45rem;border-radius:50px;font-size:.55rem;font-weight:700;letter-spacing:.07em;margin-left:auto;flex-shrink:0}
+    .sidebar-nav{flex:1;padding:1rem .7rem;overflow-y:auto;display:flex;flex-direction:column;gap:.15rem}
+    .sidebar-section{font-size:.58rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);padding:.6rem .6rem .3rem;font-weight:500}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:.65rem .85rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.84rem;transition:background .15s,color .15s;cursor:pointer;border:none;background:none;width:100%;font-family:'Onest',sans-serif;position:relative}
+    .nav-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+    .nav-item.active{background:rgba(108,99,255,.12);color:var(--accent2)}
+    .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none}
+    .nav-item-badge{position:absolute;right:.7rem;background:var(--error);color:#fff;font-size:.58rem;font-weight:800;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
+    .sidebar-footer{padding:.8rem .7rem;border-top:1px solid var(--border)}
+
+    /* TOPBAR */
+    .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:rgba(7,7,10,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;z-index:90}
+    .topbar-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.95rem}
+    .topbar-right{display:flex;align-items:center;gap:.7rem}
+    .topbar-stat{display:flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.72rem;white-space:nowrap}
+    .topbar-stat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.8rem}
+    .topbar-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.76rem;padding:.35rem .9rem;border-radius:9px;cursor:pointer;transition:all .18s;white-space:nowrap}
+    .topbar-btn:hover{border-color:var(--border2);color:var(--text)}
+    .topbar-btn.danger:hover{border-color:rgba(248,113,113,.4);color:var(--error)}
+    .maint-btn{display:flex;align-items:center;gap:.5rem}
+    .maint-btn.on{border-color:rgba(251,191,36,.3)!important;color:var(--warn)!important}
+    .toggle-track{width:28px;height:16px;background:var(--bg);border-radius:50px;position:relative;border:1px solid var(--border);flex-shrink:0;transition:background .2s}
+    .maint-btn.on .toggle-track{background:rgba(251,191,36,.15);border-color:rgba(251,191,36,.3)}
+    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+    .maint-btn.on .toggle-track::after{transform:translateX(12px);background:var(--warn)}
+
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);flex:1;overflow:auto;min-height:calc(100vh - var(--topbar-h))}
+    .main-inner{padding:1.8rem 2rem;max-width:1400px;animation:fadeIn .25s ease}
+
+    /* CARDS */
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.8rem}
+    .stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1.5rem;transition:border-color .18s}
+    .stat-card:hover{border-color:var(--border2)}
+    .stat-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.5rem;font-weight:500}
+    .stat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.8rem;line-height:1;margin-bottom:.3rem}
+    .stat-sub{font-size:.72rem;color:var(--muted)}
+    .stat-card.green .stat-num{color:var(--success)}
+    .stat-card.purple .stat-num{color:var(--accent2)}
+    .stat-card.blue .stat-num{color:var(--accent3)}
+    .stat-card.warn .stat-num{color:var(--warn)}
+    .stat-card.red .stat-num{color:var(--error)}
+
+    /* SECTION */
+    .section{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1.5rem}
+    .section-hdr{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .section-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem}
+    .section-body{padding:1.2rem 1.4rem}
+    .section-body.no-pad{padding:0}
+
+    /* TABLE */
+    .tbl{width:100%;border-collapse:collapse}
+    .tbl th{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500;padding:.7rem 1rem;text-align:left;border-bottom:1px solid var(--border);background:var(--bg3)}
+    .tbl td{padding:.85rem 1rem;font-size:.84rem;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:hover td{background:rgba(255,255,255,.02)}
+    .tbl-id{font-family:'Unbounded',sans-serif;font-size:.7rem;font-weight:700;color:var(--accent2)}
+
+    /* BADGES */
+    .sbadge{display:inline-flex;align-items:center;gap:.2rem;padding:.22rem .65rem;border-radius:50px;font-size:.66rem;font-weight:600;white-space:nowrap}
+    .sdot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .s0{background:rgba(102,102,120,.12);color:var(--muted2);border:1px solid rgba(102,102,120,.2)}
+    .s1{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
+    .s2{background:rgba(56,189,248,.1);color:var(--accent3);border:1px solid rgba(56,189,248,.18)}
+    .s3{background:rgba(167,139,250,.1);color:var(--accent2);border:1px solid rgba(167,139,250,.18)}
+    .s4{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.18)}
+    .s5{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.18)}
+    .pay-yes{background:rgba(74,222,128,.1);color:var(--success);border:1px solid rgba(74,222,128,.2);display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:50px;font-size:.64rem;font-weight:700}
+    .pay-no{background:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.2);display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:50px;font-size:.64rem;font-weight:700}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.6rem 1.2rem;border-radius:9px;font-family:'Onest',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{box-shadow:0 3px 14px rgba(108,99,255,.35)}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+    .btn-danger{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--error)}
+    .btn-danger:hover{background:rgba(248,113,113,.18)}
+    .btn-success{background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);color:var(--success)}
+    .btn-success:hover{background:rgba(74,222,128,.18)}
+    .btn-sm{padding:.38rem .8rem;font-size:.74rem;border-radius:7px}
+    .btn-xs{padding:.22rem .55rem;font-size:.66rem;border-radius:6px}
+
+    /* FORMS */
+    .form-group{margin-bottom:1rem}
+    .form-label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:.4rem;font-weight:500}
+    .form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.86rem;font-weight:300;outline:none;transition:border-color .18s}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:rgba(108,99,255,.45)}
+    .form-input::placeholder,.form-textarea::placeholder{color:var(--muted)}
+    .form-textarea{resize:vertical;min-height:90px;line-height:1.55}
+    .form-select{cursor:pointer}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+
+    /* SEARCH */
+    .search-box{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.5rem .9rem;transition:border-color .18s}
+    .search-box:focus-within{border-color:rgba(108,99,255,.35)}
+    .search-box svg{width:15px;height:15px;color:var(--muted);flex-shrink:0}
+    .search-box input{background:none;border:none;outline:none;color:var(--text);font-family:'Onest',sans-serif;font-size:.84rem;flex:1;min-width:0}
+    .search-box input::placeholder{color:var(--muted)}
+
+    /* CHAT */
+    .chat-container{display:grid;grid-template-columns:280px 1fr;height:calc(100vh - var(--topbar-h) - 4rem);border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+    .chat-sidebar{background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+    .chat-sidebar-hdr{padding:1rem;border-bottom:1px solid var(--border);flex-shrink:0}
+    .chat-list{flex:1;overflow-y:auto}
+    .chat-list-item{padding:.85rem 1rem;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;transition:background .15s;display:flex;align-items:center;gap:.7rem}
+    .chat-list-item:hover{background:rgba(255,255,255,.03)}
+    .chat-list-item.active{background:rgba(108,99,255,.08)}
+    .chat-list-item.unread{background:rgba(108,99,255,.05)}
+    .chat-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#fff;flex-shrink:0}
+    .chat-av-sm{width:30px;height:30px;font-size:.7rem}
+    .chat-item-info{flex:1;min-width:0}
+    .chat-item-name{font-size:.84rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.1rem}
+    .chat-item-last{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-unread-badge{background:var(--accent);color:#fff;font-size:.6rem;font-weight:800;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;flex-shrink:0}
+    .chat-main{display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+    .chat-hdr{padding:.9rem 1.2rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;flex-shrink:0;background:var(--bg2)}
+    .chat-hdr-info{flex:1;min-width:0}
+    .chat-hdr-name{font-weight:500;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-hdr-sub{font-size:.72rem;color:var(--muted)}
+    .chat-msgs{flex:1;overflow-y:auto;padding:1rem 1.2rem;display:flex;flex-direction:column;gap:.5rem}
+    .msg{max-width:72%;display:flex;flex-direction:column;gap:.1rem}
+    .msg.mine{align-self:flex-end;align-items:flex-end}
+    .msg.theirs{align-self:flex-start;align-items:flex-start}
+    .msg-bubble{padding:.6rem .9rem;border-radius:14px;font-size:.84rem;line-height:1.55;word-break:break-word}
+    .msg.mine .msg-bubble{background:rgba(108,99,255,.22);color:#fff;border:1px solid rgba(108,99,255,.15);border-bottom-right-radius:4px}
+    .msg.theirs .msg-bubble{background:rgba(255,255,255,.07);color:var(--text);border:1px solid var(--border);border-bottom-left-radius:4px}
+    .msg-time{font-size:.63rem;color:var(--muted);display:flex;align-items:center;gap:.3rem}
+    .msg-del-btn{background:none;border:none;color:rgba(255,255,255,.2);cursor:pointer;font-size:.7rem;padding:0;transition:color .15s}
+    .msg-del-btn:hover{color:var(--error)}
+    .msg-img{max-width:200px;max-height:160px;border-radius:9px;display:block;cursor:pointer;border:1px solid var(--border)}
+    .msg-file{display:flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:8px;padding:.4rem .65rem;font-size:.78rem;text-decoration:none;color:var(--text)}
+    .chat-input-row{padding:.8rem 1.2rem;border-top:1px solid var(--border);display:flex;gap:.5rem;align-items:flex-end;flex-shrink:0;background:var(--bg2)}
+    .chat-inp{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:.6rem .9rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.84rem;outline:none;resize:none;max-height:90px;transition:border-color .18s;line-height:1.5}
+    .chat-inp:focus{border-color:rgba(108,99,255,.4)}
+    .chat-icon-btn{width:36px;height:36px;border-radius:9px;background:var(--bg3);border:1px solid var(--border);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .17s}
+    .chat-icon-btn svg{width:15px;height:15px}
+    .chat-icon-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+    .chat-send{background:var(--accent);border-color:var(--accent);color:#fff}
+    .chat-send:hover{box-shadow:0 3px 12px rgba(108,99,255,.4);border-color:var(--accent)!important;color:#fff!important}
+    .chat-empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:.8rem}
+
+    /* DETAIL PANEL */
+    .detail-panel{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden}
+    .detail-hdr{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem}
+    .detail-id{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.9rem;flex:1}
+    .detail-body{padding:1.4rem;overflow-y:auto}
+    .dsec{margin-bottom:1.5rem}
+    .dsec-label{font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.7rem;font-weight:500}
+
+    /* STATUS BUTTONS */
+    .status-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+    .sbtn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.76rem;padding:.65rem .4rem;border-radius:10px;cursor:pointer;transition:all .16s;text-align:center;font-weight:500;line-height:1.35}
+    .sbtn:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
+    .sbtn.sb0.cur{background:rgba(102,102,120,.12);color:var(--muted2);border-color:rgba(102,102,120,.3)}
+    .sbtn.sb1.cur{background:rgba(251,191,36,.1);color:var(--warn);border-color:rgba(251,191,36,.3)}
+    .sbtn.sb2.cur{background:rgba(56,189,248,.1);color:var(--accent3);border-color:rgba(56,189,248,.3)}
+    .sbtn.sb3.cur{background:rgba(167,139,250,.1);color:var(--accent2);border-color:rgba(167,139,250,.3)}
+    .sbtn.sb4.cur{background:rgba(251,191,36,.1);color:var(--warn);border-color:rgba(251,191,36,.3)}
+    .sbtn.sb5.cur{background:rgba(74,222,128,.1);color:var(--success);border-color:rgba(74,222,128,.3)}
+
+    /* INFO GRID */
+    .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+    .info-cell{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.7rem .9rem}
+    .info-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.2rem}
+    .info-val{font-size:.84rem;font-weight:500;word-break:break-word}
+
+    /* TICKETS */
+    .ticket-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:.8rem;transition:border-color .15s}
+    .ticket-card:hover{border-color:var(--border2)}
+    .ticket-card.open{border-left:3px solid var(--accent3)}
+    .ticket-card.done{border-left:3px solid var(--success)}
+    .ticket-card-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.6rem}
+    .ticket-card-title{font-size:.95rem;font-weight:500}
+    .ticket-card-meta{font-size:.76rem;color:var(--muted);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+    .ticket-card-desc{font-size:.82rem;color:var(--muted2);line-height:1.6;margin-bottom:.8rem}
+    .ticket-card-reply{background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.15);border-radius:9px;padding:.7rem .9rem;font-size:.82rem;color:var(--accent2);line-height:1.5;margin-bottom:.8rem}
+    .ticket-reply-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.65rem .9rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.82rem;outline:none;transition:border-color .18s;margin-bottom:.5rem}
+    .ticket-reply-inp:focus{border-color:rgba(108,99,255,.4)}
+    .ticket-reply-inp::placeholder{color:var(--muted)}
+    .ticket-actions{display:flex;gap:.5rem;flex-wrap:wrap}
+
+    /* SUPPORT BLOCK */
+    .support-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.2rem}
+    .support-card.active{border-color:rgba(74,222,128,.25);background:rgba(74,222,128,.04)}
+    .support-card.expiring{border-color:rgba(251,191,36,.3);background:rgba(251,191,36,.04)}
+    .support-card.requested{border-color:rgba(56,189,248,.2);background:rgba(56,189,248,.04)}
+    .support-card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+    .support-card-label{font-size:.86rem;font-weight:500}
+    .support-prog-wrap{margin:.6rem 0}
+    .support-prog-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:.3rem}
+    .support-prog{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden}
+    .support-prog-fill{height:100%;border-radius:3px;background:var(--success);transition:width .4s}
+    .support-prog-fill.warn{background:linear-gradient(90deg,var(--warn),var(--error))}
+
+    /* PROMO */
+    .promo-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.1rem 1.4rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:.6rem;transition:border-color .15s}
+    .promo-card:hover{border-color:var(--border2)}
+    .promo-code-text{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.9rem;letter-spacing:.05em;color:var(--accent2);margin-bottom:.25rem}
+    .promo-meta{font-size:.76rem;color:var(--muted)}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .22s}
+    .modal-overlay.show{opacity:1;pointer-events:all}
+    .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:1.8rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+    .modal-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between}
+    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0;line-height:1}
+    .modal-footer{display:flex;gap:.7rem;margin-top:1.4rem}
+    .modal-footer .btn{flex:1;justify-content:center}
+
+    /* LIGHTBOX */
+    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.95);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+    .lightbox.show{opacity:1;pointer-events:all}
+    .lightbox img{max-width:94vw;max-height:92vh;border-radius:10px;object-fit:contain}
+    .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.1);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1rem}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:600;padding:.6rem 1.3rem;border-radius:10px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;transform:translateY(8px)}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.success{background:var(--success);color:#000}
+    .toast.error{background:var(--error);color:#fff}
+    .toast.info{background:var(--accent);color:#fff}
+    .toast.warn{background:var(--warn);color:#000}
+
+    /* EMPTY STATE */
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;color:var(--muted);gap:.7rem;text-align:center}
+    .empty-state-icon{font-size:2.5rem;opacity:.3}
+    .empty-state-text{font-size:.84rem}
+
+    .review-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:1.2rem 1.4rem;margin-bottom:.8rem;transition:border-color .15s}
+    .review-card:hover{border-color:var(--border2)}
+    .review-card.hidden-card{opacity:.5;border-style:dashed}
+    .stars{color:var(--warn);font-size:1rem;letter-spacing:.1em}
+  </style>
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+  <div class="sidebar" id="sidebar">
+    <a href="/admin" class="sidebar-logo">
+      <img src="../img/favicon.png" alt="Antviz">
+      <span class="sidebar-logo-text">Antviz</span>
+      <span class="sidebar-logo-badge">ADMIN</span>
+    </a>
+    <nav class="sidebar-nav">
+      <div class="sidebar-section">Основное</div>
+      <a href="/admin" class="nav-item" data-page="index">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        Дашборд
+      </a>
+      <a href="/admin/orders" class="nav-item" data-page="orders">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        Заказы
+        <span class="nav-item-badge" id="navBadgeOrders" style="display:none"></span>
+      </a>
+      <a href="/admin/chats" class="nav-item" data-page="chats">
+        <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Чаты
+        <span class="nav-item-badge" id="navBadgeChats" style="display:none"></span>
+      </a>
+      <div class="sidebar-section">Клиенты</div>
+      <a href="/admin/tickets" class="nav-item" data-page="tickets">
+        <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
+        Обслуживание
+        <span class="nav-item-badge" id="navBadgeTickets" style="display:none"></span>
+      </a>
+      <a href="/admin/promos" class="nav-item" data-page="promos">
+        <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
+        Промокоды
+      </a>
+      <div class="sidebar-section">Система</div>
+      <a href="/admin/reviews" class="nav-item" data-page="reviews">
+        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Отзывы
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="nav-item" onclick="doLogout()" style="color:var(--error)">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+        Выйти
+      </button>
+    </div>
+  </div>
+
+<div class="topbar">
+  <div class="topbar-title">Отзывы</div>
+  <div class="topbar-right">
+    <div class="topbar-stat">Всего: <span class="topbar-stat-num" id="totalCount">—</span></div>
+    <div class="topbar-stat">Средняя: <span class="topbar-stat-num" id="avgRating" style="color:var(--warn)">—</span> ★</div>
+  </div>
+</div>
+<div style="margin-left:var(--sidebar-w);margin-top:var(--topbar-h)" id="appWrap" style="display:none">
+  <div class="main-inner">
+    <div style="display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap">
+      <button class="btn btn-ghost btn-sm tab active" onclick="switchFilter('all',this)">Все</button>
+      <button class="btn btn-ghost btn-sm tab" onclick="switchFilter('visible',this)">Опубликованные</button>
+      <button class="btn btn-ghost btn-sm tab" onclick="switchFilter('hidden',this)">Скрытые</button>
+    </div>
+    <div id="reviewsList"><div class="empty-state"><span class="empty-state-icon">⭐</span><span class="empty-state-text">Загрузка...</span></div></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script type="module">
+import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let allReviews=[], currentFilter='all';
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
+document.querySelectorAll('.nav-item[data-page]').forEach(el=>{if(el.dataset.page==='reviews')el.classList.add('active');});
+window.doLogout=async()=>{const {signOut}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");await signOut(auth);window.location.href='/';};
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderReviews();};
+
+function renderReviews(){
+  const el=document.getElementById('reviewsList');
+  let list=allReviews;
+  if(currentFilter==='visible') list=list.filter(r=>!r.hidden);
+  else if(currentFilter==='hidden') list=list.filter(r=>r.hidden);
+  document.getElementById('totalCount').textContent=allReviews.length;
+  const avg=allReviews.length?allReviews.reduce((s,r)=>s+(r.stars||0),0)/allReviews.length:0;
+  document.getElementById('avgRating').textContent=avg.toFixed(1);
+  if(!list.length){el.innerHTML=`<div class="empty-state"><span class="empty-state-icon">⭐</span><span class="empty-state-text">Нет отзывов</span></div>`;return;}
+  el.innerHTML=list.map(r=>`
+    <div class="review-card${r.hidden?' hidden-card':''}">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.6rem">
+        <div>
+          <div style="font-weight:500;font-size:.9rem;margin-bottom:.2rem">${r.authorName||'Аноним'}</div>
+          <div class="stars">${stars(r.stars||0)}</div>
+        </div>
+        <div style="display:flex;gap:.4rem;align-items:center;flex-shrink:0">
+          <span style="font-size:.72rem;color:var(--muted)">${fmtDate(r.createdAt)}</span>
+          <button class="btn ${r.hidden?'btn-success':'btn-ghost'} btn-xs" onclick="toggleReview('${r.id}',${!r.hidden})">${r.hidden?'👁 Показать':'🙈 Скрыть'}</button>
+          <button class="btn btn-danger btn-xs" onclick="deleteReview('${r.id}')">🗑</button>
+        </div>
+      </div>
+      <div style="font-size:.86rem;color:var(--muted2);line-height:1.6">${r.text||'Без текста'}</div>
+      ${r.orderId?`<div style="font-size:.7rem;color:var(--muted);margin-top:.5rem">Заказ: №${r.orderId.slice(0,8).toUpperCase()}</div>`:''}
+    </div>`).join('');
+}
+window.toggleReview=async(id,hidden)=>{await updateDoc(doc(db,'reviews',id),{hidden});toast(hidden?'Скрыт':'Опубликован',hidden?'info':'success');};
+window.deleteReview=async id=>{if(!confirm('Удалить отзыв?'))return;await deleteDoc(doc(db,'reviews',id));toast('Удалён','info');};
+
+onAuthStateChanged(auth,async user=>{
+  document.getElementById('loadingScreen').style.display='none';
+  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
+  document.getElementById('appWrap').style.display='block';
+  onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')),snap=>{
+    allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderReviews();
+  });
+});
+</script>
+</body>
+</html>

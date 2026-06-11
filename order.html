@@ -9,301 +9,482 @@
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{--bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;--border:rgba(255,255,255,0.07);--accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;--text:#f0f0f5;--muted:#777789;--success:#4ade80;--error:#f87171}
+    :root{
+      --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;
+      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+      --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
+      --text:#f0f0f5;--muted:#777789;--muted2:#999aab;
+      --success:#4ade80;--error:#f87171;--warn:#fbbf24;
+    }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;min-height:100vh}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;min-height:100vh;overflow-x:hidden}
     body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-    
-    
-    
-    
-    
-    
-        @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-    
-    
-    .cart-overlay{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:flex-start;justify-content:flex-end;padding:78px 18px 18px}
-    .cart-overlay.show{display:flex}
-    .cart-popup{background:var(--card);border:1px solid rgba(255,255,255,.1);border-radius:20px;width:100%;max-width:370px;max-height:80vh;overflow-y:auto;padding:1.4rem;display:flex;flex-direction:column;gap:.9rem;box-shadow:0 20px 60px rgba(0,0,0,.5)}
-    .cart-head{display:flex;justify-content:space-between;align-items:center}
-    .cart-head h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.88rem}
-    .cart-close{background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer}
-    .cart-close:hover{color:var(--text)}
-    .cart-item{background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.85rem;display:flex;align-items:center;gap:.7rem}
-    .cart-item-info{flex:1}
-    .cart-item-info h4{font-weight:500;font-size:.83rem;margin-bottom:.12rem}
-    .cart-item-info p{color:var(--muted);font-size:.7rem}
-    .ci-actions{display:flex;align-items:center;gap:.28rem;flex-shrink:0}
-    .btn-qty{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center;transition:border-color .2s}
-    .btn-qty:hover{border-color:var(--accent2)}
-    .btn-rm{background:none;border:none;color:var(--error);cursor:pointer;font-size:.7rem;padding:.18rem .38rem;border-radius:5px}
-    .btn-rm:hover{background:rgba(248,113,113,.1)}
-    .cart-empty{text-align:center;color:var(--muted);font-size:.83rem;padding:1.3rem 0}
-    .cart-total{display:flex;justify-content:space-between;align-items:center;background:var(--bg2);border-radius:11px;padding:.85rem}
-    .cart-total-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.15rem;color:var(--accent2)}
-    .btn-checkout{width:100%;background:var(--accent);color:#fff;border:none;border-radius:50px;padding:.82rem;font-family:'Onest',sans-serif;font-size:.88rem;font-weight:500;cursor:pointer;transition:box-shadow .2s;display:flex;align-items:center;justify-content:center;gap:.5rem}
-    .btn-checkout:hover{box-shadow:0 4px 18px rgba(108,99,255,.4)}
-
-    .page-wrap{padding:100px 5vw 80px;max-width:760px;margin:0 auto;position:relative;z-index:1}
-    .breadcrumb{color:var(--muted);font-size:.77rem;margin-bottom:1.4rem}
-    .breadcrumb a{color:var(--muted);text-decoration:none}
-    .section-label{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem;font-weight:500}
-    .page-title{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(2rem,5vw,3.1rem);line-height:1.08;letter-spacing:-.03em;margin-bottom:.7rem}
+    .page-wrap{padding:100px 5vw 80px;max-width:820px;margin:0 auto;position:relative;z-index:1;animation:fadeUp .35s ease}
+    .page-hero{margin-bottom:2.8rem}
+    .page-label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:.7rem;font-weight:500;display:flex;align-items:center;gap:.5rem}
+    .page-label::before{content:'';width:18px;height:1px;background:var(--accent2)}
+    .page-title{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(1.9rem,5vw,3rem);line-height:1.08;letter-spacing:-.03em;margin-bottom:.75rem}
     .page-title span{color:var(--accent2)}
-    .page-sub{color:var(--muted);font-size:.93rem;margin-bottom:2.2rem}
+    .page-sub{color:var(--muted);font-size:.92rem;max-width:480px;line-height:1.7}
 
-    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.7rem;margin-bottom:1.1rem}
-    .card-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.86rem;margin-bottom:1.15rem;display:flex;align-items:center;gap:.55rem}
-    .step-badge{background:var(--accent);color:#fff;width:21px;height:21px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+    /* PACKAGES */
+    .packages-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem}
+    .pkg-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:1.4rem 1.2rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+    .pkg-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(108,99,255,.08),transparent 70%);opacity:0;transition:opacity .3s}
+    .pkg-card:hover{border-color:rgba(108,99,255,.3);transform:translateY(-2px)}
+    .pkg-card:hover::before{opacity:1}
+    .pkg-card.sel{border-color:var(--accent2);background:rgba(108,99,255,.08)}
+    .pkg-card.sel::before{opacity:1}
+    .pkg-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:.55rem;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .75rem;border-radius:0 0 9px 9px;font-weight:700;white-space:nowrap}
+    .pkg-icon{font-size:1.6rem;margin-bottom:.65rem}
+    .pkg-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:.3rem}
+    .pkg-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.5rem;color:var(--accent2);line-height:1;margin-bottom:.2rem}
+    .pkg-price small{font-size:.62rem;color:var(--muted);font-weight:300;font-family:'Onest',sans-serif}
+    .pkg-pages{font-size:.7rem;color:var(--muted);margin-bottom:.8rem}
+    .pkg-features{display:flex;flex-direction:column;gap:.3rem}
+    .pkg-feature{font-size:.72rem;color:var(--muted2);display:flex;align-items:flex-start;gap:.4rem;line-height:1.4}
+    .pkg-feature::before{content:'✓';color:var(--success);font-weight:700;flex-shrink:0;font-size:.7rem;margin-top:.05rem}
 
-    .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:.55rem}
-    .type-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:13px;padding:.85rem .7rem;text-align:center;cursor:pointer;transition:all .17s;user-select:none}
+    /* DIVIDER */
+    .or-divider{display:flex;align-items:center;gap:1rem;margin:1.6rem 0;color:var(--muted);font-size:.75rem}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+    /* CARD */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.6rem;margin-bottom:1rem;transition:border-color .2s}
+    .card-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.84rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.55rem}
+    .step-n{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+
+    /* TYPE GRID */
+    .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}
+    .type-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:14px;padding:.9rem .7rem;text-align:center;cursor:pointer;transition:all .17s;user-select:none}
     .type-card:hover{border-color:rgba(108,99,255,.35)}
     .type-card.sel{border-color:var(--accent2);background:rgba(108,99,255,.1)}
-    .type-card .ti{font-size:1.4rem;margin-bottom:.25rem}
-    .type-card .tn{font-size:.76rem;font-weight:500}
-    .type-card .ts{font-size:.64rem;color:var(--muted);margin-top:.08rem}
+    .type-card .ti{font-size:1.5rem;margin-bottom:.3rem}
+    .type-card .tn{font-size:.78rem;font-weight:500;margin-bottom:.05rem}
+    .type-card .ts{font-size:.65rem;color:var(--muted)}
 
-    .tariff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.4rem}
-    .tariff-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:15px;padding:1rem;cursor:pointer;transition:all .17s;user-select:none;position:relative}
-    .tariff-card:hover{border-color:rgba(108,99,255,.35)}
-    .tariff-card.sel{border-color:var(--accent2);background:rgba(108,99,255,.1)}
-    .tariff-best{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.58rem;letter-spacing:.05em;text-transform:uppercase;padding:.13rem .55rem;border-radius:50px;font-weight:700;white-space:nowrap}
-    .tariff-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.8rem;margin-bottom:.22rem}
-    .tariff-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.25rem;color:var(--accent2)}
-    .tariff-price small{font-size:.66rem;color:var(--muted);font-weight:300}
-    .tariff-min{font-size:.66rem;color:var(--muted);margin-top:.18rem}
-
-    .pages-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.55rem}
-    .pages-label span{color:var(--accent2);font-weight:700}
-    .pages-row{display:flex;align-items:center;gap:.9rem}
+    /* PAGES SLIDER */
+    .pages-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem}
+    .pages-label span{color:var(--accent2);font-weight:700;font-family:'Unbounded',sans-serif}
+    .pages-row{display:flex;align-items:center;gap:1rem}
     .pages-slider{flex:1;-webkit-appearance:none;height:4px;background:var(--bg3);border-radius:2px;outline:none;cursor:pointer}
-    .pages-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 3px rgba(108,99,255,.2)}
-    .pages-disp{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem;min-width:38px;text-align:center;color:var(--accent2)}
+    .pages-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 4px rgba(108,99,255,.2)}
+    .pages-disp{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.5rem;min-width:42px;text-align:center;color:var(--accent2)}
 
+    /* EXTRAS */
     .extras-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
-    .extra-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:13px;padding:.85rem .95rem;cursor:pointer;transition:all .17s;user-select:none;display:flex;gap:.65rem;align-items:flex-start}
-    .extra-card:hover{border-color:rgba(108,99,255,.35)}
-    .extra-card.on{border-color:var(--accent2);background:rgba(108,99,255,.1)}
-    .extra-card.disabled{opacity:.5;cursor:default;pointer-events:none}
-    .extra-check{width:17px;height:17px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .14s;font-size:.62rem;font-weight:700}
+    .extra-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:15px;padding:1rem 1.05rem;cursor:pointer;transition:all .17s;user-select:none}
+    .extra-card:hover{border-color:rgba(108,99,255,.3)}
+    .extra-card.on{border-color:var(--accent2);background:rgba(108,99,255,.08)}
+    .extra-card.disabled{opacity:.45;cursor:default;pointer-events:none}
+    .extra-top{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.55rem}
+    .extra-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .14s;font-size:.65rem;font-weight:700;color:transparent}
     .extra-card.on .extra-check{background:var(--accent);border-color:var(--accent);color:#fff}
-    .extra-icon{font-size:1rem;flex-shrink:0}
-    .extra-title{font-weight:500;font-size:.8rem;margin-bottom:.08rem}
-    .extra-desc{color:var(--muted);font-size:.68rem;line-height:1.4}
-    .extra-price{font-size:.72rem;font-weight:600;margin-top:.22rem}
-    .extra-price.free{color:var(--success)}.extra-price.paid{color:var(--accent2)}
+    .extra-icon{font-size:1.25rem;flex-shrink:0}
+    .extra-body{flex:1}
+    .extra-title{font-weight:500;font-size:.82rem;margin-bottom:.06rem;display:flex;align-items:center;gap:.4rem}
+    .extra-wip{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.2);font-size:.55rem;padding:.08rem .4rem;border-radius:50px;font-weight:600;white-space:nowrap}
+    .extra-desc{color:var(--muted);font-size:.7rem;line-height:1.5}
+    .extra-price{font-size:.74rem;font-weight:600;margin-top:.4rem;color:var(--accent2)}
+    .extra-price.free{color:var(--success)}
+    .extra-divider{height:1px;background:var(--border);margin:.45rem 0}
 
-    .price-bar{background:linear-gradient(135deg,rgba(108,99,255,.12),rgba(167,139,250,.06));border:1px solid rgba(108,99,255,.22);border-radius:17px;padding:1.3rem 1.5rem;margin-bottom:1.1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.9rem}
-    .pb-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.8rem;color:var(--accent2)}
-    .pb-breakdown{color:var(--muted);font-size:.72rem;margin-top:.12rem}
+    /* DOMAIN TOGGLE */
+    .domain-toggle{display:flex;gap:.4rem;margin-top:.55rem}
+    .dtoggle-btn{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.72rem;padding:.42rem .5rem;border-radius:8px;cursor:pointer;transition:all .15s;text-align:center}
+    .dtoggle-btn:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
+    .dtoggle-btn.sel{background:rgba(108,99,255,.1);border-color:var(--accent2);color:var(--accent2)}
+    .domain-hint{font-size:.68rem;color:var(--muted);margin-top:.4rem;line-height:1.5}
 
-    .btn{display:inline-flex;align-items:center;gap:7px;padding:.75rem 1.5rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.88rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .14s,box-shadow .2s}
-    .btn:hover{transform:translateY(-2px)}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(108,99,255,.3)}
-    .btn-primary:hover{box-shadow:0 6px 28px rgba(108,99,255,.48)}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
-    .btn-sm{padding:.42rem .9rem;font-size:.77rem}
+    /* PROMO */
+    .promo-row{display:flex;gap:.5rem}
+    .promo-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.65rem .95rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.86rem;outline:none;transition:border-color .2s;text-transform:uppercase;letter-spacing:.06em}
+    .promo-inp:focus{border-color:rgba(108,99,255,.4)}
+    .promo-inp::placeholder{color:var(--muted);text-transform:none;letter-spacing:0}
+    .promo-apply{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.78rem;padding:.65rem 1.1rem;border-radius:11px;cursor:pointer;transition:all .17s;white-space:nowrap;flex-shrink:0}
+    .promo-apply:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
+    .promo-msg{font-size:.74rem;margin-top:.45rem;display:none}
 
+    /* PRICE BAR */
+    .price-bar{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(167,139,250,.05));border:1px solid rgba(108,99,255,.2);border-radius:18px;padding:1.3rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    .pb-left{}
+    .pb-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem}
+    .pb-price-row{display:flex;align-items:baseline;gap:.6rem}
+    .pb-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2rem;color:var(--accent2)}
+    .pb-original{font-size:.85rem;color:var(--muted);text-decoration:line-through;display:none}
+    .pb-breakdown{color:var(--muted);font-size:.72rem;margin-top:.15rem}
+    .pb-discount{font-size:.72rem;color:var(--success);margin-top:.1rem;display:none}
+
+    /* FORM */
     .form-group{margin-bottom:1rem}
-    .form-label{display:block;font-size:.68rem;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.42rem}
+    .form-label{display:block;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;font-weight:500}
     .req{color:var(--accent2)}
-    .form-input,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.7rem .95rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s,box-shadow .2s}
+    .form-input,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s,box-shadow .2s}
     .form-input:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
     .form-input.err{border-color:var(--error)!important}
-    .form-textarea{resize:vertical;min-height:85px}
+    .form-textarea{resize:vertical;min-height:90px;line-height:1.6}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
-    .errmsg{color:var(--error);font-size:.7rem;margin-top:.2rem;display:none}
+    .errmsg{color:var(--error);font-size:.7rem;margin-top:.22rem;display:none}
     .errmsg.show{display:block}
-    .file-zone{border:1.5px dashed var(--border);border-radius:11px;padding:1rem;text-align:center;cursor:pointer;background:var(--bg3);transition:border-color .2s}
-    .file-zone:hover{border-color:var(--accent2)}
-    .file-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.55rem}
-    .file-chip{display:flex;align-items:center;gap:.35rem;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);border-radius:7px;padding:.2rem .5rem;font-size:.68rem;color:var(--accent2)}
-    .file-chip button{background:none;border:none;color:var(--muted);cursor:pointer;padding:0 .1rem}
+    .file-zone{border:1.5px dashed rgba(255,255,255,.1);border-radius:13px;padding:1.2rem;text-align:center;cursor:pointer;background:var(--bg3);transition:all .2s}
+    .file-zone:hover{border-color:rgba(108,99,255,.4);background:rgba(108,99,255,.04)}
+    .file-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.6rem}
+    .file-chip{display:flex;align-items:center;gap:.35rem;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.18);border-radius:7px;padding:.22rem .55rem;font-size:.68rem;color:var(--accent2)}
+    .file-chip button{background:none;border:none;color:var(--muted);cursor:pointer;padding:0 .1rem;font-size:.75rem}
     .file-chip button:hover{color:var(--error)}
-    .agree-row{display:flex;align-items:flex-start;gap:.65rem;margin-top:1rem;cursor:pointer}
-    .agree-box{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .18s;background:var(--bg3);font-size:.68rem;font-weight:700}
+    .info-box{background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.14);border-radius:11px;padding:.85rem 1rem;font-size:.77rem;color:var(--muted);line-height:1.6;margin-bottom:.5rem}
+    .info-box strong{color:var(--accent2)}
+    .agree-row{display:flex;align-items:flex-start;gap:.65rem;margin-top:1.1rem;cursor:pointer}
+    .agree-box{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .18s;background:var(--bg3);font-size:.68rem;font-weight:700;color:transparent}
     .agree-box.checked{background:var(--accent);border-color:var(--accent);color:#fff}
     .agree-box.errbdr{border-color:var(--error)!important}
-    .agree-text{font-size:.8rem;color:var(--muted)}
+    .agree-text{font-size:.8rem;color:var(--muted);line-height:1.5}
     .agree-text a{color:var(--accent2);text-decoration:none}
     .agree-text a:hover{text-decoration:underline}
-    .submit-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:50px;padding:.95rem 2rem;font-family:'Onest',sans-serif;font-size:.97rem;font-weight:500;cursor:pointer;transition:box-shadow .2s,transform .14s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:.5rem;margin-top:1.3rem}
-    .submit-btn:hover{box-shadow:0 6px 28px rgba(108,99,255,.44);transform:translateY(-2px)}
+    .submit-btn{width:100%;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:50px;padding:1rem 2rem;font-family:'Onest',sans-serif;font-size:.97rem;font-weight:500;cursor:pointer;transition:box-shadow .2s,transform .14s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:.55rem;margin-top:1.3rem;letter-spacing:.01em}
+    .submit-btn:hover{box-shadow:0 8px 30px rgba(108,99,255,.45);transform:translateY(-2px)}
     .submit-btn:disabled{opacity:.5;cursor:default;transform:none!important;box-shadow:none!important}
-    .form-note{color:var(--muted);font-size:.68rem;text-align:center;margin-top:.55rem}
+    .form-note{color:var(--muted);font-size:.68rem;text-align:center;margin-top:.6rem}
 
-    .success-wrap{display:none;flex-direction:column;align-items:center;text-align:center;padding:2.8rem 1rem;gap:.9rem}
+    /* SUCCESS */
+    .success-wrap{display:none;flex-direction:column;align-items:center;text-align:center;padding:3rem 1rem;gap:1rem}
     .success-wrap.show{display:flex}
-    @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-    .success-icon{font-size:3.2rem;animation:pop .4s ease}
-    .success-wrap h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.35rem}
-    .success-wrap p{color:var(--muted);max-width:320px}
+    .success-icon{font-size:3.5rem;animation:pop .4s ease}
+    .success-wrap h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem}
+    .success-wrap p{color:var(--muted);max-width:340px;line-height:1.65}
 
+    /* TOAST */
     .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);z-index:300;padding:.6rem 1.3rem;border-radius:50px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--success);color:#000}
     .toast.info{background:var(--accent);color:#fff}
     .toast.error{background:var(--error);color:#fff}
+    .toast.warn{background:var(--warn);color:#000}
+
+    /* BTN */
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:.72rem 1.5rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.86rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .14s,box-shadow .2s}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(108,99,255,.3)}
+    .btn-primary:hover{box-shadow:0 6px 28px rgba(108,99,255,.48)}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
 
     @media(max-width:1024px){
-      
-      .page-wrap{padding:1.2rem .9rem 100px;max-width:100%;overflow-x:hidden}
-      .tariff-grid{grid-template-columns:1fr}
+      .page-wrap{padding:1.2rem .9rem 100px;max-width:100%}
+      .packages-grid{grid-template-columns:1fr}
       .extras-grid{grid-template-columns:1fr}
       .form-row{grid-template-columns:1fr}
-      .cart-overlay{padding:14px 10px}
-      .cart-popup{max-width:100%;width:100%}
-      .footer-links{justify-content:center}
-      .type-grid{grid-template-columns:repeat(2,1fr)}
-      .pages-grid{grid-template-columns:repeat(4,1fr)}
-      .card{padding:1rem}
-      .price-bar{flex-wrap:wrap;gap:.6rem;padding:.9rem 1rem}
-      .file-zone{padding:1.2rem}
-      .form-input,.form-textarea{font-size:.9rem}
-      body{overflow-x:hidden}
     }
-    @media(max-width:480px){
+    @media(max-width:640px){
       .page-wrap{padding:.9rem .75rem 90px}
-      .type-grid{grid-template-columns:1fr 1fr}
-      .pages-grid{grid-template-columns:repeat(3,1fr)}
-      .tariff-card{padding:.85rem}
-      .btn{padding:.6rem 1rem;font-size:.8rem}
-      .price-bar .pb-price{font-size:1.4rem}
-      .step-badge{width:26px;height:26px;font-size:.65rem}
-      .card-title{font-size:.8rem}
+      .packages-grid{grid-template-columns:1fr}
+      .type-grid{grid-template-columns:repeat(2,1fr)}
+      .pb-price{font-size:1.5rem}
+      .page-title{font-size:1.7rem}
     }
-
-  
-    
   </style>
 </head>
 <body>
 <script src="nav.js" data-page="order"></script>
 
-<div class="cart-overlay" id="cartOverlay" onclick="if(event.target===this)toggleCart()">
-  <div class="cart-popup" id="cartPopup"></div>
-</div>
-
 <div class="page-wrap">
-  <div class="breadcrumb"><a href="/" id="navHome">Главная</a> / Заказать</div>
-  <p class="section-label">Конструктор заказа</p>
-  <h1 class="page-title">Собери свой<br/><span>сайт</span></h1>
-  <p class="page-sub">Выбери параметры — цена считается сразу.</p>
 
-  <!-- STEP 1 -->
+  <div class="page-hero">
+    <div class="page-label">Конструктор заказа</div>
+    <h1 class="page-title">Создадим сайт<br/><span>под ваш проект</span></h1>
+    <p class="page-sub">Выберите готовый пакет или соберите сайт под себя. Цена считается в реальном времени.</p>
+  </div>
+
+  <!-- PACKAGES -->
+  <div style="margin-bottom:.55rem">
+    <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.85rem;font-weight:500">Готовые пакеты</div>
+    <div class="packages-grid">
+
+      <div class="pkg-card" data-pkg="start" data-price="3900" data-pages="1" data-maxpages="1" onclick="selectPackage(this)">
+        <div class="pkg-icon">🚀</div>
+        <div class="pkg-name">Старт</div>
+        <div class="pkg-price">3 900 <small>₽</small></div>
+        <div class="pkg-pages">1 страница · лендинг</div>
+        <div class="pkg-features">
+          <div class="pkg-feature">Адаптивный дизайн</div>
+          <div class="pkg-feature">Форма заявки</div>
+          <div class="pkg-feature">Подключение к домену</div>
+          <div class="pkg-feature">Бесплатный хостинг</div>
+          <div class="pkg-feature">Срок: 5–7 дней</div>
+        </div>
+      </div>
+
+      <div class="pkg-card sel" data-pkg="optimal" data-price="9900" data-pages="5" data-maxpages="5" onclick="selectPackage(this)">
+        <div class="pkg-badge">Популярный</div>
+        <div class="pkg-icon">⚡</div>
+        <div class="pkg-name">Оптимальный</div>
+        <div class="pkg-price">9 900 <small>₽</small></div>
+        <div class="pkg-pages">до 5 страниц</div>
+        <div class="pkg-features">
+          <div class="pkg-feature">Всё из пакета «Старт»</div>
+          <div class="pkg-feature">Галерея и портфолио</div>
+          <div class="pkg-feature">Карта и контакты</div>
+          <div class="pkg-feature">Интеграция соцсетей</div>
+          <div class="pkg-feature">Срок: 7–10 дней</div>
+        </div>
+      </div>
+
+      <div class="pkg-card" data-pkg="business" data-price="19900" data-pages="10" data-maxpages="10" onclick="selectPackage(this)">
+        <div class="pkg-icon">💼</div>
+        <div class="pkg-name">Бизнес</div>
+        <div class="pkg-price">19 900 <small>₽</small></div>
+        <div class="pkg-pages">до 10 страниц</div>
+        <div class="pkg-features">
+          <div class="pkg-feature">Всё из «Оптимального»</div>
+          <div class="pkg-feature">Каталог с фильтрами</div>
+          <div class="pkg-feature">Форма заказа / корзина</div>
+          <div class="pkg-feature">SEO-оптимизация</div>
+          <div class="pkg-feature">Срок: 10–14 дней</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="or-divider">или настройте вручную</div>
+
+  <!-- STEP 1: TYPE -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">1</span> Тип сайта</div>
+    <div class="card-title"><span class="step-n">1</span> Тип сайта</div>
     <div class="type-grid">
-      <div class="type-card sel" data-type="Лендинг" onclick="selType(this)"><div class="ti">🎯</div><div class="tn">Лендинг</div><div class="ts">1 страница</div></div>
-      <div class="type-card" data-type="Многостраничный" onclick="selType(this)"><div class="ti">📄</div><div class="tn">Многостраничный</div><div class="ts">2+ страниц</div></div>
+      <div class="type-card" data-type="Лендинг" onclick="selType(this)"><div class="ti">🎯</div><div class="tn">Лендинг</div><div class="ts">1 страница</div></div>
+      <div class="type-card" data-type="Многостраничный" onclick="selType(this)"><div class="ti">📄</div><div class="tn">Многостраничный</div><div class="ts">Сайт-визитка</div></div>
       <div class="type-card" data-type="Портфолио" onclick="selType(this)"><div class="ti">🎨</div><div class="tn">Портфолио</div><div class="ts">Галерея работ</div></div>
+      <div class="type-card" data-type="Интернет-магазин" onclick="selType(this)"><div class="ti">🛒</div><div class="tn">Интернет-магазин</div><div class="ts">Каталог + корзина</div></div>
       <div class="type-card" data-type="Блог" onclick="selType(this)"><div class="ti">✍️</div><div class="tn">Блог</div><div class="ts">Статьи и записи</div></div>
       <div class="type-card" data-type="Другое" onclick="selType(this)"><div class="ti">✨</div><div class="tn">Другое</div><div class="ts">Обсудим</div></div>
     </div>
   </div>
 
-  <!-- STEP 2 -->
+  <!-- STEP 2: PAGES + TARIFF -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">2</span> Тариф и количество страниц</div>
-    <div class="tariff-grid">
-      <div class="tariff-card" data-price="250" data-min="1" onclick="selTariff(this)"><div class="tariff-name">Базовый</div><div class="tariff-price">250 <small>₽/стр</small></div><div class="tariff-min">Любое кол-во</div></div>
-      <div class="tariff-card sel" data-price="225" data-min="5" onclick="selTariff(this)"><div class="tariff-best">Выгодно</div><div class="tariff-name">Стандарт</div><div class="tariff-price">225 <small>₽/стр</small></div><div class="tariff-min">Мин. 5 страниц</div></div>
-      <div class="tariff-card" data-price="200" data-min="10" onclick="selTariff(this)"><div class="tariff-name">Премиум</div><div class="tariff-price">200 <small>₽/стр</small></div><div class="tariff-min">Мин. 10 страниц</div></div>
+    <div class="card-title"><span class="step-n">2</span> Количество страниц</div>
+    <div style="display:flex;gap:.5rem;margin-bottom:1.1rem;flex-wrap:wrap">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem 1rem;font-size:.76rem;flex:1;min-width:120px">
+        <div style="color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem">Цена за страницу</div>
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700;color:var(--accent2)" id="pricePerPageDisp">650 ₽</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem 1rem;font-size:.76rem;flex:1;min-width:120px">
+        <div style="color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem">Минимум страниц</div>
+        <div style="font-family:'Unbounded',sans-serif;font-weight:700;color:var(--text)" id="minPagesDisp">1</div>
+      </div>
     </div>
-    <div class="pages-label">Количество страниц: <span id="pagesLbl">5</span></div>
+    <div class="pages-label">Страниц: <span id="pagesLbl">5</span></div>
     <div class="pages-row">
-      <input type="range" class="pages-slider" id="pagesSlider" min="5" max="30" value="5" oninput="updatePages()"/>
+      <input type="range" class="pages-slider" id="pagesSlider" min="1" max="30" value="5" oninput="onSlider()"/>
       <span class="pages-disp" id="pagesDisp">5</span>
     </div>
+    <div style="font-size:.68rem;color:var(--muted);margin-top:.65rem;line-height:1.5">
+      💡 Не знаете сколько страниц нужно? Напишите в описании — поможем разобраться.
+    </div>
   </div>
 
-  <!-- STEP 3 -->
+  <!-- STEP 3: EXTRAS -->
   <div class="card">
-    <div class="card-title"><span class="step-badge">3</span> Дополнения</div>
+    <div class="card-title"><span class="step-n">3</span> Дополнительные услуги</div>
     <div class="extras-grid">
-      <div class="extra-card on disabled"><div class="extra-check">✓</div><div class="extra-icon">🚀</div><div><div class="extra-title">Бесплатный хостинг</div><div class="extra-desc">SSL, CDN, навсегда</div><div class="extra-price free">Бесплатно</div></div></div>
-      <div class="extra-card" id="extraDomain" onclick="toggleExtra(this)"><div class="extra-check"></div><div class="extra-icon">🌐</div><div><div class="extra-title">Домен .ru</div><div class="extra-desc">Регистрация + подключение</div><div class="extra-price paid">+200 ₽ / +600 ₽ в год</div></div></div>
-      <div class="extra-card" id="extraSupport" onclick="toggleExtra(this)"><div class="extra-check"></div><div class="extra-icon">🔧</div><div><div class="extra-title">Поддержка 1 месяц</div><div class="extra-desc">Правки текстов и картинок</div><div class="extra-price paid">+500 ₽</div></div></div>
-      <div class="extra-card" id="extraUrgent" onclick="toggleExtra(this)"><div class="extra-check"></div><div class="extra-icon">⚡</div><div><div class="extra-title">Срочность</div><div class="extra-desc">Готово за 1 рабочий день</div><div class="extra-price paid">+30%</div></div></div>
+
+      <!-- Домен -->
+      <div class="extra-card" id="extraDomain" style="grid-column:span 2">
+        <div class="extra-top">
+          <div class="extra-check" id="domainCheck">✓</div>
+          <div class="extra-icon">🌐</div>
+          <div class="extra-body">
+            <div class="extra-title">Домен</div>
+            <div class="extra-desc">Адрес вашего сайта в интернете — например, mycompany.ru. Можем зарегистрировать новый или подключить уже существующий.</div>
+            <div class="extra-divider"></div>
+            <div class="domain-toggle">
+              <button class="dtoggle-btn sel" id="dtnew" onclick="setDomainOpt('new',event)">🛒 Зарегистрировать .ru — +650 ₽/год</button>
+              <button class="dtoggle-btn" id="dtowner" onclick="setDomainOpt('own',event)">🔗 У меня есть — подключим бесплатно</button>
+            </div>
+            <div class="domain-hint" id="domainHint">Регистрация домена .ru на 1 год включена в стоимость. Продление домена ~650 ₽/год — оплачивается самостоятельно.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Хостинг -->
+      <div class="extra-card on disabled">
+        <div class="extra-top">
+          <div class="extra-check" style="background:var(--success);border-color:var(--success);color:#000">✓</div>
+          <div class="extra-icon">🚀</div>
+          <div class="extra-body">
+            <div class="extra-title">Хостинг</div>
+            <div class="extra-desc">Мы размещаем ваш сайт на нашем сервере — бесплатно и навсегда. Включает SSL-сертификат (замочек в браузере) и быструю загрузку.</div>
+            <div class="extra-price free">Бесплатно навсегда</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Поддержка -->
+      <div class="extra-card" id="extraSupport" onclick="toggleExtra(this,'support')">
+        <div class="extra-top">
+          <div class="extra-check">✓</div>
+          <div class="extra-icon">🔧</div>
+          <div class="extra-body">
+            <div class="extra-title">Обслуживание сайта</div>
+            <div class="extra-desc">Ежемесячное обслуживание: правки текстов, замена фотографий, мелкие изменения по вашему запросу. Отправляете заявку — мы делаем.</div>
+            <div class="extra-price paid">+500 ₽ / месяц</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SEO -->
+      <div class="extra-card" id="extraSeo" onclick="toggleExtra(this,'seo')">
+        <div class="extra-top">
+          <div class="extra-check">✓</div>
+          <div class="extra-icon">📈</div>
+          <div class="extra-body">
+            <div class="extra-title">SEO-оптимизация</div>
+            <div class="extra-desc">Настройка сайта для поисковых систем: мета-теги, заголовки, описания, robots.txt, sitemap. Помогает сайту появляться в Яндексе и Google.</div>
+            <div class="extra-price paid">+2 500 ₽</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Контент -->
+      <div class="extra-card" id="extraContent" onclick="toggleExtra(this,'content')">
+        <div class="extra-top">
+          <div class="extra-check">✓</div>
+          <div class="extra-icon">✍️</div>
+          <div class="extra-body">
+            <div class="extra-title">Наполнение контентом</div>
+            <div class="extra-desc">Напишем тексты для вашего сайта: описание компании, услуги, преимущества. Вы предоставляете информацию — мы оформляем.</div>
+            <div class="extra-price paid">+2 000 ₽</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Корзина -->
+      <div class="extra-card" id="extraShop" onclick="toggleExtra(this,'shop')">
+        <div class="extra-top">
+          <div class="extra-check">✓</div>
+          <div class="extra-icon">🛒</div>
+          <div class="extra-body">
+            <div class="extra-title">Корзина и каталог</div>
+            <div class="extra-desc">Каталог товаров с фильтрами, карточки товаров, корзина и форма оформления заказа. Идеально для интернет-магазина.</div>
+            <div class="extra-price paid">+4 900 ₽</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Срочность -->
+      <div class="extra-card" id="extraUrgent" onclick="toggleExtra(this,'urgent')">
+        <div class="extra-top">
+          <div class="extra-check">✓</div>
+          <div class="extra-icon">⚡</div>
+          <div class="extra-body">
+            <div class="extra-title">Срочное выполнение</div>
+            <div class="extra-desc">Сделаем сайт за 2–3 рабочих дня вместо стандартных 7–14. Берём в приоритетную очередь — работаем сверхурочно.</div>
+            <div class="extra-price paid">+30% к цене</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Telegram — WIP -->
+      <div class="extra-card disabled" onclick="showWip(event)">
+        <div class="extra-top">
+          <div class="extra-check">✓</div>
+          <div class="extra-icon">📱</div>
+          <div class="extra-body">
+            <div class="extra-title">Telegram-уведомления <span class="extra-wip">В разработке</span></div>
+            <div class="extra-desc">Получайте уведомления о новых заявках прямо в Telegram. Скоро появится в нашем сервисе.</div>
+            <div class="extra-price paid">+1 500 ₽</div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- PROMO CODE -->
-  <div class="card" id="promoCard" style="margin-bottom:1.1rem">
-    <div class="card-title"><span class="step-badge" style="background:var(--accent2)">🏷</span> Промокод</div>
-    <div style="display:flex;gap:.55rem">
-      <input class="form-input" id="promoInput" type="text" placeholder="Введите промокод..." style="text-transform:uppercase;letter-spacing:.06em"/>
-      <button class="btn btn-ghost btn-sm" id="promoApplyBtn" onclick="applyPromo()" style="white-space:nowrap;flex-shrink:0">Применить</button>
+  <!-- PROMO -->
+  <div class="card">
+    <div class="card-title" style="margin-bottom:.9rem">
+      <span style="font-size:1rem">🏷</span> Промокод
     </div>
-    <div id="promoMsg" style="font-size:.74rem;margin-top:.45rem;display:none"></div>
+    <div class="promo-row">
+      <input class="promo-inp" id="promoInput" type="text" placeholder="Введите промокод..."/>
+      <button class="promo-apply" id="promoApplyBtn" onclick="applyPromo()">Применить</button>
+    </div>
+    <div class="promo-msg" id="promoMsg"></div>
   </div>
 
   <!-- PRICE BAR -->
   <div class="price-bar">
-    <div>
-      <div style="font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.18rem">Итого</div>
-      <div style="display:flex;align-items:baseline;gap:.55rem">
-        <div class="pb-price" id="totalPrice">1 125 ₽</div>
-        <div id="priceOriginal" style="font-size:.8rem;color:var(--muted);text-decoration:line-through;display:none"></div>
+    <div class="pb-left">
+      <div class="pb-label">Итоговая стоимость</div>
+      <div class="pb-price-row">
+        <div class="pb-price" id="totalPrice">9 900 ₽</div>
+        <div class="pb-original" id="priceOriginal"></div>
       </div>
-      <div class="pb-breakdown" id="totalBreakdown">225 ₽ × 5 стр</div>
-      <div id="promoDiscount" style="font-size:.72rem;color:var(--success);margin-top:.15rem;display:none"></div>
+      <div class="pb-breakdown" id="totalBreakdown">Пакет «Оптимальный»</div>
+      <div class="pb-discount" id="promoDiscount"></div>
     </div>
-    <button class="btn btn-primary" onclick="addToCart()">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 01-8 0"/></svg>В корзину
+    <button class="btn btn-primary" onclick="scrollToForm()">
+      Оформить заказ
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
 
-  <!-- STEP 4: FORM — only shown when logged in -->
+  <!-- STEP 4: FORM -->
   <div class="card" id="formCard">
-    <div class="card-title"><span class="step-badge" style="background:var(--accent3)">4</span> Детали проекта</div>
+    <div class="card-title"><span class="step-n" style="background:var(--accent3)">4</span> Детали проекта</div>
     <div id="formInner">
       <div class="form-group">
         <label class="form-label">Расскажите о проекте</label>
-        <textarea class="form-textarea" id="fdesc" placeholder="Чем занимаетесь, что должно быть на сайте, примеры стиля..."></textarea>
+        <textarea class="form-textarea" id="fdesc" placeholder="Чем занимается компания, что должно быть на сайте, есть ли примеры стиля или конкуренты которые нравятся..."></textarea>
       </div>
+
       <div class="form-group">
-        <label class="form-label">Фавикон сайта <span style="font-weight:400;color:var(--muted);font-size:.78rem">(необязательно)</span></label>
-        <div style="background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.15);border-radius:10px;padding:.85rem 1rem;margin-bottom:.5rem;font-size:.78rem;color:var(--muted);line-height:1.6">
-          <strong style="color:var(--accent2)">Что такое фавикон?</strong> — это маленькая иконка вашего сайта, которая отображается во вкладке браузера и в закладках. Обычно это логотип компании размером 32×32 или 64×64 пикселей в формате PNG или ICO.
-        </div>
-        <div class="file-zone" onclick="document.getElementById('ffavicon').click()" style="padding:.75rem">
+        <label class="form-label">Фавикон <span style="font-weight:400;color:var(--muted);text-transform:none;font-size:.75rem;letter-spacing:0">(необязательно)</span></label>
+        <div class="info-box"><strong>Что такое фавикон?</strong> — маленькая иконка сайта во вкладке браузера и в закладках. Обычно это логотип компании 32×32 или 64×64 пикселя. Форматы: PNG, ICO, SVG.</div>
+        <div class="file-zone" onclick="document.getElementById('ffavicon').click()" style="padding:.85rem">
           <input type="file" id="ffavicon" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none" onchange="handleFavicon(this.files[0])"/>
-          <div style="font-size:1.1rem;margin-bottom:.2rem">🖼️</div>
-          <div style="color:var(--muted);font-size:.76rem"><strong style="color:var(--accent2)">Нажмите</strong> чтобы загрузить фавикон · PNG, ICO, SVG</div>
+          <div style="font-size:1.2rem;margin-bottom:.25rem">🖼️</div>
+          <div style="color:var(--muted);font-size:.76rem"><strong style="color:var(--accent2)">Нажмите</strong> чтобы загрузить · PNG, ICO, SVG</div>
         </div>
-        <div id="faviconPreview" style="display:none;margin-top:.5rem;display:none;align-items:center;gap:.6rem;font-size:.78rem;color:var(--muted)"></div>
+        <div id="faviconPreview" style="display:none;margin-top:.5rem;align-items:center;gap:.6rem;font-size:.78rem;color:var(--muted)"></div>
       </div>
+
       <div class="form-group">
-        <label class="form-label">Материалы (фото, PDF, архивы)</label>
+        <label class="form-label">Материалы <span style="font-weight:400;color:var(--muted);text-transform:none;font-size:.75rem;letter-spacing:0">фото, PDF, архивы, брендбук</span></label>
         <div class="file-zone" onclick="document.getElementById('ffiles').click()">
           <input type="file" id="ffiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none" onchange="handleFiles(this.files)"/>
           <div style="font-size:1.3rem;margin-bottom:.25rem">📎</div>
-          <div style="color:var(--muted);font-size:.76rem"><strong style="color:var(--accent2)">Нажмите</strong> или перетащите · до 10 МБ</div>
+          <div style="color:var(--muted);font-size:.76rem"><strong style="color:var(--accent2)">Нажмите</strong> или перетащите · до 10 МБ на файл</div>
         </div>
         <div class="file-list" id="fileList"></div>
       </div>
+
       <div class="agree-row" onclick="toggleAgree()">
         <div class="agree-box" id="agreeBox"></div>
-        <div class="agree-text">Принимаю <a href="faq#rules" target="_blank" onclick="event.stopPropagation()">правила сервиса</a> и согласен на обработку персональных данных</div>
+        <div class="agree-text">Принимаю <a href="rules" target="_blank" onclick="event.stopPropagation()">правила сервиса</a> и согласен на обработку персональных данных</div>
       </div>
       <div class="errmsg" id="err-agree">Необходимо принять правила сервиса</div>
+
       <button class="submit-btn" id="submitBtn" onclick="submitForm()">
         Отправить заявку
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <p class="form-note">Ответим в течение нескольких часов</p>
+      <p class="form-note">Ответим в течение нескольких часов · Бесплатная консультация</p>
     </div>
+
     <div class="success-wrap" id="successWrap">
       <div class="success-icon">🎉</div>
       <h3>Заявка принята!</h3>
-      <p>Заказ сохранён. Следите за статусом в личном кабинете.</p>
-      <a href="profile" class="btn btn-primary">Перейти в кабинет →</a>
+      <p>Заказ сохранён в вашем личном кабинете. Следите за статусом — уведомим о каждом этапе.</p>
+      <a href="profile/orders" class="btn btn-primary" style="margin-top:.5rem">Мои заказы →</a>
     </div>
   </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -311,101 +492,116 @@
 <script type="module">
   import { auth, db } from './firebase-config.js';
   import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { collection, addDoc, serverTimestamp, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   let currentUser = null;
-  let agreeChecked = false, uploadedFiles = [];
-  let selTypeVal = 'Лендинг', selPriceVal = 225, selMinVal = 5, selPagesVal = 5, selTariffName = 'Стандарт';
-  let extras = { domain:false, support:false, urgent:false };
+  let agreeChecked = false, uploadedFiles = [], faviconFile = null;
 
-  function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
+  // Состояние
+  let mode = 'package'; // 'package' или 'custom'
+  let selPkg = { name: 'Оптимальный', price: 9900, pages: 5 };
+  let selTypeVal = 'Лендинг';
+  let pricePerPage = 650, minPages = 1, selPages = 5;
+  let extras = { domain: true, domainOpt: 'new', support: false, seo: false, content: false, shop: false, urgent: false };
+  let promoData = null;
 
-  // AUTH — redirect to login if not authenticated
+  function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200);}
+
+  window.showWip = e => { e.stopPropagation(); toast('Telegram-уведомления пока в разработке 🚧','warn'); };
+  window.scrollToForm = () => document.getElementById('formCard').scrollIntoView({behavior:'smooth', block:'start'});
+
+  // Maintenance check
   onAuthStateChanged(auth, async user => {
-    // Check maintenance
     try{
       const snap=await getDoc(doc(db,'settings','maintenance'));
       if(snap.exists()&&snap.data().enabled===true){
-        document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:#f0f0f5;background:#0a0a0c;gap:1rem;text-align:center;padding:2rem">
-          <div style="font-size:3rem">🔧</div>
-          <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div>
-          <div style="color:#777789;font-size:.9rem;max-width:360px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div>
-          <a href="/" style="color:#a78bfa;text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a>
-        </div>`;
+        document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:#f0f0f5;background:#0a0a0c;gap:1rem;text-align:center;padding:2rem"><div style="font-size:3rem">🔧</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div><div style="color:#777789;font-size:.9rem;max-width:360px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div><a href="/" style="color:#a78bfa;text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a></div>`;
         return;
       }
     }catch(e){}
+    if(!user){ window.location.href='auth'; return; }
     currentUser = user;
-    const np = document.getElementById('navProfile');
-    const nl = document.getElementById('navLogin');
-    if(user){
-      if(np) np.style.display='flex';
-      if(nl) nl.style.display='none';
-    } else {
-      // Not logged in — redirect to auth with return URL
-      if(np) np.style.display='none';
-      if(nl) nl.style.display='flex';
-      // Redirect immediately
-      window.location.href = 'auth';
-    }
   });
 
-  // CART
-  const getCart=()=>{try{return JSON.parse(localStorage.getItem('antviz_cart')||'[]')}catch{return[]}};
-  const saveCart=c=>{localStorage.setItem('antviz_cart',JSON.stringify(c));updateBadges();renderCart();};
-  function updateBadges(){const n=getCart().reduce((s,i)=>s+i.qty,0);['deskCartBadge','mobileCartBadge'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=n;b.classList.toggle('show',n>0);}});}
-  window.toggleCart=()=>document.getElementById('cartOverlay').classList.toggle('show');
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('cartOverlay').classList.remove('show');});
-
-  function renderCart(){
-    const cart=getCart(), el=document.getElementById('cartPopup');
-    if(!el)return;
-    if(!cart.length){el.innerHTML=`<div class="cart-head"><h3>🧺 Корзина</h3><button class="cart-close" onclick="toggleCart()">✕</button></div><div class="cart-empty">Корзина пуста</div>`;return;}
-    let total=0,html=`<div class="cart-head"><h3>🧺 Корзина</h3><button class="cart-close" onclick="toggleCart()">✕</button></div>`;
-    cart.forEach((item,i)=>{const cost=item.pricePerPage*item.pages*item.qty;total+=cost;html+=`<div class="cart-item"><div class="cart-item-info"><h4>${item.name}</h4><p>${item.pricePerPage} ₽ × ${item.pages} стр${item.qty>1?' × '+item.qty:''} = ${cost.toLocaleString('ru')} ₽</p></div><div class="ci-actions"><button class="btn-qty" onclick="chQty(${i},-1)">−</button><span style="min-width:18px;text-align:center;font-size:.83rem">${item.qty}</span><button class="btn-qty" onclick="chQty(${i},1)">+</button><button class="btn-rm" onclick="rmItem(${i})">✕</button></div></div>`;});
-    html+=`<div class="cart-total"><span style="color:var(--muted);font-size:.78rem">Итого</span><span class="cart-total-num">${total.toLocaleString('ru')} ₽</span></div>`;
-    html+=`<button class="btn-checkout" onclick="toggleCart();document.getElementById('formCard').scrollIntoView({behavior:'smooth'})">Оформить →</button>`;
-    el.innerHTML=html;
-  }
-  window.rmItem=i=>{const c=getCart();c.splice(i,1);saveCart(c);};
-  window.chQty=(i,d)=>{const c=getCart();c[i].qty=Math.max(1,c[i].qty+d);saveCart(c);};
-
-  // CONSTRUCTOR
-  window.selType=el=>{document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');selTypeVal=el.dataset.type;};
-  window.selTariff=el=>{
-    document.querySelectorAll('.tariff-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');
-    selPriceVal=+el.dataset.price;selMinVal=+el.dataset.min;selTariffName=el.querySelector('.tariff-name').textContent;
-    const s=document.getElementById('pagesSlider');s.min=selMinVal;
-    if(selPagesVal<selMinVal){selPagesVal=selMinVal;s.value=selMinVal;}
-    document.getElementById('pagesLbl').textContent=selPagesVal;
-    document.getElementById('pagesDisp').textContent=selPagesVal;
+  /* ── PACKAGES ── */
+  window.selectPackage = el => {
+    document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+    mode = 'package';
+    selPkg = {
+      name: el.querySelector('.pkg-name').textContent,
+      price: +el.dataset.price,
+      pages: +el.dataset.pages,
+    };
+    // Синхронизируем ползунок
+    const slider = document.getElementById('pagesSlider');
+    selPages = selPkg.pages;
+    slider.value = selPages;
+    document.getElementById('pagesLbl').textContent = selPages;
+    document.getElementById('pagesDisp').textContent = selPages;
     updateTotal();
   };
-  window.updatePages=()=>{selPagesVal=+document.getElementById('pagesSlider').value;document.getElementById('pagesLbl').textContent=selPagesVal;document.getElementById('pagesDisp').textContent=selPagesVal;updateTotal();};
-  window.toggleExtra=el=>{const k=el.id.replace('extra','').toLowerCase();extras[k]=!extras[k];el.classList.toggle('on',extras[k]);el.querySelector('.extra-check').textContent=extras[k]?'✓':'';updateTotal();};
-  // PROMO
-  let promoData = null; // { type: 'percent'|'fixed', value: number, code: string }
 
-  window.applyPromo = async function(){
+  /* ── CUSTOM CONSTRUCTOR ── */
+  window.selType = el => {
+    mode = 'custom';
+    document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('sel'));
+    document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));
+    el.classList.add('sel');
+    selTypeVal = el.dataset.type;
+    updateTotal();
+  };
+
+  window.onSlider = () => {
+    mode = 'custom';
+    document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('sel'));
+    selPages = +document.getElementById('pagesSlider').value;
+    document.getElementById('pagesLbl').textContent = selPages;
+    document.getElementById('pagesDisp').textContent = selPages;
+    updateTotal();
+  };
+
+  /* ── EXTRAS ── */
+  // Домен — включён по умолчанию, показываем варианты
+  const domainCard = document.getElementById('extraDomain');
+  domainCard.classList.add('on');
+
+  window.setDomainOpt = (opt, e) => {
+    e.stopPropagation();
+    extras.domainOpt = opt;
+    document.getElementById('dtnew').classList.toggle('sel', opt==='new');
+    document.getElementById('dtowner').classList.toggle('sel', opt==='own');
+    document.getElementById('domainHint').textContent = opt === 'new'
+      ? 'Регистрация домена .ru на 1 год включена в стоимость. Продление домена ~650 ₽/год — оплачивается самостоятельно.'
+      : 'Подключим ваш домен бесплатно. Потребуется доступ к настройкам DNS у вашего регистратора.';
+    extras.domain = (opt === 'new');
+    updateTotal();
+  };
+
+  window.toggleExtra = (el, key) => {
+    extras[key] = !extras[key];
+    el.classList.toggle('on', extras[key]);
+    updateTotal();
+  };
+
+  /* ── PROMO ── */
+  window.applyPromo = async () => {
     const code = document.getElementById('promoInput').value.trim().toUpperCase();
     const msgEl = document.getElementById('promoMsg');
     if(!code){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Введите промокод'; return; }
     const btn = document.getElementById('promoApplyBtn');
     btn.disabled=true; btn.textContent='Проверяем...';
     try{
-      const { getDocs: _getDocs, collection: _col, query: _query, where: _where } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-      const snap = await _getDocs(_query(_col(db,'promoCodes'),_where('code','==',code),_where('active','==',true)));
+      const snap = await getDocs(query(collection(db,'promoCodes'),where('code','==',code),where('active','==',true)));
       if(snap.empty){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Промокод не найден или не активен'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
       const promo = snap.docs[0].data();
-      // Проверяем срок действия
-      if(promo.expiresAt && promo.expiresAt.toDate && promo.expiresAt.toDate() < new Date()){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Срок действия промокода истёк'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-      // Проверяем для конкретного пользователя
-      if(promo.forUid && currentUser && promo.forUid !== currentUser.uid){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+      if(promo.expiresAt?.toDate&&promo.expiresAt.toDate()<new Date()){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Срок действия промокода истёк'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+      if(promo.forUid&&currentUser&&promo.forUid!==currentUser.uid){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
       promoData = { type: promo.discountType, value: promo.discountValue, code };
       const label = promo.discountType==='percent' ? `-${promo.discountValue}%` : `-${promo.discountValue} ₽`;
       msgEl.style.display='block'; msgEl.style.color='var(--success)'; msgEl.textContent=`✓ Промокод применён: ${label}`;
       btn.textContent='✓ Применён'; btn.style.color='var(--success)'; btn.style.borderColor='var(--success)';
-    }catch(e){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Ошибка проверки промокода'; btn.disabled=false; btn.textContent='Применить'; }
+    }catch(e){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Ошибка'; btn.disabled=false; btn.textContent='Применить'; }
     updateTotal();
   };
 
@@ -415,75 +611,126 @@
     return Math.min(promoData.value, base);
   }
 
-  function updateTotal(){let base=selPriceVal*selPagesVal,add=0,parts=[`${selPriceVal} ₽ × ${selPagesVal} стр`];if(extras.domain){add+=200;parts.push('+200 ₽ домен');}if(extras.support){add+=500;parts.push('+500 ₽ поддержка');}if(extras.urgent){const u=Math.round((base+add)*.3);add+=u;parts.push('+30% срочность');}const subtotal=base+add;const discount=calcDiscount(subtotal);const total=subtotal-discount;document.getElementById('totalPrice').textContent=total.toLocaleString('ru')+' ₽';document.getElementById('totalBreakdown').textContent=parts.join(' · ');const origEl=document.getElementById('priceOriginal');const discEl=document.getElementById('promoDiscount');if(discount>0){origEl.style.display='block';origEl.textContent=subtotal.toLocaleString('ru')+' ₽';discEl.style.display='block';discEl.textContent=`Скидка по промокоду: -${discount.toLocaleString('ru')} ₽`;}else{origEl.style.display='none';discEl.style.display='none';}}
-  window.addToCart=()=>{const name=`${selTypeVal} · ${selTariffName}`;const cart=getCart();const ex=cart.find(i=>i.name===name&&i.pages===selPagesVal);if(ex)ex.qty++;else cart.push({name,pricePerPage:selPriceVal,pages:selPagesVal,qty:1});saveCart(cart);toast('Добавлено в корзину ✓','success');setTimeout(()=>document.getElementById('cartOverlay').classList.add('show'),350);};
+  /* ── PRICE CALC ── */
+  function updateTotal(){
+    let subtotal = 0;
+    let parts = [];
 
-  window.toggleAgree=()=>{agreeChecked=!agreeChecked;document.getElementById('agreeBox').classList.toggle('checked',agreeChecked);document.getElementById('agreeBox').classList.remove('errbdr');document.getElementById('err-agree').classList.remove('show');};
-  let faviconFile = null;
+    if(mode === 'package'){
+      subtotal = selPkg.price;
+      parts.push(`Пакет «${selPkg.name}»`);
+    } else {
+      subtotal = pricePerPage * selPages;
+      parts.push(`${pricePerPage} ₽ × ${selPages} стр.`);
+    }
+
+    if(extras.domain){ subtotal += 650; parts.push('+650 ₽ домен .ru'); }
+    if(extras.support){ subtotal += 500; parts.push('+500 ₽ обслуживание'); }
+    if(extras.seo){ subtotal += 2500; parts.push('+2 500 ₽ SEO'); }
+    if(extras.content){ subtotal += 2000; parts.push('+2 000 ₽ контент'); }
+    if(extras.shop){ subtotal += 4900; parts.push('+4 900 ₽ корзина'); }
+    if(extras.urgent){ const u=Math.round(subtotal*.3); subtotal+=u; parts.push('+30% срочность'); }
+
+    const discount = calcDiscount(subtotal);
+    const total = subtotal - discount;
+
+    document.getElementById('totalPrice').textContent = total.toLocaleString('ru') + ' ₽';
+    document.getElementById('totalBreakdown').textContent = parts.join(' · ');
+
+    const origEl = document.getElementById('priceOriginal');
+    const discEl = document.getElementById('promoDiscount');
+    if(discount > 0){
+      origEl.style.display='block'; origEl.textContent = subtotal.toLocaleString('ru') + ' ₽';
+      discEl.style.display='block'; discEl.textContent = `Скидка: -${discount.toLocaleString('ru')} ₽`;
+    } else {
+      origEl.style.display='none'; discEl.style.display='none';
+    }
+
+    // Обновляем цену/страниц индикаторы
+    document.getElementById('pricePerPageDisp').textContent = pricePerPage + ' ₽';
+    document.getElementById('minPagesDisp').textContent = minPages;
+  }
+
+  /* ── FILES ── */
   window.handleFavicon = file => {
     if(!file) return;
-    if(file.size > 2*1024*1024){ toast('Фавикон > 2 МБ','error'); return; }
+    if(file.size>2*1024*1024){ toast('Фавикон > 2 МБ','error'); return; }
     faviconFile = file;
     const prev = document.getElementById('faviconPreview');
     const url = URL.createObjectURL(file);
-    prev.style.display = 'flex';
-    prev.innerHTML = `<img src="${url}" style="width:32px;height:32px;border-radius:4px;object-fit:contain;background:#fff;padding:2px"> ${file.name} <button onclick="removeFavicon()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">×</button>`;
+    prev.style.display='flex';
+    prev.innerHTML=`<img src="${url}" style="width:32px;height:32px;border-radius:4px;object-fit:contain;background:#fff;padding:2px"> ${file.name} <button onclick="removeFavicon()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">×</button>`;
   };
-  window.removeFavicon = () => {
-    faviconFile = null;
-    const prev = document.getElementById('faviconPreview');
-    prev.style.display = 'none';
-    prev.innerHTML = '';
-    document.getElementById('ffavicon').value = '';
-  };
-  window.handleFiles=files=>{Array.from(files).forEach(f=>{if(f.size>10*1024*1024){toast(f.name+' > 10 МБ','error');return;}if(!uploadedFiles.find(u=>u.name===f.name))uploadedFiles.push(f);});renderFiles();};
-  function renderFiles(){const l=document.getElementById('fileList');l.innerHTML='';uploadedFiles.forEach((f,i)=>{const c=document.createElement('div');c.className='file-chip';c.innerHTML=`📄 ${f.name} <button onclick="rmFile(${i})">×</button>`;l.appendChild(c);});}
-  window.rmFile=i=>{uploadedFiles.splice(i,1);renderFiles();};
+  window.removeFavicon=()=>{ faviconFile=null; const p=document.getElementById('faviconPreview'); p.style.display='none'; p.innerHTML=''; document.getElementById('ffavicon').value=''; };
+  window.handleFiles=files=>{ Array.from(files).forEach(f=>{ if(f.size>10*1024*1024){toast(f.name+' > 10 МБ','error');return;} if(!uploadedFiles.find(u=>u.name===f.name)) uploadedFiles.push(f); }); renderFiles(); };
+  function renderFiles(){ const l=document.getElementById('fileList'); l.innerHTML=''; uploadedFiles.forEach((f,i)=>{ const c=document.createElement('div'); c.className='file-chip'; c.innerHTML=`📄 ${f.name} <button onclick="rmFile(${i})">×</button>`; l.appendChild(c); }); }
+  window.rmFile=i=>{ uploadedFiles.splice(i,1); renderFiles(); };
 
-  window.submitForm=async function(){
-    if(!agreeChecked){document.getElementById('agreeBox').classList.add('errbdr');document.getElementById('err-agree').classList.add('show');return;}
-    if(!currentUser){toast('Необходимо войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
-    const btn=document.getElementById('submitBtn');
-    btn.disabled=true;btn.textContent='Отправляем...';
-    const cart=getCart();
-    let totalPrice=selPriceVal*selPagesVal;
-    if(extras.domain)totalPrice+=200;if(extras.support)totalPrice+=500;if(extras.urgent)totalPrice=Math.round(totalPrice*1.3);
-    if(cart.length)totalPrice=cart.reduce((s,i)=>s+i.pricePerPage*i.pages*i.qty,0);
-    const extrasArr=Object.entries(extras).filter(([,v])=>v).map(([k])=>k);
-    // Convert favicon to base64
+  /* ── AGREE ── */
+  window.toggleAgree=()=>{ agreeChecked=!agreeChecked; document.getElementById('agreeBox').classList.toggle('checked',agreeChecked); document.getElementById('agreeBox').classList.remove('errbdr'); document.getElementById('err-agree').classList.remove('show'); };
+
+  /* ── SUBMIT ── */
+  window.submitForm = async () => {
+    if(!agreeChecked){ document.getElementById('agreeBox').classList.add('errbdr'); document.getElementById('err-agree').classList.add('show'); return; }
+    if(!currentUser){ toast('Необходимо войти в аккаунт','error'); setTimeout(()=>window.location.href='auth',1200); return; }
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled=true; btn.textContent='Отправляем...';
+
+    // Считаем финальную цену
+    let subtotal = mode==='package' ? selPkg.price : pricePerPage * selPages;
+    const extrasArr = [];
+    if(extras.domain){ subtotal+=650; extrasArr.push('domain'); }
+    if(extras.support){ subtotal+=500; extrasArr.push('support'); }
+    if(extras.seo){ subtotal+=2500; extrasArr.push('seo'); }
+    if(extras.content){ subtotal+=2000; extrasArr.push('content'); }
+    if(extras.shop){ subtotal+=4900; extrasArr.push('shop'); }
+    if(extras.urgent){ subtotal=Math.round(subtotal*1.3); extrasArr.push('urgent'); }
+    const discount = calcDiscount(subtotal);
+    const totalPrice = subtotal - discount;
+
+    // Фавикон
     let faviconData = null;
-    if(faviconFile){
-      try{
-        faviconData = await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(faviconFile);});
-      }catch(e){}
-    }
-    // Convert uploaded files to base64
-    const attachments=[];
+    if(faviconFile){ try{ faviconData=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(faviconFile);}); }catch(e){} }
+
+    // Файлы
+    const attachments = [];
     for(const file of uploadedFiles){
-      if(file.size>3*1024*1024) continue; // skip >3MB
-      try{
-        const base64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
-        attachments.push({fileData:base64,fileName:file.name,fileType:file.type});
-      }catch(e){console.error('File encode error:',e);}
+      if(file.size>3*1024*1024) continue;
+      try{ const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}); attachments.push({fileData:b64,fileName:file.name,fileType:file.type}); }catch(e){}
     }
+
     try{
       await addDoc(collection(db,'orders'),{
-        siteType:selTypeVal,tariff:selTariffName,pages:selPagesVal,totalPrice,extras:extrasArr,promoCode:promoData?promoData.code:null,discountApplied:promoData?calcDiscount(totalPrice+(promoData?calcDiscount(totalPrice):0)):0,
-        cart:cart.length?cart:null,description:document.getElementById('fdesc').value.trim()||'',
-        attachments:attachments.length?attachments:null,
-        clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
-        uid:currentUser.uid,status:0,createdAt:serverTimestamp()
+        orderMode: mode,
+        package: mode==='package' ? selPkg.name : null,
+        siteType: mode==='package' ? selPkg.name : selTypeVal,
+        tariff: mode==='custom' ? 'Кастомный' : selPkg.name,
+        pages: mode==='package' ? selPkg.pages : selPages,
+        totalPrice,
+        extras: extrasArr,
+        domainOption: extras.domainOpt,
+        promoCode: promoData?.code || null,
+        discountApplied: discount,
+        description: document.getElementById('fdesc').value.trim() || '',
+        attachments: attachments.length ? attachments : null,
+        favicon: faviconData,
+        clientName: currentUser.displayName || 'Пользователь',
+        clientEmail: currentUser.email,
+        uid: currentUser.uid,
+        status: 0,
+        createdAt: serverTimestamp()
       });
       document.getElementById('formInner').style.display='none';
       document.getElementById('successWrap').classList.add('show');
-      localStorage.removeItem('antviz_cart');updateBadges();renderCart();
     }catch(e){
-      btn.disabled=false;btn.innerHTML='Отправить заявку <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      toast('Ошибка отправки. Попробуйте ещё раз.','error');console.error(e);
+      btn.disabled=false;
+      btn.innerHTML='Отправить заявку <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      toast('Ошибка отправки. Попробуйте ещё раз.','error');
     }
   };
 
-  updateTotal();renderCart();updateBadges();
+  updateTotal();
 </script>
 
 <script src="footer.js" data-page="order"></script>

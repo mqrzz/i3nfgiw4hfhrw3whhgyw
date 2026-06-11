@@ -22,16 +22,13 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    nav.desktop-nav{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;
-      display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:52px;
-      width:calc(100% - 40px);max-width:1100px;background:rgba(22,22,30,0.85);backdrop-filter:blur(20px);
-      border:1px solid rgba(255,255,255,0.1);border-radius:28px;box-shadow:0 4px 30px rgba(0,0,0,.4)}
-    .logo{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.04em;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:10px}
-    .nav-links{display:flex;gap:1.5rem;align-items:center}
-    .nav-links a{color:var(--muted);text-decoration:none;font-size:.8rem;transition:color .2s}
-    .nav-links a:hover,.nav-links a.active{color:var(--text)}
-    .nav-cta{background:var(--accent)!important;color:#fff!important;padding:.4rem 1.1rem;border-radius:50px;font-weight:500!important}
-    @media(max-width:768px){nav.desktop-nav{display:none!important}}
+    
+    
+    
+    
+    
+    
+    @media(max-width:768px){}
 
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
     .spinner{width:28px;height:28px;border:2px solid var(--border-hi);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
@@ -117,24 +114,17 @@
     .toast.error{background:var(--error);color:#fff}
     .toast.info{background:var(--accent);color:#fff}
     .toast.warn{background:var(--warn);color:#000}
+  
+    
   </style>
 </head>
 <body>
+<script src="../nav.js" data-page="tickets"></script>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
   <p style="color:var(--muted);font-size:.76rem;margin-top:.3rem">Загружаю...</p>
 </div>
-
-<nav class="desktop-nav">
-  <a class="logo" href="/"><img src="../img/favicon.png" alt="Antviz" style="width:24px;height:24px;border-radius:6px;object-fit:cover;vertical-align:middle;margin-right:6px">Antviz</a>
-  <div class="nav-links">
-    <a href="/">Главная</a>
-    <a href="../faq">FAQ</a>
-    <a href="../profile" class="active">Кабинет</a>
-    <a href="../order" class="nav-cta">Заказать сайт</a>
-  </div>
-</nav>
 
 <div class="page-wrap" id="appWrap" style="display:none">
 
@@ -368,6 +358,7 @@ window.submitTicket = async function(){
 
 onAuthStateChanged(auth, async user=>{
   if(!user){ window.location.href='../auth'; return; }
+  
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('appWrap').style.display='block';
   await init(user);

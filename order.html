@@ -4,484 +4,491 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Заказать сайт — Antviz</title>
-  <link rel="icon" href="img/favicon.png" type="image/png"/>
+  <link rel="icon" href="img/favicon.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;
-      --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+      --bg:#09090d;--bg2:#0f0f14;--bg3:#141419;--card:#111116;
+      --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.13);
       --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
-      --text:#f0f0f5;--muted:#777789;--muted2:#999aab;
+      --text:#ededf2;--muted:#666674;--muted2:#9999aa;
       --success:#4ade80;--error:#f87171;--warn:#fbbf24;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.65;min-height:100vh;overflow-x:hidden}
-    body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:300;line-height:1.6;overflow-x:hidden;min-height:100vh}
 
-    .page-wrap{padding:100px 5vw 80px;max-width:820px;margin:0 auto;position:relative;z-index:1;animation:fadeUp .35s ease}
-    .page-hero{margin-bottom:2.8rem}
-    .page-label{font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);margin-bottom:.7rem;font-weight:500;display:flex;align-items:center;gap:.5rem}
-    .page-label::before{content:'';width:18px;height:1px;background:var(--accent2)}
-    .page-title{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(1.9rem,5vw,3rem);line-height:1.08;letter-spacing:-.03em;margin-bottom:.75rem}
-    .page-title span{color:var(--accent2)}
-    .page-sub{color:var(--muted);font-size:.92rem;max-width:480px;line-height:1.7}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pop{0%{transform:scale(.6)}70%{transform:scale(1.1)}100%{transform:scale(1)}}
 
-    /* PACKAGES */
-    .packages-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:2rem}
-    .pkg-card{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:1.4rem 1.2rem;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-    .pkg-card::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(108,99,255,.08),transparent 70%);opacity:0;transition:opacity .3s}
-    .pkg-card:hover{border-color:rgba(108,99,255,.3);transform:translateY(-2px)}
-    .pkg-card:hover::before{opacity:1}
-    .pkg-card.sel{border-color:var(--accent2);background:rgba(108,99,255,.08)}
-    .pkg-card.sel::before{opacity:1}
-    .pkg-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-size:.55rem;letter-spacing:.07em;text-transform:uppercase;padding:.2rem .75rem;border-radius:0 0 9px 9px;font-weight:700;white-space:nowrap}
-    .pkg-icon{font-size:1.6rem;margin-bottom:.65rem}
-    .pkg-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:.3rem}
-    .pkg-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.5rem;color:var(--accent2);line-height:1;margin-bottom:.2rem}
-    .pkg-price small{font-size:.62rem;color:var(--muted);font-weight:300;font-family:'Onest',sans-serif}
-    .pkg-pages{font-size:.7rem;color:var(--muted);margin-bottom:.8rem}
-    .pkg-features{display:flex;flex-direction:column;gap:.3rem}
-    .pkg-feature{font-size:.72rem;color:var(--muted2);display:flex;align-items:flex-start;gap:.4rem;line-height:1.4}
-    .pkg-feature::before{content:'✓';color:var(--success);font-weight:700;flex-shrink:0;font-size:.7rem;margin-top:.05rem}
+    /* ── PAGE ── */
+    .page{max-width:720px;margin:0 auto;padding:110px 24px 100px;animation:fadeUp .4s ease}
+    .page-eyebrow{font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;color:var(--accent2);margin-bottom:1rem;font-weight:500}
+    .page-h1{font-family:'Unbounded',sans-serif;font-weight:900;font-size:clamp(2rem,5vw,3.2rem);line-height:1.05;letter-spacing:-.03em;margin-bottom:.8rem}
+    .page-h1 em{font-style:normal;color:var(--accent2)}
+    .page-sub{color:var(--muted2);font-size:.95rem;max-width:460px;line-height:1.7;margin-bottom:3rem}
 
-    /* DIVIDER */
-    .or-divider{display:flex;align-items:center;gap:1rem;margin:1.6rem 0;color:var(--muted);font-size:.75rem}
-    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    /* ── PACKAGES ── */
+    .pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:2.5rem}
+    .pkg{
+      background:var(--card);border:1.5px solid var(--border);
+      border-radius:20px;padding:24px 20px;cursor:pointer;
+      transition:border-color .2s,transform .18s,box-shadow .2s;
+      position:relative;overflow:hidden;user-select:none;
+    }
+    .pkg::after{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(ellipse at 50% -20%,rgba(108,99,255,.12),transparent 65%);
+      opacity:0;transition:opacity .3s;
+    }
+    .pkg:hover{border-color:rgba(108,99,255,.35);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+    .pkg:hover::after{opacity:1}
+    .pkg.sel{border-color:var(--accent2);box-shadow:0 0 0 1px rgba(167,139,250,.25), 0 16px 48px rgba(0,0,0,.5)}
+    .pkg.sel::after{opacity:1}
+    .pkg-popular{
+      position:absolute;top:0;left:50%;transform:translateX(-50%);
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      color:#fff;font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;
+      padding:.22rem .9rem;border-radius:0 0 10px 10px;font-weight:700;
+    }
+    .pkg-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:1rem;color:var(--muted2)}
+    .pkg.sel .pkg-name{color:var(--accent2)}
+    .pkg-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.9rem;line-height:1;margin-bottom:.25rem}
+    .pkg-price span{font-size:.7rem;font-weight:300;font-family:'Onest',sans-serif;color:var(--muted2);margin-left:2px}
+    .pkg-pages{font-size:.72rem;color:var(--muted);margin-bottom:1.2rem}
+    .pkg-feats{display:flex;flex-direction:column;gap:.4rem}
+    .pkg-feat{font-size:.74rem;color:var(--muted2);display:flex;align-items:baseline;gap:.45rem;line-height:1.4}
+    .pkg-feat::before{content:'—';color:var(--accent2);font-size:.7rem;flex-shrink:0}
+    .pkg.sel .pkg-feat{color:var(--text)}
 
-    /* CARD */
-    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.6rem;margin-bottom:1rem;transition:border-color .2s}
-    .card-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.84rem;margin-bottom:1.2rem;display:flex;align-items:center;gap:.55rem}
-    .step-n{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:700;flex-shrink:0}
+    /* ── SECTION ── */
+    .sec{margin-bottom:1rem}
+    .sec-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
+    .sec-num{width:22px;height:22px;border-radius:50%;background:rgba(108,99,255,.15);border:1px solid rgba(108,99,255,.25);color:var(--accent2);font-size:.6rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sec-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem}
 
-    /* TYPE GRID */
-    .type-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:.5rem}
-    .type-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:14px;padding:.9rem .7rem;text-align:center;cursor:pointer;transition:all .17s;user-select:none}
-    .type-card:hover{border-color:rgba(108,99,255,.35)}
-    .type-card.sel{border-color:var(--accent2);background:rgba(108,99,255,.1)}
-    .type-card .ti{font-size:1.5rem;margin-bottom:.3rem}
-    .type-card .tn{font-size:.78rem;font-weight:500;margin-bottom:.05rem}
-    .type-card .ts{font-size:.65rem;color:var(--muted)}
+    /* ── CARD ── */
+    .card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:24px;margin-bottom:12px}
 
-    /* PAGES SLIDER */
-    .pages-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem}
-    .pages-label span{color:var(--accent2);font-weight:700;font-family:'Unbounded',sans-serif}
-    .pages-row{display:flex;align-items:center;gap:1rem}
-    .pages-slider{flex:1;-webkit-appearance:none;height:4px;background:var(--bg3);border-radius:2px;outline:none;cursor:pointer}
-    .pages-slider::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 4px rgba(108,99,255,.2)}
-    .pages-disp{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.5rem;min-width:42px;text-align:center;color:var(--accent2)}
+    /* ── TYPE SELECTOR ── */
+    .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .type-opt{background:var(--bg3);border:1.5px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .17s;user-select:none}
+    .type-opt:hover{border-color:rgba(108,99,255,.3)}
+    .type-opt.sel{border-color:var(--accent2);background:rgba(108,99,255,.08)}
+    .type-opt .ico{font-size:1.4rem;margin-bottom:.3rem}
+    .type-opt .lbl{font-size:.76rem;font-weight:500}
+    .type-opt .sub{font-size:.63rem;color:var(--muted);margin-top:.05rem}
 
-    /* EXTRAS */
-    .extras-grid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
-    .extra-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:15px;padding:1rem 1.05rem;cursor:pointer;transition:all .17s;user-select:none}
-    .extra-card:hover{border-color:rgba(108,99,255,.3)}
-    .extra-card.on{border-color:var(--accent2);background:rgba(108,99,255,.08)}
-    .extra-card.disabled{opacity:.45;cursor:default;pointer-events:none}
-    .extra-top{display:flex;align-items:flex-start;gap:.6rem;margin-bottom:.55rem}
-    .extra-check{width:18px;height:18px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all .14s;font-size:.65rem;font-weight:700;color:transparent}
-    .extra-card.on .extra-check{background:var(--accent);border-color:var(--accent);color:#fff}
-    .extra-icon{font-size:1.25rem;flex-shrink:0}
-    .extra-body{flex:1}
-    .extra-title{font-weight:500;font-size:.82rem;margin-bottom:.06rem;display:flex;align-items:center;gap:.4rem}
-    .extra-wip{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.2);font-size:.55rem;padding:.08rem .4rem;border-radius:50px;font-weight:600;white-space:nowrap}
-    .extra-desc{color:var(--muted);font-size:.7rem;line-height:1.5}
-    .extra-price{font-size:.74rem;font-weight:600;margin-top:.4rem;color:var(--accent2)}
-    .extra-price.free{color:var(--success)}
-    .extra-divider{height:1px;background:var(--border);margin:.45rem 0}
+    /* ── EXTRAS ── */
+    .extras{display:flex;flex-direction:column;gap:8px}
+    .extra{
+      background:var(--bg3);border:1.5px solid var(--border);border-radius:16px;
+      padding:16px 18px;cursor:pointer;transition:border-color .17s,background .17s;
+      display:flex;align-items:flex-start;gap:14px;user-select:none;
+    }
+    .extra:hover{border-color:rgba(108,99,255,.25)}
+    .extra.on{border-color:rgba(167,139,250,.4);background:rgba(108,99,255,.06)}
+    .extra.disabled{opacity:.38;cursor:default;pointer-events:none}
+    .extra-check{
+      width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:1px;
+      border:1.5px solid rgba(255,255,255,.15);
+      display:flex;align-items:center;justify-content:center;
+      transition:all .16s;font-size:.65rem;font-weight:700;color:transparent;
+      background:var(--bg2);
+    }
+    .extra.on .extra-check{background:var(--accent);border-color:var(--accent);color:#fff}
+    .extra-ico{font-size:1.3rem;flex-shrink:0;margin-top:1px}
+    .extra-body{flex:1;min-width:0}
+    .extra-top{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.25rem;flex-wrap:wrap}
+    .extra-label{font-weight:500;font-size:.84rem}
+    .extra-price-tag{font-family:'Unbounded',sans-serif;font-size:.72rem;font-weight:700;color:var(--accent2);white-space:nowrap}
+    .extra-price-tag.free{color:var(--success)}
+    .extra-desc{font-size:.74rem;color:var(--muted);line-height:1.55}
+    .wip-tag{background:rgba(251,191,36,.1);color:var(--warn);border:1px solid rgba(251,191,36,.2);font-size:.55rem;padding:.08rem .42rem;border-radius:999px;font-weight:600;white-space:nowrap;margin-left:.3rem}
 
-    /* DOMAIN TOGGLE */
-    .domain-toggle{display:flex;gap:.4rem;margin-top:.55rem}
-    .dtoggle-btn{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.72rem;padding:.42rem .5rem;border-radius:8px;cursor:pointer;transition:all .15s;text-align:center}
-    .dtoggle-btn:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
-    .dtoggle-btn.sel{background:rgba(108,99,255,.1);border-color:var(--accent2);color:var(--accent2)}
-    .domain-hint{font-size:.68rem;color:var(--muted);margin-top:.4rem;line-height:1.5}
+    /* Domain toggle */
+    .domain-opts{display:flex;gap:6px;margin-top:.7rem}
+    .domain-opt{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.72rem;padding:.45rem .5rem;border-radius:10px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.35}
+    .domain-opt:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
+    .domain-opt.sel{background:rgba(108,99,255,.1);border-color:rgba(167,139,250,.4);color:var(--accent2)}
+    .domain-note{font-size:.68rem;color:var(--muted);margin-top:.55rem;line-height:1.55;padding:.6rem .75rem;background:rgba(255,255,255,.03);border-radius:9px;border:1px solid var(--border)}
 
-    /* PROMO */
-    .promo-row{display:flex;gap:.5rem}
-    .promo-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:11px;padding:.65rem .95rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.86rem;outline:none;transition:border-color .2s;text-transform:uppercase;letter-spacing:.06em}
-    .promo-inp:focus{border-color:rgba(108,99,255,.4)}
-    .promo-inp::placeholder{color:var(--muted);text-transform:none;letter-spacing:0}
-    .promo-apply{background:var(--bg3);border:1px solid var(--border);color:var(--muted2);font-family:'Onest',sans-serif;font-size:.78rem;padding:.65rem 1.1rem;border-radius:11px;cursor:pointer;transition:all .17s;white-space:nowrap;flex-shrink:0}
-    .promo-apply:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
-    .promo-msg{font-size:.74rem;margin-top:.45rem;display:none}
+    /* ── PROMO ── */
+    .promo-row{display:flex;gap:8px}
+    .promo-inp{
+      flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:12px;
+      padding:.72rem 1rem;color:var(--text);font-family:'Onest',sans-serif;
+      font-size:.86rem;outline:none;transition:border-color .2s;
+      text-transform:uppercase;letter-spacing:.06em;
+    }
+    .promo-inp:focus{border-color:rgba(108,99,255,.45)}
+    .promo-inp::placeholder{text-transform:none;letter-spacing:0;color:var(--muted)}
+    .promo-btn{
+      background:var(--bg3);border:1px solid var(--border);color:var(--muted2);
+      font-family:'Onest',sans-serif;font-size:.78rem;padding:.72rem 1.1rem;
+      border-radius:12px;cursor:pointer;transition:all .17s;white-space:nowrap;flex-shrink:0;
+    }
+    .promo-btn:hover{border-color:rgba(108,99,255,.3);color:var(--text)}
+    .promo-feedback{font-size:.74rem;margin-top:.5rem;display:none}
 
-    /* PRICE BAR */
-    .price-bar{background:linear-gradient(135deg,rgba(108,99,255,.1),rgba(167,139,250,.05));border:1px solid rgba(108,99,255,.2);border-radius:18px;padding:1.3rem 1.5rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
-    .pb-left{}
-    .pb-label{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.2rem}
-    .pb-price-row{display:flex;align-items:baseline;gap:.6rem}
-    .pb-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:2rem;color:var(--accent2)}
-    .pb-original{font-size:.85rem;color:var(--muted);text-decoration:line-through;display:none}
-    .pb-breakdown{color:var(--muted);font-size:.72rem;margin-top:.15rem}
-    .pb-discount{font-size:.72rem;color:var(--success);margin-top:.1rem;display:none}
+    /* ── TOTAL BAR ── */
+    .total-bar{
+      position:sticky;bottom:20px;z-index:100;
+      background:rgba(11,11,16,.88);backdrop-filter:blur(24px);
+      border:1px solid rgba(255,255,255,.1);border-radius:999px;
+      padding:10px 10px 10px 22px;
+      display:flex;align-items:center;justify-content:space-between;gap:16px;
+      margin-bottom:1.5rem;
+      box-shadow:0 8px 40px rgba(0,0,0,.6);
+    }
+    .total-left{}
+    .total-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.1rem}
+    .total-price-row{display:flex;align-items:baseline;gap:.5rem}
+    .total-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.5rem;color:var(--accent2)}
+    .total-orig{font-size:.78rem;color:var(--muted);text-decoration:line-through;display:none}
+    .total-breakdown{font-size:.68rem;color:var(--muted);margin-top:.05rem}
+    .total-discount{font-size:.68rem;color:var(--success);display:none}
+    .total-btn{
+      background:linear-gradient(135deg,#6c63ff,#8b5cf6);color:#fff;
+      border:none;border-radius:999px;padding:.65rem 1.6rem;
+      font-family:'Onest',sans-serif;font-size:.86rem;font-weight:500;
+      cursor:pointer;transition:box-shadow .2s,transform .13s;
+      display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;
+    }
+    .total-btn:hover{box-shadow:0 6px 24px rgba(108,99,255,.5);transform:translateY(-1px)}
 
-    /* FORM */
-    .form-group{margin-bottom:1rem}
-    .form-label{display:block;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;font-weight:500}
-    .req{color:var(--accent2)}
-    .form-input,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s,box-shadow .2s}
-    .form-input:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
-    .form-input.err{border-color:var(--error)!important}
-    .form-textarea{resize:vertical;min-height:90px;line-height:1.6}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.9rem}
-    .errmsg{color:var(--error);font-size:.7rem;margin-top:.22rem;display:none}
-    .errmsg.show{display:block}
-    .file-zone{border:1.5px dashed rgba(255,255,255,.1);border-radius:13px;padding:1.2rem;text-align:center;cursor:pointer;background:var(--bg3);transition:all .2s}
-    .file-zone:hover{border-color:rgba(108,99,255,.4);background:rgba(108,99,255,.04)}
-    .file-list{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.6rem}
-    .file-chip{display:flex;align-items:center;gap:.35rem;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.18);border-radius:7px;padding:.22rem .55rem;font-size:.68rem;color:var(--accent2)}
-    .file-chip button{background:none;border:none;color:var(--muted);cursor:pointer;padding:0 .1rem;font-size:.75rem}
-    .file-chip button:hover{color:var(--error)}
-    .info-box{background:rgba(108,99,255,.06);border:1px solid rgba(108,99,255,.14);border-radius:11px;padding:.85rem 1rem;font-size:.77rem;color:var(--muted);line-height:1.6;margin-bottom:.5rem}
-    .info-box strong{color:var(--accent2)}
-    .agree-row{display:flex;align-items:flex-start;gap:.65rem;margin-top:1.1rem;cursor:pointer}
-    .agree-box{width:19px;height:19px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .18s;background:var(--bg3);font-size:.68rem;font-weight:700;color:transparent}
-    .agree-box.checked{background:var(--accent);border-color:var(--accent);color:#fff}
-    .agree-box.errbdr{border-color:var(--error)!important}
-    .agree-text{font-size:.8rem;color:var(--muted);line-height:1.5}
-    .agree-text a{color:var(--accent2);text-decoration:none}
-    .agree-text a:hover{text-decoration:underline}
-    .submit-btn{width:100%;background:linear-gradient(135deg,var(--accent),#8b5cf6);color:#fff;border:none;border-radius:50px;padding:1rem 2rem;font-family:'Onest',sans-serif;font-size:.97rem;font-weight:500;cursor:pointer;transition:box-shadow .2s,transform .14s,opacity .2s;display:flex;align-items:center;justify-content:center;gap:.55rem;margin-top:1.3rem;letter-spacing:.01em}
-    .submit-btn:hover{box-shadow:0 8px 30px rgba(108,99,255,.45);transform:translateY(-2px)}
-    .submit-btn:disabled{opacity:.5;cursor:default;transform:none!important;box-shadow:none!important}
-    .form-note{color:var(--muted);font-size:.68rem;text-align:center;margin-top:.6rem}
+    /* ── FORM CARD ── */
+    .form-lbl{display:block;font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.4rem;font-weight:500}
+    .form-inp,.form-ta{
+      width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:13px;
+      padding:.78rem 1.05rem;color:var(--text);font-family:'Onest',sans-serif;
+      font-size:.88rem;font-weight:300;outline:none;transition:border-color .2s,box-shadow .2s;
+    }
+    .form-inp:focus,.form-ta:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,99,255,.1)}
+    .form-inp::placeholder,.form-ta::placeholder{color:var(--muted)}
+    .form-ta{resize:vertical;min-height:90px;line-height:1.65}
+    .fgroup{margin-bottom:1rem}
+    .info-pill{background:rgba(108,99,255,.07);border:1px solid rgba(108,99,255,.14);border-radius:11px;padding:.75rem 1rem;font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:.6rem}
+    .info-pill strong{color:var(--accent2)}
+    .file-zone{border:1.5px dashed rgba(255,255,255,.1);border-radius:13px;padding:1.1rem;text-align:center;cursor:pointer;background:var(--bg3);transition:all .2s}
+    .file-zone:hover{border-color:rgba(108,99,255,.4)}
+    .file-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
+    .chip{display:flex;align-items:center;gap:.3rem;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.18);border-radius:7px;padding:.2rem .55rem;font-size:.68rem;color:var(--accent2)}
+    .chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem}
+    .chip button:hover{color:var(--error)}
+    .agree-row{display:flex;align-items:flex-start;gap:.65rem;cursor:pointer;margin-top:.8rem}
+    .agree-box{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:transparent;background:var(--bg3);transition:all .18s}
+    .agree-box.on{background:var(--accent);border-color:var(--accent);color:#fff}
+    .agree-box.err{border-color:var(--error)!important}
+    .agree-txt{font-size:.8rem;color:var(--muted);line-height:1.55}
+    .agree-txt a{color:var(--accent2);text-decoration:none}
+    .agree-txt a:hover{text-decoration:underline}
+    .err-msg{color:var(--error);font-size:.7rem;margin-top:.22rem;display:none}
+    .err-msg.show{display:block}
+    .submit-btn{
+      width:100%;background:linear-gradient(135deg,#6c63ff,#8b5cf6);color:#fff;
+      border:none;border-radius:999px;padding:1.05rem;
+      font-family:'Onest',sans-serif;font-size:1rem;font-weight:500;
+      cursor:pointer;transition:box-shadow .2s,transform .14s,opacity .2s;
+      display:flex;align-items:center;justify-content:center;gap:.55rem;
+      margin-top:1.4rem;letter-spacing:.01em;
+    }
+    .submit-btn:hover{box-shadow:0 8px 32px rgba(108,99,255,.5);transform:translateY(-2px)}
+    .submit-btn:disabled{opacity:.45;cursor:default;transform:none!important;box-shadow:none!important}
+    .form-note{color:var(--muted);font-size:.68rem;text-align:center;margin-top:.65rem}
 
-    /* SUCCESS */
-    .success-wrap{display:none;flex-direction:column;align-items:center;text-align:center;padding:3rem 1rem;gap:1rem}
-    .success-wrap.show{display:flex}
-    .success-icon{font-size:3.5rem;animation:pop .4s ease}
-    .success-wrap h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem}
-    .success-wrap p{color:var(--muted);max-width:340px;line-height:1.65}
+    /* ── SUCCESS ── */
+    .success{display:none;flex-direction:column;align-items:center;text-align:center;padding:3.5rem 1rem;gap:1rem}
+    .success.show{display:flex}
+    .success-ico{font-size:3.5rem;animation:pop .4s ease}
+    .success h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.25rem}
+    .success p{color:var(--muted2);max-width:340px;line-height:1.7}
 
-    /* TOAST */
-    .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);z-index:300;padding:.6rem 1.3rem;border-radius:50px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap}
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(12px);z-index:300;padding:.58rem 1.3rem;border-radius:999px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--success);color:#000}
     .toast.info{background:var(--accent);color:#fff}
     .toast.error{background:var(--error);color:#fff}
     .toast.warn{background:var(--warn);color:#000}
 
-    /* BTN */
-    .btn{display:inline-flex;align-items:center;gap:7px;padding:.72rem 1.5rem;border-radius:50px;font-family:'Onest',sans-serif;font-size:.86rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:transform .14s,box-shadow .2s}
-    .btn:hover{transform:translateY(-2px)}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:0 4px 18px rgba(108,99,255,.3)}
-    .btn-primary:hover{box-shadow:0 6px 28px rgba(108,99,255,.48)}
-    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn-ghost:hover{border-color:var(--accent);color:var(--text)}
-
-    @media(max-width:1024px){
-      .page-wrap{padding:1.2rem .9rem 100px;max-width:100%}
-      .packages-grid{grid-template-columns:1fr}
-      .extras-grid{grid-template-columns:1fr}
-      .form-row{grid-template-columns:1fr}
-    }
-    @media(max-width:640px){
-      .page-wrap{padding:.9rem .75rem 90px}
-      .packages-grid{grid-template-columns:1fr}
+    /* ── RESPONSIVE ── */
+    @media(max-width:768px){
+      .page{padding:80px 16px 90px}
+      .pkg-grid{grid-template-columns:1fr;gap:8px}
       .type-grid{grid-template-columns:repeat(2,1fr)}
-      .pb-price{font-size:1.5rem}
-      .page-title{font-size:1.7rem}
+      .total-bar{border-radius:20px;bottom:80px;padding:12px 12px 12px 18px}
+      .total-price{font-size:1.25rem}
+    }
+    @media(max-width:480px){
+      .page-h1{font-size:1.75rem}
+      .type-grid{grid-template-columns:1fr 1fr}
+      .domain-opts{flex-direction:column}
     }
   </style>
 </head>
 <body>
 <script src="nav.js" data-page="order"></script>
 
-<div class="page-wrap">
+<div class="page" id="pageWrap">
 
-  <div class="page-hero">
-    <div class="page-label">Конструктор заказа</div>
-    <h1 class="page-title">Создадим сайт<br/><span>под ваш проект</span></h1>
-    <p class="page-sub">Выберите готовый пакет или соберите сайт под себя. Цена считается в реальном времени.</p>
-  </div>
+  <div class="page-eyebrow">Заказать сайт</div>
+  <h1 class="page-h1">Сайт под ваш<br><em>проект</em></h1>
+  <p class="page-sub">Выберите пакет или настройте под себя. Цена обновляется в реальном времени.</p>
 
   <!-- PACKAGES -->
-  <div style="margin-bottom:.55rem">
-    <div style="font-size:.65rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:.85rem;font-weight:500">Готовые пакеты</div>
-    <div class="packages-grid">
-
-      <div class="pkg-card" data-pkg="start" data-price="3900" data-pages="1" data-maxpages="1" onclick="selectPackage(this)">
-        <div class="pkg-icon">🚀</div>
-        <div class="pkg-name">Старт</div>
-        <div class="pkg-price">3 900 <small>₽</small></div>
-        <div class="pkg-pages">1 страница · лендинг</div>
-        <div class="pkg-features">
-          <div class="pkg-feature">Адаптивный дизайн</div>
-          <div class="pkg-feature">Форма заявки</div>
-          <div class="pkg-feature">Подключение к домену</div>
-          <div class="pkg-feature">Бесплатный хостинг</div>
-          <div class="pkg-feature">Срок: 5–7 дней</div>
-        </div>
+  <div class="pkg-grid">
+    <div class="pkg" data-pkg="start" data-base="3900" onclick="selectPkg(this)">
+      <div class="pkg-name">Старт</div>
+      <div class="pkg-price">3 900 <span>₽</span></div>
+      <div class="pkg-pages">1 страница · лендинг</div>
+      <div class="pkg-feats">
+        <div class="pkg-feat">Адаптивный дизайн</div>
+        <div class="pkg-feat">Форма заявки</div>
+        <div class="pkg-feat">Хостинг бесплатно</div>
+        <div class="pkg-feat">Срок 5–7 дней</div>
       </div>
-
-      <div class="pkg-card sel" data-pkg="optimal" data-price="9900" data-pages="5" data-maxpages="5" onclick="selectPackage(this)">
-        <div class="pkg-badge">Популярный</div>
-        <div class="pkg-icon">⚡</div>
-        <div class="pkg-name">Оптимальный</div>
-        <div class="pkg-price">9 900 <small>₽</small></div>
-        <div class="pkg-pages">до 5 страниц</div>
-        <div class="pkg-features">
-          <div class="pkg-feature">Всё из пакета «Старт»</div>
-          <div class="pkg-feature">Галерея и портфолио</div>
-          <div class="pkg-feature">Карта и контакты</div>
-          <div class="pkg-feature">Интеграция соцсетей</div>
-          <div class="pkg-feature">Срок: 7–10 дней</div>
-        </div>
+    </div>
+    <div class="pkg sel" data-pkg="optimal" data-base="9900" onclick="selectPkg(this)">
+      <div class="pkg-popular">Популярный</div>
+      <div class="pkg-name">Оптимальный</div>
+      <div class="pkg-price">9 900 <span>₽</span></div>
+      <div class="pkg-pages">до 5 страниц</div>
+      <div class="pkg-feats">
+        <div class="pkg-feat">Всё из «Старта»</div>
+        <div class="pkg-feat">Галерея, карта</div>
+        <div class="pkg-feat">Интеграция соцсетей</div>
+        <div class="pkg-feat">Срок 7–10 дней</div>
       </div>
-
-      <div class="pkg-card" data-pkg="business" data-price="19900" data-pages="10" data-maxpages="10" onclick="selectPackage(this)">
-        <div class="pkg-icon">💼</div>
-        <div class="pkg-name">Бизнес</div>
-        <div class="pkg-price">19 900 <small>₽</small></div>
-        <div class="pkg-pages">до 10 страниц</div>
-        <div class="pkg-features">
-          <div class="pkg-feature">Всё из «Оптимального»</div>
-          <div class="pkg-feature">Каталог с фильтрами</div>
-          <div class="pkg-feature">Форма заказа / корзина</div>
-          <div class="pkg-feature">SEO-оптимизация</div>
-          <div class="pkg-feature">Срок: 10–14 дней</div>
-        </div>
+    </div>
+    <div class="pkg" data-pkg="business" data-base="19900" onclick="selectPkg(this)">
+      <div class="pkg-name">Бизнес</div>
+      <div class="pkg-price">19 900 <span>₽</span></div>
+      <div class="pkg-pages">до 10 страниц</div>
+      <div class="pkg-feats">
+        <div class="pkg-feat">Всё из «Оптимального»</div>
+        <div class="pkg-feat">Каталог с фильтрами</div>
+        <div class="pkg-feat">SEO-оптимизация</div>
+        <div class="pkg-feat">Срок 10–14 дней</div>
       </div>
-
     </div>
   </div>
 
-  <div class="or-divider">или настройте вручную</div>
-
-  <!-- STEP 1: TYPE -->
-  <div class="card">
-    <div class="card-title"><span class="step-n">1</span> Тип сайта</div>
-    <div class="type-grid">
-      <div class="type-card" data-type="Лендинг" onclick="selType(this)"><div class="ti">🎯</div><div class="tn">Лендинг</div><div class="ts">1 страница</div></div>
-      <div class="type-card" data-type="Многостраничный" onclick="selType(this)"><div class="ti">📄</div><div class="tn">Многостраничный</div><div class="ts">Сайт-визитка</div></div>
-      <div class="type-card" data-type="Портфолио" onclick="selType(this)"><div class="ti">🎨</div><div class="tn">Портфолио</div><div class="ts">Галерея работ</div></div>
-      <div class="type-card" data-type="Интернет-магазин" onclick="selType(this)"><div class="ti">🛒</div><div class="tn">Интернет-магазин</div><div class="ts">Каталог + корзина</div></div>
-      <div class="type-card" data-type="Блог" onclick="selType(this)"><div class="ti">✍️</div><div class="tn">Блог</div><div class="ts">Статьи и записи</div></div>
-      <div class="type-card" data-type="Другое" onclick="selType(this)"><div class="ti">✨</div><div class="tn">Другое</div><div class="ts">Обсудим</div></div>
+  <!-- TYPE -->
+  <div class="sec">
+    <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">Тип сайта</div></div>
+    <div class="card" style="padding:18px">
+      <div class="type-grid">
+        <div class="type-opt" data-t="Лендинг" onclick="selType(this)"><div class="ico">🎯</div><div class="lbl">Лендинг</div><div class="sub">1 страница</div></div>
+        <div class="type-opt" data-t="Многостраничный" onclick="selType(this)"><div class="ico">📄</div><div class="lbl">Многостраничный</div><div class="sub">Сайт-визитка</div></div>
+        <div class="type-opt" data-t="Портфолио" onclick="selType(this)"><div class="ico">🎨</div><div class="lbl">Портфолио</div><div class="sub">Галерея работ</div></div>
+        <div class="type-opt" data-t="Интернет-магазин" onclick="selType(this)"><div class="ico">🛒</div><div class="lbl">Интернет-магазин</div><div class="sub">Каталог + корзина</div></div>
+        <div class="type-opt" data-t="Блог" onclick="selType(this)"><div class="ico">✍️</div><div class="lbl">Блог</div><div class="sub">Статьи</div></div>
+        <div class="type-opt" data-t="Другое" onclick="selType(this)"><div class="ico">✨</div><div class="lbl">Другое</div><div class="sub">Обсудим</div></div>
+      </div>
     </div>
   </div>
 
-  <!-- STEP 2: PAGES + TARIFF -->
-  <div class="card">
-    <div class="card-title"><span class="step-n">2</span> Количество страниц</div>
-    <div style="display:flex;gap:.5rem;margin-bottom:1.1rem;flex-wrap:wrap">
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem 1rem;font-size:.76rem;flex:1;min-width:120px">
-        <div style="color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem">Цена за страницу</div>
-        <div style="font-family:'Unbounded',sans-serif;font-weight:700;color:var(--accent2)" id="pricePerPageDisp">650 ₽</div>
-      </div>
-      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem 1rem;font-size:.76rem;flex:1;min-width:120px">
-        <div style="color:var(--muted);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:.18rem">Минимум страниц</div>
-        <div style="font-family:'Unbounded',sans-serif;font-weight:700;color:var(--text)" id="minPagesDisp">1</div>
-      </div>
-    </div>
-    <div class="pages-label">Страниц: <span id="pagesLbl">5</span></div>
-    <div class="pages-row">
-      <input type="range" class="pages-slider" id="pagesSlider" min="1" max="30" value="5" oninput="onSlider()"/>
-      <span class="pages-disp" id="pagesDisp">5</span>
-    </div>
-    <div style="font-size:.68rem;color:var(--muted);margin-top:.65rem;line-height:1.5">
-      💡 Не знаете сколько страниц нужно? Напишите в описании — поможем разобраться.
-    </div>
-  </div>
+  <!-- EXTRAS -->
+  <div class="sec">
+    <div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">Дополнительно</div></div>
+    <div class="card" style="padding:18px">
+      <div class="extras">
 
-  <!-- STEP 3: EXTRAS -->
-  <div class="card">
-    <div class="card-title"><span class="step-n">3</span> Дополнительные услуги</div>
-    <div class="extras-grid">
-
-      <!-- Домен -->
-      <div class="extra-card" id="extraDomain" style="grid-column:span 2">
-        <div class="extra-top">
-          <div class="extra-check" id="domainCheck">✓</div>
-          <div class="extra-icon">🌐</div>
-          <div class="extra-body">
-            <div class="extra-title">Домен</div>
-            <div class="extra-desc">Адрес вашего сайта в интернете — например, mycompany.ru. Можем зарегистрировать новый или подключить уже существующий.</div>
-            <div class="extra-divider"></div>
-            <div class="domain-toggle">
-              <button class="dtoggle-btn sel" id="dtnew" onclick="setDomainOpt('new',event)">🛒 Зарегистрировать .ru — +650 ₽/год</button>
-              <button class="dtoggle-btn" id="dtowner" onclick="setDomainOpt('own',event)">🔗 У меня есть — подключим бесплатно</button>
-            </div>
-            <div class="domain-hint" id="domainHint">Регистрация домена .ru на 1 год включена в стоимость. Продление домена ~650 ₽/год — оплачивается самостоятельно.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Хостинг -->
-      <div class="extra-card on disabled">
-        <div class="extra-top">
+        <!-- Хостинг — всегда включён -->
+        <div class="extra on disabled">
           <div class="extra-check" style="background:var(--success);border-color:var(--success);color:#000">✓</div>
-          <div class="extra-icon">🚀</div>
+          <div class="extra-ico">🚀</div>
           <div class="extra-body">
-            <div class="extra-title">Хостинг</div>
-            <div class="extra-desc">Мы размещаем ваш сайт на нашем сервере — бесплатно и навсегда. Включает SSL-сертификат (замочек в браузере) и быструю загрузку.</div>
-            <div class="extra-price free">Бесплатно навсегда</div>
+            <div class="extra-top">
+              <span class="extra-label">Хостинг</span>
+              <span class="extra-price-tag free">Бесплатно</span>
+            </div>
+            <div class="extra-desc">Размещаем сайт на нашем сервере навсегда — бесплатно. Включает SSL-сертификат и быструю загрузку.</div>
           </div>
         </div>
-      </div>
 
-      <!-- Поддержка -->
-      <div class="extra-card" id="extraSupport" onclick="toggleExtra(this,'support')">
-        <div class="extra-top">
+        <!-- Домен -->
+        <div class="extra on" id="xDomain">
           <div class="extra-check">✓</div>
-          <div class="extra-icon">🔧</div>
+          <div class="extra-ico">🌐</div>
           <div class="extra-body">
-            <div class="extra-title">Обслуживание сайта</div>
-            <div class="extra-desc">Ежемесячное обслуживание: правки текстов, замена фотографий, мелкие изменения по вашему запросу. Отправляете заявку — мы делаем.</div>
-            <div class="extra-price paid">+500 ₽ / месяц</div>
+            <div class="extra-top">
+              <span class="extra-label">Домен</span>
+              <span class="extra-price-tag" id="xDomainPrice">+650 ₽/год</span>
+            </div>
+            <div class="extra-desc">Адрес вашего сайта в интернете — например, mycompany.ru. Регистрируем новый или подключаем существующий.</div>
+            <div class="domain-opts">
+              <button class="domain-opt sel" id="dOptNew" onclick="setDomain('new',event)">🛒 Зарегистрировать .ru</button>
+              <button class="domain-opt" id="dOptOwn" onclick="setDomain('own',event)">🔗 У меня есть — подключить</button>
+            </div>
+            <div class="domain-note" id="dNote">Регистрация на 1 год включена в стоимость. Продление ~650 ₽/год — самостоятельно.</div>
           </div>
         </div>
-      </div>
 
-      <!-- SEO -->
-      <div class="extra-card" id="extraSeo" onclick="toggleExtra(this,'seo')">
-        <div class="extra-top">
+        <!-- Обслуживание -->
+        <div class="extra" id="xSupport" onclick="toggleX(this,'support',500)">
           <div class="extra-check">✓</div>
-          <div class="extra-icon">📈</div>
+          <div class="extra-ico">🔧</div>
           <div class="extra-body">
-            <div class="extra-title">SEO-оптимизация</div>
-            <div class="extra-desc">Настройка сайта для поисковых систем: мета-теги, заголовки, описания, robots.txt, sitemap. Помогает сайту появляться в Яндексе и Google.</div>
-            <div class="extra-price paid">+2 500 ₽</div>
+            <div class="extra-top">
+              <span class="extra-label">Обслуживание сайта</span>
+              <span class="extra-price-tag">+500 ₽/мес</span>
+            </div>
+            <div class="extra-desc">Ежемесячные правки текстов, замена фото, мелкие изменения по запросу. Создаёте заявку — мы делаем.</div>
           </div>
         </div>
-      </div>
 
-      <!-- Контент -->
-      <div class="extra-card" id="extraContent" onclick="toggleExtra(this,'content')">
-        <div class="extra-top">
+        <!-- SEO -->
+        <div class="extra" id="xSeo" onclick="toggleX(this,'seo',2500)">
           <div class="extra-check">✓</div>
-          <div class="extra-icon">✍️</div>
+          <div class="extra-ico">📈</div>
           <div class="extra-body">
-            <div class="extra-title">Наполнение контентом</div>
-            <div class="extra-desc">Напишем тексты для вашего сайта: описание компании, услуги, преимущества. Вы предоставляете информацию — мы оформляем.</div>
-            <div class="extra-price paid">+2 000 ₽</div>
+            <div class="extra-top">
+              <span class="extra-label">SEO-оптимизация</span>
+              <span class="extra-price-tag">+2 500 ₽</span>
+            </div>
+            <div class="extra-desc">Настройка для Яндекса и Google: мета-теги, заголовки, sitemap, robots.txt. Сайт будет находить поисковиками.</div>
           </div>
         </div>
-      </div>
 
-      <!-- Корзина -->
-      <div class="extra-card" id="extraShop" onclick="toggleExtra(this,'shop')">
-        <div class="extra-top">
+        <!-- Контент -->
+        <div class="extra" id="xContent" onclick="toggleX(this,'content',2000)">
           <div class="extra-check">✓</div>
-          <div class="extra-icon">🛒</div>
+          <div class="extra-ico">✍️</div>
           <div class="extra-body">
-            <div class="extra-title">Корзина и каталог</div>
-            <div class="extra-desc">Каталог товаров с фильтрами, карточки товаров, корзина и форма оформления заказа. Идеально для интернет-магазина.</div>
-            <div class="extra-price paid">+4 900 ₽</div>
+            <div class="extra-top">
+              <span class="extra-label">Наполнение контентом</span>
+              <span class="extra-price-tag">+2 000 ₽</span>
+            </div>
+            <div class="extra-desc">Напишем тексты для сайта: описание компании, услуги, преимущества. Вы даёте информацию — мы оформляем.</div>
           </div>
         </div>
-      </div>
 
-      <!-- Срочность -->
-      <div class="extra-card" id="extraUrgent" onclick="toggleExtra(this,'urgent')">
-        <div class="extra-top">
+        <!-- Корзина -->
+        <div class="extra" id="xShop" onclick="toggleX(this,'shop',4900)">
           <div class="extra-check">✓</div>
-          <div class="extra-icon">⚡</div>
+          <div class="extra-ico">🛒</div>
           <div class="extra-body">
-            <div class="extra-title">Срочное выполнение</div>
-            <div class="extra-desc">Сделаем сайт за 2–3 рабочих дня вместо стандартных 7–14. Берём в приоритетную очередь — работаем сверхурочно.</div>
-            <div class="extra-price paid">+30% к цене</div>
+            <div class="extra-top">
+              <span class="extra-label">Каталог и корзина</span>
+              <span class="extra-price-tag">+4 900 ₽</span>
+            </div>
+            <div class="extra-desc">Каталог товаров с фильтрами, карточки товаров, корзина и форма заказа. Для интернет-магазина.</div>
           </div>
         </div>
-      </div>
 
-      <!-- Telegram — WIP -->
-      <div class="extra-card disabled" onclick="showWip(event)">
-        <div class="extra-top">
+        <!-- Срочно -->
+        <div class="extra" id="xUrgent" onclick="toggleX(this,'urgent',0)">
           <div class="extra-check">✓</div>
-          <div class="extra-icon">📱</div>
+          <div class="extra-ico">⚡</div>
           <div class="extra-body">
-            <div class="extra-title">Telegram-уведомления <span class="extra-wip">В разработке</span></div>
-            <div class="extra-desc">Получайте уведомления о новых заявках прямо в Telegram. Скоро появится в нашем сервисе.</div>
-            <div class="extra-price paid">+1 500 ₽</div>
+            <div class="extra-top">
+              <span class="extra-label">Срочное выполнение</span>
+              <span class="extra-price-tag">+30%</span>
+            </div>
+            <div class="extra-desc">Сделаем за 2–3 рабочих дня вместо стандартных 7–14. Приоритетная очередь.</div>
           </div>
         </div>
-      </div>
 
+        <!-- Telegram WIP -->
+        <div class="extra disabled" onclick="wipToast(event)">
+          <div class="extra-check">✓</div>
+          <div class="extra-ico">📱</div>
+          <div class="extra-body">
+            <div class="extra-top">
+              <span class="extra-label">Telegram-уведомления <span class="wip-tag">Скоро</span></span>
+              <span class="extra-price-tag">+1 500 ₽</span>
+            </div>
+            <div class="extra-desc">Уведомления о новых заявках прямо в Telegram. Функция в разработке.</div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
   <!-- PROMO -->
-  <div class="card">
-    <div class="card-title" style="margin-bottom:.9rem">
-      <span style="font-size:1rem">🏷</span> Промокод
+  <div class="sec">
+    <div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">Промокод</div></div>
+    <div class="card" style="padding:18px">
+      <div class="promo-row">
+        <input class="promo-inp" id="promoInp" type="text" placeholder="Введите промокод..."/>
+        <button class="promo-btn" id="promoBtn" onclick="applyPromo()">Применить</button>
+      </div>
+      <div class="promo-feedback" id="promoFb"></div>
     </div>
-    <div class="promo-row">
-      <input class="promo-inp" id="promoInput" type="text" placeholder="Введите промокод..."/>
-      <button class="promo-apply" id="promoApplyBtn" onclick="applyPromo()">Применить</button>
-    </div>
-    <div class="promo-msg" id="promoMsg"></div>
   </div>
 
-  <!-- PRICE BAR -->
-  <div class="price-bar">
-    <div class="pb-left">
-      <div class="pb-label">Итоговая стоимость</div>
-      <div class="pb-price-row">
-        <div class="pb-price" id="totalPrice">9 900 ₽</div>
-        <div class="pb-original" id="priceOriginal"></div>
+  <!-- TOTAL BAR -->
+  <div class="total-bar">
+    <div class="total-left">
+      <div class="total-lbl">Итого</div>
+      <div class="total-price-row">
+        <div class="total-price" id="tPrice">9 900 ₽</div>
+        <div class="total-orig" id="tOrig"></div>
       </div>
-      <div class="pb-breakdown" id="totalBreakdown">Пакет «Оптимальный»</div>
-      <div class="pb-discount" id="promoDiscount"></div>
+      <div class="total-breakdown" id="tBreak">Пакет «Оптимальный»</div>
+      <div class="total-discount" id="tDiscount"></div>
     </div>
-    <button class="btn btn-primary" onclick="scrollToForm()">
-      Оформить заказ
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <button class="total-btn" onclick="scrollForm()">
+      Оформить
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
 
-  <!-- STEP 4: FORM -->
-  <div class="card" id="formCard">
-    <div class="card-title"><span class="step-n" style="background:var(--accent3)">4</span> Детали проекта</div>
-    <div id="formInner">
-      <div class="form-group">
-        <label class="form-label">Расскажите о проекте</label>
-        <textarea class="form-textarea" id="fdesc" placeholder="Чем занимается компания, что должно быть на сайте, есть ли примеры стиля или конкуренты которые нравятся..."></textarea>
-      </div>
+  <!-- FORM -->
+  <div class="sec" id="formSection">
+    <div class="sec-hdr"><div class="sec-num" style="background:rgba(56,189,248,.15);border-color:rgba(56,189,248,.3);color:var(--accent3)">4</div><div class="sec-title">Детали проекта</div></div>
+    <div class="card">
+      <div id="formInner">
 
-      <div class="form-group">
-        <label class="form-label">Фавикон <span style="font-weight:400;color:var(--muted);text-transform:none;font-size:.75rem;letter-spacing:0">(необязательно)</span></label>
-        <div class="info-box"><strong>Что такое фавикон?</strong> — маленькая иконка сайта во вкладке браузера и в закладках. Обычно это логотип компании 32×32 или 64×64 пикселя. Форматы: PNG, ICO, SVG.</div>
-        <div class="file-zone" onclick="document.getElementById('ffavicon').click()" style="padding:.85rem">
-          <input type="file" id="ffavicon" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none" onchange="handleFavicon(this.files[0])"/>
-          <div style="font-size:1.2rem;margin-bottom:.25rem">🖼️</div>
-          <div style="color:var(--muted);font-size:.76rem"><strong style="color:var(--accent2)">Нажмите</strong> чтобы загрузить · PNG, ICO, SVG</div>
+        <div class="fgroup">
+          <label class="form-lbl">О проекте</label>
+          <textarea class="form-ta" id="fdesc" placeholder="Чем занимается компания, что должно быть на сайте, примеры стиля..."></textarea>
         </div>
-        <div id="faviconPreview" style="display:none;margin-top:.5rem;align-items:center;gap:.6rem;font-size:.78rem;color:var(--muted)"></div>
-      </div>
 
-      <div class="form-group">
-        <label class="form-label">Материалы <span style="font-weight:400;color:var(--muted);text-transform:none;font-size:.75rem;letter-spacing:0">фото, PDF, архивы, брендбук</span></label>
-        <div class="file-zone" onclick="document.getElementById('ffiles').click()">
-          <input type="file" id="ffiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none" onchange="handleFiles(this.files)"/>
-          <div style="font-size:1.3rem;margin-bottom:.25rem">📎</div>
-          <div style="color:var(--muted);font-size:.76rem"><strong style="color:var(--accent2)">Нажмите</strong> или перетащите · до 10 МБ на файл</div>
+        <div class="fgroup">
+          <label class="form-lbl">Фавикон <span style="font-size:.68rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:300">(необязательно)</span></label>
+          <div class="info-pill"><strong>Фавикон</strong> — маленькая иконка во вкладке браузера и закладках. Обычно логотип 32×32px. Форматы: PNG, ICO, SVG.</div>
+          <div class="file-zone" onclick="document.getElementById('fFav').click()" style="padding:.9rem">
+            <input type="file" id="fFav" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none" onchange="handleFav(this.files[0])"/>
+            <div style="font-size:1.1rem;margin-bottom:.2rem">🖼️</div>
+            <div style="color:var(--muted);font-size:.75rem"><strong style="color:var(--accent2)">Нажмите</strong> чтобы загрузить · PNG, ICO, SVG</div>
+          </div>
+          <div id="favPreview" style="display:none;margin-top:.5rem;align-items:center;gap:.6rem;font-size:.75rem;color:var(--muted)"></div>
         </div>
-        <div class="file-list" id="fileList"></div>
+
+        <div class="fgroup">
+          <label class="form-lbl">Материалы <span style="font-size:.68rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:300">фото, PDF, брендбук, архивы</span></label>
+          <div class="file-zone" onclick="document.getElementById('fFiles').click()">
+            <input type="file" id="fFiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none" onchange="handleFiles(this.files)"/>
+            <div style="font-size:1.2rem;margin-bottom:.2rem">📎</div>
+            <div style="color:var(--muted);font-size:.75rem"><strong style="color:var(--accent2)">Нажмите</strong> или перетащите · до 10 МБ на файл</div>
+          </div>
+          <div class="file-chips" id="fileChips"></div>
+        </div>
+
+        <div class="agree-row" onclick="toggleAgree()">
+          <div class="agree-box" id="agreeBox"></div>
+          <div class="agree-txt">Принимаю <a href="rules" target="_blank" onclick="event.stopPropagation()">правила сервиса</a> и согласен на обработку персональных данных</div>
+        </div>
+        <div class="err-msg" id="errAgree">Необходимо принять правила сервиса</div>
+
+        <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+          Отправить заявку
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <p class="form-note">Ответим в течение нескольких часов · Бесплатная консультация</p>
       </div>
 
-      <div class="agree-row" onclick="toggleAgree()">
-        <div class="agree-box" id="agreeBox"></div>
-        <div class="agree-text">Принимаю <a href="rules" target="_blank" onclick="event.stopPropagation()">правила сервиса</a> и согласен на обработку персональных данных</div>
+      <div class="success" id="successWrap">
+        <div class="success-ico">🎉</div>
+        <h3>Заявка принята!</h3>
+        <p>Заказ сохранён в личном кабинете. Уведомим о каждом этапе работы.</p>
+        <a href="profile/orders" style="display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;text-decoration:none;padding:.72rem 1.5rem;border-radius:999px;font-size:.86rem;font-weight:500;margin-top:.5rem;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 6px 24px rgba(108,99,255,.45)'" onmouseout="this.style.boxShadow=''">Мои заказы →</a>
       </div>
-      <div class="errmsg" id="err-agree">Необходимо принять правила сервиса</div>
-
-      <button class="submit-btn" id="submitBtn" onclick="submitForm()">
-        Отправить заявку
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </button>
-      <p class="form-note">Ответим в течение нескольких часов · Бесплатная консультация</p>
-    </div>
-
-    <div class="success-wrap" id="successWrap">
-      <div class="success-icon">🎉</div>
-      <h3>Заявка принята!</h3>
-      <p>Заказ сохранён в вашем личном кабинете. Следите за статусом — уведомим о каждом этапе.</p>
-      <a href="profile/orders" class="btn btn-primary" style="margin-top:.5rem">Мои заказы →</a>
     </div>
   </div>
 
@@ -490,247 +497,204 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-  import { auth, db } from './firebase-config.js';
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  let currentUser = null;
-  let agreeChecked = false, uploadedFiles = [], faviconFile = null;
+let currentUser = null;
+let agreed = false, favFile = null, uploadedFiles = [];
 
-  // Состояние
-  let mode = 'package'; // 'package' или 'custom'
-  let selPkg = { name: 'Оптимальный', price: 9900, pages: 5 };
-  let selTypeVal = 'Лендинг';
-  let pricePerPage = 650, minPages = 1, selPages = 5;
-  let extras = { domain: true, domainOpt: 'new', support: false, seo: false, content: false, shop: false, urgent: false };
-  let promoData = null;
+// State
+let state = {
+  pkg: 'optimal', pkgBase: 9900, pkgName: 'Оптимальный',
+  siteType: null,
+  extras: { domain: true, domainOpt: 'new', support: false, seo: false, content: false, shop: false, urgent: false },
+  promo: null,
+};
 
-  function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200);}
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200);}
+window.wipToast = e => { e.stopPropagation(); toast('Telegram-уведомления в разработке 🚧','warn'); };
+window.scrollForm = () => document.getElementById('formSection').scrollIntoView({behavior:'smooth'});
 
-  window.showWip = e => { e.stopPropagation(); toast('Telegram-уведомления пока в разработке 🚧','warn'); };
-  window.scrollToForm = () => document.getElementById('formCard').scrollIntoView({behavior:'smooth', block:'start'});
-
-  // Maintenance check
-  onAuthStateChanged(auth, async user => {
-    try{
-      const snap=await getDoc(doc(db,'settings','maintenance'));
-      if(snap.exists()&&snap.data().enabled===true){
-        document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:#f0f0f5;background:#0a0a0c;gap:1rem;text-align:center;padding:2rem"><div style="font-size:3rem">🔧</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div><div style="color:#777789;font-size:.9rem;max-width:360px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div><a href="/" style="color:#a78bfa;text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a></div>`;
-        return;
-      }
-    }catch(e){}
-    if(!user){ window.location.href='auth'; return; }
-    currentUser = user;
-  });
-
-  /* ── PACKAGES ── */
-  window.selectPackage = el => {
-    document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('sel'));
-    el.classList.add('sel');
-    mode = 'package';
-    selPkg = {
-      name: el.querySelector('.pkg-name').textContent,
-      price: +el.dataset.price,
-      pages: +el.dataset.pages,
-    };
-    // Синхронизируем ползунок
-    const slider = document.getElementById('pagesSlider');
-    selPages = selPkg.pages;
-    slider.value = selPages;
-    document.getElementById('pagesLbl').textContent = selPages;
-    document.getElementById('pagesDisp').textContent = selPages;
-    updateTotal();
-  };
-
-  /* ── CUSTOM CONSTRUCTOR ── */
-  window.selType = el => {
-    mode = 'custom';
-    document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('sel'));
-    document.querySelectorAll('.type-card').forEach(c=>c.classList.remove('sel'));
-    el.classList.add('sel');
-    selTypeVal = el.dataset.type;
-    updateTotal();
-  };
-
-  window.onSlider = () => {
-    mode = 'custom';
-    document.querySelectorAll('.pkg-card').forEach(c=>c.classList.remove('sel'));
-    selPages = +document.getElementById('pagesSlider').value;
-    document.getElementById('pagesLbl').textContent = selPages;
-    document.getElementById('pagesDisp').textContent = selPages;
-    updateTotal();
-  };
-
-  /* ── EXTRAS ── */
-  // Домен — включён по умолчанию, показываем варианты
-  const domainCard = document.getElementById('extraDomain');
-  domainCard.classList.add('on');
-
-  window.setDomainOpt = (opt, e) => {
-    e.stopPropagation();
-    extras.domainOpt = opt;
-    document.getElementById('dtnew').classList.toggle('sel', opt==='new');
-    document.getElementById('dtowner').classList.toggle('sel', opt==='own');
-    document.getElementById('domainHint').textContent = opt === 'new'
-      ? 'Регистрация домена .ru на 1 год включена в стоимость. Продление домена ~650 ₽/год — оплачивается самостоятельно.'
-      : 'Подключим ваш домен бесплатно. Потребуется доступ к настройкам DNS у вашего регистратора.';
-    extras.domain = (opt === 'new');
-    updateTotal();
-  };
-
-  window.toggleExtra = (el, key) => {
-    extras[key] = !extras[key];
-    el.classList.toggle('on', extras[key]);
-    updateTotal();
-  };
-
-  /* ── PROMO ── */
-  window.applyPromo = async () => {
-    const code = document.getElementById('promoInput').value.trim().toUpperCase();
-    const msgEl = document.getElementById('promoMsg');
-    if(!code){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Введите промокод'; return; }
-    const btn = document.getElementById('promoApplyBtn');
-    btn.disabled=true; btn.textContent='Проверяем...';
-    try{
-      const snap = await getDocs(query(collection(db,'promoCodes'),where('code','==',code),where('active','==',true)));
-      if(snap.empty){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Промокод не найден или не активен'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-      const promo = snap.docs[0].data();
-      if(promo.expiresAt?.toDate&&promo.expiresAt.toDate()<new Date()){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Срок действия промокода истёк'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-      if(promo.forUid&&currentUser&&promo.forUid!==currentUser.uid){ promoData=null; msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-      promoData = { type: promo.discountType, value: promo.discountValue, code };
-      const label = promo.discountType==='percent' ? `-${promo.discountValue}%` : `-${promo.discountValue} ₽`;
-      msgEl.style.display='block'; msgEl.style.color='var(--success)'; msgEl.textContent=`✓ Промокод применён: ${label}`;
-      btn.textContent='✓ Применён'; btn.style.color='var(--success)'; btn.style.borderColor='var(--success)';
-    }catch(e){ msgEl.style.display='block'; msgEl.style.color='var(--error)'; msgEl.textContent='Ошибка'; btn.disabled=false; btn.textContent='Применить'; }
-    updateTotal();
-  };
-
-  function calcDiscount(base){
-    if(!promoData) return 0;
-    if(promoData.type==='percent') return Math.round(base * promoData.value / 100);
-    return Math.min(promoData.value, base);
-  }
-
-  /* ── PRICE CALC ── */
-  function updateTotal(){
-    let subtotal = 0;
-    let parts = [];
-
-    if(mode === 'package'){
-      subtotal = selPkg.price;
-      parts.push(`Пакет «${selPkg.name}»`);
-    } else {
-      subtotal = pricePerPage * selPages;
-      parts.push(`${pricePerPage} ₽ × ${selPages} стр.`);
+// Maintenance
+onAuthStateChanged(auth, async user => {
+  try{
+    const s=await getDoc(doc(db,'settings','maintenance'));
+    if(s.exists()&&s.data().enabled){
+      document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:#f0f0f5;background:#09090d;gap:1rem;text-align:center;padding:2rem"><div style="font-size:3rem">🔧</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div><div style="color:#666674;font-size:.9rem;max-width:360px;line-height:1.65">Сайт временно недоступен. Скоро всё будет готово!</div><a href="/" style="color:#a78bfa;text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a></div>`;
+      return;
     }
+  }catch(e){}
+  if(!user){ window.location.href='auth'; return; }
+  currentUser = user;
+});
 
-    if(extras.domain){ subtotal += 650; parts.push('+650 ₽ домен .ru'); }
-    if(extras.support){ subtotal += 500; parts.push('+500 ₽ обслуживание'); }
-    if(extras.seo){ subtotal += 2500; parts.push('+2 500 ₽ SEO'); }
-    if(extras.content){ subtotal += 2000; parts.push('+2 000 ₽ контент'); }
-    if(extras.shop){ subtotal += 4900; parts.push('+4 900 ₽ корзина'); }
-    if(extras.urgent){ const u=Math.round(subtotal*.3); subtotal+=u; parts.push('+30% срочность'); }
-
-    const discount = calcDiscount(subtotal);
-    const total = subtotal - discount;
-
-    document.getElementById('totalPrice').textContent = total.toLocaleString('ru') + ' ₽';
-    document.getElementById('totalBreakdown').textContent = parts.join(' · ');
-
-    const origEl = document.getElementById('priceOriginal');
-    const discEl = document.getElementById('promoDiscount');
-    if(discount > 0){
-      origEl.style.display='block'; origEl.textContent = subtotal.toLocaleString('ru') + ' ₽';
-      discEl.style.display='block'; discEl.textContent = `Скидка: -${discount.toLocaleString('ru')} ₽`;
-    } else {
-      origEl.style.display='none'; discEl.style.display='none';
-    }
-
-    // Обновляем цену/страниц индикаторы
-    document.getElementById('pricePerPageDisp').textContent = pricePerPage + ' ₽';
-    document.getElementById('minPagesDisp').textContent = minPages;
-  }
-
-  /* ── FILES ── */
-  window.handleFavicon = file => {
-    if(!file) return;
-    if(file.size>2*1024*1024){ toast('Фавикон > 2 МБ','error'); return; }
-    faviconFile = file;
-    const prev = document.getElementById('faviconPreview');
-    const url = URL.createObjectURL(file);
-    prev.style.display='flex';
-    prev.innerHTML=`<img src="${url}" style="width:32px;height:32px;border-radius:4px;object-fit:contain;background:#fff;padding:2px"> ${file.name} <button onclick="removeFavicon()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">×</button>`;
-  };
-  window.removeFavicon=()=>{ faviconFile=null; const p=document.getElementById('faviconPreview'); p.style.display='none'; p.innerHTML=''; document.getElementById('ffavicon').value=''; };
-  window.handleFiles=files=>{ Array.from(files).forEach(f=>{ if(f.size>10*1024*1024){toast(f.name+' > 10 МБ','error');return;} if(!uploadedFiles.find(u=>u.name===f.name)) uploadedFiles.push(f); }); renderFiles(); };
-  function renderFiles(){ const l=document.getElementById('fileList'); l.innerHTML=''; uploadedFiles.forEach((f,i)=>{ const c=document.createElement('div'); c.className='file-chip'; c.innerHTML=`📄 ${f.name} <button onclick="rmFile(${i})">×</button>`; l.appendChild(c); }); }
-  window.rmFile=i=>{ uploadedFiles.splice(i,1); renderFiles(); };
-
-  /* ── AGREE ── */
-  window.toggleAgree=()=>{ agreeChecked=!agreeChecked; document.getElementById('agreeBox').classList.toggle('checked',agreeChecked); document.getElementById('agreeBox').classList.remove('errbdr'); document.getElementById('err-agree').classList.remove('show'); };
-
-  /* ── SUBMIT ── */
-  window.submitForm = async () => {
-    if(!agreeChecked){ document.getElementById('agreeBox').classList.add('errbdr'); document.getElementById('err-agree').classList.add('show'); return; }
-    if(!currentUser){ toast('Необходимо войти в аккаунт','error'); setTimeout(()=>window.location.href='auth',1200); return; }
-
-    const btn = document.getElementById('submitBtn');
-    btn.disabled=true; btn.textContent='Отправляем...';
-
-    // Считаем финальную цену
-    let subtotal = mode==='package' ? selPkg.price : pricePerPage * selPages;
-    const extrasArr = [];
-    if(extras.domain){ subtotal+=650; extrasArr.push('domain'); }
-    if(extras.support){ subtotal+=500; extrasArr.push('support'); }
-    if(extras.seo){ subtotal+=2500; extrasArr.push('seo'); }
-    if(extras.content){ subtotal+=2000; extrasArr.push('content'); }
-    if(extras.shop){ subtotal+=4900; extrasArr.push('shop'); }
-    if(extras.urgent){ subtotal=Math.round(subtotal*1.3); extrasArr.push('urgent'); }
-    const discount = calcDiscount(subtotal);
-    const totalPrice = subtotal - discount;
-
-    // Фавикон
-    let faviconData = null;
-    if(faviconFile){ try{ faviconData=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(faviconFile);}); }catch(e){} }
-
-    // Файлы
-    const attachments = [];
-    for(const file of uploadedFiles){
-      if(file.size>3*1024*1024) continue;
-      try{ const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);}); attachments.push({fileData:b64,fileName:file.name,fileType:file.type}); }catch(e){}
-    }
-
-    try{
-      await addDoc(collection(db,'orders'),{
-        orderMode: mode,
-        package: mode==='package' ? selPkg.name : null,
-        siteType: mode==='package' ? selPkg.name : selTypeVal,
-        tariff: mode==='custom' ? 'Кастомный' : selPkg.name,
-        pages: mode==='package' ? selPkg.pages : selPages,
-        totalPrice,
-        extras: extrasArr,
-        domainOption: extras.domainOpt,
-        promoCode: promoData?.code || null,
-        discountApplied: discount,
-        description: document.getElementById('fdesc').value.trim() || '',
-        attachments: attachments.length ? attachments : null,
-        favicon: faviconData,
-        clientName: currentUser.displayName || 'Пользователь',
-        clientEmail: currentUser.email,
-        uid: currentUser.uid,
-        status: 0,
-        createdAt: serverTimestamp()
-      });
-      document.getElementById('formInner').style.display='none';
-      document.getElementById('successWrap').classList.add('show');
-    }catch(e){
-      btn.disabled=false;
-      btn.innerHTML='Отправить заявку <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-      toast('Ошибка отправки. Попробуйте ещё раз.','error');
-    }
-  };
-
+/* ── PACKAGES ── */
+window.selectPkg = el => {
+  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  state.pkg = el.dataset.pkg;
+  state.pkgBase = +el.dataset.base;
+  state.pkgName = el.querySelector('.pkg-name').textContent;
   updateTotal();
+};
+
+/* ── TYPE ── */
+window.selType = el => {
+  document.querySelectorAll('.type-opt').forEach(t=>t.classList.remove('sel'));
+  el.classList.add('sel');
+  state.siteType = el.dataset.t;
+};
+
+/* ── DOMAIN ── */
+const xDomain = document.getElementById('xDomain');
+xDomain.classList.add('on');
+xDomain.addEventListener('click', function(e){
+  if(e.target.closest('.domain-opt')) return;
+  state.extras.domain = !state.extras.domain;
+  this.classList.toggle('on', state.extras.domain);
+  updateTotal();
+});
+
+window.setDomain = (opt, e) => {
+  e.stopPropagation();
+  state.extras.domainOpt = opt;
+  document.getElementById('dOptNew').classList.toggle('sel', opt==='new');
+  document.getElementById('dOptOwn').classList.toggle('sel', opt==='own');
+  document.getElementById('dNote').textContent = opt==='new'
+    ? 'Регистрация на 1 год включена в стоимость. Продление ~650 ₽/год — самостоятельно.'
+    : 'Подключим ваш домен бесплатно. Потребуется доступ к DNS у вашего регистратора.';
+  document.getElementById('xDomainPrice').textContent = opt==='new' ? '+650 ₽/год' : 'Бесплатно';
+  state.extras.domain = (opt==='new');
+  updateTotal();
+};
+
+/* ── EXTRAS ── */
+const EXTRA_PRICES = { support:500, seo:2500, content:2000, shop:4900, urgent:0 };
+window.toggleX = (el, key) => {
+  state.extras[key] = !state.extras[key];
+  el.classList.toggle('on', state.extras[key]);
+  updateTotal();
+};
+
+/* ── PROMO ── */
+window.applyPromo = async () => {
+  const code = document.getElementById('promoInp').value.trim().toUpperCase();
+  const fb = document.getElementById('promoFb');
+  const btn = document.getElementById('promoBtn');
+  if(!code){ fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Введите промокод'; return; }
+  btn.disabled=true; btn.textContent='Проверяем...';
+  try{
+    const snap=await getDocs(query(collection(db,'promoCodes'),where('code','==',code),where('active','==',true)));
+    if(snap.empty){ state.promo=null; fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Промокод не найден'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+    const p=snap.docs[0].data();
+    if(p.expiresAt?.toDate&&p.expiresAt.toDate()<new Date()){ state.promo=null; fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Срок действия истёк'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+    if(p.forUid&&currentUser&&p.forUid!==currentUser.uid){ state.promo=null; fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
+    state.promo={type:p.discountType,value:p.discountValue,code};
+    const lbl=p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`;
+    fb.style.display='block'; fb.style.color='var(--success)'; fb.textContent=`✓ Применён: ${lbl}`;
+    btn.textContent='✓ Применён'; btn.style.color='var(--success)';
+  }catch(e){ fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Ошибка проверки'; btn.disabled=false; btn.textContent='Применить'; }
+  updateTotal();
+};
+
+function calcDiscount(sub){
+  if(!state.promo) return 0;
+  return state.promo.type==='percent' ? Math.round(sub*state.promo.value/100) : Math.min(state.promo.value,sub);
+}
+
+/* ── TOTAL ── */
+function updateTotal(){
+  let sub = state.pkgBase;
+  let parts = [`Пакет «${state.pkgName}»`];
+  if(state.extras.domain && state.extras.domainOpt==='new'){ sub+=650; parts.push('+650 ₽ домен'); }
+  if(state.extras.support){ sub+=500; parts.push('+500 ₽ обслуживание'); }
+  if(state.extras.seo){ sub+=2500; parts.push('+2 500 ₽ SEO'); }
+  if(state.extras.content){ sub+=2000; parts.push('+2 000 ₽ контент'); }
+  if(state.extras.shop){ sub+=4900; parts.push('+4 900 ₽ корзина'); }
+  if(state.extras.urgent){ const u=Math.round(sub*.3); sub+=u; parts.push('+30% срочность'); }
+  const disc=calcDiscount(sub);
+  const total=sub-disc;
+  document.getElementById('tPrice').textContent=total.toLocaleString('ru')+' ₽';
+  document.getElementById('tBreak').textContent=parts.join(' · ');
+  const origEl=document.getElementById('tOrig');
+  const discEl=document.getElementById('tDiscount');
+  if(disc>0){origEl.style.display='block';origEl.textContent=sub.toLocaleString('ru')+' ₽';discEl.style.display='block';discEl.textContent=`Скидка: -${disc.toLocaleString('ru')} ₽`;}
+  else{origEl.style.display='none';discEl.style.display='none';}
+}
+
+/* ── FILES ── */
+window.handleFav = file => {
+  if(!file) return;
+  if(file.size>2*1024*1024){ toast('Фавикон > 2 МБ','error'); return; }
+  favFile=file;
+  const p=document.getElementById('favPreview');const url=URL.createObjectURL(file);
+  p.style.display='flex';
+  p.innerHTML=`<img src="${url}" style="width:30px;height:30px;border-radius:4px;object-fit:contain;background:#fff;padding:2px"> ${file.name} <button onclick="clearFav()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem">×</button>`;
+};
+window.clearFav=()=>{ favFile=null; const p=document.getElementById('favPreview'); p.style.display='none'; p.innerHTML=''; document.getElementById('fFav').value=''; };
+window.handleFiles=files=>{ Array.from(files).forEach(f=>{ if(f.size>10*1024*1024){toast(f.name+' > 10 МБ','error');return;} if(!uploadedFiles.find(u=>u.name===f.name)) uploadedFiles.push(f); }); renderChips(); };
+function renderChips(){ const el=document.getElementById('fileChips'); el.innerHTML=''; uploadedFiles.forEach((f,i)=>{ const c=document.createElement('div'); c.className='chip'; c.innerHTML=`📄 ${f.name} <button onclick="rmFile(${i})">×</button>`; el.appendChild(c); }); }
+window.rmFile=i=>{ uploadedFiles.splice(i,1); renderChips(); };
+
+/* ── AGREE ── */
+window.toggleAgree=()=>{ agreed=!agreed; document.getElementById('agreeBox').classList.toggle('on',agreed); document.getElementById('agreeBox').classList.remove('err'); document.getElementById('errAgree').classList.remove('show'); };
+
+/* ── SUBMIT ── */
+window.submitForm = async () => {
+  if(!agreed){ document.getElementById('agreeBox').classList.add('err'); document.getElementById('errAgree').classList.add('show'); return; }
+  if(!currentUser){ toast('Необходимо войти в аккаунт','error'); setTimeout(()=>window.location.href='auth',1200); return; }
+  const btn=document.getElementById('submitBtn');
+  btn.disabled=true; btn.textContent='Отправляем...';
+
+  let sub=state.pkgBase;
+  const extrasArr=[];
+  if(state.extras.domain&&state.extras.domainOpt==='new'){ sub+=650; extrasArr.push('domain'); }
+  if(state.extras.support){ sub+=500; extrasArr.push('support'); }
+  if(state.extras.seo){ sub+=2500; extrasArr.push('seo'); }
+  if(state.extras.content){ sub+=2000; extrasArr.push('content'); }
+  if(state.extras.shop){ sub+=4900; extrasArr.push('shop'); }
+  if(state.extras.urgent){ sub=Math.round(sub*1.3); extrasArr.push('urgent'); }
+  const disc=calcDiscount(sub);
+  const totalPrice=sub-disc;
+
+  let favData=null;
+  if(favFile){ try{ favData=await new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(favFile);}); }catch(e){} }
+
+  const attachments=[];
+  for(const f of uploadedFiles){
+    if(f.size>3*1024*1024) continue;
+    try{ const b64=await new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(f);}); attachments.push({fileData:b64,fileName:f.name,fileType:f.type}); }catch(e){}
+  }
+
+  try{
+    await addDoc(collection(db,'orders'),{
+      package: state.pkgName,
+      siteType: state.siteType || state.pkgName,
+      pages: state.pkg==='start'?1:state.pkg==='optimal'?5:10,
+      totalPrice, extras: extrasArr,
+      domainOption: state.extras.domainOpt,
+      promoCode: state.promo?.code||null,
+      discountApplied: disc,
+      description: document.getElementById('fdesc').value.trim()||'',
+      attachments: attachments.length?attachments:null,
+      favicon: favData,
+      clientName: currentUser.displayName||'Пользователь',
+      clientEmail: currentUser.email,
+      uid: currentUser.uid,
+      status: 0,
+      createdAt: serverTimestamp()
+    });
+    document.getElementById('formInner').style.display='none';
+    document.getElementById('successWrap').classList.add('show');
+  }catch(e){
+    btn.disabled=false;
+    btn.innerHTML='Отправить заявку <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    toast('Ошибка отправки. Попробуйте ещё раз.','error');
+  }
+};
+
+updateTotal();
 </script>
 
 <script src="footer.js" data-page="order"></script>

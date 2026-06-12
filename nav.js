@@ -160,10 +160,17 @@
   // hideCta:     скрывать кнопку даже незалогиненным (уже на странице заказа)
   // inApp:       внутри кабинета — только аватар, без внешних ссылок
 
+  // Единый набор публичных ссылок — как на всех крупных сайтах
+  const PUBLIC_LINKS = [
+    { href: b || '/',   label: 'Главная',     key: 'home' },
+    { href: b+'faq',    label: 'Возможности', key: 'faq' },
+    { href: b+'order',  label: 'Цены',        key: 'order' },
+  ];
+
   const NAV_CONFIG = {
-    home:     { centerLinks: [{ href: b+'faq', label: 'FAQ' }], guestLinks: [{ href: b+'faq', label: 'FAQ' }], showCta: true },
-    faq:      { centerLinks: [{ href: b || '/', label: 'Главная' }], showCta: true },
-    order:    { centerLinks: [], showCta: false, hideCta: true },
+    home:     { centerLinks: PUBLIC_LINKS, showCta: true },
+    faq:      { centerLinks: PUBLIC_LINKS, showCta: true },
+    order:    { centerLinks: PUBLIC_LINKS, showCta: false, hideCta: true },
     profile:  { inApp: true },
     auth:     { centerLinks: [], showCta: false, hideCta: true },
     orders:   { inApp: true },
@@ -171,7 +178,7 @@
     settings: { inApp: true },
     tickets:  { inApp: true },
     // fallback для privacy/terms/rules/404/project
-    default:  { centerLinks: [{ href: b+'faq', label: 'FAQ' }], showCta: true },
+    default:  { centerLinks: PUBLIC_LINKS, showCta: true },
   };
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;

@@ -11,6 +11,8 @@
         
         .footer {
             padding: 4rem 5vw 2rem;
+            border-top: 1px solid rgba(255,255,255,.1);
+            background: #000000;
         }
         .inner { max-width: 1200px; margin: 0 auto; }
         

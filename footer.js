@@ -217,7 +217,7 @@
                         <div class="contacts">
                             <a href="mailto:support@antviz.ru" class="contact-link">
                                 support@antviz.ru
-                                <span class="contact-note">Отвечаем только в чате поддержки на сайте</span>
+                                <span class="contact-note">Сюда — по любым вопросам и возражениям. По сотрудничеству отвечаем только в чате поддержки на сайте.</span>
                             </a>
                         </div>
                     </div>

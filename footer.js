@@ -7,7 +7,7 @@
     // Создаем стили для подвала
     const styles = `
         * { box-sizing: border-box; }
-        body { margin:0; background:#000000; min-height:100vh; font-family:'Onest', sans-serif; }
+        body { margin:0; background:#0a0a0c; min-height:100vh; font-family:'Onest', sans-serif; }
         
         .footer {
             padding: 4rem 5vw 2rem;

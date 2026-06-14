@@ -6,214 +6,222 @@
   <title>Кабинет — Antviz</title>
   <link rel="icon" href="img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0a0a0c;--bg2:#111116;--bg3:#18181f;--card:#16161d;
-      --border:rgba(255,255,255,0.07);--border-hi:rgba(255,255,255,0.13);
-      --accent:#6c63ff;--accent2:#a78bfa;--accent3:#38bdf8;
-      --text:#f0f0f5;--muted:#777789;--muted2:#999aab;
-      --success:#4ade80;--error:#f87171;--warn:#fbbf24;
-      --nav-h:68px;--r:16px;--r-lg:22px;
+      --bg:#f2f4f7;
+      --bg2:#ffffff;
+      --card:#ffffff;
+      --border:#dfe3e8;
+      --border-hi:#cbcdd6;
+      --accent:#1ede7b;
+      --accent-hover:#1ac16b;
+      --text:#2b2f33;
+      --muted:#707a8a;
+      --muted2:#c2c5cc;
+      --success:#1ac16b;
+      --error:#ff2d50;
+      --warn:#ffef94;
+      --nav-h:68px;
     }
-    html{scroll-behavior:smooth;font-size:17px}
+    html{scroll-behavior:smooth;font-size:16px}
     body{
       background:var(--bg);color:var(--text);
-      font-family:'Onest',sans-serif;font-weight:300;
+      font-family:'Inter', Arial, sans-serif;font-weight:300;
       line-height:1.6;min-height:100vh;overflow-x:hidden;
       -webkit-tap-highlight-color:transparent;
     }
-    body::after{
-      content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
-      background:radial-gradient(ellipse 50% 35% at 95% 0%,rgba(108,99,255,.06) 0%,transparent 60%),
-                 radial-gradient(ellipse 30% 20% at 0% 100%,rgba(56,189,248,.03) 0%,transparent 55%)
-    }
 
     /* Анимации */
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
     @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
     @keyframes circlebounce{0%,to{transform:scale(0)}50%{transform:scale(1)}}
 
     /* Mobile back bar */
-    .mobile-top-bar{display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;height:44px;
-      background:rgba(22,22,30,0.6);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
-      border:1px solid var(--border-hi);border-radius:50px;box-shadow:0 8px 32px rgba(0,0,0,.45);
-      align-items:center;padding:0 .75rem 0 .6rem;gap:.5rem;width:auto;min-width:220px;max-width:calc(100% - 32px)}
-    .mobile-top-bar a{display:flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;font-size:.78rem;transition:color .15s;flex-shrink:0;padding:.25rem .4rem;border-radius:50px}
+    .mobile-top-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:200;height:56px;
+      background:#ffffff;border-bottom:1px solid var(--border);
+      align-items:center;padding:0 16px;gap:8px;}
+    .mobile-top-bar a{display:flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;font-size:14px;transition:color .1s;}
     .mobile-top-bar a:hover{color:var(--text)}
-    .mobile-top-bar a svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-    .mobile-top-bar .mtb-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.78rem;white-space:nowrap;flex:1;text-align:center}
-    @media(max-width:768px){.mobile-top-bar{display:flex!important}.page-wrap{padding-top:calc(44px + 24px)!important}}
+    .mobile-top-bar a svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+    .mobile-top-bar .mtb-title{font-family:'Geologica',sans-serif;font-weight:500;font-size:16px;white-space:nowrap;flex:1;text-align:center;color:var(--text)}
+    @media(max-width:768px){.mobile-top-bar{display:flex!important}.page-wrap{padding-top:calc(56px + 24px)!important}}
 
     /* PAGE WRAP */
-    .page-wrap{max-width:680px;margin:0 auto;padding:calc(52px + 16px + 24px) 1.2rem 60px;position:relative;z-index:1;animation:fadeUp .3s ease}
+    .page-wrap{max-width:720px;margin:0 auto;padding:40px 16px 80px;position:relative;z-index:1;animation:fadeUp .2s ease}
     .section{display:none}
-    .section.active{display:block;animation:fadeUp .25s ease}
+    .section.active{display:block;animation:fadeUp .2s ease}
 
-    /* DS-LOADER (замена спиннера) */
-    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1.5rem}
+    /* DS-LOADER (Оригинальный Рег.ру) */
+    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
     .ds-loader{display:block}
     .ds-loader__loader-wrapper{display:inline-block;margin:0 auto;position:relative;vertical-align:middle;z-index:1}
     .ds-loader__loader-wrapper_size_large{height:36px;width:36px}
     .ds-loader__loader{animation:circlebounce 2s ease-in-out infinite;border-radius:50%;display:block;height:100%;left:0;opacity:.4;position:absolute;top:0;transform:scale(1);width:100%}
     .ds-loader__loader_delayed{animation-delay:-1s;opacity:.2}
     .ds-loader__loader_color_default{background-color:var(--accent)}
-    .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem}
+    .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:32px}
 
-    /* BACK BTN */
-    .back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.82rem;font-weight:400;background:none;border:none;cursor:pointer;padding:0;margin-bottom:1.4rem;transition:color .15s;font-family:'Onest',sans-serif}
+    /* ТИПОГРАФИКА РЕГ.РУ */
+    .back-btn{display:inline-flex;align-items:center;gap:4px;color:var(--muted);font-size:14px;font-weight:300;background:none;border:none;cursor:pointer;padding:0;margin-bottom:24px;transition:color .1s;font-family:inherit}
     .back-btn:hover{color:var(--text)}
-    .back-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-    .sec-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:.25rem}
-    .sec-sub{color:var(--muted);font-size:.8rem;margin-bottom:1.5rem}
+    .back-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+    .sec-title{font-family:'Geologica',sans-serif;font-weight:500;font-size:24px;letter-spacing:-.02em;color:var(--text);margin-bottom:4px}
+    .sec-sub{color:var(--muted);font-size:16px;font-weight:300;letter-spacing:-.02em;margin-bottom:24px}
 
-    /* DS-DRAWER MODALS (Замена старых модалок) */
-    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(10,10,12,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
-      display:flex;align-items:flex-end;justify-content:center;padding:0;opacity:0;pointer-events:none;transition:opacity .3s ease}
+    /* DS-DRAWER MODALS (Шторки/Модалки Рег.ру) */
+    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(46,46,55,.2);
+      display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .3s ease}
+    @media(max-width:719px){.modal-overlay{align-items:flex-end;padding:0;}}
     .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:var(--bg2);border:1px solid var(--border-hi);border-radius:24px 24px 0 0;
-      padding:2rem 1.5rem;width:100%;max-width:440px;transform:translateY(100%);transition:transform .4s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow:0 -8px 32px rgba(0,0,0,0.5);}
+    .modal{background:#fff;border-radius:12px;box-shadow:0 12px 32px #0033991f,0 8px 20px #00339914;
+      padding:32px;width:100%;max-width:480px;transform:translateY(20px);transition:transform .3s ease;}
+    @media(max-width:719px){.modal{border-radius:12px 12px 0 0;transform:translateY(100%);padding:24px;}}
     .modal-overlay.show .modal{transform:translateY(0)}
-    .modal-icon{font-size:2.2rem;margin-bottom:.6rem;text-align:center}
-    .modal h3{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1rem;margin-bottom:.4rem;text-align:center;color:var(--text)}
-    .modal-p{color:var(--muted);font-size:.82rem;text-align:center;margin-bottom:1.5rem;line-height:1.6}
-    .modal-btns{display:flex;gap:.8rem}
-    .modal-btns .ds-button{flex:1}
+    .modal-icon{font-size:32px;margin-bottom:12px;text-align:center}
+    .modal h3{font-family:'Geologica',sans-serif;font-weight:500;font-size:20px;margin-bottom:8px;text-align:center;color:var(--text);letter-spacing:-.02em}
+    .modal-p{color:var(--muted);font-size:14px;font-weight:300;text-align:center;margin-bottom:24px;line-height:20px}
+    .modal-btns{display:flex;gap:12px;flex-direction:column}
+    @media(min-width:480px){.modal-btns{flex-direction:row} .modal-btns .ds-button{flex:1}}
 
-    /* DS-BUTTONS */
-    .ds-button{border:none;border-radius:12px;box-sizing:border-box;cursor:pointer;display:inline-block;outline:none;padding:0;text-align:center;text-decoration:none;white-space:nowrap;font-family:inherit;touch-action:manipulation;transition:all .2s cubic-bezier(.45,0,.55,1);-webkit-user-select:none;user-select:none;}
-    .ds-button__content{align-items:center;display:flex;justify-content:center;height:100%;transition:opacity .2s}
-    .ds-button_size_xs{font-size:14px;font-weight:400;height:36px;padding:9px 16px;border-radius:8px;}
-    .ds-button_size_s{font-size:15px;font-weight:500;height:48px;padding:12px 24px;}
+    /* DS-BUTTONS (Точная копия стилей Рег.ру) */
+    .ds-button{border:none;border-radius:8px;box-sizing:border-box;cursor:pointer;display:inline-block;outline:none;padding:0;text-align:center;text-decoration:none;white-space:nowrap;font-family:inherit;transition:all .15s cubic-bezier(.45,0,.55,1);user-select:none;}
+    .ds-button__content{align-items:center;display:flex;justify-content:center;height:100%;}
+    .ds-button_size_xs{font-size:14px;font-weight:300;height:36px;letter-spacing:-.02em;line-height:17px;padding:9px 16px;}
+    .ds-button_size_s{font-size:16px;font-weight:300;height:48px;letter-spacing:-.02em;line-height:20px;padding:12px 24px;}
     
-    .ds-button_theme_primary{background-color:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(108,99,255,.2)}
-    .ds-button_theme_primary:hover:not(:disabled){background-color:#5a52db;box-shadow:0 6px 24px rgba(108,99,255,.3);transform:translateY(-1px)}
-    .ds-button_theme_primary:active:not(:disabled){transform:translateY(0)}
+    .ds-button_theme_green{background-color:var(--accent);color:var(--text)}
+    .ds-button_theme_green:hover:not(:disabled){background-color:var(--accent-hover)}
     
+    .ds-button_theme_primary{background-color:var(--text);color:#fff}
+    .ds-button_theme_primary:hover:not(:disabled){background-color:#191b1e}
+
     .ds-button_theme_secondary{background-color:transparent;border:1px solid var(--border-hi);color:var(--text)}
-    .ds-button_theme_secondary:hover:not(:disabled){background-color:rgba(255,255,255,0.05);border-color:var(--muted2)}
+    .ds-button_theme_secondary:hover:not(:disabled){background-color:var(--bg)}
     
-    .ds-button_theme_danger{background-color:rgba(248,113,113,.1);color:var(--error);border:1px solid rgba(248,113,113,.2)}
-    .ds-button_theme_danger:hover:not(:disabled){background-color:rgba(248,113,113,.15)}
+    .ds-button_theme_danger{background-color:#ffeded;color:var(--error);border:none;}
+    .ds-button_theme_danger:hover:not(:disabled){background-color:#ffd9d9}
 
-    .ds-button_theme_ghost{background-color:transparent;color:var(--muted);border:none;}
-    .ds-button_theme_ghost:hover{color:var(--text);background-color:rgba(255,255,255,0.05);}
-    .ds-button:disabled{opacity:0.5;cursor:not-allowed;pointer-events:none}
+    .ds-button_theme_ghost{background-color:transparent;color:var(--text);border:none;}
+    .ds-button_theme_ghost:hover{color:var(--accent-hover)}
+    .ds-button:disabled{opacity:0.3;cursor:default;pointer-events:none}
+    .ds-button_block{display:block;width:100%}
 
     /* DS-FIELD (Инпуты) */
-    .ds-field{margin-bottom:1.2rem}
-    .ds-field__label{color:var(--muted);font-size:12px;line-height:15px;margin:0 0 6px;display:block;font-weight:500;text-transform:uppercase;letter-spacing:0.05em}
-    .ds-field__input{width:100%;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Onest',sans-serif;font-size:15px;font-weight:400;outline:none;transition:all .2s ease;box-shadow:inset 0 2px 4px rgba(0,0,0,0.2)}
-    .ds-field__input:focus{border-color:var(--accent);background:rgba(255,255,255,0.05);box-shadow:0 0 0 3px rgba(108,99,255,.15), inset 0 2px 4px rgba(0,0,0,0.2)}
-    .ds-field__input:disabled{opacity:0.4;cursor:default}
+    .ds-field{margin-bottom:16px}
+    .ds-field__label{color:var(--text);font-size:14px;line-height:17px;margin:0 0 4px;display:block;font-weight:300;letter-spacing:-.02em;}
+    .ds-field__input{width:100%;background-color:#fff;border:1px solid var(--border-hi);border-radius:4px;padding:11px 16px;color:var(--text);font-family:inherit;font-size:16px;font-weight:300;outline:none;transition:border-color .1s;line-height:20px}
+    .ds-field__input:focus{border-color:var(--text);}
+    .ds-field__input:disabled{background-color:var(--bg);color:var(--muted);cursor:default;border-color:var(--border)}
 
-    /* DS-ALERT (Опасные зоны) */
-    .ds-alert{border-radius:16px;padding:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:12px;transition:all .2s ease;}
-    .ds-alert_theme_danger{background-color:rgba(248,113,113,.04);border:1px solid rgba(248,113,113,.15);}
-    .ds-alert_theme_danger .ds-alert__title{color:var(--error);}
+    /* DS-ALERT (Опасные зоны и уведомления) */
+    .ds-alert{border-radius:24px;padding:16px;display:flex;align-items:center;position:relative;margin-bottom:16px;}
+    .ds-alert_type_shadow{background-color:#fff;box-shadow:0 8px 20px #00339914,0 4px 8px #00339914;border:none;}
+    .ds-alert_theme_danger{background-color:#ffeded;border:1px solid #ffd9d9;}
     .ds-alert__content{flex-grow:1;}
-    .ds-alert__title{margin:0 0 4px;font-size:15px;font-weight:600;font-family:'Unbounded',sans-serif;}
-    .ds-alert__description{margin:0;color:var(--muted);font-size:13px;line-height:1.4;}
-    .ds-alert-container{margin-top:24px;}
-    @media(max-width:480px){.ds-alert{flex-direction:column;align-items:flex-start;}}
+    .ds-alert__title{color:var(--text);margin:0 0 4px;font-size:16px;font-weight:500;letter-spacing:-.02em;line-height:20px;font-family:'Geologica',sans-serif;}
+    .ds-alert__description{color:var(--muted);margin:0;font-size:14px;font-weight:300;letter-spacing:-.02em;line-height:17px;}
+    .ds-alert .ds-button{flex-shrink:0;margin-left:16px;}
+    @media(max-width:480px){
+      .ds-alert{flex-direction:column;align-items:stretch;gap:12px;}
+      .ds-alert .ds-button{margin-left:0;}
+    }
 
     /* CARDS & HERO */
-    .card, .hero-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:.75rem;box-shadow:0 8px 24px rgba(0,0,0,0.2);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
-    .hero-top{display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem}
-    .avatar{width:64px;height:64px;border-radius:16px;background:var(--bg3);border:2px solid var(--border-hi);
-      display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-weight:700;
-      font-size:1.6rem;color:var(--accent2);overflow:hidden;cursor:pointer;position:relative;transition:all .2s cubic-bezier(0.16, 1, 0.3, 1);flex-shrink:0;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
-    .avatar:hover{border-color:var(--accent);transform:scale(1.02)}
+    .card, .hero-card{background-color:#fff;border-radius:24px;padding:24px;margin-bottom:16px;box-shadow:0 8px 20px #00339914,0 4px 8px #00339914;}
+    .hero-top{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+    
+    .avatar{width:72px;height:72px;border-radius:50%;background-color:var(--bg);border:1px solid var(--border);
+      display:flex;align-items:center;justify-content:center;font-family:'Geologica',sans-serif;font-weight:500;
+      font-size:24px;color:var(--text);overflow:hidden;cursor:pointer;position:relative;transition:all .1s ease;flex-shrink:0;}
+    .avatar:hover{box-shadow:0 4px 16px #00339914;}
     .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:14px}
+    .avatar-overlay{position:absolute;inset:0;background:rgba(255,255,255,.8);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .1s;}
     .avatar:hover .avatar-overlay{opacity:1}
-    .avatar-overlay svg{width:20px;height:20px;stroke:#fff;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+    .avatar-overlay svg{width:24px;height:24px;stroke:var(--text);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
     #avatarInput{display:none}
     
     .hero-info{flex:1;min-width:0}
-    .hero-greeting{color:var(--muted);font-size:.75rem;margin-bottom:.1rem}
-    .hero-name{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.15rem;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
-    .hero-since{color:var(--muted2);font-size:.75rem;margin-top:.2rem}
+    .hero-greeting{color:var(--muted);font-size:14px;margin-bottom:2px;font-weight:300;}
+    .hero-name{font-family:'Geologica',sans-serif;font-weight:500;font-size:20px;line-height:24px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);letter-spacing:-.02em}
+    .hero-since{color:var(--muted);font-size:12px;margin-top:4px;font-weight:300}
     
-    .notif-btn{width:42px;height:42px;border-radius:12px;background:var(--bg3);border:1px solid var(--border);
-      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
-    .notif-btn:hover{border-color:var(--border-hi);background:var(--card)}
-    .notif-btn svg{width:20px;height:20px;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-    .notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--error);border:2px solid var(--bg3);display:none}
+    .notif-btn{width:40px;height:40px;border-radius:50%;background:transparent;border:1px solid var(--border-hi);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;transition:all .1s ease;}
+    .notif-btn:hover{background-color:var(--bg);border-color:var(--muted2)}
+    .notif-btn svg{width:20px;height:20px;stroke:var(--text);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+    .notif-dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background-color:var(--error);border:2px solid #fff;display:none}
     .notif-dot.show{display:block}
 
-    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
-    .stat-box{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:1rem;transition:transform .2s ease}
-    .stat-box:hover{transform:translateY(-2px);background:rgba(255,255,255,0.04);}
-    .stat-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.25rem;line-height:1;margin-bottom:.3rem}
-    .stat-lbl{color:var(--muted);font-size:.7rem;font-weight:500;}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+    .stat-box{background-color:var(--bg);border-radius:12px;padding:16px;text-align:center;}
+    .stat-num{font-family:'Geologica',sans-serif;font-weight:500;font-size:24px;line-height:1;margin-bottom:4px;color:var(--text)}
+    .stat-lbl{color:var(--muted);font-size:12px;font-weight:300;letter-spacing:-.02em;}
 
-    /* МЕНЮ НАВИГАЦИИ */
-    .menu-list{display:flex;flex-direction:column;gap:.5rem}
-    .menu-item{display:flex;align-items:center;gap:1rem;padding:1rem 1.2rem;background:rgba(255,255,255,0.02);
-      border:1px solid var(--border);border-radius:16px;cursor:pointer;transition:all .2s ease;
-      text-decoration:none;color:var(--text);font-family:'Onest',sans-serif;width:100%;text-align:left}
-    .menu-item:hover{border-color:var(--border-hi);background:rgba(255,255,255,.05);transform:translateX(2px)}
-    .menu-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .menu-ico svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-    .ico-purple{background:rgba(108,99,255,.12);color:var(--accent2)}
-    .ico-blue{background:rgba(56,189,248,.1);color:var(--accent3)}
-    .ico-green{background:rgba(74,222,128,.1);color:var(--success)}
-    .ico-orange{background:rgba(251,191,36,.08);color:var(--warn)}
-    .ico-gray{background:rgba(255,255,255,.05);color:var(--muted2)}
+    /* МЕНЮ НАВИГАЦИИ (Чистые белые плашки без лишнего фона) */
+    .menu-list{display:flex;flex-direction:column;gap:8px}
+    .menu-item{display:flex;align-items:center;gap:16px;padding:16px;background-color:#fff;
+      border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:all .1s ease;
+      text-decoration:none;color:var(--text);width:100%;text-align:left}
+    .menu-item:hover{border-color:transparent;box-shadow:0 8px 20px #00339914,0 4px 8px #00339914;}
+    
+    .menu-ico{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background-color:var(--bg);}
+    .menu-ico svg{width:20px;height:20px;stroke:var(--text);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+    
     .menu-text{flex:1}
-    .menu-title{font-size:.9rem;font-weight:500;margin-bottom:.1rem}
-    .menu-sub{font-size:.75rem;color:var(--muted)}
-    .menu-arrow{color:var(--muted2);font-size:1rem;transition:transform .2s}
-    .menu-item:hover .menu-arrow{transform:translateX(2px);color:var(--text)}
-    .menu-badge{background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;padding:.15rem .5rem;border-radius:50px;min-width:20px;text-align:center}
+    .menu-title{font-family:'Geologica',sans-serif;font-size:16px;font-weight:500;margin-bottom:2px;letter-spacing:-.02em}
+    .menu-sub{font-size:14px;color:var(--muted);font-weight:300;letter-spacing:-.02em}
+    .menu-arrow{color:var(--muted2);font-size:20px;}
+    .menu-badge{background-color:var(--error);color:#fff;font-size:12px;font-weight:500;padding:2px 8px;border-radius:12px;min-width:24px;text-align:center;line-height:16px;}
 
     /* EMPTY STATE */
-    .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    .empty-icon{font-size:2.5rem;margin-bottom:1rem}
-    .empty h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:1rem;color:var(--text);margin-bottom:.4rem}
-    .empty p{font-size:.85rem;margin-bottom:1.5rem}
+    .empty{text-align:center;padding:48px 16px;color:var(--muted)}
+    .empty-icon{font-size:40px;margin-bottom:16px}
+    .empty h3{font-family:'Geologica',sans-serif;font-weight:500;font-size:16px;color:var(--text);margin-bottom:8px}
+    .empty p{font-size:14px;font-weight:300;margin-bottom:24px}
 
     /* SETTINGS CARDS */
-    .card-hdr{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
-    .card-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(108,99,255,.1)}
-    .card-ico svg{width:16px;height:16px;stroke:var(--accent2);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-    .card-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;color:var(--text)}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    .card-hdr{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+    .card-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;background-color:var(--bg);}
+    .card-ico svg{width:18px;height:18px;stroke:var(--text);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+    .card-title{font-family:'Geologica',sans-serif;font-weight:500;font-size:18px;color:var(--text);letter-spacing:-.02em}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 
     /* LIGHTBOX */
-    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;backdrop-filter:blur(5px);}
+    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(25,27,30,.9);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s ease;}
     .lightbox.show{opacity:1;pointer-events:all}
-    .lightbox img{max-width:90vw;max-height:88vh;border-radius:12px;object-fit:contain;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
-    .lb-close{position:fixed;top:1.5rem;right:1.5rem;background:rgba(255,255,255,.1);border:none;color:#fff;font-size:1.2rem;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
-    .lb-close:hover{background:rgba(255,255,255,.2)}
+    .lightbox img{max-width:90vw;max-height:88vh;border-radius:8px;object-fit:contain;box-shadow:0 8px 32px rgba(0,0,0,0.2)}
+    .lb-close{position:fixed;top:24px;right:24px;background:#fff;border:none;color:var(--text);font-size:20px;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .1s}
+    .lb-close:hover{background:var(--bg)}
 
-    /* NOTIF MODAL */
-    .notif-modal-overlay{position:fixed;inset:0;z-index:700;background:rgba(10,10,12,.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);display:flex;align-items:flex-start;justify-content:flex-end;padding:74px 1rem 1rem;opacity:0;pointer-events:none;transition:opacity .3s ease}
+    /* NOTIF MODAL (Правая шторка на десктопе, нижняя на мобилке) */
+    .notif-modal-overlay{position:fixed;inset:0;z-index:700;background:rgba(46,46,55,.2);display:flex;align-items:flex-start;justify-content:flex-end;opacity:0;pointer-events:none;transition:opacity .3s ease}
     .notif-modal-overlay.show{opacity:1;pointer-events:all}
-    .notif-modal{background:var(--bg2);border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:1.5rem;width:100%;max-width:380px;max-height:75vh;overflow-y:auto;transform:translateY(-12px);transition:transform .3s cubic-bezier(0.16, 1, 0.3, 1);box-shadow:0 12px 40px rgba(0,0,0,0.4)}
-    .notif-modal-overlay.show .notif-modal{transform:translateY(0)}
-    .notif-modal-head{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.9rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;color:var(--text)}
-    .notif-modal-close{background:rgba(255,255,255,0.05);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:var(--muted);cursor:pointer;transition:all .2s ease}
-    .notif-modal-close:hover{background:rgba(255,255,255,0.1);color:var(--text)}
-    .notif-item{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:16px;padding:1rem;margin-bottom:.5rem;font-size:.85rem;line-height:1.55;transition:background .2s}
-    .notif-item:hover{background:rgba(255,255,255,0.04)}
-    .notif-item.unread{border-color:rgba(108,99,255,.4);background:rgba(108,99,255,.08)}
-    .notif-item-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.4rem}
-    .notif-item-title{font-weight:600;font-size:.85rem;color:var(--text)}
-    .notif-item-time{font-size:.7rem;color:var(--muted);white-space:nowrap}
-    .notif-item-text{color:var(--muted2);font-size:.8rem}
-    .notif-empty{text-align:center;color:var(--muted);font-size:.85rem;padding:2rem 0}
+    .notif-modal{background:#fff;border-left:1px solid var(--border);padding:24px;width:100%;max-width:400px;height:100vh;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease;box-shadow:-8px 0 32px #00339914;}
+    @media(max-width:719px){
+      .notif-modal{height:auto;max-height:85vh;border-left:none;border-radius:12px 12px 0 0;transform:translateY(100%);margin-top:auto;}
+      .notif-modal-overlay{align-items:flex-end;}
+    }
+    .notif-modal-overlay.show .notif-modal{transform:translate(0,0)}
+    .notif-modal-head{font-family:'Geologica',sans-serif;font-weight:500;font-size:20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;color:var(--text)}
+    .notif-modal-close{background:var(--bg);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;color:var(--text);cursor:pointer;transition:all .1s ease}
+    .notif-modal-close:hover{background:var(--border-hi);}
+    .notif-item{background-color:#fff;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px;font-size:14px;line-height:20px;transition:box-shadow .1s}
+    .notif-item:hover{box-shadow:0 4px 16px #0033990a;}
+    .notif-item.unread{border-color:var(--accent);background-color:#e8fcf2;}
+    .notif-item-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px}
+    .notif-item-title{font-weight:500;font-size:14px;color:var(--text)}
+    .notif-item-time{font-size:12px;color:var(--muted);white-space:nowrap}
+    .notif-item-text{color:var(--muted);font-size:14px;font-weight:300;}
+    .notif-empty{text-align:center;color:var(--muted);font-size:14px;padding:32px 0}
 
     /* TOAST */
-    .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);z-index:700;padding:.75rem 1.5rem;border-radius:50px;font-size:.85rem;font-weight:500;opacity:0;transition:opacity .3s cubic-bezier(0.16, 1, 0.3, 1),transform .3s cubic-bezier(0.16, 1, 0.3, 1);pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);z-index:700;padding:12px 24px;border-radius:60px;font-size:14px;font-weight:500;opacity:0;transition:all .3s ease;pointer-events:none;white-space:nowrap;box-shadow:0 8px 20px #0033991f;}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--success);color:#000}
-    .toast.error{background:var(--error);color:#fff}
-    .toast.info{background:var(--accent);color:#fff}
+    .toast.success{background-color:var(--success);color:#fff}
+    .toast.error{background-color:var(--error);color:#fff}
+    .toast.info{background-color:var(--text);color:#fff}
 
     @media(max-width:600px){
       .hero-stats{grid-template-columns:1fr 1fr}
@@ -230,13 +238,13 @@
     <div class="ds-loader__loader ds-loader__loader_color_default"></div>
     <div class="ds-loader__loader ds-loader__loader_color_default ds-loader__loader_delayed"></div>
   </div>
-  <p style="color:var(--muted);font-size:.85rem;font-weight:500;letter-spacing:0.02em;">Загружаю кабинет...</p>
+  <p style="color:var(--muted);font-size:14px;font-weight:300;letter-spacing:-.02em;">Загружаю кабинет...</p>
 </div>
 
 <div class="maint-screen" id="maintScreen" style="display:none">
-  <div style="font-size:3rem">🔧</div>
-  <div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:.4rem">Технические работы</div>
-  <div style="color:var(--muted);font-size:.84rem;max-width:330px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div>
+  <div style="font-size:48px">🔧</div>
+  <div style="font-family:'Geologica',sans-serif;font-weight:500;font-size:24px;margin-bottom:8px">Технические работы</div>
+  <div style="color:var(--muted);font-size:16px;max-width:330px;line-height:24px;font-weight:300">Сайт временно недоступен. Скоро всё будет готово!</div>
 </div>
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
@@ -247,7 +255,7 @@
 <div class="notif-modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
   <div class="notif-modal">
     <div class="notif-modal-head">
-      <span>🔔 Уведомления</span>
+      <span>Уведомления</span>
       <button class="notif-modal-close" onclick="closeNotifModal()">✕</button>
     </div>
     <div id="notifList"><div class="notif-empty">Загрузка...</div></div>
@@ -263,10 +271,10 @@
       <input class="ds-field__input" id="deleteConfirmInput" type="email" placeholder="Ваш email"/>
     </div>
     <div class="modal-btns">
-      <button class="ds-button ds-button_theme_secondary ds-button_size_s" onclick="closeDeleteModal()">
+      <button class="ds-button ds-button_theme_secondary ds-button_size_s ds-button_block" onclick="closeDeleteModal()">
         <span class="ds-button__content">Отмена</span>
       </button>
-      <button class="ds-button ds-button_theme_danger ds-button_size_s" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">
+      <button class="ds-button ds-button_theme_danger ds-button_size_s ds-button_block" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">
         <span class="ds-button__content">Удалить</span>
       </button>
     </div>
@@ -278,10 +286,8 @@
     <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
     Главная
   </a>
-  <span style="flex:1"></span>
   <span class="mtb-title">Кабинет</span>
-  <span style="flex:1"></span>
-</div>
+  <span style="width:70px"></span> </div>
 
 <div class="page-wrap" id="appWrap" style="display:none">
 
@@ -310,36 +316,36 @@
 
       <div class="hero-stats">
         <div class="stat-box"><div class="stat-num" id="statTotal">—</div><div class="stat-lbl">Всего заказов</div></div>
-        <div class="stat-box"><div class="stat-num" style="color:var(--accent3)" id="statActive">—</div><div class="stat-lbl">В работе</div></div>
+        <div class="stat-box"><div class="stat-num" style="color:var(--text)" id="statActive">—</div><div class="stat-lbl">В работе</div></div>
         <div class="stat-box"><div class="stat-num" style="color:var(--success)" id="statDone">—</div><div class="stat-lbl">Завершено</div></div>
       </div>
 
       <div class="menu-list">
         <a href="profile/orders" class="menu-item">
-          <div class="menu-ico ico-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+          <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
           <div class="menu-text"><div class="menu-title">Мои заказы</div><div class="menu-sub" id="menuOrdersSub">История всех заявок</div></div>
-          <span class="menu-badge" id="menuActiveCount" style="display:none">0</span>
+          <span class="menu-badge" id="menuActiveCount" style="display:none;background-color:var(--accent);color:var(--text)">0</span>
           <span class="menu-arrow">›</span>
         </a>
         <a href="profile/support" class="menu-item">
-          <div class="menu-ico ico-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
           <div class="menu-text"><div class="menu-title">Чат с командой</div><div class="menu-sub">Задайте вопрос по проекту</div></div>
           <span class="menu-badge" id="menuChatBadge" style="display:none">!</span>
           <span class="menu-arrow">›</span>
         </a>
         <a href="order" class="menu-item">
-          <div class="menu-ico ico-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg></div>
+          <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 5v14M5 12h14"/></svg></div>
           <div class="menu-text"><div class="menu-title">Новый заказ</div><div class="menu-sub">Оформить заявку на сайт</div></div>
           <span class="menu-arrow">›</span>
         </a>
         <a href="profile/tickets" class="menu-item" id="menuTickets">
-          <div class="menu-ico ico-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div>
+          <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div>
           <div class="menu-text"><div class="menu-title">Обслуживание сайта</div><div class="menu-sub" id="menuTicketsSub">Заявки на доработку</div></div>
           <span class="menu-badge" id="menuTicketsBadge" style="display:none">!</span>
           <span class="menu-arrow">›</span>
         </a>
         <a href="profile/settings" class="menu-item">
-          <div class="menu-ico ico-gray"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
+          <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
           <div class="menu-text"><div class="menu-title">Настройки</div><div class="menu-sub">Профиль и аккаунт</div></div>
           <span class="menu-arrow">›</span>
         </a>
@@ -349,7 +355,7 @@
 
   <div class="section" id="section-settings">
     <button class="back-btn" onclick="showSection('home')">
-      <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Назад
+      <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg> Назад
     </button>
     <div class="sec-title">Настройки</div>
     <div class="sec-sub">Управляйте профилем и аккаунтом</div>
@@ -369,7 +375,7 @@
           <input class="ds-field__input" id="settingEmail" disabled/>
         </div>
       </div>
-      <button class="ds-button ds-button_theme_primary ds-button_size_s" onclick="saveSettings()">
+      <button class="ds-button ds-button_theme_primary ds-button_size_s" onclick="saveSettings()" style="margin-top: 8px;">
         <span class="ds-button__content">Сохранить изменения</span>
       </button>
     </div>
@@ -379,34 +385,32 @@
         <div class="card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
         <span class="card-title">Безопасность</span>
       </div>
-      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1.2rem">Сбросить пароль — ссылка придёт на вашу почту</p>
-      <button class="ds-button ds-button_theme_ghost ds-button_size_s" onclick="sendPasswordReset()">
-        <span class="ds-button__content">📧 Сбросить пароль</span>
+      <p style="font-size:14px;color:var(--muted);margin-bottom:16px;font-weight:300;">Сбросить пароль — ссылка придёт на вашу почту</p>
+      <button class="ds-button ds-button_theme_secondary ds-button_size_s" onclick="sendPasswordReset()">
+        <span class="ds-button__content">Сбросить пароль</span>
       </button>
     </div>
 
-    <div class="ds-alert-container">
-      <div class="sec-title" style="font-size: 1rem; color: var(--error); margin-bottom: 0.8rem; padding-left: 0.5rem;">Опасная зона</div>
-      
-      <div class="ds-alert ds-alert_theme_danger">
-        <div class="ds-alert__content">
-           <h4 class="ds-alert__title">Выйти из аккаунта</h4>
-           <p class="ds-alert__description">Завершить текущую сессию на устройстве</p>
-        </div>
-        <button class="ds-button ds-button_theme_danger ds-button_size_xs" onclick="doLogout()">
-          <span class="ds-button__content">Выйти</span>
-        </button>
+    <div class="sec-title" style="font-size: 20px; color: var(--error); margin: 32px 0 16px;">Опасная зона</div>
+    
+    <div class="ds-alert ds-alert_type_shadow ds-alert_theme_danger">
+      <div class="ds-alert__content">
+         <h4 class="ds-alert__title">Выйти из аккаунта</h4>
+         <p class="ds-alert__description">Завершить текущую сессию на устройстве</p>
       </div>
+      <button class="ds-button ds-button_theme_danger ds-button_size_s" onclick="doLogout()">
+        <span class="ds-button__content">Выйти</span>
+      </button>
+    </div>
 
-      <div class="ds-alert ds-alert_theme_danger">
-        <div class="ds-alert__content">
-           <h4 class="ds-alert__title">Удалить аккаунт</h4>
-           <p class="ds-alert__description">Безвозвратно удалить все ваши данные</p>
-        </div>
-        <button class="ds-button ds-button_theme_danger ds-button_size_xs" onclick="openDeleteModal()">
-          <span class="ds-button__content">Удалить</span>
-        </button>
+    <div class="ds-alert ds-alert_type_shadow ds-alert_theme_danger">
+      <div class="ds-alert__content">
+         <h4 class="ds-alert__title">Удалить аккаунт</h4>
+         <p class="ds-alert__description">Безвозвратно удалить все ваши данные</p>
       </div>
+      <button class="ds-button ds-button_theme_danger ds-button_size_s" onclick="openDeleteModal()">
+        <span class="ds-button__content">Удалить</span>
+      </button>
     </div>
   </div>
 
@@ -496,7 +500,7 @@ function watchNotifications(uid){
     const hasUnread = snap.docs.some(d=>!d.data().read);
     document.getElementById('notifDot').style.display = hasUnread ? 'block' : 'none';
     if(hasUnread){
-      document.getElementById('notifIcon').style.stroke='var(--accent2)';
+      document.getElementById('notifIcon').style.stroke='var(--accent)';
     } else {
       document.getElementById('notifIcon').style.stroke='';
     }

@@ -140,27 +140,24 @@
             margin-top: 40px;
         }
         
-        .robokassa-block {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255,255,255,.06);
-            flex-wrap: wrap;
+        .payment-block {
+            margin-top: 20px;
         }
-        .robokassa-label {
-            color: rgba(255,255,255,.25);
-            font-size: 13px;
-        }
-        .robokassa-logo img {
+        .payment-label {
             display: block;
-            height: 22px;
+            color: rgba(255,255,255,.2);
+            font-weight: 400;
+            font-size: 16px;
+            letter-spacing: -.02em;
+            margin-bottom: 8px;
+        }
+        .payment-logo img {
+            display: block;
+            height: 28px;
             width: auto;
-            opacity: 0.55;
             transition: opacity .2s;
         }
-        .robokassa-logo:hover img { opacity: 0.85; }
+        .payment-logo:hover img { opacity: .75; }
         
         .legal-info {
             margin-top: 16px;
@@ -248,6 +245,12 @@
                                 support@antviz.ru
                                 <span class="contact-note">Сюда — по любым вопросам и возражениям. По сотрудничеству отвечаем только в чате поддержки на сайте.</span>
                             </a>
+                            <div class="payment-block">
+                                <span class="payment-label">Приём платежей</span>
+                                <a href="https://robokassa.com/" class="payment-logo" target="_blank" rel="noopener" aria-label="Robokassa">
+                                    <img src="https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.svg" alt="Robokassa" onerror="this.src='https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.png'">
+                                </a>
+                            </div>
                         </div>
                     </div>
                     
@@ -322,15 +325,9 @@
                     </div>
                 </div>
                 
-                <div class="robokassa-block">
-                    <span class="robokassa-label">Приём платежей:</span>
-                    <a href="https://robokassa.com/" class="robokassa-logo" target="_blank" rel="noopener" aria-label="Robokassa">
-                        <img src="https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.svg" alt="Robokassa" onerror="this.src='https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.png'">
-                    </a>
-                </div>
                 
                 <div class="legal-info">
-                    Самозанятый: Иванов Максим Григорьевич &nbsp;·&nbsp; ИНН: 701508269796
+                    Самозанятый: Ошибка &nbsp;·&nbsp; ИНН: 701508269796
                 </div>
                 
                 <div class="meta-note">

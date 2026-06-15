@@ -140,6 +140,35 @@
             margin-top: 40px;
         }
         
+        .robokassa-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            flex-wrap: wrap;
+        }
+        .robokassa-label {
+            color: rgba(255,255,255,.25);
+            font-size: 13px;
+        }
+        .robokassa-logo img {
+            display: block;
+            height: 22px;
+            width: auto;
+            opacity: 0.55;
+            transition: opacity .2s;
+        }
+        .robokassa-logo:hover img { opacity: 0.85; }
+        
+        .legal-info {
+            margin-top: 16px;
+            color: rgba(255,255,255,.18);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+        
         /* Мобильный навбар */
         .antviz-mobile-nav {
             display: none;
@@ -279,6 +308,7 @@
                         <ul class="group-items">
                             <li><a href="${base}privacy">Конфиденциальность</a></li>
                             <li><a href="${base}terms">Соглашение</a></li>
+                            <li><a href="${base}p_oferta.docx" download="p_oferta.docx">Публичная оферта ↓</a></li>
                         </ul>
                     </div>
                 </div>
@@ -288,7 +318,19 @@
                     <div class="legal-links">
                         <a href="${base}privacy">Политика конфиденциальности</a>
                         <a href="${base}terms">Пользовательское соглашение</a>
+                        <a href="${base}p_oferta.docx" download="p_oferta.docx">Публичная оферта</a>
                     </div>
+                </div>
+                
+                <div class="robokassa-block">
+                    <span class="robokassa-label">Приём платежей:</span>
+                    <a href="https://robokassa.com/" class="robokassa-logo" target="_blank" rel="noopener" aria-label="Robokassa">
+                        <img src="https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.svg" alt="Robokassa" onerror="this.src='https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.png'">
+                    </a>
+                </div>
+                
+                <div class="legal-info">
+                    Самозанятый: Иванов Максим Григорьевич &nbsp;·&nbsp; ИНН: 701508269796
                 </div>
                 
                 <div class="meta-note">

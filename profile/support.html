@@ -31,13 +31,6 @@
     @keyframes scaleIn{from{opacity:0;transform:scale(.9) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
     @keyframes msgPop{0%{opacity:0;transform:scale(.94) translateY(6px)}60%{transform:scale(1.015) translateY(-1px)}100%{opacity:1;transform:scale(1) translateY(0)}}
 
-    
-    
-    
-    
-    
-    
-    
     @media(max-width:768px){}
 
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
@@ -51,13 +44,11 @@
     }
     @media(max-width:768px){.chat-layout{top:0;border:none;bottom:0}}
 
-    /* Chat header — как в мессенджере: без линии сверху, скруглённый */
     .chat-hdr{
       padding:.7rem 1.1rem;
       display:flex;align-items:center;gap:.7rem;
       flex-shrink:0;
     }
-    /* Кнопка назад — круглая */
     .back-link{
       width:36px;height:36px;border-radius:50%;
       background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);
@@ -68,7 +59,6 @@
     .back-link:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:var(--text)}
     .back-link svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2}
 
-    /* Основная плашка хедера — скруглённая, без свечения */
     .chat-hdr-body{
       display:flex;align-items:center;gap:.75rem;flex:1;
       background:rgba(255,255,255,.04);
@@ -206,9 +196,6 @@
     .toast.success{background:rgba(74,222,128,.15);border:1px solid rgba(74,222,128,.3);color:var(--success)}
     .toast.error{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:var(--error)}
     .toast.info{background:rgba(108,99,255,.18);border:1px solid rgba(108,99,255,.35);color:var(--accent2)}
-
-  
-    
   </style>
 </head>
 <body>
@@ -225,7 +212,6 @@
 </div>
 
 <div class="chat-layout" id="appWrap" style="display:none">
-  <!-- Хедер как в мессенджере: кнопка назад + скруглённая плашка с инфой -->
   <div class="chat-hdr">
     <a href="../profile" class="back-link" title="Назад">
       <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
@@ -261,7 +247,6 @@
   </div>
 </div>
 
-
 <button class="new-topic-btn" id="newTopicBtn" onclick="startNewTopic()">
   ✦ Новая тема
 </button>
@@ -284,8 +269,8 @@ let unsubChat = null;
 let userOrders = [];
 let flowState = 'topic';
 let initialLoadDone = false;
-let welcomeShown = false;   // ← флаг: показано ли приветствие в этой сессии
-let hasUserMessages = false; // ← были ли уже сообщения от пользователя в чате
+let welcomeShown = false;
+let hasUserMessages = false;
 
 /* ── helpers ── */
 function toast(msg, type='info'){
@@ -392,7 +377,6 @@ function renderBotWithButtons(m){
 
 /* ── button sets by flowTag ── */
 function getBotButtons(tag){
-  const go=(topic)=>()=>{ doSendUserMsg(topic); handleTopic(topic==='order'?'order':topic==='payment'?'payment':topic==='timing'?'timing':'revision'); };
   const topicBtns=[
     {label:'Статус заказа', cls:'accent', fn:()=>{ doSendUserMsg('Статус заказа'); handleTopic('order'); }},
     {label:'Оплата',        cls:'accent', fn:()=>{ doSendUserMsg('Оплата'); handleTopic('payment'); }},
@@ -471,7 +455,6 @@ function hideTyping(){document.getElementById('typingIndicator')?.remove();}
 async function doSendUserMsg(text){
   if(!currentUser||!text) return;
   try{
-    // Если пользователь что-то отправил (даже кнопкой) — удаляем приветствие
     if(welcomeShown) await removeWelcomeMessages();
 
     await setDoc(doc(db,'chats',currentUser.uid),
@@ -485,7 +468,6 @@ async function doSendUserMsg(text){
 
 /* ── BOT FLOW ── */
 async function showWelcome(){
-  // Удаляем старые приветствия перед показом нового
   await removeWelcomeMessages();
   welcomeShown = true;
   await saveBotMsg('Привет! Я бот Антвизик.\nЧем могу помочь? Выберите тему:', 'welcome');
@@ -530,11 +512,9 @@ async function openFreeChat(){
 
 /* ── Firestore live listener ── */
 window.startNewTopic = async function(){
-  // Сбрасываем состояние и показываем приветствие заново
   flowState = 'topic';
   document.getElementById('newTopicBtn').classList.remove('show');
   const msgs = document.getElementById('chatMsgs');
-  // Добавляем разделитель
   const sep = document.createElement('div');
   sep.style.cssText = 'text-align:center;color:var(--muted);font-size:.68rem;padding:.6rem;opacity:.6';
   sep.textContent = '─── Новая тема ───';
@@ -581,7 +561,6 @@ window.sendMsg=async function(){
   inp.value=''; inp.style.height='auto';
   document.getElementById('sendBtn').classList.remove('active');
 
-  // При любой ручной отправке — удаляем приветствие
   if(welcomeShown) await removeWelcomeMessages();
 
   if(flowState==='topic'){
@@ -632,12 +611,7 @@ window.closeLightbox=function(){
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
 
 /* ── Bootstrap ── */
-
-  
-  // Заполняем имя и аватар (onAuthStateChanged уже есть в этих страницах)
-    }
-
-  onAuthStateChanged(auth,async user=>{
+onAuthStateChanged(auth,async user=>{
   if(!user){ window.location.href='../auth'; return; }
   
   currentUser=user;
@@ -645,7 +619,6 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
   await purgeOldMessages(user.uid);
 
   try{
-    // No orderBy to avoid composite index requirement
     const snap=await getDocs(
       query(collection(db,'orders'),where('uid','==',user.uid))
     );
@@ -656,10 +629,8 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('appWrap').style.display='flex';
 
-  // Проверяем, есть ли вообще сообщения в чате
   const chatSnap = await getDocs(collection(db,'chats',user.uid,'messages'));
 
-  // Проверяем сообщения
   hasUserMessages = false;
   let hasAdminMessages = false;
   chatSnap.forEach(d => {
@@ -668,18 +639,14 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape') closeLightbox();});
     if(s === 'admin') hasAdminMessages = true;
   });
 
-  // Запускаем слушатель
   listenChat(user.uid);
 
-  // Если есть сообщения от админа — сразу открытый чат, бот не мешает
   if(hasAdminMessages){
     flowState = 'open';
     document.getElementById('newTopicBtn')?.classList.add('show');
   } else if(chatSnap.empty || !hasUserMessages){
     await showWelcome();
   }
-
-
 });
 </script>
 </body>

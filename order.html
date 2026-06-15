@@ -668,7 +668,7 @@ window.submitForm = async () => {
   }
 
   try{
-    await addDoc(collection(db,'orders'),{
+    const docRef = await addDoc(collection(db,'orders'),{
       package: state.pkgName,
       siteType: state.siteType || state.pkgName,
       pages: state.pkg==='start'?1:state.pkg==='optimal'?5:10,
@@ -685,8 +685,20 @@ window.submitForm = async () => {
       status: 0,
       createdAt: serverTimestamp()
     });
-    document.getElementById('formInner').style.display='none';
-    document.getElementById('successWrap').classList.add('show');
+
+    // Переходим к оплате через Робокассу
+    btn.textContent='Переходим к оплате...';
+    const resp = await fetch('https://api-lac-six-78.vercel.app/api/createPayment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: docRef.id, amount: totalPrice })
+    });
+    const data = await resp.json();
+    if(data.paymentUrl){
+      window.location.href = data.paymentUrl;
+    } else {
+      throw new Error('Нет ссылки на оплату');
+    }
   }catch(e){
     btn.disabled=false;
     btn.innerHTML='Отправить заявку <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';

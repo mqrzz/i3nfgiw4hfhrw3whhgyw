@@ -17,8 +17,7 @@
     
     
     
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(1.3)}}
-    
+
     
     
     
@@ -421,8 +420,7 @@ window.acceptCookies=function(){
 </script>
 
 <script type="module">
-  import { auth, db } from './firebase-config.js';
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { db } from './firebase-config.js';
   import { doc, onSnapshot, collection, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   // ── MAINTENANCE OVERLAY ──
@@ -442,39 +440,6 @@ window.acceptCookies=function(){
     } else if (!on && maintOverlay) {
       maintOverlay.remove(); maintOverlay = null;
       document.body.style.overflow = '';
-    }
-  });
-
-  // ── AUTH NAV ──
-  
-
-  onAuthStateChanged(auth, user => {
-    const nu = document.getElementById('navUser');
-    const nl = document.getElementById('navLogin');
-    const navHome = document.getElementById('navHome');
-    const navCta = document.querySelector('.nav-cta');
-    if(user){
-      if(nu) nu.classList.add('show');
-      if(nl) nl.style.display='none';
-      if(navHome) navHome.style.display='none';
-      if(navCta) navCta.style.display='none';
-      // Имя и аватар
-      const name = user.displayName||user.email?.split('@')[0]||'Профиль';
-      const nameEl = document.getElementById('navUserName');
-      const avatarEl = document.getElementById('navAvatar');
-      if(nameEl) nameEl.textContent = name;
-      if(avatarEl){
-        if(user.photoURL){
-          avatarEl.innerHTML = `<img src="${user.photoURL}" alt="">`;
-        } else {
-          avatarEl.textContent = name[0].toUpperCase();
-        }
-      }
-    } else {
-      if(nu) nu.classList.remove('show');
-      if(nl) nl.style.display='inline-flex';
-      if(navHome) navHome.style.display='';
-      if(navCta) navCta.style.display='';
     }
   });
 </script>

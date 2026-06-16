@@ -256,7 +256,7 @@
                                     <a href="https://www.cloudflare.com/" class="payment-logo" target="_blank" rel="noopener" aria-label="Cloudflare" style="text-decoration:none;">
                                         <img src="https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.png" alt="Cloudflare" style="height:28px; width:auto; display:block; filter:brightness(0) saturate(100%) invert(11%) sepia(97%) saturate(7489%) hue-rotate(358deg) brightness(98%) contrast(118%);">
                                     </a>
-                                    <span class="payment-label">под защитой</span>
+                                    <span class="payment-label">Под защитой</span>
                                 </div>
                             </div>
                         </div>

@@ -1,29 +1,18 @@
 /**
- * nav.js — Antviz
+ * nav.js — Antviz (простая версия)
  * <script src="nav.js" data-page="home"></script>
  *
- * data-page: home | faq | order | profile | auth
- *            orders | support | settings | tickets
- *
- * ВАЖНО: подключать на КАЖДОЙ странице сайта (включая index.html),
- * иначе на странице будет другое/старое меню.
+ * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
+ * инициализирует САМА СТРАНИЦА (как она и делает сейчас), и просто
+ * подключается к уже существующему приложению через getApps()/getAuth().
+ * Это убирает любые проблемы с относительными путями к конфигу.
  */
 (function () {
 
   const script = document.currentScript;
   const page   = script ? (script.getAttribute('data-page') || 'home') : 'home';
-
-  /* Путь к firebase-config.js считаем от РЕАЛЬНОГО пути самого nav.js
-     (script.src), а не от URL страницы в адресной строке. Это надёжнее:
-     "чистые" URL вида /profile/orders на GitHub Pages не всегда совпадают
-     по глубине с реальным расположением файлов на диске, и подсчёт
-     слэшей в location.pathname легко даёт неверный результат —
-     именно из-за этого firebase-config.js мог не находиться, и весь
-     блок авторизации падал в catch без видимого сообщения. */
-  const navScriptUrl = new URL(script.src, window.location.href);
-  const baseUrl       = new URL('.', navScriptUrl); // папка, где лежит nav.js
   const depth  = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
-  const linkBase = depth > 0 ? '../' : '';
+  const b      = depth > 0 ? '../' : '';
 
   /* ─────────────── CSS ─────────────── */
   const CSS = `
@@ -115,7 +104,6 @@
     }
     .an-notify-dot.show { display: block; }
 
-    /* ── Dropdown — красивая карточка с разделением на секции ── */
     .an-dd {
       position: absolute; top: calc(100% + 12px); right: 0;
       background: linear-gradient(165deg, rgba(19,19,26,0.98), rgba(13,13,18,0.98));
@@ -135,8 +123,7 @@
 
     .an-dd-head {
       display: flex; align-items: center; gap: 11px;
-      padding: 10px 10px 12px;
-      margin-bottom: 4px;
+      padding: 10px 10px 12px; margin-bottom: 4px;
       border-bottom: 1px solid rgba(255,255,255,0.07);
     }
     .an-dd-head-avatar {
@@ -174,15 +161,13 @@
       position: relative;
     }
     .an-dd-item:hover { background: rgba(255,255,255,0.07); color: #f0f0f5; padding-left: 13px; }
-    .an-dd-item:active { background: rgba(255,255,255,0.1); }
     .an-dd-ico {
       width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(167,139,250,0.1);
-      transition: background .14s;
+      background: rgba(167,139,250,0.1); transition: background .14s;
     }
     .an-dd-item:hover .an-dd-ico { background: rgba(167,139,250,0.18); }
-    .an-dd-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .75; stroke: var(--an-ico-color, #a78bfa); fill: none; stroke-width: 1.8; }
+    .an-dd-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .75; stroke: #a78bfa; fill: none; stroke-width: 1.8; }
     .an-dd-item.red .an-dd-ico { background: rgba(248,113,113,0.1); }
     .an-dd-item.red .an-dd-ico svg { stroke: #f87171; opacity: .85; }
     .an-dd-item.red { color: rgba(248,113,113,0.75); }
@@ -205,10 +190,9 @@
     @media(max-width:768px) { .antviz-nav { display: none !important; } }
   `;
 
-  // "Главная" убрана — лого уже ведёт туда
   const PUBLIC_LINKS = [
-    { href: linkBase+'faq',    label: 'Возможности', key: 'faq' },
-    { href: linkBase+'order',  label: 'Цены',        key: 'order' },
+    { href: b+'faq',    label: 'Возможности', key: 'faq' },
+    { href: b+'order',  label: 'Цены',        key: 'order' },
   ];
 
   const NAV_CONFIG = {
@@ -226,17 +210,15 @@
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
-  /* badgeKey подставляется живыми данными из Firestore ниже —
-     те же сущности, что уже показаны в profile.html */
   const DD_ITEMS = [
-    { href: linkBase+'profile',         icon: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>', label: 'Обзор кабинета' },
+    { href: b+'profile',         icon: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>', label: 'Обзор кабинета' },
     { sep: true },
     { section: 'Кабинет' },
-    { href: linkBase+'profile/orders',  icon: '<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
-    { href: linkBase+'profile/tickets', icon: '<path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/>', label: 'Обслуживание', badgeKey: 'tickets' },
-    { href: linkBase+'profile/support', icon: '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/orders',  icon: '<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
+    { href: b+'profile/tickets', icon: '<path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/>', label: 'Обслуживание', badgeKey: 'tickets' },
+    { href: b+'profile/support', icon: '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>', label: 'Поддержка', badgeKey: 'support' },
     { sep: true },
-    { href: linkBase+'profile/settings', icon: '<circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>', label: 'Настройки' },
+    { href: b+'profile/settings', icon: '<circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>', label: 'Настройки' },
     { logout: true },
   ];
 
@@ -261,18 +243,18 @@
 
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
-  <a class="an-logo" href="${linkBase || '/'}">
-    <img src="${linkBase}img/favicon.png" alt="Antviz">
+  <a class="an-logo" href="${b || '/'}">
+    <img src="${b}img/favicon.png" alt="Antviz">
     Antviz
   </a>
 
   ${buildCenter()}
 
   <div class="an-right">
-    ${(!cfg.inApp && !cfg.hideCta) ? `<a href="${linkBase}order" class="an-cta" id="anCta">Заказать сайт</a>` : ''}
+    ${(!cfg.inApp && !cfg.hideCta) ? `<a href="${b}order" class="an-cta" id="anCta">Заказать сайт</a>` : ''}
 
     <div class="an-user" id="anUser">
-      <a href="${linkBase}auth" class="an-user-btn guest" id="anUserBtn" aria-expanded="false">
+      <a href="${b}auth" class="an-user-btn guest" id="anUserBtn" aria-expanded="false">
         <div class="an-avatar" id="anAvatar">?<span class="an-notify-dot" id="anNotifyDot"></span></div>
         <span class="an-uname" id="anUname">Войти</span>
         <svg class="an-chevron" viewBox="0 0 12 12" fill="none">
@@ -311,7 +293,6 @@
     const open = dd.classList.toggle('open');
     userBtn.setAttribute('aria-expanded', String(open));
   }
-
   userBtn?.addEventListener('click', onUserBtnClick);
 
   document.addEventListener('click', e => {
@@ -350,100 +331,129 @@
     unsubOrders?.();  unsubOrders  = null;
   }
 
+  function applyAuthedUI(user) {
+    const ctaEl    = document.getElementById('anCta');
+    const centerEl = document.getElementById('anCenter');
+    const unameEl  = document.getElementById('anUname');
+    const avatarEl = document.getElementById('anAvatar');
+    const ddHead   = document.getElementById('anDdHead');
+    const ddHeadAv = document.getElementById('anDdHeadAvatar');
+    const ddHeadNm = document.getElementById('anDdHeadName');
+    const ddHeadEm = document.getElementById('anDdHeadEmail');
+
+    isAuthed = true;
+    ctaEl?.classList.remove('show');
+    if (cfg.inApp && centerEl) centerEl.style.display = 'none';
+
+    userBtn.classList.remove('guest');
+    userBtn.removeAttribute('href');
+    userBtn.style.cursor = 'pointer';
+
+    const name = user.displayName || user.email?.split('@')[0] || 'Профиль';
+    const initial = name[0].toUpperCase();
+    if (unameEl) unameEl.textContent = name;
+    if (avatarEl) {
+      avatarEl.innerHTML = (user.photoURL
+        ? `<img src="${user.photoURL}" alt="">`
+        : initial) + '<span class="an-notify-dot" id="anNotifyDot"></span>';
+    }
+    if (ddHead) ddHead.style.display = 'flex';
+    if (ddHeadAv) ddHeadAv.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : initial;
+    if (ddHeadNm) ddHeadNm.textContent = name;
+    if (ddHeadEm) ddHeadEm.textContent = user.email || '';
+  }
+
+  function applyGuestUI() {
+    const ctaEl    = document.getElementById('anCta');
+    const unameEl  = document.getElementById('anUname');
+    const avatarEl = document.getElementById('anAvatar');
+    const ddHead   = document.getElementById('anDdHead');
+
+    isAuthed = false;
+    userBtn.classList.add('guest');
+    userBtn.setAttribute('href', `${b}auth`);
+    if (unameEl) unameEl.textContent = 'Войти';
+    if (avatarEl) avatarEl.innerHTML = '?<span class="an-notify-dot" id="anNotifyDot"></span>';
+    if (ddHead) ddHead.style.display = 'none';
+    if (!cfg.hideCta) ctaEl?.classList.add('show');
+    ['support','orders','tickets'].forEach(k => setBadge(k, 0, null));
+    refreshNotifyDot();
+  }
+
+  function watchBadges(db, fsMod, user) {
+    const { collection, query, where, onSnapshot } = fsMod;
+    teardownListeners();
+
+    unsubSupport = onSnapshot(
+      collection(db, 'chats', user.uid, 'messages'),
+      snap => {
+        const unread = snap.docs.filter(d => d.data().sender === 'admin' && !d.data().readByUser).length;
+        setBadge('support', unread, 'warn');
+        refreshNotifyDot();
+      },
+      () => {}
+    );
+
+    unsubOrders = onSnapshot(
+      query(collection(db, 'orders'), where('uid', '==', user.uid)),
+      snap => {
+        const orders = snap.docs.map(d => d.data());
+        const active = orders.filter(o => (o.status || 0) >= 1 && (o.status || 0) <= 4).length;
+        setBadge('orders', active, null);
+        const activeSupport = orders.some(o =>
+          o.supportActive && o.supportExpiresAt?.toDate &&
+          o.supportExpiresAt.toDate() > new Date()
+        );
+        setBadge('tickets', activeSupport ? 1 : 0, 'dot');
+        refreshNotifyDot();
+      },
+      () => {}
+    );
+  }
+
+  /* ── Ждём, пока сама страница инициализирует Firebase App, и подключаемся
+     к УЖЕ СУЩЕСТВУЮЩЕМУ приложению — без своего импорта firebase-config.js.
+     Каждая страница (profile, support, order и т.д.) уже сама делает
+     initializeApp() в своём скрипте — нам достаточно дождаться этого
+     момента через getApps().length, чтобы не зависеть от путей вообще. */
   (async () => {
     try {
-      /* Импортируем auth/db из ТОГО ЖЕ firebase-config.js, что использует
-         вся остальная часть сайта — строим путь от реального расположения
-         nav.js (script.src), а не от URL страницы в браузере. */
-      const configUrl = new URL('firebase-config.js', baseUrl).href;
-      const { auth, db } = await import(configUrl);
-      const { onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      const { collection, query, where, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+      const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+      const fsMod   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+
+      let tries = 0;
+      while (appMod.getApps().length === 0 && tries < 100) {
+        await new Promise(r => setTimeout(r, 50));
+        tries++;
+      }
+      if (appMod.getApps().length === 0) {
+        console.error('nav.js: Firebase App не инициализирован страницей за 5 секунд — профиль не может загрузиться.');
+        return;
+      }
+
+      const app  = appMod.getApp();
+      const auth = authMod.getAuth(app);
+      const db   = fsMod.getFirestore(app);
 
       document.getElementById('anSignOut')?.addEventListener('click', async () => {
         try {
           teardownListeners();
-          await signOut(auth);
-          window.location.href = linkBase || '/';
+          await authMod.signOut(auth);
+          window.location.href = b || '/';
         } catch(e) { console.error('nav.js signOut:', e); }
       });
 
-      onAuthStateChanged(auth, user => {
-        const ctaEl     = document.getElementById('anCta');
-        const centerEl  = document.getElementById('anCenter');
-        const unameEl   = document.getElementById('anUname');
-        const avatarEl  = document.getElementById('anAvatar');
-        const ddHead    = document.getElementById('anDdHead');
-        const ddHeadAv  = document.getElementById('anDdHeadAvatar');
-        const ddHeadNm  = document.getElementById('anDdHeadName');
-        const ddHeadEm  = document.getElementById('anDdHeadEmail');
-
+      authMod.onAuthStateChanged(auth, user => {
         teardownListeners();
-
         if (user) {
-          isAuthed = true;
-          ctaEl?.classList.remove('show');
-          if (cfg.inApp && centerEl) centerEl.style.display = 'none';
-
-          userBtn.classList.remove('guest');
-          userBtn.removeAttribute('href');
-          userBtn.style.cursor = 'pointer';
-
-          const name = user.displayName || user.email?.split('@')[0] || 'Профиль';
-          const initial = name[0].toUpperCase();
-          if (unameEl) unameEl.textContent = name;
-          if (avatarEl) {
-            avatarEl.innerHTML = (user.photoURL
-              ? `<img src="${user.photoURL}" alt="">`
-              : initial) + '<span class="an-notify-dot" id="anNotifyDot"></span>';
-          }
-          if (ddHead) ddHead.style.display = 'flex';
-          if (ddHeadAv) ddHeadAv.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : initial;
-          if (ddHeadNm) ddHeadNm.textContent = name;
-          if (ddHeadEm) ddHeadEm.textContent = user.email || '';
-
-          unsubSupport = onSnapshot(
-            collection(db, 'chats', user.uid, 'messages'),
-            snap => {
-              const unread = snap.docs.filter(d => d.data().sender === 'admin' && !d.data().readByUser).length;
-              setBadge('support', unread, 'warn');
-              refreshNotifyDot();
-            },
-            () => {}
-          );
-
-          unsubOrders = onSnapshot(
-            query(collection(db, 'orders'), where('uid', '==', user.uid)),
-            snap => {
-              const orders = snap.docs.map(d => d.data());
-              const active = orders.filter(o => (o.status || 0) >= 1 && (o.status || 0) <= 4).length;
-              setBadge('orders', active, null);
-
-              const activeSupport = orders.some(o =>
-                o.supportActive && o.supportExpiresAt?.toDate &&
-                o.supportExpiresAt.toDate() > new Date()
-              );
-              setBadge('tickets', activeSupport ? 1 : 0, 'dot');
-              refreshNotifyDot();
-            },
-            () => {}
-          );
+          applyAuthedUI(user);
+          watchBadges(db, fsMod, user);
         } else {
-          isAuthed = false;
-          userBtn.classList.add('guest');
-          userBtn.setAttribute('href', `${linkBase}auth`);
-          if (unameEl) unameEl.textContent = 'Войти';
-          if (avatarEl) avatarEl.innerHTML = '?<span class="an-notify-dot" id="anNotifyDot"></span>';
-          if (ddHead) ddHead.style.display = 'none';
-          if (!cfg.hideCta) ctaEl?.classList.add('show');
-          ['support','orders','tickets'].forEach(k => setBadge(k, 0, null));
-          refreshNotifyDot();
+          applyGuestUI();
         }
       });
     } catch(e) {
-      // Подробный лог — если меню профиля не работает, открой консоль (F12)
-      // браузера и посмотри сообщение "nav.js auth error:" — там будет видно,
-      // не нашёлся ли firebase-config.js или другая причина.
       console.error('nav.js auth error:', e);
     }
   })();

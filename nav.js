@@ -25,7 +25,7 @@
       backdrop-filter: blur(28px) saturate(200%);
       -webkit-backdrop-filter: blur(28px) saturate(200%);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 999px;
+      border-radius: 16px;
       box-shadow: 0 2px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
       transition: border-color .3s, background .3s;
     }
@@ -53,7 +53,7 @@
       color: rgba(240,240,245,0.45);
       font-family: 'Onest', sans-serif; font-size: .8rem;
       text-decoration: none; padding: .38rem .78rem;
-      border-radius: 999px; transition: color .18s, background .18s;
+      border-radius: 10px; transition: color .18s, background .18s;
       white-space: nowrap;
     }
     .an-link:hover { color: #f0f0f5; background: rgba(255,255,255,0.06); }
@@ -62,45 +62,37 @@
     /* Right */
     .an-right { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 
-    /* Login */
-    .an-login {
-      display: none; align-items: center; gap: 6px;
-      color: rgba(240,240,245,0.55); font-family: 'Onest', sans-serif;
-      font-size: .78rem; text-decoration: none;
-      padding: .38rem .85rem; border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.1);
-      transition: color .18s, border-color .18s, background .18s;
-      white-space: nowrap;
-    }
-    .an-login:hover { color: #f0f0f5; border-color: rgba(255,255,255,0.2); background: rgba(255,255,255,0.05); }
-    .an-login.show { display: inline-flex; }
-
-    /* CTA */
+    /* CTA (Заказать сайт) */
     .an-cta {
       display: none; align-items: center; gap: 6px;
       background: #6c63ff; color: #fff;
       font-family: 'Onest', sans-serif; font-size: .78rem; font-weight: 500;
       text-decoration: none; padding: .42rem 1.05rem;
-      border-radius: 999px; border: none; cursor: pointer;
+      border-radius: 10px; border: none; cursor: pointer;
       transition: box-shadow .2s, transform .12s;
       white-space: nowrap;
     }
     .an-cta:hover { box-shadow: 0 4px 18px rgba(108,99,255,.5); transform: translateY(-1px); }
     .an-cta.show { display: inline-flex; }
 
-    /* User */
-    .an-user { position: relative; display: none; }
-    .an-user.show { display: flex; }
+    /* User / Профиль — всегда на месте, меняется только содержимое и поведение */
+    .an-user { position: relative; display: flex; }
     .an-user-btn {
       display: flex; align-items: center; gap: 7px;
       background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 999px; padding: 5px 12px 5px 5px;
+      border-radius: 10px; padding: 5px 12px 5px 5px;
       cursor: pointer; transition: background .18s, border-color .18s;
       font-family: 'Onest', sans-serif; font-size: .78rem; color: #f0f0f5;
     }
     .an-user-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.15); }
+
+    /* Гостевой режим кнопки профиля: без аватара, просто "Войти" */
+    .an-user-btn.guest { padding: 5px 14px; }
+    .an-user-btn.guest .an-avatar { display: none; }
+    .an-user-btn.guest .an-chevron { display: none; }
+
     .an-avatar {
-      width: 26px; height: 26px; border-radius: 50%;
+      width: 26px; height: 26px; border-radius: 8px;
       background: linear-gradient(135deg,#6c63ff,#a78bfa);
       display: flex; align-items: center; justify-content: center;
       font-size: .65rem; font-weight: 700; color: #fff;
@@ -119,7 +111,7 @@
       position: absolute; top: calc(100% + 10px); right: 0;
       background: rgba(13,13,18,0.97); backdrop-filter: blur(28px);
       border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 18px; padding: 5px;
+      border-radius: 14px; padding: 5px;
       min-width: 195px;
       box-shadow: 0 16px 48px rgba(0,0,0,0.65), inset 0 1px 0 rgba(255,255,255,0.06);
       opacity: 0; pointer-events: none;
@@ -136,7 +128,7 @@
     }
     .an-dd-item {
       display: flex; align-items: center; gap: 9px;
-      padding: 8px 10px; border-radius: 11px;
+      padding: 8px 10px; border-radius: 9px;
       font-size: .8rem; color: rgba(240,240,245,0.6);
       text-decoration: none; cursor: pointer;
       transition: background .13s, color .13s;
@@ -155,14 +147,12 @@
 
   /* ─────────────── NAV CONFIG per page ─────────────── */
   // centerLinks: показываются всегда (незалогинен/залогинен)
-  // guestLinks:  только незалогиненным
   // showCta:     кнопка "Заказать сайт" незалогиненным
   // hideCta:     скрывать кнопку даже незалогиненным (уже на странице заказа)
-  // inApp:       внутри кабинета — только аватар, без внешних ссылок
+  // inApp:       внутри кабинета — центральные ссылки скрываются у залогиненных
 
-  // Единый набор публичных ссылок — как на всех крупных сайтах
+  // "Главная" убрана — лого уже ведёт туда
   const PUBLIC_LINKS = [
-    { href: b || '/',   label: 'Главная',     key: 'home' },
     { href: b+'faq',    label: 'Возможности', key: 'faq' },
     { href: b+'order',  label: 'Цены',        key: 'order' },
   ];
@@ -183,7 +173,7 @@
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
-  /* ─────────────── Dropdown items ─────────────── */
+  /* ─────────────── Dropdown items (для залогиненных) ─────────────── */
   const DD_ITEMS = [
     { section: 'Кабинет' },
     { href: b+'profile',         icon: '<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>', label: 'Обзор' },
@@ -215,6 +205,9 @@
   }
 
   /* ─────────────── Full nav HTML ─────────────── */
+  // Профиль теперь всегда виден: по умолчанию рисуем гостевой вариант
+  // ("Войти" + ссылка на /auth), JS при онлайн-проверке авторизации
+  // переключает его в авторизованный вид (аватар + дропдаун).
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
   <a class="an-logo" href="${b || '/'}">
@@ -225,17 +218,16 @@
   ${buildCenter()}
 
   <div class="an-right">
-    ${!cfg.inApp ? `<a href="${b}auth" class="an-login" id="anLogin">Войти</a>` : ''}
     ${(!cfg.inApp && !cfg.hideCta) ? `<a href="${b}order" class="an-cta" id="anCta">Заказать сайт</a>` : ''}
 
     <div class="an-user" id="anUser">
-      <button class="an-user-btn" id="anUserBtn" aria-expanded="false">
+      <a href="${b}auth" class="an-user-btn guest" id="anUserBtn" aria-expanded="false">
         <div class="an-avatar" id="anAvatar">?</div>
-        <span class="an-uname" id="anUname">Профиль</span>
+        <span class="an-uname" id="anUname">Войти</span>
         <svg class="an-chevron" viewBox="0 0 12 12" fill="none">
           <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
-      </button>
+      </a>
       <div class="an-dd" id="anDd">${buildDD()}</div>
     </div>
   </div>
@@ -251,13 +243,19 @@
   document.body.insertBefore(tmp.firstElementChild, document.body.firstChild);
 
   /* ─────────────── Logic ─────────────── */
-  const userBtn = document.getElementById('anUserBtn');
-  const dd      = document.getElementById('anDd');
+  let userBtn = document.getElementById('anUserBtn');
+  const dd    = document.getElementById('anDd');
+  let isAuthed = false;
 
-  userBtn?.addEventListener('click', () => {
+  function onUserBtnClick(e) {
+    if (!isAuthed) return; // гость — просто переход по href на /auth
+    e.preventDefault();
     const open = dd.classList.toggle('open');
     userBtn.setAttribute('aria-expanded', String(open));
-  });
+  }
+
+  userBtn?.addEventListener('click', onUserBtnClick);
+
   document.addEventListener('click', e => {
     if (!userBtn || !dd) return;
     if (!userBtn.contains(e.target) && !dd.contains(e.target)) {
@@ -282,21 +280,21 @@
     try {
       const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
       onAuthStateChanged(getAuth(), user => {
-        const loginEl = document.getElementById('anLogin');
-        const ctaEl   = document.getElementById('anCta');
-        const userEl  = document.getElementById('anUser');
+        const ctaEl    = document.getElementById('anCta');
         const centerEl = document.getElementById('anCenter');
+        const unameEl  = document.getElementById('anUname');
+        const avatarEl = document.getElementById('anAvatar');
 
         if (user) {
-          loginEl?.classList.remove('show');
-          ctaEl  ?.classList.remove('show');
-          userEl ?.classList.add('show');
-          // Залогинен — скрываем центральные ссылки если inApp
+          isAuthed = true;
+          ctaEl?.classList.remove('show');
           if (cfg.inApp && centerEl) centerEl.style.display = 'none';
 
+          userBtn.classList.remove('guest');
+          userBtn.removeAttribute('href');
+          userBtn.style.cursor = 'pointer';
+
           const name = user.displayName || user.email?.split('@')[0] || 'Профиль';
-          const unameEl  = document.getElementById('anUname');
-          const avatarEl = document.getElementById('anAvatar');
           if (unameEl) unameEl.textContent = name;
           if (avatarEl) {
             avatarEl.innerHTML = user.photoURL
@@ -304,11 +302,11 @@
               : name[0].toUpperCase();
           }
         } else {
-          userEl ?.classList.remove('show');
-          if (!cfg.inApp) {
-            loginEl?.classList.add('show');
-            if (!cfg.hideCta) ctaEl?.classList.add('show');
-          }
+          isAuthed = false;
+          userBtn.classList.add('guest');
+          userBtn.setAttribute('href', `${b}auth`);
+          if (unameEl) unameEl.textContent = 'Войти';
+          if (!cfg.hideCta) ctaEl?.classList.add('show');
         }
       });
     } catch(e) { console.error('nav.js:', e); }

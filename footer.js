@@ -149,7 +149,7 @@
             font-weight: 400;
             font-size: 16px;
             letter-spacing: -.02em;
-            margin-bottom: 8px;
+            margin-top: 6px;
         }
         .payment-logo img {
             display: block;
@@ -246,10 +246,10 @@
                                 <span class="contact-note">Сюда — по любым вопросам и возражениям. По сотрудничеству отвечаем только в чате поддержки на сайте.</span>
                             </a>
                             <div class="payment-block">
-                                <span class="payment-label">Приём платежей</span>
                                 <a href="https://robokassa.com/" class="payment-logo" target="_blank" rel="noopener" aria-label="Robokassa">
                                     <img src="https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.svg" alt="Robokassa" onerror="this.src='https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.png'">
                                 </a>
+                                <span class="payment-label">Приём платежей</span>
                             </div>
                         </div>
                     </div>
@@ -327,7 +327,7 @@
                 
                 
                 <div class="legal-info">
-                    Самозанятый: Ошибка &nbsp;·&nbsp; ИНН: 701508269796
+                    Самозанятый: Конухин Алексей Денисович &nbsp;·&nbsp; ИНН: 701508269796
                 </div>
                 
                 <div class="meta-note">
@@ -338,7 +338,7 @@
         
         ${showMobileNav ? `
         <nav class="antviz-mobile-nav">
-            <a href="${base}" class="antviz-mobile-nav__item${activePage === 'home' ? ' active' : ''}">
+            <a href="https://antviz.ru/" class="antviz-mobile-nav__item${activePage === 'home' ? ' active' : ''}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
                     <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
                     <path d="M9 21V12h6v9"/>

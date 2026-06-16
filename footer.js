@@ -248,15 +248,15 @@
                             <div style="display:flex; align-items:center; gap:32px; flex-wrap:wrap;">
                                 <div class="payment-block">
                                     <a href="https://robokassa.com/" class="payment-logo" target="_blank" rel="noopener" aria-label="Robokassa">
-                                        <img src="https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.svg" alt="Robokassa" onerror="this.src='https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.png'">
+                                        <img src="https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.svg" alt="Robokassa" onerror="this.src='https://logo-teka.com/wp-content/uploads/2025/09/robokassa-logo.png'" style="height:28px; width:auto; display:block;">
                                     </a>
-                                    <span class="payment-label">Приём платежей</span>
+                                    <span class="payment-label">приём платежей</span>
                                 </div>
-                                <div class="payment-block">
+                                <div class="payment-block" style="display:flex; flex-direction:column; align-items:center;">
                                     <a href="https://www.cloudflare.com/" class="payment-logo" target="_blank" rel="noopener" aria-label="Cloudflare">
-                                        <img src="https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.svg" alt="Cloudflare" style="max-width:200px; height:auto;" onerror="this.src='https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.png'">
+                                        <img src="https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.png" alt="Cloudflare" style="height:28px; width:auto; display:block; filter:brightness(0) invert(1);">
                                     </a>
-                                    <span class="payment-label">Под защитой</span>
+                                    <span class="payment-label">под защитой</span>
                                 </div>
                             </div>
                         </div>

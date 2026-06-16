@@ -65,12 +65,12 @@
       position: fixed;
       top: var(--nav-h); left: 0; right: 0; bottom: 0;
       display: flex; flex-direction: column;
-      max-width: 680px; margin: 0 auto;
+      max-width: 880px; margin: 0 auto;
       border-left: 1px solid var(--border);
       border-right: 1px solid var(--border);
     }
     @media (max-width: 768px) {
-      .chat-layout { top: 0; border: none; }
+      .chat-layout { top: 0; border: none; max-width: 100%; }
     }
 
     /* ── header ── */
@@ -128,7 +128,7 @@
     .chat-msgs::-webkit-scrollbar { width: 3px; }
     .chat-msgs::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
 
-    .msg { max-width: 78%; display: flex; flex-direction: column; gap: 3px; animation: msgIn .2s ease both; }
+    .msg { max-width: min(78%, 560px); display: flex; flex-direction: column; gap: 3px; animation: msgIn .2s ease both; }
     .msg.mine   { align-self: flex-end; align-items: flex-end; }
     .msg.theirs { align-self: flex-start; align-items: flex-start; }
 
@@ -201,6 +201,14 @@
     }
     .bot-btn.back { color: var(--muted); font-size: 11.5px; }
     .bot-btn.back:hover { color: var(--muted2); }
+    .bot-btn:disabled {
+      opacity: .4; cursor: default; pointer-events: none;
+    }
+    .bot-actions.scrollable {
+      max-height: 168px; overflow-y: auto; padding-right: 2px;
+    }
+    .bot-actions.scrollable::-webkit-scrollbar { width: 3px; }
+    .bot-actions.scrollable::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 2px; }
 
     /* ── order card ── */
     .order-info-card {
@@ -466,11 +474,13 @@ async function purgeOldMessages(uid){
   try{
     const cutoff=Timestamp.fromMillis(Date.now()-THREE_DAYS_MS);
     const snap=await getDocs(query(collection(db,'chats',uid,'messages'),where('createdAt','<',cutoff)));
+    if(snap.empty) return;
     for(const d of snap.docs) deleteDoc(d.ref).catch(()=>{});
+    toast('История старше 3 дней очищена','info');
   }catch(e){}
 }
 
-/* ── remove welcome messages ── */
+/* ── dismiss welcome messages (soft-delete, no extra writes/deletes cost) ── */
 async function removeWelcomeMessages(){
   if(!currentUser) return;
   try{
@@ -478,7 +488,10 @@ async function removeWelcomeMessages(){
       collection(db,'chats',currentUser.uid,'messages'),
       where('flowTag','==','welcome')
     ));
-    for(const d of snap.docs) deleteDoc(d.ref).catch(()=>{});
+    for(const d of snap.docs){
+      if(!d.data().dismissed) updateDoc(d.ref,{dismissed:true}).catch(()=>{});
+      document.querySelector(`[data-id="${d.id}"]`)?.remove();
+    }
     welcomeShown = false;
   }catch(e){}
 }
@@ -518,17 +531,32 @@ function renderMsg(m){
   return div;
 }
 
+function lockAllButtonRows(){
+  document.querySelectorAll('.bot-actions:not(.locked)').forEach(r=>{
+    r.classList.add('locked');
+    r.querySelectorAll('button').forEach(b=>b.disabled=true);
+  });
+}
+
 function renderBotWithButtons(m){
   const div = renderMsg(m);
   if(!div) return;
+  // деактивируем все ранее показанные блоки кнопок — не даём кликать по "устаревшим" темам
+  lockAllButtonRows();
+
   const row = document.createElement('div');
   row.className='bot-actions';
   const buttons = getBotButtons(m.flowTag);
+  if(buttons.length > 6) row.classList.add('scrollable');
   buttons.forEach(a=>{
     const btn=document.createElement('button');
     btn.className=`bot-btn${a.cls?' '+a.cls:''}`;
     btn.textContent=a.label;
-    btn.onclick=a.fn;
+    btn.onclick=()=>{
+      row.classList.add('locked');
+      row.querySelectorAll('button').forEach(b=>b.disabled=true);
+      a.fn();
+    };
     row.appendChild(btn);
   });
   if(buttons.length) div.appendChild(row);
@@ -574,7 +602,7 @@ function appendOrderCard(o){
   const container=document.getElementById('chatMsgs');
   const div=document.createElement('div');
   div.className='msg theirs';
-  const s=o.status||0;
+  const s = (typeof o.status==='number' && STATUS_LABELS[o.status]) ? o.status : 0;
   div.innerHTML=`
     <div class="msg-bubble">Вот информация по вашему заказу:</div>
     <div class="order-info-card">
@@ -586,14 +614,20 @@ function appendOrderCard(o){
       <div class="oi-row"><span class="oi-lbl">Создан</span><span class="oi-val">${fmtDate(o.createdAt)}</span></div>
       ${o.statusComment?`<div class="oi-row" style="flex-direction:column;gap:4px"><span class="oi-lbl">Комментарий</span><span class="oi-val" style="text-align:left;color:var(--accent2)">${o.statusComment}</span></div>`:''}
     </div>
-    <div class="msg-time">Бот · сейчас</div>`;
+    <div class="msg-time">Бот · ${fmtTime(Timestamp.now())}</div>`;
+  lockAllButtonRows();
   const row=document.createElement('div');
   row.className='bot-actions';
   [{label:'Назад к темам', cls:'back', fn:()=>showTopicMenu()},
    {label:'Написать менеджеру', cls:'accent', fn:()=>openFreeChat()}
   ].forEach(a=>{
     const btn=document.createElement('button');
-    btn.className=`bot-btn ${a.cls}`; btn.textContent=a.label; btn.onclick=a.fn;
+    btn.className=`bot-btn ${a.cls}`; btn.textContent=a.label;
+    btn.onclick=()=>{
+      row.classList.add('locked');
+      row.querySelectorAll('button').forEach(b=>b.disabled=true);
+      a.fn();
+    };
     row.appendChild(btn);
   });
   div.appendChild(row);
@@ -680,15 +714,22 @@ window.startNewTopic = async function(){
   await showWelcome();
 };
 
-/* ── Firestore live listener ── */
-function listenChat(uid){
+/* ── Firestore live listener ──
+   onFirstSnapshot(stats) вызывается один раз сразу после обработки первого
+   снапшота — на тех же данных, что и рендер, без отдельного getDocs (нет гонки) */
+function listenChat(uid, onFirstSnapshot){
   if(unsubChat) unsubChat();
   const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(100));
   unsubChat=onSnapshot(q,snap=>{
+    let hasAdminMessages = false;
+    const isFirst = !initialLoadDone;
+
     snap.docChanges().forEach(ch=>{
       if(ch.type==='added'){
         const m={...ch.doc.data(), _id:ch.doc.id};
+        if(m.sender==='admin') hasAdminMessages = true;
         if(document.querySelector(`[data-id="${m._id}"]`)) return;
+        if(m.dismissed) return;
 
         if(m.sender==='bot'){
           renderBotWithButtons(m);
@@ -707,6 +748,9 @@ function listenChat(uid){
     if(!initialLoadDone){
       initialLoadDone=true;
       setTimeout(()=>scrollBottom(true), 80);
+      if(isFirst && onFirstSnapshot){
+        onFirstSnapshot({hasAdminMessages, isEmpty: snap.empty});
+      }
     }
   },e=>console.error(e));
 }
@@ -788,24 +832,16 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('appWrap').style.display='flex';
 
-  const chatSnap = await getDocs(collection(db,'chats',user.uid,'messages'));
-
-  hasUserMessages = false;
-  let hasAdminMessages = false;
-  chatSnap.forEach(d => {
-    const s = d.data().sender;
-    if(s === 'user') hasUserMessages = true;
-    if(s === 'admin') hasAdminMessages = true;
+  // решение о welcome/flowState принимаем по тому же снапшоту, что и рендер —
+  // без отдельного getDocs, чтобы не было гонки с onSnapshot
+  listenChat(user.uid, ({hasAdminMessages, isEmpty})=>{
+    if(hasAdminMessages){
+      flowState = 'open';
+      document.getElementById('newTopicBtn')?.classList.add('show');
+    } else if(isEmpty || !hasUserMessages){
+      showWelcome();
+    }
   });
-
-  listenChat(user.uid);
-
-  if(hasAdminMessages){
-    flowState = 'open';
-    document.getElementById('newTopicBtn')?.classList.add('show');
-  } else if(chatSnap.empty || !hasUserMessages){
-    await showWelcome();
-  }
 });
 </script>
 </body>

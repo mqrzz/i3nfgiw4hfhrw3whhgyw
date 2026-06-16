@@ -69,15 +69,17 @@
     .tl-body p{color:var(--muted);font-size:.875rem}
     .tl-time{display:inline-flex;align-items:center;gap:4px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.15);color:var(--accent2);font-size:.68rem;padding:.2rem .6rem;border-radius:50px;margin-top:.5rem;font-weight:500}
     .calc-wrap{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem;margin-top:3rem}
-    .calc-row{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:1.5rem}
     .calc-group{margin-bottom:1.5rem}
     .calc-group label{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem}
-    .calc-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:'Onest',sans-serif;font-size:.9rem;outline:none;-webkit-appearance:none;cursor:pointer;transition:border-color .2s}
-    .calc-select:focus{border-color:var(--accent)}
-    .pages-row{display:flex;align-items:center;gap:1rem;margin-top:.6rem}
-    .pages-slider{flex:1;-webkit-appearance:none;height:4px;background:var(--bg3);border-radius:2px;outline:none;cursor:pointer}
-    .pages-slider::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--accent);cursor:pointer;box-shadow:0 0 0 3px rgba(108,99,255,.2)}
-    .pages-num{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem;min-width:40px;text-align:center;color:var(--accent2)}
+    .calc-pkgs{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:1.5rem}
+    .calc-pkg{background:var(--bg3);border:1px solid var(--border);border-radius:16px;padding:1.3rem 1.1rem;cursor:pointer;transition:border-color .2s,transform .15s;position:relative;user-select:none}
+    .calc-pkg:hover{transform:translateY(-2px)}
+    .calc-pkg.sel{border-color:var(--accent2);background:rgba(108,99,255,.07)}
+    .calc-pkg-tag{position:absolute;top:0;left:50%;transform:translateX(-50%);background:var(--accent2);color:#0a0a0c;font-size:.58rem;letter-spacing:.06em;text-transform:uppercase;padding:.18rem .7rem;border-radius:0 0 8px 8px;font-weight:700}
+    .calc-pkg-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.78rem;color:var(--muted);margin-bottom:.6rem}
+    .calc-pkg.sel .calc-pkg-name{color:var(--accent2)}
+    .calc-pkg-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.45rem;margin-bottom:.2rem}
+    .calc-pkg-pages{font-size:.72rem;color:var(--muted)}
     .calc-extras{display:flex;flex-wrap:wrap;gap:.75rem}
     .calc-extra{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.6rem 1rem;cursor:pointer;font-size:.82rem;transition:border-color .2s,background .2s,color .2s;user-select:none}
     .calc-extra:hover{border-color:rgba(108,99,255,.3)}
@@ -135,7 +137,7 @@
       section{padding:60px 5vw}
       .hero{padding:80px 5vw 80px;min-height:auto}
       .hero-stats{gap:2rem;margin-top:3rem}
-      .calc-row{grid-template-columns:1fr}
+      .calc-pkgs{grid-template-columns:1fr}
       .ms-block{grid-template-columns:1fr;gap:2rem;padding:2rem}      .footer-links{justify-content:center}
       .cta-section{padding-bottom:100px}
     }
@@ -249,42 +251,40 @@
   <h2 class="section-title reveal">Рассчитайте стоимость</h2>
   <p class="section-sub reveal">Настройте параметры — цена обновляется в реальном времени.</p>
   <div class="calc-wrap reveal">
-    <div class="calc-row">
-      <div class="calc-group">
-        <label>Тариф</label>
-        <select class="calc-select" id="calcTariff" onchange="calcUpdate()">
-          <option value="250:1">Базовый — 250 ₽/стр</option>
-          <option value="225:5" selected>Стандарт — 225 ₽/стр (мин. 5 стр)</option>
-          <option value="200:10">Премиум — 200 ₽/стр (мин. 10 стр)</option>
-        </select>
+    <div class="calc-pkgs">
+      <div class="calc-pkg sel" data-base="3900" onclick="selectPkg(this)">
+        <div class="calc-pkg-name">Старт</div>
+        <div class="calc-pkg-price">3 900 ₽</div>
+        <div class="calc-pkg-pages">1 страница</div>
       </div>
-      <div class="calc-group">
-        <label>Тип сайта</label>
-        <select class="calc-select" id="calcType">
-          <option>Лендинг</option><option>Многостраничный</option><option>Портфолио</option><option>Блог</option><option>Другое</option>
-        </select>
+      <div class="calc-pkg" data-base="9900" onclick="selectPkg(this)">
+        <div class="calc-pkg-tag">Популярный</div>
+        <div class="calc-pkg-name">Оптимальный</div>
+        <div class="calc-pkg-price">9 900 ₽</div>
+        <div class="calc-pkg-pages">до 5 страниц</div>
       </div>
-    </div>
-    <div class="calc-group">
-      <label>Количество страниц: <span id="pagesLabel" style="color:var(--accent2);font-weight:600;">5</span></label>
-      <div class="pages-row">
-        <input type="range" class="pages-slider" id="pagesSlider" min="1" max="30" value="5" oninput="calcUpdate()" />
-        <span class="pages-num" id="pagesNum">5</span>
+      <div class="calc-pkg" data-base="19900" onclick="selectPkg(this)">
+        <div class="calc-pkg-name">Бизнес</div>
+        <div class="calc-pkg-price">19 900 ₽</div>
+        <div class="calc-pkg-pages">до 10 страниц</div>
       </div>
     </div>
     <div class="calc-group">
       <label>Дополнения</label>
       <div class="calc-extras">
-        <div class="calc-extra" id="extraDomain" onclick="toggleExtra(this)">🌐 Домен .ru <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+200 ₽</span></div>
-        <div class="calc-extra" id="extraSupport" onclick="toggleExtra(this)">🔧 Поддержка 1 мес <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+500 ₽</span></div>
+        <div class="calc-extra" id="extraDomain" onclick="toggleExtra(this)">🌐 Домен .ru <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+650 ₽</span></div>
+        <div class="calc-extra" id="extraSupport" onclick="toggleExtra(this)">🔧 Обслуживание <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+500 ₽/мес</span></div>
+        <div class="calc-extra" id="extraSeo" onclick="toggleExtra(this)">📈 SEO <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+2 500 ₽</span></div>
+        <div class="calc-extra" id="extraContent" onclick="toggleExtra(this)">✍️ Контент <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+2 000 ₽</span></div>
+        <div class="calc-extra" id="extraShop" onclick="toggleExtra(this)">🛒 Каталог и корзина <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+4 900 ₽</span></div>
         <div class="calc-extra" id="extraUrgent" onclick="toggleExtra(this)">⚡ Срочность <span style="color:var(--muted);font-size:.72rem;margin-left:4px;">+30%</span></div>
       </div>
     </div>
     <div class="calc-result">
       <div>
         <div style="color:var(--muted);font-size:.72rem;margin-bottom:.2rem;text-transform:uppercase;letter-spacing:.06em;">Итого</div>
-        <div class="calc-price" id="calcPrice">1 125 ₽</div>
-        <div style="color:var(--muted);font-size:.75rem;margin-top:.2rem;" id="calcBreakdown">225 ₽ × 5 стр</div>
+        <div class="calc-price" id="calcPrice">3 900 ₽</div>
+        <div style="color:var(--muted);font-size:.75rem;margin-top:.2rem;" id="calcBreakdown">Пакет «Старт»</div>
       </div>
       <a href="order" class="btn btn-primary" style="white-space:nowrap;">Заказать →</a>
     </div>
@@ -382,24 +382,26 @@
 <script>
 function getCart(){try{return JSON.parse(localStorage.getItem('antviz_cart')||'[]')}catch(e){return[]}}
 function updateCartBadges(){const n=getCart().reduce((s,i)=>s+i.qty,0);['desktopCartBadge','mobileCartBadge'].forEach(id=>{const b=document.getElementById(id);if(b){b.textContent=n;b.classList.toggle('show',n>0)}})}
+function selectPkg(el){
+  document.querySelectorAll('.calc-pkg').forEach(p=>p.classList.remove('sel'));
+  el.classList.add('sel');
+  calcUpdate();
+}
 function toggleExtra(el){el.classList.toggle('on');calcUpdate()}
 function calcUpdate(){
-  const[price,min]=document.getElementById('calcTariff').value.split(':').map(Number);
-  const slider=document.getElementById('pagesSlider');
-  slider.min=min;
-  if(parseInt(slider.value)<min)slider.value=min;
-  const pages=parseInt(slider.value);
-  document.getElementById('pagesLabel').textContent=pages;
-  document.getElementById('pagesNum').textContent=pages;
-  let total=price*pages;
-  let bd=`${price} ₽ × ${pages} стр`;
-  const ex=[];
-  if(document.getElementById('extraDomain').classList.contains('on')){total+=200;ex.push('+200 ₽ домен')}
-  if(document.getElementById('extraSupport').classList.contains('on')){total+=500;ex.push('+500 ₽ поддержка')}
-  if(document.getElementById('extraUrgent').classList.contains('on')){total=Math.round(total*1.3);ex.push('+30% срочность')}
-  if(ex.length)bd+=' · '+ex.join(' · ');
+  const pkg=document.querySelector('.calc-pkg.sel');
+  const base=Number(pkg.dataset.base);
+  const name=pkg.querySelector('.calc-pkg-name').textContent;
+  let total=base;
+  const parts=[`Пакет «${name}»`];
+  if(document.getElementById('extraDomain').classList.contains('on')){total+=650;parts.push('+650 ₽ домен')}
+  if(document.getElementById('extraSupport').classList.contains('on')){total+=500;parts.push('+500 ₽ обслуживание')}
+  if(document.getElementById('extraSeo').classList.contains('on')){total+=2500;parts.push('+2 500 ₽ SEO')}
+  if(document.getElementById('extraContent').classList.contains('on')){total+=2000;parts.push('+2 000 ₽ контент')}
+  if(document.getElementById('extraShop').classList.contains('on')){total+=4900;parts.push('+4 900 ₽ корзина')}
+  if(document.getElementById('extraUrgent').classList.contains('on')){total=Math.round(total*1.3);parts.push('+30% срочность')}
   document.getElementById('calcPrice').textContent=total.toLocaleString('ru')+' ₽';
-  document.getElementById('calcBreakdown').textContent=bd;
+  document.getElementById('calcBreakdown').textContent=parts.join(' · ');
 }
 const obs=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));

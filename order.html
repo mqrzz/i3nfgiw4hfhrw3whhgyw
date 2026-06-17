@@ -1,487 +1,495 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Заказать сайт — Antviz</title>
-  <link rel="icon" href="img/favicon.png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#0a0a0c;--bg2:#0f0f13;--bg3:#131318;--card:#111115;
-      --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
-      --accent:#a78bfa;--accent-dim:rgba(167,139,250,.15);
-      --text:#f0f0f5;--muted:rgba(255,255,255,.25);--muted2:rgba(255,255,255,.45);
-      --success:#4ade80;--error:#f87171;--warn:#fbbf24;
-    }
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--text);font-family:'Onest',sans-serif;font-weight:400;line-height:1.6;overflow-x:hidden;min-height:100vh}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Новый заказ — Antviz</title>
+<link rel="icon" href="img/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0c;--surface:#111114;--surface-2:#15151a;--surface-3:#1a1a21;
+  --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
+  --ink:#f2f2f6;--ink-dim:rgba(255,255,255,.46);--ink-faint:rgba(255,255,255,.24);
+  --accent:#7D32FF;--accent-soft:#a78bfa;--accent-wash:rgba(125,50,255,.12);
+  --good:#34d399;--good-wash:rgba(52,211,153,.12);--warn:#fbbf24;--bad:#f87171;
+  --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:'Onest',sans-serif;font-weight:300;line-height:1.6;min-height:100vh}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
 
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes pop{0%{transform:scale(.7)}70%{transform:scale(1.08)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-    /* ── PAGE ── */
-    .page{max-width:720px;margin:0 auto;padding:110px 24px 100px;animation:fadeUp .35s ease}
-    .page-eyebrow{font-size:.65rem;text-transform:uppercase;letter-spacing:.14em;color:var(--muted2);margin-bottom:1rem;font-weight:500}
-    .page-h1{font-family:'Unbounded',sans-serif;font-weight:600;font-size:clamp(1.8rem,5vw,2.8rem);line-height:1.08;letter-spacing:-.03em;margin-bottom:.8rem}
-    .page-h1 em{font-style:normal;color:var(--accent)}
-    .page-sub{color:var(--muted2);font-size:.95rem;max-width:460px;line-height:1.7;margin-bottom:3rem}
+/* ===== LAYOUT SHELL ===== */
+.ov-wrap{max-width:1080px;margin:0 auto;padding:108px 24px 140px}
 
-    /* ── PACKAGES ── */
-    .pkg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2.5rem}
-    .pkg{
-      background:var(--card);border:1px solid var(--border);
-      border-radius:18px;padding:24px 20px;cursor:pointer;
-      transition:border-color .2s,transform .15s;
-      position:relative;overflow:hidden;user-select:none;
-    }
-    .pkg:hover{border-color:var(--border2);transform:translateY(-2px)}
-    .pkg.sel{border-color:var(--accent)}
-    .pkg-popular{
-      position:absolute;top:0;left:50%;transform:translateX(-50%);
-      background:var(--accent);
-      color:#0a0a0c;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;
-      padding:.2rem .85rem;border-radius:0 0 8px 8px;font-weight:700;
-    }
-    .pkg-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.78rem;margin-bottom:1rem;color:var(--muted2)}
-    .pkg.sel .pkg-name{color:var(--accent)}
-    .pkg-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.85rem;line-height:1;margin-bottom:.25rem}
-    .pkg-price span{font-size:.7rem;font-weight:400;font-family:'Onest',sans-serif;color:var(--muted2);margin-left:2px}
-    .pkg-pages{font-size:.72rem;color:var(--muted);margin-bottom:1.2rem}
-    .pkg-feats{display:flex;flex-direction:column;gap:.4rem}
-    .pkg-feat{font-size:.74rem;color:var(--muted2);display:flex;align-items:baseline;gap:.45rem;line-height:1.4}
-    .pkg-feat::before{content:'—';color:rgba(255,255,255,.2);font-size:.7rem;flex-shrink:0}
-    .pkg.sel .pkg-feat::before{color:var(--accent)}
-    .pkg.sel .pkg-feat{color:var(--text)}
+/* ===== INTRO ===== */
+.ov-intro{max-width:640px;margin:0 auto 48px;text-align:center}
+.ov-eyebrow{font-size:.65rem;text-transform:uppercase;letter-spacing:.16em;color:var(--accent-soft);font-weight:500;margin-bottom:14px}
+.ov-h1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.9rem,4.6vw,2.7rem);line-height:1.08;letter-spacing:-.025em;margin-bottom:14px}
+.ov-lede{color:var(--ink-dim);font-size:.95rem;line-height:1.7}
 
-    /* ── SECTION ── */
-    .sec{margin-bottom:1rem}
-    .sec-hdr{display:flex;align-items:center;gap:.6rem;margin-bottom:1rem}
-    .sec-num{width:20px;height:20px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--muted2);font-size:.6rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .sec-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.8rem;color:var(--text)}
+/* ===== STEPPER ===== */
+.ov-stepper{position:relative;max-width:580px;margin:0 auto 56px;display:flex;justify-content:space-between}
+.ov-stepper-track{position:absolute;left:40px;right:40px;top:19px;height:1px;background:var(--line-strong);z-index:0}
+.ov-stepper-fill{position:absolute;left:40px;top:19px;height:1px;background:var(--accent);width:0%;z-index:0;transition:width .4s ease;max-width:calc(100% - 80px)}
+.ov-step{position:relative;z-index:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;flex:1;padding:4px}
+.ov-step:disabled{cursor:default}
+.ov-step-dot{width:38px;height:38px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;font-family:'Unbounded',sans-serif;font-size:.78rem;color:var(--ink-dim);transition:all .2s}
+.ov-step.is-active .ov-step-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.ov-step.is-done .ov-step-dot{background:var(--surface-2);border-color:var(--accent-soft);color:var(--accent-soft)}
+.ov-step-label{font-size:.7rem;color:var(--ink-faint);transition:color .2s;white-space:nowrap}
+.ov-step.is-active .ov-step-label{color:var(--ink)}
+.ov-mobile-progress{display:none}
 
-    /* ── CARD ── */
-    .card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:24px;margin-bottom:12px}
+/* ===== BOARD ===== */
+.ov-board{display:grid;grid-template-columns:1fr 320px;gap:48px;align-items:start}
+.ov-panel{min-width:0}
 
-    /* ── TYPE SELECTOR ── */
-    .type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-    .type-opt{background:var(--bg3);border:1px solid var(--border);border-radius:13px;padding:14px 10px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
-    .type-opt:hover{border-color:var(--border2)}
-    .type-opt.sel{border-color:var(--accent);background:rgba(167,139,250,.06)}
-    .type-opt .ico{font-size:1.3rem;margin-bottom:.3rem}
-    .type-opt .lbl{font-size:.76rem;font-weight:500}
-    .type-opt .sub{font-size:.63rem;color:var(--muted);margin-top:.05rem}
+/* ===== STEP VIEW ===== */
+.ov-view{animation:fadeIn .3s ease}
+.ov-view-head{margin-bottom:28px}
+.ov-view-num{font-family:'Unbounded',sans-serif;font-size:.68rem;color:var(--ink-faint);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.ov-view-title{font-family:'Unbounded',sans-serif;font-weight:600;font-size:1.5rem;letter-spacing:-.02em;margin-bottom:8px}
+.ov-view-sub{color:var(--ink-dim);font-size:.88rem;line-height:1.65;max-width:480px}
 
-    /* ── EXTRAS ── */
-    .extras{display:flex;flex-direction:column}
-    .extra{
-      padding:18px 0;cursor:pointer;
-      display:flex;align-items:center;gap:16px;user-select:none;
-      border-bottom:1px solid var(--border);
-      transition:opacity .15s;
-      position:relative;
-    }
-    .extras .extra:first-child{border-top:1px solid var(--border)}
-    .extra:hover .extra-label{color:var(--text)}
-    .extra.disabled{opacity:.3;cursor:default;pointer-events:none}
-    .extra-toggle{
-      width:36px;height:20px;border-radius:99px;flex-shrink:0;
-      background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
-      position:relative;transition:background .2s,border-color .2s;
-    }
-    .extra-toggle::after{
-      content:'';position:absolute;top:2px;left:2px;
-      width:14px;height:14px;border-radius:50%;
-      background:rgba(255,255,255,.35);
-      transition:transform .2s,background .2s;
-    }
-    .extra.on .extra-toggle{background:var(--accent);border-color:var(--accent)}
-    .extra.on .extra-toggle::after{transform:translateX(16px);background:#0a0a0c}
-    .extra.disabled .extra-toggle{background:rgba(74,222,128,.15);border-color:rgba(74,222,128,.3)}
-    .extra.disabled .extra-toggle::after{transform:translateX(16px);background:var(--success)}
-    .extra-body{flex:1;min-width:0}
-    .extra-row{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
-    .extra-label{font-size:.9rem;font-weight:500;color:var(--muted2);transition:color .15s;line-height:1.3}
-    .extra.on .extra-label{color:var(--text)}
-    .extra-price-tag{font-family:'Unbounded',sans-serif;font-size:.7rem;font-weight:600;color:var(--muted);white-space:nowrap;flex-shrink:0}
-    .extra-price-tag.free{color:var(--success)}
-    .extra.on .extra-price-tag{color:var(--accent)}
-    .extra-desc{font-size:.76rem;color:var(--muted);line-height:1.5;margin-top:3px}
-    .wip-tag{background:rgba(251,191,36,.08);color:var(--warn);border:1px solid rgba(251,191,36,.15);font-size:.55rem;padding:.06rem .4rem;border-radius:99px;font-weight:600;white-space:nowrap;margin-left:.4rem;vertical-align:middle}
+/* ===== FORMAT CARDS ===== */
+.ov-formats{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--line);border-radius:var(--r-lg);overflow:hidden}
+.ov-format{background:var(--surface);padding:26px 22px;cursor:pointer;transition:background .15s;display:flex;flex-direction:column;gap:12px;position:relative}
+.ov-format:hover{background:var(--surface-2)}
+.ov-format.sel{background:var(--accent-wash)}
+.ov-format.sel::after{content:'';position:absolute;inset:0;border:1px solid var(--accent);border-radius:0;pointer-events:none}
+.ov-format-icon{width:30px;height:30px;color:var(--ink-dim)}
+.ov-format.sel .ov-format-icon{color:var(--accent-soft)}
+.ov-format-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.92rem}
+.ov-format-desc{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
+.ov-note-wrap{margin-top:18px}
+.ov-note-wrap[hidden]{display:none}
 
-    /* Domain toggle */
-    .domain-opts{display:flex;gap:6px;margin-top:.7rem}
-    .domain-opt{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--muted);font-family:'Onest',sans-serif;font-size:.72rem;padding:.45rem .5rem;border-radius:9px;cursor:pointer;transition:all .15s;text-align:center;line-height:1.35}
-    .domain-opt:hover{border-color:var(--border2);color:var(--muted2)}
-    .domain-opt.sel{border-color:rgba(167,139,250,.35);color:var(--accent);background:rgba(167,139,250,.06)}
-    .domain-note{font-size:.68rem;color:var(--muted);margin-top:.55rem;line-height:1.55;padding:.6rem .75rem;background:rgba(255,255,255,.02);border-radius:9px;border:1px solid var(--border)}
+/* ===== TIER CARDS ===== */
+.ov-tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border-radius:var(--r-lg);overflow:hidden}
+.ov-tier{background:var(--surface);padding:26px 22px;cursor:pointer;transition:background .15s;position:relative;display:flex;flex-direction:column}
+.ov-tier:hover{background:var(--surface-2)}
+.ov-tier.sel{background:var(--accent-wash)}
+.ov-tier.sel::after{content:'';position:absolute;inset:0;border:1px solid var(--accent);pointer-events:none}
+.ov-tier-tag{position:absolute;top:14px;right:14px;font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-soft);background:rgba(125,50,255,.14);padding:.2rem .55rem;border-radius:99px;font-weight:500}
+.ov-tier-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;color:var(--ink-dim);margin-bottom:14px}
+.ov-tier.sel .ov-tier-name{color:var(--accent-soft)}
+.ov-tier-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.7rem;line-height:1;margin-bottom:4px}
+.ov-tier-price span{font-size:.65rem;font-weight:400;font-family:'Onest',sans-serif;color:var(--ink-dim);margin-left:2px}
+.ov-tier-meta{font-size:.7rem;color:var(--ink-faint);margin-bottom:16px}
+.ov-tier-feats{display:flex;flex-direction:column;gap:7px;border-top:1px solid var(--line);padding-top:14px;margin-top:auto}
+.ov-tier-feat{font-size:.74rem;color:var(--ink-dim);display:flex;gap:8px;line-height:1.4}
+.ov-tier-feat::before{content:'';width:5px;height:1px;background:var(--ink-faint);margin-top:8px;flex-shrink:0}
+.ov-tier.sel .ov-tier-feat{color:var(--ink)}
+.ov-tier.sel .ov-tier-feat::before{background:var(--accent-soft)}
 
-    /* ── PROMO ── */
-    .promo-row{display:flex;gap:8px}
-    .promo-inp{
-      flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:11px;
-      padding:.72rem 1rem;color:var(--text);font-family:'Onest',sans-serif;
-      font-size:.86rem;outline:none;transition:border-color .2s;
-      text-transform:uppercase;letter-spacing:.06em;
-    }
-    .promo-inp:focus{border-color:rgba(167,139,250,.4)}
-    .promo-inp::placeholder{text-transform:none;letter-spacing:0;color:var(--muted)}
-    .promo-btn{
-      background:var(--bg3);border:1px solid var(--border);color:var(--muted2);
-      font-family:'Onest',sans-serif;font-size:.78rem;padding:.72rem 1.1rem;
-      border-radius:11px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;
-    }
-    .promo-btn:hover{border-color:var(--border2);color:var(--text)}
-    .promo-feedback{font-size:.74rem;margin-top:.5rem;display:none}
+/* ===== EXTRAS GROUPS ===== */
+.ov-group{margin-bottom:30px}
+.ov-group:last-child{margin-bottom:0}
+.ov-group-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);font-weight:500;margin-bottom:2px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.ov-extra{display:flex;align-items:flex-start;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.ov-group .ov-extra:last-child{border-bottom:none}
+.ov-extra.disabled{cursor:default;opacity:.4}
+.ov-toggle{width:34px;height:19px;border-radius:99px;background:var(--surface-3);border:1px solid var(--line-strong);position:relative;flex-shrink:0;margin-top:2px;transition:background .2s,border-color .2s}
+.ov-toggle::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:var(--ink-faint);transition:transform .2s,background .2s}
+.ov-extra.on .ov-toggle{background:var(--accent);border-color:var(--accent)}
+.ov-extra.on .ov-toggle::after{transform:translateX(15px);background:#fff}
+.ov-extra.disabled .ov-toggle{background:var(--good-wash);border-color:rgba(52,211,153,.3)}
+.ov-extra.disabled .ov-toggle::after{transform:translateX(15px);background:var(--good)}
+.ov-extra-body{flex:1;min-width:0}
+.ov-extra-row{display:flex;justify-content:space-between;gap:10px}
+.ov-extra-name{font-size:.88rem;color:var(--ink-dim);font-weight:400;transition:color .15s}
+.ov-extra.on .ov-extra-name{color:var(--ink)}
+.ov-extra-price{font-family:'Unbounded',sans-serif;font-size:.68rem;color:var(--ink-faint);white-space:nowrap}
+.ov-extra-price.is-free{color:var(--good)}
+.ov-extra.on .ov-extra-price{color:var(--accent-soft)}
+.ov-extra-desc{font-size:.76rem;color:var(--ink-faint);margin-top:4px;line-height:1.5}
+.ov-wip{font-size:.55rem;text-transform:uppercase;letter-spacing:.06em;color:var(--warn);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);padding:.06rem .4rem;border-radius:99px;margin-left:.4rem;vertical-align:middle}
+.ov-domain-opts{display:flex;gap:6px;margin-top:12px}
+.ov-domain-opt{flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-faint);font-family:'Onest',sans-serif;font-size:.72rem;padding:.5rem .6rem;border-radius:var(--r-sm);cursor:pointer;transition:all .15s;text-align:center;line-height:1.4}
+.ov-domain-opt:hover{border-color:var(--line-strong);color:var(--ink-dim)}
+.ov-domain-opt.sel{border-color:var(--accent-soft);color:var(--accent-soft);background:var(--accent-wash)}
 
-    /* ── TOTAL BAR ── */
-    .total-bar{
-      position:sticky;bottom:20px;z-index:100;
-      background:rgba(15,15,19,.92);backdrop-filter:blur(20px);
-      border:1px solid rgba(255,255,255,.09);border-radius:99px;
-      padding:10px 10px 10px 22px;
-      display:flex;align-items:center;justify-content:space-between;gap:16px;
-      margin-bottom:1.5rem;
-    }
-    .total-left{}
-    .total-lbl{font-size:.6rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.1rem}
-    .total-price-row{display:flex;align-items:baseline;gap:.5rem}
-    .total-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.5rem;color:var(--text)}
-    .total-orig{font-size:.78rem;color:var(--muted);text-decoration:line-through;display:none}
-    .total-breakdown{font-size:.68rem;color:var(--muted);margin-top:.05rem}
-    .total-discount{font-size:.68rem;color:var(--success);display:none}
-    .total-btn{
-      background:var(--accent);color:#0a0a0c;
-      border:none;border-radius:99px;padding:.65rem 1.6rem;
-      font-family:'Onest',sans-serif;font-size:.86rem;font-weight:600;
-      cursor:pointer;transition:background .15s,transform .13s;
-      display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;
-    }
-    .total-btn:hover{background:#c4b5fd;transform:translateY(-1px)}
+/* ===== FORM (step 4) ===== */
+.ov-field{margin-bottom:24px}
+.ov-label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);margin-bottom:10px;font-weight:500}
+.ov-input,.ov-textarea{
+  width:100%;background:transparent;border:none;border-bottom:1.5px solid var(--line-strong);
+  padding:.6rem 0;color:var(--ink);font-family:'Onest',sans-serif;font-size:.92rem;font-weight:400;
+  outline:none;transition:border-color .2s;border-radius:0
+}
+.ov-input:focus,.ov-textarea:focus{border-color:var(--accent)}
+.ov-input::placeholder,.ov-textarea::placeholder{color:var(--ink-faint)}
+.ov-textarea{resize:vertical;min-height:84px;line-height:1.65}
+.ov-info{background:var(--accent-wash);border-radius:var(--r-sm);padding:.75rem 1rem;font-size:.75rem;color:var(--ink-dim);line-height:1.6;margin-bottom:10px}
+.ov-info strong{color:var(--accent-soft)}
+.ov-filezone{border:1px dashed var(--line-strong);border-radius:var(--r-sm);padding:1rem;text-align:center;cursor:pointer;transition:border-color .2s}
+.ov-filezone:hover{border-color:var(--accent-soft)}
+.ov-filezone-text{font-size:.76rem;color:var(--ink-faint)}
+.ov-filezone-text strong{color:var(--accent-soft)}
+.ov-fav-preview{display:none;margin-top:10px;align-items:center;gap:.6rem;font-size:.75rem;color:var(--ink-faint)}
+.ov-fav-preview img{width:28px;height:28px;border-radius:4px;object-fit:contain;background:#fff;padding:2px}
+.ov-fav-preview button{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:.9rem}
+.ov-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:10px}
+.ov-chip{display:flex;align-items:center;gap:.3rem;background:var(--accent-wash);border:1px solid rgba(125,50,255,.2);border-radius:var(--r-xs);padding:.2rem .55rem;font-size:.68rem;color:var(--accent-soft)}
+.ov-chip button{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:.75rem}
+.ov-chip button:hover{color:var(--bad)}
+.ov-promo-row{display:flex;gap:8px}
+.ov-promo-row .ov-input{flex:1}
+.ov-promo-btn{background:transparent;border:1px solid var(--line-strong);color:var(--ink-dim);font-size:.78rem;padding:.55rem 1.1rem;border-radius:var(--r-sm);cursor:pointer;transition:all .15s;white-space:nowrap}
+.ov-promo-btn:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
+.ov-promo-fb{font-size:.74rem;margin-top:8px;display:none}
+.ov-agree{display:flex;align-items:flex-start;gap:.7rem;cursor:pointer;margin-top:8px}
+.ov-agree-box{width:18px;height:18px;border-radius:5px;border:1px solid var(--line-strong);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;color:transparent;background:var(--surface-2);transition:all .15s}
+.ov-agree-box.on{background:var(--accent);border-color:var(--accent);color:#fff;font-size:.65rem;font-weight:700}
+.ov-agree-box.err{border-color:var(--bad)!important}
+.ov-agree-txt{font-size:.8rem;color:var(--ink-dim);line-height:1.55}
+.ov-agree-txt a{color:var(--accent-soft);text-decoration:none}
+.ov-agree-txt a:hover{color:var(--ink)}
+.ov-err{color:var(--bad);font-size:.7rem;margin-top:6px;display:none}
+.ov-err.show{display:block}
 
-    /* ── FORM CARD ── */
-    .form-lbl{display:block;font-size:.63rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-bottom:.4rem;font-weight:500}
-    .form-inp,.form-ta{
-      width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;
-      padding:.78rem 1.05rem;color:var(--text);font-family:'Onest',sans-serif;
-      font-size:.88rem;font-weight:400;outline:none;transition:border-color .2s;
-    }
-    .form-inp:focus,.form-ta:focus{border-color:rgba(167,139,250,.4)}
-    .form-inp::placeholder,.form-ta::placeholder{color:var(--muted)}
-    .form-ta{resize:vertical;min-height:90px;line-height:1.65}
-    .fgroup{margin-bottom:1rem}
-    .info-pill{background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.12);border-radius:10px;padding:.75rem 1rem;font-size:.76rem;color:var(--muted2);line-height:1.6;margin-bottom:.6rem}
-    .info-pill strong{color:var(--accent)}
-    .file-zone{border:1px dashed rgba(255,255,255,.1);border-radius:12px;padding:1.1rem;text-align:center;cursor:pointer;background:var(--bg3);transition:border-color .2s}
-    .file-zone:hover{border-color:rgba(167,139,250,.35)}
-    .file-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.55rem}
-    .chip{display:flex;align-items:center;gap:.3rem;background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.15);border-radius:7px;padding:.2rem .55rem;font-size:.68rem;color:var(--accent)}
-    .chip button{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.75rem}
-    .chip button:hover{color:var(--error)}
-    .agree-row{display:flex;align-items:flex-start;gap:.65rem;cursor:pointer;margin-top:.8rem}
-    .agree-box{width:18px;height:18px;border-radius:5px;border:1px solid rgba(255,255,255,.15);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;color:transparent;background:var(--bg3);transition:all .15s}
-    .agree-box.on{background:var(--accent);border-color:var(--accent);color:#0a0a0c;font-size:.65rem;font-weight:700}
-    .agree-box.err{border-color:var(--error)!important}
-    .agree-txt{font-size:.8rem;color:var(--muted);line-height:1.55}
-    .agree-txt a{color:var(--accent);text-decoration:none}
-    .agree-txt a:hover{color:#c4b5fd}
-    .err-msg{color:var(--error);font-size:.7rem;margin-top:.22rem;display:none}
-    .err-msg.show{display:block}
-    .submit-btn{
-      width:100%;background:var(--accent);color:#0a0a0c;
-      border:none;border-radius:14px;padding:1rem;
-      font-family:'Onest',sans-serif;font-size:1rem;font-weight:600;
-      cursor:pointer;transition:background .15s,transform .14s,opacity .2s;
-      display:flex;align-items:center;justify-content:center;gap:.55rem;
-      margin-top:1.4rem;letter-spacing:.01em;
-    }
-    .submit-btn:hover{background:#c4b5fd;transform:translateY(-1px)}
-    .submit-btn:disabled{opacity:.4;cursor:default;transform:none!important}
-    .form-note{color:var(--muted);font-size:.68rem;text-align:center;margin-top:.65rem}
+/* ===== PANEL NAV ===== */
+.ov-panel-nav{display:flex;justify-content:space-between;align-items:center;margin-top:40px;padding-top:24px;border-top:1px solid var(--line)}
+.ov-btn-ghost{background:none;border:none;color:var(--ink-dim);font-size:.86rem;cursor:pointer;padding:.6rem 0;transition:color .15s;display:flex;align-items:center;gap:6px}
+.ov-btn-ghost:hover{color:var(--ink)}
+.ov-btn-ghost[style*="hidden"]{visibility:hidden}
+.ov-btn-solid{background:var(--accent);color:#fff;border:none;border-radius:var(--r-md);padding:.85rem 1.7rem;font-size:.9rem;font-weight:500;cursor:pointer;transition:background .15s,transform .13s,opacity .2s;display:flex;align-items:center;gap:8px}
+.ov-btn-solid:hover:not(:disabled){background:#8f4eff;transform:translateY(-1px)}
+.ov-btn-solid:disabled{opacity:.35;cursor:default;transform:none}
 
-    /* ── SUCCESS ── */
-    .success{display:none;flex-direction:column;align-items:center;text-align:center;padding:3.5rem 1rem;gap:1rem}
-    .success.show{display:flex}
-    .success-ico{font-size:3.5rem;animation:pop .4s ease}
-    .success h3{font-family:'Unbounded',sans-serif;font-weight:600;font-size:1.25rem}
-    .success p{color:var(--muted2);max-width:340px;line-height:1.7}
+/* ===== LEDGER ===== */
+.ov-ledger{position:sticky;top:24px;background:var(--surface);border-radius:var(--r-lg);padding:26px 24px}
+.ov-ledger-label{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.85rem;margin-bottom:18px}
+.ov-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.82rem}
+.ov-row:first-child{padding-top:0}
+.ov-row span:first-child{color:var(--ink-dim)}
+.ov-row span:last-child{color:var(--ink);font-family:'Unbounded',sans-serif;font-size:.74rem;white-space:nowrap}
+.ov-row .is-free{color:var(--good)}
+.ov-row.is-sub span:first-child{color:var(--ink-faint);font-size:.7rem}
+.ov-discount-wrap[hidden]{display:none}
+.ov-row.is-discount span{color:var(--good)!important}
+.ov-ledger-total{display:flex;justify-content:space-between;align-items:baseline;padding-top:18px;margin-top:6px}
+.ov-ledger-total span:first-child{font-size:.78rem;color:var(--ink-dim)}
+.ov-ledger-total span:last-child{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.55rem}
+.ov-ledger-note{font-size:.7rem;color:var(--ink-faint);line-height:1.6;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.ov-mobile-bar{display:none}
 
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(12px);z-index:300;padding:.58rem 1.3rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--success);color:#000}
-    .toast.info{background:var(--accent);color:#0a0a0c}
-    .toast.error{background:var(--error);color:#fff}
-    .toast.warn{background:var(--warn);color:#000}
+/* ===== TOAST ===== */
+.ov-toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);z-index:300;padding:.6rem 1.3rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.ov-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ov-toast.success{background:var(--good);color:#04140e}
+.ov-toast.info{background:var(--accent);color:#fff}
+.ov-toast.error{background:var(--bad);color:#1a0606}
+.ov-toast.warn{background:var(--warn);color:#1a1206}
 
-    /* ── RESPONSIVE ── */
-    @media(max-width:768px){
-      .page{padding:80px 16px 90px}
-      .pkg-grid{grid-template-columns:1fr;gap:8px}
-      .type-grid{grid-template-columns:repeat(2,1fr)}
-      .total-bar{border-radius:18px;bottom:80px;padding:12px 12px 12px 18px}
-      .total-price{font-size:1.25rem}
-    }
-    @media(max-width:480px){
-      .page-h1{font-size:1.75rem}
-      .type-grid{grid-template-columns:1fr 1fr}
-      .domain-opts{flex-direction:column}
-    }
-  </style>
+/* ===== RESPONSIVE ===== */
+@media(max-width:880px){
+  .ov-board{grid-template-columns:1fr}
+  .ov-ledger{position:fixed;left:0;right:0;bottom:0;border-radius:var(--r-xl) var(--r-xl) 0 0;z-index:200;padding:16px 20px;
+    box-shadow:0 -8px 30px rgba(0,0,0,.4);max-height:70vh;overflow:auto;
+    transform:translateY(calc(100% - 64px));transition:transform .3s ease}
+  .ov-ledger.is-open{transform:translateY(0)}
+  .ov-ledger-label{display:none}
+  .ov-mobile-bar{display:flex;justify-content:space-between;align-items:center;cursor:pointer;padding-bottom:4px}
+  .ov-mobile-bar-price{font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.05rem}
+  .ov-mobile-bar-chev{width:18px;height:18px;color:var(--ink-faint);transition:transform .25s}
+  .ov-ledger.is-open .ov-mobile-bar-chev{transform:rotate(180deg)}
+  .ov-wrap{padding-bottom:120px}
+}
+@media(max-width:720px){
+  .ov-wrap{padding:84px 18px 130px}
+  .ov-formats,.ov-tiers{grid-template-columns:1fr}
+  .ov-stepper{display:none}
+  .ov-mobile-progress{display:block;max-width:420px;margin:0 auto 40px}
+  .ov-mobile-progress-text{font-size:.7rem;color:var(--ink-faint);text-align:center;margin-bottom:10px;letter-spacing:.04em}
+  .ov-mobile-progress-track{height:2px;background:var(--line-strong);border-radius:99px;overflow:hidden}
+  .ov-mobile-progress-fill{height:100%;background:var(--accent);width:25%;transition:width .35s ease}
+}
+@media(max-width:480px){
+  .ov-h1{font-size:1.7rem}
+  .ov-panel-nav{flex-direction:row}
+}
+</style>
 </head>
 <body>
 <script src="nav.js" data-page="order"></script>
 
-<div class="page" id="pageWrap">
+<main class="ov-wrap" id="ovWrap">
 
-  <div class="page-eyebrow">Заказать сайт</div>
-  <h1 class="page-h1">Сайт под ваш<br><em>проект</em></h1>
-  <p class="page-sub">Выберите пакет или настройте под себя. Цена обновляется в реальном времени.</p>
+  <header class="ov-intro">
+    <p class="ov-eyebrow">Новый заказ · Antviz</p>
+    <h1 class="ov-h1">Четыре шага до запуска сайта</h1>
+    <p class="ov-lede">Выберите формат и масштаб проекта, включите нужные опции и оставьте контакты — сумма справа пересчитывается на ходу.</p>
+  </header>
 
-  <!-- PACKAGES -->
-  <div class="pkg-grid">
-    <div class="pkg" data-pkg="start" data-base="3900" onclick="selectPkg(this)">
-      <div class="pkg-name">Старт</div>
-      <div class="pkg-price">3 900 <span>₽</span></div>
-      <div class="pkg-pages">1 страница · лендинг</div>
-      <div class="pkg-feats">
-        <div class="pkg-feat">Адаптивный дизайн</div>
-        <div class="pkg-feat">Форма заявки</div>
-        <div class="pkg-feat">Хостинг бесплатно</div>
-        <div class="pkg-feat">Срок 5–7 дней</div>
-      </div>
-    </div>
-    <div class="pkg sel" data-pkg="optimal" data-base="9900" onclick="selectPkg(this)">
-      <div class="pkg-popular">Популярный</div>
-      <div class="pkg-name">Оптимальный</div>
-      <div class="pkg-price">9 900 <span>₽</span></div>
-      <div class="pkg-pages">до 5 страниц</div>
-      <div class="pkg-feats">
-        <div class="pkg-feat">Всё из «Старта»</div>
-        <div class="pkg-feat">Галерея, карта</div>
-        <div class="pkg-feat">Интеграция соцсетей</div>
-        <div class="pkg-feat">Срок 7–10 дней</div>
-      </div>
-    </div>
-    <div class="pkg" data-pkg="business" data-base="19900" onclick="selectPkg(this)">
-      <div class="pkg-name">Бизнес</div>
-      <div class="pkg-price">19 900 <span>₽</span></div>
-      <div class="pkg-pages">до 10 страниц</div>
-      <div class="pkg-feats">
-        <div class="pkg-feat">Всё из «Оптимального»</div>
-        <div class="pkg-feat">Каталог с фильтрами</div>
-        <div class="pkg-feat">SEO-оптимизация</div>
-        <div class="pkg-feat">Срок 10–14 дней</div>
-      </div>
-    </div>
+  <nav class="ov-stepper" id="ovStepper" aria-label="Этапы оформления заказа">
+    <div class="ov-stepper-track"></div>
+    <div class="ov-stepper-fill" id="stepperFill"></div>
+    <button type="button" class="ov-step" data-step="1"><span class="ov-step-dot">1</span><span class="ov-step-label">Формат</span></button>
+    <button type="button" class="ov-step" data-step="2"><span class="ov-step-dot">2</span><span class="ov-step-label">Масштаб</span></button>
+    <button type="button" class="ov-step" data-step="3"><span class="ov-step-dot">3</span><span class="ov-step-label">Опции</span></button>
+    <button type="button" class="ov-step" data-step="4"><span class="ov-step-dot">4</span><span class="ov-step-label">Детали</span></button>
+  </nav>
+
+  <div class="ov-mobile-progress">
+    <div class="ov-mobile-progress-text" id="mobileProgressText">Шаг 1 из 4 · Формат</div>
+    <div class="ov-mobile-progress-track"><div class="ov-mobile-progress-fill" id="mobileProgressFill"></div></div>
   </div>
 
-  <!-- TYPE -->
-  <div class="sec">
-    <div class="sec-hdr"><div class="sec-num">1</div><div class="sec-title">Тип сайта</div></div>
-    <div class="card" style="padding:18px">
-      <div class="type-grid">
-        <div class="type-opt" data-t="Лендинг" onclick="selType(this)"><div class="ico">🎯</div><div class="lbl">Лендинг</div><div class="sub">1 страница</div></div>
-        <div class="type-opt" data-t="Многостраничный" onclick="selType(this)"><div class="ico">📄</div><div class="lbl">Многостраничный</div><div class="sub">Сайт-визитка</div></div>
-        <div class="type-opt" data-t="Портфолио" onclick="selType(this)"><div class="ico">🎨</div><div class="lbl">Портфолио</div><div class="sub">Галерея работ</div></div>
-        <div class="type-opt" data-t="Интернет-магазин" onclick="selType(this)"><div class="ico">🛒</div><div class="lbl">Интернет-магазин</div><div class="sub">Каталог + корзина</div></div>
-        <div class="type-opt" data-t="Блог" onclick="selType(this)"><div class="ico">✍️</div><div class="lbl">Блог</div><div class="sub">Статьи</div></div>
-        <div class="type-opt" data-t="Другое" onclick="selType(this)"><div class="ico">✨</div><div class="lbl">Другое</div><div class="sub">Обсудим</div></div>
+  <div class="ov-board" id="ovBoard">
+    <section class="ov-panel">
+
+      <!-- STEP 1 — FORMAT -->
+      <div class="ov-view" data-view="1">
+        <div class="ov-view-head">
+          <p class="ov-view-num">Шаг 1</p>
+          <h2 class="ov-view-title">С чего начнём?</h2>
+          <p class="ov-view-sub">Выберите формат, ближе всего к задаче. Это определит структуру будущего сайта.</p>
+        </div>
+        <div class="ov-formats">
+          <div class="ov-format" data-format="landing">
+            <svg class="ov-format-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18" stroke-linecap="round"/><path d="M7 13h6" stroke-linecap="round"/><path d="M7 16h3" stroke-linecap="round"/></svg>
+            <div class="ov-format-name">Лендинг-визитка</div>
+            <div class="ov-format-desc">Один экран с чётким посылом — для запуска услуги, мероприятия или личного бренда.</div>
+          </div>
+          <div class="ov-format" data-format="multipage">
+            <svg class="ov-format-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="3" width="14" height="18" rx="2"/><path d="M8 8h6M8 12h6M8 16h3" stroke-linecap="round"/></svg>
+            <div class="ov-format-name">Многостраничный сайт</div>
+            <div class="ov-format-desc">Несколько связанных разделов — о компании, услуги, контакты, кейсы.</div>
+          </div>
+          <div class="ov-format" data-format="shop">
+            <svg class="ov-format-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5 8h14l-1.5 11a2 2 0 0 1-2 1.7H8.5a2 2 0 0 1-2-1.7L5 8Z" stroke-linejoin="round"/><path d="M8 8V6a4 4 0 0 1 8 0v2" stroke-linecap="round"/></svg>
+            <div class="ov-format-name">Интернет-магазин</div>
+            <div class="ov-format-desc">Каталог товаров с фильтрами, карточками и оформлением заказа.</div>
+          </div>
+          <div class="ov-format" data-format="custom">
+            <svg class="ov-format-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v4M12 17v4M3 12h4M17 12h4" stroke-linecap="round"/><path d="M12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6Z"/></svg>
+            <div class="ov-format-name">Особый случай</div>
+            <div class="ov-format-desc">Формат не подходит? Опишите задачу в двух словах — подберём решение.</div>
+          </div>
+        </div>
+        <div class="ov-note-wrap" id="customNoteWrap" hidden>
+          <label class="ov-label" for="formatNote">В двух словах, что нужно</label>
+          <textarea class="ov-textarea" id="formatNote" placeholder="Например: квиз для отбора заявок, посадочная для вебинара, портал с личным кабинетом..."></textarea>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- EXTRAS -->
-  <div class="sec">
-    <div class="sec-hdr"><div class="sec-num">2</div><div class="sec-title">Дополнительно</div></div>
-    <div class="card" style="padding:18px">
-      <div class="extras">
-
-        <div class="extra on disabled">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Хостинг</span>
-              <span class="extra-price-tag free">Бесплатно</span>
+      <!-- STEP 2 — TIER -->
+      <div class="ov-view" data-view="2" hidden>
+        <div class="ov-view-head">
+          <p class="ov-view-num">Шаг 2</p>
+          <h2 class="ov-view-title">Какой масштаб нужен?</h2>
+          <p class="ov-view-sub">Каждый следующий уровень включает всё из предыдущего и добавляет возможности.</p>
+        </div>
+        <div class="ov-tiers">
+          <div class="ov-tier" data-tier="start">
+            <div class="ov-tier-name">Старт</div>
+            <div class="ov-tier-price">3 900<span>₽</span></div>
+            <div class="ov-tier-meta">1 страница · 5–7 дней</div>
+            <div class="ov-tier-feats">
+              <div class="ov-tier-feat">Адаптивная вёрстка</div>
+              <div class="ov-tier-feat">Форма обратной связи</div>
+              <div class="ov-tier-feat">Хостинг включён</div>
             </div>
-            <div class="extra-desc">Размещаем сайт на нашем сервере навсегда. SSL и быстрая загрузка включены.</div>
+          </div>
+          <div class="ov-tier sel" data-tier="growth">
+            <div class="ov-tier-tag">Чаще выбирают</div>
+            <div class="ov-tier-name">Рост</div>
+            <div class="ov-tier-price">9 900<span>₽</span></div>
+            <div class="ov-tier-meta">до 5 страниц · 7–10 дней</div>
+            <div class="ov-tier-feats">
+              <div class="ov-tier-feat">Всё из «Старт»</div>
+              <div class="ov-tier-feat">Галерея и карта</div>
+              <div class="ov-tier-feat">Интеграция с соцсетями</div>
+            </div>
+          </div>
+          <div class="ov-tier" data-tier="scale">
+            <div class="ov-tier-name">Масштаб</div>
+            <div class="ov-tier-price">19 900<span>₽</span></div>
+            <div class="ov-tier-meta">до 10 страниц · 10–14 дней</div>
+            <div class="ov-tier-feats">
+              <div class="ov-tier-feat">Всё из «Рост»</div>
+              <div class="ov-tier-feat">Каталог с фильтрами</div>
+              <div class="ov-tier-feat">Базовая SEO-оптимизация</div>
+            </div>
           </div>
         </div>
-
-        <div class="extra on" id="xDomain">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Домен</span>
-              <span class="extra-price-tag" id="xDomainPrice">+650 ₽/год</span>
-            </div>
-            <div class="extra-desc">Адрес сайта в интернете — например, mycompany.ru</div>
-            <div class="domain-opts">
-              <button class="domain-opt sel" id="dOptNew" onclick="setDomain('new',event)">Зарегистрировать .ru</button>
-              <button class="domain-opt" id="dOptOwn" onclick="setDomain('own',event)">У меня есть — подключить</button>
-            </div>
-            <div class="domain-note" id="dNote">Регистрация на 1 год включена в стоимость. Продление ~650 ₽/год — самостоятельно.</div>
-          </div>
-        </div>
-
-        <div class="extra" id="xSupport" onclick="toggleX(this,'support',500)">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Обслуживание сайта</span>
-              <span class="extra-price-tag">+500 ₽/мес</span>
-            </div>
-            <div class="extra-desc">Ежемесячные правки текстов и фото по заявке.</div>
-          </div>
-        </div>
-
-        <div class="extra" id="xSeo" onclick="toggleX(this,'seo',2500)">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">SEO-оптимизация</span>
-              <span class="extra-price-tag">+2 500 ₽</span>
-            </div>
-            <div class="extra-desc">Мета-теги, заголовки, sitemap, robots.txt — для Яндекса и Google.</div>
-          </div>
-        </div>
-
-        <div class="extra" id="xContent" onclick="toggleX(this,'content',2000)">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Наполнение контентом</span>
-              <span class="extra-price-tag">+2 000 ₽</span>
-            </div>
-            <div class="extra-desc">Напишем тексты: описание, услуги, преимущества. Вы даёте информацию — мы оформляем.</div>
-          </div>
-        </div>
-
-        <div class="extra" id="xShop" onclick="toggleX(this,'shop',4900)">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Каталог и корзина</span>
-              <span class="extra-price-tag">+4 900 ₽</span>
-            </div>
-            <div class="extra-desc">Каталог с фильтрами, карточки товаров, корзина и форма заказа.</div>
-          </div>
-        </div>
-
-        <div class="extra" id="xUrgent" onclick="toggleX(this,'urgent',0)">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Срочное выполнение</span>
-              <span class="extra-price-tag">+30%</span>
-            </div>
-            <div class="extra-desc">За 2–3 рабочих дня вместо 7–14. Приоритетная очередь.</div>
-          </div>
-        </div>
-
-        <div class="extra disabled" onclick="wipToast(event)">
-          <div class="extra-toggle"></div>
-          <div class="extra-body">
-            <div class="extra-row">
-              <span class="extra-label">Telegram-уведомления <span class="wip-tag">Скоро</span></span>
-              <span class="extra-price-tag">+1 500 ₽</span>
-            </div>
-            <div class="extra-desc">Уведомления о новых заявках прямо в Telegram.</div>
-          </div>
-        </div>
-
       </div>
-    </div>
-  </div>
 
-  <!-- PROMO -->
-  <div class="sec">
-    <div class="sec-hdr"><div class="sec-num">3</div><div class="sec-title">Промокод</div></div>
-    <div class="card" style="padding:18px">
-      <div class="promo-row">
-        <input class="promo-inp" id="promoInp" type="text" placeholder="Введите промокод..."/>
-        <button class="promo-btn" id="promoBtn" onclick="applyPromo()">Применить</button>
-      </div>
-      <div class="promo-feedback" id="promoFb"></div>
-    </div>
-  </div>
-
-  <!-- TOTAL BAR -->
-  <div class="total-bar">
-    <div class="total-left">
-      <div class="total-lbl">Итого</div>
-      <div class="total-price-row">
-        <div class="total-price" id="tPrice">9 900 ₽</div>
-        <div class="total-orig" id="tOrig"></div>
-      </div>
-      <div class="total-breakdown" id="tBreak">Пакет «Оптимальный»</div>
-      <div class="total-discount" id="tDiscount"></div>
-    </div>
-    <button class="total-btn" onclick="scrollForm()">
-      Оформить
-      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </button>
-  </div>
-
-  <!-- FORM -->
-  <div class="sec" id="formSection">
-    <div class="sec-hdr"><div class="sec-num">4</div><div class="sec-title">Детали проекта</div></div>
-    <div class="card">
-      <div id="formInner">
-
-        <div class="fgroup">
-          <label class="form-lbl">О проекте</label>
-          <textarea class="form-ta" id="fdesc" placeholder="Чем занимается компания, что должно быть на сайте, примеры стиля..."></textarea>
+      <!-- STEP 3 — EXTRAS -->
+      <div class="ov-view" data-view="3" hidden>
+        <div class="ov-view-head">
+          <p class="ov-view-num">Шаг 3</p>
+          <h2 class="ov-view-title">Что добавить?</h2>
+          <p class="ov-view-sub">Включайте только нужное — сумма справа обновляется сразу.</p>
         </div>
 
-        <div class="fgroup">
-          <label class="form-lbl">Фавикон <span style="font-size:.68rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:300">(необязательно)</span></label>
-          <div class="info-pill"><strong>Фавикон</strong> — маленькая иконка во вкладке браузера и закладках. Обычно логотип 32×32px. Форматы: PNG, ICO, SVG.</div>
-          <div class="file-zone" onclick="document.getElementById('fFav').click()" style="padding:.9rem">
-            <input type="file" id="fFav" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none" onchange="handleFav(this.files[0])"/>
-            <div style="font-size:1.1rem;margin-bottom:.2rem">🖼️</div>
-            <div style="color:var(--muted);font-size:.75rem"><strong style="color:var(--accent2)">Нажмите</strong> чтобы загрузить · PNG, ICO, SVG</div>
+        <div class="ov-group">
+          <div class="ov-group-label">Инфраструктура</div>
+          <div class="ov-extra on disabled">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Хостинг</span><span class="ov-extra-price is-free">Бесплатно</span></div>
+              <div class="ov-extra-desc">Размещаем сайт на собственном сервере без ограничения по времени. SSL включён.</div>
+            </div>
           </div>
-          <div id="favPreview" style="display:none;margin-top:.5rem;align-items:center;gap:.6rem;font-size:.75rem;color:var(--muted)"></div>
-        </div>
-
-        <div class="fgroup">
-          <label class="form-lbl">Материалы <span style="font-size:.68rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:300">фото, PDF, брендбук, архивы</span></label>
-          <div class="file-zone" onclick="document.getElementById('fFiles').click()">
-            <input type="file" id="fFiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none" onchange="handleFiles(this.files)"/>
-            <div style="font-size:1.2rem;margin-bottom:.2rem">📎</div>
-            <div style="color:var(--muted);font-size:.75rem"><strong style="color:var(--accent2)">Нажмите</strong> или перетащите · до 10 МБ на файл</div>
+          <div class="ov-extra on" id="xDomain">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Домен</span><span class="ov-extra-price" id="xDomainPrice">+650 ₽/год</span></div>
+              <div class="ov-extra-desc">Адрес сайта в интернете — например, mycompany.ru</div>
+              <div class="ov-domain-opts">
+                <button type="button" class="ov-domain-opt sel" id="dOptNew">Зарегистрировать .ru</button>
+                <button type="button" class="ov-domain-opt" id="dOptOwn">У меня есть свой</button>
+              </div>
+            </div>
           </div>
-          <div class="file-chips" id="fileChips"></div>
         </div>
 
-        <div class="agree-row" onclick="toggleAgree()">
-          <div class="agree-box" id="agreeBox"></div>
-          <div class="agree-txt">Принимаю <a href="rules" target="_blank" onclick="event.stopPropagation()">правила сервиса</a> и согласен на обработку персональных данных</div>
+        <div class="ov-group">
+          <div class="ov-group-label">Скорость запуска</div>
+          <div class="ov-extra" id="xUrgent">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Срочный запуск</span><span class="ov-extra-price">+30%</span></div>
+              <div class="ov-extra-desc">Сокращаем срок до 2–3 рабочих дней, ставим проект в приоритет.</div>
+            </div>
+          </div>
         </div>
-        <div class="err-msg" id="errAgree">Необходимо принять правила сервиса</div>
 
-        <button class="submit-btn" id="submitBtn" onclick="submitForm()">
-          Отправить заявку
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div class="ov-group">
+          <div class="ov-group-label">Видимость в поиске</div>
+          <div class="ov-extra" id="xSeo">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">SEO-оптимизация</span><span class="ov-extra-price">+2 500 ₽</span></div>
+              <div class="ov-extra-desc">Мета-теги, структура заголовков, sitemap и robots.txt для Яндекса и Google.</div>
+            </div>
+          </div>
+          <div class="ov-extra" id="xContent">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Наполнение контентом</span><span class="ov-extra-price">+2 000 ₽</span></div>
+              <div class="ov-extra-desc">Берём вашу информацию и оформляем тексты разделов сами.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-group">
+          <div class="ov-group-label">Коммерция</div>
+          <div class="ov-extra" id="xShop">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Каталог и корзина</span><span class="ov-extra-price">+4 900 ₽</span></div>
+              <div class="ov-extra-desc">Карточки товаров, фильтры, корзина и форма оформления заказа.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ov-group">
+          <div class="ov-group-label">После запуска</div>
+          <div class="ov-extra" id="xSupport">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Ежемесячное обслуживание</span><span class="ov-extra-price">+500 ₽/мес</span></div>
+              <div class="ov-extra-desc">Правки текста и фотографий по заявке каждый месяц.</div>
+            </div>
+          </div>
+          <div class="ov-extra disabled" id="xTelegram">
+            <div class="ov-toggle"></div>
+            <div class="ov-extra-body">
+              <div class="ov-extra-row"><span class="ov-extra-name">Telegram-уведомления<span class="ov-wip">Скоро</span></span><span class="ov-extra-price">+1 500 ₽</span></div>
+              <div class="ov-extra-desc">Уведомления о новых заявках прямо в Telegram.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 — DETAILS -->
+      <div class="ov-view" data-view="4" hidden>
+        <div class="ov-view-head">
+          <p class="ov-view-num">Шаг 4</p>
+          <h2 class="ov-view-title">Последний шаг</h2>
+          <p class="ov-view-sub">Расскажите о проекте в нескольких предложениях — детали уточним при первом созвоне.</p>
+        </div>
+
+        <div class="ov-field">
+          <label class="ov-label" for="briefText">О проекте</label>
+          <textarea class="ov-textarea" id="briefText" placeholder="Чем занимается компания, что должно быть на сайте, примеры стиля, которые нравятся..."></textarea>
+        </div>
+
+        <div class="ov-field">
+          <label class="ov-label">Фавикон <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--ink-faint)">(необязательно)</span></label>
+          <div class="ov-info"><strong>Фавикон</strong> — маленькая иконка во вкладке браузера. Обычно логотип 32×32px. PNG, ICO или SVG.</div>
+          <div class="ov-filezone" id="favZone">
+            <input type="file" id="fFav" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none"/>
+            <div class="ov-filezone-text"><strong>Нажмите</strong>, чтобы загрузить файл</div>
+          </div>
+          <div class="ov-fav-preview" id="favPreview"></div>
+        </div>
+
+        <div class="ov-field">
+          <label class="ov-label">Материалы <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--ink-faint)">фото, PDF, брендбук, архивы</span></label>
+          <div class="ov-filezone" id="filesZone">
+            <input type="file" id="fFiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none"/>
+            <div class="ov-filezone-text"><strong>Нажмите</strong> или перетащите файлы · до 10 МБ каждый</div>
+          </div>
+          <div class="ov-chips" id="fileChips"></div>
+        </div>
+
+        <div class="ov-field">
+          <label class="ov-label">Промокод <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--ink-faint)">(если есть)</span></label>
+          <div class="ov-promo-row">
+            <input class="ov-input" id="promoInp" type="text" placeholder="Введите код"/>
+            <button type="button" class="ov-promo-btn" id="promoBtn">Применить</button>
+          </div>
+          <div class="ov-promo-fb" id="promoFb"></div>
+        </div>
+
+        <div class="ov-agree" id="agreeRow">
+          <div class="ov-agree-box" id="agreeBox"></div>
+          <div class="ov-agree-txt">Принимаю <a href="rules" target="_blank">правила сервиса</a> и согласен на обработку персональных данных</div>
+        </div>
+        <div class="ov-err" id="errAgree">Нужно принять правила сервиса, чтобы продолжить</div>
+      </div>
+
+      <div class="ov-panel-nav">
+        <button type="button" class="ov-btn-ghost" id="backBtn" style="visibility:hidden">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M13 8H3M7 4 3 8l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Назад
         </button>
-        <p class="form-note">Ответим в течение нескольких часов · Бесплатная консультация</p>
+        <button type="button" class="ov-btn-solid" id="nextBtn">
+          Далее
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
+    </section>
 
-      <div class="success" id="successWrap">
-        <div class="success-ico">🎉</div>
-        <h3>Заявка принята!</h3>
-        <p>Заказ сохранён в личном кабинете. Уведомим о каждом этапе работы.</p>
-        <a href="profile/orders" style="display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;text-decoration:none;padding:.72rem 1.5rem;border-radius:999px;font-size:.86rem;font-weight:500;margin-top:.5rem;transition:box-shadow .2s" onmouseover="this.style.boxShadow='0 6px 24px rgba(108,99,255,.45)'" onmouseout="this.style.boxShadow=''">Мои заказы →</a>
+    <aside class="ov-ledger" id="ovLedger">
+      <div class="ov-mobile-bar" id="mobileBarToggle">
+        <span class="ov-mobile-bar-price" id="mobileBarPrice">9 900 ₽</span>
+        <svg class="ov-mobile-bar-chev" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-    </div>
+      <div class="ov-ledger-label">Ваш проект</div>
+      <div id="ledgerRows"></div>
+      <div class="ov-discount-wrap" id="ledgerDiscountWrap" hidden></div>
+      <div class="ov-ledger-total">
+        <span>Итого</span>
+        <span id="ledgerPrice">9 900 ₽</span>
+      </div>
+      <p class="ov-ledger-note">Сумма ориентировочная. Точную стоимость зафиксируем после короткого брифинга, до начала работ.</p>
+    </aside>
   </div>
+</main>
 
-</div>
-
-<div class="toast" id="toast"></div>
+<div class="ov-toast" id="ovToast"></div>
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
@@ -490,210 +498,368 @@ import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where
 
 let currentUser = null;
 let agreed = false, favFile = null, uploadedFiles = [];
+let currentStep = 1;
 
-// State
-let state = {
-  pkg: 'optimal', pkgBase: 9900, pkgName: 'Оптимальный',
-  siteType: null,
-  extras: { domain: true, domainOpt: 'new', support: false, seo: false, content: false, shop: false, urgent: false },
-  promo: null,
+const FORMAT_LABELS = {
+  landing: 'Лендинг-визитка',
+  multipage: 'Многостраничный сайт',
+  shop: 'Интернет-магазин',
+  custom: 'Особый случай'
 };
 
-function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200);}
-window.wipToast = e => { e.stopPropagation(); toast('Telegram-уведомления в разработке 🚧','warn'); };
-window.scrollForm = () => document.getElementById('formSection').scrollIntoView({behavior:'smooth'});
+const TIERS = {
+  start:  { name: 'Старт',   base: 3900,  pages: 1,  meta: '1 страница · 5–7 дней' },
+  growth: { name: 'Рост',    base: 9900,  pages: 5,  meta: 'до 5 страниц · 7–10 дней' },
+  scale:  { name: 'Масштаб', base: 19900, pages: 10, meta: 'до 10 страниц · 10–14 дней' }
+};
 
-// Maintenance
+const STEP_TITLES = ['Формат','Масштаб','Опции','Детали'];
+
+let state = {
+  format: null,
+  formatNote: '',
+  tier: 'growth',
+  extras: { domain:true, domainOpt:'new', urgent:false, seo:false, content:false, shop:false, support:false },
+  promo: null
+};
+
+const fmt = n => Math.round(n).toLocaleString('ru');
+function toast(msg, type='info'){
+  const el = document.getElementById('ovToast');
+  el.textContent = msg;
+  el.className = `ov-toast ${type} show`;
+  setTimeout(()=>{ el.className = 'ov-toast'; }, 3400);
+}
+
+/* ===== MAINTENANCE / AUTH ===== */
 onAuthStateChanged(auth, async user => {
   try{
-    const s=await getDoc(doc(db,'settings','maintenance'));
-    if(s.exists()&&s.data().enabled){
-      document.body.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:#f0f0f5;background:#09090d;gap:1rem;text-align:center;padding:2rem"><div style="font-size:3rem">🔧</div><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.4rem">Технические работы</div><div style="color:#666674;font-size:.9rem;max-width:360px;line-height:1.65">Сайт временно недоступен. Скоро всё будет готово!</div><a href="/" style="color:#a78bfa;text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a></div>`;
+    const s = await getDoc(doc(db,'settings','maintenance'));
+    if(s.exists() && s.data().enabled){
+      document.body.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'Onest',sans-serif;color:var(--ink);background:var(--bg);gap:1rem;text-align:center;padding:2rem"><div style="font-family:'Unbounded',sans-serif;font-weight:700;font-size:1.3rem">Технические работы</div><div style="color:var(--ink-dim);font-size:.9rem;max-width:360px;line-height:1.65">Страница временно недоступна. Скоро всё будет готово.</div><a href="/" style="color:var(--accent-soft);text-decoration:none;font-size:.85rem;margin-top:.5rem">← На главную</a></div>`;
       return;
     }
   }catch(e){}
-  if(!user){ window.location.href='auth'; return; }
+  if(!user){ window.location.href = 'auth'; return; }
   currentUser = user;
 });
 
-/* ── PACKAGES ── */
-window.selectPkg = el => {
-  document.querySelectorAll('.pkg').forEach(p=>p.classList.remove('sel'));
-  el.classList.add('sel');
-  state.pkg = el.dataset.pkg;
-  state.pkgBase = +el.dataset.base;
-  state.pkgName = el.querySelector('.pkg-name').textContent;
-  updateTotal();
-};
+/* ===== STEP NAVIGATION ===== */
+function isStepValid(n){
+  if(n===1) return !!state.format && (state.format!=='custom' || state.formatNote.trim().length>0);
+  return true;
+}
+function updateNextState(){
+  document.getElementById('nextBtn').disabled = !isStepValid(currentStep);
+}
+function showStep(n){
+  currentStep = n;
+  document.querySelectorAll('.ov-view').forEach(v=>{ v.hidden = (+v.dataset.view !== n); });
+  document.querySelectorAll('.ov-step').forEach(s=>{
+    const sn = +s.dataset.step;
+    s.classList.toggle('is-active', sn===n);
+    s.classList.toggle('is-done', sn<n);
+  });
+  document.getElementById('stepperFill').style.width = `${((n-1)/3)*100}%`;
+  document.getElementById('mobileProgressFill').style.width = `${(n/4)*100}%`;
+  document.getElementById('mobileProgressText').textContent = `Шаг ${n} из 4 · ${STEP_TITLES[n-1]}`;
+  document.getElementById('backBtn').style.visibility = n===1 ? 'hidden' : 'visible';
+  document.getElementById('nextBtn').innerHTML = n===4
+    ? 'Отправить заявку <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+    : 'Далее <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  updateNextState();
+  document.getElementById('ovBoard').scrollIntoView({behavior:'smooth', block:'start'});
+}
 
-/* ── TYPE ── */
-window.selType = el => {
-  document.querySelectorAll('.type-opt').forEach(t=>t.classList.remove('sel'));
-  el.classList.add('sel');
-  state.siteType = el.dataset.t;
-};
-
-/* ── DOMAIN ── */
-const xDomain = document.getElementById('xDomain');
-xDomain.classList.add('on');
-xDomain.addEventListener('click', function(e){
-  if(e.target.closest('.domain-opt')) return;
-  state.extras.domain = !state.extras.domain;
-  this.classList.toggle('on', state.extras.domain);
-  updateTotal();
+document.querySelectorAll('.ov-step').forEach(s=>{
+  s.addEventListener('click', ()=>{
+    const sn = +s.dataset.step;
+    if(sn <= currentStep) showStep(sn);
+  });
+});
+document.getElementById('backBtn').addEventListener('click', ()=>{ if(currentStep>1) showStep(currentStep-1); });
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  if(!isStepValid(currentStep)) return;
+  if(currentStep < 4) showStep(currentStep+1);
+  else submitOrder();
 });
 
-window.setDomain = (opt, e) => {
+/* ===== STEP 1: FORMAT ===== */
+document.querySelectorAll('.ov-format').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.ov-format').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel');
+    state.format = card.dataset.format;
+    document.getElementById('customNoteWrap').hidden = state.format !== 'custom';
+    updateNextState();
+    recalc();
+  });
+});
+document.getElementById('formatNote').addEventListener('input', e=>{
+  state.formatNote = e.target.value;
+  updateNextState();
+});
+
+/* ===== STEP 2: TIER ===== */
+document.querySelectorAll('.ov-tier').forEach(card=>{
+  card.addEventListener('click', ()=>{
+    document.querySelectorAll('.ov-tier').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel');
+    state.tier = card.dataset.tier;
+    recalc();
+  });
+});
+
+/* ===== STEP 3: EXTRAS ===== */
+const xDomain = document.getElementById('xDomain');
+xDomain.addEventListener('click', e=>{
+  if(e.target.closest('.ov-domain-opt')) return;
+  state.extras.domain = !state.extras.domain;
+  xDomain.classList.toggle('on', state.extras.domain);
+  recalc();
+});
+document.getElementById('dOptNew').addEventListener('click', e=>{
   e.stopPropagation();
-  state.extras.domainOpt = opt;
-  document.getElementById('dOptNew').classList.toggle('sel', opt==='new');
-  document.getElementById('dOptOwn').classList.toggle('sel', opt==='own');
-  document.getElementById('dNote').textContent = opt==='new'
-    ? 'Регистрация на 1 год включена в стоимость. Продление ~650 ₽/год — самостоятельно.'
-    : 'Подключим ваш домен бесплатно. Потребуется доступ к DNS у вашего регистратора.';
-  document.getElementById('xDomainPrice').textContent = opt==='new' ? '+650 ₽/год' : 'Бесплатно';
-  state.extras.domain = (opt==='new');
-  updateTotal();
-};
+  state.extras.domainOpt = 'new'; state.extras.domain = true;
+  document.getElementById('dOptNew').classList.add('sel');
+  document.getElementById('dOptOwn').classList.remove('sel');
+  document.getElementById('xDomainPrice').textContent = '+650 ₽/год';
+  recalc();
+});
+document.getElementById('dOptOwn').addEventListener('click', e=>{
+  e.stopPropagation();
+  state.extras.domainOpt = 'own'; state.extras.domain = false;
+  document.getElementById('dOptOwn').classList.add('sel');
+  document.getElementById('dOptNew').classList.remove('sel');
+  document.getElementById('xDomainPrice').textContent = 'Бесплатно';
+  recalc();
+});
 
-/* ── EXTRAS ── */
-const EXTRA_PRICES = { support:500, seo:2500, content:2000, shop:4900, urgent:0 };
-window.toggleX = (el, key) => {
-  state.extras[key] = !state.extras[key];
-  el.classList.toggle('on', state.extras[key]);
-  updateTotal();
-};
+function bindToggle(id, key){
+  const el = document.getElementById(id);
+  el.addEventListener('click', ()=>{
+    state.extras[key] = !state.extras[key];
+    el.classList.toggle('on', state.extras[key]);
+    recalc();
+  });
+}
+bindToggle('xUrgent','urgent');
+bindToggle('xSeo','seo');
+bindToggle('xContent','content');
+bindToggle('xShop','shop');
+bindToggle('xSupport','support');
+document.getElementById('xTelegram').addEventListener('click', ()=> toast('Telegram-уведомления пока в разработке','warn'));
 
-/* ── PROMO ── */
-window.applyPromo = async () => {
+/* ===== STEP 4: PROMO ===== */
+document.getElementById('promoBtn').addEventListener('click', async ()=>{
   const code = document.getElementById('promoInp').value.trim().toUpperCase();
   const fb = document.getElementById('promoFb');
   const btn = document.getElementById('promoBtn');
-  if(!code){ fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Введите промокод'; return; }
-  btn.disabled=true; btn.textContent='Проверяем...';
+  if(!code){ fb.style.display='block'; fb.style.color='var(--bad)'; fb.textContent='Введите промокод'; return; }
+  btn.disabled = true; btn.textContent = 'Проверяем...';
   try{
-    const snap=await getDocs(query(collection(db,'promoCodes'),where('code','==',code),where('active','==',true)));
-    if(snap.empty){ state.promo=null; fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Промокод не найден'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-    const p=snap.docs[0].data();
-    if(p.expiresAt?.toDate&&p.expiresAt.toDate()<new Date()){ state.promo=null; fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Срок действия истёк'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-    if(p.forUid&&currentUser&&p.forUid!==currentUser.uid){ state.promo=null; fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; updateTotal(); return; }
-    state.promo={type:p.discountType,value:p.discountValue,code};
-    const lbl=p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`;
-    fb.style.display='block'; fb.style.color='var(--success)'; fb.textContent=`✓ Применён: ${lbl}`;
-    btn.textContent='✓ Применён'; btn.style.color='var(--success)';
-  }catch(e){ fb.style.display='block'; fb.style.color='var(--error)'; fb.textContent='Ошибка проверки'; btn.disabled=false; btn.textContent='Применить'; }
-  updateTotal();
-};
+    const snap = await getDocs(query(collection(db,'promoCodes'), where('code','==',code), where('active','==',true)));
+    if(snap.empty){ state.promo=null; fb.style.display='block'; fb.style.color='var(--bad)'; fb.textContent='Промокод не найден'; btn.disabled=false; btn.textContent='Применить'; recalc(); return; }
+    const p = snap.docs[0].data();
+    if(p.expiresAt?.toDate && p.expiresAt.toDate() < new Date()){ state.promo=null; fb.style.display='block'; fb.style.color='var(--bad)'; fb.textContent='Срок действия истёк'; btn.disabled=false; btn.textContent='Применить'; recalc(); return; }
+    if(p.forUid && currentUser && p.forUid !== currentUser.uid){ state.promo=null; fb.style.display='block'; fb.style.color='var(--bad)'; fb.textContent='Этот промокод вам не подходит'; btn.disabled=false; btn.textContent='Применить'; recalc(); return; }
+    state.promo = { type:p.discountType, value:p.discountValue, code };
+    const lbl = p.discountType==='percent' ? `-${p.discountValue}%` : `-${p.discountValue} ₽`;
+    fb.style.display='block'; fb.style.color='var(--good)'; fb.textContent=`✓ Применён: ${lbl}`;
+    btn.textContent='✓ Применён'; btn.style.color='var(--good)';
+  }catch(e){
+    fb.style.display='block'; fb.style.color='var(--bad)'; fb.textContent='Ошибка проверки'; btn.disabled=false; btn.textContent='Применить';
+  }
+  recalc();
+});
 
-function calcDiscount(sub){
-  if(!state.promo) return 0;
-  return state.promo.type==='percent' ? Math.round(sub*state.promo.value/100) : Math.min(state.promo.value,sub);
-}
-
-/* ── TOTAL ── */
-function updateTotal(){
-  let sub = state.pkgBase;
-  let parts = [`Пакет «${state.pkgName}»`];
-  if(state.extras.domain && state.extras.domainOpt==='new'){ sub+=650; parts.push('+650 ₽ домен'); }
-  if(state.extras.support){ sub+=500; parts.push('+500 ₽ обслуживание'); }
-  if(state.extras.seo){ sub+=2500; parts.push('+2 500 ₽ SEO'); }
-  if(state.extras.content){ sub+=2000; parts.push('+2 000 ₽ контент'); }
-  if(state.extras.shop){ sub+=4900; parts.push('+4 900 ₽ корзина'); }
-  if(state.extras.urgent){ const u=Math.round(sub*.3); sub+=u; parts.push('+30% срочность'); }
-  const disc=calcDiscount(sub);
-  const total=sub-disc;
-  document.getElementById('tPrice').textContent=total.toLocaleString('ru')+' ₽';
-  document.getElementById('tBreak').textContent=parts.join(' · ');
-  const origEl=document.getElementById('tOrig');
-  const discEl=document.getElementById('tDiscount');
-  if(disc>0){origEl.style.display='block';origEl.textContent=sub.toLocaleString('ru')+' ₽';discEl.style.display='block';discEl.textContent=`Скидка: -${disc.toLocaleString('ru')} ₽`;}
-  else{origEl.style.display='none';discEl.style.display='none';}
-}
-
-/* ── FILES ── */
-window.handleFav = file => {
+/* ===== STEP 4: FILES ===== */
+document.getElementById('favZone').addEventListener('click', ()=> document.getElementById('fFav').click());
+document.getElementById('fFav').addEventListener('change', e=>{
+  const file = e.target.files[0];
   if(!file) return;
-  if(file.size>2*1024*1024){ toast('Фавикон > 2 МБ','error'); return; }
-  favFile=file;
-  const p=document.getElementById('favPreview');const url=URL.createObjectURL(file);
-  p.style.display='flex';
-  p.innerHTML=`<img src="${url}" style="width:30px;height:30px;border-radius:4px;object-fit:contain;background:#fff;padding:2px"> ${file.name} <button onclick="clearFav()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem">×</button>`;
-};
-window.clearFav=()=>{ favFile=null; const p=document.getElementById('favPreview'); p.style.display='none'; p.innerHTML=''; document.getElementById('fFav').value=''; };
-window.handleFiles=files=>{ Array.from(files).forEach(f=>{ if(f.size>10*1024*1024){toast(f.name+' > 10 МБ','error');return;} if(!uploadedFiles.find(u=>u.name===f.name)) uploadedFiles.push(f); }); renderChips(); };
-function renderChips(){ const el=document.getElementById('fileChips'); el.innerHTML=''; uploadedFiles.forEach((f,i)=>{ const c=document.createElement('div'); c.className='chip'; c.innerHTML=`📄 ${f.name} <button onclick="rmFile(${i})">×</button>`; el.appendChild(c); }); }
-window.rmFile=i=>{ uploadedFiles.splice(i,1); renderChips(); };
+  if(file.size > 2*1024*1024){ toast('Фавикон больше 2 МБ','error'); return; }
+  favFile = file;
+  const p = document.getElementById('favPreview');
+  const url = URL.createObjectURL(file);
+  p.style.display = 'flex';
+  p.innerHTML = `<img src="${url}" alt=""> ${file.name} <button type="button" id="favClear">×</button>`;
+  document.getElementById('favClear').addEventListener('click', ()=>{
+    favFile = null; p.style.display='none'; p.innerHTML=''; document.getElementById('fFav').value='';
+  });
+});
 
-/* ── AGREE ── */
-window.toggleAgree=()=>{ agreed=!agreed; document.getElementById('agreeBox').classList.toggle('on',agreed); document.getElementById('agreeBox').classList.remove('err'); document.getElementById('errAgree').classList.remove('show'); };
+document.getElementById('filesZone').addEventListener('click', ()=> document.getElementById('fFiles').click());
+document.getElementById('fFiles').addEventListener('change', e=>{
+  Array.from(e.target.files).forEach(f=>{
+    if(f.size > 10*1024*1024){ toast(f.name+' больше 10 МБ','error'); return; }
+    if(!uploadedFiles.find(u=>u.name===f.name)) uploadedFiles.push(f);
+  });
+  renderChips();
+});
+function renderChips(){
+  const el = document.getElementById('fileChips');
+  el.innerHTML = '';
+  uploadedFiles.forEach((f,i)=>{
+    const c = document.createElement('div');
+    c.className = 'ov-chip';
+    c.innerHTML = `${f.name} <button type="button" data-i="${i}">×</button>`;
+    c.querySelector('button').addEventListener('click', ()=>{ uploadedFiles.splice(i,1); renderChips(); });
+    el.appendChild(c);
+  });
+}
 
-/* ── SUBMIT ── */
-window.submitForm = async () => {
-  if(!agreed){ document.getElementById('agreeBox').classList.add('err'); document.getElementById('errAgree').classList.add('show'); return; }
-  if(!currentUser){ toast('Необходимо войти в аккаунт','error'); setTimeout(()=>window.location.href='auth',1200); return; }
-  const btn=document.getElementById('submitBtn');
-  btn.disabled=true; btn.textContent='Отправляем...';
+/* ===== STEP 4: AGREEMENT ===== */
+document.getElementById('agreeRow').addEventListener('click', e=>{
+  if(e.target.closest('a')) return;
+  agreed = !agreed;
+  document.getElementById('agreeBox').classList.toggle('on', agreed);
+  document.getElementById('agreeBox').classList.remove('err');
+  document.getElementById('errAgree').classList.remove('show');
+});
 
-  let sub=state.pkgBase;
-  const extrasArr=[];
-  if(state.extras.domain&&state.extras.domainOpt==='new'){ sub+=650; extrasArr.push('domain'); }
-  if(state.extras.support){ sub+=500; extrasArr.push('support'); }
-  if(state.extras.seo){ sub+=2500; extrasArr.push('seo'); }
-  if(state.extras.content){ sub+=2000; extrasArr.push('content'); }
-  if(state.extras.shop){ sub+=4900; extrasArr.push('shop'); }
-  if(state.extras.urgent){ sub=Math.round(sub*1.3); extrasArr.push('urgent'); }
-  const disc=calcDiscount(sub);
-  const totalPrice=sub-disc;
+/* ===== MOBILE LEDGER TOGGLE ===== */
+document.getElementById('mobileBarToggle').addEventListener('click', ()=>{
+  document.getElementById('ovLedger').classList.toggle('is-open');
+});
 
-  let favData=null;
-  if(favFile){ try{ favData=await new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(favFile);}); }catch(e){} }
+/* ===== LEDGER CALCULATION ===== */
+function calcAmounts(){
+  const t = TIERS[state.tier];
+  const rows = [{ label: t.name, sub: t.meta, amount: t.base }];
+  let running = t.base;
 
-  const attachments=[];
+  if(state.extras.domain && state.extras.domainOpt==='new'){
+    running += 650; rows.push({ label:'Домен на 1 год', amount:650 });
+  } else if(state.extras.domainOpt==='own'){
+    rows.push({ label:'Подключение своего домена', amount:0, free:true });
+  } else {
+    rows.push({ label:'Домен', amount:0, free:true });
+  }
+  if(state.extras.support){ running += 500; rows.push({ label:'Обслуживание (первый месяц)', amount:500 }); }
+  if(state.extras.seo){ running += 2500; rows.push({ label:'SEO-оптимизация', amount:2500 }); }
+  if(state.extras.content){ running += 2000; rows.push({ label:'Наполнение контентом', amount:2000 }); }
+  if(state.extras.shop){ running += 4900; rows.push({ label:'Каталог и корзина', amount:4900 }); }
+
+  let urgentAmt = 0;
+  if(state.extras.urgent){ urgentAmt = Math.round(running*0.3); running += urgentAmt; rows.push({ label:'Срочный запуск', amount:urgentAmt }); }
+
+  const discount = state.promo
+    ? (state.promo.type==='percent' ? Math.round(running*state.promo.value/100) : Math.min(state.promo.value, running))
+    : 0;
+  const total = running - discount;
+  return { rows, subtotal: running, discount, total };
+}
+
+function recalc(){
+  const { rows, discount, total } = calcAmounts();
+  document.getElementById('ledgerRows').innerHTML = rows.map(r => `
+    <div class="ov-row">
+      <span>${r.label}</span>
+      <span class="${r.free ? 'is-free' : ''}">${r.free ? 'Бесплатно' : fmt(r.amount)+' ₽'}</span>
+    </div>`).join('');
+  const dWrap = document.getElementById('ledgerDiscountWrap');
+  if(discount > 0 && state.promo){
+    dWrap.hidden = false;
+    dWrap.innerHTML = `<div class="ov-row is-discount"><span>Промокод ${state.promo.code}</span><span>−${fmt(discount)} ₽</span></div>`;
+  } else { dWrap.hidden = true; }
+  document.getElementById('ledgerPrice').textContent = fmt(total)+' ₽';
+  document.getElementById('mobileBarPrice').textContent = fmt(total)+' ₽';
+}
+
+/* ===== SUBMIT ===== */
+function fileToBase64(file){
+  return new Promise((resolve, reject)=>{
+    const r = new FileReader();
+    r.onload = ()=> resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function setSubmitting(on, label){
+  const btn = document.getElementById('nextBtn');
+  btn.disabled = on;
+  if(on) btn.textContent = label || 'Отправляем...';
+  else showStep(4);
+}
+
+async function submitOrder(){
+  if(!agreed){
+    document.getElementById('agreeBox').classList.add('err');
+    document.getElementById('errAgree').classList.add('show');
+    return;
+  }
+  if(!currentUser){
+    toast('Нужно войти в аккаунт', 'error');
+    setTimeout(()=> window.location.href='auth', 1200);
+    return;
+  }
+  setSubmitting(true, 'Сохраняем заявку...');
+
+  const { total, discount } = calcAmounts();
+  const t = TIERS[state.tier];
+  const extrasArr = [];
+  if(state.extras.domain && state.extras.domainOpt==='new') extrasArr.push('domain');
+  if(state.extras.support) extrasArr.push('support');
+  if(state.extras.seo) extrasArr.push('seo');
+  if(state.extras.content) extrasArr.push('content');
+  if(state.extras.shop) extrasArr.push('shop');
+  if(state.extras.urgent) extrasArr.push('urgent');
+
+  let favData = null;
+  if(favFile){ try{ favData = await fileToBase64(favFile); }catch(e){} }
+  const attachments = [];
   for(const f of uploadedFiles){
-    if(f.size>3*1024*1024) continue;
-    try{ const b64=await new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(f);}); attachments.push({fileData:b64,fileName:f.name,fileType:f.type}); }catch(e){}
+    if(f.size > 3*1024*1024) continue;
+    try{ attachments.push({ fileData: await fileToBase64(f), fileName:f.name, fileType:f.type }); }catch(e){}
   }
 
+  let docRef;
   try{
-    const docRef = await addDoc(collection(db,'orders'),{
-      package: state.pkgName,
-      siteType: state.siteType || state.pkgName,
-      pages: state.pkg==='start'?1:state.pkg==='optimal'?5:10,
-      totalPrice, extras: extrasArr,
+    docRef = await addDoc(collection(db,'orders'), {
+      package: t.name,
+      siteType: state.format==='custom' ? `Особый случай: ${state.formatNote.trim()}` : FORMAT_LABELS[state.format],
+      pages: t.pages,
+      totalPrice: total,
+      extras: extrasArr,
       domainOption: state.extras.domainOpt,
-      promoCode: state.promo?.code||null,
-      discountApplied: disc,
-      description: document.getElementById('fdesc').value.trim()||'',
-      attachments: attachments.length?attachments:null,
+      promoCode: state.promo?.code || null,
+      discountApplied: discount,
+      description: document.getElementById('briefText').value.trim() || '',
+      attachments: attachments.length ? attachments : null,
       favicon: favData,
-      clientName: currentUser.displayName||'Пользователь',
+      clientName: currentUser.displayName || 'Пользователь',
       clientEmail: currentUser.email,
       uid: currentUser.uid,
       status: 0,
       createdAt: serverTimestamp()
     });
+  }catch(e){
+    setSubmitting(false);
+    toast('Не получилось сохранить заявку. Проверьте соединение и попробуйте ещё раз.', 'error');
+    return;
+  }
 
-    // Переходим к оплате через Робокассу
-    btn.textContent='Переходим к оплате...';
+  try{
+    setSubmitting(true, 'Переходим к оплате...');
     const resp = await fetch('https://api-lac-six-78.vercel.app/api/createPayment', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId: docRef.id, amount: totalPrice })
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ orderId: docRef.id, amount: total })
     });
     const data = await resp.json();
-    if(data.paymentUrl){
-      window.location.href = data.paymentUrl;
-    } else {
-      throw new Error('Нет ссылки на оплату');
-    }
+    if(data.paymentUrl){ window.location.href = data.paymentUrl; }
+    else throw new Error('no payment url');
   }catch(e){
-    btn.disabled=false;
-    btn.innerHTML='Отправить заявку <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    toast('Ошибка отправки. Попробуйте ещё раз.','error');
+    setSubmitting(false);
+    toast('Заявка сохранена. Не получилось открыть оплату — мы свяжемся с вами по почте.', 'warn');
   }
-};
+}
 
-updateTotal();
+/* ===== INIT ===== */
+recalc();
+showStep(1);
 </script>
 
 <script src="footer.js" data-page="order"></script>

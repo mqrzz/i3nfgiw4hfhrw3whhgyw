@@ -7,7 +7,7 @@
   <link rel="icon" href="../img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
-  <style>
+  <script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=tvHxSWknDD1M6Rwo1T-3zyzutxpyZ3gTXPPP6pzT-G6e8iV1iupMk71XaHyBM0yGEva0v7OivDnp5dNf3_5sew" charset="UTF-8"></script><style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --bg:       #0c0c0e;
@@ -170,6 +170,7 @@
     }
     .btn-primary { background: var(--accent); color: #fff; }
     .btn-primary:hover { background: #7c74ff; }
+    .btn-primary:disabled { opacity: .5; cursor: default; }
     .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--muted); }
     .btn-ghost:hover { border-color: var(--border-hi); color: var(--text); }
     .btn-full    { width: 100%; justify-content: center; }
@@ -224,7 +225,7 @@
     <div class="status-card inactive">
       <div class="status-icon">🔧</div>
       <div class="status-title">Обслуживание не подключено</div>
-      <div class="status-sub">Подключите обслуживание и получите возможность отправлять заявки на правки и доработки вашего сайта.</div>
+      <div class="status-sub">Подключите обслуживание и получите возможность отправлять заявки на правки и доработки вашего сайта. Стоимость — 500 ₽/мес.</div>
     </div>
 
     <div class="features-grid">
@@ -253,6 +254,7 @@
         </div>
         <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:100%"></div></div>
       </div>
+      <button class="btn btn-primary btn-full" id="renewBtn" style="margin-top:16px" onclick="payForSupport(true)">Продлить на 30 дней — 500 ₽</button>
     </div>
 
     <div class="ticket-form">
@@ -281,9 +283,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
+const SUPPORT_PRICE = 500;
+const CREATE_PAYMENT_URL = 'https://api-lac-six-78.vercel.app/api/createPayment';
+
 let currentUser = null;
 let userOrders = [];
 let activeOrder = null;
+let pendingSupportOrderId = null; // заказ, для которого сейчас покупается/продлевается обслуживание
 
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDate(ts){if(!ts) return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
@@ -305,6 +311,7 @@ async function init(user){
   document.getElementById('sectionLoading').style.display='none';
 
   if(activeOrder){
+    pendingSupportOrderId = activeOrder.id;
     showActiveSection();
   } else if(doneOrders.length===0){
     document.getElementById('sectionNoOrders').style.display='block';
@@ -351,22 +358,33 @@ function showActiveSection(){
   loadTickets();
 }
 
+// Запрос на подключение обслуживания (первая оплата) — сразу ведёт на Робокассу
 window.requestSupport = async function(orderId){
+  pendingSupportOrderId = orderId;
+  await payForSupport(false);
+};
+
+// Оплата подключения или продления обслуживания через Робокассу.
+// isRenewal только влияет на текст кнопки/тосты, логика платежа одинаковая —
+// resultUrl.js сам разбирается, продлевать ли существующее обслуживание или
+// активировать новое, по текущим данным заказа в Firestore.
+window.payForSupport = async function(isRenewal){
+  if(!pendingSupportOrderId){ toast('Не найден заказ для обслуживания','error'); return; }
+  const btn = isRenewal ? document.getElementById('renewBtn') : null;
+  if(btn){ btn.disabled = true; btn.textContent = 'Переходим к оплате...'; }
   try{
-    const order = userOrders.find(o=>o.id===orderId);
-    const msg = `🔧 Запрос на подключение обслуживания\nЗаказ: №${orderId.slice(0,8).toUpperCase()} · ${order?.siteType||'Сайт'}\nПрошу выставить счёт на оплату обслуживания (500 ₽/месяц).`;
-    await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-      text: msg, sender:'user',
-      senderName: currentUser.displayName||'Пользователь',
-      type:'text', supportRequest: true, supportOrderId: orderId,
-      createdAt: serverTimestamp()
+    const resp = await fetch(CREATE_PAYMENT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: pendingSupportOrderId, amount: SUPPORT_PRICE, type: 'support' })
     });
-    await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js").then(({setDoc,doc:_doc})=>{
-      return setDoc(_doc(db,'chats',currentUser.uid),{name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
-    });
-    toast('Запрос отправлен! Менеджер пришлёт ссылку на оплату в чате.','success');
-    setTimeout(()=>window.location.href='../profile/support',1800);
-  }catch(e){ toast('Ошибка: '+e.message,'error'); }
+    const data = await resp.json();
+    if(data.paymentUrl){ window.location.href = data.paymentUrl; }
+    else throw new Error('no payment url');
+  }catch(e){
+    if(btn){ btn.disabled = false; btn.textContent = 'Продлить на 30 дней — 500 ₽'; }
+    toast('Не получилось открыть оплату. Попробуйте ещё раз.','error');
+  }
 };
 
 async function loadTickets(){

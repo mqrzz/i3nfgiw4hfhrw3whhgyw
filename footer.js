@@ -2,7 +2,7 @@
 
 (function() {
     // Страницы БЕЗ мобильного меню
-    const NO_MOBILE_NAV_PAGES = ['auth', 'profile', 'settings', 'orders', 'support'];
+    const NO_MOBILE_NAV_PAGES = ['auth', 'profile', 'settings', 'orders', сsupport', 'order'];
     
     // Создаем стили для подвала
     const styles = `

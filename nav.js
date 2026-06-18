@@ -14,178 +14,207 @@
   const depth  = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
   const b      = depth > 0 ? '../' : '';
 
-  /* ─────────────── CSS ─────────────── */
+  /* ─────────────── CSS ───────────────
+     Палитра: фон почти чёрный с тёплым подтоном, один фиолетовый акцент,
+     без стекла/неона/inset-теней — плоско, контрастно, по делу. */
   const CSS = `
+    :root {
+      --an-bg:        #0a0a0c;
+      --an-surface:   #131316;
+      --an-line:      rgba(242,242,240,0.08);
+      --an-line-soft: rgba(242,242,240,0.05);
+      --an-ink:       #f2f2f0;
+      --an-ink-dim:   rgba(242,242,240,0.46);
+      --an-ink-faint: rgba(242,242,240,0.26);
+      --an-accent:    #7c6fff;
+      --an-accent-ink:#0a0a0c;
+      --an-warn:      #e8a23d;
+      --an-danger:    #e8634f;
+    }
+
     .antviz-nav {
-      position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 8px 0 18px;
-      height: 52px;
+      padding: 0 8px 0 20px;
+      height: 50px;
       width: calc(100% - 40px); max-width: 1060px;
-      background: rgba(10,10,14,0.75);
-      backdrop-filter: blur(28px) saturate(200%);
-      -webkit-backdrop-filter: blur(28px) saturate(200%);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 16px;
-      box-shadow: 0 2px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
-      transition: border-color .3s, background .3s;
+      background: var(--an-bg);
+      border: 1px solid var(--an-line);
+      border-radius: 11px;
+      transition: border-color .2s;
     }
-    .antviz-nav:hover { border-color: rgba(255,255,255,0.12); }
+    .antviz-nav:hover { border-color: rgba(242,242,240,0.14); }
 
     .an-logo {
-      font-family: 'Unbounded', sans-serif; font-weight: 700;
-      font-size: .85rem; letter-spacing: .03em;
-      color: #f0f0f5; text-decoration: none;
+      font-family: 'Unbounded', sans-serif; font-weight: 600;
+      font-size: .82rem; letter-spacing: .01em;
+      color: var(--an-ink); text-decoration: none;
       display: flex; align-items: center; gap: 9px; flex-shrink: 0;
     }
-    .an-logo img { width: 26px; height: 26px; border-radius: 7px; object-fit: cover; }
+    .an-logo img { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; }
 
     .an-center {
       position: absolute; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; gap: 2px;
     }
     .an-link {
-      color: rgba(240,240,245,0.45);
+      color: var(--an-ink-dim);
       font-family: 'Onest', sans-serif; font-size: .8rem;
-      text-decoration: none; padding: .38rem .78rem;
-      border-radius: 10px; transition: color .18s, background .18s;
-      white-space: nowrap;
+      text-decoration: none; padding: .4rem .8rem;
+      border-radius: 8px; transition: color .15s;
+      white-space: nowrap; position: relative;
     }
-    .an-link:hover { color: #f0f0f5; background: rgba(255,255,255,0.06); }
-    .an-link.active { color: #f0f0f5; background: rgba(255,255,255,0.08); }
+    .an-link:hover { color: var(--an-ink); }
+    .an-link.active { color: var(--an-ink); }
+    .an-link.active::after {
+      content: ''; position: absolute; left: .8rem; right: .8rem; bottom: 1px;
+      height: 1px; background: var(--an-accent);
+    }
 
-    .an-right { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+    .an-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
     .an-cta {
       display: none; align-items: center; gap: 6px;
-      background: #6c63ff; color: #fff;
-      font-family: 'Onest', sans-serif; font-size: .78rem; font-weight: 500;
-      text-decoration: none; padding: .42rem 1.05rem;
-      border-radius: 10px; border: none; cursor: pointer;
-      transition: box-shadow .2s, transform .12s;
+      background: var(--an-accent); color: var(--an-accent-ink);
+      font-family: 'Onest', sans-serif; font-size: .78rem; font-weight: 600;
+      text-decoration: none; padding: .44rem 1.05rem;
+      border-radius: 8px; border: none; cursor: pointer;
+      transition: opacity .15s;
       white-space: nowrap;
     }
-    .an-cta:hover { box-shadow: 0 4px 18px rgba(108,99,255,.5); transform: translateY(-1px); }
+    .an-cta:hover { opacity: .85; }
     .an-cta.show { display: inline-flex; }
 
     .an-user { position: relative; display: flex; }
     .an-user-btn {
-      display: flex; align-items: center; gap: 7px;
-      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.09);
-      border-radius: 10px; padding: 5px 12px 5px 5px;
-      cursor: pointer; transition: background .18s, border-color .18s;
-      font-family: 'Onest', sans-serif; font-size: .78rem; color: #f0f0f5;
+      display: flex; align-items: center; gap: 8px;
+      background: none; border: 1px solid transparent;
+      border-radius: 9px; padding: 4px 10px 4px 4px;
+      cursor: pointer; transition: border-color .15s;
+      font-family: 'Onest', sans-serif; font-size: .78rem; color: var(--an-ink);
+      text-decoration: none;
       position: relative;
     }
-    .an-user-btn:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.15); }
+    .an-user-btn:hover { border-color: var(--an-line); }
 
-    .an-user-btn.guest { padding: 5px 14px; }
-    .an-user-btn.guest .an-avatar { display: none; }
+    .an-user-btn.guest { padding: .4rem .85rem; border: 1px solid var(--an-line); }
+    .an-user-btn.guest:hover { border-color: rgba(242,242,240,0.18); }
+    .an-user-btn.guest .an-avatar-ring { display: none; }
     .an-user-btn.guest .an-chevron { display: none; }
 
-    .an-avatar {
-      width: 26px; height: 26px; border-radius: 8px;
-      background: linear-gradient(135deg,#6c63ff,#a78bfa);
+    /* Аватар: квадрат со скруглением, без градиента — инициал на ровном
+       акцентном фоне. Кольцо появляется только когда есть непрочитанное —
+       единственный «декоративный» момент во всей навигации. */
+    .an-avatar-ring {
+      width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: .65rem; font-weight: 700; color: #fff;
-      flex-shrink: 0; overflow: hidden; position: relative;
+      position: relative; padding: 2px;
     }
+    .an-avatar-ring.notify {
+      background: conic-gradient(from -45deg, var(--an-warn), var(--an-accent) 60%);
+    }
+    .an-avatar {
+      width: 100%; height: 100%; border-radius: 7px;
+      background: var(--an-accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .68rem; font-weight: 700; color: var(--an-accent-ink);
+      overflow: hidden;
+    }
+    .an-avatar-ring.notify .an-avatar { border-radius: 6px; }
     .an-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
     .an-uname { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .an-chevron { width: 11px; height: 11px; opacity: .4; flex-shrink: 0; transition: transform .2s; }
+    .an-chevron { width: 10px; height: 10px; opacity: .4; flex-shrink: 0; transition: transform .2s; }
     .an-user-btn[aria-expanded="true"] .an-chevron { transform: rotate(180deg); }
 
-    .an-notify-dot {
-      position: absolute; top: -2px; right: -2px;
-      width: 9px; height: 9px; border-radius: 50%;
-      background: #f87171; border: 2px solid rgba(10,10,14,0.9);
-      display: none;
-    }
-    .an-notify-dot.show { display: block; }
-
+    /* ── Дропдаун: плоская карточка, тонкая граница, без blur/inset-теней.
+       Единственный акцент — верхняя кромка цвета бренда. */
     .an-dd {
-      position: absolute; top: calc(100% + 12px); right: 0;
-      background: linear-gradient(165deg, rgba(19,19,26,0.98), rgba(13,13,18,0.98));
-      backdrop-filter: blur(32px) saturate(180%);
-      -webkit-backdrop-filter: blur(32px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 18px; padding: 8px;
-      min-width: 240px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.07);
+      position: absolute; top: calc(100% + 10px); right: 0;
+      background: var(--an-surface);
+      border: 1px solid var(--an-line);
+      border-radius: 13px; padding: 6px;
+      min-width: 232px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
       opacity: 0; pointer-events: none;
-      transform: translateY(-8px) scale(.96);
+      transform: translateY(-6px);
       transform-origin: top right;
-      transition: opacity .2s cubic-bezier(.2,.8,.2,1), transform .2s cubic-bezier(.2,.8,.2,1);
+      transition: opacity .16s ease, transform .16s ease;
       z-index: 9999;
+      overflow: hidden;
     }
-    .an-dd.open { opacity: 1; pointer-events: all; transform: translateY(0) scale(1); }
+    .an-dd::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--an-accent);
+    }
+    .an-dd.open { opacity: 1; pointer-events: all; transform: translateY(0); }
 
     .an-dd-head {
-      display: flex; align-items: center; gap: 11px;
-      padding: 10px 10px 12px; margin-bottom: 4px;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 8px 12px; margin-bottom: 2px;
+      border-bottom: 1px solid var(--an-line-soft);
     }
     .an-dd-head-avatar {
-      width: 38px; height: 38px; border-radius: 11px;
-      background: linear-gradient(135deg,#6c63ff,#a78bfa);
+      width: 34px; height: 34px; border-radius: 9px;
+      background: var(--an-accent);
       display: flex; align-items: center; justify-content: center;
-      font-size: .95rem; font-weight: 700; color: #fff;
+      font-size: .85rem; font-weight: 700; color: var(--an-accent-ink);
       flex-shrink: 0; overflow: hidden;
     }
     .an-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .an-dd-head-info { min-width: 0; flex: 1; }
     .an-dd-head-name {
-      font-family: 'Onest', sans-serif; font-size: .85rem; font-weight: 500;
-      color: #f0f0f5; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: 'Onest', sans-serif; font-size: .84rem; font-weight: 500;
+      color: var(--an-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .an-dd-head-email {
       font-family: 'Onest', sans-serif; font-size: .7rem;
-      color: rgba(240,240,245,0.4); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: var(--an-ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       margin-top: 1px;
     }
 
     .an-dd-section {
-      padding: 10px 10px 4px;
-      font-size: .58rem; text-transform: uppercase; letter-spacing: .1em;
-      color: rgba(240,240,245,0.25); font-weight: 600;
+      padding: 12px 10px 5px;
+      font-size: .68rem;
+      color: var(--an-ink-faint); font-weight: 500;
+      font-family: 'Onest', sans-serif;
     }
     .an-dd-item {
-      display: flex; align-items: center; gap: 11px;
-      padding: 9px 10px; border-radius: 12px;
-      font-size: .82rem; color: rgba(240,240,245,0.68);
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 9px; border-radius: 8px;
+      font-size: .82rem; color: rgba(242,242,240,0.72);
       text-decoration: none; cursor: pointer;
-      transition: background .14s, color .14s, padding-left .14s;
+      transition: background .12s, color .12s;
       font-family: 'Onest', sans-serif; border: none;
       background: none; width: 100%; text-align: left;
       position: relative;
     }
-    .an-dd-item:hover { background: rgba(255,255,255,0.07); color: #f0f0f5; padding-left: 13px; }
+    .an-dd-item:hover { background: rgba(242,242,240,0.06); color: var(--an-ink); }
     .an-dd-ico {
-      width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+      width: 17px; height: 17px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      background: rgba(167,139,250,0.1); transition: background .14s;
+      color: var(--an-ink-dim); transition: color .12s;
     }
-    .an-dd-item:hover .an-dd-ico { background: rgba(167,139,250,0.18); }
-    .an-dd-item svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .75; stroke: #a78bfa; fill: none; stroke-width: 1.8; }
-    .an-dd-item.red .an-dd-ico { background: rgba(248,113,113,0.1); }
-    .an-dd-item.red .an-dd-ico svg { stroke: #f87171; opacity: .85; }
-    .an-dd-item.red { color: rgba(248,113,113,0.75); }
-    .an-dd-item.red:hover { background: rgba(248,113,113,0.09); color: #f87171; }
-    .an-dd-item.red:hover .an-dd-ico { background: rgba(248,113,113,0.16); }
+    .an-dd-item:hover .an-dd-ico { color: var(--an-accent); }
+    .an-dd-item svg { width: 17px; height: 17px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .an-dd-item.red .an-dd-ico { color: rgba(232,99,79,0.7); }
+    .an-dd-item.red:hover .an-dd-ico { color: var(--an-danger); }
+    .an-dd-item.red { color: rgba(232,99,79,0.78); }
+    .an-dd-item.red:hover { background: rgba(232,99,79,0.08); color: var(--an-danger); }
 
-    .an-dd-sep { height: 1px; background: rgba(255,255,255,0.07); margin: 6px 8px; }
+    .an-dd-sep { height: 1px; background: var(--an-line-soft); margin: 5px 9px; }
 
     .an-dd-badge {
       margin-left: auto; flex-shrink: 0;
-      background: #6c63ff; color: #fff;
-      font-size: .62rem; font-weight: 700;
-      min-width: 18px; height: 18px; border-radius: 50px;
+      background: var(--an-accent); color: var(--an-accent-ink);
+      font-size: .64rem; font-weight: 700;
+      min-width: 17px; height: 17px; border-radius: 5px;
       display: flex; align-items: center; justify-content: center;
-      padding: 0 5px;
+      padding: 0 5px; font-family: 'Onest', sans-serif;
     }
-    .an-dd-badge.warn { background: #fbbf24; color: #1a1400; }
-    .an-dd-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; background: #f87171; }
+    .an-dd-badge.warn { background: var(--an-warn); color: #1a1400; }
+    .an-dd-badge.dot { width: 6px; height: 6px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
 
     @media(max-width:768px) { .antviz-nav { display: none !important; } }
   `;
@@ -210,15 +239,17 @@
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
+  // Свой набор иконок: единая толщина линии (1.6), скруглённые углы,
+  // но формы более характерные — не дефолтный Feather-набор.
   const DD_ITEMS = [
-    { href: b+'profile',         icon: '<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>', label: 'Обзор кабинета' },
+    { href: b+'profile',         icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 14.5c0-2 1.8-3.2 4-3.2s4 1.2 4 3.2"/><circle cx="12" cy="9" r="2.1"/>', label: 'Обзор кабинета' },
     { sep: true },
     { section: 'Кабинет' },
-    { href: b+'profile/orders',  icon: '<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
-    { href: b+'profile/tickets', icon: '<path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/>', label: 'Обслуживание', badgeKey: 'tickets' },
-    { href: b+'profile/support', icon: '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/orders',  icon: '<path d="M4 7.5l8-3.8 8 3.8-8 3.8-8-3.8z"/><path d="M4 7.5v9l8 3.8 8-3.8v-9"/><path d="M12 11.3v9"/>', label: 'Мои заказы', badgeKey: 'orders' },
+    { href: b+'profile/tickets', icon: '<path d="M5 7a2 2 0 012-2h10a2 2 0 012 2v3a2 2 0 100 4v3a2 2 0 01-2 2H7a2 2 0 01-2-2v-3a2 2 0 100-4V7z"/><path d="M14 6v12" stroke-dasharray="2.4 2.4"/>', label: 'Обслуживание', badgeKey: 'tickets' },
+    { href: b+'profile/support', icon: '<path d="M12 4a7 7 0 00-7 7v3.5A1.5 1.5 0 006.5 16H8v-5.5H5.3"/><path d="M12 4a7 7 0 017 7v3.5a1.5 1.5 0 01-1.5 1.5H16v-5.5h2.7"/><path d="M8 16.5v1A2.5 2.5 0 0010.5 20H12"/>', label: 'Поддержка', badgeKey: 'support' },
     { sep: true },
-    { href: b+'profile/settings', icon: '<circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>', label: 'Настройки' },
+    { href: b+'profile/settings', icon: '<path d="M12 4.5v2.3M12 17.2v2.3M19.5 12h-2.3M6.8 12H4.5M17.2 6.8l-1.6 1.6M8.4 15.6l-1.6 1.6M17.2 17.2l-1.6-1.6M8.4 8.4L6.8 6.8"/><circle cx="12" cy="12" r="3.4"/>', label: 'Настройки' },
     { logout: true },
   ];
 
@@ -226,7 +257,7 @@
     return DD_ITEMS.map(item => {
       if (item.section) return `<div class="an-dd-section">${item.section}</div>`;
       if (item.sep)     return `<div class="an-dd-sep"></div>`;
-      if (item.logout)  return `<button class="an-dd-item red" id="anSignOut"><span class="an-dd-ico"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg></span>Выйти</button>`;
+      if (item.logout)  return `<button class="an-dd-item red" id="anSignOut"><span class="an-dd-ico"><svg viewBox="0 0 24 24"><path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/></svg></span>Выйти</button>`;
       const badgeSlot = item.badgeKey ? `<span class="an-dd-badge" id="anBadge-${item.badgeKey}" style="display:none"></span>` : '';
       return `<a href="${item.href}" class="an-dd-item"><span class="an-dd-ico"><svg viewBox="0 0 24 24">${item.icon}</svg></span>${item.label}${badgeSlot}</a>`;
     }).join('');
@@ -255,7 +286,9 @@
 
     <div class="an-user" id="anUser">
       <a href="${b}auth" class="an-user-btn guest" id="anUserBtn" aria-expanded="false">
-        <div class="an-avatar" id="anAvatar">?<span class="an-notify-dot" id="anNotifyDot"></span></div>
+        <div class="an-avatar-ring" id="anAvatarRing">
+          <div class="an-avatar" id="anAvatar">?</div>
+        </div>
         <span class="an-uname" id="anUname">Войти</span>
         <svg class="an-chevron" viewBox="0 0 12 12" fill="none">
           <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
@@ -315,13 +348,13 @@
     el.style.display = 'flex';
   }
   function refreshNotifyDot() {
-    const dot = document.getElementById('anNotifyDot');
-    if (!dot) return;
+    const ring = document.getElementById('anAvatarRing');
+    if (!ring) return;
     const any = ['support','tickets'].some(k => {
       const el = document.getElementById(`anBadge-${k}`);
       return el && el.style.display !== 'none';
     });
-    dot.classList.toggle('show', any);
+    ring.classList.toggle('notify', any);
   }
 
   let unsubSupport = null;
@@ -353,9 +386,9 @@
     const initial = name[0].toUpperCase();
     if (unameEl) unameEl.textContent = name;
     if (avatarEl) {
-      avatarEl.innerHTML = (user.photoURL
+      avatarEl.innerHTML = user.photoURL
         ? `<img src="${user.photoURL}" alt="">`
-        : initial) + '<span class="an-notify-dot" id="anNotifyDot"></span>';
+        : initial;
     }
     if (ddHead) ddHead.style.display = 'flex';
     if (ddHeadAv) ddHeadAv.innerHTML = user.photoURL ? `<img src="${user.photoURL}" alt="">` : initial;
@@ -367,13 +400,15 @@
     const ctaEl    = document.getElementById('anCta');
     const unameEl  = document.getElementById('anUname');
     const avatarEl = document.getElementById('anAvatar');
+    const avatarRing = document.getElementById('anAvatarRing');
     const ddHead   = document.getElementById('anDdHead');
 
     isAuthed = false;
     userBtn.classList.add('guest');
     userBtn.setAttribute('href', `${b}auth`);
     if (unameEl) unameEl.textContent = 'Войти';
-    if (avatarEl) avatarEl.innerHTML = '?<span class="an-notify-dot" id="anNotifyDot"></span>';
+    if (avatarEl) avatarEl.innerHTML = '?';
+    avatarRing?.classList.remove('notify');
     if (ddHead) ddHead.style.display = 'none';
     if (!cfg.hideCta) ctaEl?.classList.add('show');
     ['support','orders','tickets'].forEach(k => setBadge(k, 0, null));

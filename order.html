@@ -308,7 +308,7 @@ button{font-family:inherit}
               <div class="ov-tier-feat">1 бесплатная правка после запуска</div>
             </div>
           </div>
-          <div class="ov-tier" data-tier="growth">
+          <div class="ov-tier sel" data-tier="growth">
             <div class="ov-tier-tag">Чаще выбирают</div>
             <div class="ov-tier-name">Рост</div>
             <div class="ov-tier-price">9 900<span>₽</span></div>
@@ -756,13 +756,14 @@ function calcAmounts(){
   const rows = [{ label: t.name, sub: t.meta, amount: t.base }];
   let running = t.base;
 
+  // Домен показываем ТОЛЬКО если он включен
   if(state.extras.domain && state.extras.domainOpt==='new'){
     running += 650; rows.push({ label:'Домен на 1 год', amount:650 });
-  } else if(state.extras.domainOpt==='own'){
+  } else if(state.extras.domain && state.extras.domainOpt==='own'){
     rows.push({ label:'Подключение своего домена', amount:0, free:true });
-  } else {
-    rows.push({ label:'Домен', amount:0, free:true });
   }
+  // Если домен выключен — ничего не показываем
+
   if(state.extras.support){ running += 500; rows.push({ label:'Обслуживание (первый месяц)', amount:500 }); }
   if(state.extras.content){ running += 2000; rows.push({ label:'Наполнение контентом', amount:2000 }); }
   if(state.extras.shop){ running += 4900; rows.push({ label:'Каталог и корзина', amount:4900 }); }

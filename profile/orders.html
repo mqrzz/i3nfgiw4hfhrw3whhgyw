@@ -6,277 +6,220 @@
   <title>Мои заказы — Antviz</title>
   <link rel="icon" href="../img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:       #0c0c0e;
-      --bg2:      #111114;
-      --bg3:      #161619;
-      --card:     #131316;
-      --border:   rgba(255,255,255,0.06);
-      --border-hi:rgba(255,255,255,0.11);
-      --accent:   #6c63ff;
-      --accent2:  #a78bfa;
-      --accent3:  #38bdf8;
-      --text:     #ededf2;
-      --muted:    #6b6b80;
-      --muted2:   #8f8fa3;
-      --success:  #4ade80;
-      --error:    #f87171;
-      --warn:     #fbbf24;
-      --nav-h:    64px;
+      --bg:#0a0a0c; --surface:#111114; --surface-2:#15151a; --surface-3:#1a1a21;
+      --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
+      --ink:#f2f2f6; --ink-dim:rgba(255,255,255,.46); --ink-faint:rgba(255,255,255,.26);
+      --accent:#7D32FF; --accent-soft:#a78bfa; --accent-wash:rgba(125,50,255,.12);
+      --good:#34d399; --good-wash:rgba(52,211,153,.12);
+      --warn:#fbbf24; --warn-wash:rgba(251,191,36,.1);
+      --bad:#f87171; --bad-wash:rgba(248,113,113,.1);
+      --info:#60a5fa; --info-wash:rgba(96,165,250,.12);
+      --r-xs:6px; --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:40px;
+      --nav-h:64px;
     }
-    html { scroll-behavior: smooth; }
-    body {
-      background: var(--bg); color: var(--text);
-      font-family: 'Inter', sans-serif; font-weight: 400;
-      line-height: 1.6; min-height: 100vh; font-size: 14px;
-      -webkit-font-smoothing: antialiased;
-    }
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--ink);font-family:'Onest',sans-serif;font-weight:300;line-height:1.6;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased}
+    @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+    :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
 
-    @keyframes spin   { to { transform: rotate(360deg); } }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes cFall  { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes cFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+    @keyframes rowIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
-    .loading-screen {
-      position: fixed; inset: 0; z-index: 999; background: var(--bg);
-      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px;
-    }
-    .spinner { width: 22px; height: 22px; border: 1.5px solid var(--border-hi); border-top-color: var(--accent); border-radius: 50%; animation: spin .65s linear infinite; }
-    .loading-text { color: var(--muted); font-size: 12px; }
+    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+    .spinner{width:22px;height:22px;border:1.5px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+    .loading-text{color:var(--ink-faint);font-size:12px}
 
-    /* Mobile top bar */
-    .mobile-top-bar {
-      display: none; position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
-      z-index: 200; height: 42px;
-      background: var(--bg2); border: 1px solid var(--border-hi);
-      border-radius: 8px;
-      align-items: center; padding: 0 12px; gap: 8px;
-      width: auto; min-width: 200px; max-width: calc(100% - 28px);
-    }
-    .mobile-top-bar a { display: flex; align-items: center; gap: 4px; color: var(--muted); text-decoration: none; font-size: 13px; transition: color .15s; flex-shrink: 0; }
-    .mobile-top-bar a:hover { color: var(--text); }
-    .mobile-top-bar a svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; }
-    .mtb-title { font-size: 13px; font-weight: 600; white-space: nowrap; flex: 1; text-align: center; }
-    @media (max-width: 768px) {
-      .mobile-top-bar { display: flex !important; }
-      .page-wrap { padding-top: calc(42px + 20px) !important; }
+    .confetti-wrap{position:fixed;inset:0;z-index:1000;pointer-events:none;overflow:hidden}
+    .c-piece{position:absolute;top:-10px;border-radius:2px;animation:cFall linear forwards}
+
+    /* MOBILE TOP BAR */
+    .mobile-top-bar{display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;height:44px;background:var(--surface);border:1px solid var(--line-strong);border-radius:99px;align-items:center;padding:0 16px;gap:8px;min-width:200px;max-width:calc(100% - 28px)}
+    .mobile-top-bar a{display:flex;align-items:center;gap:5px;color:var(--ink-faint);text-decoration:none;font-size:13px;transition:color .15s;flex-shrink:0}
+    .mobile-top-bar a:hover{color:var(--ink)}
+    .mobile-top-bar a svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+    .mtb-title{font-family:'Unbounded',sans-serif;font-size:12.5px;font-weight:600;white-space:nowrap;flex:1;text-align:center}
+    @media (max-width:840px){
+      .mobile-top-bar{display:flex!important}
+      .ord-shell{padding-top:calc(44px + 28px)!important}
+      .ord-back{display:none}
     }
 
-    /* PAGE */
-    .page-wrap {
-      max-width: 640px; margin: 0 auto;
-      padding: calc(var(--nav-h) + 32px) 16px 80px;
-      animation: fadeUp .25s ease;
-    }
+    /* SHELL */
+    .ord-shell{max-width:1100px;margin:0 auto;padding:104px 40px 120px;animation:fadeUp .25s ease}
+    .ord-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-faint);font-size:.82rem;text-decoration:none;margin-bottom:28px;transition:color .15s}
+    .ord-back:hover{color:var(--ink)}
+    .ord-back svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
 
-    .page-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px; flex-wrap: wrap; gap: 10px;
-    }
-    .page-header-left { display: flex; align-items: center; gap: 12px; }
-    .back-btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      color: var(--muted); font-size: 13px;
-      background: none; border: none; cursor: pointer; padding: 0;
-      font-family: 'Inter', sans-serif; transition: color .15s; text-decoration: none;
-    }
-    .back-btn:hover { color: var(--text); }
-    .back-btn svg { width: 15px; height: 15px; stroke: currentColor; stroke-width: 2; fill: none; flex-shrink: 0; }
-    .page-title { font-size: 18px; font-weight: 600; letter-spacing: -.02em; }
+    .ord-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:36px}
+    .ord-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.025em;margin-bottom:8px}
+    .ord-sub{color:var(--ink-dim);font-size:.92rem}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.7rem 1.3rem;border-radius:var(--r-md);font-family:'Onest',sans-serif;font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s;white-space:nowrap}
+    .btn svg{width:13px;height:13px}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:#8f4eff}
+    .btn-ghost{background:transparent;border:1px solid var(--line-strong);color:var(--ink-dim)}
+    .btn-ghost:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
+    .btn-success{background:var(--good-wash);color:var(--good);border:1px solid rgba(52,211,153,.22)}
+    .btn-success:hover{background:rgba(52,211,153,.18)}
+    .btn-warn{background:var(--warn-wash);color:var(--warn);border:1px solid rgba(251,191,36,.22)}
+    .btn-warn:hover{background:rgba(251,191,36,.16)}
+    .btn-xs{padding:.36rem .7rem;font-size:.72rem}
+    .btn-sm{padding:.55rem 1rem;font-size:.78rem}
 
-    /* ORDERS */
-    .orders-list { display: flex; flex-direction: column; gap: 8px; }
-    .order-card  { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: border-color .15s; }
-    .order-card:hover { border-color: var(--border-hi); }
-    .order-card-head { padding: 14px 16px; cursor: pointer; display: flex; flex-direction: column; gap: 8px; }
-    .oc-top    { display: flex; align-items: center; gap: 8px; }
-    .oc-num    { font-size: 11px; font-weight: 600; color: var(--muted2); letter-spacing: .05em; }
-    .oc-meta   { color: var(--muted); font-size: 12px; }
-    .oc-price  { font-size: 13px; font-weight: 600; margin-left: auto; color: var(--text); }
-    .oc-status-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    /* TOOLBAR: summary + filters */
+    .ord-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+    .ord-tabs{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px}
+    .ord-tab{border:none;background:transparent;color:var(--ink-faint);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:.45rem .9rem;border-radius:99px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+    .ord-tab:hover{color:var(--ink)}
+    .ord-tab.is-active{background:var(--accent-wash);color:var(--accent-soft)}
+    .ord-count{color:var(--ink-faint);font-size:.78rem}
 
-    .pay-pill    { display: inline-flex; align-items: center; gap: 3px; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; flex-shrink: 0; }
-    .pay-yes     { background: rgba(74,222,128,.08);  color: var(--success); border: 1px solid rgba(74,222,128,.2); }
-    .pay-no      { background: rgba(248,113,113,.08); color: var(--error);   border: 1px solid rgba(248,113,113,.2); }
-    .status-pill { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 4px; font-size: 11px; font-weight: 500; flex-shrink: 0; }
-    .sp-dot      { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .s0 { background: rgba(102,102,120,.1);  color: var(--muted2); border: 1px solid rgba(102,102,120,.18); }
-    .s1 { background: rgba(251,191,36,.08);  color: var(--warn);   border: 1px solid rgba(251,191,36,.18); }
-    .s2 { background: rgba(56,189,248,.08);  color: var(--accent3);border: 1px solid rgba(56,189,248,.18); }
-    .s3 { background: rgba(167,139,250,.08); color: var(--accent2);border: 1px solid rgba(167,139,250,.18); }
-    .s4 { background: rgba(251,191,36,.08);  color: var(--warn);   border: 1px solid rgba(251,191,36,.18); }
-    .s5 { background: rgba(74,222,128,.08);  color: var(--success);border: 1px solid rgba(74,222,128,.18); }
+    /* TABLE-STYLE LIST */
+    .ord-cols{display:grid;grid-template-columns:1fr 130px 120px 110px 22px;gap:16px;padding:0 20px 10px;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+    .ord-list{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+    .ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
+    .ord-row-wrap:last-child{border-bottom:none}
+    .ord-row-wrap.is-filtered{display:none}
+    .ord-row{all:unset;display:grid;grid-template-columns:1fr 130px 120px 110px 22px;gap:16px;align-items:center;width:100%;padding:18px 20px;cursor:pointer;transition:background .15s;font-family:'Onest',sans-serif}
+    .ord-row:hover{background:var(--surface)}
+    .ord-cell-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+    .ord-num{font-size:.92rem;font-weight:500;color:var(--ink)}
+    .ord-meta{font-size:.78rem;color:var(--ink-faint)}
+    .ord-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:500;padding:.3rem .65rem;border-radius:var(--r-xs);width:fit-content}
+    .ord-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .ord-tag.s0{background:var(--surface-3);color:var(--ink-faint)}
+    .ord-tag.s1{background:var(--warn-wash);color:var(--warn)}
+    .ord-tag.s2{background:var(--info-wash);color:var(--info)}
+    .ord-tag.s3{background:var(--accent-wash);color:var(--accent-soft)}
+    .ord-tag.s4{background:var(--warn-wash);color:var(--warn)}
+    .ord-tag.s5{background:var(--good-wash);color:var(--good)}
+    .ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:500}
+    .ord-pay.is-paid{color:var(--good)}
+    .ord-pay.is-unpaid{color:var(--bad)}
+    .ord-pay svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.4;fill:none}
+    .ord-price{font-size:.92rem;font-weight:500;text-align:right}
+    .ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
+    .ord-row-wrap:has(.ord-body.open) .ord-chevron{transform:rotate(180deg)}
 
-    .status-comment {
-      background: rgba(108,99,255,.05); border: 1px solid rgba(108,99,255,.12);
-      border-radius: 8px; padding: 8px 12px; font-size: 12.5px;
-      color: var(--accent2); line-height: 1.5;
-      display: flex; align-items: flex-start; gap: 7px;
-    }
-    .status-comment svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; flex-shrink: 0; margin-top: 2px; fill: none; }
+    .ord-comment{display:flex;align-items:flex-start;gap:7px;margin:0 20px 16px;padding:10px 13px;background:var(--accent-wash);border-radius:var(--r-sm);font-size:.8rem;color:var(--accent-soft);line-height:1.55}
+    .ord-comment svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none}
 
-    .order-expand { display: none; border-top: 1px solid var(--border); padding: 14px 16px; }
-    .order-expand.open { display: block; }
+    .ord-body{display:none;border-top:1px solid var(--line);padding:24px 20px 26px;background:var(--surface)}
+    .ord-body.open{display:block;animation:fadeUp .2s ease}
 
     /* TRACKER */
-    .tracker-wrap { margin-bottom: 14px; }
-    .tracker-row  { display: flex; align-items: flex-start; gap: 0; }
-    .tr-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; min-width: 44px; position: relative; }
-    .tr-step:not(:last-child)::after {
-      content: ''; position: absolute; top: 16px;
-      left: calc(50% + 17px); right: calc(-50% + 17px);
-      height: 1px; background: var(--border); z-index: 0; transition: background .3s;
-    }
-    .tr-step.done:not(:last-child)::after    { background: var(--accent); }
-    .tr-step.current:not(:last-child)::after { background: linear-gradient(to right, var(--accent), var(--border)); }
-    .tr-ico {
-      width: 32px; height: 32px; border-radius: 50%;
-      border: 1px solid var(--border); background: var(--bg3);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 1; position: relative; transition: all .25s; flex-shrink: 0;
-    }
-    .tr-ico svg { width: 13px; height: 13px; stroke: var(--muted); stroke-width: 1.8; fill: none; transition: stroke .25s; }
-    .tr-step.done .tr-ico    { border-color: var(--accent); background: rgba(108,99,255,.12); }
-    .tr-step.done .tr-ico svg { stroke: var(--accent2); }
-    .tr-step.done .tr-ico .check-icon { display: block; }
-    .tr-step.done .tr-ico .step-icon  { display: none; }
-    .check-icon { display: none; }
-    .tr-step.current .tr-ico { border-color: var(--accent2); background: rgba(167,139,250,.14); box-shadow: 0 0 0 3px rgba(108,99,255,.1); }
-    .tr-step.current .tr-ico svg { stroke: var(--accent2); }
-    .tr-step.pending .tr-ico { opacity: .3; }
-    .tr-lbl { font-size: 10px; color: var(--muted); text-align: center; line-height: 1.3; max-width: 52px; }
-    .tr-step.done .tr-lbl    { color: var(--muted2); }
-    .tr-step.current .tr-lbl { color: var(--text); font-weight: 500; }
+    .trk{margin-bottom:18px}
+    .trk-row{display:flex;align-items:flex-start;gap:0}
+    .trk-step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:44px;position:relative}
+    .trk-step:not(:last-child)::after{content:'';position:absolute;top:15px;left:calc(50% + 16px);right:calc(-50% + 16px);height:1px;background:var(--line);z-index:0;transition:background .3s}
+    .trk-step.done:not(:last-child)::after{background:var(--accent)}
+    .trk-step.current:not(:last-child)::after{background:linear-gradient(to right,var(--accent),var(--line))}
+    .trk-ico{width:30px;height:30px;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface-2);display:flex;align-items:center;justify-content:center;z-index:1;position:relative;transition:all .25s;flex-shrink:0}
+    .trk-ico svg{width:13px;height:13px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;transition:stroke .25s}
+    .trk-step.done .trk-ico{border-color:var(--accent);background:var(--accent-wash)}
+    .trk-step.done .trk-ico svg{stroke:var(--accent-soft)}
+    .trk-step.done .trk-ico .check-icon{display:block}
+    .trk-step.done .trk-ico .step-icon{display:none}
+    .check-icon{display:none}
+    .trk-step.current .trk-ico{border-color:var(--accent-soft);background:var(--accent-wash);box-shadow:0 0 0 3px var(--accent-wash)}
+    .trk-step.current .trk-ico svg{stroke:var(--accent-soft)}
+    .trk-step.pending .trk-ico{opacity:.35}
+    .trk-lbl{font-size:.66rem;color:var(--ink-faint);text-align:center;line-height:1.3;max-width:56px}
+    .trk-step.done .trk-lbl{color:var(--ink-dim)}
+    .trk-step.current .trk-lbl{color:var(--ink);font-weight:500}
+    .trk-info{margin-top:14px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);display:flex;align-items:flex-start;gap:11px}
+    .trk-info-ico{width:30px;height:30px;border-radius:var(--r-xs);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .trk-info-ico svg{width:14px;height:14px;stroke-width:1.8}
+    .trk-info-title{font-size:.86rem;font-weight:500;margin-bottom:2px}
+    .trk-info-sub{font-size:.78rem;color:var(--ink-faint);line-height:1.5}
 
-    .tracker-info {
-      margin-top: 10px; padding: 10px 12px;
-      background: var(--bg3); border: 1px solid var(--border); border-radius: 9px;
-      display: flex; align-items: flex-start; gap: 10px;
-    }
-    .tracker-info-ico { width: 30px; height: 30px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .tracker-info-ico svg { width: 14px; height: 14px; stroke-width: 1.8; }
-    .tr-info-title { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
-    .tr-info-sub   { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    /* SUBSTEPS */
+    .sub-list{display:flex;flex-direction:column;gap:5px;margin:14px 0;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm)}
+    .sub-item{display:flex;align-items:center;gap:9px;font-size:.8rem}
+    .sub-ico{width:16px;height:16px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sub-ico svg{width:8px;height:8px;stroke:var(--ink-faint);stroke-width:2.5;fill:none}
+    .sub-item.done .sub-ico{border-color:var(--good);background:var(--good-wash)}
+    .sub-item.done .sub-ico svg{stroke:var(--good)}
+    .sub-lbl{flex:1;color:var(--ink-faint)}
+    .sub-item.done .sub-lbl{color:var(--ink)}
+    .sub-date{font-size:.72rem;color:var(--ink-faint);white-space:nowrap}
 
-    /* Substeps */
-    .substeps { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; padding: 10px 12px; background: var(--bg3); border: 1px solid var(--border); border-radius: 9px; }
-    .substep  { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
-    .substep-ico { width: 16px; height: 16px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .substep-ico svg { width: 8px; height: 8px; stroke: var(--muted); stroke-width: 2.5; fill: none; }
-    .substep.done .substep-ico { border-color: var(--success); background: rgba(74,222,128,.08); }
-    .substep.done .substep-ico svg { stroke: var(--success); }
-    .substep-lbl  { flex: 1; color: var(--muted); }
-    .substep.done .substep-lbl { color: var(--text); }
-    .substep-date { font-size: 11px; color: var(--muted); white-space: nowrap; }
+    /* DELIVERY CARD (also reused inside the delivery modal) */
+    .delivery-card{background:var(--good-wash);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-sm);padding:16px;margin-bottom:14px}
+    .delivery-card h4{font-size:.72rem;font-weight:600;color:var(--good);margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:.04em;text-transform:uppercase}
+    .delivery-card h4 svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
+    .site-domain-big{font-size:1rem;font-weight:600;margin-bottom:4px;letter-spacing:-.01em}
+    .site-favicon{width:24px;height:24px;border-radius:5px;object-fit:contain;background:var(--surface-2);border:1px solid var(--line);margin-bottom:8px}
+    .site-pages-list{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
+    .site-page-item{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-dim)}
+    .site-page-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--good);flex-shrink:0}
 
-    /* Delivery card */
-    .site-delivery-card {
-      background: rgba(74,222,128,.04); border: 1px solid rgba(74,222,128,.16);
-      border-radius: 10px; padding: 14px; margin-bottom: 10px;
-    }
-    .site-delivery-card h4 {
-      font-size: 12px; font-weight: 600; color: var(--success); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 6px; letter-spacing: .02em; text-transform: uppercase;
-    }
-    .site-delivery-card h4 svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 1.8; fill: none; }
-    .site-domain-big { font-size: 15px; font-weight: 600; margin-bottom: 4px; letter-spacing: -.01em; }
-    .site-favicon    { width: 24px; height: 24px; border-radius: 5px; object-fit: contain; background: var(--bg3); border: 1px solid var(--border); margin-bottom: 8px; }
-    .site-pages-list { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; }
-    .site-page-item  { display: flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted2); }
-    .site-page-item::before { content: ''; width: 4px; height: 4px; border-radius: 50%; background: var(--success); flex-shrink: 0; }
-
-    .delivery-row {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(56,189,248,.05); border: 1px solid rgba(56,189,248,.12);
-      border-radius: 8px; padding: 7px 10px; font-size: 12.5px; color: var(--accent3); margin-bottom: 10px;
-    }
-    .delivery-row svg { width: 12px; height: 12px; stroke: currentColor; stroke-width: 1.8; fill: none; flex-shrink: 0; }
-    .order-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ord-eta{display:flex;align-items:center;gap:7px;background:var(--info-wash);border-radius:var(--r-sm);padding:9px 13px;font-size:.8rem;color:var(--info);margin-bottom:14px}
+    .ord-eta svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+    .ord-actions{display:flex;gap:8px;flex-wrap:wrap}
 
     /* EMPTY */
-    .empty { text-align: center; padding: 48px 16px; color: var(--muted); }
-    .empty-icon { margin-bottom: 14px; display: flex; justify-content: center; }
-    .empty-icon svg { width: 40px; height: 40px; stroke: var(--muted); stroke-width: 1.2; fill: none; opacity: .4; }
-    .empty h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
-    .empty p  { font-size: 13px; margin-bottom: 18px; }
-
-    /* BUTTONS */
-    .btn {
-      display: inline-flex; align-items: center; gap: 5px;
-      padding: 9px 18px; border-radius: 8px;
-      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
-      text-decoration: none; cursor: pointer; border: none;
-      transition: background .15s, opacity .15s;
-    }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: #7c74ff; }
-    .btn-ghost   { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-    .btn-ghost:hover { border-color: var(--border-hi); color: var(--text); }
-    .btn-danger  { background: rgba(248,113,113,.07); color: var(--error); border: 1px solid rgba(248,113,113,.16); }
-    .btn-danger:hover { background: rgba(248,113,113,.13); }
-    .btn-success { background: rgba(74,222,128,.08); color: var(--success); border: 1px solid rgba(74,222,128,.18); }
-    .btn-xs { padding: 4px 10px; font-size: 11.5px; }
-    .btn-sm { padding: 6px 13px; font-size: 12px; }
+    .empty{text-align:center;padding:64px 16px;color:var(--ink-faint)}
+    .empty-icon{margin-bottom:16px;display:flex;justify-content:center}
+    .empty-icon svg{width:42px;height:42px;stroke:var(--ink-faint);stroke-width:1.2;fill:none;opacity:.5}
+    .empty h3{font-family:'Unbounded',sans-serif;font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .empty p{font-size:.86rem;margin-bottom:20px}
 
     /* TOAST */
-    .toast {
-      position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%) translateY(10px);
-      z-index: 700; padding: 7px 16px; border-radius: 7px; font-size: 12px; font-weight: 500;
-      opacity: 0; transition: opacity .22s, transform .22s; pointer-events: none; white-space: nowrap;
-    }
-    .toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.success { background: rgba(74,222,128,.12);  border: 1px solid rgba(74,222,128,.3);  color: var(--success); }
-    .toast.error   { background: rgba(248,113,113,.12); border: 1px solid rgba(248,113,113,.3); color: var(--error); }
-    .toast.info    { background: rgba(108,99,255,.12);  border: 1px solid rgba(108,99,255,.3);  color: var(--accent2); }
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.6rem 1.3rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.success{background:var(--good);color:#04140e}
+    .toast.error{background:var(--bad);color:#1a0606}
+    .toast.info{background:var(--accent);color:#fff}
 
     /* MODAL */
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 800; background: rgba(0,0,0,.65);
-      display: flex; align-items: center; justify-content: center; padding: 16px;
-      opacity: 0; pointer-events: none; transition: opacity .22s;
-    }
-    .modal-overlay.show { opacity: 1; pointer-events: all; }
-    .modal {
-      background: var(--bg2); border: 1px solid var(--border-hi);
-      border-radius: 14px; padding: 24px 20px; width: 100%; max-width: 420px;
-      transform: scale(.96); transition: transform .22s;
-    }
-    .modal-overlay.show .modal { transform: scale(1); }
-    .modal-icon { font-size: 26px; margin-bottom: 10px; text-align: center; }
-    .modal h3   { font-size: 15px; font-weight: 600; margin-bottom: 6px; text-align: center; }
-    .modal-p    { color: var(--muted); font-size: 13px; text-align: center; margin-bottom: 16px; line-height: 1.55; }
-    .modal-btns { display: flex; gap: 8px; }
-    .modal-btns .btn { flex: 1; justify-content: center; }
+    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.show{opacity:1;pointer-events:all}
+    .modal{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-xl);padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .2s}
+    .modal-overlay.show .modal{transform:translateY(0) scale(1)}
+    .modal-icon-wrap{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .modal-icon-wrap svg{width:22px;height:22px;stroke-width:1.7;fill:none}
+    .modal h3{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:600;margin-bottom:8px;text-align:center}
+    .modal-p{color:var(--ink-dim);font-size:.86rem;text-align:center;margin-bottom:20px;line-height:1.6}
+    .modal-btns{display:flex;gap:10px}
+    .modal-btns .btn{flex:1;justify-content:center}
+    .stars-row{display:flex;justify-content:center;gap:6px;margin-bottom:16px}
+    .star{width:30px;height:30px;cursor:pointer;color:var(--line-strong);transition:color .14s,transform .12s}
+    .star svg{width:100%;height:100%;fill:currentColor}
+    .star.on{color:var(--warn)}
+    .star:hover{transform:scale(1.12)}
+    .review-textarea{width:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.7rem .85rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.88rem;outline:none;resize:vertical;min-height:84px;margin-bottom:16px;transition:border-color .18s}
+    .review-textarea:focus{border-color:var(--accent)}
+    .review-textarea::placeholder{color:var(--ink-faint)}
 
-    .stars-row { display: flex; justify-content: center; gap: 4px; margin-bottom: 14px; }
-    .star { font-size: 28px; cursor: pointer; filter: grayscale(1) opacity(.3); transition: filter .14s, transform .12s; }
-    .star.on { filter: none; }
-    .star:hover { transform: scale(1.12); }
-    .review-textarea {
-      width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 8px;
-      padding: 9px 12px; color: var(--text);
-      font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 400;
-      outline: none; resize: vertical; min-height: 80px; margin-bottom: 14px;
-      transition: border-color .18s;
-    }
-    .review-textarea:focus { border-color: rgba(108,99,255,.4); }
+    /* BANNER */
+    .ord-banner{position:fixed;top:78px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:300;background:var(--surface);border:1px solid var(--line-strong);border-radius:99px;padding:.55rem 1rem .55rem .8rem;display:flex;align-items:center;gap:10px;font-size:.84rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap}
+    .ord-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
+    #bannerIcon:empty::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent-soft);display:inline-block}
+    .ord-banner-close{background:none;border:none;color:var(--ink-faint);cursor:pointer;padding:0;display:flex}
+    .ord-banner-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* Confetti */
-    .confetti-wrap { position: fixed; inset: 0; z-index: 1000; pointer-events: none; overflow: hidden; }
-    .c-piece       { position: absolute; top: -10px; border-radius: 2px; animation: cFall linear forwards; }
-
-    /* Banner */
-    .status-banner {
-      position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(-8px); z-index: 300;
-      background: var(--card); border: 1px solid var(--border-hi); border-radius: 8px;
-      padding: 8px 16px 8px 12px;
-      display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500;
-      opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; white-space: nowrap;
+    @media (max-width:840px){
+      .ord-shell{padding-left:20px;padding-right:20px}
+      .ord-cols{display:none}
+      .ord-row,.ord-row-wrap .ord-row{grid-template-columns:1fr;gap:8px}
+      .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
+      .ord-row{position:relative}
+      .ord-chevron{position:absolute;top:18px;right:20px}
+      .ord-row-wrap .ord-row{padding-right:44px}
+      .ord-tags-mobile{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
     }
-    .status-banner.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: all; }
-    .banner-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; padding: 0; }
+    @media (max-width:480px){
+      .ord-head{flex-direction:column;align-items:flex-start}
+      .ord-toolbar{flex-direction:column;align-items:flex-start}
+      .ord-tabs{overflow-x:auto;max-width:100%}
+    }
   </style>
 </head>
 <body>
@@ -289,26 +232,30 @@
 
 <div class="confetti-wrap" id="confettiWrap"></div>
 
-<div class="status-banner" id="statusBanner">
+<div class="ord-banner" id="statusBanner">
   <span id="bannerIcon"></span>
   <span id="bannerText">Статус заказа изменился</span>
-  <button class="banner-close" onclick="closeBanner()">✕</button>
+  <button class="ord-banner-close" onclick="closeBanner()">
+    <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
 </div>
 
 <!-- REVIEW MODAL -->
 <div class="modal-overlay" id="reviewModal">
   <div class="modal">
-    <div class="modal-icon">⭐</div>
-    <h3>Оставить отзыв</h3>
-    <p class="modal-p">Расскажите как прошла работа</p>
-    <div class="stars-row">
-      <span class="star" data-v="1" onclick="setStar(1)">★</span>
-      <span class="star" data-v="2" onclick="setStar(2)">★</span>
-      <span class="star" data-v="3" onclick="setStar(3)">★</span>
-      <span class="star" data-v="4" onclick="setStar(4)">★</span>
-      <span class="star" data-v="5" onclick="setStar(5)">★</span>
+    <div class="modal-icon-wrap" style="background:var(--warn-wash)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="1.6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     </div>
-    <textarea class="review-textarea" id="reviewText" placeholder="Напишите пару слов о сотрудничестве..."></textarea>
+    <h3>Оставить отзыв</h3>
+    <p class="modal-p">Расскажите, как прошла работа над проектом</p>
+    <div class="stars-row">
+      <span class="star" data-v="1" onclick="setStar(1)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="2" onclick="setStar(2)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="3" onclick="setStar(3)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="4" onclick="setStar(4)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="5" onclick="setStar(5)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+    </div>
+    <textarea class="review-textarea" id="reviewText" placeholder="Пару слов о сотрудничестве (необязательно)..."></textarea>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeReview()">Позже</button>
       <button class="btn btn-primary" onclick="submitReview()">Отправить</button>
@@ -319,9 +266,11 @@
 <!-- DELIVERY MODAL -->
 <div class="modal-overlay" id="deliveryModal">
   <div class="modal">
-    <div class="modal-icon">🎉</div>
+    <div class="modal-icon-wrap" style="background:var(--good-wash)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="1.7"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    </div>
     <h3>Ваш сайт готов!</h3>
-    <p class="modal-p">Работа завершена — посмотрите результат</p>
+    <p class="modal-p">Работа завершена — можно посмотреть результат</p>
     <div id="deliveryModalContent"></div>
     <div class="modal-btns">
       <button class="btn btn-ghost" onclick="closeDelivery()">Закрыть</button>
@@ -330,35 +279,46 @@
   </div>
 </div>
 
-<!-- Mobile top bar -->
 <div class="mobile-top-bar">
-  <a href="../profile">
-    <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
-    Кабинет
-  </a>
+  <a href="../profile"><svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Кабинет</a>
   <span style="flex:1"></span>
   <span class="mtb-title">Мои заказы</span>
   <span style="flex:1"></span>
 </div>
 
-<div class="page-wrap" id="appWrap" style="display:none">
+<div class="ord-shell" id="appWrap" style="display:none">
 
-  <div class="page-header">
-    <div class="page-header-left">
-      <a href="../profile" class="back-btn">
-        <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
-        Назад
-      </a>
-      <div class="page-title">Мои заказы</div>
+  <a href="../profile" class="ord-back">
+    <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>В личный кабинет
+  </a>
+
+  <div class="ord-head">
+    <div>
+      <div class="ord-title">Заказы</div>
+      <div class="ord-sub">Статусы, документы и история работ по вашим сайтам</div>
     </div>
-    <a href="../order" class="btn btn-primary btn-sm">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:12px;height:12px;stroke-width:2.5"><path d="M12 5v14M5 12h14"/></svg>
+    <a href="../order" class="btn btn-primary">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
       Новый заказ
     </a>
   </div>
 
-  <div class="orders-list" id="ordersList">
-    <p style="color:var(--muted);font-size:13px">Загрузка...</p>
+  <div class="ord-toolbar">
+    <div class="ord-tabs" id="ordTabs">
+      <button class="ord-tab is-active" data-filter="all">Все</button>
+      <button class="ord-tab" data-filter="active">Активные</button>
+      <button class="ord-tab" data-filter="done">Завершено</button>
+      <button class="ord-tab" data-filter="unpaid">Не оплачены</button>
+    </div>
+    <span class="ord-count" id="ordCount"></span>
+  </div>
+
+  <div class="ord-cols">
+    <span>Заказ</span><span>Статус</span><span>Оплата</span><span>Сумма</span><span></span>
+  </div>
+
+  <div class="ord-list" id="ordersList">
+    <div style="padding:20px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
   </div>
 
 </div>
@@ -389,8 +349,8 @@ const INFO_ICONS = [
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
 ];
-const INFO_COLORS = ['rgba(102,102,120,.12)','rgba(251,191,36,.1)','rgba(56,189,248,.1)','rgba(167,139,250,.1)','rgba(251,191,36,.1)','rgba(74,222,128,.1)'];
-const INFO_STROKE = ['var(--muted2)','var(--warn)','var(--accent3)','var(--accent2)','var(--warn)','var(--success)'];
+const INFO_COLORS = ['var(--surface-3)','var(--warn-wash)','var(--info-wash)','var(--accent-wash)','var(--warn-wash)','var(--good-wash)'];
+const INFO_STROKE = ['var(--ink-faint)','var(--warn)','var(--info)','var(--accent-soft)','var(--warn)','var(--good)'];
 const CHECK_SVG = `<svg class="check-icon" viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>`;
 
 let currentUser = null, unsubOrders = null, unsubChat = null;
@@ -409,18 +369,18 @@ function buildTracker(o){
   const stepLabels = ['Заявка','Обсуждение','В работе','Проверка','Правки','Готово'];
   const steps = stepLabels.map((label, i) => {
     const state = i < s ? 'done' : i === s ? 'current' : 'pending';
-    return `<div class="tr-step ${state}">
-      <div class="tr-ico">${STEP_ICONS[i]}${CHECK_SVG}</div>
-      <div class="tr-lbl">${label}</div>
+    return `<div class="trk-step ${state}">
+      <div class="trk-ico">${STEP_ICONS[i]}${CHECK_SVG}</div>
+      <div class="trk-lbl">${label}</div>
     </div>`;
   }).join('');
-  return `<div class="tracker-wrap">
-    <div class="tracker-row">${steps}</div>
-    <div class="tracker-info">
-      <div class="tracker-info-ico" style="background:${INFO_COLORS[s]};color:${INFO_STROKE[s]}">${INFO_ICONS[s]}</div>
+  return `<div class="trk">
+    <div class="trk-row">${steps}</div>
+    <div class="trk-info">
+      <div class="trk-info-ico" style="background:${INFO_COLORS[s]};color:${INFO_STROKE[s]}">${INFO_ICONS[s]}</div>
       <div>
-        <div class="tr-info-title">${STATUS_LABELS[s]}</div>
-        <div class="tr-info-sub">${STATUS_SUBS[s]}</div>
+        <div class="trk-info-title">${STATUS_LABELS[s]}</div>
+        <div class="trk-info-sub">${STATUS_SUBS[s]}</div>
       </div>
     </div>
   </div>`;
@@ -429,11 +389,11 @@ function buildTracker(o){
 function buildSubsteps(o){
   const ss = o.substeps || [];
   if (!ss.length) return '';
-  return `<div class="substeps">${ss.map(s=>`
-    <div class="substep ${s.done?'done':''}">
-      <div class="substep-ico"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
-      <span class="substep-lbl">${s.label}</span>
-      <span class="substep-date">${s.done&&s.date?s.date:''}</span>
+  return `<div class="sub-list">${ss.map(s=>`
+    <div class="sub-item ${s.done?'done':''}">
+      <div class="sub-ico"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <span class="sub-lbl">${s.label}</span>
+      <span class="sub-date">${s.done&&s.date?s.date:''}</span>
     </div>`).join('')}</div>`;
 }
 
@@ -446,7 +406,7 @@ function orderCard(o){
   if(hasSite){
     const siteHref = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : (o.siteDomain ? 'https://'+o.siteDomain : '#');
     const pages = (o.sitePages||'').split('\n').filter(Boolean);
-    siteBlock = `<div class="site-delivery-card">
+    siteBlock = `<div class="delivery-card">
       <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Ваш сайт</h4>
       ${o.siteFaviconUrl?`<img class="site-favicon" src="${o.siteFaviconUrl}" alt=""/>`:''}
       ${o.siteDomain?`<div class="site-domain-big">${o.siteDomain}</div>`:''}
@@ -456,34 +416,39 @@ function orderCard(o){
   }
 
   const statusComment = o.statusComment
-    ? `<div class="status-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${o.statusComment}</div>`
+    ? `<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${o.statusComment}</div>`
     : '';
 
-  return `<div class="order-card">
-    <div class="order-card-head" onclick="toggleOrder(this)">
-      <div class="oc-top">
-        <span class="oc-num">№ ${o.id.slice(0,8).toUpperCase()}</span>
-        <span class="oc-meta">${o.siteType||'Сайт'} · ${fmtDate(o.createdAt)||'—'}</span>
-        <span class="oc-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span>
+  return `<div class="ord-row-wrap" data-status="${s}" data-paid="${paid?1:0}">
+    <button type="button" class="ord-row" onclick="toggleOrder(this)">
+      <div class="ord-cell-main">
+        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${o.siteType||'Сайт'}</span>
+        <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
+        <div class="ord-tags-mobile">
+          <span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span>
+          <span class="ord-pay ${paid?'is-paid':'is-unpaid'}">${paid?'Оплачен':'Не оплачен'}</span>
+        </div>
       </div>
-      <div class="oc-status-row">
-        <span class="status-pill s${s}"><span class="sp-dot"></span>${STATUS_LABELS[s]}</span>
-        <span class="pay-pill ${paid?'pay-yes':'pay-no'}">${paid?'✓ Оплачен':'✕ Не оплачен'}</span>
-      </div>
-      ${statusComment}
-    </div>
-    <div class="order-expand">
+      <div class="ord-cell-status"><span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span></div>
+      <div class="ord-cell-pay"><span class="ord-pay ${paid?'is-paid':'is-unpaid'}">
+        <svg viewBox="0 0 24 24">${paid?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg>
+        ${paid?'Оплачен':'Не оплачен'}</span></div>
+      <div class="ord-cell-price ord-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div>
+      <svg class="ord-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+    ${statusComment}
+    <div class="ord-body">
       ${buildTracker(o)}
       ${buildSubsteps(o)}
-      ${estDate?`<div class="delivery-row"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--text);margin-left:4px">${estDate}</strong></div>`:''}
+      ${estDate?`<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">${estDate}</strong></div>`:''}
       ${siteBlock}
-      <div class="order-actions">
+      <div class="ord-actions">
         <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();printReceipt(${JSON.stringify(o).replace(/"/g,'&quot;')})">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;stroke-width:2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           Квитанция
         </button>
         ${s>=5&&!o.reviewed?`<button class="btn btn-xs btn-success" onclick="event.stopPropagation();openReview('${o.id}')">★ Отзыв</button>`:''}
-        ${s===3?`<button class="btn btn-xs" style="background:rgba(251,191,36,.08);color:var(--warn);border:1px solid rgba(251,191,36,.18)" onclick="event.stopPropagation();requestRevision('${o.id}')">
+        ${s===3?`<button class="btn btn-xs btn-warn" onclick="event.stopPropagation();requestRevision('${o.id}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;stroke-width:2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           Запросить правки
         </button>`:''}
@@ -492,7 +457,7 @@ function orderCard(o){
   </div>`;
 }
 
-window.toggleOrder = function(el){const exp=el.closest('.order-card').querySelector('.order-expand');if(exp) exp.classList.toggle('open');};
+window.toggleOrder = function(el){const exp=el.closest('.ord-row-wrap').querySelector('.ord-body');if(exp) exp.classList.toggle('open');};
 window.requestRevision = async function(id){try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
 
 function renderOrders(orders){
@@ -500,8 +465,8 @@ function renderOrders(orders){
   if(!orders.length){
     el.innerHTML = `<div class="empty">
       <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
-      <h3>Заказов пока нет</h3>
-      <p>Оформите первый заказ — займёт 2 минуты</p>
+      <h3>Здесь появятся ваши заказы</h3>
+      <p>Оформите первый проект — это займёт пару минут</p>
       <a href="../order" class="btn btn-primary btn-sm">Заказать сайт</a>
     </div>`;
     return;
@@ -549,7 +514,7 @@ window.printReceipt = function(o){
   w.document.close();
 };
 
-function launchConfetti(){const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';const colors=['#6c63ff','#a78bfa','#38bdf8','#4ade80','#fbbf24','#f87171','#fff'];for(let i=0;i<90;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}setTimeout(()=>{wrap.innerHTML='';},5000);}
+function launchConfetti(){const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';const colors=['#7D32FF','#a78bfa','#60a5fa','#34d399','#fbbf24','#f87171','#fff'];for(let i=0;i<90;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}setTimeout(()=>{wrap.innerHTML='';},5000);}
 
 function watchChatBadge(uid){
   const q = collection(db,'chats',uid,'messages');
@@ -602,6 +567,55 @@ onAuthStateChanged(auth, async user=>{
   loadOrders(user.uid);
   watchChatBadge(user.uid);
 });
+</script>
+
+<script>
+/* Presentation-only enhancement: filter tabs + live counts.
+   Reads data-status/data-paid attributes already present on rendered rows;
+   never touches Firebase data or the module above. */
+(function(){
+  const list = document.getElementById('ordersList');
+  const tabs = document.getElementById('ordTabs');
+  const countEl = document.getElementById('ordCount');
+  let activeFilter = 'all';
+
+  function matches(row, filter){
+    const status = +row.dataset.status;
+    const paid = row.dataset.paid === '1';
+    if(filter==='all') return true;
+    if(filter==='active') return status < 5;
+    if(filter==='done') return status === 5;
+    if(filter==='unpaid') return !paid;
+    return true;
+  }
+
+  function apply(){
+    const rows = Array.from(list.querySelectorAll('.ord-row-wrap'));
+    let shown = 0;
+    rows.forEach(r=>{
+      const ok = matches(r, activeFilter);
+      r.classList.toggle('is-filtered', !ok);
+      if(ok) shown++;
+    });
+    countEl.textContent = rows.length ? `Показано ${shown} из ${rows.length}` : '';
+  }
+
+  if(tabs){
+    tabs.addEventListener('click', e=>{
+      const btn = e.target.closest('.ord-tab');
+      if(!btn) return;
+      tabs.querySelectorAll('.ord-tab').forEach(b=>b.classList.toggle('is-active', b===btn));
+      activeFilter = btn.dataset.filter;
+      apply();
+    });
+  }
+
+  if(list){
+    const mo = new MutationObserver(apply);
+    mo.observe(list, { childList:true });
+    apply();
+  }
+})();
 </script>
 
 <script src="../footer.js" data-page="orders"></script>

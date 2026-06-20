@@ -1,701 +1,693 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Поддержка — Antviz</title>
-  <link rel="icon" href="../img/favicon.png" type="image/png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="icon" href="../img/favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#0a0a0c;--surface:#111114;--surface-2:#15151a;--surface-3:#1a1a21;
-      --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
-      --ink:#f2f2f6;--ink-dim:rgba(255,255,255,.46);--ink-faint:rgba(255,255,255,.26);
-      --accent:#7D32FF;--accent-soft:#a78bfa;--accent-wash:rgba(125,50,255,.12);
-      --good:#34d399;--good-wash:rgba(52,211,153,.12);
-      --warn:#fbbf24;--warn-wash:rgba(251,191,36,.10);
-      --bad:#f87171;--bad-wash:rgba(248,113,113,.10);
-      --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
-      --success:var(--good);--error:var(--bad);--accent2:var(--accent-soft);--muted:var(--ink-faint);
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#0a0a0c; --surface:#111114; --surface-2:#15151a; --surface-3:#1a1a21;
+      --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
+      --ink:#f2f2f6; --ink-dim:rgba(255,255,255,.46); --ink-faint:rgba(255,255,255,.26);
+      --accent:#7D32FF; --accent-soft:#a78bfa; --accent-wash:rgba(125,50,255,.12);
+      --good:#34d399; --good-wash:rgba(52,211,153,.12);
+      --warn:#fbbf24; --warn-wash:rgba(251,191,36,.1);
+      --bad:#f87171; --bad-wash:rgba(248,113,113,.1);
+      --info:#60a5fa; --info-wash:rgba(96,165,250,.12);
+      --r-xs:6px; --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:40px;
+      --filter-height: 36px;
     }
-    html,body{height:100%;overflow:hidden}
-    body{background:var(--bg);color:var(--ink);font-family:'Onest',sans-serif;font-weight:300;font-size:15px;-webkit-font-smoothing:antialiased}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--ink);font-family:'Onest',sans-serif;font-weight:300;line-height:1.6;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased}
+    @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
     :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+
     @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
-    @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes rowIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
     /* LOADING */
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
     .spinner{width:22px;height:22px;border:1.5px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
 
-    /* LIGHTBOX */
-    .lightbox{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
-    .lightbox.show{display:flex}
-    .lb-close{position:absolute;top:20px;right:20px;background:var(--surface);border:1px solid var(--line-strong);color:var(--ink-faint);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:color .15s,border-color .15s}
-    .lb-close:hover{color:var(--ink);border-color:var(--line-strong)}
-    .lightbox img{max-width:90vw;max-height:85vh;border-radius:var(--r-md);object-fit:contain}
+    .mobile-top-bar{display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;height:44px;background:var(--surface);border:1px solid var(--line-strong);border-radius:99px;align-items:center;padding:0 16px;gap:8px;min-width:200px;max-width:calc(100% - 28px)}
+    .mobile-top-bar a{display:flex;align-items:center;gap:5px;color:var(--ink-faint);text-decoration:none;font-size:13px;transition:color .15s;flex-shrink:0}
+    .mobile-top-bar a:hover{color:var(--ink)}
+    .mobile-top-bar a svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+    .mtb-title{font-family:'Unbounded',sans-serif;font-size:12.5px;font-weight:600;white-space:nowrap;flex:1;text-align:center}
+    .unread-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-size:10px;font-weight:600;width:18px;height:18px;border-radius:50%;margin-left:4px}
+    @media (max-width:840px){.mobile-top-bar{display:flex!important}.ticket-shell{padding-top:calc(44px + 28px)!important}.ticket-back{display:none}}
 
-    /* ROOT LAYOUT — two columns */
-    .chat-layout{
-      display:none;
-      width:100%;height:100%;
-      max-width:1100px;margin:0 auto;
-      flex-direction:row;
-      padding:0;
-    }
-    .chat-layout.show{display:flex}
+    .ticket-shell{max-width:1100px;margin:0 auto;padding:104px 40px 120px;animation:fadeUp .25s ease}
+    .ticket-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-faint);font-size:.82rem;text-decoration:none;margin-bottom:28px;transition:color .15s}
+    .ticket-back:hover{color:var(--ink)}
+    .ticket-back svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* SIDEBAR */
-    .chat-sidebar{
-      width:260px;flex-shrink:0;
-      background:var(--surface);border-right:1px solid var(--line);
-      display:flex;flex-direction:column;
-      overflow:hidden;
-    }
-    .sidebar-top{padding:22px 20px 18px;border-bottom:1px solid var(--line)}
-    .sidebar-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-faint);text-decoration:none;font-size:.8rem;margin-bottom:20px;transition:color .15s}
-    .sidebar-back:hover{color:var(--ink)}
-    .sidebar-back svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
-    .sidebar-brand{display:flex;align-items:center;gap:10px}
-    .sidebar-av{width:38px;height:38px;border-radius:var(--r-sm);background:var(--accent-wash);border:1px solid rgba(125,50,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-    .sidebar-av img{width:100%;height:100%;object-fit:cover}
-    .sidebar-brand-text{line-height:1.3}
-    .sidebar-name{font-family:'Unbounded',sans-serif;font-size:.78rem;font-weight:600}
-    .sidebar-status{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--ink-faint)}
-    .online-dot{width:6px;height:6px;border-radius:50%;background:var(--good);flex-shrink:0}
-    .sidebar-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-    .sidebar-label{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;margin-bottom:4px}
-    .sidebar-hint{font-size:.78rem;color:var(--ink-dim);line-height:1.6}
-    .sidebar-divider{height:1px;background:var(--line);margin:4px 0}
-    .sidebar-topic{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);color:var(--ink-faint);font-size:.8rem;cursor:default;transition:background .15s}
-    .sidebar-topic svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
-    .sidebar-footer{padding:16px 20px;border-top:1px solid var(--line)}
-    .sidebar-new-topic-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:.6rem .9rem;background:var(--accent-wash);border:1px solid rgba(125,50,255,.2);color:var(--accent-soft);font-family:'Onest',sans-serif;font-size:.8rem;font-weight:500;border-radius:var(--r-md);cursor:pointer;transition:background .15s;opacity:0;pointer-events:none;transition:opacity .2s,background .15s}
-    .sidebar-new-topic-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none}
-    .sidebar-new-topic-btn.show{opacity:1;pointer-events:all}
-    .sidebar-new-topic-btn:hover{background:rgba(125,50,255,.18)}
+    .ticket-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:36px}
+    .ticket-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.025em;margin-bottom:8px}
+    .ticket-sub{color:var(--ink-dim);font-size:.92rem}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.7rem 1.3rem;border-radius:var(--r-md);font-family:'Onest',sans-serif;font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s;white-space:nowrap}
+    .btn svg{width:13px;height:13px}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{background:#8f4eff}
+    .btn-ghost{background:transparent;border:1px solid var(--line-strong);color:var(--ink-dim)}
+    .btn-ghost:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
+    .btn-xs{padding:.36rem .7rem;font-size:.72rem}
 
-    /* MAIN CHAT AREA */
-    .chat-main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+    .ticket-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+    .ticket-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .ticket-tabs{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;height:var(--filter-height)}
+    .ticket-tab{border:none;background:transparent;color:var(--ink-faint);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:0 .9rem;border-radius:99px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;height:100%;display:flex;align-items:center}
+    .ticket-tab:hover{color:var(--ink)}
+    .ticket-tab.is-active{background:var(--accent-wash);color:var(--accent-soft)}
+    .ticket-search{position:relative;height:var(--filter-height)}
+    .ticket-search input{height:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:99px;padding:0 .9rem 0 2.2rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.8rem;outline:none;width:200px;transition:border-color .18s,width .2s}
+    .ticket-search input:focus{border-color:var(--accent);width:240px}
+    .ticket-search input::placeholder{color:var(--ink-faint)}
+    .ticket-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--ink-faint);stroke-width:2;fill:none}
+    .ticket-count{color:var(--ink-faint);font-size:.78rem}
+    .topic-filter{height:var(--filter-height)}
+    .topic-filter select{height:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:99px;padding:0 2rem 0 .9rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.78rem;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;min-width:160px}
+    .topic-filter select:focus{border-color:var(--accent)}
+    .topic-filter select option{background:var(--surface-2);color:var(--ink)}
 
-    /* TOP STRIPE (narrow status bar) */
-    .chat-top-bar{height:48px;padding:0 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface)}
-    .chat-top-title{font-family:'Unbounded',sans-serif;font-size:.78rem;font-weight:600;color:var(--ink-faint)}
-    .chat-top-meta{font-size:.72rem;color:var(--ink-faint);display:flex;align-items:center;gap:6px}
-    .chat-top-meta span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--good)}
+    .ticket-cols{display:grid;grid-template-columns:1fr 120px 110px 100px 22px;gap:16px;padding:0 20px 10px;font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+    .ticket-list{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+    .ticket-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
+    .ticket-row-wrap:last-child{border-bottom:none}
+    .ticket-row{all:unset;display:grid;grid-template-columns:1fr 120px 110px 100px 22px;gap:16px;align-items:center;width:100%;padding:18px 20px;cursor:pointer;transition:background .15s;font-family:'Onest',sans-serif}
+    .ticket-row:hover{background:var(--surface)}
+    .ticket-cell-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+    .ticket-subject{font-size:.92rem;font-weight:500;color:var(--ink)}
+    .ticket-subject.has-unread{font-weight:700;color:var(--accent-soft)}
+    .ticket-preview{font-size:.78rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
+    .ticket-meta{font-size:.72rem;color:var(--ink-faint)}
+    .ticket-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:500;padding:.3rem .65rem;border-radius:var(--r-xs);width:fit-content}
+    .ticket-tag.open{background:var(--info-wash);color:var(--info)}
+    .ticket-tag.in-progress{background:var(--warn-wash);color:var(--warn)}
+    .ticket-tag.resolved{background:var(--good-wash);color:var(--good)}
+    .ticket-tag.closed{background:var(--surface-3);color:var(--ink-faint)}
+    .ticket-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
+    .ticket-row-wrap:has(.ticket-body.open) .ticket-chevron{transform:rotate(180deg)}
+    .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--bad);display:inline-block;flex-shrink:0;animation:pulse 1.5s infinite}
 
-    /* MESSAGES */
-    .chat-msgs{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:3px;scroll-behavior:smooth}
-    .chat-msgs::-webkit-scrollbar{width:4px}
-    .chat-msgs::-webkit-scrollbar-track{background:transparent}
-    .chat-msgs::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:4px}
+    .ticket-body{display:none;border-top:1px solid var(--line);padding:24px 20px 26px;background:var(--surface)}
+    .ticket-body.open{display:block;animation:fadeUp .2s ease}
 
-    /* MSG — class names kept to match JS renderMsg */
-    .msg{display:flex;flex-direction:column;gap:4px;max-width:76%;animation:popIn .18s ease;margin-bottom:8px}
-    .msg.mine{align-self:flex-end;align-items:flex-end}
-    .msg.theirs{align-self:flex-start;align-items:flex-start}
-    .msg-bubble{padding:11px 14px;border-radius:var(--r-lg);font-size:.88rem;line-height:1.65;word-break:break-word}
-    .msg.mine .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:var(--r-xs)}
-    .msg.theirs .msg-bubble{background:var(--surface);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:var(--r-xs)}
-    .msg-time{font-size:.68rem;color:var(--ink-faint);padding:0 2px}
-    .msg-img{max-width:220px;border-radius:var(--r-md);cursor:zoom-in;display:block;border:1px solid var(--line)}
-    .msg-file-link{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);font-size:.82rem;color:var(--accent-soft);text-decoration:none;transition:border-color .15s}
-    .msg-file-link:hover{border-color:var(--accent-soft)}
+    .chat-wrapper{position:relative}
+    .chat-box{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;max-height:450px;overflow-y:auto;padding-right:6px;scroll-behavior:smooth}
+    .chat-msg{padding:10px 14px;border-radius:var(--r-sm);max-width:84%;font-size:.84rem;line-height:1.5;animation:fadeUp .15s ease}
+    .chat-msg.user{background:var(--accent-wash);color:var(--ink);align-self:flex-end;border-bottom-right-radius:2px}
+    .chat-msg.support{background:var(--surface-2);color:var(--ink-dim);align-self:flex-start;border-bottom-left-radius:2px;border:1px solid var(--line)}
+    .chat-msg .msg-date{font-size:.65rem;color:var(--ink-faint);display:block;margin-top:4px}
+    .chat-msg .msg-img{max-width:160px;border-radius:var(--r-xs);margin-top:4px;border:1px solid var(--line)}
+    .msg-divider{font-size:.7rem;color:var(--ink-faint);text-align:center;padding:8px 0 4px;font-weight:500;letter-spacing:.04em}
 
-    /* BOT ACTIONS — class names and modifiers kept to match JS */
-    .bot-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;max-width:520px}
-    .bot-actions.scrollable{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
-    .bot-actions.locked{pointer-events:none;opacity:.45}
-    .bot-btn{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-dim);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:.5rem .95rem;border-radius:99px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
-    .bot-btn:hover:not(:disabled){background:var(--surface-3);color:var(--ink);border-color:var(--line-strong)}
-    .bot-btn.accent{background:var(--accent-wash);border-color:rgba(125,50,255,.25);color:var(--accent-soft)}
-    .bot-btn.accent:hover:not(:disabled){background:rgba(125,50,255,.18)}
-    .bot-btn.back{background:transparent;border-color:var(--line);color:var(--ink-faint)}
-    .bot-btn:disabled{cursor:default}
+    .chat-input-wrap{display:flex;gap:8px;margin-top:4px}
+    .chat-input-wrap input{flex:1;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.6rem .9rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.82rem;outline:none;transition:border-color .18s}
+    .chat-input-wrap input:focus{border-color:var(--accent)}
+    .chat-input-wrap input::placeholder{color:var(--ink-faint)}
+    .chat-input-wrap .btn{flex-shrink:0}
+    .scroll-down-btn{position:absolute;bottom:60px;right:12px;background:var(--surface);border:1px solid var(--line-strong);border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-faint);transition:all .2s;opacity:0;pointer-events:none}
+    .scroll-down-btn.visible{opacity:1;pointer-events:all}
+    .scroll-down-btn:hover{background:var(--surface-2);border-color:var(--accent-soft);color:var(--accent-soft)}
+    .scroll-down-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* TYPING INDICATOR — class names kept */
-    .typing-indicator{display:flex;align-items:center;gap:5px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg) var(--r-lg) var(--r-lg) var(--r-xs);width:fit-content;margin-bottom:8px}
-    .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);animation:blink 1.2s ease-in-out infinite}
-    .typing-dot:nth-child(2){animation-delay:.2s}
-    .typing-dot:nth-child(3){animation-delay:.4s}
+    .ticket-form-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .ticket-form-overlay.show{opacity:1;pointer-events:all}
+    .ticket-form-modal{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-xl);padding:36px 32px;width:100%;max-width:480px;transform:translateY(14px) scale(.98);transition:transform .2s}
+    .ticket-form-overlay.show .ticket-form-modal{transform:translateY(0) scale(1)}
+    .ticket-form-modal h3{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:600;margin-bottom:20px;text-align:center}
+    .ticket-form-group{margin-bottom:14px}
+    .ticket-form-group label{display:block;font-size:.72rem;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+    .ticket-form-group select,.ticket-form-group input,.ticket-form-group textarea{width:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.65rem .8rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.86rem;outline:none;transition:border-color .18s}
+    .ticket-form-group select:focus,.ticket-form-group input:focus,.ticket-form-group textarea:focus{border-color:var(--accent)}
+    .ticket-form-group textarea{min-height:80px;resize:vertical}
+    .ticket-form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;background-color:var(--surface-2)}
+    .ticket-form-group select option{background:var(--surface-2);color:var(--ink)}
+    .ticket-form-actions{display:flex;gap:10px;margin-top:20px}
+    .ticket-form-actions .btn{flex:1;justify-content:center}
+    .file-preview{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--ink-faint);margin-top:6px}
+    .file-preview .remove-file{cursor:pointer;color:var(--bad)}
 
-    /* ORDER INFO CARD — class names kept to match appendOrderCard */
-    .order-info-card{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:14px 16px;margin-top:8px;min-width:240px}
-    .oi-num{font-family:'Unbounded',sans-serif;font-size:.82rem;font-weight:600;margin-bottom:10px;color:var(--ink)}
-    .oi-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.8rem}
-    .oi-row:last-child{border-bottom:none}
-    .oi-lbl{color:var(--ink-faint);flex-shrink:0}
-    .oi-val{text-align:right;font-weight:500;color:var(--ink);word-break:break-word}
-    /* status pills s0–s5 — class names kept */
-    .s-pill{display:inline-block;font-size:.7rem;font-weight:600;padding:.2rem .55rem;border-radius:var(--r-xs)}
-    .s0{background:var(--surface-3);color:var(--ink-faint)}
-    .s1{background:var(--warn-wash);color:var(--warn)}
-    .s2{background:rgba(96,165,250,.12);color:#60a5fa}
-    .s3{background:var(--accent-wash);color:var(--accent-soft)}
-    .s4{background:var(--warn-wash);color:var(--warn)}
-    .s5{background:var(--good-wash);color:var(--good)}
+    .empty{text-align:center;padding:64px 16px;color:var(--ink-faint)}
+    .empty-icon{margin-bottom:16px;display:flex;justify-content:center}
+    .empty-icon svg{width:42px;height:42px;stroke:var(--ink-faint);stroke-width:1.2;fill:none;opacity:.5}
+    .empty h3{font-family:'Unbounded',sans-serif;font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .empty p{font-size:.86rem;margin-bottom:20px}
 
-    /* INPUT BAR */
-    .chat-input-wrap{flex-shrink:0;padding:12px 16px;background:var(--surface);border-top:1px solid var(--line)}
-    .chat-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-xl);padding:8px 8px 8px 14px;transition:border-color .18s}
-    .chat-input-bar:focus-within{border-color:var(--accent)}
-    .attach-btn{width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink-faint);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:color .15s,border-color .15s;margin-bottom:1px}
-    .attach-btn:hover{color:var(--ink);border-color:var(--line-strong)}
-    .attach-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
-    .chat-textarea{flex:1;background:transparent;border:none;outline:none;resize:none;color:var(--ink);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;line-height:1.6;min-height:24px;max-height:120px;padding:4px 0}
-    .chat-textarea::placeholder{color:var(--ink-faint)}
-    .send-btn{width:34px;height:34px;border-radius:50%;background:var(--line);border:none;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s;margin-bottom:1px}
-    .send-btn svg{width:14px;height:14px}
-    .send-btn.active{background:var(--accent);color:#fff}
-    .send-btn:hover.active{background:#8f4eff}
-
-    /* TOAST */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);z-index:800;padding:.55rem 1.2rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.6rem 1.3rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--good);color:#04140e}
     .toast.error{background:var(--bad);color:#1a0606}
     .toast.info{background:var(--accent);color:#fff}
 
-    /* NEW TOPIC BTN (still in DOM for JS) — hidden; sidebar button replaces it visually */
-    #newTopicBtn{display:none}
+    .ticket-mobile-tags{display:none}
 
-    /* MOBILE: collapse sidebar */
-    @media(max-width:760px){
-      html,body{overflow:auto}
-      .chat-layout{flex-direction:column;height:auto;min-height:100vh}
-      .chat-sidebar{width:100%;border-right:none;border-bottom:1px solid var(--line)}
-      .sidebar-body{display:none}
-      .sidebar-footer{display:none}
-      .chat-main{flex:1;min-height:0;height:calc(100vh - 90px)}
-      .chat-msgs{height:calc(100vh - 90px - 48px - 72px)}
+    @media (max-width:840px){
+      .ticket-shell{padding-left:20px;padding-right:20px}
+      .ticket-cols{display:none}
+      .ticket-row{grid-template-columns:1fr;gap:6px}
+      .ticket-cell-status,.ticket-cell-date{display:none}
+      .ticket-row{position:relative}
+      .ticket-chevron{position:absolute;top:18px;right:20px}
+      .ticket-row{padding-right:44px}
+      .ticket-mobile-tags{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+      .ticket-preview{max-width:100%}
+      .ticket-search input{width:140px}
+      .ticket-search input:focus{width:160px}
+      .chat-box{max-height:320px}
+    }
+    @media (max-width:480px){
+      .ticket-head{flex-direction:column;align-items:flex-start}
+      .ticket-toolbar{flex-direction:column;align-items:stretch}
+      .ticket-search input{width:100%}
+      .ticket-search input:focus{width:100%}
+      .ticket-form-modal{padding:24px 16px}
+      .chat-box{max-height:280px}
+      .ticket-filters{flex-direction:column;align-items:stretch}
+      .ticket-tabs{width:100%;overflow-x:auto}
+      .topic-filter select{width:100%}
     }
   </style>
 </head>
 <body>
+<script src="../nav.js" data-page="support"></script>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
 </div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
-  <img id="lightboxImg" src="" alt=""/>
+<div class="mobile-top-bar">
+  <a href="../profile"><svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Кабинет</a>
+  <span style="flex:1"></span>
+  <span class="mtb-title">Поддержка <span class="unread-badge" id="headerUnread" style="display:none">0</span></span>
+  <span style="flex:1"></span>
 </div>
 
-<!-- hidden legacy new-topic btn kept for JS compatibility -->
-<button id="newTopicBtn" onclick="startNewTopic()" aria-hidden="true"></button>
+<div class="ticket-shell" id="appWrap" style="display:none">
 
-<div class="toast" id="toast"></div>
+  <a href="../profile" class="ticket-back">
+    <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>В личный кабинет
+  </a>
 
-<div class="chat-layout" id="appWrap">
+  <div class="ticket-head">
+    <div>
+      <div class="ticket-title">Поддержка</div>
+      <div class="ticket-sub">Вопросы, идеи, сообщения об ошибках — мы на связи</div>
+    </div>
+    <button class="btn btn-primary" id="newTicketBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+      Новый тикет
+    </button>
+  </div>
 
-  <!-- SIDEBAR -->
-  <aside class="chat-sidebar">
-    <div class="sidebar-top">
-      <a href="../profile" class="sidebar-back">
-        <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
-        Личный кабинет
-      </a>
-      <div class="sidebar-brand">
-        <div class="sidebar-av">
-          <img src="../img/favicon.png" alt="Antviz"/>
-        </div>
-        <div class="sidebar-brand-text">
-          <div class="sidebar-name">Поддержка</div>
-          <div class="sidebar-status">
-            <span class="online-dot"></span>
-            онлайн
-          </div>
-        </div>
+  <div class="ticket-toolbar">
+    <div class="ticket-filters">
+      <div class="ticket-tabs" id="ticketTabs">
+        <button class="ticket-tab is-active" data-filter="all">Все</button>
+        <button class="ticket-tab" data-filter="open">Открытые</button>
+        <button class="ticket-tab" data-filter="in-progress">В обработке</button>
+        <button class="ticket-tab" data-filter="resolved">Решённые</button>
+      </div>
+      <div class="topic-filter">
+        <select id="topicFilter">
+          <option value="all">Все темы</option>
+          <option value="Техническая проблема">Техническая проблема</option>
+          <option value="Идея / предложение">Идея / предложение</option>
+          <option value="Вопрос по оплате">Вопрос по оплате</option>
+          <option value="Правки по проекту">Правки по проекту</option>
+          <option value="Другое">Другое</option>
+        </select>
+      </div>
+      <div class="ticket-search">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Поиск..." />
       </div>
     </div>
+    <span class="ticket-count" id="ticketCount"></span>
+  </div>
 
-    <div class="sidebar-body">
-      <div>
-        <div class="sidebar-label">Как это работает</div>
-        <div class="sidebar-hint">Выберите тему — бот поможет разобраться. Для сложных вопросов подключим менеджера.</div>
-      </div>
-      <div class="sidebar-divider"></div>
-      <div>
-        <div class="sidebar-label">Доступные темы</div>
-        <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Статус заказа</div>
-        <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Оплата</div>
-        <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Сроки</div>
-        <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Правки</div>
-        <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Написать вопрос</div>
-      </div>
-    </div>
+  <div class="ticket-cols">
+    <span>Тема</span><span>Статус</span><span>Обновлён</span><span>Сообщений</span><span></span>
+  </div>
 
-    <div class="sidebar-footer">
-      <button class="sidebar-new-topic-btn" id="sidebarNewTopicBtn" onclick="startNewTopic()">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14"/></svg>
-        Новая тема
-      </button>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="chat-main">
-    <div class="chat-top-bar">
-      <span class="chat-top-title">Диалог с поддержкой</span>
-      <span class="chat-top-meta"><span></span>Antviz · онлайн</span>
-    </div>
-
-    <div class="chat-msgs" id="chatMsgs"></div>
-
-    <div class="chat-input-wrap">
-      <input type="file" id="fileInput" style="display:none" multiple
-        accept="image/*,.pdf,.doc,.docx,.zip,.rar,.psd,.fig"
-        onchange="sendFiles(this.files)"/>
-      <div class="chat-input-bar">
-        <button class="attach-btn" onclick="document.getElementById('fileInput').click()" title="Прикрепить файл">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>
-        </button>
-        <textarea class="chat-textarea" id="chatInput" placeholder="Напишите сообщение..." rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
-          oninput="onInput(this)"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMsg()">
-          <svg viewBox="0 0 24 24" fill="none"><line x1="22" y1="2" x2="11" y2="13" stroke="currentColor" stroke-width="2"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor"/></svg>
-        </button>
-      </div>
-    </div>
+  <div class="ticket-list" id="ticketsList">
+    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem;text-align:center">Загрузка...</div>
   </div>
 
 </div>
+
+<!-- Форма нового тикета -->
+<div class="ticket-form-overlay" id="ticketFormOverlay">
+  <div class="ticket-form-modal">
+    <h3>Создать тикет</h3>
+    <div class="ticket-form-group">
+      <label>Тема вопроса</label>
+      <select id="ticketTopic">
+        <option value="Техническая проблема">Техническая проблема</option>
+        <option value="Идея / предложение">Идея / предложение</option>
+        <option value="Вопрос по оплате">Вопрос по оплате</option>
+        <option value="Правки по проекту">Правки по проекту</option>
+        <option value="Другое">Другое</option>
+      </select>
+    </div>
+    <div class="ticket-form-group">
+      <label>Приоритет</label>
+      <select id="ticketPriority">
+        <option value="low">Низкий</option>
+        <option value="medium" selected>Средний</option>
+        <option value="high">Высокий</option>
+      </select>
+    </div>
+    <div class="ticket-form-group">
+      <label>Краткое описание</label>
+      <input type="text" id="ticketSubject" placeholder="Например: не загружается сайт" />
+    </div>
+    <div class="ticket-form-group">
+      <label>Сообщение</label>
+      <textarea id="ticketMessage" placeholder="Опишите подробнее…"></textarea>
+    </div>
+    <div class="ticket-form-group">
+      <label>Прикрепить скриншот (необязательно)</label>
+      <input type="file" id="ticketFile" accept="image/*" style="padding:6px 0;background:transparent;border:none;color:var(--ink-faint);font-size:.8rem" />
+      <div class="file-preview" id="filePreview"></div>
+    </div>
+    <div class="ticket-form-actions">
+      <button class="btn btn-ghost" id="cancelTicketBtn">Отмена</button>
+      <button class="btn btn-primary" id="submitTicketBtn">Отправить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  collection, query, orderBy, where, onSnapshot, limit,
-  addDoc, serverTimestamp, doc, setDoc, updateDoc,
-  getDocs, deleteDoc, Timestamp
+  collection, query, where, orderBy, onSnapshot,
+  addDoc, serverTimestamp, doc, updateDoc, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
-const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
-
 let currentUser = null;
-let unsubChat = null;
-let userOrders = [];
-let flowState = 'topic';
-let initialLoadDone = false;
-let welcomeShown = false;
-let hasUserMessages = false;
+let allTickets = [];
+let unsubTickets = null;
+let unsubMessages = {}; // ticketId -> unsubscribe fn
 
-/* ── helpers ── */
-function toast(msg, type='info'){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className=`toast ${type} show`;
-  setTimeout(()=>t.className='toast',3000);
-}
-function fmtTime(ts){
-  if(!ts) return '';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-}
-function fmtDate(ts){
-  if(!ts) return '—';
-  const d=ts.toDate?ts.toDate():new Date(ts);
-  return d.toLocaleDateString('ru',{day:'numeric',month:'short'});
-}
-function scrollBottom(instant){
-  const c=document.getElementById('chatMsgs');
-  if(instant) c.style.scrollBehavior='auto';
-  c.scrollTop=c.scrollHeight;
-  if(instant) setTimeout(()=>c.style.scrollBehavior='smooth',50);
-}
-function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+// ─── UTILS ───────────────────────────────────────────────────────────────────
 
-window.onInput=function(el){
-  el.style.height='auto';
-  el.style.height=Math.min(el.scrollHeight,120)+'px';
-  document.getElementById('sendBtn').classList.toggle('active',el.value.trim().length>0);
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  clearTimeout(t._h);
+  t._h = setTimeout(() => t.className = 'toast', 3200);
+}
+
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+  if (d >= today) return 'Сегодня ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+  if (d >= yesterday) return 'Вчера ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('ru', {day:'numeric',month:'short'}) + ' ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+}
+
+function statusLabel(s) {
+  return {open:'Открыт','in-progress':'В обработке',resolved:'Решён',closed:'Закрыт'}[s] || s;
+}
+function statusClass(s) {
+  return {open:'open','in-progress':'in-progress',resolved:'resolved',closed:'closed'}[s] || 'open';
+}
+
+function hasUnread(ticket) {
+  const msgs = ticket._messages || [];
+  if (!msgs.length) return false;
+  const last = msgs[msgs.length - 1];
+  return last.sender === 'support' && !ticket._read;
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+
+function renderTickets() {
+  const el = document.getElementById('ticketsList');
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const topicFilter = document.getElementById('topicFilter')?.value || 'all';
+  const statusFilter = document.querySelector('.ticket-tab.is-active')?.dataset.filter || 'all';
+
+  let filtered = allTickets.filter(t => {
+    if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+    if (topicFilter !== 'all' && t.topic !== topicFilter) return false;
+    if (search) {
+      const inSubject = (t.subject || '').toLowerCase().includes(search);
+      const inTopic = (t.topic || '').toLowerCase().includes(search);
+      const inMsgs = (t._messages || []).some(m => (m.text || '').toLowerCase().includes(search));
+      return inSubject || inTopic || inMsgs;
+    }
+    return true;
+  });
+
+  filtered.sort((a, b) => {
+    const au = hasUnread(a) ? 1 : 0, bu = hasUnread(b) ? 1 : 0;
+    if (au !== bu) return bu - au;
+    const at = a.updatedAt?.seconds || a.createdAt?.seconds || 0;
+    const bt = b.updatedAt?.seconds || b.createdAt?.seconds || 0;
+    return bt - at;
+  });
+
+  // unread badge в шапке
+  const unreadCount = allTickets.filter(t => hasUnread(t)).length;
+  const badge = document.getElementById('headerUnread');
+  badge.style.display = unreadCount ? 'inline-flex' : 'none';
+  badge.textContent = unreadCount;
+
+  document.getElementById('ticketCount').textContent = filtered.length
+    ? `Показано ${filtered.length} из ${allTickets.length}`
+    : '';
+
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty">
+      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <h3>${allTickets.length ? 'Ничего не найдено' : 'Нет тикетов'}</h3>
+      <p>${allTickets.length ? 'Попробуйте изменить параметры поиска' : 'Напишите нам — ответим в ближайшее время'}</p>
+      ${!allTickets.length ? '<button class="btn btn-primary btn-xs" id="emptyNewBtn">Создать тикет</button>' : ''}
+    </div>`;
+    const btn = el.querySelector('#emptyNewBtn');
+    if (btn) btn.addEventListener('click', openModal);
+    return;
+  }
+
+  el.innerHTML = filtered.map(t => {
+    const msgs = t._messages || [];
+    const last = msgs.length ? msgs[msgs.length - 1] : null;
+    const updated = last ? formatDate(last.createdAt) : formatDate(t.createdAt);
+    const preview = last ? esc((last.text || '').slice(0, 60)) + (last.text?.length > 60 ? '…' : '') : 'Нет сообщений';
+    const unread = hasUnread(t);
+    const sc = statusClass(t.status);
+
+    return `<div class="ticket-row-wrap" data-id="${t.id}">
+      <button type="button" class="ticket-row" onclick="toggleTicket('${t.id}')">
+        <div class="ticket-cell-main">
+          <span class="ticket-subject ${unread ? 'has-unread' : ''}">
+            ${unread ? '<span class="unread-dot"></span> ' : ''}
+            ${esc(t.topic || 'Без темы')} · ${esc(t.subject || '')}
+          </span>
+          <div class="ticket-preview">${preview}</div>
+          <span class="ticket-meta">№ ${t.id.slice(0,8).toUpperCase()}</span>
+          <div class="ticket-mobile-tags">
+            <span class="ticket-tag ${sc}">${statusLabel(t.status)}</span>
+            <span style="font-size:.72rem;color:var(--ink-faint)">${msgs.length} сообщ.</span>
+          </div>
+        </div>
+        <div class="ticket-cell-status"><span class="ticket-tag ${sc}">${statusLabel(t.status)}</span></div>
+        <div class="ticket-cell-date" style="font-size:.78rem;color:var(--ink-faint)">${updated}</div>
+        <div style="font-size:.78rem;color:var(--ink-faint);text-align:center">${msgs.length}</div>
+        <svg class="ticket-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="ticket-body" id="ticketBody_${t.id}">
+        <div class="chat-wrapper">
+          <div class="chat-box" id="chatBox_${t.id}">${buildChat(msgs)}</div>
+          <button class="scroll-down-btn" id="scrollDown_${t.id}" onclick="scrollToBottom('${t.id}')">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="chat-input-wrap">
+          <input type="text" id="chatInput_${t.id}" placeholder="Написать сообщение..." onkeydown="if(event.key==='Enter')sendChat('${t.id}')" />
+          <button class="btn btn-primary btn-xs" onclick="sendChat('${t.id}')">Отправить</button>
+          <label class="btn btn-ghost btn-xs" style="cursor:pointer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:13px;height:13px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <input type="file" accept="image/*" style="display:none" onchange="attachImg('${t.id}', this)" />
+          </label>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // scroll listeners
+  filtered.forEach(t => {
+    const box = document.getElementById('chatBox_' + t.id);
+    if (box) box.addEventListener('scroll', () => updateScrollBtn(t.id));
+  });
+}
+
+function buildChat(msgs) {
+  if (!msgs.length) return '<div style="color:var(--ink-faint);font-size:.8rem;padding:6px 0">Нет сообщений</div>';
+  let html = '', lastDate = null;
+  msgs.forEach(m => {
+    const d = m.createdAt?.toDate ? m.createdAt.toDate() : new Date(m.createdAt || 0);
+    const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long',year:'numeric'});
+    if (lastDate !== dateStr) { html += `<div class="msg-divider">${dateStr}</div>`; lastDate = dateStr; }
+    const isUser = m.sender === 'user';
+    html += `<div class="chat-msg ${isUser ? 'user' : 'support'}">
+      <div>${esc(m.text)}</div>
+      ${m.imageUrl ? `<img class="msg-img" src="${m.imageUrl}" alt="вложение" />` : ''}
+      <span class="msg-date">${formatDate(m.createdAt)}</span>
+    </div>`;
+  });
+  return html;
+}
+
+function updateScrollBtn(id) {
+  const box = document.getElementById('chatBox_' + id);
+  const btn = document.getElementById('scrollDown_' + id);
+  if (!box || !btn) return;
+  btn.classList.toggle('visible', box.scrollHeight - box.scrollTop - box.clientHeight > 40);
+}
+
+// ─── TOGGLE TICKET ────────────────────────────────────────────────────────────
+
+window.toggleTicket = async function(id) {
+  const body = document.getElementById('ticketBody_' + id);
+  if (!body) return;
+  body.classList.toggle('open');
+  if (body.classList.contains('open')) {
+    // пометить как прочитанное
+    const ticket = allTickets.find(t => t.id === id);
+    if (ticket && hasUnread(ticket)) {
+      ticket._read = true;
+      await updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
+      renderTickets();
+      // восстановить open класс после перерисовки
+      const b2 = document.getElementById('ticketBody_' + id);
+      if (b2) b2.classList.add('open');
+    }
+    setTimeout(() => scrollToBottom(id), 80);
+  }
 };
 
-/* ── purge messages older than 3 days ── */
-async function purgeOldMessages(uid){
-  try{
-    const cutoff=Timestamp.fromMillis(Date.now()-THREE_DAYS_MS);
-    const snap=await getDocs(query(collection(db,'chats',uid,'messages'),where('createdAt','<',cutoff)));
-    if(snap.empty) return;
-    for(const d of snap.docs) deleteDoc(d.ref).catch(()=>{});
-    toast('История старше 3 дней очищена','info');
-  }catch(e){}
-}
+// ─── SEND MESSAGE ─────────────────────────────────────────────────────────────
 
-/* ── dismiss welcome messages (soft-delete, no extra writes/deletes cost) ── */
-async function removeWelcomeMessages(){
-  if(!currentUser) return;
-  try{
-    const snap = await getDocs(query(
-      collection(db,'chats',currentUser.uid,'messages'),
-      where('flowTag','==','welcome')
-    ));
-    for(const d of snap.docs){
-      if(!d.data().dismissed) updateDoc(d.ref,{dismissed:true}).catch(()=>{});
-      document.querySelector(`[data-id="${d.id}"]`)?.remove();
-    }
-    welcomeShown = false;
-  }catch(e){}
-}
-
-/* ── save bot message to Firestore ── */
-async function saveBotMsg(text, flowTag){
-  if(!currentUser) return null;
-  try{
-    const ref = await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-      text, sender:'bot', senderName:'Бот', type:'text',
-      flowTag: flowTag||null,
+window.sendChat = async function(ticketId) {
+  const inp = document.getElementById('chatInput_' + ticketId);
+  const text = inp?.value.trim();
+  if (!text) return toast('Напишите сообщение', 'error');
+  inp.value = '';
+  try {
+    await addDoc(collection(db, 'tickets', ticketId, 'messages'), {
+      sender: 'user',
+      text,
+      imageUrl: null,
       createdAt: serverTimestamp()
     });
-    return ref.id;
-  }catch(e){ return null; }
-}
-
-/* ── render helpers ── */
-function renderMsg(m){
-  const container=document.getElementById('chatMsgs');
-  const isMe=m.sender==='user';
-  const isBot=m.sender==='bot';
-  const div=document.createElement('div');
-  div.className=`msg ${isMe?'mine':'theirs'}`;
-  if(m._id) div.dataset.id=m._id;
-
-  if(m.type==='file'){
-    const src=m.fileData||m.fileUrl||'';
-    const isImg=m.fileType&&m.fileType.startsWith('image/');
-    if(isImg) div.innerHTML=`<img class="msg-img" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-    else div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-  } else {
-    const name = isMe?'Вы': isBot?'Бот':'Поддержка';
-    div.innerHTML=`<div class="msg-bubble">${(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${name} · ${fmtTime(m.createdAt)}</div>`;
-  }
-  container.appendChild(div);
-  return div;
-}
-
-function lockAllButtonRows(){
-  document.querySelectorAll('.bot-actions:not(.locked)').forEach(r=>{
-    r.classList.add('locked');
-    r.querySelectorAll('button').forEach(b=>b.disabled=true);
-  });
-}
-
-function renderBotWithButtons(m){
-  const div = renderMsg(m);
-  if(!div) return;
-  // деактивируем все ранее показанные блоки кнопок — не даём кликать по "устаревшим" темам
-  lockAllButtonRows();
-
-  const row = document.createElement('div');
-  row.className='bot-actions';
-  const buttons = getBotButtons(m.flowTag);
-  if(buttons.length > 6) row.classList.add('scrollable');
-  buttons.forEach(a=>{
-    const btn=document.createElement('button');
-    btn.className=`bot-btn${a.cls?' '+a.cls:''}`;
-    btn.textContent=a.label;
-    btn.onclick=()=>{
-      row.classList.add('locked');
-      row.querySelectorAll('button').forEach(b=>b.disabled=true);
-      a.fn();
-    };
-    row.appendChild(btn);
-  });
-  if(buttons.length) div.appendChild(row);
-}
-
-/* ── button sets by flowTag ── */
-function getBotButtons(tag){
-  const topicBtns=[
-    {label:'Статус заказа',    cls:'accent', fn:()=>{ doSendUserMsg('Статус заказа'); handleTopic('order'); }},
-    {label:'Оплата',           cls:'accent', fn:()=>{ doSendUserMsg('Оплата'); handleTopic('payment'); }},
-    {label:'Сроки',            cls:'accent', fn:()=>{ doSendUserMsg('Сроки'); handleTopic('timing'); }},
-    {label:'Правки',           cls:'accent', fn:()=>{ doSendUserMsg('Правки'); handleTopic('revision'); }},
-    {label:'Написать вопрос',          fn:()=>{ doSendUserMsg('Хочу написать вопрос'); openFreeChat(); }},
-  ];
-  const backBtn    ={label:'Назад к темам',     cls:'back',   fn:()=>showTopicMenu()};
-  const managerBtn ={label:'Написать менеджеру', cls:'accent', fn:()=>openFreeChat()};
-
-  switch(tag){
-    case 'welcome': return topicBtns;
-    case 'topic':   return topicBtns;
-    case 'no_orders': return [
-      {label:'Оформить заказ', cls:'accent', fn:()=>window.location.href='../order'},
-      {label:'Назад', cls:'back', fn:()=>showTopicMenu()},
-    ];
-    case 'pick_order': return [
-      ...userOrders.map(o=>({
-        label:`№ ${(o.id||'').slice(0,8).toUpperCase()} · ${STATUS_LABELS[o.status||0]}`,
-        cls:'accent',
-        fn:async()=>{ showTyping(); await delay(700); hideTyping(); appendOrderCard(o); }
-      })),
-      {label:'Назад', cls:'back', fn:()=>showTopicMenu()},
-    ];
-    case 'payment':  return [backBtn, managerBtn];
-    case 'timing':   return [backBtn, managerBtn];
-    case 'revision': return [backBtn, {label:'Описать правки', cls:'accent', fn:()=>openFreeChat()}];
-    case 'free':     return [backBtn];
-    case 'hint':     return [{label:'Написать вопрос', cls:'accent', fn:()=>{ doSendUserMsg('Хочу написать вопрос'); openFreeChat(); }}];
-    default: return [];
-  }
-}
-
-function appendOrderCard(o){
-  const container=document.getElementById('chatMsgs');
-  const div=document.createElement('div');
-  div.className='msg theirs';
-  const s = (typeof o.status==='number' && STATUS_LABELS[o.status]) ? o.status : 0;
-  div.innerHTML=`
-    <div class="msg-bubble">Вот информация по вашему заказу:</div>
-    <div class="order-info-card">
-      <div class="oi-num">Заказ № ${(o.id||'').slice(0,8).toUpperCase()}</div>
-      <div class="oi-row"><span class="oi-lbl">Тип</span><span class="oi-val">${o.siteType||'Сайт'}</span></div>
-      <div class="oi-row"><span class="oi-lbl">Статус</span><span class="oi-val"><span class="s-pill s${s}">${STATUS_LABELS[s]}</span></span></div>
-      <div class="oi-row"><span class="oi-lbl">Оплата</span><span class="oi-val" style="color:${o.paid?'var(--success)':'var(--error)'}">${o.paid?'Оплачен':'Не оплачен'}</span></div>
-      <div class="oi-row"><span class="oi-lbl">Сумма</span><span class="oi-val">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span></div>
-      <div class="oi-row"><span class="oi-lbl">Создан</span><span class="oi-val">${fmtDate(o.createdAt)}</span></div>
-      ${o.statusComment?`<div class="oi-row" style="flex-direction:column;gap:4px"><span class="oi-lbl">Комментарий</span><span class="oi-val" style="text-align:left;color:var(--accent2)">${o.statusComment}</span></div>`:''}
-    </div>
-    <div class="msg-time">Бот · ${fmtTime(Timestamp.now())}</div>`;
-  lockAllButtonRows();
-  const row=document.createElement('div');
-  row.className='bot-actions';
-  [{label:'Назад к темам', cls:'back', fn:()=>showTopicMenu()},
-   {label:'Написать менеджеру', cls:'accent', fn:()=>openFreeChat()}
-  ].forEach(a=>{
-    const btn=document.createElement('button');
-    btn.className=`bot-btn ${a.cls}`; btn.textContent=a.label;
-    btn.onclick=()=>{
-      row.classList.add('locked');
-      row.querySelectorAll('button').forEach(b=>b.disabled=true);
-      a.fn();
-    };
-    row.appendChild(btn);
-  });
-  div.appendChild(row);
-  container.appendChild(div);
-  scrollBottom();
-}
-
-function showTyping(){
-  const c=document.getElementById('chatMsgs');
-  const el=document.createElement('div');
-  el.className='typing-indicator'; el.id='typingIndicator';
-  el.innerHTML='<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
-  c.appendChild(el); scrollBottom();
-}
-function hideTyping(){ document.getElementById('typingIndicator')?.remove(); }
-
-/* ── persist user msg (from button clicks) ── */
-async function doSendUserMsg(text){
-  if(!currentUser||!text) return;
-  try{
-    if(welcomeShown) await removeWelcomeMessages();
-    await setDoc(doc(db,'chats',currentUser.uid),
-      {name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
-    await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-      text, sender:'user', senderName:currentUser.displayName||'Пользователь',
-      type:'text', createdAt:serverTimestamp()
+    await updateDoc(doc(db, 'tickets', ticketId), {
+      updatedAt: serverTimestamp(),
+      _read: true,
+      status: 'open'
     });
-  }catch(e){}
-}
+    setTimeout(() => scrollToBottom(ticketId), 100);
+  } catch(e) { toast('Ошибка отправки', 'error'); }
+};
 
-/* ── bot flow ── */
-async function showWelcome(){
-  await removeWelcomeMessages();
-  welcomeShown = true;
-  await saveBotMsg('Привет! Я бот Антвизик.\nЧем могу помочь? Выберите тему:', 'welcome');
-}
-
-async function showTopicMenu(){
-  flowState='topic';
-  await saveBotMsg('Выберите тему:', 'topic');
-}
-
-async function handleTopic(topic){
-  if(topic==='order'){
-    if(!userOrders.length){
-      showTyping(); await delay(800); hideTyping();
-      await saveBotMsg('У вас пока нет заказов. Хотите оформить первый?', 'no_orders');
-      return;
-    }
-    if(userOrders.length===1){
-      showTyping(); await delay(900); hideTyping();
-      appendOrderCard(userOrders[0]);
-      return;
-    }
-    showTyping(); await delay(600); hideTyping();
-    await saveBotMsg('Выберите заказ:', 'pick_order');
-    return;
-  }
-  showTyping(); await delay(900); hideTyping();
-  const texts={
-    payment:'Принимаем оплату через СБП, банковские карты, T‑Pay и SberPay.\nОплата происходит прямо на сайте.',
-    timing:'Сроки зависят от объёма:\n· Большинство сайтов — около двух дней\n· Если срок меняется, появится уведомление\n· Точные сроки уточняем после первого этапа заказа',
-    revision:'Правки вносим по вашему ТЗ. Укажите в сообщении, что именно хотите изменить — менеджер ответит в ближайшее время.',
+window.attachImg = async function(ticketId, fileInput) {
+  const file = fileInput.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      await addDoc(collection(db, 'tickets', ticketId, 'messages'), {
+        sender: 'user',
+        text: 'Вложение',
+        imageUrl: e.target.result,
+        createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, 'tickets', ticketId), { updatedAt: serverTimestamp(), _read: true });
+      toast('Изображение отправлено ✓', 'success');
+      setTimeout(() => scrollToBottom(ticketId), 100);
+    } catch(err) { toast('Ошибка', 'error'); }
   };
-  await saveBotMsg(texts[topic], topic);
-}
-
-async function openFreeChat(){
-  flowState='open';
-  document.getElementById('newTopicBtn')?.classList.add('show');
-  document.getElementById('sidebarNewTopicBtn')?.classList.add('show');
-  await saveBotMsg('Напишите ваш вопрос — менеджер ответит в ближайшее время.\nДля быстрой навигации используйте кнопки выше.', 'free');
-  document.getElementById('chatInput').focus();
-}
-
-/* ── new topic ── */
-window.startNewTopic = async function(){
-  flowState = 'topic';
-  document.getElementById('newTopicBtn').classList.remove('show');
-  document.getElementById('sidebarNewTopicBtn').classList.remove('show');
-  const msgs = document.getElementById('chatMsgs');
-  const sep = document.createElement('div');
-  sep.style.cssText = 'text-align:center;color:var(--muted);font-size:11px;padding:10px;opacity:.5;letter-spacing:.04em';
-  sep.textContent = '— Новая тема —';
-  msgs.appendChild(sep);
-  await showWelcome();
+  reader.readAsDataURL(file);
+  fileInput.value = '';
 };
 
-/* ── Firestore live listener ──
-   onFirstSnapshot(stats) вызывается один раз сразу после обработки первого
-   снапшота — на тех же данных, что и рендер, без отдельного getDocs (нет гонки) */
-function listenChat(uid, onFirstSnapshot){
-  if(unsubChat) unsubChat();
-  const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(100));
-  unsubChat=onSnapshot(q,snap=>{
-    let hasAdminMessages = false;
-    const isFirst = !initialLoadDone;
+window.scrollToBottom = function(id) {
+  const box = document.getElementById('chatBox_' + id);
+  if (box) { box.scrollTop = box.scrollHeight; updateScrollBtn(id); }
+};
 
-    snap.docChanges().forEach(ch=>{
-      if(ch.type==='added'){
-        const m={...ch.doc.data(), _id:ch.doc.id};
-        if(m.sender==='admin') hasAdminMessages = true;
-        if(document.querySelector(`[data-id="${m._id}"]`)) return;
-        if(m.dismissed) return;
+// ─── CREATE TICKET ────────────────────────────────────────────────────────────
 
-        if(m.sender==='bot'){
-          renderBotWithButtons(m);
-          if(m.flowTag==='welcome') welcomeShown = true;
-        } else if(m.sender==='admin'||m.sender==='user'){
-          renderMsg(m);
-          if(m.sender==='user') hasUserMessages = true;
-        }
-        if(m.sender==='admin'&&!m.readByUser)
-          updateDoc(ch.doc.ref,{readByUser:true}).catch(()=>{});
+function openModal() {
+  document.getElementById('ticketFormOverlay').classList.add('show');
+  document.getElementById('ticketSubject').value = '';
+  document.getElementById('ticketMessage').value = '';
+  document.getElementById('ticketFile').value = '';
+  document.getElementById('filePreview').innerHTML = '';
+  window._pendingFile = null;
+}
 
-        scrollBottom(!initialLoadDone);
-      }
-    });
+document.getElementById('newTicketBtn').addEventListener('click', openModal);
+document.getElementById('cancelTicketBtn').addEventListener('click', () => {
+  document.getElementById('ticketFormOverlay').classList.remove('show');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('ticketFormOverlay').classList.remove('show');
+});
 
-    if(!initialLoadDone){
-      initialLoadDone=true;
-      setTimeout(()=>scrollBottom(true), 80);
-      if(isFirst && onFirstSnapshot){
-        onFirstSnapshot({hasAdminMessages, isEmpty: snap.empty});
+document.getElementById('ticketFile').addEventListener('change', function() {
+  const file = this.files[0];
+  const preview = document.getElementById('filePreview');
+  if (file) {
+    window._pendingFile = file;
+    preview.innerHTML = `<span>${esc(file.name)}</span> <span class="remove-file" onclick="document.getElementById('ticketFile').value='';document.getElementById('filePreview').innerHTML='';window._pendingFile=null;">✕</span>`;
+  } else {
+    preview.innerHTML = '';
+    window._pendingFile = null;
+  }
+});
+
+document.getElementById('submitTicketBtn').addEventListener('click', async function() {
+  const topic = document.getElementById('ticketTopic').value;
+  const priority = document.getElementById('ticketPriority').value;
+  const subject = document.getElementById('ticketSubject').value.trim();
+  const message = document.getElementById('ticketMessage').value.trim();
+  if (!subject) return toast('Введите краткое описание', 'error');
+  if (!message) return toast('Напишите сообщение', 'error');
+
+  this.disabled = true;
+  this.textContent = 'Отправка...';
+
+  const doCreate = async (imageUrl) => {
+    try {
+      const ticketRef = await addDoc(collection(db, 'tickets'), {
+        uid: currentUser.uid,
+        userName: currentUser.displayName || 'Пользователь',
+        userEmail: currentUser.email || '',
+        topic,
+        priority,
+        subject,
+        status: 'open',
+        _read: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
+      await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
+        sender: 'user',
+        text: message,
+        imageUrl: imageUrl || null,
+        createdAt: serverTimestamp()
+      });
+      document.getElementById('ticketFormOverlay').classList.remove('show');
+      toast('Тикет создан ✓', 'success');
+    } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
+    this.disabled = false;
+    this.textContent = 'Отправить';
+  };
+
+  const file = window._pendingFile;
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => doCreate(e.target.result);
+    reader.readAsDataURL(file);
+  } else {
+    await doCreate(null);
+  }
+});
+
+// ─── FILTERS ─────────────────────────────────────────────────────────────────
+
+document.getElementById('ticketTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.ticket-tab');
+  if (!btn) return;
+  document.querySelectorAll('.ticket-tab').forEach(b => b.classList.toggle('is-active', b === btn));
+  renderTickets();
+});
+
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', () => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(renderTickets, 250);
+});
+
+document.getElementById('topicFilter').addEventListener('change', renderTickets);
+
+// ─── FIREBASE LISTEN ─────────────────────────────────────────────────────────
+
+function subscribeMessages(ticketId) {
+  if (unsubMessages[ticketId]) return; // уже подписаны
+  const q = query(collection(db, 'tickets', ticketId, 'messages'), orderBy('createdAt', 'asc'));
+  unsubMessages[ticketId] = onSnapshot(q, snap => {
+    const ticket = allTickets.find(t => t.id === ticketId);
+    if (!ticket) return;
+    ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // если тикет открыт — обновить чат
+    const body = document.getElementById('ticketBody_' + ticketId);
+    if (body) {
+      const box = document.getElementById('chatBox_' + ticketId);
+      if (box) {
+        const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+        box.innerHTML = buildChat(ticket._messages);
+        if (wasAtBottom) setTimeout(() => scrollToBottom(ticketId), 50);
       }
     }
-  },e=>console.error(e));
+    renderTickets();
+  });
 }
 
-/* ── send message from textarea ── */
-window.sendMsg=async function(){
-  if(!currentUser) return;
-  const inp=document.getElementById('chatInput');
-  const text=inp.value.trim();
-  if(!text) return;
-  inp.value=''; inp.style.height='auto';
-  document.getElementById('sendBtn').classList.remove('active');
+async function loadMessages(ticket) {
+  const snap = await getDocs(query(collection(db, 'tickets', ticket.id, 'messages'), orderBy('createdAt', 'asc')));
+  ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
 
-  if(welcomeShown) await removeWelcomeMessages();
+// ─── INIT ─────────────────────────────────────────────────────────────────────
 
-  if(flowState==='topic'){
-    await saveBotMsg('Для навигации используйте кнопки выше.\nЕсли хотите написать менеджеру — нажмите «Написать вопрос».', 'hint');
-    return;
-  }
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = '../auth'; return; }
+  currentUser = user;
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('appWrap').style.display = 'block';
 
-  flowState='open';
-  document.getElementById('newTopicBtn')?.classList.add('show');
-  document.getElementById('sidebarNewTopicBtn')?.classList.add('show');
-  try{
-    await setDoc(doc(db,'chats',currentUser.uid),
-      {name:currentUser.displayName||'',email:currentUser.email||''},{merge:true});
-    await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-      text, sender:'user', senderName:currentUser.displayName||'Пользователь',
-      type:'text', createdAt:serverTimestamp()
-    });
-  }catch(e){ toast('Ошибка отправки','error'); }
-};
-
-/* ── file sending ── */
-window.sendFiles=async function(files){
-  if(!currentUser||!files.length) return;
-  for(const file of Array.from(files)){
-    if(file.size>3*1024*1024){ toast(file.name+' > 3 МБ','error'); continue; }
-    try{
-      const base64=await new Promise((res,rej)=>{
-        const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-      });
-      await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-        type:'file', fileData:base64, fileName:file.name, fileType:file.type,
-        sender:'user', senderName:currentUser.displayName||'', createdAt:serverTimestamp()
-      });
-      toast(file.name+' отправлен','success');
-    }catch(e){ toast('Ошибка: '+file.name,'error'); }
-  }
-  document.getElementById('fileInput').value='';
-};
-
-/* ── lightbox ── */
-window.openLightbox=function(src){
-  document.getElementById('lightboxImg').src=src;
-  document.getElementById('lightbox').classList.add('show');
-};
-window.closeLightbox=function(){
-  document.getElementById('lightbox').classList.remove('show');
-  document.getElementById('lightboxImg').src='';
-};
-document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
-
-/* ── bootstrap ── */
-onAuthStateChanged(auth,async user=>{
-  if(!user){ window.location.href='../auth'; return; }
-
-  currentUser=user;
-
-  await purgeOldMessages(user.uid);
-
-  try{
-    const snap=await getDocs(
-      query(collection(db,'orders'),where('uid','==',user.uid))
-    );
-    userOrders=snap.docs.map(d=>({id:d.id,...d.data()}))
-      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  }catch(e){}
-
-  document.getElementById('loadingScreen').style.display='none';
-  document.getElementById('appWrap').style.display='flex';
-
-  // решение о welcome/flowState принимаем по тому же снапшоту, что и рендер —
-  // без отдельного getDocs, чтобы не было гонки с onSnapshot
-  listenChat(user.uid, ({hasAdminMessages, isEmpty})=>{
-    if(hasAdminMessages){
-      flowState = 'open';
-      document.getElementById('newTopicBtn')?.classList.add('show');
-      document.getElementById('sidebarNewTopicBtn')?.classList.add('show');
-    } else if(isEmpty || !hasUserMessages){
-      showWelcome();
+  const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
+  unsubTickets = onSnapshot(q, async snap => {
+    // обновляем тикеты, сохраняя _messages
+    const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    for (const t of incoming) {
+      const existing = allTickets.find(x => x.id === t.id);
+      t._messages = existing?._messages || [];
+      t._read = existing?._read ?? t._read ?? true;
+      // загружаем сообщения если нет
+      if (!t._messages.length) await loadMessages(t);
+      // подписываемся на real-time сообщения
+      subscribeMessages(t.id);
     }
+    allTickets = incoming;
+    renderTickets();
   });
 });
 </script>
+
+<script src="../footer.js" data-page="profile"></script>
 </body>
 </html>

@@ -122,6 +122,11 @@ button{font-family:inherit}
 .ov-domain-opt{flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--ink-faint);font-family:'Onest',sans-serif;font-size:.72rem;padding:.5rem .6rem;border-radius:var(--r-sm);cursor:pointer;transition:all .15s;text-align:center;line-height:1.4}
 .ov-domain-opt:hover{border-color:var(--line-strong);color:var(--ink-dim)}
 .ov-domain-opt.sel{border-color:var(--accent-soft);color:var(--accent-soft);background:var(--accent-wash)}
+.ov-xtile-info{background:var(--surface);padding:18px 20px;border-radius:var(--r-md);border:1.5px dashed var(--line-strong);display:flex;flex-direction:column;gap:8px}
+.ov-xtile-info-top{display:flex;align-items:center;gap:10px;color:var(--ink-dim)}
+.ov-xtile-info-top svg{width:18px;height:18px;flex-shrink:0;color:var(--accent-soft)}
+.ov-xtile-info .ov-xtile-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.86rem;color:var(--ink)}
+.ov-xtile-info .ov-xtile-desc{font-size:.78rem;color:var(--ink-faint);line-height:1.6}
 
 /* ===== FORM (step 4) ===== */
 .ov-field{margin-bottom:24px}
@@ -316,7 +321,7 @@ button{font-family:inherit}
               <div class="ov-tier-feat">1 бесплатная правка после запуска</div>
             </div>
           </div>
-          <div class="ov-tier sel" data-tier="growth">
+          <div class="ov-tier" data-tier="growth">
             <div class="ov-tier-tag">Чаще выбирают</div>
             <div class="ov-tier-name">Рост</div>
             <div class="ov-tier-price">9 900<span>₽</span></div>
@@ -422,14 +427,13 @@ button{font-family:inherit}
 
         <div class="ov-xgroup">
           <div class="ov-xgroup-label">Поддержка</div>
-          <div class="ov-xgrid">
-            <div class="ov-xtile" id="xSupport">
-              <div class="ov-xtile-top">
+          <div class="ov-xgrid single">
+            <div class="ov-xtile-info" id="xSupportInfo">
+              <div class="ov-xtile-info-top">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></svg>
                 <span class="ov-xtile-name">Ежемесячное обслуживание</span>
-                <span class="ov-xtile-check"><svg viewBox="0 0 16 16" fill="none"><path d="M3 8.5 6 11.5 13 4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
               </div>
-              <div class="ov-xtile-desc">Правки текста и фотографий по заявке каждый месяц.</div>
-              <div class="ov-xtile-price">+500 ₽/мес</div>
+              <div class="ov-xtile-desc">Правки текста и фотографий по заявке каждый месяц — 500 ₽/мес. Подключается отдельно, когда сайт уже готов: в личном кабинете → «Обслуживание».</div>
             </div>
           </div>
         </div>
@@ -548,7 +552,7 @@ let state = {
   format: null,
   formatNote: '',
   tier: null,
-  extras: { domain:false, domainOpt:'new', urgent:false, content:false, shop:false, support:false },
+  extras: { domain:false, domainOpt:'new', urgent:false, content:false, shop:false },
   promo: null
 };
 
@@ -577,6 +581,7 @@ onAuthStateChanged(auth, async user => {
 /* ===== STEP NAVIGATION ===== */
 function isStepValid(n){
   if(n===1) return !!state.format && (state.format!=='custom' || state.formatNote.trim().length>0);
+  if(n===2) return !!state.tier;
   return true;
 }
 function updateNextState(){
@@ -636,6 +641,7 @@ document.querySelectorAll('.ov-tier').forEach(card=>{
     document.querySelectorAll('.ov-tier').forEach(c=>c.classList.remove('sel'));
     card.classList.add('sel');
     state.tier = card.dataset.tier;
+    updateNextState();
     recalc();
   });
 });
@@ -678,7 +684,6 @@ function bindToggle(id, key){
 bindToggle('xUrgent','urgent');
 bindToggle('xContent','content');
 bindToggle('xShop','shop');
-bindToggle('xSupport','support');
 
 /* ===== STEP 4: PROMO ===== */
 document.getElementById('promoBtn').addEventListener('click', async ()=>{
@@ -719,7 +724,16 @@ function compressImageToDataUrl(file, maxDim, quality, mime){
       }
       const canvas = document.createElement('canvas');
       canvas.width = width; canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      const ctx = canvas.getContext('2d');
+      // JPEG не поддерживает прозрачность — без заливки фона прозрачные
+      // области (например, у PNG-логотипов) рендерятся чёрным. PNG/SVG
+      // источники заливаем белым перед отрисовкой; для mime=png оставляем
+      // прозрачность как есть (фавикон сохраняется именно в PNG).
+      if((mime || 'image/jpeg') === 'image/jpeg'){
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+      }
+      ctx.drawImage(img, 0, 0, width, height);
       URL.revokeObjectURL(url);
       try{ resolve(canvas.toDataURL(mime || 'image/jpeg', quality)); }
       catch(err){ reject(err); }
@@ -814,7 +828,6 @@ function calcAmounts(){
   }
   // Если домен выключен — ничего не показываем
 
-  if(state.extras.support){ running += 500; rows.push({ label:'Обслуживание (первый месяц)', amount:500 }); }
   if(state.extras.content){ running += 2000; rows.push({ label:'Наполнение контентом', amount:2000 }); }
   if(state.extras.shop){ running += 4900; rows.push({ label:'Каталог и корзина', amount:4900 }); }
 
@@ -879,7 +892,6 @@ async function submitOrder(){
   const t = TIERS[state.tier];
   const extrasArr = [];
   if(state.extras.domain && state.extras.domainOpt==='new') extrasArr.push('domain');
-  if(state.extras.support) extrasArr.push('support');
   if(state.extras.content) extrasArr.push('content');
   if(state.extras.shop) extrasArr.push('shop');
   if(state.extras.urgent) extrasArr.push('urgent');

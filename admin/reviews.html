@@ -188,6 +188,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/f
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allReviews=[], currentFilter='all';
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
 function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
@@ -208,7 +209,7 @@ function renderReviews(){
     <div class="review-card${r.hidden?' hidden-card':''}">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.6rem">
         <div>
-          <div style="font-weight:500;font-size:.9rem;margin-bottom:.2rem">${r.authorName||'Аноним'}</div>
+          <div style="font-weight:500;font-size:.9rem;margin-bottom:.2rem">${escapeHtml(r.clientName||r.authorName||'Аноним')}</div>
           <div class="stars">${stars(r.stars||0)}</div>
         </div>
         <div style="display:flex;gap:.4rem;align-items:center;flex-shrink:0">
@@ -217,7 +218,7 @@ function renderReviews(){
           <button class="btn btn-danger btn-xs" onclick="deleteReview('${r.id}')">🗑</button>
         </div>
       </div>
-      <div style="font-size:.86rem;color:var(--muted2);line-height:1.6">${r.text||'Без текста'}</div>
+      <div style="font-size:.86rem;color:var(--muted2);line-height:1.6">${escapeHtml(r.text||'Без текста')}</div>
       ${r.orderId?`<div style="font-size:.7rem;color:var(--muted);margin-top:.5rem">Заказ: №${r.orderId.slice(0,8).toUpperCase()}</div>`:''}
     </div>`).join('');
 }

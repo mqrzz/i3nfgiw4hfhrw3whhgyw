@@ -337,6 +337,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { collection, query, orderBy, onSnapshot, getDocs, addDoc, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
@@ -357,7 +358,7 @@ window.toggleMaintenance=async()=>{
 window.openNotifModal=async()=>{
   const snap=await getDocs(collection(db,'chats'));
   const sel=document.getElementById('notifTarget');
-  sel.innerHTML='<option value="all">📢 Всем пользователям</option>'+snap.docs.map(d=>`<option value="${d.id}">${d.data().name||d.id} · ${d.data().email||''}</option>`).join('');
+  sel.innerHTML='<option value="all">📢 Всем пользователям</option>'+snap.docs.map(d=>`<option value="${d.id}">${escapeHtml(d.data().name||d.id)} · ${escapeHtml(d.data().email||'')}</option>`).join('');
   document.getElementById('notifTitle').value='';document.getElementById('notifText').value='';
   document.getElementById('notifModal').classList.add('show');
 };
@@ -412,7 +413,7 @@ onAuthStateChanged(auth,async user=>{
       <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
       <tbody>${recent.map(o=>`<tr style="cursor:pointer" onclick="location.href='/admin/orders?id=${o.id}'">
         <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.7rem;color:var(--muted);margin-top:.15rem">${fmtDate(o.createdAt)}</div></td>
-        <td><div style="font-size:.84rem;font-weight:500">${o.clientName||'—'}</div><div style="font-size:.7rem;color:var(--muted)">${o.clientEmail||'—'}</div></td>
+        <td><div style="font-size:.84rem;font-weight:500">${escapeHtml(o.clientName||'—')}</div><div style="font-size:.7rem;color:var(--muted)">${escapeHtml(o.clientEmail||'—')}</div></td>
         <td><span class="tag ${o.package==='Старт'||o.tariff==='Старт'?'tag-blue':o.package==='Рост'||o.tariff==='Рост'?'tag-green':'tag-purple'}">${o.package||o.tariff||'—'}</span></td>
         <td><span class="sbadge s${o.status||0}"><span class="sdot"></span>${S_LABELS[o.status||0]}</span></td>
         <td style="font-weight:600;color:var(--accent2)">${fmtPrice(o.totalPrice)}</td>
@@ -444,7 +445,7 @@ onAuthStateChanged(auth,async user=>{
     const max=sorted[0]?.[1]||1;
     document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
       <div style="margin-bottom:.7rem">
-        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span>${t}</span><span style="font-family:'Geologica',sans-serif;font-weight:600;font-size:.76rem;color:var(--accent2)">${n}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span>${escapeHtml(t)}</span><span style="font-family:'Geologica',sans-serif;font-weight:600;font-size:.76rem;color:var(--accent2)">${n}</span></div>
         <div style="height:4px;background:var(--bg3);border-radius:2px"><div style="height:100%;border-radius:2px;background:var(--accent);width:${n/max*100}%"></div></div>
       </div>`).join('')||'<div class="empty-state"><span class="empty-state-text">Нет данных</span></div>';
 
@@ -454,7 +455,7 @@ onAuthStateChanged(auth,async user=>{
       const exp=o.supportExpiresAt.toDate();
       const days=Math.ceil((exp-new Date())/(1000*60*60*24));
       return`<div style="background:var(--bg3);border-radius:10px;padding:.75rem .9rem;margin-bottom:.5rem">
-        <div style="font-size:.82rem;font-weight:500;margin-bottom:.15rem">${o.clientName||'—'}</div>
+        <div style="font-size:.82rem;font-weight:500;margin-bottom:.15rem">${escapeHtml(o.clientName||'—')}</div>
         <div style="font-size:.72rem;color:${days<3?'var(--error)':'var(--muted)'}">Осталось ${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
       </div>`;}).join(''):
       '<div class="empty-state"><span class="empty-state-icon" style="font-size:1.5rem">🔧</span><span class="empty-state-text">Нет активных обслуживаний</span></div>';

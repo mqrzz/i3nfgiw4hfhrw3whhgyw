@@ -3,895 +3,1125 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Алина Краснова — Дизайнер</title>
+  <title>Алина Краснова — графический дизайнер</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #f2f0ed;
-      --bg2: #e8e4df;
-      --ink: #1a1814;
-      --accent: #ff4d2e;
-      --accent2: #ff7a5c;
-      --muted: #8a8680;
-      --border: rgba(26,24,20,0.1);
-      --card: #ffffff;
+      --paper: #f1ece2;
+      --paper-deep: #e8e0d0;
+      --ink: #221d16;
+      --ink-soft: #5a5347;
+      --rust: #b6481f;
+      --rust-deep: #8f3414;
+      --olive: #5f6b46;
+      --line: rgba(34,29,22,0.14);
+      --card: #fbf8f2;
     }
 
     html { scroll-behavior: smooth; }
 
     body {
-      background: var(--bg);
+      background: var(--paper);
       color: var(--ink);
-      font-family: 'Inter', sans-serif;
-      font-weight: 300;
-      line-height: 1.65;
+      font-family: 'Manrope', sans-serif;
+      font-weight: 400;
+      line-height: 1.6;
       overflow-x: hidden;
-      cursor: none;
     }
 
-    /* CURSOR */
-    .cursor {
+    /* faint paper grain via layered gradients, no images needed */
+    body::before {
+      content: '';
       position: fixed;
-      width: 12px; height: 12px;
-      background: var(--accent);
-      border-radius: 50%;
+      inset: 0;
       pointer-events: none;
-      z-index: 9999;
-      transition: transform .15s, width .2s, height .2s;
-      transform: translate(-50%, -50%);
+      z-index: 1;
+      opacity: 0.5;
+      background-image:
+        radial-gradient(rgba(34,29,22,0.025) 1px, transparent 1px);
+      background-size: 3px 3px;
     }
 
-    .cursor-ring {
-      position: fixed;
-      width: 40px; height: 40px;
-      border: 1px solid rgba(255,77,46,0.4);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transition: transform .35s cubic-bezier(.25,.46,.45,.94), width .25s, height .25s, opacity .2s;
-      transform: translate(-50%, -50%);
+    a { color: inherit; }
+
+    .wrap { position: relative; z-index: 2; }
+
+    ::selection { background: var(--rust); color: #fff; }
+
+    /* skip link for keyboard users */
+    .skip-link {
+      position: absolute;
+      left: -999px; top: 0;
+      background: var(--ink); color: var(--paper);
+      padding: .6rem 1rem; z-index: 999;
+    }
+    .skip-link:focus { left: 1rem; top: 1rem; }
+
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--rust);
+      outline-offset: 3px;
     }
 
-    body:has(a:hover) .cursor { transform: translate(-50%, -50%) scale(2); }
-    body:has(a:hover) .cursor-ring { width: 60px; height: 60px; opacity: .5; }
-
-    /* BACK */
-    .back-banner {
-      position: fixed;
-      top: 1rem; left: 1rem;
-      z-index: 300;
-      background: var(--ink);
-      color: var(--bg);
-      font-size: .65rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: .5rem 1rem;
-      text-decoration: none;
-      border-radius: 50px;
-      transition: background .2s;
-      display: flex;
-      align-items: center;
-      gap: .4rem;
-    }
-    .back-banner:hover { background: var(--accent); }
-
-    .demo-badge {
-      position: fixed;
-      bottom: 1.5rem; right: 1.5rem;
-      z-index: 300;
-      background: var(--accent);
-      color: #fff;
-      font-size: .62rem;
-      font-weight: 500;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: .45rem .9rem;
-      border-radius: 50px;
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
     }
 
-    /* NAV */
+    /* ===== NAV ===== */
     nav {
-      position: fixed;
+      position: sticky;
       top: 0; left: 0; right: 0;
       z-index: 100;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 1.2rem 5vw;
-      background: rgba(242,240,237,0.9);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
+      padding: 1.1rem 5vw;
+      background: rgba(241,236,226,0.92);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
     }
 
     .nav-logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: .95rem;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-      color: var(--ink);
+      font-family: 'Fraunces', serif;
+      font-weight: 600;
+      font-size: 1.15rem;
+      letter-spacing: -.01em;
       text-decoration: none;
+      color: var(--ink);
     }
+    .nav-logo em { font-style: italic; color: var(--rust); }
 
     .nav-links {
       display: flex;
-      gap: 2rem;
+      gap: 1.8rem;
       align-items: center;
     }
 
     .nav-links a {
-      color: var(--muted);
       text-decoration: none;
-      font-size: .78rem;
+      font-size: .85rem;
+      color: var(--ink-soft);
       transition: color .2s;
     }
-
     .nav-links a:hover { color: var(--ink); }
 
     .nav-cta {
-      background: var(--accent) !important;
-      color: #fff !important;
-      padding: .5rem 1.3rem !important;
-      border-radius: 50px !important;
-      font-size: .75rem !important;
-      font-weight: 500 !important;
-    }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      padding: 8rem 5vw 4rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-bg-text {
-      position: absolute;
-      bottom: -4rem; right: -2rem;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 22vw;
-      color: rgba(26,24,20,0.04);
-      line-height: 1;
-      pointer-events: none;
-      letter-spacing: -.04em;
-      white-space: nowrap;
-    }
-
-    .hero-inner {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-
-    .hero-left {}
-
-    .hero-status {
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      background: rgba(255,77,46,0.08);
-      border: 1px solid rgba(255,77,46,0.2);
-      border-radius: 50px;
-      padding: .3rem .85rem;
-      font-size: .68rem;
-      color: var(--accent);
-      letter-spacing: .06em;
-      margin-bottom: 1.8rem;
-    }
-
-    .status-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--accent);
-      animation: blink 1.5s infinite;
-    }
-
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-    .hero-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(3rem, 6vw, 5.5rem);
-      line-height: 1;
-      letter-spacing: -.03em;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-title .line2 {
-      color: transparent;
-      -webkit-text-stroke: 2px var(--ink);
-    }
-
-    .hero-title .accent { color: var(--accent); }
-
-    .hero-desc {
-      color: var(--muted);
-      font-size: .9rem;
-      max-width: 400px;
-      margin-bottom: 2.5rem;
-      line-height: 1.75;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: .75rem;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-
-    .btn-red {
-      background: var(--accent);
-      color: #fff;
-      padding: .85rem 2rem;
-      border-radius: 50px;
-      font-size: .8rem;
-      font-weight: 500;
-      text-decoration: none;
-      transition: background .2s, transform .15s;
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      border: none;
-      cursor: none;
-    }
-
-    .btn-red:hover { background: var(--accent2); transform: translateY(-2px); }
-
-    .btn-border {
-      border: 1.5px solid var(--ink);
-      color: var(--ink);
-      padding: .85rem 2rem;
-      border-radius: 50px;
-      font-size: .8rem;
-      text-decoration: none;
+      border: 1.5px solid var(--ink) !important;
+      padding: .45rem 1.1rem !important;
+      border-radius: 3px !important;
+      color: var(--ink) !important;
       transition: background .2s, color .2s;
     }
+    .nav-cta:hover { background: var(--ink); color: var(--paper) !important; }
 
-    .btn-border:hover { background: var(--ink); color: var(--bg); }
+    .nav-toggle { display: none; }
 
-    .hero-right {
+    /* ===== HERO ===== */
+    .hero {
+      padding: 5rem 5vw 6rem;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .75rem;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3rem;
+      align-items: end;
+      border-bottom: 1px solid var(--line);
     }
 
-    .hero-card {
-      background: var(--card);
-      border-radius: 20px;
-      padding: 1.5rem;
-      border: 1px solid var(--border);
-      transition: transform .2s;
-    }
-
-    .hero-card:hover { transform: translateY(-4px); }
-    .hero-card:nth-child(1) { grid-column: span 2; }
-    .hero-card:nth-child(2) { background: var(--accent); }
-
-    .card-label {
-      font-size: .62rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: .5rem;
-    }
-
-    .hero-card:nth-child(2) .card-label { color: rgba(255,255,255,0.6); }
-
-    .card-num {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 2.5rem;
-      line-height: 1;
-      color: var(--ink);
-    }
-
-    .hero-card:nth-child(2) .card-num { color: #fff; }
-
-    .card-desc {
-      font-size: .75rem;
-      color: var(--muted);
-      margin-top: .3rem;
-    }
-
-    .hero-card:nth-child(2) .card-desc { color: rgba(255,255,255,0.7); }
-
-    .card-big {
-      display: flex;
-      align-items: center;
-      gap: 1.2rem;
-    }
-
-    .card-big-icon {
-      width: 52px; height: 52px;
-      border-radius: 14px;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-
-    /* WORK */
-    .work {
-      padding: 8rem 5vw;
-    }
-
-    .work-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 3rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-
-    .work-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2rem, 4vw, 3.5rem);
-      letter-spacing: -.03em;
-    }
-
-    .work-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-    }
-
-    .work-item {
-      border-radius: 20px;
-      overflow: hidden;
-      position: relative;
-      aspect-ratio: 4/3;
-      cursor: none;
-    }
-
-    .work-item:first-child {
-      grid-column: span 2;
-      aspect-ratio: 16/9;
-    }
-
-    .work-bg {
-      width: 100%; height: 100%;
-      transition: transform .4s;
-    }
-
-    .work-item:hover .work-bg { transform: scale(1.04); }
-
-    .work-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(to top, rgba(26,24,20,0.85) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity .3s;
-      display: flex;
-      align-items: flex-end;
-      padding: 1.5rem;
-    }
-
-    .work-item:hover .work-overlay { opacity: 1; }
-
-    .work-info {}
-    .work-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: #fff; }
-    .work-type { font-size: .72rem; color: rgba(255,255,255,0.6); margin-top: .2rem; }
-
-    .work-tag {
-      position: absolute;
-      top: 1rem; left: 1rem;
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(8px);
-      color: var(--ink);
-      font-size: .62rem;
-      font-weight: 500;
-      letter-spacing: .08em;
-      text-transform: uppercase;
-      padding: .25rem .7rem;
-      border-radius: 50px;
-    }
-
-    /* SERVICES */
-    .services {
-      padding: 8rem 5vw;
-      background: var(--ink);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .services::before {
-      content: '';
-      position: absolute;
-      top: -200px; right: -200px;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,77,46,0.08) 0%, transparent 70%);
-    }
-
-    .services .work-title { color: #fff; }
-
-    .services-list {
-      display: flex;
-      flex-direction: column;
-      margin-top: 3rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .service-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.8rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.07);
-      gap: 2rem;
-      transition: padding-left .2s;
-      cursor: none;
-    }
-
-    .service-row:hover { padding-left: 1rem; }
-    .service-row:first-child { border-top: 1px solid rgba(255,255,255,0.07); }
-
-    .sr-left { display: flex; align-items: center; gap: 1.5rem; }
-    .sr-num {
-      font-family: 'Syne', sans-serif;
-      font-size: .75rem;
-      color: var(--accent);
-      font-weight: 700;
-      min-width: 28px;
-    }
-    .sr-name {
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(1.1rem, 2vw, 1.6rem);
-      font-weight: 700;
-      color: #fff;
-    }
-    .sr-right { display: flex; align-items: center; gap: 2rem; }
-    .sr-price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--accent); white-space: nowrap; }
-    .sr-arrow { color: rgba(255,255,255,0.3); font-size: 1.2rem; transition: color .2s, transform .2s; }
-    .service-row:hover .sr-arrow { color: var(--accent); transform: translateX(4px); }
-    .sr-tags { display: flex; gap: .4rem; flex-wrap: wrap; }
-    .sr-tag {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(255,255,255,0.5);
-      font-size: .62rem;
-      padding: .18rem .55rem;
-      border-radius: 50px;
-    }
-
-    /* ABOUT */
-    .about {
-      padding: 8rem 5vw;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 6rem;
-      align-items: center;
-    }
-
-    .about-img {
-      aspect-ratio: 3/4;
-      border-radius: 24px;
-      background: linear-gradient(135deg, var(--bg2), var(--accent2));
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .about-img-inner {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 8rem;
-      color: rgba(255,255,255,0.15);
-      line-height: 1;
-    }
-
-    .about-img-badge {
-      position: absolute;
-      bottom: 1.5rem; right: 1.5rem;
-      background: #fff;
-      border-radius: 16px;
-      padding: 1rem 1.2rem;
-      font-size: .75rem;
-    }
-
-    .about-img-badge strong {
-      display: block;
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1.4rem;
-      color: var(--accent);
-    }
-
-    .about-eyebrow {
-      font-size: .65rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--accent);
-      margin-bottom: .8rem;
-    }
-
-    .about-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2rem, 3vw, 2.8rem);
-      letter-spacing: -.03em;
-      line-height: 1.1;
-      margin-bottom: 1.2rem;
-    }
-
-    .about-desc {
-      color: var(--muted);
-      font-size: .88rem;
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    .about-skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: .5rem;
-      margin-bottom: 2.5rem;
-    }
-
-    .skill-tag {
-      background: var(--bg2);
-      border: 1px solid var(--border);
-      color: var(--ink);
-      font-size: .72rem;
-      font-weight: 500;
-      padding: .35rem .85rem;
-      border-radius: 50px;
-    }
-
-    /* CONTACT */
-    .contact-section {
-      padding: 8rem 5vw;
-      background: var(--bg2);
-      text-align: center;
-    }
-
-    .contact-title {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: clamp(2.5rem, 5vw, 5rem);
-      letter-spacing: -.04em;
-      line-height: 1;
-      margin-bottom: 1rem;
-    }
-
-    .contact-title span { color: var(--accent); }
-    .contact-sub { color: var(--muted); font-size: .92rem; margin-bottom: 3rem; }
-
-    .contact-links {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .contact-link {
+    .hero-eyebrow {
+      font-size: .8rem;
+      color: var(--rust);
+      letter-spacing: .03em;
+      margin-bottom: 1.4rem;
       display: flex;
       align-items: center;
       gap: .6rem;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .75rem 1.5rem;
-      font-size: .82rem;
-      color: var(--ink);
-      text-decoration: none;
-      transition: background .2s, border-color .2s, transform .15s;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 28px; height: 1px;
+      background: var(--rust);
+      display: inline-block;
     }
 
-    .contact-link:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .hero-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: clamp(2.6rem, 5.2vw, 4.4rem);
+      line-height: 1.04;
+      letter-spacing: -.02em;
+      margin-bottom: 1.6rem;
+      max-width: 14ch;
+    }
+    .hero-title em { font-style: italic; color: var(--rust); font-weight: 400; }
 
-    /* FOOTER */
-    footer {
-      padding: 2rem 5vw;
-      border-top: 1px solid var(--border);
+    .hero-desc {
+      color: var(--ink-soft);
+      font-size: 1rem;
+      max-width: 46ch;
+      margin-bottom: 2rem;
+    }
+
+    .hero-actions { display: flex; gap: .9rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .8rem 1.6rem;
+      border-radius: 3px;
+      font-size: .85rem;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1.5px solid var(--ink);
+      transition: background .2s, color .2s, transform .15s;
+    }
+    .btn-fill { background: var(--ink); color: var(--paper); }
+    .btn-fill:hover { background: var(--rust); border-color: var(--rust); }
+    .btn-line { background: transparent; color: var(--ink); }
+    .btn-line:hover { background: var(--ink); color: var(--paper); }
+
+    .hero-portrait {
+      position: relative;
+    }
+    .hero-portrait-frame {
+      aspect-ratio: 3/4;
+      border-radius: 4px;
+      overflow: hidden;
+      background: var(--paper-deep);
+      border: 1px solid var(--line);
+    }
+    .hero-portrait-frame img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: sepia(8%) saturate(85%);
+    }
+    .hero-portrait-tag {
+      position: absolute;
+      bottom: -1rem; left: -1rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: .8rem 1.1rem;
+      font-size: .78rem;
+      max-width: 220px;
+      box-shadow: 4px 4px 0 var(--rust);
+    }
+    .hero-portrait-tag strong { font-family: 'Fraunces', serif; display: block; font-size: 1rem; margin-bottom: .15rem; }
+
+    /* ===== marquee strip ===== */
+    .strip {
+      border-bottom: 1px solid var(--line);
+      padding: 1.1rem 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .strip-track {
+      display: inline-flex;
+      gap: 3rem;
+      animation: scroll-left 32s linear infinite;
+    }
+    @keyframes scroll-left {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .strip span {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      font-size: 1.05rem;
+      color: var(--ink-soft);
+      opacity: .65;
+    }
+
+    /* ===== SECTION shared ===== */
+    section { padding: 6rem 5vw; }
+    .section-head {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 2rem;
+      align-items: end;
+      margin-bottom: 3rem;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 1.5rem;
+    }
+    .section-num {
+      font-family: 'Fraunces', serif;
+      font-style: italic;
+      color: var(--rust);
+      font-size: 1rem;
+    }
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+      letter-spacing: -.02em;
+    }
+    .section-note {
+      color: var(--ink-soft);
+      font-size: .88rem;
+      max-width: 32ch;
+      justify-self: end;
+      text-align: right;
+    }
+
+    @media (max-width: 700px) {
+      .section-head { grid-template-columns: 1fr; }
+      .section-note { justify-self: start; text-align: left; }
+    }
+
+    /* ===== WORK ===== */
+    .work-list { display: flex; flex-direction: column; }
+    .work-row {
+      display: grid;
+      grid-template-columns: 90px 1fr 280px 110px;
+      gap: 1.5rem;
+      align-items: center;
+      padding: 1.6rem 0;
+      border-bottom: 1px solid var(--line);
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .work-row:first-child { border-top: 1px solid var(--line); }
+    .work-year { font-size: .8rem; color: var(--ink-soft); }
+    .work-name-wrap {}
+    .work-name {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: clamp(1.15rem, 2vw, 1.55rem);
+      margin-bottom: .25rem;
+    }
+    .work-meta { font-size: .8rem; color: var(--ink-soft); }
+    .work-thumb {
+      width: 100%; aspect-ratio: 16/10;
+      border-radius: 3px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      opacity: 0;
+      transform: scale(.96);
+      transition: opacity .25s, transform .25s;
+    }
+    .work-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .work-row:hover .work-thumb { opacity: 1; transform: scale(1); }
+    .work-row:hover .work-name { color: var(--rust); }
+    .work-arrow { justify-self: end; font-size: 1rem; color: var(--ink-soft); transition: transform .2s; }
+    .work-row:hover .work-arrow { transform: translateX(4px); color: var(--rust); }
+
+    @media (max-width: 800px) {
+      .work-row { grid-template-columns: 50px 1fr 30px; }
+      .work-thumb { display: none; }
+    }
+
+    /* ===== CASE STUDY DETAIL ===== */
+    .case {
+      background: var(--paper-deep);
+    }
+    .case-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .case-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .case-thumb {
+      aspect-ratio: 16/10;
+      border-radius: 3px;
+      overflow: hidden;
+      margin-bottom: 1.4rem;
+      border: 1px solid var(--line);
+    }
+    .case-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .case-client { font-family: 'Fraunces', serif; font-size: 1.25rem; margin-bottom: .6rem; }
+    .case-block { margin-bottom: .9rem; }
+    .case-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .08em; color: var(--rust); margin-bottom: .3rem; }
+    .case-text { font-size: .87rem; color: var(--ink-soft); }
+    .case-stats { display: flex; gap: 1.2rem; margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--line); }
+    .case-stat strong { display: block; font-family: 'Fraunces', serif; font-size: 1.3rem; }
+    .case-stat span { font-size: .72rem; color: var(--ink-soft); }
+
+    @media (max-width: 900px) { .case-grid { grid-template-columns: 1fr; } }
+
+    /* ===== PROCESS ===== */
+    .process-list {
+      display: flex;
+      flex-direction: column;
+    }
+    .process-step {
+      display: grid;
+      grid-template-columns: 70px 1fr 1.3fr;
+      gap: 2rem;
+      padding: 2.2rem 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .process-step:first-child { border-top: 1px solid var(--line); }
+    .process-index { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.4rem; color: var(--rust); }
+    .process-name { font-family: 'Fraunces', serif; font-size: 1.3rem; font-weight: 500; }
+    .process-duration { font-size: .78rem; color: var(--ink-soft); margin-top: .35rem; }
+    .process-desc { font-size: .9rem; color: var(--ink-soft); max-width: 52ch; }
+
+    @media (max-width: 700px) {
+      .process-step { grid-template-columns: 40px 1fr; }
+      .process-desc { grid-column: 1 / -1; }
+    }
+
+    /* ===== TESTIMONIALS ===== */
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .testi-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 1.8rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .testi-quote {
+      font-family: 'Fraunces', serif;
+      font-size: 1.05rem;
+      line-height: 1.5;
+      margin-bottom: 1.4rem;
+      flex-grow: 1;
+    }
+    .testi-quote::before { content: '"'; color: var(--rust); }
+    .testi-person { display: flex; align-items: center; gap: .8rem; padding-top: 1rem; border-top: 1px solid var(--line); }
+    .testi-avatar { width: 38px; height: 38px; border-radius: 50%; overflow: hidden; flex-shrink: 0; background: var(--paper-deep); }
+    .testi-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .testi-name { font-size: .85rem; font-weight: 600; }
+    .testi-role { font-size: .75rem; color: var(--ink-soft); }
+
+    @media (max-width: 900px) { .testi-grid { grid-template-columns: 1fr; } }
+
+    /* ===== SERVICES / PRICING ===== */
+    .services-dark {
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .services-dark .section-title { color: var(--paper); }
+    .services-dark .section-note { color: rgba(241,236,226,0.55); }
+    .services-dark .section-num { color: var(--rust-deep); filter: brightness(1.6); }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .price-card {
+      border: 1px solid rgba(241,236,226,0.16);
+      border-radius: 4px;
+      padding: 2.2rem 1.8rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .price-card.featured {
+      background: var(--rust);
+      border-color: var(--rust);
+    }
+    .price-name { font-family: 'Fraunces', serif; font-size: 1.3rem; margin-bottom: .4rem; }
+    .price-desc { font-size: .82rem; color: rgba(241,236,226,0.6); margin-bottom: 1.5rem; }
+    .price-card.featured .price-desc { color: rgba(255,255,255,0.85); }
+    .price-value { font-family: 'Fraunces', serif; font-size: 2.3rem; margin-bottom: 1.5rem; }
+    .price-value sub { font-size: .9rem; font-family: 'Manrope', sans-serif; color: rgba(241,236,226,0.5); }
+    .price-card.featured .price-value sub { color: rgba(255,255,255,0.7); }
+    .price-features { list-style: none; margin-bottom: 1.8rem; flex-grow: 1; }
+    .price-features li {
+      font-size: .85rem;
+      padding: .55rem 0;
+      border-top: 1px solid rgba(241,236,226,0.1);
+      display: flex;
+      gap: .6rem;
+    }
+    .price-card.featured .price-features li { border-top-color: rgba(255,255,255,0.18); }
+    .price-features li::before { content: '—'; color: var(--rust); flex-shrink: 0; }
+    .price-card.featured .price-features li::before { color: #fff; }
+    .price-btn {
+      text-align: center;
+      padding: .75rem;
+      border: 1.5px solid var(--paper);
+      border-radius: 3px;
+      text-decoration: none;
+      color: var(--paper);
+      font-size: .85rem;
+      font-weight: 600;
+      transition: background .2s, color .2s;
+    }
+    .price-btn:hover { background: var(--paper); color: var(--ink); }
+    .price-card.featured .price-btn { border-color: #fff; color: #fff; }
+    .price-card.featured .price-btn:hover { background: #fff; color: var(--rust-deep); }
+
+    @media (max-width: 900px) { .pricing-grid { grid-template-columns: 1fr; } }
+
+    /* ===== ABOUT ===== */
+    .about {
+      display: grid;
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .about-portrait {
+      aspect-ratio: 4/5;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      position: sticky;
+      top: 6rem;
+    }
+    .about-portrait img { width: 100%; height: 100%; object-fit: cover; filter: sepia(8%) saturate(85%); }
+
+    .about-lede {
+      font-family: 'Fraunces', serif;
+      font-size: 1.4rem;
+      line-height: 1.45;
+      margin-bottom: 1.8rem;
+      max-width: 38ch;
+    }
+    .about-lede em { font-style: italic; color: var(--rust); }
+    .about-desc { color: var(--ink-soft); font-size: .92rem; margin-bottom: 1.2rem; max-width: 56ch; }
+
+    .about-facts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin: 2.2rem 0;
+      padding: 1.8rem 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+    .about-fact strong { display: block; font-family: 'Fraunces', serif; font-size: 1.6rem; color: var(--rust); }
+    .about-fact span { font-size: .75rem; color: var(--ink-soft); }
+
+    .skill-tag-row { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1.5rem; }
+    .skill-tag {
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      font-size: .78rem;
+      padding: .4rem .9rem;
+      border-radius: 3px;
+    }
+
+    @media (max-width: 900px) {
+      .about { grid-template-columns: 1fr; }
+      .about-portrait { position: static; max-width: 320px; }
+      .about-facts { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ===== FAQ ===== */
+    .faq-list { max-width: 760px; }
+    .faq-item {
+      border-bottom: 1px solid var(--line);
+    }
+    .faq-item:first-child { border-top: 1px solid var(--line); }
+    .faq-q {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 1.4rem 0;
+      font-family: 'Fraunces', serif;
+      font-size: 1.1rem;
+      color: var(--ink);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+    }
+    .faq-q-mark { font-size: 1.2rem; color: var(--rust); flex-shrink: 0; transition: transform .25s; }
+    .faq-item[data-open="true"] .faq-q-mark { transform: rotate(45deg); }
+    .faq-a {
+      font-size: .9rem;
+      color: var(--ink-soft);
+      max-width: 60ch;
+      overflow: hidden;
+      max-height: 0;
+      transition: max-height .3s ease, padding .3s ease;
+    }
+    .faq-item[data-open="true"] .faq-a {
+      max-height: 240px;
+      padding-bottom: 1.4rem;
+    }
+
+    /* ===== JOURNAL / BLOG ===== */
+    .journal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .journal-card {
+      text-decoration: none;
+      color: var(--ink);
+      display: flex;
+      flex-direction: column;
+    }
+    .journal-thumb {
+      aspect-ratio: 4/3;
+      border-radius: 4px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      margin-bottom: 1.1rem;
+    }
+    .journal-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .3s; }
+    .journal-card:hover .journal-thumb img { transform: scale(1.04); }
+    .journal-cat { font-size: .7rem; text-transform: uppercase; letter-spacing: .07em; color: var(--rust); margin-bottom: .5rem; }
+    .journal-title { font-family: 'Fraunces', serif; font-size: 1.15rem; margin-bottom: .5rem; line-height: 1.3; }
+    .journal-meta { font-size: .78rem; color: var(--ink-soft); margin-top: auto; }
+
+    @media (max-width: 900px) { .journal-grid { grid-template-columns: 1fr; } }
+
+    /* ===== CONTACT ===== */
+    .contact-section {
+      background: var(--paper-deep);
+      text-align: left;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3rem;
+    }
+    .contact-title {
+      font-family: 'Fraunces', serif;
+      font-weight: 500;
+      font-size: clamp(2.1rem, 4vw, 3.2rem);
+      letter-spacing: -.02em;
+      line-height: 1.08;
+      margin-bottom: 1.2rem;
+    }
+    .contact-title em { font-style: italic; color: var(--rust); }
+    .contact-sub { color: var(--ink-soft); font-size: .95rem; max-width: 42ch; margin-bottom: 2rem; }
+    .contact-links { display: flex; flex-direction: column; gap: .8rem; max-width: 360px; }
+    .contact-link {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: .75rem;
-      color: var(--muted);
-    }
-
-    footer a { color: var(--accent); text-decoration: none; }
-
-    .footer-logo {
-      font-family: 'Syne', sans-serif;
-      font-weight: 800;
-      font-size: 1rem;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: 1rem 1.3rem;
+      font-size: .9rem;
       color: var(--ink);
-      letter-spacing: -.01em;
+      text-decoration: none;
+      transition: border-color .2s, transform .15s;
     }
+    .contact-link:hover { border-color: var(--rust); transform: translateX(3px); }
+    .contact-link span:last-child { color: var(--ink-soft); font-size: .8rem; }
 
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
+    .contact-form {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 4px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
+    .contact-form label { font-size: .78rem; color: var(--ink-soft); display: block; margin-bottom: .4rem; }
+    .contact-form input, .contact-form textarea {
+      width: 100%;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 3px;
+      padding: .7rem .9rem;
+      font-family: 'Manrope', sans-serif;
+      font-size: .88rem;
+      color: var(--ink);
+    }
+    .contact-form input:focus, .contact-form textarea:focus { outline: 1.5px solid var(--rust); }
+    .contact-form button {
+      margin-top: .4rem;
+      background: var(--ink);
+      color: var(--paper);
+      border: none;
+      padding: .85rem;
+      border-radius: 3px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .contact-form button:hover { background: var(--rust); }
 
-    .hero-status { animation: fadeUp .6s .1s both; }
-    .hero-title { animation: fadeUp .6s .2s both; }
-    .hero-desc { animation: fadeUp .6s .3s both; }
-    .hero-actions { animation: fadeUp .6s .4s both; }
-    .hero-right { animation: fadeUp .6s .3s both; }
+    @media (max-width: 900px) { .contact-section { grid-template-columns: 1fr; } }
+
+    /* ===== FOOTER ===== */
+    footer {
+      padding: 2rem 5vw;
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .8rem;
+      color: var(--ink-soft);
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer a { color: var(--rust); text-decoration: none; }
+    .footer-logo { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1rem; color: var(--ink); }
+
+    /* demo banner kept minimal, no longer fixed/floating mid-content */
+    .demo-bar {
+      background: var(--ink);
+      color: var(--paper);
+      font-size: .72rem;
+      text-align: center;
+      padding: .5rem 1rem;
+      letter-spacing: .02em;
+    }
+    .demo-bar a { color: var(--rust-deep); filter: brightness(1.6); text-decoration: underline; }
 
     @media (max-width: 900px) {
-      .hero-inner { grid-template-columns: 1fr; }
-      .hero-right { display: none; }
-      .work-grid { grid-template-columns: 1fr; }
-      .work-item:first-child { grid-column: span 1; aspect-ratio: 4/3; }
-      .about { grid-template-columns: 1fr; }
-      .about-img { aspect-ratio: 1/1; }
-      .sr-tags { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .hero-portrait { max-width: 320px; }
+      .case-grid, .testi-grid, .pricing-grid { grid-template-columns: 1fr; }
       .nav-links { display: none; }
-      body { cursor: auto; }
-      .cursor, .cursor-ring { display: none; }
     }
   </style>
 </head>
 <body>
 
-<div class="cursor" id="cursor"></div>
-<div class="cursor-ring" id="cursorRing"></div>
+<div class="demo-bar">Демо-макет от <a href="/">Antviz</a> — пример того, как может выглядеть сайт-портфолио. Без фото - сайт для демонстрации.</div>
 
-<a href="/" class="back-banner">← Antviz · Демо</a>
-<div class="demo-badge">Демо-сайт</div>
+<a href="#main" class="skip-link">Перейти к содержанию</a>
+
+<div class="wrap">
 
 <nav>
-  <a href="#" class="nav-logo">Alina.design</a>
+  <a href="#" class="nav-logo">Алина <em>Краснова</em></a>
   <div class="nav-links">
     <a href="#work">Работы</a>
+    <a href="#process">Процесс</a>
     <a href="#services">Услуги</a>
     <a href="#about">Обо мне</a>
-    <a href="#contact" class="nav-cta">Написать →</a>
+    <a href="#journal">Журнал</a>
+    <a href="#faq">Вопросы</a>
+    <a href="#contact" class="nav-cta">Написать</a>
   </div>
 </nav>
 
+<main id="main">
+
 <section class="hero">
-  <div class="hero-bg-text">DESIGN</div>
-  <div class="hero-inner">
-    <div class="hero-left">
-      <div class="hero-status">
-        <div class="status-dot"></div>
-        Доступна для проектов
-      </div>
-      <h1 class="hero-title">
-        Дизайн<br/>
-        <span class="line2">который</span><br/>
-        <span class="accent">продаёт</span>
-      </h1>
-      <p class="hero-desc">Создаю айдентику, лендинги и интерфейсы для бизнеса. 6 лет опыта, более 80 проектов — от стартапов до крупных брендов.</p>
-      <div class="hero-actions">
-        <a href="#work" class="btn-red">Смотреть работы →</a>
-        <a href="#contact" class="btn-border">Связаться</a>
-      </div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">Графический и веб-дизайнер. Нижний Новгород</div>
+    <h1 class="hero-title">Делаю дизайн, который <em>проживает</em> дольше брифа</h1>
+    <p class="hero-desc">Помогаю малому и среднему бизнесу — от кофеен до финтех-стартапов — обрести внятную визуальную форму. Без шаблонов из конструктора и без «модно сейчас». С 2018 года, 47 завершённых проектов.</p>
+    <div class="hero-actions">
+      <a href="#work" class="btn btn-fill">Смотреть работы</a>
+      <a href="#contact" class="btn btn-line">Обсудить проект</a>
     </div>
-    <div class="hero-right">
-      <div class="hero-card">
-        <div class="card-big">
-          <div class="card-big-icon">🏆</div>
-          <div>
-            <div class="card-label">Достижение</div>
-            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem">Awwwards Site of the Day</div>
-            <div class="card-desc">Лучший сайт дня · 2023</div>
-          </div>
+  </div>
+  <div class="hero-portrait">
+    <div class="hero-portrait-frame">
+      <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80" alt="Алина Краснова за рабочим столом"/>
+    </div>
+    <div class="hero-portrait-tag"><strong>Свободна с июля</strong>Беру 1–2 новых проекта в месяц</div>
+  </div>
+</section>
+
+<div class="strip" aria-hidden="true">
+  <div class="strip-track">
+    <span>Брендинг</span><span>·</span><span>Веб-дизайн</span><span>·</span><span>UI/UX</span><span>·</span><span>Упаковка</span><span>·</span><span>Полиграфия</span><span>·</span><span>Motion</span><span>·</span>
+    <span>Брендинг</span><span>·</span><span>Веб-дизайн</span><span>·</span><span>UI/UX</span><span>·</span><span>Упаковка</span><span>·</span><span>Полиграфия</span><span>·</span><span>Motion</span><span>·</span>
+  </div>
+</div>
+
+<!-- ===== WORK LIST ===== -->
+<section id="work">
+  <div class="section-head">
+    <div class="section-num">01</div>
+    <div>
+      <h2 class="section-title">Избранные проекты</h2>
+    </div>
+    <div class="section-note">Полный список — по запросу, здесь самое показательное за три года</div>
+  </div>
+  <div class="work-list">
+    <a href="#case-nexus" class="work-row">
+      <div class="work-year">2025</div>
+      <div class="work-name-wrap">
+        <div class="work-name">Nexus Finance</div>
+        <div class="work-meta">Айдентика для финтех-сервиса · логотип, брендбук, носители</div>
+      </div>
+      <div class="work-thumb"><img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?w=600&q=80" alt="Айдентика Nexus Finance"/></div>
+      <div class="work-arrow">→</div>
+    </a>
+    <a href="#case-eco" class="work-row">
+      <div class="work-year">2024</div>
+      <div class="work-name-wrap">
+        <div class="work-name">Eco Market</div>
+        <div class="work-meta">Сайт сети эко-магазинов · UI/UX, адаптивная вёрстка</div>
+      </div>
+      <div class="work-thumb"><img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80" alt="Сайт Eco Market"/></div>
+      <div class="work-arrow">→</div>
+    </a>
+    <a href="#case-pulse" class="work-row">
+      <div class="work-year">2024</div>
+      <div class="work-name-wrap">
+        <div class="work-name">Pulse App</div>
+        <div class="work-meta">Интерфейс мобильного приложения для трекинга тренировок</div>
+      </div>
+      <div class="work-thumb"><img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&q=80" alt="Интерфейс Pulse App"/></div>
+      <div class="work-arrow">→</div>
+    </a>
+    <a href="#contact" class="work-row">
+      <div class="work-year">2023</div>
+      <div class="work-name-wrap">
+        <div class="work-name">Luna Café</div>
+        <div class="work-meta">Айдентика кофейни · логотип, упаковка, оформление меню</div>
+      </div>
+      <div class="work-thumb"><img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80" alt="Айдентика Luna Café"/></div>
+      <div class="work-arrow">→</div>
+    </a>
+    <a href="#contact" class="work-row">
+      <div class="work-year">2023</div>
+      <div class="work-name-wrap">
+        <div class="work-name">TechStart</div>
+        <div class="work-meta">Лендинг для B2B SaaS-продукта · дизайн и вёрстка</div>
+      </div>
+      <div class="work-thumb"><img src="https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&q=80" alt="Лендинг TechStart"/></div>
+      <div class="work-arrow">→</div>
+    </a>
+  </div>
+</section>
+
+<!-- ===== CASE STUDIES DETAIL ===== -->
+<section class="case">
+  <div class="section-head">
+    <div class="section-num">02</div>
+    <div><h2 class="section-title">Как это устроено</h2></div>
+    <div class="section-note">Три кейса подробно: задача, что делала, что получилось</div>
+  </div>
+  <div class="case-grid">
+    <article class="case-card" id="case-nexus">
+      <div class="case-thumb"><img src="https://images.unsplash.com/photo-1634942537034-2531766767d1?w=600&q=80" alt="Айдентика Nexus Finance"/></div>
+      <div class="case-client">Nexus Finance</div>
+      <div class="case-block">
+        <div class="case-label">Задача</div>
+        <p class="case-text">Финтех-стартап выходил на рынок с названием, но без какой-либо визуальной системы — питч-дек собирали вручную в Google Slides перед каждой встречей с инвесторами.</p>
+      </div>
+      <div class="case-block">
+        <div class="case-label">Решение</div>
+        <p class="case-text">Логотип на основе монограммы, сдержанная сине-графитовая палитра, брендбук на 24 страницы и шаблоны для презентаций, которые команда теперь собирает сама за час.</p>
+      </div>
+      <div class="case-stats">
+        <div class="case-stat"><strong>5</strong><span>недель</span></div>
+        <div class="case-stat"><strong>24</strong><span>стр. брендбука</span></div>
+      </div>
+    </article>
+    <article class="case-card" id="case-eco">
+      <div class="case-thumb"><img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=600&q=80" alt="Сайт Eco Market"/></div>
+      <div class="case-client">Eco Market</div>
+      <div class="case-block">
+        <div class="case-label">Задача</div>
+        <p class="case-text">Старый сайт сети из шести магазинов не открывался нормально с телефона, а доля мобильного трафика у клиента — 70%.</p>
+      </div>
+      <div class="case-block">
+        <div class="case-label">Решение</div>
+        <p class="case-text">Полная переразработка интерфейса: упростила навигацию до трёх уровней, сделала карточки товаров читаемыми с одного взгляда, ускорила загрузку за счёт верстки без лишних библиотек.</p>
+      </div>
+      <div class="case-stats">
+        <div class="case-stat"><strong>+38%</strong><span>мобильных заявок</span></div>
+        <div class="case-stat"><strong>6</strong><span>недель</span></div>
+      </div>
+    </article>
+    <article class="case-card" id="case-pulse">
+      <div class="case-thumb"><img src="https://images.unsplash.com/photo-1551650975-87deedd944c3?w=600&q=80" alt="Интерфейс Pulse App"/></div>
+      <div class="case-client">Pulse App</div>
+      <div class="case-block">
+        <div class="case-label">Задача</div>
+        <p class="case-text">Команда разработчиков сделала рабочее приложение, но пользователи бросали его после первой тренировки — интерфейс был перегружен метриками.</p>
+      </div>
+      <div class="case-block">
+        <div class="case-label">Решение</div>
+        <p class="case-text">Провела аудит пользовательских сценариев, убрала треть экранов, переработала главный дашборд вокруг одной метрики за раз вместо семи одновременно.</p>
+      </div>
+      <div class="case-stats">
+        <div class="case-stat"><strong>+21%</strong><span>удержание D7</span></div>
+        <div class="case-stat"><strong>4</strong><span>недели</span></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<!-- ===== PROCESS ===== -->
+<section id="process">
+  <div class="section-head">
+    <div class="section-num">03</div>
+    <div><h2 class="section-title">Как проходит работа</h2></div>
+    <div class="section-note">Реальный порядок этапов — без него хороший результат не складывается</div>
+  </div>
+  <div class="process-list">
+    <div class="process-step">
+      <div class="process-index">01</div>
+      <div>
+        <div class="process-name">Бриф и погружение</div>
+        <div class="process-duration">2–4 дня</div>
+      </div>
+      <p class="process-desc">Созваниваемся, разбираю бизнес, конкурентов и то, что уже пробовали. Если нужно — задаю неудобные вопросы про аудиторию и бюджет на старте, чтобы потом не переделывать.</p>
+    </div>
+    <div class="process-step">
+      <div class="process-index">02</div>
+      <div>
+        <div class="process-name">Концепция</div>
+        <div class="process-duration">1–2 недели</div>
+      </div>
+      <p class="process-desc">Предлагаю не один вариант «на угад», а одно обоснованное направление с логикой выбора — почему именно эти цвета, шрифты и форма, а не просто «нравится — не нравится».</p>
+    </div>
+    <div class="process-step">
+      <div class="process-index">03</div>
+      <div>
+        <div class="process-name">Доработка</div>
+        <div class="process-duration">1 неделя</div>
+      </div>
+      <p class="process-desc">Два круга правок включены в стоимость. Работаем по комментариям в Figma — ничего не теряется в переписке.</p>
+    </div>
+    <div class="process-step">
+      <div class="process-index">04</div>
+      <div>
+        <div class="process-name">Финализация и передача</div>
+        <div class="process-duration">3–5 дней</div>
+      </div>
+      <p class="process-desc">Собираю файлы во всех нужных форматах, пишу краткую инструкцию по использованию — чтобы дизайн не разваливался в руках другого исполнителя через полгода.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTIMONIALS ===== -->
+<section id="testimonials" style="background:var(--paper-deep)">
+  <div class="section-head">
+    <div class="section-num">04</div>
+    <div><h2 class="section-title">Отзывы клиентов</h2></div>
+    <div class="section-note">Контакты для проверки отзывов даю по запросу</div>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <p class="testi-quote">Алина единственная из всех дизайнеров, с кем мы работали, сразу спросила про юнит-экономику, прежде чем предлагать цвета. Это было неожиданно и оказалось очень в тему.</p>
+      <div class="testi-person">
+        <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&q=80" alt="Дмитрий Соколов"/></div>
+        <div>
+          <div class="testi-name">Дмитрий Соколов</div>
+          <div class="testi-role">Сооснователь, Nexus Finance</div>
         </div>
       </div>
-      <div class="hero-card">
-        <div class="card-label">Проектов</div>
-        <div class="card-num">80<span style="color:var(--accent)">+</span></div>
-        <div class="card-desc">Завершено</div>
+    </div>
+    <div class="testi-card">
+      <p class="testi-quote">Боялись, что редизайн сайта затянется на полгода, как в прошлый раз с другим подрядчиком. Уложились в шесть недель, и заявки с мобильных правда выросли.</p>
+      <div class="testi-person">
+        <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=100&q=80" alt="Марина Волкова"/></div>
+        <div>
+          <div class="testi-name">Марина Волкова</div>
+          <div class="testi-role">Маркетинг-директор, Eco Market</div>
+        </div>
       </div>
-      <div class="hero-card" style="background:var(--bg2)">
-        <div class="card-label">Опыт</div>
-        <div class="card-num" style="font-size:2rem">6 лет</div>
-        <div class="card-desc">В профессии</div>
+    </div>
+    <div class="testi-card">
+      <p class="testi-quote">Дала честную обратную связь, что наш интерфейс перегружен, хотя мы были уверены в обратном. Через месяц после правок поняли, что она была права.</p>
+      <div class="testi-person">
+        <div class="testi-avatar"><img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?w=100&q=80" alt="Игорь Петренко"/></div>
+        <div>
+          <div class="testi-name">Игорь Петренко</div>
+          <div class="testi-role">CTO, Pulse App</div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="work" id="work">
-  <div class="work-header">
-    <h2 class="work-title">Избранные<br/>работы</h2>
-    <a href="#contact" class="btn-red" style="font-size:.78rem">Обсудить проект →</a>
+<!-- ===== SERVICES / PRICING ===== -->
+<section id="services" class="services-dark">
+  <div class="section-head" style="border-color: rgba(241,236,226,0.16)">
+    <div class="section-num">05</div>
+    <div><h2 class="section-title">Услуги и цены</h2></div>
+    <div class="section-note">Ориентир по бюджету — точная смета после брифа</div>
   </div>
-  <div class="work-grid">
-    <div class="work-item">
-      <div class="work-bg" style="background:linear-gradient(135deg,#1a1814,#3d2e5a,#1a1814);height:100%"></div>
-      <div class="work-tag">Брендинг</div>
-      <div class="work-overlay">
-        <div class="work-info">
-          <div class="work-name">Nexus Finance — Айдентика</div>
-          <div class="work-type">Логотип · Brand book · Носители</div>
-        </div>
-      </div>
+  <div class="pricing-grid">
+    <div class="price-card">
+      <div class="price-name">Айдентика</div>
+      <p class="price-desc">Для тех, кто запускается с нуля или давно не обновлял визуальный образ</p>
+      <div class="price-value">от 45 000 ₽</div>
+      <ul class="price-features">
+        <li>Логотип в 2–3 вариантах</li>
+        <li>Цветовая и шрифтовая система</li>
+        <li>Брендбук 12–20 страниц</li>
+        <li>Шаблоны для соцсетей</li>
+        <li>2 круга правок</li>
+      </ul>
+      <a href="#contact" class="price-btn">Обсудить проект</a>
     </div>
-    <div class="work-item">
-      <div class="work-bg" style="background:linear-gradient(135deg,#0d2818,#1a4d2e);height:100%"></div>
-      <div class="work-tag">Веб</div>
-      <div class="work-overlay">
-        <div class="work-info">
-          <div class="work-name">Eco Market — Сайт</div>
-          <div class="work-type">UI/UX · Адаптив · Анимации</div>
-        </div>
-      </div>
+    <div class="price-card featured">
+      <div class="price-name">Сайт под ключ</div>
+      <p class="price-desc">Самый частый запрос: лендинг или сайт на 3–6 страниц с адаптивом</p>
+      <div class="price-value">от 65 000 ₽<sub> / проект</sub></div>
+      <ul class="price-features">
+        <li>UX-структура и прототип</li>
+        <li>Дизайн под десктоп и мобильные</li>
+        <li>Подготовка к вёрстке</li>
+        <li>Анимации и микро-интеракции</li>
+        <li>2 круга правок</li>
+      </ul>
+      <a href="#contact" class="price-btn">Обсудить проект</a>
     </div>
-    <div class="work-item">
-      <div class="work-bg" style="background:linear-gradient(135deg,#2d1010,#6b2020);height:100%"></div>
-      <div class="work-tag">UI/UX</div>
-      <div class="work-overlay">
-        <div class="work-info">
-          <div class="work-name">Pulse App — Интерфейс</div>
-          <div class="work-type">Мобильное приложение</div>
-        </div>
-      </div>
+    <div class="price-card">
+      <div class="price-name">UI/UX продукта</div>
+      <p class="price-desc">Для приложений и сервисов — от первого экрана до дизайн-системы</p>
+      <div class="price-value">от 80 000 ₽</div>
+      <ul class="price-features">
+        <li>Исследование пользовательских сценариев</li>
+        <li>Прототип в Figma</li>
+        <li>Дизайн-система компонентов</li>
+        <li>Передача разработчикам</li>
+        <li>2 круга правок</li>
+      </ul>
+      <a href="#contact" class="price-btn">Обсудить проект</a>
     </div>
-    <div class="work-item">
-      <div class="work-bg" style="background:linear-gradient(135deg,#1a1430,#2d2260);height:100%"></div>
-      <div class="work-tag">Брендинг</div>
-      <div class="work-overlay">
-        <div class="work-info">
-          <div class="work-name">Luna Café — Айдентика</div>
-          <div class="work-type">Логотип · Упаковка · Меню</div>
-        </div>
-      </div>
+  </div>
+</section>
+
+<!-- ===== ABOUT ===== -->
+<section id="about">
+  <div class="about">
+    <div class="about-portrait">
+      <img src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=700&q=80" alt="Алина Краснова, дизайнер"/>
     </div>
-    <div class="work-item">
-      <div class="work-bg" style="background:linear-gradient(135deg,#0d1a14,#1a3d2a);height:100%"></div>
-      <div class="work-tag">Лендинг</div>
-      <div class="work-overlay">
-        <div class="work-info">
-          <div class="work-name">TechStart — Лендинг</div>
-          <div class="work-type">Разработка + Дизайн</div>
-        </div>
+    <div class="about-content">
+      <p class="about-lede">Я начинала с заказов на фрилансе за пять тысяч рублей и логотипов для одногруппников. <em>Сейчас веду проекты для компаний по всей стране</em> — но та же дотошность к деталям никуда не делась.</p>
+      <p class="about-desc">Дизайном занимаюсь с 2018 года. Закончила Вышку по специальности «графический дизайн», потом два года в студии в Нижнем — после неё ушла на свои проекты. Беру не всё подряд: если не вижу, как могу реально помочь бизнесу, честно отказываюсь, даже если бюджет хороший.</p>
+      <p class="about-desc">Параллельно с проектами веду небольшой блог про дизайн-процессы — без воды и без «10 секретов успеха», в основном разборы, что не сработало и почему.</p>
+      <div class="about-facts">
+        <div class="about-fact"><strong>47</strong><span>проектов с 2018</span></div>
+        <div class="about-fact"><strong>6 лет</strong><span>в профессии</span></div>
+        <div class="about-fact"><strong>12</strong><span>постоянных клиентов</span></div>
+      </div>
+      <div class="skill-tag-row">
+        <span class="skill-tag">Figma</span>
+        <span class="skill-tag">Illustrator</span>
+        <span class="skill-tag">Photoshop</span>
+        <span class="skill-tag">After Effects</span>
+        <span class="skill-tag">Webflow</span>
+        <span class="skill-tag">Брендинг</span>
+        <span class="skill-tag">Motion-дизайн</span>
       </div>
     </div>
   </div>
 </section>
 
-<section class="services" id="services">
-  <h2 class="work-title" style="color:#fff;position:relative;z-index:1">Чем я<br/>занимаюсь</h2>
-  <div class="services-list">
-    <div class="service-row">
-      <div class="sr-left">
-        <div class="sr-num">01</div>
-        <div class="sr-name">Брендинг и айдентика</div>
-      </div>
-      <div class="sr-right">
-        <div class="sr-tags">
-          <span class="sr-tag">Логотип</span>
-          <span class="sr-tag">Фирменный стиль</span>
-          <span class="sr-tag">Brand book</span>
-        </div>
-        <div class="sr-price">от 45 000 ₽</div>
-        <div class="sr-arrow">→</div>
-      </div>
+<!-- ===== JOURNAL ===== -->
+<section id="journal" style="background:var(--paper-deep)">
+  <div class="section-head">
+    <div class="section-num">06</div>
+    <div><h2 class="section-title">Журнал</h2></div>
+    <div class="section-note">Заметки о процессе — без списков «10 трендов 2026»</div>
+  </div>
+  <div class="journal-grid">
+    <a href="#" class="journal-card">
+      <div class="journal-thumb"><img src="https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500&q=80" alt="Статья о брифе"/></div>
+      <div class="journal-cat">Процесс</div>
+      <div class="journal-title">Почему я не начинаю работу без брифа на бумаге, а не в переписке</div>
+      <div class="journal-meta">12 мая 2026 · 6 мин чтения</div>
+    </a>
+    <a href="#" class="journal-card">
+      <div class="journal-thumb"><img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&q=80" alt="Статья о ребрендинге"/></div>
+      <div class="journal-cat">Кейс</div>
+      <div class="journal-title">Что пошло не так в первой версии логотипа Nexus Finance</div>
+      <div class="journal-meta">28 марта 2026 · 8 мин чтения</div>
+    </a>
+    <a href="#" class="journal-card">
+      <div class="journal-thumb"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=500&q=80" alt="Статья про типографику"/></div>
+      <div class="journal-cat">Заметка</div>
+      <div class="journal-title">Три шрифтовые пары, которые я почти перестала использовать в 2026</div>
+      <div class="journal-meta">9 февраля 2026 · 4 мин чтения</div>
+    </a>
+  </div>
+</section>
+
+<!-- ===== FAQ ===== -->
+<section id="faq">
+  <div class="section-head">
+    <div class="section-num">07</div>
+    <div><h2 class="section-title">Частые вопросы</h2></div>
+    <div class="section-note">Если ответа нет здесь — лучше спросить напрямую</div>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item" data-open="false">
+      <button class="faq-q" aria-expanded="false">Сколько времени занимает проект?<span class="faq-q-mark">+</span></button>
+      <div class="faq-a">Логотип и базовая айдентика — 3–5 недель, сайт под ключ — 5–8 недель в зависимости от объёма. Точные сроки фиксирую в брифе перед стартом, чтобы обе стороны понимали дедлайны.</div>
     </div>
-    <div class="service-row">
-      <div class="sr-left">
-        <div class="sr-num">02</div>
-        <div class="sr-name">Дизайн сайтов</div>
-      </div>
-      <div class="sr-right">
-        <div class="sr-tags">
-          <span class="sr-tag">Лендинг</span>
-          <span class="sr-tag">Многостраничный</span>
-          <span class="sr-tag">Адаптив</span>
-        </div>
-        <div class="sr-price">от 35 000 ₽</div>
-        <div class="sr-arrow">→</div>
-      </div>
+    <div class="faq-item" data-open="false">
+      <button class="faq-q" aria-expanded="false">Берёте ли предоплату?<span class="faq-q-mark">+</span></button>
+      <div class="faq-a">Да, 50% перед стартом работы, оставшиеся 50% — после согласования финальной концепции, до передачи исходников. Для проектов дороже 100 000 ₽ возможна разбивка на три платежа.</div>
     </div>
-    <div class="service-row">
-      <div class="sr-left">
-        <div class="sr-num">03</div>
-        <div class="sr-name">UI/UX дизайн</div>
-      </div>
-      <div class="sr-right">
-        <div class="sr-tags">
-          <span class="sr-tag">Figma</span>
-          <span class="sr-tag">Прототип</span>
-          <span class="sr-tag">UX-аудит</span>
-        </div>
-        <div class="sr-price">от 55 000 ₽</div>
-        <div class="sr-arrow">→</div>
-      </div>
+    <div class="faq-item" data-open="false">
+      <button class="faq-q" aria-expanded="false">Сколько правок включено?<span class="faq-q-mark">+</span></button>
+      <div class="faq-a">Два круга правок включены в стоимость на каждом этапе. Дополнительные правки за пределами этого — по часовой ставке, она оговаривается заранее, без сюрпризов в финальном счёте.</div>
     </div>
-    <div class="service-row">
-      <div class="sr-left">
-        <div class="sr-num">04</div>
-        <div class="sr-name">Полиграфия и упаковка</div>
-      </div>
-      <div class="sr-right">
-        <div class="sr-tags">
-          <span class="sr-tag">Упаковка</span>
-          <span class="sr-tag">Печать</span>
-          <span class="sr-tag">POS</span>
-        </div>
-        <div class="sr-price">от 20 000 ₽</div>
-        <div class="sr-arrow">→</div>
-      </div>
+    <div class="faq-item" data-open="false">
+      <button class="faq-q" aria-expanded="false">Работаете ли с маленьким бюджетом или стартапами на ранней стадии?<span class="faq-q-mark">+</span></button>
+      <div class="faq-a">Иногда — зависит от проекта и графика. Если бюджет ограничен, честно скажу, что реально сделать в его рамках, без обещаний нереалистичного объёма работы.</div>
+    </div>
+    <div class="faq-item" data-open="false">
+      <button class="faq-q" aria-expanded="false">В каких форматах передаёте файлы?<span class="faq-q-mark">+</span></button>
+      <div class="faq-a">Зависит от задачи: для брендинга — AI, EPS, PDF, PNG, SVG плюс брендбук в PDF; для сайтов — макет в Figma с готовой передачей разработчику и описанием компонентов.</div>
     </div>
   </div>
 </section>
 
-<section class="about" id="about">
-  <div class="about-img">
-    <div class="about-img-inner">AK</div>
-    <div class="about-img-badge">
-      <strong>80+</strong>
-      проектов
-    </div>
-  </div>
-  <div class="about-content">
-    <div class="about-eyebrow">Обо мне</div>
-    <h2 class="about-title">Алина Краснова — дизайнер с душой</h2>
-    <p class="about-desc">Занимаюсь дизайном с 2018 года. Начинала с малого бизнеса, сейчас работаю с компаниями по всей России. Верю, что хороший дизайн — это не красиво, а работает.</p>
-    <p class="about-desc">Люблю проекты где есть история, смысл и амбиции. Не беру работу ради работы — только если вижу, как могу помочь бизнесу расти.</p>
-    <div class="about-skills">
-      <span class="skill-tag">Figma</span>
-      <span class="skill-tag">Illustrator</span>
-      <span class="skill-tag">Photoshop</span>
-      <span class="skill-tag">After Effects</span>
-      <span class="skill-tag">Webflow</span>
-      <span class="skill-tag">Брендинг</span>
-      <span class="skill-tag">Motion</span>
-    </div>
-    <a href="#contact" class="btn-red">Написать →</a>
-  </div>
-</section>
-
+<!-- ===== CONTACT ===== -->
 <section class="contact-section" id="contact">
-  <h2 class="contact-title">Есть <span>проект?</span><br/>Давайте!</h2>
-  <p class="contact-sub">Напишите мне — обсудим задачу и я скажу могу ли помочь</p>
-  <div class="contact-links">
-    <a href="#" class="contact-link">✉️ alina@design.ru</a>
-    <a href="#" class="contact-link">💬 Telegram @alina_krasova</a>
-    <a href="#" class="contact-link">📱 +7 (999) 123-45-67</a>
+  <div>
+    <h2 class="contact-title">Есть задача? <br/><em>Расскажите о ней.</em></h2>
+    <p class="contact-sub">Отвечаю обычно в течение суток. Если проект не мой — скажу сразу и, если получится, посоветую, к кому обратиться.</p>
+    <div class="contact-links">
+      <a href="mailto:alina@design.ru" class="contact-link"><span>Email</span><span>alina@design.ru</span></a>
+      <a href="#" class="contact-link"><span>Telegram</span><span>@alina_krasova</span></a>
+      <a href="tel:+79991234567" class="contact-link"><span>Телефон</span><span>+7 (999) 123-45-67</span></a>
+    </div>
   </div>
+  <form class="contact-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Отправлено';">
+    <div>
+      <label for="f-name">Имя</label>
+      <input id="f-name" type="text" placeholder="Как к вам обращаться" required/>
+    </div>
+    <div>
+      <label for="f-mail">Email или Telegram</label>
+      <input id="f-mail" type="text" placeholder="Куда ответить" required/>
+    </div>
+    <div>
+      <label for="f-msg">О проекте</label>
+      <textarea id="f-msg" rows="4" placeholder="Коротко: что за бизнес, какая задача, есть ли сроки"></textarea>
+    </div>
+    <button type="submit">Отправить заявку</button>
+  </form>
 </section>
+
+</main>
 
 <footer>
-  <div class="footer-logo">Alina.design</div>
-  <div>© 2024 Алина Краснова. Все права защищены.</div>
-  <div>Сайт создан <a href="/">Design Antviz</a></div>
+  <div class="footer-logo">Алина Краснова</div>
+  <div>© 2026. Все права защищены.</div>
+  <div>Демо-макет — <a href="/">Design Antviz</a></div>
 </footer>
 
+</div>
+
 <script>
-  const cursor = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  let mx = 0, my = 0, rx = 0, ry = 0;
-
-  document.addEventListener('mousemove', e => {
-    mx = e.clientX; my = e.clientY;
-    cursor.style.left = mx + 'px';
-    cursor.style.top = my + 'px';
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item => {
+    const btn = item.querySelector('.faq-q');
+    btn.addEventListener('click', () => {
+      const isOpen = item.getAttribute('data-open') === 'true';
+      document.querySelectorAll('.faq-item').forEach(i => {
+        i.setAttribute('data-open', 'false');
+        i.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        item.setAttribute('data-open', 'true');
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
   });
-
-  function animRing() {
-    rx += (mx - rx) * 0.12;
-    ry += (my - ry) * 0.12;
-    ring.style.left = rx + 'px';
-    ring.style.top = ry + 'px';
-    requestAnimationFrame(animRing);
-  }
-  animRing();
 </script>
 
 </body>

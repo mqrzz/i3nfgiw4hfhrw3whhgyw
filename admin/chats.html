@@ -263,6 +263,27 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, setDoc, getDocs, deleteDoc, limit, where, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allChatUsers={}, selUid=null, unsubChat=null, currentTab='active';
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function compressImageToDataUrl(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      let { width, height } = img;
+      if(width > maxDim || height > maxDim){
+        const ratio = Math.min(maxDim/width, maxDim/height);
+        width = Math.round(width*ratio); height = Math.round(height*ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      try{ resolve(canvas.toDataURL('image/jpeg', quality)); }catch(err){ reject(err); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+    img.src = url;
+  });
+}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function fmtTime(ts){if(!ts)return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtDate(ts){if(!ts)return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
@@ -283,10 +304,10 @@ function renderList(){
   if(q)uids=uids.filter(uid=>(allChatUsers[uid].name||'').toLowerCase().includes(q)||(allChatUsers[uid].email||'').toLowerCase().includes(q));
   if(!uids.length){el.innerHTML=`<div class="empty-state"><span class="empty-state-icon">💬</span><span class="empty-state-text">Нет диалогов</span></div>`;return;}
   el.innerHTML=uids.map(uid=>{const u=allChatUsers[uid];return`<div class="chat-list-item${uid===selUid?' active':''}${u.hasUnread?' unread':''}" onclick="openChat('${uid}')">
-    <div class="chat-av">${initials(u.name)}</div>
+    <div class="chat-av">${escapeHtml(initials(u.name))}</div>
     <div class="chat-item-info">
-      <div class="chat-item-name">${u.name||'Пользователь'}</div>
-      <div class="chat-item-last">${u.lastMsg||u.email||'—'}</div>
+      <div class="chat-item-name">${escapeHtml(u.name||'Пользователь')}</div>
+      <div class="chat-item-last">${escapeHtml(u.lastMsg||u.email||'—')}</div>
     </div>
     ${u.hasUnread?`<div class="chat-unread-badge">${u.unreadCount>9?'9+':u.unreadCount||'●'}</div>`:''}
   </div>`;}).join('');
@@ -329,15 +350,34 @@ function appendMsg(m,msgId){
   const del=msgId?`<button class="msg-del-btn" onclick="delMsg('${msgId}')">✕</button>`:'';
   if(m.type==='file'){
     const src=m.fileData||m.fileUrl||'';const isImg=m.fileType?.startsWith('image/');
-    div.innerHTML=isImg?`<img class="msg-img" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\'")}')"><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)} ${del}</div>`:
-      `<a class="msg-file" href="${src}" download="${m.fileName||'file'}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)} ${del}</div>`;
-  }else{div.innerHTML=`<div class="msg-bubble">${(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)} ${del}</div>`;}
+    const who=escapeHtml(isAdmin?'Вы':(m.senderName||'Клиент'));
+    const fname=escapeHtml(m.fileName||'Файл');
+    div.innerHTML=isImg?`<img class="msg-img" alt="${fname}" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\'")}')"><div class="msg-time">${who} · ${fmtTime(m.createdAt)} ${del}</div>`:
+      `<a class="msg-file" href="${src}" download="${escapeHtml(m.fileName||'file')}">📎 ${fname}</a><div class="msg-time">${who} · ${fmtTime(m.createdAt)} ${del}</div>`;
+  }else{const who=escapeHtml(isAdmin?'Вы':(m.senderName||'Клиент'));div.innerHTML=`<div class="msg-bubble">${escapeHtml(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${who} · ${fmtTime(m.createdAt)} ${del}</div>`;}
   el.appendChild(div);el.scrollTop=el.scrollHeight;
 }
 async function markRead(uid){const snap=await getDocs(query(collection(db,'chats',uid,'messages'),where('sender','==','user'),where('read','==',false)));snap.docs.forEach(d=>updateDoc(d.ref,{read:true}).catch(()=>{}));}
 window.delMsg=async msgId=>{if(!selUid)return;await deleteDoc(doc(db,'chats',selUid,'messages',msgId)).catch(()=>{});toast('Удалено','info');};
 window.sendMsg=async()=>{if(!selUid)return;const inp=document.getElementById('chatInp');const text=inp.value.trim();if(!text)return;inp.value='';inp.style.height='auto';await addDoc(collection(db,'chats',selUid,'messages'),{text,sender:'admin',senderName:'Поддержка',type:'text',read:true,createdAt:serverTimestamp()}).catch(()=>{});};
-window.sendFiles=async files=>{if(!selUid||!files.length)return;for(const file of Array.from(files)){if(file.size>3*1024*1024){toast(file.name+' > 3 МБ','error');continue;}try{const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});await addDoc(collection(db,'chats',selUid,'messages'),{type:'file',fileData:b64,fileName:file.name,fileType:file.type,sender:'admin',senderName:'Поддержка',read:true,createdAt:serverTimestamp()});toast(file.name+' ✓','success');}catch(e){toast('Ошибка','error');}}document.getElementById('fileInp').value='';};
+window.sendFiles=async files=>{
+  if(!selUid||!files.length)return;
+  for(const file of Array.from(files)){
+    try{
+      let b64, sizeNote='';
+      if(file.type && file.type.startsWith('image/')){
+        b64=await compressImageToDataUrl(file, 1600, .72);
+        if(b64.length*0.75>900*1024){ toast(file.name+': слишком тяжёлый даже после сжатия','error'); continue; }
+      }else{
+        if(file.size>700*1024){ toast(file.name+' > 700 КБ — для тяжёлых файлов пришлите ссылку','error'); continue; }
+        b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+      }
+      await addDoc(collection(db,'chats',selUid,'messages'),{type:'file',fileData:b64,fileName:file.name,fileType:file.type&&file.type.startsWith('image/')?'image/jpeg':file.type,sender:'admin',senderName:'Поддержка',read:true,createdAt:serverTimestamp()});
+      toast(file.name+' ✓','success');
+    }catch(e){toast('Ошибка','error');}
+  }
+  document.getElementById('fileInp').value='';
+};
 window.clearChat=async()=>{if(!selUid||!confirm('Удалить все сообщения?'))return;const snap=await getDocs(collection(db,'chats',selUid,'messages'));await Promise.all(snap.docs.map(d=>deleteDoc(d.ref)));document.getElementById('chatMsgs').innerHTML='';toast('Чат очищен','success');};
 window.archiveChat=async()=>{if(!selUid)return;await setDoc(doc(db,'chats',selUid),{archived:true,archivedAt:serverTimestamp()},{merge:true});document.getElementById('chatWrap').style.display='none';document.getElementById('chatEmpty').style.display='flex';selUid=null;renderList();toast('Чат в архиве','success');};
 window.doLogout=async()=>{if(unsubChat)unsubChat();const {signOut:so}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");await so(auth);window.location.href='/';};

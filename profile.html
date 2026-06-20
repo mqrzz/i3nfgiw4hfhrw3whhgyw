@@ -432,11 +432,10 @@ async function watchSupportStatus(uid){
 }
 
 function watchChatBadge(uid){
-  const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','desc'));
+  const q=query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false));
   unsubChat=onSnapshot(q,snap=>{
-    const hasUnread=snap.docs.some(d=>d.data().sender==='admin'&&!d.data().readByUser);
     const menuBadge=document.getElementById('menuChatBadge');
-    if(menuBadge) menuBadge.style.display=hasUnread?'':'none';
+    if(menuBadge) menuBadge.style.display=snap.size?'':'none';
   },()=>{});
 }
 
@@ -446,7 +445,17 @@ window.doLogout=async function(){if(unsubOrders) unsubOrders();if(unsubChat) uns
 
 window.openDeleteModal=function(){document.getElementById('deleteConfirmInput').value='';document.getElementById('deleteModal').classList.add('show');setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),200);};
 window.closeDeleteModal=function(){document.getElementById('deleteModal').classList.remove('show');};
-window.confirmDeleteAccount=async function(){if(!currentUser) return;if(document.getElementById('deleteConfirmInput').value.trim()!==currentUser.email){toast('Email не совпадает','error');return;}const btn=document.getElementById('deleteConfirmBtn');btn.textContent='Удаляю...';btn.disabled=true;try{const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));for(const d of ordSnap.docs) await deleteDoc(d.ref).catch(()=>{});const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});await deleteUser(currentUser);window.location.href='auth';}catch(e){if(e.code==='auth/requires-recent-login') toast('Выйдите и войдите снова','error');else toast('Ошибка. Попробуйте позже.','error');btn.textContent='Удалить';btn.disabled=false;}};
+window.confirmDeleteAccount=async function(){if(!currentUser) return;if(document.getElementById('deleteConfirmInput').value.trim()!==currentUser.email){toast('Email не совпадает','error');return;}const btn=document.getElementById('deleteConfirmBtn');btn.textContent='Удаляю...';btn.disabled=true;try{
+  // Заказы не удаляем целиком — это история оплат/работ, нужная для бухгалтерии.
+  // Вместо этого обезличиваем: убираем личные данные, сумму/статус/даты оставляем.
+  const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
+  for(const d of ordSnap.docs) await updateDoc(d.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
+  const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
+  for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});
+  await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
+  await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
+  await deleteUser(currentUser);window.location.href='auth';
+}catch(e){if(e.code==='auth/requires-recent-login') toast('Для удаления нужен недавний вход: выйдите и зайдите снова, затем повторите','error');else toast('Ошибка. Попробуйте позже.','error');btn.textContent='Удалить';btn.disabled=false;}};
 
 window.openLightbox=function(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('show');};
 window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('show');document.getElementById('lightboxImg').src='';};

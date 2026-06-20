@@ -125,6 +125,10 @@
     .ticket-card-meta{font-size:.76rem;color:var(--muted);margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
     .ticket-card-desc{font-size:.82rem;color:var(--muted2);line-height:1.6;margin-bottom:.8rem}
     .ticket-card-reply{background:rgba(30,222,123,.06);border:1px solid rgba(30,222,123,.15);border-radius:9px;padding:.7rem .9rem;font-size:.82rem;color:var(--accent2);line-height:1.5;margin-bottom:.8rem}
+    .ticket-order-link{display:inline-flex;align-items:center;gap:.4rem;background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca;font-size:.74rem;font-weight:500;padding:.3rem .75rem;border-radius:8px;text-decoration:none;margin-bottom:.7rem;transition:background .15s}
+    .ticket-order-link:hover{background:#e0e7ff}
+    .ticket-order-link svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+    .ticket-no-order{display:inline-flex;align-items:center;gap:.4rem;background:#fef3c7;border:1px solid #fde68a;color:#b45309;font-size:.74rem;font-weight:500;padding:.3rem .75rem;border-radius:8px;margin-bottom:.7rem}
     .ticket-reply-inp{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.65rem .9rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.82rem;outline:none;transition:border-color .18s;margin-bottom:.5rem}
     .ticket-reply-inp:focus{border-color:var(--accent)}
     .ticket-reply-inp::placeholder{color:var(--muted2)}
@@ -261,7 +265,7 @@ function renderTickets(){
   let list=allTickets;
   if(currentFilter==='open') list=list.filter(t=>t.status!=='done');
   else if(currentFilter==='done') list=list.filter(t=>t.status==='done');
-  if(q) list=list.filter(t=>(t.title||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.userEmail||'').toLowerCase().includes(q));
+  if(q) list=list.filter(t=>(t.title||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.userEmail||'').toLowerCase().includes(q)||(t.orderDomain||'').toLowerCase().includes(q)||(t.orderSiteType||'').toLowerCase().includes(q));
   document.getElementById('openCount').textContent=allTickets.filter(t=>t.status!=='done').length;
   if(!list.length){el.innerHTML=`<div class="empty-state"><span class="empty-state-icon">✅</span><span class="empty-state-text">Нет заявок</span></div>`;return;}
   el.innerHTML=list.map(t=>`
@@ -277,6 +281,10 @@ function renderTickets(){
         <span>·</span>
         <span>${fmtDT(t.createdAt)}</span>
       </div>
+      ${t.orderId?`<a class="ticket-order-link" href="/admin/orders?id=${t.orderId}">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        ${escapeHtml(t.orderDomain || ('№ '+t.orderId.slice(0,8).toUpperCase()))}${t.orderSiteType||t.orderTariff?` · ${escapeHtml(t.orderSiteType||'Сайт')}${t.orderTariff?' · '+escapeHtml(t.orderTariff):''}`:''}
+      </a>`:`<span class="ticket-no-order">⚠ Заказ не привязан</span>`}
       ${t.description?`<div class="ticket-card-desc">${escapeHtml(t.description)}</div>`:''}
       ${t.adminReply?`<div class="ticket-card-reply">💬 Ваш ответ: ${escapeHtml(t.adminReply)}</div>`:''}
       <textarea class="ticket-reply-inp" id="tr_${t.id}" placeholder="Написать ответ клиенту..." rows="2">${escapeHtml(t.adminReply||'')}</textarea>
@@ -311,7 +319,7 @@ function renderSupports(){
 window.saveReply=async id=>{
   const val=document.getElementById('tr_'+id)?.value.trim()||'';
   try{
-    await updateDoc(doc(db,'tickets',id),{adminReply:val});
+    await updateDoc(doc(db,'service_tickets',id),{adminReply:val});
     const ticket=allTickets.find(t=>t.id===id);
     if(ticket?.uid&&val){
       await addDoc(collection(db,'notifications',ticket.uid,'items'),{title:'💬 Ответ на вашу заявку',text:`«${ticket.title}»: ${val}`,read:false,createdAt:serverTimestamp()}).catch(()=>{});
@@ -321,16 +329,16 @@ window.saveReply=async id=>{
   }catch(e){toast('Ошибка','error');}
 };
 window.closeTick=async id=>{
-  try{await updateDoc(doc(db,'tickets',id),{status:'done'});toast('Закрыта ✓','success');await loadTickets();renderTickets();}
+  try{await updateDoc(doc(db,'service_tickets',id),{status:'done'});toast('Закрыта ✓','success');await loadTickets();renderTickets();}
   catch(e){toast('Ошибка','error');}
 };
 window.reopenTick=async id=>{
-  try{await updateDoc(doc(db,'tickets',id),{status:'open'});toast('Открыта','info');await loadTickets();renderTickets();}
+  try{await updateDoc(doc(db,'service_tickets',id),{status:'open'});toast('Открыта','info');await loadTickets();renderTickets();}
   catch(e){toast('Ошибка','error');}
 };
 window.deleteTick=async id=>{
   if(!confirm('Удалить заявку?'))return;
-  try{await deleteDoc(doc(db,'tickets',id));toast('Удалена','info');await loadTickets();renderTickets();}
+  try{await deleteDoc(doc(db,'service_tickets',id));toast('Удалена','info');await loadTickets();renderTickets();}
   catch(e){toast('Ошибка','error');}
 };
 window.notifyExpiry=async uid=>{
@@ -340,7 +348,7 @@ window.notifyExpiry=async uid=>{
 };
 
 async function loadTickets(){
-  const snap=await getDocs(collection(db,'tickets'));
+  const snap=await getDocs(collection(db,'service_tickets'));
   allTickets=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
     if((a.status==='done')!=(b.status==='done'))return a.status==='done'?1:-1;
     return(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0);

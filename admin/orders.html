@@ -464,6 +464,27 @@ let selOrderId=null,selUid=null,unsubChat=null;
 let currentTab='active',currentPaid=false,currentSubsteps=[];
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function compressImageToDataUrl(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      let { width, height } = img;
+      if(width > maxDim || height > maxDim){
+        const ratio = Math.min(maxDim/width, maxDim/height);
+        width = Math.round(width*ratio); height = Math.round(height*ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      try{ resolve(canvas.toDataURL('image/jpeg', quality)); }catch(err){ reject(err); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+    img.src = url;
+  });
+}
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDT(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtTime(ts){if(!ts)return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
@@ -496,9 +517,9 @@ function renderList(){
         <span class="sbadge s${o.status||0}"><span class="sdot"></span>${S_LABELS[o.status||0]}</span>
         ${unread?'<span class="chat-unread-badge">●</span>':''}
       </div>
-      <div class="or-sub">${o.clientName||'—'} · ${o.clientEmail||'—'}</div>
+      <div class="or-sub">${escapeHtml(o.clientName||'—')} · ${escapeHtml(o.clientEmail||'—')}</div>
       <div class="or-foot">
-        <span style="font-size:.68rem;color:var(--muted)">${o.siteType||'Сайт'}</span>
+        <span style="font-size:.68rem;color:var(--muted)">${escapeHtml(o.siteType||'Сайт')}</span>
         <span class="tag ${tagClass}" style="font-size:.62rem;padding:.1rem .5rem">${tariff}</span>
         <div style="display:flex;align-items:center;gap:.3rem">
           <span class="${o.paid?'pay-yes':'pay-no'}" style="font-size:.62rem">${o.paid?'✓':'✕'}</span>
@@ -542,19 +563,19 @@ function showDetail(o){
   document.getElementById('siteFavicon').value=o.siteFaviconUrl||'';
   document.getElementById('sitePages').value=o.sitePages||'';
   document.getElementById('clientInfo').innerHTML=`
-    <div class="info-cell"><div class="info-lbl">Имя</div><div class="info-val">${o.clientName||'—'}</div></div>
-    <div class="info-cell"><div class="info-lbl">Email</div><div class="info-val">${o.clientEmail||'—'}</div></div>`;
+    <div class="info-cell"><div class="info-lbl">Имя</div><div class="info-val">${escapeHtml(o.clientName||'—')}</div></div>
+    <div class="info-cell"><div class="info-lbl">Email</div><div class="info-val">${escapeHtml(o.clientEmail||'—')}</div></div>`;
   
   // Order info with new fields
   const domainLabel=o.domainOption==='new'?'Регистрация .ru':o.domainOption==='own'?'Свой домен':'—';
   document.getElementById('orderInfo').innerHTML=`
-    <div class="info-cell"><div class="info-lbl">Тип</div><div class="info-val">${o.siteType||'—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Тип</div><div class="info-val">${escapeHtml(o.siteType||'—')}</div></div>
     <div class="info-cell"><div class="info-lbl">Тариф</div><div class="info-val" style="font-weight:600;color:var(--accent2)">${tariff}</div></div>
     <div class="info-cell"><div class="info-lbl">Страниц</div><div class="info-val">${o.pages||'—'}</div></div>
     <div class="info-cell"><div class="info-lbl">Домен</div><div class="info-val">${domainLabel}</div></div>
     <div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Сумма</div><div class="info-val" style="font-weight:700;color:var(--accent2)">${fmtPrice(o.totalPrice)}</div></div>
     <div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Создан</div><div class="info-val">${fmtDT(o.createdAt)}</div></div>
-    ${o.promoCode?`<div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Промокод</div><div class="info-val" style="color:var(--accent2)">${o.promoCode}${o.discountApplied?` (-${fmtPrice(o.discountApplied)})`:''}</div></div>`:''}`;
+    ${o.promoCode?`<div class="info-cell" style="grid-column:span 2"><div class="info-lbl">Промокод</div><div class="info-val" style="color:var(--accent2)">${escapeHtml(o.promoCode)}${o.discountApplied?` (-${fmtPrice(o.discountApplied)})`:''}</div></div>`:''}`;
 
   // Extras block
   const extrasArr=o.extras||[];
@@ -574,13 +595,13 @@ function showDetail(o){
   const att=document.getElementById('attachSec');const ag=document.getElementById('attachGrid');
   if(o.attachments?.length){
     att.style.display='block';
-    ag.innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="attach-thumb" src="${a.fileData}" onclick="openLightbox('${a.fileData.replace(/'/g,"\'")}')">`:
-      `<a class="msg-file" href="${a.fileData}" download="${a.fileName||'file'}">📎 ${a.fileName||'Файл'}</a>`).join('');
+    ag.innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="attach-thumb" alt="${escapeHtml(a.fileName||'')}" src="${a.fileData}" onclick="openLightbox('${a.fileData.replace(/'/g,"\'")}')">`:
+      `<a class="msg-file" href="${a.fileData}" download="${escapeHtml(a.fileName||'file')}">📎 ${escapeHtml(a.fileName||'Файл')}</a>`).join('');
   }else att.style.display='none';
   renderSupportBlock(o);
   const rev=allReviews.find(r=>r.orderId===o.id);
   const rs=document.getElementById('reviewSec');
-  if(rev){rs.style.display='block';document.getElementById('reviewContent').innerHTML=`<div style="background:var(--bg3);border-radius:10px;padding:.85rem 1rem"><div style="color:var(--warn);margin-bottom:.3rem">${stars(rev.stars||0)}</div><div style="font-size:.84rem;color:var(--muted2)">${rev.text||'Без текста'}</div></div>`;}
+  if(rev){rs.style.display='block';document.getElementById('reviewContent').innerHTML=`<div style="background:var(--bg3);border-radius:10px;padding:.85rem 1rem"><div style="color:var(--warn);margin-bottom:.3rem">${stars(rev.stars||0)}</div><div style="font-size:.84rem;color:var(--muted2)">${escapeHtml(rev.text||'Без текста')}</div></div>`;}
   else rs.style.display='none';
 }
 
@@ -716,9 +737,11 @@ function appendMsg(m,msgId){
   const del=msgId?`<button class="msg-del-btn" onclick="delMsg('${msgId}')">✕</button>`:'';
   if(m.type==='file'){
     const src=m.fileData||m.fileUrl||'';const isImg=m.fileType?.startsWith('image/');
-    div.innerHTML=isImg?`<img class="msg-img" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\'")}')"><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)} ${del}</div>`:
-      `<a class="msg-file" href="${src}" download="${m.fileName||'file'}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)} ${del}</div>`;
-  }else{div.innerHTML=`<div class="msg-bubble">${(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${isAdmin?'Вы':(m.senderName||'Клиент')} · ${fmtTime(m.createdAt)} ${del}</div>`;}
+    const who=escapeHtml(isAdmin?'Вы':(m.senderName||'Клиент'));
+    const fname=escapeHtml(m.fileName||'Файл');
+    div.innerHTML=isImg?`<img class="msg-img" alt="${fname}" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\'")}')"><div class="msg-time">${who} · ${fmtTime(m.createdAt)} ${del}</div>`:
+      `<a class="msg-file" href="${src}" download="${escapeHtml(m.fileName||'file')}">📎 ${fname}</a><div class="msg-time">${who} · ${fmtTime(m.createdAt)} ${del}</div>`;
+  }else{const who=escapeHtml(isAdmin?'Вы':(m.senderName||'Клиент'));div.innerHTML=`<div class="msg-bubble">${escapeHtml(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${who} · ${fmtTime(m.createdAt)} ${del}</div>`;}
   el.appendChild(div);el.scrollTop=el.scrollHeight;
 }
 function openChat(uid,name,email){
@@ -761,10 +784,16 @@ window.sendMsg=async()=>{
 window.sendFiles=async files=>{
   if(!selUid||!files.length)return;
   for(const file of Array.from(files)){
-    if(file.size>3*1024*1024){toast(file.name+' > 3 МБ','error');continue;}
     try{
-      const b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
-      await addDoc(collection(db,'chats',selUid,'messages'),{type:'file',fileData:b64,fileName:file.name,fileType:file.type,sender:'admin',senderName:'Поддержка',read:true,createdAt:serverTimestamp()});
+      let b64;
+      if(file.type && file.type.startsWith('image/')){
+        b64=await compressImageToDataUrl(file, 1600, .72);
+        if(b64.length*0.75>900*1024){ toast(file.name+': слишком тяжёлый даже после сжатия','error'); continue; }
+      }else{
+        if(file.size>700*1024){ toast(file.name+' > 700 КБ — для тяжёлых файлов пришлите ссылку','error'); continue; }
+        b64=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+      }
+      await addDoc(collection(db,'chats',selUid,'messages'),{type:'file',fileData:b64,fileName:file.name,fileType:file.type&&file.type.startsWith('image/')?'image/jpeg':file.type,sender:'admin',senderName:'Поддержка',read:true,createdAt:serverTimestamp()});
       toast(file.name+' ✓','success');
     }catch(e){toast('Ошибка','error');}
   }

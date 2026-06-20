@@ -13,7 +13,7 @@
       --bg:#0a0a0c;--surface:#111114;--surface-2:#15151a;--surface-3:#1a1a21;
       --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
       --ink:#f2f2f6;--ink-dim:rgba(255,255,255,.46);--ink-faint:rgba(255,255,255,.26);
-      --accent:#7D32FF;--accent-soft:#a78bfa;--accent-wash:rgba(125,50,255,.12);
+      --accent:#6c63ff;--accent-soft:#a78bfa;--accent-wash:rgba(108,99,255,.12);
       --good:#34d399;--good-wash:rgba(52,211,153,.12);
       --warn:#fbbf24;--warn-wash:rgba(251,191,36,.10);
       --bad:#f87171;--bad-wash:rgba(248,113,113,.10);
@@ -62,7 +62,7 @@
     .sidebar-back:hover{color:var(--ink)}
     .sidebar-back svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
     .sidebar-brand{display:flex;align-items:center;gap:10px}
-    .sidebar-av{width:38px;height:38px;border-radius:var(--r-sm);background:var(--accent-wash);border:1px solid rgba(125,50,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+    .sidebar-av{width:38px;height:38px;border-radius:var(--r-sm);background:var(--accent-wash);border:1px solid rgba(108,99,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
     .sidebar-av img{width:100%;height:100%;object-fit:cover}
     .sidebar-brand-text{line-height:1.3}
     .sidebar-name{font-family:'Unbounded',sans-serif;font-size:.78rem;font-weight:600}
@@ -75,10 +75,10 @@
     .sidebar-topic{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);color:var(--ink-faint);font-size:.8rem;cursor:default;transition:background .15s}
     .sidebar-topic svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
     .sidebar-footer{padding:16px 20px;border-top:1px solid var(--line)}
-    .sidebar-new-topic-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:.6rem .9rem;background:var(--accent-wash);border:1px solid rgba(125,50,255,.2);color:var(--accent-soft);font-family:'Onest',sans-serif;font-size:.8rem;font-weight:500;border-radius:var(--r-md);cursor:pointer;transition:background .15s;opacity:0;pointer-events:none;transition:opacity .2s,background .15s}
+    .sidebar-new-topic-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:.6rem .9rem;background:var(--accent-wash);border:1px solid rgba(108,99,255,.2);color:var(--accent-soft);font-family:'Onest',sans-serif;font-size:.8rem;font-weight:500;border-radius:var(--r-md);cursor:pointer;transition:background .15s;opacity:0;pointer-events:none;transition:opacity .2s,background .15s}
     .sidebar-new-topic-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none}
     .sidebar-new-topic-btn.show{opacity:1;pointer-events:all}
-    .sidebar-new-topic-btn:hover{background:rgba(125,50,255,.18)}
+    .sidebar-new-topic-btn:hover{background:rgba(108,99,255,.18)}
 
     /* MAIN CHAT AREA */
     .chat-main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
@@ -113,8 +113,8 @@
     .bot-actions.locked{pointer-events:none;opacity:.45}
     .bot-btn{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-dim);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:.5rem .95rem;border-radius:99px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
     .bot-btn:hover:not(:disabled){background:var(--surface-3);color:var(--ink);border-color:var(--line-strong)}
-    .bot-btn.accent{background:var(--accent-wash);border-color:rgba(125,50,255,.25);color:var(--accent-soft)}
-    .bot-btn.accent:hover:not(:disabled){background:rgba(125,50,255,.18)}
+    .bot-btn.accent{background:var(--accent-wash);border-color:rgba(108,99,255,.25);color:var(--accent-soft)}
+    .bot-btn.accent:hover:not(:disabled){background:rgba(108,99,255,.18)}
     .bot-btn.back{background:transparent;border-color:var(--line);color:var(--ink-faint)}
     .bot-btn:disabled{cursor:default}
 
@@ -289,6 +289,27 @@ let welcomeShown = false;
 let hasUserMessages = false;
 
 /* ── helpers ── */
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function compressImageToDataUrl(file, maxDim, quality){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      let { width, height } = img;
+      if(width > maxDim || height > maxDim){
+        const ratio = Math.min(maxDim/width, maxDim/height);
+        width = Math.round(width*ratio); height = Math.round(height*ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      try{ resolve(canvas.toDataURL('image/jpeg', quality)); }catch(err){ reject(err); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+    img.src = url;
+  });
+}
 function toast(msg, type='info'){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className=`toast ${type} show`;
@@ -370,11 +391,12 @@ function renderMsg(m){
   if(m.type==='file'){
     const src=m.fileData||m.fileUrl||'';
     const isImg=m.fileType&&m.fileType.startsWith('image/');
-    if(isImg) div.innerHTML=`<img class="msg-img" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-    else div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+    const fname=escapeHtml(m.fileName||'Файл');
+    if(isImg) div.innerHTML=`<img class="msg-img" alt="${fname}" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+    else div.innerHTML=`<a class="msg-file-link" href="${src}" download="${escapeHtml(m.fileName)}">📎 ${fname}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
   } else {
     const name = isMe?'Вы': isBot?'Бот':'Поддержка';
-    div.innerHTML=`<div class="msg-bubble">${(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${name} · ${fmtTime(m.createdAt)}</div>`;
+    div.innerHTML=`<div class="msg-bubble">${escapeHtml(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${name} · ${fmtTime(m.createdAt)}</div>`;
   }
   container.appendChild(div);
   return div;
@@ -456,12 +478,12 @@ function appendOrderCard(o){
     <div class="msg-bubble">Вот информация по вашему заказу:</div>
     <div class="order-info-card">
       <div class="oi-num">Заказ № ${(o.id||'').slice(0,8).toUpperCase()}</div>
-      <div class="oi-row"><span class="oi-lbl">Тип</span><span class="oi-val">${o.siteType||'Сайт'}</span></div>
+      <div class="oi-row"><span class="oi-lbl">Тип</span><span class="oi-val">${escapeHtml(o.siteType||'Сайт')}</span></div>
       <div class="oi-row"><span class="oi-lbl">Статус</span><span class="oi-val"><span class="s-pill s${s}">${STATUS_LABELS[s]}</span></span></div>
       <div class="oi-row"><span class="oi-lbl">Оплата</span><span class="oi-val" style="color:${o.paid?'var(--success)':'var(--error)'}">${o.paid?'Оплачен':'Не оплачен'}</span></div>
       <div class="oi-row"><span class="oi-lbl">Сумма</span><span class="oi-val">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span></div>
       <div class="oi-row"><span class="oi-lbl">Создан</span><span class="oi-val">${fmtDate(o.createdAt)}</span></div>
-      ${o.statusComment?`<div class="oi-row" style="flex-direction:column;gap:4px"><span class="oi-lbl">Комментарий</span><span class="oi-val" style="text-align:left;color:var(--accent2)">${o.statusComment}</span></div>`:''}
+      ${o.statusComment?`<div class="oi-row" style="flex-direction:column;gap:4px"><span class="oi-lbl">Комментарий</span><span class="oi-val" style="text-align:left;color:var(--accent2)">${escapeHtml(o.statusComment)}</span></div>`:''}
     </div>
     <div class="msg-time">Бот · ${fmtTime(Timestamp.now())}</div>`;
   lockAllButtonRows();
@@ -639,13 +661,19 @@ window.sendMsg=async function(){
 window.sendFiles=async function(files){
   if(!currentUser||!files.length) return;
   for(const file of Array.from(files)){
-    if(file.size>3*1024*1024){ toast(file.name+' > 3 МБ','error'); continue; }
     try{
-      const base64=await new Promise((res,rej)=>{
-        const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-      });
+      let base64;
+      if(file.type && file.type.startsWith('image/')){
+        base64=await compressImageToDataUrl(file, 1600, .72);
+        if(base64.length*0.75>900*1024){ toast(file.name+': слишком тяжёлый даже после сжатия','error'); continue; }
+      }else{
+        if(file.size>700*1024){ toast(file.name+' > 700 КБ — пришлите ссылку или файл полегче','error'); continue; }
+        base64=await new Promise((res,rej)=>{
+          const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
+        });
+      }
       await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-        type:'file', fileData:base64, fileName:file.name, fileType:file.type,
+        type:'file', fileData:base64, fileName:file.name, fileType:file.type&&file.type.startsWith('image/')?'image/jpeg':file.type,
         sender:'user', senderName:currentUser.displayName||'', createdAt:serverTimestamp()
       });
       toast(file.name+' отправлен','success');

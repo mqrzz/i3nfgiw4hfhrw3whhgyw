@@ -13,7 +13,7 @@
       --bg:#0a0a0c;--surface:#111114;--surface-2:#15151a;--surface-3:#1a1a21;
       --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
       --ink:#f2f2f6;--ink-dim:rgba(255,255,255,.46);--ink-faint:rgba(255,255,255,.26);
-      --accent:#7D32FF;--accent-soft:#a78bfa;--accent-wash:rgba(125,50,255,.12);
+      --accent:#6c63ff;--accent-soft:#a78bfa;--accent-wash:rgba(108,99,255,.12);
       --good:#34d399;--good-wash:rgba(52,211,153,.12);
       --warn:#fbbf24;--warn-wash:rgba(251,191,36,.10);
       --bad:#f87171;--bad-wash:rgba(248,113,113,.10);
@@ -145,10 +145,10 @@
     .ticket-item:last-child{border-bottom:none}
     .ticket-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
     .ticket-item-title{font-size:.9rem;font-weight:500;color:var(--ink);flex:1}
-    .t-open{font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.22rem .6rem;border-radius:var(--r-xs);background:var(--accent-wash);color:var(--accent-soft);border:1px solid rgba(125,50,255,.2);white-space:nowrap}
+    .t-open{font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.22rem .6rem;border-radius:var(--r-xs);background:var(--accent-wash);color:var(--accent-soft);border:1px solid rgba(108,99,255,.2);white-space:nowrap}
     .t-done{font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.22rem .6rem;border-radius:var(--r-xs);background:var(--good-wash);color:var(--good);border:1px solid rgba(52,211,153,.2);white-space:nowrap}
     .ticket-desc{font-size:.82rem;color:var(--ink-dim);line-height:1.6}
-    .ticket-reply{display:flex;align-items:flex-start;gap:8px;background:var(--accent-wash);border:1px solid rgba(125,50,255,.16);border-radius:var(--r-sm);padding:10px 12px;font-size:.82rem;color:var(--accent-soft);line-height:1.55}
+    .ticket-reply{display:flex;align-items:flex-start;gap:8px;background:var(--accent-wash);border:1px solid rgba(108,99,255,.16);border-radius:var(--r-sm);padding:10px 12px;font-size:.82rem;color:var(--accent-soft);line-height:1.55}
     .ticket-reply svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;margin-top:1px}
     .ticket-date{font-size:.72rem;color:var(--ink-faint)}
     .tickets-empty{text-align:center;padding:40px 24px;color:var(--ink-faint);font-size:.84rem}
@@ -358,6 +358,7 @@ let userOrders = [];
 let activeOrder = null;
 let pendingSupportOrderId = null; // заказ, для которого сейчас покупается/продлевается обслуживание
 
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDate(ts){if(!ts) return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
 
@@ -396,7 +397,7 @@ function showBuySection(doneOrders){
         <span class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</span>
         <span class="ok-pill">Готов</span>
       </div>
-      <div class="order-type">${o.siteType||'Сайт'} · ${o.tariff||'—'}</div>
+      <div class="order-type">${escapeHtml(o.siteType||'Сайт')} · ${escapeHtml(o.tariff||'—')}</div>
       <div class="order-meta">${fmtDate(o.createdAt)}</div>
       <svg class="order-card-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
@@ -470,11 +471,11 @@ function renderTickets(tickets){
   el.innerHTML = tickets.map(t=>`
     <div class="ticket-item">
       <div class="ticket-item-head">
-        <span class="ticket-item-title">${t.title}</span>
+        <span class="ticket-item-title">${escapeHtml(t.title)}</span>
         <span class="${t.status==='done'?'t-done':'t-open'}">${t.status==='done'?'Готово':'Открыта'}</span>
       </div>
-      ${t.description?`<div class="ticket-desc">${t.description}</div>`:''}
-      ${t.adminReply?`<div class="ticket-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${t.adminReply}</div>`:''}
+      ${t.description?`<div class="ticket-desc">${escapeHtml(t.description)}</div>`:''}
+      ${t.adminReply?`<div class="ticket-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${escapeHtml(t.adminReply)}</div>`:''}
       <div class="ticket-date">${t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
     </div>`).join('');
 }

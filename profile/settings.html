@@ -13,7 +13,7 @@
       --bg:#0a0a0c; --surface:#111114; --surface-2:#15151a; --surface-3:#1a1a21;
       --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
       --ink:#f2f2f6; --ink-dim:rgba(255,255,255,.46); --ink-faint:rgba(255,255,255,.26);
-      --accent:#7D32FF; --accent-soft:#a78bfa; --accent-wash:rgba(125,50,255,.12);
+      --accent:#6c63ff; --accent-soft:#a78bfa; --accent-wash:rgba(108,99,255,.12);
       --good:#34d399; --good-wash:rgba(52,211,153,.12);
       --warn:#fbbf24; --warn-wash:rgba(251,191,36,.08);
       --bad:#f87171; --bad-wash:rgba(248,113,113,.08);
@@ -474,9 +474,11 @@ window.confirmDeleteAccount=async function(){
   const btn=document.getElementById('deleteConfirmBtn');
   btn.textContent='Удаляю...';btn.disabled=true;
   try{
-    const {collection:col,query:q,where:wh,getDocs:gd,deleteDoc:dd,doc:d} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const {collection:col,query:q,where:wh,getDocs:gd,deleteDoc:dd,updateDoc:ud,doc:d} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    // Заказы не удаляем целиком — это история оплат/работ для бухгалтерии.
+    // Обезличиваем: убираем личные данные, сумму/статус/даты оставляем.
     const ordSnap=await gd(q(col(db,'orders'),wh('uid','==',currentUser.uid)));
-    for(const x of ordSnap.docs) await dd(x.ref).catch(()=>{});
+    for(const x of ordSnap.docs) await ud(x.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
     const chatSnap=await gd(col(db,'chats',currentUser.uid,'messages'));
     for(const x of chatSnap.docs) await dd(x.ref).catch(()=>{});
     await dd(d(db,'chats',currentUser.uid)).catch(()=>{});
@@ -484,7 +486,7 @@ window.confirmDeleteAccount=async function(){
     await deleteUser(currentUser);
     window.location.href='../auth';
   }catch(e){
-    if(e.code==='auth/requires-recent-login') toast('Выйдите и войдите снова','error');
+    if(e.code==='auth/requires-recent-login') toast('Для удаления нужен недавний вход: выйдите и зайдите снова, затем повторите','error');
     else toast('Ошибка. Попробуйте позже.','error');
     btn.textContent='Удалить';btn.disabled=false;
   }

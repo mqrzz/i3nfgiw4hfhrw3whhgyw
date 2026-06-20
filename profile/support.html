@@ -6,39 +6,69 @@
   <title>Поддержка — Antviz</title>
   <link rel="icon" href="../img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#0a0a0c;--surface:#111114;--surface-2:#15151a;--surface-3:#1a1a21;
-      --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
-      --ink:#f2f2f6;--ink-dim:rgba(255,255,255,.46);--ink-faint:rgba(255,255,255,.26);
-      --accent:#6c63ff;--accent-soft:#a78bfa;--accent-wash:rgba(108,99,255,.12);
-      --good:#34d399;--good-wash:rgba(52,211,153,.12);
-      --warn:#fbbf24;--warn-wash:rgba(251,191,36,.10);
-      --bad:#f87171;--bad-wash:rgba(248,113,113,.10);
-      --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
-      --success:var(--good);--error:var(--bad);--accent2:var(--accent-soft);--muted:var(--ink-faint);
+      /* цвета */
+      --bg:#ffffff;
+      --bg-secondary:#f9fafc;
+      --bg-tertiary:#f2f4f7;
+      --surface:#ffffff;
+      --surface-2:#f9fafc;
+      --surface-3:#f2f4f7;
+      --line:#dfe3e8;
+      --line-strong:#cbcdd6;
+      --ink:#191b1e;
+      --ink-dim:#707a8a;
+      --ink-faint:#cbcdd6;
+      --accent:#1ede7b;
+      --accent-hover:#1ac16b;
+      --accent-dark:#149955;
+      --accent-wash:#e8fcf2;
+      --accent-light:#d2f8e5;
+      --good:#47bf67;
+      --good-wash:#e8fcf2;
+      --warn:#ffd11a;
+      --warn-wash:#fffadb;
+      --bad:#ff2d50;
+      --bad-wash:#ffeded;
+      --shadow-1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+      --shadow-2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
+      --radius-xxs:4px;
+      --radius-xs:8px;
+      --radius-s:12px;
+      --radius-m:24px;
+      --radius-l:40px;
+      --radius-xl:60px;
+      --radius-pill:100px;
+      --font:'Geologica',Inter,Arial,Helvetica Neue,Helvetica,FreeSans,sans-serif;
+      --transition-fast:.05s;
+      --transition-default:.1s;
+      --transition-slow:.2s;
+      --ease-change:cubic-bezier(.45,0,.55,1);
+      --ease-in:cubic-bezier(.81,0,.04,1);
+      --ease-out:cubic-bezier(.25,.01,.47,.99);
     }
-    html,body{height:100%;overflow:hidden}
-    body{background:var(--bg);color:var(--ink);font-family:'Onest',sans-serif;font-weight:300;font-size:15px;-webkit-font-smoothing:antialiased}
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased;letter-spacing:-.02em}
     @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-    :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+    :focus-visible{outline:2px solid var(--accent-light);outline-offset:2px}
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
     @keyframes blink{0%,100%{opacity:.25}50%{opacity:1}}
-    @keyframes popIn{from{opacity:0;transform:scale(.94) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    @keyframes popIn{from{opacity:0;transform:scale(.96) translateY(4px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
     /* LOADING */
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
     .spinner{width:22px;height:22px;border:1.5px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
 
     /* LIGHTBOX */
-    .lightbox{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+    .lightbox{position:fixed;inset:0;z-index:900;background:rgba(46,46,55,.2);display:none;align-items:center;justify-content:center;flex-direction:column;gap:12px}
     .lightbox.show{display:flex}
-    .lb-close{position:absolute;top:20px;right:20px;background:var(--surface);border:1px solid var(--line-strong);color:var(--ink-faint);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:color .15s,border-color .15s}
+    .lb-close{position:absolute;top:20px;right:20px;background:var(--surface);border:1px solid var(--line-strong);color:var(--ink-dim);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:color var(--transition-default),border-color var(--transition-default)}
     .lb-close:hover{color:var(--ink);border-color:var(--line-strong)}
-    .lightbox img{max-width:90vw;max-height:85vh;border-radius:var(--r-md);object-fit:contain}
+    .lightbox img{max-width:90vw;max-height:85vh;border-radius:var(--radius-m);object-fit:contain}
 
     /* ROOT LAYOUT — two columns */
     .chat-layout{
@@ -58,113 +88,120 @@
       overflow:hidden;
     }
     .sidebar-top{padding:22px 20px 18px;border-bottom:1px solid var(--line)}
-    .sidebar-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-faint);text-decoration:none;font-size:.8rem;margin-bottom:20px;transition:color .15s}
+    .sidebar-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-dim);text-decoration:none;font-size:.8rem;margin-bottom:20px;transition:color var(--transition-default)}
     .sidebar-back:hover{color:var(--ink)}
     .sidebar-back svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
     .sidebar-brand{display:flex;align-items:center;gap:10px}
-    .sidebar-av{width:38px;height:38px;border-radius:var(--r-sm);background:var(--accent-wash);border:1px solid rgba(108,99,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+    .sidebar-av{width:38px;height:38px;border-radius:var(--radius-xs);background:var(--accent-wash);border:1px solid rgba(30,222,123,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
     .sidebar-av img{width:100%;height:100%;object-fit:cover}
     .sidebar-brand-text{line-height:1.3}
-    .sidebar-name{font-family:'Unbounded',sans-serif;font-size:.78rem;font-weight:600}
-    .sidebar-status{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--ink-faint)}
+    .sidebar-name{font-weight:500;font-size:.78rem;letter-spacing:-.02em}
+    .sidebar-status{display:flex;align-items:center;gap:5px;font-size:.72rem;color:var(--ink-dim)}
     .online-dot{width:6px;height:6px;border-radius:50%;background:var(--good);flex-shrink:0}
     .sidebar-body{flex:1;padding:20px;display:flex;flex-direction:column;gap:12px;overflow-y:auto}
-    .sidebar-label{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500;margin-bottom:4px}
+    .sidebar-label{font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-dim);font-weight:500;margin-bottom:4px}
     .sidebar-hint{font-size:.78rem;color:var(--ink-dim);line-height:1.6}
     .sidebar-divider{height:1px;background:var(--line);margin:4px 0}
-    .sidebar-topic{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--r-sm);color:var(--ink-faint);font-size:.8rem;cursor:default;transition:background .15s}
+    .sidebar-topic{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius-xs);color:var(--ink-dim);font-size:.8rem;cursor:default;transition:background var(--transition-default)}
     .sidebar-topic svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
     .sidebar-footer{padding:16px 20px;border-top:1px solid var(--line)}
-    .sidebar-new-topic-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:.6rem .9rem;background:var(--accent-wash);border:1px solid rgba(108,99,255,.2);color:var(--accent-soft);font-family:'Onest',sans-serif;font-size:.8rem;font-weight:500;border-radius:var(--r-md);cursor:pointer;transition:background .15s;opacity:0;pointer-events:none;transition:opacity .2s,background .15s}
+    .sidebar-new-topic-btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:.6rem .9rem;background:var(--accent-wash);border:1px solid rgba(30,222,123,.2);color:var(--accent-dark);font-family:var(--font);font-size:.8rem;font-weight:500;border-radius:var(--radius-s);cursor:pointer;transition:background var(--transition-default);opacity:0;pointer-events:none}
     .sidebar-new-topic-btn svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none}
     .sidebar-new-topic-btn.show{opacity:1;pointer-events:all}
-    .sidebar-new-topic-btn:hover{background:rgba(108,99,255,.18)}
+    .sidebar-new-topic-btn:hover{background:rgba(30,222,123,.15)}
 
     /* MAIN CHAT AREA */
-    .chat-main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg)}
+    .chat-main{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--bg-secondary)}
 
-    /* TOP STRIPE (narrow status bar) */
+    /* TOP STRIPE */
     .chat-top-bar{height:48px;padding:0 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--surface)}
-    .chat-top-title{font-family:'Unbounded',sans-serif;font-size:.78rem;font-weight:600;color:var(--ink-faint)}
-    .chat-top-meta{font-size:.72rem;color:var(--ink-faint);display:flex;align-items:center;gap:6px}
+    .chat-top-title{font-weight:500;font-size:.78rem;color:var(--ink-dim);letter-spacing:-.02em}
+    .chat-top-meta{font-size:.72rem;color:var(--ink-dim);display:flex;align-items:center;gap:6px}
     .chat-top-meta span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--good)}
 
     /* MESSAGES */
-    .chat-msgs{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:3px;scroll-behavior:smooth}
+    .chat-msgs{flex:1;overflow-y:auto;padding:24px 20px;display:flex;flex-direction:column;gap:3px;scroll-behavior:smooth;background:var(--bg-secondary)}
     .chat-msgs::-webkit-scrollbar{width:4px}
     .chat-msgs::-webkit-scrollbar-track{background:transparent}
-    .chat-msgs::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:4px}
+    .chat-msgs::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:var(--radius-pill)}
 
-    /* MSG — class names kept to match JS renderMsg */
+    /* MSG */
     .msg{display:flex;flex-direction:column;gap:4px;max-width:76%;animation:popIn .18s ease;margin-bottom:8px}
     .msg.mine{align-self:flex-end;align-items:flex-end}
     .msg.theirs{align-self:flex-start;align-items:flex-start}
-    .msg-bubble{padding:11px 14px;border-radius:var(--r-lg);font-size:.88rem;line-height:1.65;word-break:break-word}
-    .msg.mine .msg-bubble{background:var(--accent);color:#fff;border-bottom-right-radius:var(--r-xs)}
-    .msg.theirs .msg-bubble{background:var(--surface);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:var(--r-xs)}
-    .msg-time{font-size:.68rem;color:var(--ink-faint);padding:0 2px}
-    .msg-img{max-width:220px;border-radius:var(--r-md);cursor:zoom-in;display:block;border:1px solid var(--line)}
-    .msg-file-link{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);font-size:.82rem;color:var(--accent-soft);text-decoration:none;transition:border-color .15s}
-    .msg-file-link:hover{border-color:var(--accent-soft)}
+    .msg-bubble{padding:11px 14px;border-radius:var(--radius-m);font-size:.88rem;line-height:1.65;word-break:break-word;font-weight:300;letter-spacing:-.02em}
+    .msg.mine .msg-bubble{background:var(--accent);color:var(--ink);border-bottom-right-radius:var(--radius-xs)}
+    .msg.theirs .msg-bubble{background:var(--surface);border:1px solid var(--line);color:var(--ink);border-bottom-left-radius:var(--radius-xs);box-shadow:var(--shadow-1)}
+    .msg-time{font-size:.68rem;color:var(--ink-dim);padding:0 2px;font-weight:300}
+    .msg-img{max-width:220px;border-radius:var(--radius-s);cursor:zoom-in;display:block;border:1px solid var(--line)}
+    .msg-file-link{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-s);font-size:.82rem;color:var(--accent-dark);text-decoration:none;transition:border-color var(--transition-default)}
+    .msg-file-link:hover{border-color:var(--accent)}
 
-    /* BOT ACTIONS — class names and modifiers kept to match JS */
+    /* BOT ACTIONS */
     .bot-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;max-width:520px}
     .bot-actions.scrollable{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px}
     .bot-actions.locked{pointer-events:none;opacity:.45}
-    .bot-btn{border:1px solid var(--line-strong);background:var(--surface-2);color:var(--ink-dim);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:.5rem .95rem;border-radius:99px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;white-space:nowrap}
-    .bot-btn:hover:not(:disabled){background:var(--surface-3);color:var(--ink);border-color:var(--line-strong)}
-    .bot-btn.accent{background:var(--accent-wash);border-color:rgba(108,99,255,.25);color:var(--accent-soft)}
-    .bot-btn.accent:hover:not(:disabled){background:rgba(108,99,255,.18)}
-    .bot-btn.back{background:transparent;border-color:var(--line);color:var(--ink-faint)}
+    .bot-btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink-dim);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.5rem .95rem;border-radius:var(--radius-pill);cursor:pointer;transition:all var(--transition-default);white-space:nowrap;letter-spacing:-.02em}
+    .bot-btn:hover:not(:disabled){background:var(--surface-3);color:var(--ink);border-color:var(--line-strong);transform:translateY(-1px);box-shadow:var(--shadow-1)}
+    .bot-btn.accent{background:var(--accent-wash);border-color:rgba(30,222,123,.25);color:var(--accent-dark)}
+    .bot-btn.accent:hover:not(:disabled){background:rgba(30,222,123,.18)}
+    .bot-btn.back{background:transparent;border-color:var(--line);color:var(--ink-dim)}
+    .bot-btn.back:hover:not(:disabled){background:var(--surface-2);border-color:var(--line-strong)}
     .bot-btn:disabled{cursor:default}
 
-    /* TYPING INDICATOR — class names kept */
-    .typing-indicator{display:flex;align-items:center;gap:5px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg) var(--r-lg) var(--r-lg) var(--r-xs);width:fit-content;margin-bottom:8px}
-    .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);animation:blink 1.2s ease-in-out infinite}
+    /* TYPING INDICATOR */
+    .typing-indicator{display:flex;align-items:center;gap:5px;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-m) var(--radius-m) var(--radius-m) var(--radius-xs);width:fit-content;margin-bottom:8px;box-shadow:var(--shadow-1)}
+    .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--ink-dim);animation:blink 1.2s ease-in-out infinite}
     .typing-dot:nth-child(2){animation-delay:.2s}
     .typing-dot:nth-child(3){animation-delay:.4s}
 
-    /* ORDER INFO CARD — class names kept to match appendOrderCard */
-    .order-info-card{background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-md);padding:14px 16px;margin-top:8px;min-width:240px}
-    .oi-num{font-family:'Unbounded',sans-serif;font-size:.82rem;font-weight:600;margin-bottom:10px;color:var(--ink)}
+    /* ORDER INFO CARD */
+    .order-info-card{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-s);padding:14px 16px;margin-top:8px;min-width:240px;box-shadow:var(--shadow-1)}
+    .oi-num{font-weight:500;font-size:.82rem;margin-bottom:10px;color:var(--ink);letter-spacing:-.02em}
     .oi-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line);font-size:.8rem}
     .oi-row:last-child{border-bottom:none}
-    .oi-lbl{color:var(--ink-faint);flex-shrink:0}
+    .oi-lbl{color:var(--ink-dim);flex-shrink:0}
     .oi-val{text-align:right;font-weight:500;color:var(--ink);word-break:break-word}
-    /* status pills s0–s5 — class names kept */
-    .s-pill{display:inline-block;font-size:.7rem;font-weight:600;padding:.2rem .55rem;border-radius:var(--r-xs)}
-    .s0{background:var(--surface-3);color:var(--ink-faint)}
-    .s1{background:var(--warn-wash);color:var(--warn)}
-    .s2{background:rgba(96,165,250,.12);color:#60a5fa}
-    .s3{background:var(--accent-wash);color:var(--accent-soft)}
-    .s4{background:var(--warn-wash);color:var(--warn)}
+    .s-pill{display:inline-block;font-size:.7rem;font-weight:500;padding:.2rem .55rem;border-radius:var(--radius-xxs)}
+    .s0{background:var(--surface-3);color:var(--ink-dim)}
+    .s1{background:var(--warn-wash);color:#b8960f}
+    .s2{background:rgba(96,165,250,.12);color:#3b82f6}
+    .s3{background:var(--accent-wash);color:var(--accent-dark)}
+    .s4{background:var(--warn-wash);color:#b8960f}
     .s5{background:var(--good-wash);color:var(--good)}
+
+    /* SUPPORT INFO CARD */
+    .support-info-card{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--radius-s);padding:14px 16px;margin-top:8px;min-width:240px;box-shadow:var(--shadow-1)}
+    .si-title{font-weight:500;font-size:.82rem;margin-bottom:10px;color:var(--ink);letter-spacing:-.02em}
+    .si-row{display:flex;align-items:flex-start;gap:10px;padding:5px 0;font-size:.8rem;color:var(--ink-dim)}
+    .si-row svg{width:14px;height:14px;stroke:var(--accent-dark);stroke-width:1.8;fill:none;flex-shrink:0;margin-top:2px}
+    .si-row strong{color:var(--ink);font-weight:500}
+    .si-price{font-weight:500;font-size:1.1rem;color:var(--ink);letter-spacing:-.02em;margin:6px 0}
 
     /* INPUT BAR */
     .chat-input-wrap{flex-shrink:0;padding:12px 16px;background:var(--surface);border-top:1px solid var(--line)}
-    .chat-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-xl);padding:8px 8px 8px 14px;transition:border-color .18s}
-    .chat-input-bar:focus-within{border-color:var(--accent)}
-    .attach-btn{width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink-faint);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:color .15s,border-color .15s;margin-bottom:1px}
-    .attach-btn:hover{color:var(--ink);border-color:var(--line-strong)}
+    .chat-input-bar{display:flex;align-items:flex-end;gap:8px;background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--radius-pill);padding:8px 8px 8px 14px;transition:border-color var(--transition-default);box-shadow:var(--shadow-1)}
+    .chat-input-bar:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-light)}
+    .attach-btn{width:34px;height:34px;border-radius:50%;background:transparent;border:1px solid var(--line);color:var(--ink-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all var(--transition-default);margin-bottom:1px}
+    .attach-btn:hover{color:var(--ink);border-color:var(--line-strong);background:var(--surface-2)}
     .attach-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
-    .chat-textarea{flex:1;background:transparent;border:none;outline:none;resize:none;color:var(--ink);font-family:'Onest',sans-serif;font-size:.88rem;font-weight:300;line-height:1.6;min-height:24px;max-height:120px;padding:4px 0}
+    .chat-textarea{flex:1;background:transparent;border:none;outline:none;resize:none;color:var(--ink);font-family:var(--font);font-size:.88rem;font-weight:300;line-height:1.6;min-height:24px;max-height:120px;padding:4px 0;letter-spacing:-.02em}
     .chat-textarea::placeholder{color:var(--ink-faint)}
-    .send-btn{width:34px;height:34px;border-radius:50%;background:var(--line);border:none;color:var(--ink-faint);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s;margin-bottom:1px}
+    .send-btn{width:34px;height:34px;border-radius:50%;background:var(--line);border:none;color:var(--ink-dim);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all var(--transition-default);margin-bottom:1px}
     .send-btn svg{width:14px;height:14px}
-    .send-btn.active{background:var(--accent);color:#fff}
-    .send-btn:hover.active{background:#8f4eff}
+    .send-btn.active{background:var(--accent);color:var(--ink)}
+    .send-btn:hover.active{background:var(--accent-hover);transform:scale(1.05)}
 
     /* TOAST */
-    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);z-index:800;padding:.55rem 1.2rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);z-index:800;padding:.55rem 1.2rem;border-radius:var(--radius-pill);font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;box-shadow:var(--shadow-2);letter-spacing:-.02em}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--good);color:#04140e}
-    .toast.error{background:var(--bad);color:#1a0606}
-    .toast.info{background:var(--accent);color:#fff}
+    .toast.success{background:var(--good);color:#fff}
+    .toast.error{background:var(--bad);color:#fff}
+    .toast.info{background:var(--accent);color:var(--ink)}
 
-    /* NEW TOPIC BTN (still in DOM for JS) — hidden; sidebar button replaces it visually */
     #newTopicBtn{display:none}
 
-    /* MOBILE: collapse sidebar */
+    /* MOBILE */
     @media(max-width:760px){
       html,body{overflow:auto}
       .chat-layout{flex-direction:column;height:auto;min-height:100vh}
@@ -187,14 +224,12 @@
   <img id="lightboxImg" src="" alt=""/>
 </div>
 
-<!-- hidden legacy new-topic btn kept for JS compatibility -->
 <button id="newTopicBtn" onclick="startNewTopic()" aria-hidden="true"></button>
 
 <div class="toast" id="toast"></div>
 
 <div class="chat-layout" id="appWrap">
 
-  <!-- SIDEBAR -->
   <aside class="chat-sidebar">
     <div class="sidebar-top">
       <a href="../profile" class="sidebar-back">
@@ -218,15 +253,16 @@
     <div class="sidebar-body">
       <div>
         <div class="sidebar-label">Как это работает</div>
-        <div class="sidebar-hint">Выберите тему — бот поможет разобраться. Для сложных вопросов подключим менеджера.</div>
+        <div class="sidebar-hint">Выберите тему — бот поможет разобраться.</div>
       </div>
       <div class="sidebar-divider"></div>
       <div>
-        <div class="sidebar-label">Доступные темы</div>
+        <div class="sidebar-label">Темы</div>
         <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Статус заказа</div>
         <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Оплата</div>
         <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Сроки</div>
         <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Правки</div>
+        <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>Обслуживание</div>
         <div class="sidebar-topic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Написать вопрос</div>
       </div>
     </div>
@@ -239,7 +275,6 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <div class="chat-main">
     <div class="chat-top-bar">
       <span class="chat-top-title">Диалог с поддержкой</span>
@@ -275,7 +310,7 @@ import {
   collection, query, orderBy, where, onSnapshot, limit,
   addDoc, serverTimestamp, doc, setDoc, updateDoc,
   getDocs, deleteDoc, Timestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
 const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
@@ -288,28 +323,6 @@ let initialLoadDone = false;
 let welcomeShown = false;
 let hasUserMessages = false;
 
-/* ── helpers ── */
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function compressImageToDataUrl(file, maxDim, quality){
-  return new Promise((resolve, reject)=>{
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = ()=>{
-      let { width, height } = img;
-      if(width > maxDim || height > maxDim){
-        const ratio = Math.min(maxDim/width, maxDim/height);
-        width = Math.round(width*ratio); height = Math.round(height*ratio);
-      }
-      const canvas = document.createElement('canvas');
-      canvas.width = width; canvas.height = height;
-      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
-      URL.revokeObjectURL(url);
-      try{ resolve(canvas.toDataURL('image/jpeg', quality)); }catch(err){ reject(err); }
-    };
-    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
-    img.src = url;
-  });
-}
 function toast(msg, type='info'){
   const t=document.getElementById('toast');
   t.textContent=msg; t.className=`toast ${type} show`;
@@ -339,18 +352,15 @@ window.onInput=function(el){
   document.getElementById('sendBtn').classList.toggle('active',el.value.trim().length>0);
 };
 
-/* ── purge messages older than 3 days ── */
 async function purgeOldMessages(uid){
   try{
     const cutoff=Timestamp.fromMillis(Date.now()-THREE_DAYS_MS);
     const snap=await getDocs(query(collection(db,'chats',uid,'messages'),where('createdAt','<',cutoff)));
     if(snap.empty) return;
     for(const d of snap.docs) deleteDoc(d.ref).catch(()=>{});
-    toast('История старше 3 дней очищена','info');
   }catch(e){}
 }
 
-/* ── dismiss welcome messages (soft-delete, no extra writes/deletes cost) ── */
 async function removeWelcomeMessages(){
   if(!currentUser) return;
   try{
@@ -366,7 +376,6 @@ async function removeWelcomeMessages(){
   }catch(e){}
 }
 
-/* ── save bot message to Firestore ── */
 async function saveBotMsg(text, flowTag){
   if(!currentUser) return null;
   try{
@@ -379,7 +388,6 @@ async function saveBotMsg(text, flowTag){
   }catch(e){ return null; }
 }
 
-/* ── render helpers ── */
 function renderMsg(m){
   const container=document.getElementById('chatMsgs');
   const isMe=m.sender==='user';
@@ -391,12 +399,11 @@ function renderMsg(m){
   if(m.type==='file'){
     const src=m.fileData||m.fileUrl||'';
     const isImg=m.fileType&&m.fileType.startsWith('image/');
-    const fname=escapeHtml(m.fileName||'Файл');
-    if(isImg) div.innerHTML=`<img class="msg-img" alt="${fname}" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
-    else div.innerHTML=`<a class="msg-file-link" href="${src}" download="${escapeHtml(m.fileName)}">📎 ${fname}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+    if(isImg) div.innerHTML=`<img class="msg-img" src="${src}" onclick="openLightbox('${src.replace(/'/g,"\\'")}')"/><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
+    else div.innerHTML=`<a class="msg-file-link" href="${src}" download="${m.fileName}">📎 ${m.fileName||'Файл'}</a><div class="msg-time">${isMe?'Вы':'Поддержка'} · ${fmtTime(m.createdAt)}</div>`;
   } else {
     const name = isMe?'Вы': isBot?'Бот':'Поддержка';
-    div.innerHTML=`<div class="msg-bubble">${escapeHtml(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${name} · ${fmtTime(m.createdAt)}</div>`;
+    div.innerHTML=`<div class="msg-bubble">${(m.text||'').replace(/\n/g,'<br>')}</div><div class="msg-time">${name} · ${fmtTime(m.createdAt)}</div>`;
   }
   container.appendChild(div);
   return div;
@@ -412,7 +419,6 @@ function lockAllButtonRows(){
 function renderBotWithButtons(m){
   const div = renderMsg(m);
   if(!div) return;
-  // деактивируем все ранее показанные блоки кнопок — не даём кликать по "устаревшим" темам
   lockAllButtonRows();
 
   const row = document.createElement('div');
@@ -433,14 +439,14 @@ function renderBotWithButtons(m){
   if(buttons.length) div.appendChild(row);
 }
 
-/* ── button sets by flowTag ── */
 function getBotButtons(tag){
   const topicBtns=[
     {label:'Статус заказа',    cls:'accent', fn:()=>{ doSendUserMsg('Статус заказа'); handleTopic('order'); }},
     {label:'Оплата',           cls:'accent', fn:()=>{ doSendUserMsg('Оплата'); handleTopic('payment'); }},
     {label:'Сроки',            cls:'accent', fn:()=>{ doSendUserMsg('Сроки'); handleTopic('timing'); }},
     {label:'Правки',           cls:'accent', fn:()=>{ doSendUserMsg('Правки'); handleTopic('revision'); }},
-    {label:'Написать вопрос',          fn:()=>{ doSendUserMsg('Хочу написать вопрос'); openFreeChat(); }},
+    {label:'Обслуживание',     cls:'accent', fn:()=>{ doSendUserMsg('Обслуживание'); handleTopic('support'); }},
+    {label:'Написать вопрос',  fn:()=>{ doSendUserMsg('Хочу написать вопрос'); openFreeChat(); }},
   ];
   const backBtn    ={label:'Назад к темам',     cls:'back',   fn:()=>showTopicMenu()};
   const managerBtn ={label:'Написать менеджеру', cls:'accent', fn:()=>openFreeChat()};
@@ -463,6 +469,7 @@ function getBotButtons(tag){
     case 'payment':  return [backBtn, managerBtn];
     case 'timing':   return [backBtn, managerBtn];
     case 'revision': return [backBtn, {label:'Описать правки', cls:'accent', fn:()=>openFreeChat()}];
+    case 'support':  return [backBtn, {label:'Подключить обслуживание', cls:'accent', fn:()=>{ window.location.href='../tickets'; }}];
     case 'free':     return [backBtn];
     case 'hint':     return [{label:'Написать вопрос', cls:'accent', fn:()=>{ doSendUserMsg('Хочу написать вопрос'); openFreeChat(); }}];
     default: return [];
@@ -478,12 +485,12 @@ function appendOrderCard(o){
     <div class="msg-bubble">Вот информация по вашему заказу:</div>
     <div class="order-info-card">
       <div class="oi-num">Заказ № ${(o.id||'').slice(0,8).toUpperCase()}</div>
-      <div class="oi-row"><span class="oi-lbl">Тип</span><span class="oi-val">${escapeHtml(o.siteType||'Сайт')}</span></div>
+      <div class="oi-row"><span class="oi-lbl">Тип</span><span class="oi-val">${o.siteType||'Сайт'}</span></div>
       <div class="oi-row"><span class="oi-lbl">Статус</span><span class="oi-val"><span class="s-pill s${s}">${STATUS_LABELS[s]}</span></span></div>
-      <div class="oi-row"><span class="oi-lbl">Оплата</span><span class="oi-val" style="color:${o.paid?'var(--success)':'var(--error)'}">${o.paid?'Оплачен':'Не оплачен'}</span></div>
+      <div class="oi-row"><span class="oi-lbl">Оплата</span><span class="oi-val" style="color:${o.paid?'var(--good)':'var(--bad)'}">${o.paid?'Оплачен':'Не оплачен'}</span></div>
       <div class="oi-row"><span class="oi-lbl">Сумма</span><span class="oi-val">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</span></div>
       <div class="oi-row"><span class="oi-lbl">Создан</span><span class="oi-val">${fmtDate(o.createdAt)}</span></div>
-      ${o.statusComment?`<div class="oi-row" style="flex-direction:column;gap:4px"><span class="oi-lbl">Комментарий</span><span class="oi-val" style="text-align:left;color:var(--accent2)">${escapeHtml(o.statusComment)}</span></div>`:''}
+      ${o.statusComment?`<div class="oi-row" style="flex-direction:column;gap:4px"><span class="oi-lbl">Комментарий</span><span class="oi-val" style="text-align:left;color:var(--accent-dark)">${o.statusComment}</span></div>`:''}
     </div>
     <div class="msg-time">Бот · ${fmtTime(Timestamp.now())}</div>`;
   lockAllButtonRows();
@@ -515,7 +522,6 @@ function showTyping(){
 }
 function hideTyping(){ document.getElementById('typingIndicator')?.remove(); }
 
-/* ── persist user msg (from button clicks) ── */
 async function doSendUserMsg(text){
   if(!currentUser||!text) return;
   try{
@@ -529,7 +535,6 @@ async function doSendUserMsg(text){
   }catch(e){}
 }
 
-/* ── bot flow ── */
 async function showWelcome(){
   await removeWelcomeMessages();
   welcomeShown = true;
@@ -557,6 +562,25 @@ async function handleTopic(topic){
     await saveBotMsg('Выберите заказ:', 'pick_order');
     return;
   }
+  if(topic==='support'){
+    showTyping(); await delay(800); hideTyping();
+    const msg = `Обслуживание сайта — это ежемесячная подписка на поддержку и доработку вашего проекта.
+
+📋 Что входит:
+• Правки текстов и контента
+• Замена изображений
+• Мелкие стилевые правки (цвета, отступы, шрифты)
+• Приоритетный ответ на заявки
+
+💰 Стоимость: 500 ₽ в месяц
+
+🔧 Как подключить:
+Перейдите в раздел "Обслуживание" в личном кабинете, выберите готовый проект и оплатите подписку.
+
+📝 Заявки обрабатываются в течение 24 часов в рабочие дни.`;
+    await saveBotMsg(msg, 'support');
+    return;
+  }
   showTyping(); await delay(900); hideTyping();
   const texts={
     payment:'Принимаем оплату через СБП, банковские карты, T‑Pay и SberPay.\nОплата происходит прямо на сайте.',
@@ -574,22 +598,18 @@ async function openFreeChat(){
   document.getElementById('chatInput').focus();
 }
 
-/* ── new topic ── */
 window.startNewTopic = async function(){
   flowState = 'topic';
   document.getElementById('newTopicBtn').classList.remove('show');
   document.getElementById('sidebarNewTopicBtn').classList.remove('show');
   const msgs = document.getElementById('chatMsgs');
   const sep = document.createElement('div');
-  sep.style.cssText = 'text-align:center;color:var(--muted);font-size:11px;padding:10px;opacity:.5;letter-spacing:.04em';
+  sep.style.cssText = 'text-align:center;color:var(--ink-faint);font-size:11px;padding:10px;opacity:.5;letter-spacing:.04em';
   sep.textContent = '— Новая тема —';
   msgs.appendChild(sep);
   await showWelcome();
 };
 
-/* ── Firestore live listener ──
-   onFirstSnapshot(stats) вызывается один раз сразу после обработки первого
-   снапшота — на тех же данных, что и рендер, без отдельного getDocs (нет гонки) */
 function listenChat(uid, onFirstSnapshot){
   if(unsubChat) unsubChat();
   const q=query(collection(db,'chats',uid,'messages'),orderBy('createdAt','asc'),limit(100));
@@ -628,7 +648,6 @@ function listenChat(uid, onFirstSnapshot){
   },e=>console.error(e));
 }
 
-/* ── send message from textarea ── */
 window.sendMsg=async function(){
   if(!currentUser) return;
   const inp=document.getElementById('chatInput');
@@ -657,23 +676,16 @@ window.sendMsg=async function(){
   }catch(e){ toast('Ошибка отправки','error'); }
 };
 
-/* ── file sending ── */
 window.sendFiles=async function(files){
   if(!currentUser||!files.length) return;
   for(const file of Array.from(files)){
+    if(file.size>3*1024*1024){ toast(file.name+' > 3 МБ','error'); continue; }
     try{
-      let base64;
-      if(file.type && file.type.startsWith('image/')){
-        base64=await compressImageToDataUrl(file, 1600, .72);
-        if(base64.length*0.75>900*1024){ toast(file.name+': слишком тяжёлый даже после сжатия','error'); continue; }
-      }else{
-        if(file.size>700*1024){ toast(file.name+' > 700 КБ — пришлите ссылку или файл полегче','error'); continue; }
-        base64=await new Promise((res,rej)=>{
-          const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
-        });
-      }
+      const base64=await new Promise((res,rej)=>{
+        const r=new FileReader(); r.onload=()=>res(r.result); r.onerror=rej; r.readAsDataURL(file);
+      });
       await addDoc(collection(db,'chats',currentUser.uid,'messages'),{
-        type:'file', fileData:base64, fileName:file.name, fileType:file.type&&file.type.startsWith('image/')?'image/jpeg':file.type,
+        type:'file', fileData:base64, fileName:file.name, fileType:file.type,
         sender:'user', senderName:currentUser.displayName||'', createdAt:serverTimestamp()
       });
       toast(file.name+' отправлен','success');
@@ -682,7 +694,6 @@ window.sendFiles=async function(files){
   document.getElementById('fileInput').value='';
 };
 
-/* ── lightbox ── */
 window.openLightbox=function(src){
   document.getElementById('lightboxImg').src=src;
   document.getElementById('lightbox').classList.add('show');
@@ -693,7 +704,6 @@ window.closeLightbox=function(){
 };
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeLightbox(); });
 
-/* ── bootstrap ── */
 onAuthStateChanged(auth,async user=>{
   if(!user){ window.location.href='../auth'; return; }
 
@@ -712,8 +722,6 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('appWrap').style.display='flex';
 
-  // решение о welcome/flowState принимаем по тому же снапшоту, что и рендер —
-  // без отдельного getDocs, чтобы не было гонки с onSnapshot
   listenChat(user.uid, ({hasAdminMessages, isEmpty})=>{
     if(hasAdminMessages){
       flowState = 'open';

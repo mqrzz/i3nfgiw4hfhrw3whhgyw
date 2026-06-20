@@ -4,6 +4,12 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Вход — Antviz</title>
+  <meta name="description" content="Войдите или зарегистрируйтесь в личном кабинете Antviz, чтобы оформить заказ и следить за его статусом." />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Вход — Antviz" />
+  <meta property="og:description" content="Личный кабинет Antviz: заказы, поддержка, статусы." />
+  <meta property="og:image" content="https://antviz.ru/img/favicon.png" />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;600;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -358,8 +364,10 @@
   window.sendReset=async function(){
     const email=document.getElementById('forgot-email').value.trim();
     if(!email){toast('Введите email','error');return;}
-    try{await sendPasswordResetEmail(auth,email);toast('Письмо отправлено! Проверьте почту.','success');closeForgot();}
-    catch(e){const msg=e.code==='auth/user-not-found'?'Аккаунт с таким email не найден':'Ошибка: '+e.message;toast(msg,'error');}
+    try{await sendPasswordResetEmail(auth,email);}
+    catch(e){ if(e.code!=='auth/user-not-found'){ toast('Ошибка: '+e.message,'error'); return; } }
+    toast('Если такой аккаунт есть — письмо отправлено. Проверьте почту.','success');
+    closeForgot();
   };
 
   document.getElementById('forgotModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeForgot();});

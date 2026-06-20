@@ -132,6 +132,18 @@
     .progress-fill{height:100%;background:var(--good);border-radius:99px;transition:width .4s ease}
     .progress-fill.warn{background:var(--warn)}
 
+    /* SITE SWITCHER */
+    .site-switcher{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:32px;padding-bottom:32px;border-bottom:1px solid var(--line)}
+    .site-switch-btn{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 18px;transition:border-color .15s,background .15s}
+    .site-switch-btn:hover{border-color:var(--line-strong)}
+    .site-switch-btn.is-active{border-color:var(--accent-soft);background:var(--accent-wash)}
+    .site-switch-ico{width:30px;height:30px;border-radius:50%;background:var(--good-wash);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .site-switch-ico svg{width:14px;height:14px;stroke:var(--good);stroke-width:2;fill:none}
+    .site-switch-btn.is-expiring .site-switch-ico{background:var(--warn-wash);border-color:rgba(251,191,36,.22)}
+    .site-switch-btn.is-expiring .site-switch-ico svg{stroke:var(--warn)}
+    .site-switch-name{font-size:.85rem;font-weight:500;color:var(--ink);line-height:1.3}
+    .site-switch-meta{font-size:.72rem;color:var(--ink-faint)}
+
     /* RIGHT COLUMN: tickets */
     .tickets-col{display:flex;flex-direction:column;gap:24px}
     .tickets-form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);padding:30px}
@@ -145,6 +157,8 @@
     .ticket-item:last-child{border-bottom:none}
     .ticket-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
     .ticket-item-title{font-size:.9rem;font-weight:500;color:var(--ink);flex:1}
+    .ticket-order-tag{font-size:.68rem;color:var(--ink-faint);display:flex;align-items:center;gap:5px}
+    .ticket-order-tag svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
     .t-open{font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.22rem .6rem;border-radius:var(--r-xs);background:var(--accent-wash);color:var(--accent-soft);border:1px solid rgba(108,99,255,.2);white-space:nowrap}
     .t-done{font-size:.7rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:.22rem .6rem;border-radius:var(--r-xs);background:var(--good-wash);color:var(--good);border:1px solid rgba(52,211,153,.2);white-space:nowrap}
     .ticket-desc{font-size:.82rem;color:var(--ink-dim);line-height:1.6}
@@ -201,6 +215,9 @@
   </div>
 
   <div id="sectionLoading" style="color:var(--ink-faint);font-size:.85rem;padding:20px 0">Загрузка...</div>
+
+  <!-- ─── ПЕРЕКЛЮЧАТЕЛЬ САЙТА (если активных обслуживаний несколько) ─── -->
+  <div id="siteSwitcher" class="site-switcher" style="display:none"></div>
 
   <!-- ─── НЕТ ГОТОВЫХ ЗАКАЗОВ ─── -->
   <div id="sectionNoOrders" style="display:none">
@@ -281,6 +298,7 @@
             <!-- .status-title text overridden by JS on expiry -->
             <div class="status-title">Обслуживание активно</div>
             <div id="activeSub">Загрузка...</div>
+            <div id="activeSiteLabel" style="font-size:.78rem;color:var(--ink-faint);margin-top:2px"></div>
           </div>
         </div>
 
@@ -303,7 +321,7 @@
         <div class="tickets-form-card">
           <div class="card-head">
             <div class="card-title">Новая заявка</div>
-            <div class="card-sub">Опишите что нужно изменить или добавить — ответим в ближайшее время</div>
+            <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить — ответим в ближайшее время</div>
           </div>
           <div class="field-group">
             <div>
@@ -317,7 +335,7 @@
             <div>
               <button class="btn btn-primary" onclick="submitTicket()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
-                Отправить заявку
+                Отправить ещё одну заявку
               </button>
             </div>
           </div>
@@ -326,7 +344,7 @@
         <div class="tickets-list-card">
           <div class="tickets-list-head">
             <div class="card-title" style="margin-bottom:4px">История заявок</div>
-            <div class="card-sub">Все ваши обращения по этому сайту</div>
+            <div class="card-sub" id="listSub">Все ваши обращения по этому сайту</div>
           </div>
           <div id="ticketsList">
             <div class="tickets-empty">Заявок пока нет</div>
@@ -355,12 +373,14 @@ const CREATE_PAYMENT_URL = 'https://api-lac-six-78.vercel.app/api/createPayment'
 
 let currentUser = null;
 let userOrders = [];
-let activeOrder = null;
+let activeOrders = [];      // все заказы с активным обслуживанием
+let activeOrder = null;     // выбранный в переключателе заказ
 let pendingSupportOrderId = null; // заказ, для которого сейчас покупается/продлевается обслуживание
 
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDate(ts){if(!ts) return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function orderLabel(o){ return `${escapeHtml(o.siteType||'Сайт')} · ${escapeHtml(o.tariff||o.package||'—')}`; }
 
 async function init(user){
   currentUser = user;
@@ -371,15 +391,19 @@ async function init(user){
   }catch(e){ userOrders=[]; }
 
   const doneOrders = userOrders.filter(o=>o.status===5);
-  activeOrder = doneOrders.find(o=>{
+  activeOrders = doneOrders.filter(o=>{
     if(!o.supportActive||!o.supportExpiresAt) return false;
     return o.supportExpiresAt.toDate() > new Date();
   });
 
   document.getElementById('sectionLoading').style.display='none';
 
-  if(activeOrder){
+  if(activeOrders.length){
+    // если в адресной строке указан конкретный заказ (?order=ID) — выбираем его, иначе первый
+    const urlOrderId = new URLSearchParams(location.search).get('order');
+    activeOrder = activeOrders.find(o=>o.id===urlOrderId) || activeOrders[0];
     pendingSupportOrderId = activeOrder.id;
+    renderSiteSwitcher();
     showActiveSection();
   } else if(doneOrders.length===0){
     document.getElementById('sectionNoOrders').style.display='block';
@@ -387,6 +411,41 @@ async function init(user){
     showBuySection(doneOrders);
   }
 }
+
+function renderSiteSwitcher(){
+  const wrap = document.getElementById('siteSwitcher');
+  if(activeOrders.length<2){ wrap.style.display='none'; return; }
+  wrap.style.display='flex';
+  wrap.innerHTML = activeOrders.map(o=>{
+    const daysLeft = Math.ceil((o.supportExpiresAt.toDate()-new Date())/864e5);
+    const expiring = daysLeft<=2;
+    const domain = o.siteDomain ? o.siteDomain : ('№ '+o.id.slice(0,8).toUpperCase());
+    return `
+    <button class="site-switch-btn ${o.id===activeOrder.id?'is-active':''} ${expiring?'is-expiring':''}" onclick="switchSite('${o.id}')">
+      <span class="site-switch-ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">${expiring
+          ? '<path d="M12 9v4M12 17h.01M10.29 3.86l-8.18 14.18A2 2 0 003.82 21h16.36a2 2 0 001.71-2.96L13.71 3.86a2 2 0 00-3.42 0z"/>'
+          : '<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'}</svg>
+      </span>
+      <span>
+        <div class="site-switch-name">${escapeHtml(domain)}</div>
+        <div class="site-switch-meta">${orderLabel(o)} · ${expiring?`осталось ${daysLeft} дн.`:`до ${fmtDate(o.supportExpiresAt)}`}</div>
+      </span>
+    </button>`;
+  }).join('');
+}
+
+window.switchSite = function(orderId){
+  const o = activeOrders.find(x=>x.id===orderId);
+  if(!o) return;
+  activeOrder = o;
+  pendingSupportOrderId = o.id;
+  const url = new URL(location.href);
+  url.searchParams.set('order', o.id);
+  history.replaceState(null,'',url);
+  renderSiteSwitcher();
+  showActiveSection();
+};
 
 function showBuySection(doneOrders){
   document.getElementById('sectionBuy').style.display='block';
@@ -397,7 +456,7 @@ function showBuySection(doneOrders){
         <span class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</span>
         <span class="ok-pill">Готов</span>
       </div>
-      <div class="order-type">${escapeHtml(o.siteType||'Сайт')} · ${escapeHtml(o.tariff||'—')}</div>
+      <div class="order-type">${orderLabel(o)}</div>
       <div class="order-meta">${fmtDate(o.createdAt)}</div>
       <svg class="order-card-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
     </div>`).join('');
@@ -405,6 +464,7 @@ function showBuySection(doneOrders){
 
 function showActiveSection(){
   document.getElementById('sectionActive').style.display='block';
+  document.getElementById('sectionBuy').style.display='none';
   const exp = activeOrder.supportExpiresAt.toDate();
   const total = 30*24*60*60*1000;
   const left = exp - new Date();
@@ -412,18 +472,25 @@ function showActiveSection(){
   const pct = Math.max(0,Math.min(100, left/total*100));
 
   document.getElementById('activeSub').textContent = `Активно до ${fmtDate(activeOrder.supportExpiresAt)}`;
+  document.getElementById('activeSiteLabel').textContent =
+    (activeOrder.siteDomain ? activeOrder.siteDomain+' · ' : '№ '+activeOrder.id.slice(0,8).toUpperCase()+' · ') + orderLabel(activeOrder).replace(/<[^>]+>/g,'');
   document.getElementById('progressLabel').textContent = `осталось ${daysLeft} дн.`;
   const fill = document.getElementById('progressFill');
   fill.style.width = pct+'%';
-  if(daysLeft<=2) fill.classList.add('warn');
+  fill.classList.toggle('warn', daysLeft<=2);
 
-  if(daysLeft<=2){
-    const card = document.getElementById('activeCard');
-    card.classList.remove('active');
-    card.classList.add('expiring');
-    document.querySelector('#activeCard .status-icon').textContent='⚠️';
-    document.querySelector('#activeCard .status-title').textContent='Обслуживание истекает';
-  }
+  const card = document.getElementById('activeCard');
+  card.classList.toggle('expiring', daysLeft<=2);
+  card.classList.toggle('active', daysLeft>2);
+  document.querySelector('#activeCard .status-title').textContent = daysLeft<=2 ? 'Обслуживание истекает' : 'Обслуживание активно';
+
+  const siteName = activeOrder.siteDomain || ('заказу № '+activeOrder.id.slice(0,8).toUpperCase());
+  document.getElementById('formSub').textContent = `Заявка будет привязана к сайту: ${siteName}`;
+  document.getElementById('listSub').textContent = `Обращения по сайту: ${siteName}`;
+
+  document.getElementById('ticketTitle').value='';
+  document.getElementById('ticketDesc').value='';
+
   loadTickets();
 }
 
@@ -457,8 +524,11 @@ window.payForSupport = async function(isRenewal){
 };
 
 async function loadTickets(){
+  if(!activeOrder) return;
+  const orderIdAtLoad = activeOrder.id;
   try{
-    const snap = await getDocs(query(collection(db,'tickets'),where('uid','==',currentUser.uid)));
+    const snap = await getDocs(query(collection(db,'service_tickets'),where('orderId','==',orderIdAtLoad)));
+    if(!activeOrder || activeOrder.id!==orderIdAtLoad) return; // переключились на другой сайт пока грузилось
     const tickets = snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     renderTickets(tickets);
@@ -474,6 +544,10 @@ function renderTickets(tickets){
         <span class="ticket-item-title">${escapeHtml(t.title)}</span>
         <span class="${t.status==='done'?'t-done':'t-open'}">${t.status==='done'?'Готово':'Открыта'}</span>
       </div>
+      <div class="ticket-order-tag">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+        ${escapeHtml(t.orderDomain || (t.orderId ? '№ '+t.orderId.slice(0,8).toUpperCase() : 'Сайт'))}
+      </div>
       ${t.description?`<div class="ticket-desc">${escapeHtml(t.description)}</div>`:''}
       ${t.adminReply?`<div class="ticket-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${escapeHtml(t.adminReply)}</div>`:''}
       <div class="ticket-date">${t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
@@ -484,12 +558,17 @@ window.submitTicket = async function(){
   const title = document.getElementById('ticketTitle').value.trim();
   const desc = document.getElementById('ticketDesc').value.trim();
   if(!title){ toast('Введите название заявки','error'); return; }
+  if(!activeOrder){ toast('Не выбран сайт для заявки','error'); return; }
   try{
-    await addDoc(collection(db,'tickets'),{
+    await addDoc(collection(db,'service_tickets'),{
       title, description: desc||'',
       uid: currentUser.uid,
       userName: currentUser.displayName||'Пользователь',
       userEmail: currentUser.email||'',
+      orderId: activeOrder.id,
+      orderSiteType: activeOrder.siteType||'',
+      orderTariff: activeOrder.tariff||activeOrder.package||'',
+      orderDomain: activeOrder.siteDomain||'',
       status:'open',
       createdAt: serverTimestamp()
     });

@@ -25,8 +25,8 @@
       --an-line-soft: rgba(242,242,240,0.05);
       --an-ink:       #f2f2f0;
       --an-ink-dim:   rgba(242,242,240,0.46);
-      --an-ink-faint: rgba(242,242,240,0.26);
-      --an-accent:    #7c6fff;
+      --an-ink-faint: rgba(242,242,240,0.5);
+      --an-accent:    #6c63ff;
       --an-accent-ink:#0a0a0c;
       --an-warn:      #e8a23d;
       --an-danger:    #e8634f;
@@ -420,10 +420,9 @@
     teardownListeners();
 
     unsubSupport = onSnapshot(
-      collection(db, 'chats', user.uid, 'messages'),
+      query(collection(db, 'chats', user.uid, 'messages'), where('sender', '==', 'admin'), where('readByUser', '==', false)),
       snap => {
-        const unread = snap.docs.filter(d => d.data().sender === 'admin' && !d.data().readByUser).length;
-        setBadge('support', unread, 'warn');
+        setBadge('support', snap.size, 'warn');
         refreshNotifyDot();
       },
       () => {}

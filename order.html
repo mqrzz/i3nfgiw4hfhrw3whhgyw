@@ -4,6 +4,14 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Новый заказ — Antviz</title>
+<meta name="description" content="Оформите заказ на сайт в Antviz: выберите формат, тариф и дополнения — рассчитаем стоимость и свяжемся с вами." />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Новый заказ — Antviz" />
+<meta property="og:description" content="Оформите заказ на сайт: выберите формат, тариф и дополнения." />
+<meta property="og:image" content="https://antviz.ru/img/favicon.png" />
+<meta property="og:url" content="https://antviz.ru/order" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="canonical" href="https://antviz.ru/order" />
 <link rel="icon" href="img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500&display=swap" rel="stylesheet"/>
@@ -13,7 +21,7 @@
   --bg:#0a0a0c;--surface:#111114;--surface-2:#15151a;--surface-3:#1a1a21;
   --line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
   --ink:#f2f2f6;--ink-dim:rgba(255,255,255,.46);--ink-faint:rgba(255,255,255,.24);
-  --accent:#7D32FF;--accent-soft:#a78bfa;--accent-wash:rgba(125,50,255,.12);
+  --accent:#6c63ff;--accent-soft:#a78bfa;--accent-wash:rgba(108,99,255,.12);
   --good:#34d399;--good-wash:rgba(52,211,153,.12);--warn:#fbbf24;--bad:#f87171;
   --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
 }
@@ -75,7 +83,7 @@ button{font-family:inherit}
 .ov-tier{background:var(--surface);padding:25px 21px;cursor:pointer;transition:background .15s,border-color .15s;position:relative;display:flex;flex-direction:column;border-radius:var(--r-md);border:1.5px solid var(--line)}
 .ov-tier:hover{background:var(--surface-2);border-color:var(--line-strong)}
 .ov-tier.sel{background:var(--accent-wash);border-color:var(--accent)}
-.ov-tier-tag{position:absolute;top:14px;right:14px;font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-soft);background:rgba(125,50,255,.14);padding:.2rem .55rem;border-radius:99px;font-weight:500}
+.ov-tier-tag{position:absolute;top:14px;right:14px;font-size:.55rem;text-transform:uppercase;letter-spacing:.08em;color:var(--accent-soft);background:rgba(108,99,255,.14);padding:.2rem .55rem;border-radius:99px;font-weight:500}
 .ov-tier-name{font-family:'Unbounded',sans-serif;font-weight:600;font-size:.82rem;color:var(--ink-dim);margin-bottom:14px}
 .ov-tier.sel .ov-tier-name{color:var(--accent-soft)}
 .ov-tier-price{font-family:'Unbounded',sans-serif;font-weight:900;font-size:1.7rem;line-height:1;margin-bottom:4px}
@@ -136,7 +144,7 @@ button{font-family:inherit}
 .ov-fav-preview img{width:28px;height:28px;border-radius:4px;object-fit:contain;background:#fff;padding:2px}
 .ov-fav-preview button{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:.9rem}
 .ov-chips{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:10px}
-.ov-chip{display:flex;align-items:center;gap:.3rem;background:var(--accent-wash);border:1px solid rgba(125,50,255,.2);border-radius:var(--r-xs);padding:.2rem .55rem;font-size:.68rem;color:var(--accent-soft)}
+.ov-chip{display:flex;align-items:center;gap:.3rem;background:var(--accent-wash);border:1px solid rgba(108,99,255,.2);border-radius:var(--r-xs);padding:.2rem .55rem;font-size:.68rem;color:var(--accent-soft)}
 .ov-chip button{background:none;border:none;color:var(--ink-faint);cursor:pointer;font-size:.75rem}
 .ov-chip button:hover{color:var(--bad)}
 .ov-promo-row{display:flex;gap:8px}
@@ -545,6 +553,7 @@ let state = {
 };
 
 const fmt = n => Math.round(n).toLocaleString('ru');
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg, type='info'){
   const el = document.getElementById('ovToast');
   el.textContent = msg;
@@ -695,28 +704,69 @@ document.getElementById('promoBtn').addEventListener('click', async ()=>{
 });
 
 /* ===== STEP 4: FILES ===== */
+// Сжимаем фото на клиенте перед кодированием в base64: уменьшает размер документа
+// в Firestore в разы (телефонные фото 3-8 МБ -> обычно 100-400 КБ) и экономит
+// квоту на чтение/запись, не отказываясь от хранения файлов прямо в Firestore.
+function compressImageToDataUrl(file, maxDim, quality, mime){
+  return new Promise((resolve, reject)=>{
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = ()=>{
+      let { width, height } = img;
+      if(width > maxDim || height > maxDim){
+        const ratio = Math.min(maxDim/width, maxDim/height);
+        width = Math.round(width*ratio); height = Math.round(height*ratio);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = width; canvas.height = height;
+      canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+      URL.revokeObjectURL(url);
+      try{ resolve(canvas.toDataURL(mime || 'image/jpeg', quality)); }
+      catch(err){ reject(err); }
+    };
+    img.onerror = ()=>{ URL.revokeObjectURL(url); reject(new Error('image load failed')); };
+    img.src = url;
+  });
+}
 document.getElementById('favZone').addEventListener('click', ()=> document.getElementById('fFav').click());
-document.getElementById('fFav').addEventListener('change', e=>{
+document.getElementById('fFav').addEventListener('change', async e=>{
   const file = e.target.files[0];
   if(!file) return;
-  if(file.size > 2*1024*1024){ toast('Фавикон больше 2 МБ','error'); return; }
-  favFile = file;
+  if(file.size > 5*1024*1024){ toast('Фавикон больше 5 МБ — выберите файл поменьше', 'error'); return; }
   const p = document.getElementById('favPreview');
-  const url = URL.createObjectURL(file);
+  let url, dataUrl;
+  try{
+    dataUrl = await compressImageToDataUrl(file, 512, .9, 'image/png');
+    url = dataUrl;
+  }catch(err){
+    toast('Не получилось обработать изображение фавикона', 'error');
+    return;
+  }
+  favFile = { name:file.name, type:'image/png', dataUrl };
   p.style.display = 'flex';
-  p.innerHTML = `<img src="${url}" alt=""> ${file.name} <button type="button" id="favClear">×</button>`;
+  p.innerHTML = `<img src="${url}" alt=""> ${escapeHtml(file.name)} <button type="button" id="favClear">×</button>`;
   document.getElementById('favClear').addEventListener('click', ()=>{
     favFile = null; p.style.display='none'; p.innerHTML=''; document.getElementById('fFav').value='';
   });
 });
 
 document.getElementById('filesZone').addEventListener('click', ()=> document.getElementById('fFiles').click());
-document.getElementById('fFiles').addEventListener('change', e=>{
-  Array.from(e.target.files).forEach(f=>{
-    if(f.size > 10*1024*1024){ toast(f.name+' больше 10 МБ','error'); return; }
-    if(!uploadedFiles.find(u=>u.name===f.name)) uploadedFiles.push(f);
-  });
+document.getElementById('fFiles').addEventListener('change', async e=>{
+  for(const f of Array.from(e.target.files)){
+    if(uploadedFiles.find(u=>u.name===f.name)) continue;
+    if(f.type && f.type.startsWith('image/')){
+      try{
+        const dataUrl = await compressImageToDataUrl(f, 1600, .72, 'image/jpeg');
+        if(dataUrl.length*0.75 > 900*1024){ toast(f.name+': файл слишком тяжёлый даже после сжатия', 'error'); continue; }
+        uploadedFiles.push({ name:f.name, type:'image/jpeg', size:Math.round(dataUrl.length*0.75), dataUrl });
+      }catch(err){ toast('Не получилось обработать '+f.name, 'error'); }
+    }else{
+      if(f.size > 700*1024){ toast(f.name+': файл больше 700 КБ — для тяжёлых документов пришлите ссылку или прикрепите в чат поддержки после оформления', 'error'); continue; }
+      uploadedFiles.push(f);
+    }
+  }
   renderChips();
+  e.target.value = '';
 });
 function renderChips(){
   const el = document.getElementById('fileChips');
@@ -724,7 +774,7 @@ function renderChips(){
   uploadedFiles.forEach((f,i)=>{
     const c = document.createElement('div');
     c.className = 'ov-chip';
-    c.innerHTML = `${f.name} <button type="button" data-i="${i}">×</button>`;
+    c.innerHTML = `${escapeHtml(f.name)} <button type="button" data-i="${i}">×</button>`;
     c.querySelector('button').addEventListener('click', ()=>{ uploadedFiles.splice(i,1); renderChips(); });
     el.appendChild(c);
   });
@@ -788,7 +838,7 @@ function recalc(){
   const dWrap = document.getElementById('ledgerDiscountWrap');
   if(discount > 0 && state.promo){
     dWrap.hidden = false;
-    dWrap.innerHTML = `<div class="ov-row is-discount"><span>Промокод ${state.promo.code}</span><span>−${fmt(discount)} ₽</span></div>`;
+    dWrap.innerHTML = `<div class="ov-row is-discount"><span>Промокод ${escapeHtml(state.promo.code)}</span><span>−${fmt(discount)} ₽</span></div>`;
   } else { dWrap.hidden = true; }
   document.getElementById('ledgerPrice').textContent = fmt(total)+' ₽';
   document.getElementById('mobileBarPrice').textContent = fmt(total)+' ₽';
@@ -796,6 +846,7 @@ function recalc(){
 
 /* ===== SUBMIT ===== */
 function fileToBase64(file){
+  if(file.dataUrl) return Promise.resolve(file.dataUrl);
   return new Promise((resolve, reject)=>{
     const r = new FileReader();
     r.onload = ()=> resolve(r.result);
@@ -834,11 +885,25 @@ async function submitOrder(){
   if(state.extras.urgent) extrasArr.push('urgent');
 
   let favData = null;
-  if(favFile){ try{ favData = await fileToBase64(favFile); }catch(e){} }
+  if(favFile){ try{ favData = await fileToBase64(favFile); }catch(e){ toast('Не удалось прикрепить фавикон, заявка отправлена без него', 'error'); } }
+  // Документ Firestore не может весить больше ~1 МБ — держим вложения в безопасном
+  // бюджете (с запасом под остальные поля заказа), а не отправляем всё подряд.
+  const ATTACH_BUDGET = 850*1024;
+  let usedBytes = favData ? Math.round(favData.length*0.75) : 0;
   const attachments = [];
   for(const f of uploadedFiles){
-    if(f.size > 3*1024*1024) continue;
-    try{ attachments.push({ fileData: await fileToBase64(f), fileName:f.name, fileType:f.type }); }catch(e){}
+    try{
+      const data = await fileToBase64(f);
+      const approxBytes = Math.round(data.length*0.75);
+      if(usedBytes + approxBytes > ATTACH_BUDGET){
+        toast(`«${f.name}» не поместился в заявку — пришлите его отдельно в чат поддержки после оформления`, 'error');
+        continue;
+      }
+      usedBytes += approxBytes;
+      attachments.push({ fileData: data, fileName:f.name, fileType:f.type });
+    }catch(e){
+      toast(`Не удалось прикрепить «${f.name}», заявка отправлена без него`, 'error');
+    }
   }
 
   let docRef;

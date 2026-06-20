@@ -399,6 +399,11 @@
           <div style="background:var(--bg3);border-radius:10px;padding:.9rem 1rem;font-size:.84rem;line-height:1.65;color:var(--muted2)" id="descBox"></div>
         </div>
 
+        <div class="dsec" id="favSec" style="display:none">
+          <div class="dsec-label">Фавикон от клиента</div>
+          <div class="attach-grid" id="favGrid"></div>
+        </div>
+
         <div class="dsec" id="attachSec" style="display:none">
           <div class="dsec-label">Вложения</div>
           <div class="attach-grid" id="attachGrid"></div>
@@ -583,7 +588,7 @@ function showDetail(o){
   const el=document.getElementById('extrasList');
   if(extrasArr.length){
     es.style.display='block';
-    const labels={domain:'Домен',support:'Обслуживание',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно'};
+    const labels={domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно'};
     el.innerHTML=extrasArr.map(e=>{
       const label=labels[e]||e;
       const cls=e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':e==='urgent'?'tag-yellow':'';
@@ -592,6 +597,13 @@ function showDetail(o){
   }else{es.style.display='none';}
 
   const desc=document.getElementById('descSec');if(o.description){desc.style.display='block';document.getElementById('descBox').textContent=o.description;}else desc.style.display='none';
+
+  const favSec=document.getElementById('favSec');const fg=document.getElementById('favGrid');
+  if(o.favicon){
+    favSec.style.display='block';
+    fg.innerHTML=`<img class="attach-thumb" alt="favicon" src="${o.favicon}" style="background:#fff;object-fit:contain;padding:6px" onclick="openLightbox('${o.favicon.replace(/'/g,"\'")}')">`;
+  }else favSec.style.display='none';
+
   const att=document.getElementById('attachSec');const ag=document.getElementById('attachGrid');
   if(o.attachments?.length){
     att.style.display='block';

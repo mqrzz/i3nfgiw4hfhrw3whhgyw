@@ -246,6 +246,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { collection, query, orderBy, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, onSnapshot, Timestamp, getDoc, where, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allTickets=[], allOrders=[], currentFilter='all';
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDT(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
@@ -266,19 +267,19 @@ function renderTickets(){
   el.innerHTML=list.map(t=>`
     <div class="ticket-card ${t.status==='done'?'done':'open'}" id="tc_${t.id}">
       <div class="ticket-card-hdr">
-        <div class="ticket-card-title">${t.title}</div>
+        <div class="ticket-card-title">${escapeHtml(t.title)}</div>
         <span class="sbadge ${t.status==='done'?'s5':'s2'}">${t.status==='done'?'Закрыта':'Открыта'}</span>
       </div>
       <div class="ticket-card-meta">
-        <span style="font-weight:500">${t.userName||'—'}</span>
+        <span style="font-weight:500">${escapeHtml(t.userName||'—')}</span>
         <span>·</span>
-        <span>${t.userEmail||'—'}</span>
+        <span>${escapeHtml(t.userEmail||'—')}</span>
         <span>·</span>
         <span>${fmtDT(t.createdAt)}</span>
       </div>
-      ${t.description?`<div class="ticket-card-desc">${t.description}</div>`:''}
-      ${t.adminReply?`<div class="ticket-card-reply">💬 Ваш ответ: ${t.adminReply}</div>`:''}
-      <textarea class="ticket-reply-inp" id="tr_${t.id}" placeholder="Написать ответ клиенту..." rows="2">${t.adminReply||''}</textarea>
+      ${t.description?`<div class="ticket-card-desc">${escapeHtml(t.description)}</div>`:''}
+      ${t.adminReply?`<div class="ticket-card-reply">💬 Ваш ответ: ${escapeHtml(t.adminReply)}</div>`:''}
+      <textarea class="ticket-reply-inp" id="tr_${t.id}" placeholder="Написать ответ клиенту..." rows="2">${escapeHtml(t.adminReply||'')}</textarea>
       <div class="ticket-actions">
         <button class="btn btn-primary btn-sm" onclick="saveReply('${t.id}')">💾 Сохранить ответ</button>
         ${t.status!=='done'?`<button class="btn btn-success btn-sm" onclick="closeTick('${t.id}')">✅ Закрыть заявку</button>`:`<button class="btn btn-ghost btn-sm" onclick="reopenTick('${t.id}')">↩ Открыть</button>`}
@@ -299,7 +300,7 @@ function renderSupports(){
     const pct=Math.max(0,Math.min(100,(exp-now)/(30*864e5)*100));
     return`<div style="margin-bottom:.85rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem">
-        <div><div style="font-size:.86rem;font-weight:500">${o.clientName||'—'}</div><div style="font-size:.72rem;color:var(--muted)">${o.clientEmail||'—'}</div></div>
+        <div><div style="font-size:.86rem;font-weight:500">${escapeHtml(o.clientName||'—')}</div><div style="font-size:.72rem;color:var(--muted)">${escapeHtml(o.clientEmail||'—')}</div></div>
         <span style="font-size:.72rem;color:${days<3?'var(--error)':'var(--muted)'}">осталось ${days} дн.</span>
       </div>
       <div style="height:4px;background:var(--bg);border-radius:2px"><div style="height:100%;border-radius:2px;background:${days<3?'var(--warn)':'var(--success)'};width:${pct}%"></div></div>

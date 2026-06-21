@@ -3,354 +3,325 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Дашборд — Antviz Admin</title>
+  <title>Дашборд — Antviz</title>
   <link rel="icon" href="../img/favicon.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
   <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --green:#1ede7b; --green-h:#1ac16b; --green-d:#149955;
-  --green-light:rgba(30,222,123,.1); --green-border:rgba(30,222,123,.2);
-  --bg:#f2f4f7; --bg2:#fff; --bg3:#f9fafc;
-  --text:#191b1e; --muted:#707a8a; --muted2:#a0a8b4;
-  --border:#dfe3e8; --border2:#cbcdd6;
-  --dark:#191b1e; --dark2:#2b2f33; --dark3:#383d42;
-  --red:#ff2d50; --amber:#ffd11a; --blue:#3b82f6;
-  --font:'Geologica','Inter',sans-serif;
-  --sidebar-w:220px; --topbar-h:56px;
-  --radius-xl:40px; --radius-l:24px; --radius-m:16px; --radius-s:10px; --radius-xs:6px;
-}
-html,body{height:100%;font-family:var(--font);font-weight:300;background:var(--bg);color:var(--text);-webkit-font-smoothing:antialiased;letter-spacing:-.01em}
-a{text-decoration:none;color:inherit}
-button{font-family:var(--font);cursor:pointer}
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#f5f7fa;
+      --bg2:#ffffff;
+      --bg3:#f0f2f5;
+      --card:#ffffff;
+      --border:#e8ecf0;
+      --border2:#d0d5db;
+      --accent:#1ede7b;
+      --accent2:#17b86a;
+      --accent3:#0d9f56;
+      --text:#1a1a1e;
+      --muted:#6b7280;
+      --muted2:#9ca3af;
+      --success:#1ede7b;
+      --error:#ff2d50;
+      --warn:#ffd11a;
+      --sidebar-w:240px;
+      --topbar-h:60px;
+    }
+    html,body{height:100%;font-size:16px;background:var(--bg)}
+    body{color:var(--text);font-family:'Inter',sans-serif;font-weight:400;display:flex;flex-direction:column}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    ::-webkit-scrollbar{width:4px;height:4px}
+    ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
 
-/* ── LOADING ── */
-.loading{position:fixed;inset:0;z-index:9999;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .3s}
-.loading-logo{font-size:22px;font-weight:500;color:#fff;letter-spacing:-.03em}
-.loading-logo em{color:var(--green);font-style:normal}
-.loading-bar{width:120px;height:2px;background:rgba(255,255,255,.1);border-radius:2px;overflow:hidden}
-.loading-bar::after{content:'';display:block;height:100%;width:40%;background:var(--green);border-radius:2px;animation:loadbar 1s ease infinite}
-@keyframes loadbar{0%{transform:translateX(-100%)}100%{transform:translateX(400%)}}
+    /* LOADING */
+    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
+    .spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
 
-/* ── SIDEBAR ── */
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--dark);display:flex;flex-direction:column;z-index:100}
-.sb-logo{padding:20px 20px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.07)}
-.sb-logo img{width:26px;height:26px;border-radius:8px;object-fit:cover;flex-shrink:0}
-.sb-logo-name{font-size:15px;font-weight:500;color:#fff;letter-spacing:-.02em}
-.sb-logo-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:600;letter-spacing:.06em;padding:2px 7px;border-radius:4px;flex-shrink:0}
-.sb-nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.sb-section{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);padding:12px 10px 4px}
-.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-s);color:rgba(255,255,255,.4);font-size:13px;font-weight:400;transition:color .15s,background .15s;position:relative;border:none;background:none;width:100%;text-align:left}
-.sb-item:hover{color:rgba(255,255,255,.8);background:rgba(255,255,255,.06)}
-.sb-item.active{color:#fff;background:rgba(30,222,123,.12)}
-.sb-item.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:2px;border-radius:0 2px 2px 0;background:var(--green)}
-.sb-item svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;stroke-width:1.8;fill:none;opacity:.7}
-.sb-item.active svg{opacity:1}
-.sb-badge{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:var(--red);color:#fff;font-size:9px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
-.sb-footer{padding:10px;border-top:1px solid rgba(255,255,255,.07)}
-.sb-logout{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--radius-s);color:rgba(255,255,255,.3);font-size:13px;transition:color .15s,background .15s;border:none;background:none;width:100%;cursor:pointer}
-.sb-logout:hover{color:var(--red);background:rgba(255,45,80,.08)}
-.sb-logout svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;stroke-width:1.8;fill:none}
+    /* SIDEBAR */
+    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100;transition:transform .25s}
+    .sidebar-logo{padding:1.2rem 1.2rem 1rem;display:flex;align-items:center;gap:10px;text-decoration:none;border-bottom:1px solid var(--border)}
+    .sidebar-logo img{width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0}
+    .sidebar-logo-text{font-family:'Geologica',sans-serif;font-weight:700;font-size:.85rem;color:var(--text)}
+    .sidebar-logo-badge{background:rgba(255,45,80,.1);color:var(--error);border:1px solid rgba(255,45,80,.15);padding:.08rem .45rem;border-radius:50px;font-size:.55rem;font-weight:700;letter-spacing:.07em;margin-left:auto;flex-shrink:0}
+    .sidebar-nav{flex:1;padding:1rem .7rem;overflow-y:auto;display:flex;flex-direction:column;gap:.15rem}
+    .sidebar-section{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.6rem .6rem .3rem;font-weight:600}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:.6rem .85rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.84rem;transition:all .15s;cursor:pointer;border:none;background:none;width:100%;font-family:'Inter',sans-serif;position:relative}
+    .nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
+    .nav-item.active{background:rgba(30,222,123,.12);color:var(--accent2)}
+    .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none}
+    .nav-item-badge{position:absolute;right:.7rem;background:var(--error);color:#fff;font-size:.58rem;font-weight:700;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
+    .sidebar-footer{padding:.8rem .7rem;border-top:1px solid var(--border)}
 
-/* ── TOPBAR ── */
-.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:90}
-.topbar-left{display:flex;align-items:center;gap:16px}
-.topbar-title{font-size:15px;font-weight:500;color:var(--text);letter-spacing:-.02em}
-.topbar-right{display:flex;align-items:center;gap:10px}
-.topbar-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;padding:5px 12px;font-size:12px;color:var(--muted);white-space:nowrap}
-.topbar-chip-val{font-weight:600;font-size:13px;color:var(--text)}
-.topbar-btn{display:inline-flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-s);padding:6px 14px;font-size:12px;font-weight:400;color:var(--muted);transition:all .15s;white-space:nowrap}
-.topbar-btn:hover{border-color:var(--border2);color:var(--text)}
-.topbar-btn.active-btn{background:var(--dark);border-color:var(--dark);color:#fff}
-.maint-btn{display:flex;align-items:center;gap:7px}
-.maint-btn.on{border-color:rgba(255,209,26,.4);color:var(--amber)}
-.maint-dot{width:6px;height:6px;border-radius:50%;background:var(--border2);transition:background .2s}
-.maint-btn.on .maint-dot{background:var(--amber);box-shadow:0 0 6px rgba(255,209,26,.5)}
+    /* TOPBAR */
+    .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;z-index:90}
+    .topbar-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.95rem;color:var(--text)}
+    .topbar-right{display:flex;align-items:center;gap:.7rem}
+    .topbar-stat{display:flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.72rem;white-space:nowrap;color:var(--muted)}
+    .topbar-stat-num{font-family:'Geologica',sans-serif;font-weight:700;font-size:.8rem;color:var(--text)}
+    .topbar-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;font-size:.76rem;padding:.35rem .9rem;border-radius:9px;cursor:pointer;transition:all .18s;white-space:nowrap}
+    .topbar-btn:hover{border-color:var(--border2);color:var(--text)}
+    .topbar-btn.danger:hover{border-color:rgba(255,45,80,.3);color:var(--error)}
+    .maint-btn{display:flex;align-items:center;gap:.5rem}
+    .maint-btn.on{border-color:rgba(255,209,26,.4)!important;color:var(--warn)!important}
+    .toggle-track{width:28px;height:16px;background:var(--bg);border-radius:50px;position:relative;border:1px solid var(--border);flex-shrink:0;transition:background .2s}
+    .maint-btn.on .toggle-track{background:rgba(255,209,26,.15);border-color:rgba(255,209,26,.3)}
+    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
+    .maint-btn.on .toggle-track::after{transform:translateX(12px);background:var(--warn)}
 
-/* ── MAIN ── */
-.main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);min-height:calc(100vh - var(--topbar-h));padding:28px;animation:fadeUp .3s ease}
+    /* MAIN */
+    .main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);flex:1;overflow:auto;min-height:calc(100vh - var(--topbar-h))}
+    .main-inner{padding:1.8rem 2rem;max-width:1400px;animation:fadeIn .25s ease}
 
-/* ── STAT GRID ── */
-.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:24px}
-.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-l);padding:20px 22px;transition:border-color .15s}
-.stat-card:hover{border-color:var(--border2)}
-.stat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
-.stat-num{font-size:28px;font-weight:500;letter-spacing:-.04em;line-height:1;margin-bottom:4px}
-.stat-sub{font-size:11px;color:var(--muted2)}
-.stat-num.c-green{color:var(--green-d)}
-.stat-num.c-blue{color:var(--blue)}
-.stat-num.c-amber{color:#d97706}
-.stat-num.c-purple{color:#7c3aed}
-.stat-num.c-red{color:var(--red)}
+    /* CARDS */
+    .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin-bottom:1.8rem}
+    .stat-card{background:var(--bg2);border-radius:16px;padding:1.3rem 1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);transition:box-shadow .18s}
+    .stat-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .stat-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.5rem;font-weight:600}
+    .stat-num{font-family:'Geologica',sans-serif;font-weight:700;font-size:1.8rem;line-height:1;margin-bottom:.3rem}
+    .stat-sub{font-size:.72rem;color:var(--muted)}
+    .stat-card.green .stat-num{color:var(--success)}
+    .stat-card.purple .stat-num{color:#6c63ff}
+    .stat-card.blue .stat-num{color:#3b82f6}
+    .stat-card.warn .stat-num{color:var(--warn)}
+    .stat-card.red .stat-num{color:var(--error)}
 
-/* ── TARIFF ROW ── */
-.tariff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
-.tariff-card{background:var(--dark);border-radius:var(--radius-l);padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.tariff-name{font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:4px}
-.tariff-count{font-size:32px;font-weight:500;letter-spacing:-.04em;color:#fff;line-height:1}
-.tariff-label{font-size:11px;color:rgba(255,255,255,.25)}
-.tariff-tag{font-size:10px;font-weight:600;letter-spacing:.05em;padding:3px 10px;border-radius:100px}
-.tariff-tag.t-start{background:rgba(59,130,246,.15);color:#93c5fd}
-.tariff-tag.t-growth{background:var(--green-light);color:var(--green-d)}
-.tariff-tag.t-scale{background:rgba(124,58,237,.15);color:#c4b5fd}
+    /* SECTION */
+    .section{background:var(--bg2);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:1.5rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+    .section-hdr{padding:1rem 1.4rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+    .section-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.82rem;color:var(--text)}
+    .section-body{padding:1.2rem 1.4rem}
+    .section-body.no-pad{padding:0}
 
-/* ── SECTIONS ── */
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
-.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:20px}
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-l);overflow:hidden}
-.card-hdr{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.card-title{font-size:13px;font-weight:500;color:var(--text);letter-spacing:-.01em}
-.card-body{padding:16px 20px}
-.card-link{font-size:12px;color:var(--muted);transition:color .15s;font-weight:400}
-.card-link:hover{color:var(--text)}
+    /* TABLE */
+    .tbl{width:100%;border-collapse:collapse}
+    .tbl th{font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;padding:.7rem 1rem;text-align:left;border-bottom:1px solid var(--border);background:var(--bg3)}
+    .tbl td{padding:.85rem 1rem;font-size:.84rem;border-bottom:1px solid var(--border);vertical-align:middle}
+    .tbl tr:last-child td{border-bottom:none}
+    .tbl tr:hover td{background:rgba(0,0,0,.02)}
+    .tbl-id{font-family:'Geologica',sans-serif;font-size:.7rem;font-weight:700;color:var(--accent2)}
 
-/* ── TABLE ── */
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600;padding:8px 16px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg3)}
-.tbl td{padding:12px 16px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--bg3)}
-.tbl tr{cursor:pointer}
-.order-id{font-size:11px;font-weight:600;color:var(--green-d);letter-spacing:.04em}
-.order-date{font-size:10px;color:var(--muted2);margin-top:2px}
-.client-name{font-size:13px;font-weight:500}
-.client-email{font-size:11px;color:var(--muted)}
+    /* BADGES */
+    .sbadge{display:inline-flex;align-items:center;gap:.2rem;padding:.22rem .65rem;border-radius:50px;font-size:.66rem;font-weight:600;white-space:nowrap}
+    .sdot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .s0{background:#f3f4f6;color:var(--muted);border:1px solid var(--border)}
+    .s1{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+    .s2{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe}
+    .s3{background:#e0e7ff;color:#4f46e5;border:1px solid #c7d2fe}
+    .s4{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
+    .s5{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
+    .pay-yes{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:50px;font-size:.64rem;font-weight:700}
+    .pay-no{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:50px;font-size:.64rem;font-weight:700}
 
-/* ── BADGES ── */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:100px;font-size:10px;font-weight:600;letter-spacing:.03em;white-space:nowrap}
-.badge-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
-.s0{background:#f1f3f5;color:var(--muted);border:1px solid var(--border)}
-.s1{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
-.s2{background:#dbeafe;color:#1e40af;border:1px solid #bfdbfe}
-.s3{background:#ede9fe;color:#4c1d95;border:1px solid #ddd6fe}
-.s4{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
-.s5{background:#d1fae5;color:#064e3b;border:1px solid #a7f3d0}
-.tag-pill{display:inline-block;font-size:10px;font-weight:600;padding:2px 8px;border-radius:100px}
-.tag-start{background:#dbeafe;color:#1e40af}
-.tag-growth{background:#d1fae5;color:#064e3b}
-.tag-scale{background:#ede9fe;color:#4c1d95}
-.price-val{font-weight:600;font-size:13px;color:var(--green-d)}
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.6rem 1.2rem;border-radius:9px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
+    .btn-primary{background:var(--accent);color:#fff}
+    .btn-primary:hover{box-shadow:0 4px 12px rgba(30,222,123,.35)}
+    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--muted)}
+    .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+    .btn-danger{background:#fee2e2;border:1px solid #fca5a5;color:var(--error)}
+    .btn-danger:hover{background:#fecaca}
+    .btn-success{background:#d1fae5;border:1px solid #a7f3d0;color:#065f46}
+    .btn-success:hover{background:#a7f3d0}
+    .btn-sm{padding:.38rem .8rem;font-size:.74rem;border-radius:7px}
+    .btn-xs{padding:.22rem .55rem;font-size:.66rem;border-radius:6px}
 
-/* ── EXTRAS BAR ── */
-.extra-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.extra-row:last-child{border-bottom:none}
-.extra-count{font-weight:600;font-size:13px;color:var(--green-d)}
+    /* EMPTY STATE */
+    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;color:var(--muted);gap:.7rem;text-align:center}
+    .empty-state-icon{font-size:2.5rem;opacity:.3}
+    .empty-state-text{font-size:.84rem}
 
-/* ── TYPE BARS ── */
-.type-bar{margin-bottom:12px}
-.type-bar:last-child{margin-bottom:0}
-.type-bar-hdr{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px}
-.type-bar-name{color:var(--text)}
-.type-bar-n{font-weight:600;color:var(--green-d)}
-.type-bar-track{height:3px;background:var(--border);border-radius:2px}
-.type-bar-fill{height:100%;border-radius:2px;background:var(--green)}
+    /* TOAST */
+    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:600;padding:.6rem 1.3rem;border-radius:10px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;transform:translateY(8px)}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.success{background:var(--success);color:#fff}
+    .toast.error{background:var(--error);color:#fff}
+    .toast.info{background:#3b82f6;color:#fff}
+    .toast.warn{background:var(--warn);color:#1a1a1e}
 
-/* ── SUPPORT ITEMS ── */
-.support-item{padding:10px 0;border-bottom:1px solid var(--border)}
-.support-item:last-child{border-bottom:none}
-.support-name{font-size:13px;font-weight:500;margin-bottom:2px}
-.support-days{font-size:11px}
-.support-prog{height:3px;background:var(--border);border-radius:2px;margin-top:5px}
-.support-prog-fill{height:100%;border-radius:2px;background:var(--green);transition:width .4s}
-.support-prog-fill.warn{background:linear-gradient(90deg,var(--amber),var(--red))}
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .22s}
+    .modal-overlay.show{opacity:1;pointer-events:all}
+    .modal{background:var(--bg2);border-radius:20px;padding:1.8rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+    .modal-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between}
+    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0;line-height:1}
+    .modal-footer{display:flex;gap:.7rem;margin-top:1.4rem}
+    .modal-footer .btn{flex:1;justify-content:center}
 
-/* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border-radius:var(--radius-xl);padding:32px;width:100%;max-width:460px;box-shadow:0 24px 64px rgba(0,0,0,.16)}
-.modal-title{font-size:18px;font-weight:500;letter-spacing:-.02em;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
-.modal-close{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;line-height:1;padding:2px}
-.modal-close:hover{color:var(--text)}
-.form-group{margin-bottom:14px}
-.form-label{display:block;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:5px}
-.form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-s);padding:10px 14px;color:var(--text);font-family:var(--font);font-size:13px;font-weight:300;outline:none;transition:border-color .15s}
-.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--green-d)}
-.form-input::placeholder,.form-textarea::placeholder{color:var(--muted2)}
-.form-textarea{resize:vertical;min-height:80px;line-height:1.55}
-.form-select{cursor:pointer}
-.modal-footer{display:flex;gap:8px;margin-top:20px}
-.modal-footer .btn{flex:1;justify-content:center}
+    /* FORMS */
+    .form-group{margin-bottom:1rem}
+    .form-label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.4rem;font-weight:600}
+    .form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;font-weight:400;outline:none;transition:border-color .18s}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,222,123,.15)}
+    .form-input::placeholder,.form-textarea::placeholder{color:var(--muted2)}
+    .form-textarea{resize:vertical;min-height:90px;line-height:1.55}
+    .form-select{cursor:pointer}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 
-/* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-s);font-family:var(--font);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;white-space:nowrap;letter-spacing:-.01em}
-.btn-primary{background:var(--dark);color:#fff;padding:10px 20px}
-.btn-primary:hover{background:var(--dark2)}
-.btn-green{background:var(--green);color:var(--dark);padding:10px 20px}
-.btn-green:hover{background:var(--green-h)}
-.btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:10px 20px}
-.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.btn-sm{padding:6px 14px;font-size:12px;border-radius:var(--radius-xs)}
+    .tag{display:inline-block;background:var(--bg3);padding:.2rem .7rem;border-radius:50px;font-size:.72rem;color:var(--muted);margin:.15rem}
+    .tag-green{background:#d1fae5;color:#065f46}
+    .tag-blue{background:#dbeafe;color:#1d4ed8}
+    .tag-purple{background:#e0e7ff;color:#4f46e5}
+    .tag-yellow{background:#fef3c7;color:#b45309}
 
-/* ── EMPTY ── */
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;color:var(--muted);gap:8px;text-align:center}
-.empty svg{width:32px;height:32px;stroke:var(--border2);fill:none;stroke-width:1.5;margin-bottom:4px}
-.empty-text{font-size:13px}
+    .stat-card .stat-num.green{color:var(--success)}
+    .stat-card .stat-num.blue{color:#3b82f6}
+    .stat-card .stat-num.purple{color:#6c63ff}
+    .stat-card .stat-num.warn{color:var(--warn)}
+    .stat-card .stat-num.red{color:var(--error)}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;right:20px;z-index:600;padding:10px 18px;border-radius:var(--radius-m);font-size:13px;font-weight:400;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;transform:translateY(8px);letter-spacing:-.01em}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast.success{background:var(--dark);color:var(--green)}
-.toast.error{background:var(--dark);color:var(--red)}
-.toast.info{background:var(--dark);color:#fff}
-.toast.warn{background:var(--dark);color:var(--amber)}
+    .orders-layout{display:grid;grid-template-columns:320px 1fr 340px;height:calc(100vh - var(--topbar-h));overflow:hidden}
+    .orders-col{overflow:hidden;display:flex;flex-direction:column}
+    .orders-col:not(:last-child){border-right:1px solid var(--border)}
+    .col-hdr{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg2)}
+    .col-hdr-title{font-family:"Geologica",sans-serif;font-weight:600;font-size:.78rem;margin-bottom:.55rem}
+    .col-scroll{flex:1;overflow-y:auto;padding:.5rem}
+    .order-row{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:.75rem .9rem;margin-bottom:.35rem;cursor:pointer;transition:border-color .15s,background .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+    .order-row:hover{border-color:var(--accent)}
+    .order-row.sel{border-color:var(--accent);background:rgba(30,222,123,.05)}
+    .order-row.unread{border-color:var(--accent);background:rgba(30,222,123,.04)}
+    .or-head{display:flex;align-items:center;justify-content:space-between;gap:.4rem;margin-bottom:.2rem}
+    .or-id{font-family:"Geologica",sans-serif;font-size:.65rem;font-weight:700;color:var(--accent2)}
+    .or-sub{font-size:.7rem;color:var(--muted);margin-bottom:.18rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .or-foot{display:flex;align-items:center;justify-content:space-between;gap:.3rem}
+    .tabs{display:flex;gap:.2rem;flex-wrap:wrap}
+    .tab{background:transparent;border:1px solid transparent;color:var(--muted);font-family:"Inter",sans-serif;font-size:.72rem;padding:.28rem .65rem;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
+    .tab:hover{color:var(--text);background:rgba(0,0,0,.04)}
+    .tab.active{background:rgba(30,222,123,.12);color:var(--accent2);border-color:rgba(30,222,123,.25)}
+    .search-box{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.5rem .9rem;transition:border-color .18s}
+    .search-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+    .search-box svg{width:15px;height:15px;color:var(--muted);flex-shrink:0}
+    .search-box input{background:none;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:.84rem;flex:1;min-width:0}
+    .search-box input::placeholder{color:var(--muted2)}
   </style>
 </head>
 <body>
-<div class="loading" id="loadingScreen">
-  <div class="loading-logo">Ant<em>viz</em></div>
-  <div class="loading-bar"></div>
-</div>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <a href="/admin" class="sb-logo">
+<div class="sidebar" id="sidebar">
+  <a href="/admin" class="sidebar-logo">
     <img src="../img/favicon.png" alt="Antviz">
-    <span class="sb-logo-name">Antviz</span>
-    <span class="sb-logo-badge">ADMIN</span>
+    <span class="sidebar-logo-text">Antviz</span>
+    <span class="sidebar-logo-badge">ADMIN</span>
   </a>
-  <nav class="sb-nav">
-    <div class="sb-section">Основное</div>
-    <a href="/admin" class="sb-item active" data-page="index">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section">Основное</div>
+    <a href="/admin" class="nav-item" data-page="index">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Дашборд
     </a>
-    <a href="/admin/orders" class="sb-item" data-page="orders">
+    <a href="/admin/orders" class="nav-item" data-page="orders">
       <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
       Заказы
-      <span class="sb-badge" id="navBadgeOrders" style="display:none"></span>
+      <span class="nav-item-badge" id="navBadgeOrders" style="display:none"></span>
     </a>
-    <a href="/admin/chats" class="sb-item" data-page="chats">
+    <a href="/admin/chats" class="nav-item" data-page="chats">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Тикеты
-      <span class="sb-badge" id="navBadgeChats" style="display:none"></span>
+      Чаты
+      <span class="nav-item-badge" id="navBadgeChats" style="display:none"></span>
     </a>
-    <div class="sb-section">Клиенты</div>
-    <a href="/admin/tickets" class="sb-item" data-page="tickets">
-      <svg viewBox="0 0 24 24"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+    <div class="sidebar-section">Клиенты</div>
+    <a href="/admin/tickets" class="nav-item" data-page="tickets">
+      <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
       Обслуживание
-      <span class="sb-badge" id="navBadgeTickets" style="display:none"></span>
+      <span class="nav-item-badge" id="navBadgeTickets" style="display:none"></span>
     </a>
-    <a href="/admin/promos" class="sb-item" data-page="promos">
+    <a href="/admin/promos" class="nav-item" data-page="promos">
       <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
       Промокоды
     </a>
-    <div class="sb-section">Система</div>
-    <a href="/admin/reviews" class="sb-item" data-page="reviews">
+    <div class="sidebar-section">Система</div>
+    <a href="/admin/reviews" class="nav-item" data-page="reviews">
       <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       Отзывы
     </a>
   </nav>
-  <div class="sb-footer">
-    <button class="sb-logout" onclick="doLogout()">
+  <div class="sidebar-footer">
+    <button class="nav-item" onclick="doLogout()" style="color:var(--error)">
       <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Выйти
     </button>
   </div>
-</aside>
+</div>
 
-<!-- TOPBAR -->
-<header class="topbar">
-  <div class="topbar-left">
-    <span class="topbar-title">Дашборд</span>
-  </div>
+<div class="topbar">
+  <div class="topbar-title">Дашборд</div>
   <div class="topbar-right">
     <button class="topbar-btn maint-btn" id="maintBtn" onclick="toggleMaintenance()">
-      <span class="maint-dot"></span>
+      <div class="toggle-track"></div>
       <span id="maintLabel">Техработы</span>
     </button>
-    <button class="topbar-btn" onclick="openNotifModal()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-      Уведомление
-    </button>
+    <button class="topbar-btn" onclick="openNotifModal()">🔔 Уведомление</button>
   </div>
-</header>
+</div>
 
-<!-- MAIN -->
-<main class="main" id="appWrap" style="display:none">
+<div class="main" id="appWrap" style="display:none">
+  <div class="main-inner">
 
-  <!-- STATS -->
-  <div class="stat-grid" id="statGrid">
-    <div class="stat-card"><div class="stat-label">Всего заказов</div><div class="stat-num" id="sAll">—</div><div class="stat-sub">за всё время</div></div>
-    <div class="stat-card"><div class="stat-label">Новых</div><div class="stat-num c-amber" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
-    <div class="stat-card"><div class="stat-label">В работе</div><div class="stat-num c-blue" id="sWork">—</div><div class="stat-sub">активных</div></div>
-    <div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num c-green" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
-    <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-num c-purple" id="sRev">—</div><div class="stat-sub">по завершённым</div></div>
-    <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num c-blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
-  </div>
-
-  <!-- TARIFF ROW -->
-  <div class="tariff-row">
-    <div class="tariff-card">
-      <div><div class="tariff-name">Тариф</div><div class="tariff-count" id="sStart">—</div><div class="tariff-label">заказов</div></div>
-      <span class="tariff-tag t-start">Старт</span>
+    <!-- STATS -->
+    <div class="stat-grid" id="statGrid">
+      <div class="stat-card"><div class="stat-label">Всего заказов</div><div class="stat-num" id="sAll">—</div><div class="stat-sub">за всё время</div></div>
+      <div class="stat-card"><div class="stat-label">Новых</div><div class="stat-num warn" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
+      <div class="stat-card"><div class="stat-label">В работе</div><div class="stat-num blue" id="sWork">—</div><div class="stat-sub">активных</div></div>
+      <div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num green" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
+      <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-num purple" id="sRev">—</div><div class="stat-sub">по завершённым</div></div>
+      <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
     </div>
-    <div class="tariff-card">
-      <div><div class="tariff-name">Тариф</div><div class="tariff-count" id="sGrowth">—</div><div class="tariff-label">заказов</div></div>
-      <span class="tariff-tag t-growth">Рост</span>
-    </div>
-    <div class="tariff-card">
-      <div><div class="tariff-name">Тариф</div><div class="tariff-count" id="sScale">—</div><div class="tariff-label">заказов</div></div>
-      <span class="tariff-tag t-scale">Масштаб</span>
-    </div>
-  </div>
 
-  <!-- RECENT + EXTRAS -->
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-hdr">
-        <span class="card-title">Последние заказы</span>
-        <a href="/admin/orders" class="card-link">Все заказы →</a>
+    <!-- TARIFF STATS -->
+    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-card"><div class="stat-label">Старт</div><div class="stat-num" id="sStart">—</div><div class="stat-sub">заказов</div></div>
+      <div class="stat-card"><div class="stat-label">Рост</div><div class="stat-num green" id="sGrowth">—</div><div class="stat-sub">заказов</div></div>
+      <div class="stat-card"><div class="stat-label">Масштаб</div><div class="stat-num purple" id="sScale">—</div><div class="stat-sub">заказов</div></div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem">
+
+      <!-- Recent orders -->
+      <div class="section">
+        <div class="section-hdr">
+          <div class="section-title">Последние заказы</div>
+          <a href="/admin/orders" class="btn btn-ghost btn-sm">Все →</a>
+        </div>
+        <div class="section-body no-pad">
+          <table class="tbl" id="recentOrders"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--muted)">Загрузка...</td></tr></table>
+        </div>
       </div>
-      <table class="tbl" id="recentOrders">
-        <tr><td colspan="4" style="text-align:center;padding:32px;color:var(--muted2);font-size:13px">Загрузка…</td></tr>
-      </table>
+
+      <!-- Popular extras -->
+      <div class="section">
+        <div class="section-hdr">
+          <div class="section-title">Популярные опции</div>
+        </div>
+        <div class="section-body" id="popularExtras" style="display:flex;flex-direction:column;gap:.6rem">
+          <div style="text-align:center;color:var(--muted);font-size:.82rem;padding:1rem">Загрузка...</div>
+        </div>
+      </div>
+
     </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title">Популярные опции</span></div>
-      <div class="card-body" id="popularExtras" style="display:flex;flex-direction:column">
-        <div class="empty"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg><span class="empty-text">Загрузка…</span></div>
+
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;margin-top:1.5rem">
+      <div class="section">
+        <div class="section-hdr"><div class="section-title">Популярные типы сайтов</div></div>
+        <div class="section-body" id="typeStats"></div>
+      </div>
+      <div class="section">
+        <div class="section-hdr"><div class="section-title">Активные обслуживания</div></div>
+        <div class="section-body" id="supportStats"></div>
       </div>
     </div>
-  </div>
 
-  <!-- TYPE STATS + SUPPORTS -->
-  <div class="grid-2-1">
-    <div class="card">
-      <div class="card-hdr"><span class="card-title">Типы сайтов</span></div>
-      <div class="card-body" id="typeStats"></div>
-    </div>
-    <div class="card">
-      <div class="card-hdr"><span class="card-title">Активные обслуживания</span></div>
-      <div class="card-body" id="supportStats"></div>
-    </div>
   </div>
-
-</main>
+</div>
 
 <!-- NOTIF MODAL -->
 <div class="modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
   <div class="modal">
-    <div class="modal-title">
-      Новое уведомление
-      <button class="modal-close" onclick="closeNotifModal()">✕</button>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Получатель</label>
-      <select class="form-select" id="notifTarget"><option value="all">Всем пользователям</option></select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Заголовок</label>
-      <input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления…"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Текст</label>
-      <textarea class="form-textarea" id="notifText" placeholder="Текст сообщения…"></textarea>
-    </div>
+    <div class="modal-title">🔔 Уведомление <button class="modal-close" onclick="closeNotifModal()">✕</button></div>
+    <div class="form-group"><label class="form-label">Получатель</label><select class="form-select" id="notifTarget"><option value="all">📢 Всем пользователям</option></select></div>
+    <div class="form-group"><label class="form-label">Заголовок</label><input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
+    <div class="form-group"><label class="form-label">Текст</label><textarea class="form-textarea" id="notifText" placeholder="Текст..."></textarea></div>
     <div class="modal-footer">
       <button class="btn btn-ghost" onclick="closeNotifModal()">Отмена</button>
       <button class="btn btn-primary" onclick="sendNotif()">Отправить</button>
@@ -366,42 +337,40 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { collection, query, orderBy, onSnapshot, getDocs, addDoc, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
 
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200)}
-function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
-function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—'}
+document.querySelectorAll('.nav-item[data-page]').forEach(el=>{if(el.dataset.page==='index')el.classList.add('active');});
 
-let maintEnabled = false;
-onSnapshot(doc(db,'settings','maintenance'), snap => {
-  maintEnabled = snap.exists() && snap.data().enabled === true;
-  const btn = document.getElementById('maintBtn');
-  btn.classList.toggle('on', maintEnabled);
-  document.getElementById('maintLabel').textContent = maintEnabled ? 'Сайт закрыт' : 'Техработы';
+let maintEnabled=false;
+onSnapshot(doc(db,'settings','maintenance'),snap=>{
+  maintEnabled=snap.exists()&&snap.data().enabled===true;
+  document.getElementById('maintBtn').classList.toggle('on',maintEnabled);
+  document.getElementById('maintLabel').textContent=maintEnabled?'Сайт закрыт':'Техработы';
 });
-window.toggleMaintenance = async () => {
-  await setDoc(doc(db,'settings','maintenance'), {enabled:!maintEnabled}, {merge:true});
-  toast(!maintEnabled ? 'Сайт закрыт — техработы включены' : 'Сайт открыт', !maintEnabled?'warn':'success');
+window.toggleMaintenance=async()=>{
+  await setDoc(doc(db,'settings','maintenance'),{enabled:!maintEnabled},{merge:true});
+  toast(!maintEnabled?'Сайт закрыт 🔧':'Сайт открыт ✅',!maintEnabled?'warn':'success');
 };
 
-window.openNotifModal = async () => {
-  const snap = await getDocs(collection(db,'chats'));
-  const sel = document.getElementById('notifTarget');
-  sel.innerHTML = '<option value="all">Всем пользователям</option>' +
-    snap.docs.map(d=>`<option value="${d.id}">${esc(d.data().name||d.id)} · ${esc(d.data().email||'')}</option>`).join('');
-  document.getElementById('notifTitle').value = '';
-  document.getElementById('notifText').value = '';
+window.openNotifModal=async()=>{
+  const snap=await getDocs(collection(db,'chats'));
+  const sel=document.getElementById('notifTarget');
+  sel.innerHTML='<option value="all">📢 Всем пользователям</option>'+snap.docs.map(d=>`<option value="${d.id}">${escapeHtml(d.data().name||d.id)} · ${escapeHtml(d.data().email||'')}</option>`).join('');
+  document.getElementById('notifTitle').value='';document.getElementById('notifText').value='';
   document.getElementById('notifModal').classList.add('show');
 };
-window.closeNotifModal = () => document.getElementById('notifModal').classList.remove('show');
-window.sendNotif = async () => {
-  const target = document.getElementById('notifTarget').value;
-  const title = document.getElementById('notifTitle').value.trim();
-  const text = document.getElementById('notifText').value.trim();
-  if(!title||!text){toast('Заполните все поля','error');return}
-  try {
+window.closeNotifModal=()=>document.getElementById('notifModal').classList.remove('show');
+window.sendNotif=async()=>{
+  const target=document.getElementById('notifTarget').value;
+  const title=document.getElementById('notifTitle').value.trim();
+  const text=document.getElementById('notifText').value.trim();
+  if(!title||!text){toast('Заполните все поля','error');return;}
+  try{
     if(target==='all'){
-      const snp = await getDocs(collection(db,'chats'));
+      const snp=await getDocs(collection(db,'chats'));
       await Promise.all(snp.docs.map(d=>addDoc(collection(db,'notifications',d.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
       toast(`Отправлено ${snp.docs.length} пользователям ✓`,'success');
     } else {
@@ -409,90 +378,87 @@ window.sendNotif = async () => {
       toast('Отправлено ✓','success');
     }
     closeNotifModal();
-  } catch(e){toast('Ошибка: '+e.message,'error')}
+  }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
-window.doLogout = async () => { await signOut(auth); window.location.href='/'; };
+window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
 
-onAuthStateChanged(auth, async user => {
+onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
-  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return}
+  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
 
-  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')), snap => {
-    const orders = snap.docs.map(d=>({id:d.id,...d.data()}));
-    const done = orders.filter(o=>o.status===5);
-    const rev = done.reduce((s,o)=>s+(o.totalPrice||0),0);
+  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
+    const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const done=orders.filter(o=>o.status===5);
+    const rev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
+    document.getElementById('sAll').textContent=orders.length;
+    document.getElementById('sNew').textContent=orders.filter(o=>(o.status||0)===0).length;
+    document.getElementById('sWork').textContent=orders.filter(o=>o.status>=1&&o.status<=4).length;
+    document.getElementById('sDone').textContent=done.length;
+    document.getElementById('sRev').textContent=fmtPrice(rev);
+    document.getElementById('sAvg').textContent=done.length?fmtPrice(Math.round(rev/done.length)):'—';
 
-    document.getElementById('sAll').textContent = orders.length;
-    document.getElementById('sNew').textContent = orders.filter(o=>(o.status||0)===0).length;
-    document.getElementById('sWork').textContent = orders.filter(o=>o.status>=1&&o.status<=4).length;
-    document.getElementById('sDone').textContent = done.length;
-    document.getElementById('sRev').textContent = fmtPrice(rev);
-    document.getElementById('sAvg').textContent = done.length ? fmtPrice(Math.round(rev/done.length)) : '—';
-    document.getElementById('sStart').textContent = orders.filter(o=>o.package==='Старт'||o.tariff==='Старт').length;
-    document.getElementById('sGrowth').textContent = orders.filter(o=>o.package==='Рост'||o.tariff==='Рост').length;
-    document.getElementById('sScale').textContent = orders.filter(o=>o.package==='Масштаб'||o.tariff==='Масштаб').length;
+    // Tariff stats
+    const startCount=orders.filter(o=>o.package==='Старт'||o.tariff==='Старт').length;
+    const growthCount=orders.filter(o=>o.package==='Рост'||o.tariff==='Рост').length;
+    const scaleCount=orders.filter(o=>o.package==='Масштаб'||o.tariff==='Масштаб').length;
+    document.getElementById('sStart').textContent=startCount;
+    document.getElementById('sGrowth').textContent=growthCount;
+    document.getElementById('sScale').textContent=scaleCount;
 
-    // Recent orders table
-    const recent = orders.filter(o=>o.status<5).slice(0,8);
-    const tbl = document.getElementById('recentOrders');
-    if(recent.length) {
-      tbl.innerHTML = `<thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead><tbody>${
-        recent.map(o=>{
-          const tariff = o.package||o.tariff||'—';
-          const tc = tariff==='Старт'?'tag-start':tariff==='Рост'?'tag-growth':'tag-scale';
-          return `<tr onclick="location.href='/admin/orders?id=${o.id}'">
-            <td><div class="order-id">№${o.id.slice(0,7).toUpperCase()}</div><div class="order-date">${fmtDate(o.createdAt)}</div></td>
-            <td><div class="client-name">${esc(o.clientName||'—')}</div><div class="client-email">${esc(o.clientEmail||'—')}</div></td>
-            <td><span class="tag-pill ${tc}">${tariff}</span></td>
-            <td><span class="badge ${`s${o.status||0}`}"><span class="badge-dot"></span>${S_LABELS[o.status||0]}</span></td>
-            <td><span class="price-val">${fmtPrice(o.totalPrice)}</span></td>
-          </tr>`;
-        }).join('')
-      }</tbody>`;
-    } else {
-      tbl.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:32px;color:var(--muted2);font-size:13px">Нет активных заказов</td></tr>`;
-    }
+    // Recent orders
+    const recent=orders.filter(o=>o.status<5).slice(0,8);
+    document.getElementById('recentOrders').innerHTML=recent.length?`
+      <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
+      <tbody>${recent.map(o=>`<tr style="cursor:pointer" onclick="location.href='/admin/orders?id=${o.id}'">
+        <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.7rem;color:var(--muted);margin-top:.15rem">${fmtDate(o.createdAt)}</div></td>
+        <td><div style="font-size:.84rem;font-weight:500">${escapeHtml(o.clientName||'—')}</div><div style="font-size:.7rem;color:var(--muted)">${escapeHtml(o.clientEmail||'—')}</div></td>
+        <td><span class="tag ${o.package==='Старт'||o.tariff==='Старт'?'tag-blue':o.package==='Рост'||o.tariff==='Рост'?'tag-green':'tag-purple'}">${o.package||o.tariff||'—'}</span></td>
+        <td><span class="sbadge s${o.status||0}"><span class="sdot"></span>${S_LABELS[o.status||0]}</span></td>
+        <td style="font-weight:600;color:var(--accent2)">${fmtPrice(o.totalPrice)}</td>
+      </tr>`).join('')}</tbody>` :
+      '<tr><td colspan="5" class="empty-state"><span class="empty-state-icon">📋</span><span class="empty-state-text">Нет активных заказов</span></td></tr>';
 
     // Popular extras
-    const extrasMap = {};
+    const extrasMap={};
     orders.forEach(o=>{
-      if(Array.isArray(o.extras)) o.extras.forEach(e=>{
-        const l=e==='domain'?'Домен':e==='support'?'Обслуживание':e==='seo'?'SEO':e==='content'?'Контент':e==='shop'?'Каталог':e==='urgent'?'Срочно':e;
-        extrasMap[l]=(extrasMap[l]||0)+1;
-      });
+      if(o.extras&&Array.isArray(o.extras)){
+        o.extras.forEach(e=>{
+          const label=e==='domain'?'Домен':e==='support'?'Обслуживание':e==='seo'?'SEO':e==='content'?'Контент':e==='shop'?'Каталог':e==='urgent'?'Срочно':e;
+          extrasMap[label]=(extrasMap[label]||0)+1;
+        });
+      }
     });
-    const sortedExtras = Object.entries(extrasMap).sort((a,b)=>b[1]-a[1]).slice(0,6);
-    const exEl = document.getElementById('popularExtras');
-    exEl.innerHTML = sortedExtras.length
-      ? sortedExtras.map(([name,count])=>`<div class="extra-row"><span style="font-size:13px">${name}</span><span class="extra-count">${count}</span></div>`).join('')
-      : `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/></svg><span class="empty-text">Нет данных</span></div>`;
+    const sortedExtras=Object.entries(extrasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const maxExtras=sortedExtras[0]?.[1]||1;
+    document.getElementById('popularExtras').innerHTML=sortedExtras.length?sortedExtras.map(([name,count])=>`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:.4rem .6rem;background:var(--bg3);border-radius:8px">
+        <span style="font-size:.82rem">${name}</span>
+        <span style="font-family:'Geologica',sans-serif;font-weight:600;font-size:.76rem;color:var(--accent2)">${count}</span>
+      </div>`).join(''):
+      '<div class="empty-state"><span class="empty-state-text">Нет данных</span></div>';
 
     // Type stats
-    const byType = {};
-    orders.forEach(o=>{const t=o.siteType||'Другое';byType[t]=(byType[t]||0)+1});
-    const sorted = Object.entries(byType).sort((a,b)=>b[1]-a[1]);
-    const maxT = sorted[0]?.[1]||1;
-    document.getElementById('typeStats').innerHTML = sorted.length
-      ? sorted.map(([t,n])=>`<div class="type-bar"><div class="type-bar-hdr"><span class="type-bar-name">${esc(t)}</span><span class="type-bar-n">${n}</span></div><div class="type-bar-track"><div class="type-bar-fill" style="width:${n/maxT*100}%"></div></div></div>`).join('')
-      : `<div class="empty"><span class="empty-text">Нет данных</span></div>`;
+    const byType={};orders.forEach(o=>{const t=o.siteType||'Другое';byType[t]=(byType[t]||0)+1;});
+    const sorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);
+    const max=sorted[0]?.[1]||1;
+    document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
+      <div style="margin-bottom:.7rem">
+        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:.3rem"><span>${escapeHtml(t)}</span><span style="font-family:'Geologica',sans-serif;font-weight:600;font-size:.76rem;color:var(--accent2)">${n}</span></div>
+        <div style="height:4px;background:var(--bg3);border-radius:2px"><div style="height:100%;border-radius:2px;background:var(--accent);width:${n/max*100}%"></div></div>
+      </div>`).join('')||'<div class="empty-state"><span class="empty-state-text">Нет данных</span></div>';
 
     // Support stats
-    const now = new Date();
-    const withSupport = orders.filter(o=>o.supportActive&&o.supportExpiresAt?.toDate()>now);
-    document.getElementById('supportStats').innerHTML = withSupport.length
-      ? withSupport.slice(0,6).map(o=>{
-          const exp=o.supportExpiresAt.toDate();
-          const days=Math.ceil((exp-now)/864e5);
-          const pct=Math.max(0,Math.min(100,(exp-now)/(30*864e5)*100));
-          return `<div class="support-item">
-            <div class="support-name">${esc(o.clientName||'—')}</div>
-            <div class="support-days" style="color:${days<3?'var(--red)':'var(--muted)'}">${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
-            <div class="support-prog"><div class="support-prog-fill${days<3?' warn':''}" style="width:${pct}%"></div></div>
-          </div>`;
-        }).join('')
-      : `<div class="empty"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="empty-text">Нет активных</span></div>`;
+    const withSupport=orders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
+    document.getElementById('supportStats').innerHTML=withSupport.length?withSupport.slice(0,5).map(o=>{
+      const exp=o.supportExpiresAt.toDate();
+      const days=Math.ceil((exp-new Date())/(1000*60*60*24));
+      return`<div style="background:var(--bg3);border-radius:10px;padding:.75rem .9rem;margin-bottom:.5rem">
+        <div style="font-size:.82rem;font-weight:500;margin-bottom:.15rem">${escapeHtml(o.clientName||'—')}</div>
+        <div style="font-size:.72rem;color:${days<3?'var(--error)':'var(--muted)'}">Осталось ${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
+      </div>`;}).join(''):
+      '<div class="empty-state"><span class="empty-state-icon" style="font-size:1.5rem">🔧</span><span class="empty-state-text">Нет активных обслуживаний</span></div>';
   });
 });
 </script>

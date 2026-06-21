@@ -233,6 +233,80 @@
     .an-dd-badge.warn { background: var(--an-warn); color: #1a1400; }
     .an-dd-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
 
+    /* ══════════════════════════════════════
+       МОБИЛЬНАЯ ВЕРСИЯ — та же тёмная капсула,
+       только сверху, компактнее, с бургером
+       вместо текстовых ссылок по центру.
+       Заменяет нижний таб-бар из footer.js.
+    ══════════════════════════════════════ */
+    .an-burger {
+      display: none;
+      align-items: center; justify-content: center;
+      width: 38px; height: 38px;
+      background: none; border: 1px solid var(--an-line);
+      border-radius: 12px; cursor: pointer; flex-shrink: 0;
+      transition: border-color .15s, background .15s;
+    }
+    .an-burger:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+    .an-burger span {
+      display: block; width: 16px; height: 1.6px; background: var(--an-ink);
+      border-radius: 2px; position: relative; transition: transform .2s, opacity .2s;
+    }
+    .an-burger span::before, .an-burger span::after {
+      content: ''; position: absolute; left: 0; width: 16px; height: 1.6px;
+      background: var(--an-ink); border-radius: 2px; transition: transform .2s, top .2s, opacity .2s;
+    }
+    .an-burger span::before { top: -5px; }
+    .an-burger span::after  { top: 5px; }
+    .an-burger.open span { background: transparent; }
+    .an-burger.open span::before { top: 0; transform: rotate(45deg); }
+    .an-burger.open span::after  { top: 0; transform: rotate(-45deg); }
+
+    .an-mobile-sheet {
+      position: fixed; top: calc(20px + 64px + 10px); left: 50%; transform: translateX(-50%) translateY(-8px);
+      z-index: 8999;
+      width: calc(100% - 40px); max-width: 1100px;
+      background: var(--an-bg);
+      border: 1px solid var(--an-line);
+      border-radius: 24px;
+      padding: 10px;
+      display: none;
+      flex-direction: column; gap: 2px;
+      opacity: 0; pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      font-family: var(--an-font);
+      box-shadow: 0 16px 40px rgba(0,0,0,.4);
+    }
+    .an-mobile-sheet.open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+    .an-mobile-link {
+      display: block; color: var(--an-ink-dim);
+      font-weight: 300; font-size: .95rem;
+      text-decoration: none; padding: 14px 16px;
+      border-radius: 14px; transition: background .12s, color .12s;
+    }
+    .an-mobile-link:hover, .an-mobile-link.active { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-mobile-link.active { font-weight: 500; }
+    .an-mobile-cta {
+      display: block; text-align: center; margin-top: 4px;
+      background: var(--an-green); color: var(--an-green-ink);
+      font-weight: 500; font-size: .95rem;
+      text-decoration: none; padding: 14px 16px; border-radius: 14px;
+    }
+
+    @media (max-width: 768px) {
+      .antviz-nav { top: 14px; height: 58px; padding: 0 8px 0 18px; width: calc(100% - 24px); border-radius: 20px; }
+      .an-logo { font-size: .88rem; }
+      .an-logo img { width: 24px; height: 24px; }
+      .an-center { display: none; }
+      .an-cta.show { display: none; }
+      .an-burger { display: flex; }
+      .an-mobile-sheet { top: calc(14px + 58px + 8px); }
+      .an-uname { display: none; }
+      .an-user-btn { padding: 5px; }
+      .an-user-btn.guest { padding: .5rem .7rem; }
+      .an-user-btn.guest .an-uname { display: inline; max-width: 60px; }
+    }
+
     @media(max-width:768px) { .antviz-nav { display: none !important; } }
   `;
 
@@ -290,6 +364,18 @@
     </div>`;
   }
 
+  // Мобильная панель: те же ссылки, что и в центре десктопной капсулы,
+  // плюс CTA снизу — раскрывается по тапу на бургер, заменяет собой
+  // нижний таб-бар из footer.js.
+  function buildMobileSheet() {
+    if (cfg.inApp) return '';
+    const links = cfg.centerLinks || [];
+    const linksHtml = links.map(l => `<a href="${l.href}" class="an-mobile-link${page === l.key ? ' active' : ''}">${l.label}</a>`).join('');
+    const ctaHtml = (!cfg.hideCta) ? `<a href="${b}order" class="an-mobile-cta">Заказать сайт</a>` : '';
+    if (!linksHtml && !ctaHtml) return '';
+    return `<div class="an-mobile-sheet" id="anMobileSheet">${linksHtml}${ctaHtml}</div>`;
+  }
+
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
   <a class="an-logo" href="${b || '/'}">
@@ -323,8 +409,11 @@
         ${buildDD()}
       </div>
     </div>
+
+    ${!cfg.inApp ? `<button class="an-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span></span></button>` : ''}
   </div>
-</nav>`;
+</nav>
+${buildMobileSheet()}`;
 
   const style = document.createElement('style');
   style.textContent = CSS;
@@ -346,15 +435,32 @@
   }
   userBtn?.addEventListener('click', onUserBtnClick);
 
+  // Бургер мобильной капсулы — открывает/закрывает an-mobile-sheet
+  const burger = document.getElementById('anBurger');
+  const sheet  = document.getElementById('anMobileSheet');
+  burger?.addEventListener('click', () => {
+    const open = burger.classList.toggle('open');
+    burger.setAttribute('aria-expanded', String(open));
+    sheet?.classList.toggle('open', open);
+  });
+  function closeMobileSheet() {
+    burger?.classList.remove('open');
+    burger?.setAttribute('aria-expanded', 'false');
+    sheet?.classList.remove('open');
+  }
+
   document.addEventListener('click', e => {
     if (!userBtn || !dd) return;
     if (!userBtn.contains(e.target) && !dd.contains(e.target)) {
       dd.classList.remove('open');
       userBtn.setAttribute('aria-expanded', 'false');
     }
+    if (burger && sheet && !burger.contains(e.target) && !sheet.contains(e.target)) {
+      closeMobileSheet();
+    }
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { dd?.classList.remove('open'); }
+    if (e.key === 'Escape') { dd?.classList.remove('open'); closeMobileSheet(); }
   });
 
   function setBadge(key, value, variant) {

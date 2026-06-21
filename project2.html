@@ -1,819 +1,609 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Студия массажа Sōma — Восстановление тела и духа</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg: #0d0d0b;
-      --bg2: #141410;
-      --card: #1a1a15;
-      --stone: #2a2a22;
-      --sage: #8a9e7a;
-      --sage2: #b5c9a3;
-      --cream: #f0ebe0;
-      --warm: #c8a97e;
-      --muted: #6b6b58;
-      --border: rgba(138,158,122,0.15);
-    }
-
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--bg);
-      color: var(--cream);
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 300;
-      line-height: 1.7;
-      overflow-x: hidden;
-    }
-
-    /* BACK */
-    .back-banner {
-      position: fixed;
-      top: 1rem; left: 1rem;
-      z-index: 300;
-      background: rgba(13,13,11,0.9);
-      backdrop-filter: blur(12px);
-      color: var(--cream);
-      font-size: .65rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: .5rem 1rem;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      transition: border-color .2s, color .2s;
-    }
-    .back-banner:hover { border-color: var(--sage); color: var(--sage2); }
-
-    .demo-badge {
-      position: fixed;
-      bottom: 1.5rem; right: 1.5rem;
-      z-index: 300;
-      background: var(--sage);
-      color: var(--bg);
-      font-size: .62rem;
-      font-weight: 500;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      padding: .45rem .9rem;
-      border-radius: 50px;
-    }
-
-    /* NAV */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.4rem 5vw;
-      background: rgba(13,13,11,0.85);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .nav-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--cream);
-      text-decoration: none;
-      letter-spacing: .06em;
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-    }
-
-    .nav-logo span {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--sage);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2.2rem;
-      align-items: center;
-    }
-
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: .78rem;
-      letter-spacing: .06em;
-      transition: color .2s;
-    }
-
-    .nav-links a:hover { color: var(--cream); }
-
-    .nav-cta {
-      background: var(--sage) !important;
-      color: var(--bg) !important;
-      padding: .55rem 1.4rem !important;
-      border-radius: 50px !important;
-      font-weight: 500 !important;
-    }
-
-    /* HERO */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 6rem 8vw;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 80% at 70% 30%, rgba(138,158,122,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 60% at 20% 80%, rgba(200,169,126,0.06) 0%, transparent 50%),
-        linear-gradient(160deg, #0d0d0b 0%, #141410 100%);
-    }
-
-    .hero-circles {
-      position: absolute;
-      top: 10%; right: 8%;
-      pointer-events: none;
-    }
-
-    .circle {
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      animation: breathe 6s ease-in-out infinite;
-    }
-
-    .c1 { width: 300px; height: 300px; animation-delay: 0s; }
-    .c2 { width: 420px; height: 420px; animation-delay: .5s; border-color: rgba(138,158,122,0.08); }
-    .c3 { width: 560px; height: 560px; animation-delay: 1s; border-color: rgba(138,158,122,0.05); }
-
-    @keyframes breathe {
-      0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      50% { transform: translate(-50%, -50%) scale(1.04); opacity: .7; }
-    }
-
-    .hero-content { position: relative; z-index: 1; max-width: 680px; }
-
-    .hero-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: .6rem;
-      background: rgba(138,158,122,0.1);
-      border: 1px solid var(--border);
-      border-radius: 50px;
-      padding: .35rem 1rem;
-      font-size: .7rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--sage2);
-      margin-bottom: 2rem;
-      animation: fadeUp .8s .1s both;
-    }
-
-    .hero-tag-dot {
-      width: 5px; height: 5px;
-      border-radius: 50%;
-      background: var(--sage);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
-
-    .hero-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(3rem, 6vw, 5.5rem);
-      font-weight: 400;
-      line-height: 1.08;
-      margin-bottom: 1.5rem;
-      letter-spacing: -.01em;
-      animation: fadeUp .8s .2s both;
-    }
-
-    .hero-title em {
-      font-style: italic;
-      color: var(--sage2);
-    }
-
-    .hero-desc {
-      color: var(--muted);
-      font-size: .95rem;
-      max-width: 480px;
-      margin-bottom: 2.5rem;
-      animation: fadeUp .8s .3s both;
-    }
-
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-wrap: wrap;
-      animation: fadeUp .8s .4s both;
-    }
-
-    .btn-main {
-      background: var(--sage);
-      color: var(--bg);
-      padding: .9rem 2.2rem;
-      border-radius: 50px;
-      font-size: .82rem;
-      font-weight: 500;
-      letter-spacing: .04em;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: background .2s, transform .15s;
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-    }
-
-    .btn-main:hover { background: var(--sage2); transform: translateY(-2px); }
-
-    .btn-outline {
-      border: 1px solid var(--border);
-      color: var(--muted);
-      padding: .9rem 2rem;
-      border-radius: 50px;
-      font-size: .82rem;
-      text-decoration: none;
-      transition: border-color .2s, color .2s;
-    }
-
-    .btn-outline:hover { border-color: var(--sage); color: var(--cream); }
-
-    .hero-scroll {
-      position: absolute;
-      bottom: 2.5rem; right: 8vw;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: .6rem;
-      color: var(--muted);
-      font-size: .62rem;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-      animation: fadeUp .8s .6s both;
-    }
-
-    .scroll-line {
-      width: 1px;
-      height: 48px;
-      background: linear-gradient(to bottom, var(--sage), transparent);
-      animation: scrollAnim 2s ease-in-out infinite;
-    }
-
-    @keyframes scrollAnim {
-      0% { transform: scaleY(0); transform-origin: top; }
-      50% { transform: scaleY(1); transform-origin: top; }
-      51% { transform: scaleY(1); transform-origin: bottom; }
-      100% { transform: scaleY(0); transform-origin: bottom; }
-    }
-
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* BENEFITS */
-    .benefits {
-      padding: 2rem 8vw;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--bg2);
-    }
-
-    .benefit {
-      padding: 2rem 1.5rem;
-      border-right: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .benefit:last-child { border-right: none; }
-
-    .benefit-icon {
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-
-    .benefit-title {
-      font-size: .82rem;
-      font-weight: 500;
-      margin-bottom: .15rem;
-    }
-
-    .benefit-sub { font-size: .72rem; color: var(--muted); }
-
-    /* SERVICES */
-    .services {
-      padding: 8rem 8vw;
-    }
-
-    .eyebrow {
-      font-size: .65rem;
-      letter-spacing: .18em;
-      text-transform: uppercase;
-      color: var(--sage);
-      margin-bottom: .8rem;
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    .eyebrow::before {
-      content: '';
-      width: 20px; height: 1px;
-      background: var(--sage);
-    }
-
-    .sec-title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 3.5vw, 3rem);
-      font-weight: 400;
-      line-height: 1.15;
-      margin-bottom: 3.5rem;
-    }
-
-    .sec-title em { font-style: italic; color: var(--sage2); }
-
-    .services-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: var(--border);
-      border: 1px solid var(--border);
-    }
-
-    .service-card {
-      background: var(--bg);
-      padding: 2.5rem;
-      transition: background .25s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .service-card:hover { background: var(--card); }
-
-    .service-card::after {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px; height: 0;
-      background: var(--sage);
-      transition: height .3s;
-    }
-
-    .service-card:hover::after { height: 100%; }
-
-    .service-tag {
-      display: inline-block;
-      background: rgba(138,158,122,0.1);
-      color: var(--sage);
-      font-size: .62rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      padding: .22rem .7rem;
-      border-radius: 50px;
-      margin-bottom: 1.2rem;
-    }
-
-    .service-name {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 400;
-      margin-bottom: .6rem;
-    }
-
-    .service-desc {
-      color: var(--muted);
-      font-size: .8rem;
-      line-height: 1.75;
-      margin-bottom: 1.5rem;
-    }
-
-    .service-footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .service-price {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.5rem;
-      color: var(--warm);
-    }
-
-    .service-duration {
-      font-size: .72rem;
-      color: var(--muted);
-      letter-spacing: .06em;
-    }
-
-    /* PROCESS */
-    .process {
-      padding: 8rem 8vw;
-      background: var(--bg2);
-    }
-
-    .process-steps {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-      margin-top: 3.5rem;
-      position: relative;
-    }
-
-    .process-steps::before {
-      content: '';
-      position: absolute;
-      top: 28px; left: 10%;
-      width: 80%;
-      height: 1px;
-      background: linear-gradient(to right, transparent, var(--sage), var(--sage), transparent);
-      opacity: .3;
-    }
-
-    .step {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      gap: 1rem;
-    }
-
-    .step-num {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: var(--sage);
-      position: relative;
-      z-index: 1;
-    }
-
-    .step-title {
-      font-size: .85rem;
-      font-weight: 500;
-    }
-
-    .step-desc { font-size: .76rem; color: var(--muted); line-height: 1.65; }
-
-    /* BOOKING */
-    .booking {
-      padding: 8rem 8vw;
-      display: grid;
-      grid-template-columns: 1.2fr 1fr;
-      gap: 6rem;
-      align-items: center;
-    }
-
-    .booking-form {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 2.5rem;
-    }
-
-    .booking-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      margin-bottom: .5rem;
-    }
-
-    .booking-sub { color: var(--muted); font-size: .82rem; margin-bottom: 2rem; }
-
-    .form-group { margin-bottom: 1.1rem; }
-
-    .form-label {
-      display: block;
-      font-size: .65rem;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: .4rem;
-    }
-
-    .form-input, .form-select {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: .72rem 1rem;
-      color: var(--cream);
-      font-family: 'DM Sans', sans-serif;
-      font-size: .84rem;
-      outline: none;
-      transition: border-color .2s;
-    }
-
-    .form-input:focus, .form-select:focus { border-color: var(--sage); }
-    .form-select option { background: var(--card); }
-
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
-
-    .booking-info .sec-title { font-size: clamp(1.8rem, 2.5vw, 2.6rem); }
-
-    .booking-perks {
-      display: flex;
-      flex-direction: column;
-      gap: .85rem;
-      margin-top: 2rem;
-    }
-
-    .perk {
-      display: flex;
-      align-items: center;
-      gap: .85rem;
-      font-size: .82rem;
-      color: var(--muted);
-    }
-
-    .perk-check {
-      width: 28px; height: 28px;
-      border-radius: 50%;
-      background: rgba(138,158,122,0.12);
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--sage);
-      font-size: .75rem;
-      flex-shrink: 0;
-    }
-
-    /* FOOTER */
-    footer {
-      background: var(--bg2);
-      border-top: 1px solid var(--border);
-      padding: 2.5rem 8vw;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: .75rem;
-      color: var(--muted);
-    }
-
-    footer a { color: var(--sage); text-decoration: none; }
-
-    .footer-logo {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.3rem;
-      color: var(--cream);
-    }
-
-    @media (max-width: 900px) {
-      .hero { padding: 8rem 5vw 4rem; }
-      .benefits { grid-template-columns: 1fr 1fr; }
-      .benefit { border-right: none; border-bottom: 1px solid var(--border); }
-      .services-grid { grid-template-columns: 1fr; }
-      .process-steps { grid-template-columns: 1fr 1fr; }
-      .process-steps::before { display: none; }
-      .booking { grid-template-columns: 1fr; gap: 3rem; }
-      .nav-links { display: none; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Sōma — Студия массажа</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --espresso:#2b1d16;
+  --espresso-deep:#1a110c;
+  --paper:#f7ede1;
+  --paper-dim:#e8dcc8;
+  --terracotta:#c9683f;
+  --terracotta-bright:#e08355;
+  --stone:#8a6f5c;
+  --sand:#e8c9a0;
+  --line:rgba(247,237,225,0.12);
+  --line-bright:rgba(247,237,225,0.22);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--espresso);
+  color:var(--paper);
+  font-family:'Outfit',sans-serif;
+  font-weight:300;
+  line-height:1.65;
+  overflow-x:hidden;
+}
+::selection{background:var(--terracotta);color:var(--paper)}
+.mono{font-family:'JetBrains Mono',monospace}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:0.01ms !important;animation-iteration-count:1 !important;transition-duration:0.01ms !important;scroll-behavior:auto !important}
+}
+
+/* texture grain */
+.grain{
+  position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.05;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:1.5rem 5vw;
+  background:rgba(26,17,12,0.7);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+.nav-logo{
+  font-family:'Fraunces',serif;font-size:1.4rem;font-weight:500;
+  color:var(--paper);text-decoration:none;letter-spacing:.01em;
+  font-variation-settings:'opsz' 30;
+}
+.nav-logo i{font-style:italic;color:var(--terracotta-bright);font-weight:300}
+.nav-links{display:flex;gap:2.4rem;align-items:center}
+.nav-links a{color:var(--stone);text-decoration:none;font-size:.82rem;transition:color .2s}
+.nav-links a:hover{color:var(--paper)}
+.nav-cta{
+  background:var(--terracotta) !important;color:var(--espresso-deep) !important;
+  padding:.6rem 1.5rem !important;border-radius:2px !important;font-weight:500 !important;
+}
+
+/* HERO with 3D stones */
+.hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding:7rem 8vw 4rem;position:relative;overflow:hidden;
+  perspective:1200px;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 60% at 80% 20%, rgba(201,104,63,0.12) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 10% 90%, rgba(232,201,160,0.06) 0%, transparent 50%),
+    linear-gradient(150deg,#1a110c 0%,#2b1d16 100%);
+}
+.stones-field{
+  position:absolute;right:2vw;top:0;bottom:0;width:48%;
+  transform-style:preserve-3d;pointer-events:none;
+}
+.stone{
+  position:absolute;border-radius:48% 52% 50% 50% / 52% 48% 52% 48%;
+  transform-style:preserve-3d;
+  box-shadow:0 30px 60px -20px rgba(0,0,0,0.6), inset -8px -12px 20px rgba(0,0,0,0.25), inset 6px 8px 16px rgba(255,255,255,0.06);
+  will-change:transform;
+}
+.stone1{width:220px;height:160px;top:8%;left:30%;background:linear-gradient(150deg,#8a6f5c,#5c4636);animation:float1 9s ease-in-out infinite}
+.stone2{width:160px;height:130px;top:38%;left:5%;background:linear-gradient(150deg,#c9683f,#9a4d2e);animation:float2 11s ease-in-out infinite}
+.stone3{width:280px;height:200px;top:48%;left:38%;background:linear-gradient(150deg,#3a2c22,#241a13);animation:float3 13s ease-in-out infinite}
+.stone4{width:120px;height:100px;top:18%;left:62%;background:linear-gradient(150deg,#e8c9a0,#c9a06a);animation:float2 10s ease-in-out infinite reverse}
+.stone5{width:150px;height:115px;top:75%;left:18%;background:linear-gradient(150deg,#6b5444,#3a2c22);animation:float1 8s ease-in-out infinite reverse}
+@keyframes float1{0%,100%{transform:translateZ(40px) rotate(-4deg) translateY(0)}50%{transform:translateZ(40px) rotate(2deg) translateY(-18px)}}
+@keyframes float2{0%,100%{transform:translateZ(80px) rotate(6deg) translateY(0)}50%{transform:translateZ(80px) rotate(-3deg) translateY(14px)}}
+@keyframes float3{0%,100%{transform:translateZ(0px) rotate(-2deg) translateY(0)}50%{transform:translateZ(0px) rotate(3deg) translateY(-10px)}}
+
+.hero-content{position:relative;z-index:2;max-width:620px}
+.hero-tag{
+  display:inline-flex;align-items:center;gap:.7rem;
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:.05em;
+  color:var(--terracotta-bright);margin-bottom:2rem;
+  padding-bottom:.5rem;border-bottom:1px solid var(--line-bright);
+  animation:fadeUp .9s .1s both;
+}
+.hero-title{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:clamp(3rem,6.5vw,5.8rem);line-height:1.02;
+  letter-spacing:-.02em;margin-bottom:1.8rem;
+  animation:fadeUp .9s .25s both;
+}
+.hero-title i{font-style:italic;font-weight:300;color:var(--terracotta-bright)}
+.hero-desc{
+  color:var(--paper-dim);font-size:1.02rem;max-width:440px;
+  margin-bottom:2.6rem;animation:fadeUp .9s .4s both;opacity:.85;
+}
+.hero-actions{display:flex;gap:1.2rem;align-items:center;animation:fadeUp .9s .55s both}
+.btn-main{
+  background:var(--terracotta);color:var(--espresso-deep);
+  padding:1rem 2.4rem;border-radius:2px;font-size:.85rem;font-weight:500;
+  text-decoration:none;border:none;cursor:pointer;
+  transition:background .25s,transform .2s;display:inline-flex;align-items:center;gap:.6rem;
+}
+.btn-main:hover{background:var(--terracotta-bright);transform:translateY(-3px)}
+.btn-ghost{
+  color:var(--paper-dim);font-size:.85rem;text-decoration:none;
+  border-bottom:1px solid var(--line-bright);padding-bottom:.2rem;
+  transition:border-color .2s,color .2s;
+}
+.btn-ghost:hover{border-color:var(--terracotta-bright);color:var(--paper)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+/* MARQUEE strip */
+.marquee-strip{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:1.1rem 0;overflow:hidden;background:var(--espresso-deep);
+}
+.marquee-track{display:flex;gap:3rem;white-space:nowrap;animation:scrollMarquee 28s linear infinite;width:max-content}
+.marquee-track span{
+  font-family:'Fraunces',serif;font-style:italic;font-size:1.1rem;color:var(--stone);
+  display:flex;align-items:center;gap:3rem;
+}
+.marquee-track span::after{content:'◆';color:var(--terracotta);font-size:.6rem;font-style:normal}
+@keyframes scrollMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTIONS shared */
+section{padding:7rem 8vw;position:relative}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;letter-spacing:.08em;
+  color:var(--terracotta-bright);margin-bottom:1rem;
+  display:flex;align-items:center;gap:.7rem;text-transform:uppercase;
+}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--terracotta)}
+.sec-title{
+  font-family:'Fraunces',serif;font-weight:400;
+  font-size:clamp(2.1rem,3.6vw,3.2rem);line-height:1.12;margin-bottom:1rem;
+}
+.sec-title i{font-style:italic;color:var(--terracotta-bright)}
+.sec-lede{color:var(--stone);font-size:1rem;max-width:520px;margin-bottom:3.5rem}
+
+/* SERVICES — asymmetric, no rounded cards */
+.services{background:var(--espresso-deep)}
+.services-grid{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.service-row{
+  display:grid;grid-template-columns:80px 1fr auto auto;gap:2rem;align-items:center;
+  padding:2rem 0;border-bottom:1px solid var(--line);
+  transition:padding-left .3s;position:relative;
+}
+.service-row:hover{padding-left:1rem}
+.service-row:hover .service-name{color:var(--terracotta-bright)}
+.service-idx{font-family:'JetBrains Mono',monospace;color:var(--stone);font-size:.85rem}
+.service-name{font-family:'Fraunces',serif;font-size:1.6rem;transition:color .25s}
+.service-desc{color:var(--stone);font-size:.84rem;max-width:380px;display:none}
+.service-duration{font-family:'JetBrains Mono',monospace;color:var(--stone);font-size:.78rem;white-space:nowrap}
+.service-price{font-family:'Fraunces',serif;font-size:1.5rem;color:var(--sand);white-space:nowrap}
+@media(min-width:900px){.service-desc{display:block}}
+
+/* MASTERS — parallax tilt cards */
+.masters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line)}
+.master-card{
+  background:var(--espresso);padding:2.4rem 2rem;
+  transform-style:preserve-3d;transition:transform .15s ease-out;
+  cursor:default;
+}
+.master-avatar{
+  width:64px;height:64px;border-radius:50%;
+  background:linear-gradient(135deg,var(--terracotta),var(--sand));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:1.4rem;color:var(--espresso-deep);
+  margin-bottom:1.4rem;
+}
+.master-name{font-family:'Fraunces',serif;font-size:1.25rem;margin-bottom:.3rem}
+.master-role{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--terracotta-bright);letter-spacing:.04em;text-transform:uppercase;margin-bottom:1rem}
+.master-bio{color:var(--stone);font-size:.84rem}
+
+/* GALLERY — varied heights */
+.gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:140px;gap:.5rem}
+.gallery-item{
+  border-radius:2px;position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;padding:1.2rem;
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--paper-dim);
+  background-size:cover;background-position:center;
+  transition:transform .4s ease;
+}
+.gallery-item:hover{transform:scale(1.02)}
+.gallery-item::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(26,17,12,0.85),transparent 55%)}
+.gallery-item span{position:relative;z-index:1}
+.g1{grid-column:span 2;grid-row:span 2;background:linear-gradient(150deg,#3a2c22,#5c4636)}
+.g2{background:linear-gradient(150deg,#9a4d2e,#c9683f)}
+.g3{background:linear-gradient(150deg,#241a13,#3a2c22)}
+.g4{grid-row:span 2;background:linear-gradient(150deg,#6b5444,#8a6f5c)}
+.g5{background:linear-gradient(150deg,#c9a06a,#e8c9a0)}
+.g6{grid-column:span 2;background:linear-gradient(150deg,#1a110c,#2b1d16)}
+
+/* TESTIMONIALS — stacked stone cards */
+.testimonials{background:var(--espresso-deep)}
+.test-track{display:flex;gap:1.5rem;overflow-x:auto;padding-bottom:1rem;scrollbar-width:none}
+.test-track::-webkit-scrollbar{display:none}
+.test-card{
+  min-width:340px;background:var(--espresso);border:1px solid var(--line);
+  padding:2.2rem;border-radius:2px;flex-shrink:0;
+}
+.test-quote{font-family:'Fraunces',serif;font-size:1.15rem;font-style:italic;line-height:1.5;margin-bottom:1.5rem;color:var(--paper)}
+.test-author{display:flex;align-items:center;gap:.8rem}
+.test-dot{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--terracotta),var(--stone));flex-shrink:0}
+.test-name{font-size:.85rem;font-weight:500}
+.test-meta{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--stone)}
+
+/* PROCESS — path not numbers */
+.path{position:relative;margin-top:3rem}
+.path-line{
+  position:absolute;left:0;right:0;top:50%;height:1px;
+  background:repeating-linear-gradient(to right,var(--terracotta) 0,var(--terracotta) 6px,transparent 6px,transparent 14px);
+  opacity:.4;display:none;
+}
+.path-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:2.5rem}
+.path-step{display:flex;flex-direction:column;gap:1rem}
+.path-icon{font-size:1.6rem}
+.path-title{font-family:'Fraunces',serif;font-size:1.15rem}
+.path-desc{color:var(--stone);font-size:.84rem}
+
+/* FAQ accordion */
+.faq-list{border-top:1px solid var(--line)}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-q{
+  padding:1.6rem 0;display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;font-family:'Fraunces',serif;font-size:1.15rem;
+}
+.faq-q::after{content:'+';font-family:'JetBrains Mono',monospace;color:var(--terracotta-bright);font-size:1.3rem;transition:transform .3s}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.faq-item.open .faq-a{max-height:200px}
+.faq-a p{color:var(--stone);font-size:.88rem;padding-bottom:1.6rem;max-width:560px}
+
+/* BOOKING */
+.booking{display:grid;grid-template-columns:1fr 1.1fr;gap:5rem;align-items:start}
+.booking-perks{display:flex;flex-direction:column;gap:1.1rem;margin-top:2.2rem}
+.perk{display:flex;align-items:flex-start;gap:1rem;font-size:.88rem;color:var(--paper-dim)}
+.perk-mark{font-family:'JetBrains Mono',monospace;color:var(--terracotta-bright);font-size:.78rem;margin-top:.2rem}
+.booking-form{background:var(--espresso-deep);border:1px solid var(--line);padding:2.6rem;border-radius:2px}
+.form-group{margin-bottom:1.2rem}
+.form-label{display:block;font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:.06em;text-transform:uppercase;color:var(--stone);margin-bottom:.5rem}
+.form-input,.form-select{
+  width:100%;background:rgba(247,237,225,0.04);border:1px solid var(--line);border-radius:2px;
+  padding:.8rem 1rem;color:var(--paper);font-family:'Outfit',sans-serif;font-size:.86rem;outline:none;
+  transition:border-color .2s;
+}
+.form-input:focus,.form-select:focus{border-color:var(--terracotta)}
+.form-select option{background:var(--espresso-deep)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+
+/* MAP placeholder */
+.map-wrap{
+  margin-top:3rem;border:1px solid var(--line);border-radius:2px;overflow:hidden;
+  position:relative;height:280px;
+  background:
+    repeating-linear-gradient(0deg,transparent,transparent 39px,var(--line) 40px),
+    repeating-linear-gradient(90deg,transparent,transparent 39px,var(--line) 40px),
+    var(--espresso-deep);
+}
+.map-pin{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-100%);
+  display:flex;flex-direction:column;align-items:center;
+}
+.map-pin-dot{width:14px;height:14px;border-radius:50%;background:var(--terracotta);box-shadow:0 0 0 6px rgba(201,104,63,0.2)}
+.map-pin-stem{width:1px;height:40px;background:var(--terracotta-bright)}
+.map-addr{position:absolute;bottom:1.2rem;left:1.2rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--paper-dim)}
+
+/* FOOTER */
+footer{
+  background:var(--espresso-deep);border-top:1px solid var(--line);
+  padding:3rem 8vw;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:2rem;
+}
+.footer-logo{font-family:'Fraunces',serif;font-size:1.5rem}
+.footer-logo i{font-style:italic;color:var(--terracotta-bright)}
+.footer-meta{font-size:.78rem;color:var(--stone);max-width:280px}
+.footer-hours{font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--stone);text-align:right}
+
+@media(max-width:900px){
+  .hero-content{max-width:100%}
+  .stones-field{display:none}
+  .nav-links{display:none}
+  .masters-grid{grid-template-columns:1fr}
+  .gallery-grid{grid-template-columns:repeat(2,1fr)}
+  .g1,.g6{grid-column:span 2}
+  .booking{grid-template-columns:1fr}
+  .path-steps{grid-template-columns:1fr 1fr}
+  .service-row{grid-template-columns:40px 1fr;row-gap:.5rem}
+  .service-duration,.service-price{grid-column:2}
+}
+</style>
 </head>
 <body>
-
-<a href="/" class="back-banner">← Antviz · Демо</a>
-<div class="demo-badge">Демо-сайт</div>
+<div class="grain"></div>
 
 <nav>
-  <a href="#" class="nav-logo"><span></span>Sōma Studio</a>
+  <a href="#" class="nav-logo">S<i>ō</i>ma</a>
   <div class="nav-links">
     <a href="#services">Услуги</a>
-    <a href="#process">Как это работает</a>
-    <a href="#booking">Записаться</a>
+    <a href="#masters">Мастера</a>
+    <a href="#faq">Вопросы</a>
     <a href="#booking" class="nav-cta">Записаться</a>
   </div>
 </nav>
 
-<section class="hero">
+<section class="hero" id="hero">
   <div class="hero-bg"></div>
-  <div class="hero-circles">
-    <div class="circle c1"></div>
-    <div class="circle c2"></div>
-    <div class="circle c3"></div>
+  <div class="stones-field" id="stonesField">
+    <div class="stone stone1"></div>
+    <div class="stone stone2"></div>
+    <div class="stone stone3"></div>
+    <div class="stone stone4"></div>
+    <div class="stone stone5"></div>
   </div>
   <div class="hero-content">
-    <div class="hero-tag">
-      <div class="hero-tag-dot"></div>
-      Студия профессионального массажа
-    </div>
-    <h1 class="hero-title">
-      Восстановление<br/>тела и <em>духа</em>
-    </h1>
-    <p class="hero-desc">Индивидуальный подход к каждому гостю. Авторские техники массажа, атмосфера полного расслабления и опытные специалисты.</p>
+    <div class="hero-tag mono">МОСКВА · САДОВАЯ-КУДРИНСКАЯ 12</div>
+    <h1 class="hero-title">Тепло,<br/>которое <i>помнит тело</i></h1>
+    <p class="hero-desc">Авторские техники массажа на горячих базальтовых камнях. Десять лет практики, тишина вместо музыки и руки, которые знают, где живёт напряжение.</p>
     <div class="hero-actions">
       <a href="#booking" class="btn-main">Записаться →</a>
-      <a href="#services" class="btn-outline">Все услуги</a>
+      <a href="#services" class="btn-ghost">Посмотреть услуги</a>
     </div>
-  </div>
-  <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    Листать
   </div>
 </section>
 
-<div class="benefits">
-  <div class="benefit">
-    <div class="benefit-icon">🌿</div>
-    <div>
-      <div class="benefit-title">Натуральные масла</div>
-      <div class="benefit-sub">Только органика</div>
-    </div>
-  </div>
-  <div class="benefit">
-    <div class="benefit-icon">👐</div>
-    <div>
-      <div class="benefit-title">Опытные мастера</div>
-      <div class="benefit-sub">От 5 лет практики</div>
-    </div>
-  </div>
-  <div class="benefit">
-    <div class="benefit-icon">🕯️</div>
-    <div>
-      <div class="benefit-title">Атмосфера спа</div>
-      <div class="benefit-sub">Полное погружение</div>
-    </div>
-  </div>
-  <div class="benefit">
-    <div class="benefit-icon">📅</div>
-    <div>
-      <div class="benefit-title">Запись онлайн</div>
-      <div class="benefit-sub">7 дней в неделю</div>
-    </div>
+<div class="marquee-strip">
+  <div class="marquee-track">
+    <span>Балийский ритуал</span>
+    <span>Горячие камни</span>
+    <span>Глубокая ткань</span>
+    <span>Массаж для двоих</span>
+    <span>Лимфодренаж</span>
+    <span>Балийский ритуал</span>
+    <span>Горячие камни</span>
+    <span>Глубокая ткань</span>
+    <span>Массаж для двоих</span>
+    <span>Лимфодренаж</span>
   </div>
 </div>
 
 <section class="services" id="services">
-  <div class="eyebrow">Наши услуги</div>
-  <h2 class="sec-title">Выберите <em>свой</em> ритуал</h2>
+  <div class="eyebrow">Прайс-лист</div>
+  <h2 class="sec-title">Пять способов <i>замедлиться</i></h2>
+  <p class="sec-lede">Каждая программа — это не шаблон, а разговор с телом: мастер подбирает давление, температуру и масла под то, что вы чувствуете сегодня.</p>
   <div class="services-grid">
-    <div class="service-card">
-      <div class="service-tag">Популярное</div>
-      <div class="service-name">Классический массаж</div>
-      <div class="service-desc">Традиционный расслабляющий массаж всего тела. Снимает мышечное напряжение, улучшает кровообращение и дарит глубокое ощущение покоя.</div>
-      <div class="service-footer">
-        <div class="service-price">2 800 ₽</div>
-        <div class="service-duration">60 мин</div>
-      </div>
+    <div class="service-row">
+      <div class="service-idx mono">01</div>
+      <div><div class="service-name">Классический</div><div class="service-desc">Расслабляющий массаж всего тела, мягкое давление, акцент на спину и шею.</div></div>
+      <div class="service-duration mono">60 мин</div>
+      <div class="service-price">2 800 ₽</div>
     </div>
-    <div class="service-card">
-      <div class="service-tag">Премиум</div>
-      <div class="service-name">Балийский ритуал</div>
-      <div class="service-desc">Глубокий массаж по балийской технике с использованием ароматических масел. Восстанавливает энергетический баланс и снимает хронический стресс.</div>
-      <div class="service-footer">
-        <div class="service-price">4 500 ₽</div>
-        <div class="service-duration">90 мин</div>
-      </div>
+    <div class="service-row">
+      <div class="service-idx mono">02</div>
+      <div><div class="service-name">Балийский ритуал</div><div class="service-desc">Глубокая работа по балийской технике с ароматическими маслами холодного отжима.</div></div>
+      <div class="service-duration mono">90 мин</div>
+      <div class="service-price">4 500 ₽</div>
     </div>
-    <div class="service-card">
-      <div class="service-tag">Терапия</div>
-      <div class="service-name">Лечебный массаж</div>
-      <div class="service-desc">Целенаправленная работа с проблемными зонами — спина, шея, суставы. Курс процедур для устойчивого терапевтического эффекта.</div>
-      <div class="service-footer">
-        <div class="service-price">3 200 ₽</div>
-        <div class="service-duration">60 мин</div>
-      </div>
+    <div class="service-row">
+      <div class="service-idx mono">03</div>
+      <div><div class="service-name">Горячие камни</div><div class="service-desc">Базальтовые камни прогревают мышцы перед глубокой проработкой — для хронического напряжения.</div></div>
+      <div class="service-duration mono">75 мин</div>
+      <div class="service-price">3 900 ₽</div>
     </div>
-    <div class="service-card">
-      <div class="service-tag">Пара</div>
-      <div class="service-name">Массаж для двоих</div>
-      <div class="service-desc">Романтический ритуал в отдельном кабинете. Одновременный массаж двум гостям от двух мастеров. Идеально для особого вечера.</div>
-      <div class="service-footer">
-        <div class="service-price">8 000 ₽</div>
-        <div class="service-duration">60 мин</div>
-      </div>
+    <div class="service-row">
+      <div class="service-idx mono">04</div>
+      <div><div class="service-name">Лечебный</div><div class="service-desc">Точечная работа со спиной, шеей и суставами. Рекомендован курсом от трёх процедур.</div></div>
+      <div class="service-duration mono">60 мин</div>
+      <div class="service-price">3 200 ₽</div>
+    </div>
+    <div class="service-row">
+      <div class="service-idx mono">05</div>
+      <div><div class="service-name">Для двоих</div><div class="service-desc">Параллельный ритуал в отдельном кабинете на двух кушетках — для пар и близких людей.</div></div>
+      <div class="service-duration mono">60 мин</div>
+      <div class="service-price">8 000 ₽</div>
+    </div>
+  </div>
+</section>
+
+<section class="masters" id="masters">
+  <div class="eyebrow">Команда</div>
+  <h2 class="sec-title">Руки, которым <i>доверяют</i></h2>
+  <p class="sec-lede">Каждый мастер — с медицинским образованием и минимум пятью годами практики. Закрепляем за вами одного специалиста, если так удобнее.</p>
+  <div class="masters-grid" id="mastersGrid">
+    <div class="master-card">
+      <div class="master-avatar">МК</div>
+      <div class="master-name">Марина Котова</div>
+      <div class="master-role mono">Балийская техника</div>
+      <div class="master-bio">12 лет практики, стажировка на Бали. Специализация — глубокий расслабляющий массаж.</div>
+    </div>
+    <div class="master-card">
+      <div class="master-avatar">ДВ</div>
+      <div class="master-name">Дмитрий Волков</div>
+      <div class="master-role mono">Лечебный массаж</div>
+      <div class="master-bio">Реабилитолог, 9 лет в спортивной медицине. Работает с хроническими зажимами.</div>
+    </div>
+    <div class="master-card">
+      <div class="master-avatar">АЛ</div>
+      <div class="master-name">Анна Лосева</div>
+      <div class="master-role mono">Горячие камни</div>
+      <div class="master-bio">Сертификат термотерапии, 7 лет практики. Мягкая, но глубокая работа с теплом.</div>
+    </div>
+  </div>
+</section>
+
+<section class="gallery">
+  <div class="eyebrow">Пространство</div>
+  <h2 class="sec-title">Внутри <i>студии</i></h2>
+  <p class="sec-lede">Шесть кабинетов, тёплый свет, запах кедра и полная тишина — никакой фоновой музыки, если вы не попросите.</p>
+  <div class="gallery-grid">
+    <div class="gallery-item g1"><span>Кабинет №1 · горячие камни</span></div>
+    <div class="gallery-item g2"><span>Зона отдыха</span></div>
+    <div class="gallery-item g3"><span>Кабинет №2</span></div>
+    <div class="gallery-item g4"><span>Чайная зона</span></div>
+    <div class="gallery-item g5"><span>Ресепшн</span></div>
+    <div class="gallery-item g6"><span>Кабинет для двоих</span></div>
+  </div>
+</section>
+
+<section class="testimonials" id="testimonials">
+  <div class="eyebrow">Отзывы</div>
+  <h2 class="sec-title">Что говорят <i>гости</i></h2>
+  <div class="test-track">
+    <div class="test-card">
+      <div class="test-quote">«Впервые ушла с массажа без единой мысли в голове. Именно то тепло и тишина, которых не хватало».</div>
+      <div class="test-author"><div class="test-dot"></div><div><div class="test-name">Екатерина С.</div><div class="test-meta mono">Балийский ритуал</div></div></div>
+    </div>
+    <div class="test-card">
+      <div class="test-quote">«Хожу к Дмитрию уже год с больной спиной после травмы. Это единственное место, где реально становится легче».</div>
+      <div class="test-author"><div class="test-dot"></div><div><div class="test-name">Игорь П.</div><div class="test-meta mono">Лечебный массаж</div></div></div>
+    </div>
+    <div class="test-card">
+      <div class="test-quote">«Камни — отдельный вид магии. Прогрев перед массажем меняет всё ощущение процедуры».</div>
+      <div class="test-author"><div class="test-dot"></div><div><div class="test-name">Наталья В.</div><div class="test-meta mono">Горячие камни</div></div></div>
+    </div>
+    <div class="test-card">
+      <div class="test-quote">«Записались с мужем на массаж для двоих на годовщину — оба вышли в полном восторге».</div>
+      <div class="test-author"><div class="test-dot"></div><div><div class="test-name">Алина и Максим</div><div class="test-meta mono">Для двоих</div></div></div>
     </div>
   </div>
 </section>
 
 <section class="process" id="process">
-  <div class="eyebrow">Как это работает</div>
-  <h2 class="sec-title">Четыре шага<br/>до <em>расслабления</em></h2>
-  <div class="process-steps">
-    <div class="step">
-      <div class="step-num">01</div>
-      <div class="step-title">Выбор услуги</div>
-      <div class="step-desc">Выберите программу и удобное время онлайн или по телефону</div>
+  <div class="eyebrow">Перед визитом</div>
+  <h2 class="sec-title">Как проходит <i>визит</i></h2>
+  <div class="path">
+    <div class="path-line"></div>
+    <div class="path-steps">
+      <div class="path-step">
+        <div class="path-icon">✎</div>
+        <div class="path-title">Выбор времени</div>
+        <div class="path-desc">Бронируете услугу и слот онлайн или по телефону.</div>
+      </div>
+      <div class="path-step">
+        <div class="path-icon">☕</div>
+        <div class="path-title">Чай у входа</div>
+        <div class="path-desc">Приходите за 10 минут — травяной чай и смена обстановки.</div>
+      </div>
+      <div class="path-step">
+        <div class="path-icon">✋</div>
+        <div class="path-title">Сама процедура</div>
+        <div class="path-desc">Мастер уточняет зоны напряжения и работает по ощущениям.</div>
+      </div>
+      <div class="path-step">
+        <div class="path-icon">🌙</div>
+        <div class="path-title">Время на тишину</div>
+        <div class="path-desc">После сеанса можно остаться в зоне отдыха сколько нужно.</div>
+      </div>
     </div>
-    <div class="step">
-      <div class="step-num">02</div>
-      <div class="step-title">Консультация</div>
-      <div class="step-desc">Мастер обсудит ваши пожелания и особенности здоровья</div>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="eyebrow">Вопросы</div>
+  <h2 class="sec-title">Перед тем как <i>записаться</i></h2>
+  <div class="faq-list" id="faqList">
+    <div class="faq-item open">
+      <div class="faq-q">Нужно ли что-то готовить перед визитом?</div>
+      <div class="faq-a"><p>Нет, всё необходимое — полотенца, одноразовое бельё, масла — уже в кабинете. Приходите за 10–15 минут до начала, чтобы не торопиться.</p></div>
     </div>
-    <div class="step">
-      <div class="step-num">03</div>
-      <div class="step-title">Процедура</div>
-      <div class="step-desc">Полное погружение в атмосферу отдыха и восстановления</div>
+    <div class="faq-item">
+      <div class="faq-q">Можно ли отменить или перенести запись?</div>
+      <div class="faq-a"><p>Да, за 4 часа до сеанса — бесплатно. При более позднем переносе удерживается 30% стоимости.</p></div>
     </div>
-    <div class="step">
-      <div class="step-num">04</div>
-      <div class="step-title">Рекомендации</div>
-      <div class="step-desc">Получите индивидуальные советы по уходу и следующему визиту</div>
+    <div class="faq-item">
+      <div class="faq-q">Есть ли противопоказания для горячих камней?</div>
+      <div class="faq-a"><p>Беременность, гипертония, варикоз и кожные воспаления — повод предупредить мастера заранее, он скорректирует программу.</p></div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Можно ли купить процедуру в подарок?</div>
+      <div class="faq-a"><p>Да, сертификаты оформляются на любую сумму или конкретную услугу, действуют 6 месяцев.</p></div>
     </div>
   </div>
 </section>
 
 <section class="booking" id="booking">
+  <div class="booking-info">
+    <div class="eyebrow">Запись</div>
+    <h2 class="sec-title">Найдите время<br/>для <i>тишины</i></h2>
+    <p class="sec-lede" style="margin-bottom:0">Отвечаем на заявки в течение часа в рабочее время.</p>
+    <div class="booking-perks">
+      <div class="perk"><div class="perk-mark mono">―</div><span>Медицинское образование у каждого мастера</span></div>
+      <div class="perk"><div class="perk-mark mono">―</div><span>Органические масла и термальные камни премиум-класса</span></div>
+      <div class="perk"><div class="perk-mark mono">―</div><span>Чай и фрукты после каждой процедуры</span></div>
+      <div class="perk"><div class="perk-mark mono">―</div><span>Открыты ежедневно с 10:00 до 22:00</span></div>
+    </div>
+    <div class="map-wrap">
+      <div class="map-pin"><div class="map-pin-stem"></div><div class="map-pin-dot"></div></div>
+      <div class="map-addr mono">САДОВАЯ-КУДРИНСКАЯ, 12 · МОСКВА</div>
+    </div>
+  </div>
   <div class="booking-form">
-    <div class="booking-title">Записаться</div>
-    <div class="booking-sub">Выберите услугу и удобное время — ответим в течение часа</div>
+    <div class="sec-title" style="font-size:1.5rem;margin-bottom:.4rem">Записаться</div>
+    <p style="color:var(--stone);font-size:.84rem;margin-bottom:2rem">Выберите услугу и удобное время</p>
     <div class="form-group">
       <label class="form-label">Услуга</label>
       <select class="form-select">
-        <option>Классический массаж — 2 800 ₽</option>
+        <option>Классический — 2 800 ₽</option>
         <option>Балийский ритуал — 4 500 ₽</option>
-        <option>Лечебный массаж — 3 200 ₽</option>
-        <option>Массаж для двоих — 8 000 ₽</option>
+        <option>Горячие камни — 3 900 ₽</option>
+        <option>Лечебный — 3 200 ₽</option>
+        <option>Для двоих — 8 000 ₽</option>
       </select>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Дата</label>
-        <input class="form-input" type="date"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Время</label>
-        <select class="form-select">
-          <option>10:00</option>
-          <option>12:00</option>
-          <option>14:00</option>
-          <option>16:00</option>
-          <option>18:00</option>
-          <option>20:00</option>
-        </select>
+      <div class="form-group"><label class="form-label">Дата</label><input class="form-input" type="date"/></div>
+      <div class="form-group"><label class="form-label">Время</label>
+        <select class="form-select"><option>10:00</option><option>12:00</option><option>14:00</option><option>16:00</option><option>18:00</option><option>20:00</option></select>
       </div>
     </div>
     <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Имя</label>
-        <input class="form-input" type="text" placeholder="Анна"/>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Телефон</label>
-        <input class="form-input" type="tel" placeholder="+7 (___) ___-__-__"/>
-      </div>
+      <div class="form-group"><label class="form-label">Имя</label><input class="form-input" type="text" placeholder="Анна"/></div>
+      <div class="form-group"><label class="form-label">Телефон</label><input class="form-input" type="tel" placeholder="+7 (___) ___-__-__"/></div>
     </div>
-    <button class="btn-main" style="width:100%;justify-content:center;margin-top:.5rem;border-radius:12px" onclick="event.preventDefault()">Записаться →</button>
-  </div>
-  <div class="booking-info">
-    <div class="eyebrow">Почему мы</div>
-    <h2 class="sec-title">Забота о вас<br/>в <em>каждой детали</em></h2>
-    <div class="booking-perks">
-      <div class="perk">
-        <div class="perk-check">✓</div>
-        <span>Сертифицированные специалисты с медицинским образованием</span>
-      </div>
-      <div class="perk">
-        <div class="perk-check">✓</div>
-        <span>Профессиональные масла и косметика премиум-класса</span>
-      </div>
-      <div class="perk">
-        <div class="perk-check">✓</div>
-        <span>Индивидуальные программы под ваши запросы</span>
-      </div>
-      <div class="perk">
-        <div class="perk-check">✓</div>
-        <span>Чай и фрукты в подарок после каждой процедуры</span>
-      </div>
-      <div class="perk">
-        <div class="perk-check">✓</div>
-        <span>Гибкое расписание — работаем с 10:00 до 22:00</span>
-      </div>
-    </div>
+    <button class="btn-main" style="width:100%;justify-content:center;margin-top:.5rem" onclick="event.preventDefault()">Записаться →</button>
   </div>
 </section>
 
 <footer>
-  <div class="footer-logo">Sōma Studio</div>
-  <div>© 2024 Студия массажа Sōma. Москва, Садовая-Кудринская 12</div>
-  <div>Демо-сайт создан <a href="/">Design Antviz</a></div>
+  <div>
+    <div class="footer-logo">S<i>ō</i>ma</div>
+    <div class="footer-meta" style="margin-top:.6rem">Студия массажа · Москва, Садовая-Кудринская 12</div>
+  </div>
+  <div class="footer-hours">ПН–ВС<br/>10:00 — 22:00</div>
 </footer>
 
+<script>
+  // 3D parallax stones following cursor
+  const stonesField = document.getElementById('stonesField');
+  const hero = document.getElementById('hero');
+  if (stonesField && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    hero.addEventListener('mousemove', (e) => {
+      const r = hero.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      stonesField.style.transform = `rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+    });
+    hero.addEventListener('mouseleave', () => {
+      stonesField.style.transform = 'rotateY(0deg) rotateX(0deg)';
+    });
+  }
+
+  // Master cards subtle tilt
+  document.querySelectorAll('.master-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateZ(10px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateY(0) rotateX(0) translateZ(0)';
+    });
+  });
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-q').forEach(q => {
+    q.addEventListener('click', () => {
+      const item = q.parentElement;
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!wasOpen) item.classList.add('open');
+    });
+  });
+</script>
 </body>
 </html>

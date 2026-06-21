@@ -30,11 +30,8 @@
       --sh2: 0 8px 20px rgba(0,51,153,.08), 0 4px 8px rgba(0,51,153,.08);
       --font: 'Geologica', 'Inter', 'Arial', sans-serif;
     }
-    html, body {
+    html {
       height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden; /* Добавлено: предотвращает горизонтальный скролл на 100% */
     }
     body {
       background: var(--bg);
@@ -47,6 +44,7 @@
       display: flex;
       flex-direction: column;
       min-height: 100vh;
+      overflow-x: hidden; /* Полностью исключает горизонтальный скролл на любых устройствах */
     }
 
     /* ── HERO ── */
@@ -55,14 +53,17 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 24px;
+      /* Безопасные отступы, чтобы контент не залезал под меню и подвал */
+      padding: 100px 24px 120px 24px; 
       position: relative;
       overflow: hidden;
       min-height: 70vh;
+      box-sizing: border-box;
     }
     @media (max-width: 768px) {
       .hero-section { 
-        padding: 30px 16px;
+        /* На мобильных уменьшаем отступы под размер мобильной шапки и подвала */
+        padding: 80px 16px 100px 16px;
         min-height: 60vh;
       }
     }
@@ -85,17 +86,21 @@
       text-align: center;
       max-width: 560px;
       width: 100%;
+      box-sizing: border-box;
+      overflow-wrap: break-word; /* Защита от вылета длинных слов за границы экрана */
     }
 
     /* ── 404 число ── */
     .error-number {
-      font-size: clamp(100px, 25vw, 200px);
+      /* Изменен min-размер со 100px на 75px, чтобы цифры гарантированно помещались на экранах 320px */
+      font-size: clamp(75px, 22vw, 180px);
       font-weight: 600;
       line-height: 0.9;
-      letter-spacing: -0.06em;
+      letter-spacing: -0.04em;
       margin-bottom: 16px;
       position: relative;
       display: inline-block;
+      max-width: 100%;
     }
     .error-number .digit {
       display: inline-block;
@@ -112,11 +117,12 @@
 
     /* ── Заголовок ── */
     .error-title {
-      font-size: clamp(28px, 5vw, 48px);
+      font-size: clamp(24px, 5vw, 44px);
       font-weight: 600;
       letter-spacing: -0.03em;
-      line-height: 1.08;
+      line-height: 1.1;
       margin-bottom: 16px;
+      padding: 0 8px;
     }
     .error-title em {
       font-style: normal;
@@ -124,11 +130,12 @@
     }
 
     .error-desc {
-      font-size: 17px;
+      font-size: 16px;
       color: var(--muted);
-      line-height: 1.7;
+      line-height: 1.6;
       max-width: 420px;
       margin: 0 auto 36px;
+      padding: 0 8px;
     }
 
     /* ── Кнопки ── */
@@ -139,11 +146,13 @@
       gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 48px;
+      width: 100%;
     }
     @media (max-width: 500px) {
       .error-actions { 
         flex-direction: column; 
         width: 100%; 
+        padding: 0 8px;
       }
       .error-actions .btn { 
         width: 100%; 
@@ -195,6 +204,7 @@
       gap: 8px;
       padding-top: 32px;
       border-top: 1px solid var(--border);
+      width: 100%;
     }
     .quick-links-label {
       width: 100%;
@@ -294,9 +304,12 @@
       .deco-ring-3 { width: 100px; height: 100px; }
     }
 
-    /* ── Чтобы подвал не наезжал на контент ── */
-    .hero-section + footer {
-      margin-top: 0;
+    /* ── Фикс наложения подвала ── */
+    .hero-section + footer, footer {
+      margin-top: auto; /* Выталкивает подвал в самый низ флекс-контейнера */
+      position: relative;
+      z-index: 10;
+      width: 100%;
     }
   </style>
 </head>

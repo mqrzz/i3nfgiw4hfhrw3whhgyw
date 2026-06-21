@@ -17,8 +17,9 @@
   /* ─────────────── CSS ───────────────
      Палитра и формы взяты напрямую с главной страницы Antviz:
      тёмная капсула (var(--dark)), зелёный акцент (var(--green)),
-     шрифт Geologica, скругления-«квадраты» (не pill), светлые
-     карточки для дропдауна — как остальные блоки сайта. */
+     шрифт Geologica, скругления-«квадраты» (не pill). Дропдаун —
+     тоже тёмный, на тон светлее капсулы (как .type-card.dark на
+     сайте: dark2 на dark), без белых/серых поверхностей. */
   const CSS = `
     :root {
       --an-bg:        #191b1e;
@@ -31,13 +32,13 @@
       --an-green:     #1ede7b;
       --an-green-h:   #1ac16b;
       --an-green-ink: #191b1e;
+      --an-green-dim: rgba(30,222,123,.14);
       --an-warn:      #f59e0b;
-      --an-danger:    #e8634f;
-      --an-card:      #f9fafc;
-      --an-card-border: #dfe3e8;
-      --an-card-border2: #cbcdd6;
-      --an-card-ink:  #191b1e;
-      --an-card-muted:#707a8a;
+      --an-danger:    #ff6b54;
+      --an-card:      #20242a;
+      --an-card-border: rgba(255,255,255,.09);
+      --an-card-ink:  #ffffff;
+      --an-card-muted:rgba(255,255,255,.4);
       --an-font: 'Geologica','Inter','Arial',sans-serif;
     }
 
@@ -138,16 +139,17 @@
     .an-chevron { width: 11px; height: 11px; opacity: .45; flex-shrink: 0; transition: transform .2s; }
     .an-user-btn[aria-expanded="true"] .an-chevron { transform: rotate(180deg); }
 
-    /* ── Дропдаун: светлая карточка, как остальные элементы сайта
-       (.rv, .type-card) — bg3, граница border, тень sh2, скругление 24px.
-       Акцент — зелёная кромка сверху вместо фиолетовой. */
+    /* ── Дропдаун: остаётся в тёмной палитре капсулы, на тон светлее
+       (--an-card #20242a поверх --an-bg #191b1e) — так же, как
+       .type-card.dark (dark2 поверх dark) на главной странице.
+       Никакого белого/серого: ховеры и акценты — зелёные. */
     .an-dd {
       position: absolute; top: calc(100% + 12px); right: 0;
       background: var(--an-card);
       border: 1.5px solid var(--an-card-border);
       border-radius: 24px; padding: 8px;
       min-width: 248px;
-      box-shadow: 0 8px 20px rgba(0,51,153,.08), 0 4px 8px rgba(0,51,153,.08);
+      box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
       opacity: 0; pointer-events: none;
       transform: translateY(-6px);
       transform-origin: top right;
@@ -204,18 +206,19 @@
       background: none; width: 100%; text-align: left;
       position: relative;
     }
-    .an-dd-item:hover { background: var(--an-bg2,#f2f4f7); padding-left: 13px; }
+    .an-dd-item:hover { background: var(--an-green-dim); padding-left: 13px; }
     .an-dd-ico {
       width: 18px; height: 18px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       color: var(--an-card-muted); transition: color .12s;
     }
-    .an-dd-item:hover .an-dd-ico { color: var(--an-green-h); }
+    .an-dd-item:hover .an-dd-ico { color: var(--an-green); }
+    .an-dd-item:hover { color: #fff; }
     .an-dd-item svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .an-dd-item.red .an-dd-ico { color: rgba(232,99,79,0.75); }
+    .an-dd-item.red .an-dd-ico { color: rgba(255,107,84,0.8); }
     .an-dd-item.red:hover .an-dd-ico { color: var(--an-danger); }
-    .an-dd-item.red { color: rgba(217,90,72,0.92); }
-    .an-dd-item.red:hover { background: rgba(232,99,79,0.08); }
+    .an-dd-item.red { color: rgba(255,140,122,0.9); }
+    .an-dd-item.red:hover { background: rgba(255,107,84,0.1); color: #ffb3a3; }
 
     .an-dd-sep { height: 1px; background: var(--an-card-border); margin: 6px 10px; }
 
@@ -253,16 +256,18 @@
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
-  // Набор иконок: единая толщина линии (1.6), скруглённые углы.
+  // Набор иконок: единая толщина линии (1.6), форма «квадрат со скруглением»
+  // перекликается с антвиз-карточками (tier, type-card) — не дефолтный
+  // набор, а угловатые геометричные формы под общий стиль сайта.
   const DD_ITEMS = [
-    { href: b+'profile',         icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 14.5c0-2 1.8-3.2 4-3.2s4 1.2 4 3.2"/><circle cx="12" cy="9" r="2.1"/>', label: 'Обзор кабинета' },
+    { href: b+'profile',         icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/>', label: 'Обзор кабинета' },
     { sep: true },
     { section: 'Кабинет' },
-    { href: b+'profile/orders',  icon: '<path d="M4 7.5l8-3.8 8 3.8-8 3.8-8-3.8z"/><path d="M4 7.5v9l8 3.8 8-3.8v-9"/><path d="M12 11.3v9"/>', label: 'Мои заказы', badgeKey: 'orders' },
-    { href: b+'profile/tickets', icon: '<path d="M5 7a2 2 0 012-2h10a2 2 0 012 2v3a2 2 0 100 4v3a2 2 0 01-2 2H7a2 2 0 01-2-2v-3a2 2 0 100-4V7z"/><path d="M14 6v12" stroke-dasharray="2.4 2.4"/>', label: 'Обслуживание', badgeKey: 'tickets' },
-    { href: b+'profile/support', icon: '<path d="M12 4a7 7 0 00-7 7v3.5A1.5 1.5 0 006.5 16H8v-5.5H5.3"/><path d="M12 4a7 7 0 017 7v3.5a1.5 1.5 0 01-1.5 1.5H16v-5.5h2.7"/><path d="M8 16.5v1A2.5 2.5 0 0010.5 20H12"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/orders',  icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label: 'Мои заказы', badgeKey: 'orders' },
+    { href: b+'profile/tickets', icon: '<rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/>', label: 'Обслуживание', badgeKey: 'tickets' },
+    { href: b+'profile/support', icon: '<rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/>', label: 'Поддержка', badgeKey: 'support' },
     { sep: true },
-    { href: b+'profile/settings', icon: '<path d="M12 4.5v2.3M12 17.2v2.3M19.5 12h-2.3M6.8 12H4.5M17.2 6.8l-1.6 1.6M8.4 15.6l-1.6 1.6M17.2 17.2l-1.6-1.6M8.4 8.4L6.8 6.8"/><circle cx="12" cy="12" r="3.4"/>', label: 'Настройки' },
+    { href: b+'profile/settings', icon: '<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/>', label: 'Настройки' },
     { logout: true },
   ];
 

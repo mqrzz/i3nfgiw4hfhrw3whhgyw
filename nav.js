@@ -1,7 +1,11 @@
 /**
- * nav.js — единая навигация для всех страниц Antviz
- * Стили и структура как в index.html (тёмная капсула, Geologica)
+ * nav.js — Antviz (дизайн под главную страницу)
  * <script src="nav.js" data-page="home"></script>
+ *
+ * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
+ * инициализирует САМА СТРАНИЦА (как она и делает сейчас), и просто
+ * подключается к уже существующему приложению через getApps()/getAuth().
+ * Это убирает любые проблемы с относительными путями к конфигу.
  */
 (function () {
 
@@ -11,10 +15,11 @@
   const b      = depth > 0 ? '../' : '';
 
   /* ─────────────── CSS ───────────────
-     Тёмная капсула как в index.html:
-     фон #191b1e, зелёный акцент #1ede7b,
-     шрифт Geologica, скругления 24px.
-  */
+     Палитра и формы взяты напрямую с главной страницы Antviz:
+     тёмная капсула (var(--dark)), зелёный акцент (var(--green)),
+     шрифт Geologica, скругления-«квадраты» (не pill). Дропдаун —
+     тоже тёмный, на тон светлее капсулы (как .type-card.dark на
+     сайте: dark2 на dark), без белых/серых поверхностей. */
   const CSS = `
     :root {
       --an-bg:        #191b1e;
@@ -109,6 +114,9 @@
     .an-user-btn.guest .an-avatar-ring { display: none; }
     .an-user-btn.guest .an-chevron { display: none; }
 
+    /* Аватар: квадрат со скруглением в духе карточек сайта (border-radius
+       такой же логики, как .tier-badge / .rv-av), на зелёном фоне.
+       Кольцо появляется только когда есть непрочитанное. */
     .an-avatar-ring {
       width: 32px; height: 32px; border-radius: 11px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
@@ -131,6 +139,10 @@
     .an-chevron { width: 11px; height: 11px; opacity: .45; flex-shrink: 0; transition: transform .2s; }
     .an-user-btn[aria-expanded="true"] .an-chevron { transform: rotate(180deg); }
 
+    /* ── Дропдаун: остаётся в тёмной палитре капсулы, на тон светлее
+       (--an-card #20242a поверх --an-bg #191b1e) — так же, как
+       .type-card.dark (dark2 поверх dark) на главной странице.
+       Никакого белого/серого: ховеры и акценты — зелёные. */
     .an-dd {
       position: absolute; top: calc(100% + 12px); right: 0;
       background: var(--an-card);
@@ -221,6 +233,12 @@
     .an-dd-badge.warn { background: var(--an-warn); color: #1a1400; }
     .an-dd-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
 
+    /* ══════════════════════════════════════
+       МОБИЛЬНАЯ ВЕРСИЯ — та же тёмная капсула,
+       только сверху, компактнее, с бургером
+       вместо текстовых ссылок по центру.
+       Заменяет нижний таб-бар из footer.js.
+    ══════════════════════════════════════ */
     .an-burger {
       display: none;
       align-items: center; justify-content: center;
@@ -305,12 +323,14 @@
     support:  { inApp: true },
     settings: { inApp: true },
     tickets:  { inApp: true },
-    404:      { centerLinks: PUBLIC_LINKS, showCta: true },
     default:  { centerLinks: PUBLIC_LINKS, showCta: true },
   };
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
+  // Набор иконок: единая толщина линии (1.6), форма «квадрат со скруглением»
+  // перекликается с антвиз-карточками (tier, type-card) — не дефолтный
+  // набор, а угловатые геометричные формы под общий стиль сайта.
   const DD_ITEMS = [
     { href: b+'profile',         icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/>', label: 'Обзор кабинета' },
     { sep: true },
@@ -342,6 +362,9 @@
     </div>`;
   }
 
+  // Мобильная панель: те же ссылки, что и в центре десктопной капсулы,
+  // плюс CTA снизу — раскрывается по тапу на бургер, заменяет собой
+  // нижний таб-бар из footer.js.
   function buildMobileSheet() {
     if (cfg.inApp) return '';
     const links = cfg.centerLinks || [];
@@ -410,6 +433,7 @@ ${buildMobileSheet()}`;
   }
   userBtn?.addEventListener('click', onUserBtnClick);
 
+  // Бургер мобильной капсулы — открывает/закрывает an-mobile-sheet
   const burger = document.getElementById('anBurger');
   const sheet  = document.getElementById('anMobileSheet');
   burger?.addEventListener('click', () => {
@@ -543,6 +567,11 @@ ${buildMobileSheet()}`;
     );
   }
 
+  /* ── Ждём, пока сама страница инициализирует Firebase App, и подключаемся
+     к УЖЕ СУЩЕСТВУЮЩЕМУ приложению — без своего импорта firebase-config.js.
+     Каждая страница (profile, support, order и т.д.) уже сама делает
+     initializeApp() в своём скрипте — нам достаточно дождаться этого
+     момента через getApps().length, чтобы не зависеть от путей вообще. */
   (async () => {
     try {
       const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
@@ -555,7 +584,7 @@ ${buildMobileSheet()}`;
         tries++;
       }
       if (appMod.getApps().length === 0) {
-        console.error('nav.js:App не инициализирован');
+        console.error('nav.js: Firebase App не инициализирован страницей за 5 секунд — профиль не может загрузиться.');
         return;
       }
 

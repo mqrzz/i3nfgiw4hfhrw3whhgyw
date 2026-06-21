@@ -306,8 +306,6 @@
       .an-user-btn.guest { padding: .5rem .7rem; }
       .an-user-btn.guest .an-uname { display: inline; max-width: 60px; }
     }
-
-    @media(max-width:768px) { .antviz-nav { display: none !important; } }
   `;
 
   const PUBLIC_LINKS = [

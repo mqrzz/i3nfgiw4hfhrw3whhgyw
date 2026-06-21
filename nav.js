@@ -1,5 +1,5 @@
 /**
- * nav.js — Antviz (простая версия)
+ * nav.js — Antviz (дизайн под главную страницу)
  * <script src="nav.js" data-page="home"></script>
  *
  * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
@@ -15,44 +15,54 @@
   const b      = depth > 0 ? '../' : '';
 
   /* ─────────────── CSS ───────────────
-     Палитра: фон почти чёрный с тёплым подтоном, один фиолетовый акцент,
-     без стекла/неона/inset-теней — плоско, контрастно, по делу. */
+     Палитра и формы взяты напрямую с главной страницы Antviz:
+     тёмная капсула (var(--dark)), зелёный акцент (var(--green)),
+     шрифт Geologica, скругления-«квадраты» (не pill), светлые
+     карточки для дропдауна — как остальные блоки сайта. */
   const CSS = `
     :root {
-      --an-bg:        #0a0a0c;
-      --an-surface:   #131316;
-      --an-line:      rgba(242,242,240,0.08);
-      --an-line-soft: rgba(242,242,240,0.05);
-      --an-ink:       #f2f2f0;
-      --an-ink-dim:   rgba(242,242,240,0.46);
-      --an-ink-faint: rgba(242,242,240,0.5);
-      --an-accent:    #6c63ff;
-      --an-accent-ink:#0a0a0c;
-      --an-warn:      #e8a23d;
+      --an-bg:        #191b1e;
+      --an-bg2:       #2b2f33;
+      --an-line:      rgba(255,255,255,.08);
+      --an-line-soft: rgba(255,255,255,.05);
+      --an-ink:       #ffffff;
+      --an-ink-dim:   rgba(255,255,255,.45);
+      --an-ink-faint: rgba(255,255,255,.3);
+      --an-green:     #1ede7b;
+      --an-green-h:   #1ac16b;
+      --an-green-ink: #191b1e;
+      --an-warn:      #f59e0b;
       --an-danger:    #e8634f;
+      --an-card:      #f9fafc;
+      --an-card-border: #dfe3e8;
+      --an-card-border2: #cbcdd6;
+      --an-card-ink:  #191b1e;
+      --an-card-muted:#707a8a;
+      --an-font: 'Geologica','Inter','Arial',sans-serif;
     }
 
     .antviz-nav {
-      position: fixed; top: 16px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 8px 0 20px;
-      height: 50px;
-      width: calc(100% - 40px); max-width: 1060px;
+      padding: 0 10px 0 26px;
+      height: 64px;
+      width: calc(100% - 40px); max-width: 1100px;
       background: var(--an-bg);
       border: 1px solid var(--an-line);
-      border-radius: 11px;
-      transition: border-color .2s;
+      border-radius: 24px;
+      transition: border-color .2s, background .2s;
+      font-family: var(--an-font);
     }
-    .antviz-nav:hover { border-color: rgba(242,242,240,0.14); }
+    .antviz-nav:hover { border-color: rgba(255,255,255,.14); }
 
     .an-logo {
-      font-family: 'Unbounded', sans-serif; font-weight: 600;
-      font-size: .82rem; letter-spacing: .01em;
+      font-family: var(--an-font); font-weight: 500;
+      font-size: .95rem; letter-spacing: -.01em;
       color: var(--an-ink); text-decoration: none;
-      display: flex; align-items: center; gap: 9px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
-    .an-logo img { width: 24px; height: 24px; border-radius: 6px; object-fit: cover; }
+    .an-logo img { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
 
     .an-center {
       position: absolute; left: 50%; transform: translateX(-50%);
@@ -60,161 +70,165 @@
     }
     .an-link {
       color: var(--an-ink-dim);
-      font-family: 'Onest', sans-serif; font-size: .8rem;
-      text-decoration: none; padding: .4rem .8rem;
-      border-radius: 8px; transition: color .15s;
+      font-family: var(--an-font); font-weight: 300; font-size: .88rem;
+      text-decoration: none; padding: .5rem .9rem;
+      border-radius: 10px; transition: color .15s, background .15s;
       white-space: nowrap; position: relative;
     }
-    .an-link:hover { color: var(--an-ink); }
-    .an-link.active { color: var(--an-ink); }
+    .an-link:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-link.active { color: var(--an-ink); font-weight: 500; }
     .an-link.active::after {
-      content: ''; position: absolute; left: .8rem; right: .8rem; bottom: 1px;
-      height: 1px; background: var(--an-accent);
+      content: ''; position: absolute; left: .9rem; right: .9rem; bottom: 2px;
+      height: 2px; border-radius: 2px; background: var(--an-green);
     }
 
-    .an-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .an-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 
     .an-cta {
-      display: none; align-items: center; gap: 6px;
-      background: var(--an-accent); color: var(--an-accent-ink);
-      font-family: 'Onest', sans-serif; font-size: .78rem; font-weight: 600;
-      text-decoration: none; padding: .44rem 1.05rem;
-      border-radius: 8px; border: none; cursor: pointer;
-      transition: opacity .15s;
+      display: none; align-items: center; gap: 8px;
+      background: var(--an-green); color: var(--an-green-ink);
+      font-family: var(--an-font); font-size: .85rem; font-weight: 500;
+      text-decoration: none; padding: .65rem 1.3rem;
+      border-radius: 14px; border: none; cursor: pointer;
+      transition: background .12s, transform .12s;
       white-space: nowrap;
     }
-    .an-cta:hover { opacity: .85; }
+    .an-cta:hover { background: var(--an-green-h); transform: translateY(-1px); }
     .an-cta.show { display: inline-flex; }
 
     .an-user { position: relative; display: flex; }
     .an-user-btn {
-      display: flex; align-items: center; gap: 8px;
+      display: flex; align-items: center; gap: 9px;
       background: none; border: 1px solid transparent;
-      border-radius: 9px; padding: 4px 10px 4px 4px;
-      cursor: pointer; transition: border-color .15s;
-      font-family: 'Onest', sans-serif; font-size: .78rem; color: var(--an-ink);
+      border-radius: 14px; padding: 5px 12px 5px 5px;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      font-family: var(--an-font); font-weight: 300; font-size: .85rem; color: var(--an-ink);
       text-decoration: none;
       position: relative;
     }
-    .an-user-btn:hover { border-color: var(--an-line); }
+    .an-user-btn:hover { border-color: var(--an-line); background: rgba(255,255,255,.04); }
 
-    .an-user-btn.guest { padding: .4rem .85rem; border: 1px solid var(--an-line); }
-    .an-user-btn.guest:hover { border-color: rgba(242,242,240,0.18); }
+    .an-user-btn.guest { padding: .55rem 1.1rem; border: 1px solid var(--an-line); border-radius: 14px; }
+    .an-user-btn.guest:hover { border-color: rgba(255,255,255,.2); }
     .an-user-btn.guest .an-avatar-ring { display: none; }
     .an-user-btn.guest .an-chevron { display: none; }
 
-    /* Аватар: квадрат со скруглением, без градиента — инициал на ровном
-       акцентном фоне. Кольцо появляется только когда есть непрочитанное —
-       единственный «декоративный» момент во всей навигации. */
+    /* Аватар: квадрат со скруглением в духе карточек сайта (border-radius
+       такой же логики, как .tier-badge / .rv-av), на зелёном фоне.
+       Кольцо появляется только когда есть непрочитанное. */
     .an-avatar-ring {
-      width: 28px; height: 28px; border-radius: 9px; flex-shrink: 0;
+      width: 32px; height: 32px; border-radius: 11px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       position: relative; padding: 2px;
     }
     .an-avatar-ring.notify {
-      background: conic-gradient(from -45deg, var(--an-warn), var(--an-accent) 60%);
+      background: conic-gradient(from -45deg, var(--an-warn), var(--an-green) 60%);
     }
     .an-avatar {
-      width: 100%; height: 100%; border-radius: 7px;
-      background: var(--an-accent);
+      width: 100%; height: 100%; border-radius: 9px;
+      background: var(--an-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: .68rem; font-weight: 700; color: var(--an-accent-ink);
+      font-size: .72rem; font-weight: 500; color: var(--an-green-ink);
       overflow: hidden;
     }
-    .an-avatar-ring.notify .an-avatar { border-radius: 6px; }
+    .an-avatar-ring.notify .an-avatar { border-radius: 8px; }
     .an-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
-    .an-uname { max-width: 90px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .an-chevron { width: 10px; height: 10px; opacity: .4; flex-shrink: 0; transition: transform .2s; }
+    .an-uname { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .an-chevron { width: 11px; height: 11px; opacity: .45; flex-shrink: 0; transition: transform .2s; }
     .an-user-btn[aria-expanded="true"] .an-chevron { transform: rotate(180deg); }
 
-    /* ── Дропдаун: плоская карточка, тонкая граница, без blur/inset-теней.
-       Единственный акцент — верхняя кромка цвета бренда. */
+    /* ── Дропдаун: светлая карточка, как остальные элементы сайта
+       (.rv, .type-card) — bg3, граница border, тень sh2, скругление 24px.
+       Акцент — зелёная кромка сверху вместо фиолетовой. */
     .an-dd {
-      position: absolute; top: calc(100% + 10px); right: 0;
-      background: var(--an-surface);
-      border: 1px solid var(--an-line);
-      border-radius: 13px; padding: 6px;
-      min-width: 232px;
-      box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+      position: absolute; top: calc(100% + 12px); right: 0;
+      background: var(--an-card);
+      border: 1.5px solid var(--an-card-border);
+      border-radius: 24px; padding: 8px;
+      min-width: 248px;
+      box-shadow: 0 8px 20px rgba(0,51,153,.08), 0 4px 8px rgba(0,51,153,.08);
       opacity: 0; pointer-events: none;
       transform: translateY(-6px);
       transform-origin: top right;
       transition: opacity .16s ease, transform .16s ease;
       z-index: 9999;
       overflow: hidden;
+      font-family: var(--an-font);
     }
     .an-dd::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--an-accent);
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--an-green);
     }
     .an-dd.open { opacity: 1; pointer-events: all; transform: translateY(0); }
 
     .an-dd-head {
-      display: flex; align-items: center; gap: 10px;
-      padding: 12px 8px 12px; margin-bottom: 2px;
-      border-bottom: 1px solid var(--an-line-soft);
+      display: flex; align-items: center; gap: 11px;
+      padding: 14px 10px 14px; margin-bottom: 2px;
+      border-bottom: 1px solid var(--an-card-border);
     }
     .an-dd-head-avatar {
-      width: 34px; height: 34px; border-radius: 9px;
-      background: var(--an-accent);
+      width: 38px; height: 38px; border-radius: 11px;
+      background: var(--an-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: .85rem; font-weight: 700; color: var(--an-accent-ink);
+      font-size: .9rem; font-weight: 500; color: var(--an-green-ink);
       flex-shrink: 0; overflow: hidden;
     }
     .an-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .an-dd-head-info { min-width: 0; flex: 1; }
     .an-dd-head-name {
-      font-family: 'Onest', sans-serif; font-size: .84rem; font-weight: 500;
-      color: var(--an-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-family: var(--an-font); font-size: .88rem; font-weight: 500;
+      color: var(--an-card-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      letter-spacing: -.01em;
     }
     .an-dd-head-email {
-      font-family: 'Onest', sans-serif; font-size: .7rem;
-      color: var(--an-ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      margin-top: 1px;
+      font-family: var(--an-font); font-weight: 300; font-size: .73rem;
+      color: var(--an-card-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      margin-top: 2px;
     }
 
     .an-dd-section {
-      padding: 12px 10px 5px;
+      padding: 14px 11px 6px;
       font-size: .68rem;
-      color: var(--an-ink-faint); font-weight: 500;
-      font-family: 'Onest', sans-serif;
+      color: var(--an-card-muted); font-weight: 500;
+      text-transform: uppercase; letter-spacing: .08em;
+      font-family: var(--an-font);
     }
     .an-dd-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 8px 9px; border-radius: 8px;
-      font-size: .82rem; color: rgba(242,242,240,0.72);
+      display: flex; align-items: center; gap: 11px;
+      padding: 10px 10px; border-radius: 12px;
+      font-size: .85rem; color: var(--an-card-ink); font-weight: 300;
       text-decoration: none; cursor: pointer;
-      transition: background .12s, color .12s;
-      font-family: 'Onest', sans-serif; border: none;
+      transition: background .12s, padding-left .12s;
+      font-family: var(--an-font); border: none;
       background: none; width: 100%; text-align: left;
       position: relative;
     }
-    .an-dd-item:hover { background: rgba(242,242,240,0.06); color: var(--an-ink); }
+    .an-dd-item:hover { background: var(--an-bg2,#f2f4f7); padding-left: 13px; }
     .an-dd-ico {
-      width: 17px; height: 17px; flex-shrink: 0;
+      width: 18px; height: 18px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      color: var(--an-ink-dim); transition: color .12s;
+      color: var(--an-card-muted); transition: color .12s;
     }
-    .an-dd-item:hover .an-dd-ico { color: var(--an-accent); }
-    .an-dd-item svg { width: 17px; height: 17px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .an-dd-item.red .an-dd-ico { color: rgba(232,99,79,0.7); }
+    .an-dd-item:hover .an-dd-ico { color: var(--an-green-h); }
+    .an-dd-item svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .an-dd-item.red .an-dd-ico { color: rgba(232,99,79,0.75); }
     .an-dd-item.red:hover .an-dd-ico { color: var(--an-danger); }
-    .an-dd-item.red { color: rgba(232,99,79,0.78); }
-    .an-dd-item.red:hover { background: rgba(232,99,79,0.08); color: var(--an-danger); }
+    .an-dd-item.red { color: rgba(217,90,72,0.92); }
+    .an-dd-item.red:hover { background: rgba(232,99,79,0.08); }
 
-    .an-dd-sep { height: 1px; background: var(--an-line-soft); margin: 5px 9px; }
+    .an-dd-sep { height: 1px; background: var(--an-card-border); margin: 6px 10px; }
 
     .an-dd-badge {
       margin-left: auto; flex-shrink: 0;
-      background: var(--an-accent); color: var(--an-accent-ink);
-      font-size: .64rem; font-weight: 700;
-      min-width: 17px; height: 17px; border-radius: 5px;
+      background: var(--an-green); color: var(--an-green-ink);
+      font-size: .66rem; font-weight: 500;
+      min-width: 18px; height: 18px; border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      padding: 0 5px; font-family: 'Onest', sans-serif;
+      padding: 0 5px; font-family: var(--an-font);
     }
     .an-dd-badge.warn { background: var(--an-warn); color: #1a1400; }
-    .an-dd-badge.dot { width: 6px; height: 6px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
+    .an-dd-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
 
     @media(max-width:768px) { .antviz-nav { display: none !important; } }
   `;
@@ -239,8 +253,7 @@
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
-  // Свой набор иконок: единая толщина линии (1.6), скруглённые углы,
-  // но формы более характерные — не дефолтный Feather-набор.
+  // Набор иконок: единая толщина линии (1.6), скруглённые углы.
   const DD_ITEMS = [
     { href: b+'profile',         icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M8 14.5c0-2 1.8-3.2 4-3.2s4 1.2 4 3.2"/><circle cx="12" cy="9" r="2.1"/>', label: 'Обзор кабинета' },
     { sep: true },

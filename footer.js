@@ -1,31 +1,30 @@
-// footer.js - универсальный подвал для всех страниц с мобильной навигацией
+// footer.js - универсальный подвал для всех страниц
 
 (function() {
     // Страницы БЕЗ мобильного меню
     const NO_MOBILE_NAV_PAGES = ['auth', 'profile', 'settings', 'orders', 'support', 'order'];
     
-    // Создаем стили для подвала
+    // Стили ТОЛЬКО для подвала — НИЧЕГО не трогают страницу
     const styles = `
-        * { box-sizing: border-box; }
-        body { margin:0; background:#0a0a0c; min-height:100vh; font-family:'Onest', sans-serif; }
-        
-        .footer {
+        .antviz-footer {
             padding: 4rem 5vw 2rem;
             border-top: 1px solid rgba(255,255,255,.1);
             background: #000000;
+            margin-top: auto;
+            font-family: 'Onest', sans-serif;
         }
-        .inner { max-width: 1200px; margin: 0 auto; }
+        .antviz-footer * { box-sizing: border-box; }
+        .antviz-footer .inner { max-width: 1200px; margin: 0 auto; }
         
-        /* верхний блок: лого + соцсети */
-        .top-grid {
+        .antviz-footer .top-grid {
             display: grid;
             grid-template-columns: auto 1fr;
             gap: 40px;
             padding-bottom: 60px;
             border-bottom: 1px solid rgba(255,255,255,.06);
         }
-        .brand-col { display: flex; flex-direction: column; }
-        .logo {
+        .antviz-footer .brand-col { display: flex; flex-direction: column; }
+        .antviz-footer .logo {
             display: inline-flex;
             align-items: center;
             gap: 9px;
@@ -36,18 +35,18 @@
             text-decoration: none;
             margin-bottom: 32px;
         }
-        .logo img {
+        .antviz-footer .logo img {
             width: 28px; height: 28px;
             border-radius: 7px;
             object-fit: cover;
         }
-        .contacts {
+        .antviz-footer .contacts {
             display: flex;
             flex-direction: column;
             gap: 20px;
             margin-top: auto;
         }
-        .contact-link {
+        .antviz-footer .contact-link {
             color: #f0f0f5;
             font-family: 'Unbounded', sans-serif;
             font-weight: 500;
@@ -56,8 +55,8 @@
             text-decoration: none;
             transition: color .2s;
         }
-        .contact-link:hover { color: #a78bfa; }
-        .contact-note {
+        .antviz-footer .contact-link:hover { color: #a78bfa; }
+        .antviz-footer .contact-note {
             display: block;
             color: rgba(255,255,255,.2);
             font-weight: 400;
@@ -66,11 +65,13 @@
             margin-top: 4px;
         }
         
-        .socials {
+        .antviz-footer .socials {
             display: flex;
             gap: 8px;
+            align-self: start;
+            justify-content: flex-end;
         }
-        .soc {
+        .antviz-footer .soc {
             width: 40px; height: 40px;
             border-radius: 12px;
             background: rgba(255,255,255,.04);
@@ -79,39 +80,39 @@
             text-decoration: none;
             transition: background .2s;
         }
-        .soc:hover { background: rgba(255,255,255,.08); }
-        .soc svg { width: 18px; height: 18px; }
+        .antviz-footer .soc:hover { background: rgba(255,255,255,.08); }
+        .antviz-footer .soc svg { width: 18px; height: 18px; }
         
-        /* группы ссылок */
-        .groups {
+        .antviz-footer .groups {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 40px;
+            padding-top: 60px;
+            padding-bottom: 48px;
         }
-        .group-title {
+        .antviz-footer .group-title {
             display: block;
             color: rgba(255,255,255,.2);
             font-size: 16px;
             margin-bottom: 16px;
         }
-        .group-items {
+        .antviz-footer .group-items {
             list-style: none;
             margin: 0; padding: 0;
             font-size: 16px;
             line-height: 1.6;
         }
-        .group-items li:not(:last-child) { margin-bottom: 12px; }
-        .group-items a {
+        .antviz-footer .group-items li:not(:last-child) { margin-bottom: 12px; }
+        .antviz-footer .group-items a {
             color: #cfcfd6;
             text-decoration: none;
             transition: color .18s;
         }
-        .group-items a:hover { color: #f0f0f5; }
-        .group-items a.cta { color: #cbb8ff; font-weight: 500; }
-        .group-items a.cta:hover { color: #ddd0ff; }
+        .antviz-footer .group-items a:hover { color: #f0f0f5; }
+        .antviz-footer .group-items a.cta { color: #cbb8ff; font-weight: 500; }
+        .antviz-footer .group-items a.cta:hover { color: #ddd0ff; }
         
-        /* нижняя строка */
-        .bottom {
+        .antviz-footer .bottom {
             padding-top: 40px;
             border-top: 1px solid rgba(255,255,255,.06);
             display: flex;
@@ -120,19 +121,19 @@
             flex-wrap: wrap;
             gap: 16px;
         }
-        .copy { color: rgba(255,255,255,.18); font-size: 16px; }
-        .legal-links {
+        .antviz-footer .copy { color: rgba(255,255,255,.18); font-size: 16px; }
+        .antviz-footer .legal-links {
             display: flex; flex-wrap: wrap; gap: 24px;
         }
-        .legal-links a {
+        .antviz-footer .legal-links a {
             color: rgba(255,255,255,.18);
             font-size: 16px;
             text-decoration: none;
             transition: color .18s;
         }
-        .legal-links a:hover { color: #999; }
+        .antviz-footer .legal-links a:hover { color: #999; }
         
-        .meta-note {
+        .antviz-footer .meta-note {
             grid-column: 1 / -1;
             color: rgba(255,255,255,.12);
             font-size: 13px;
@@ -140,10 +141,10 @@
             margin-top: 40px;
         }
         
-        .payment-block {
+        .antviz-footer .payment-block {
             margin-top: 20px;
         }
-        .payment-label {
+        .antviz-footer .payment-label {
             display: block;
             color: rgba(255,255,255,.2);
             font-weight: 400;
@@ -151,15 +152,15 @@
             letter-spacing: -.02em;
             margin-top: 6px;
         }
-        .payment-logo img {
+        .antviz-footer .payment-logo img {
             display: block;
             height: 28px;
             width: auto;
             transition: opacity .2s;
         }
-        .payment-logo:hover img { opacity: .75; }
+        .antviz-footer .payment-logo:hover img { opacity: .75; }
         
-        .legal-info {
+        .antviz-footer .legal-info {
             margin-top: 16px;
             color: rgba(255,255,255,.18);
             font-size: 13px;
@@ -167,13 +168,13 @@
         }
         
         @media (max-width: 1023px) {
-            .top-grid { grid-template-columns: 1fr; gap: 32px; padding-bottom: 32px; }
-            .contacts { margin-top: 0; }
-            .groups { grid-template-columns: 1fr 1fr; gap: 32px; }
-            .bottom { flex-direction: column; align-items: flex-start; }
+            .antviz-footer .top-grid { grid-template-columns: 1fr; gap: 32px; padding-bottom: 32px; }
+            .antviz-footer .contacts { margin-top: 0; }
+            .antviz-footer .groups { grid-template-columns: 1fr 1fr; gap: 32px; }
+            .antviz-footer .bottom { flex-direction: column; align-items: flex-start; }
         }
         @media (max-width: 600px) {
-            .groups { grid-template-columns: 1fr; gap: 24px; }
+            .antviz-footer .groups { grid-template-columns: 1fr; gap: 24px; }
         }
     `;
     
@@ -188,7 +189,7 @@
     
     // HTML структура подвала
     const footerHTML = `
-        <footer class="footer">
+        <footer class="antviz-footer">
             <div class="inner">
                 <div class="top-grid">
                     <div class="brand-col">
@@ -218,7 +219,7 @@
                         </div>
                     </div>
                     
-                    <div class="socials" style="align-self:start; justify-content:flex-end;">
+                    <div class="socials">
                         <a href="https://t.me/antviz_official" class="soc" target="_blank" rel="noopener" aria-label="Telegram">
                             <svg viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/>
@@ -242,7 +243,7 @@
                     </div>
                 </div>
                 
-                <div class="groups" style="padding-top:60px; padding-bottom:48px;">
+                <div class="groups">
                     <div>
                         <span class="group-title">Навигация</span>
                         <ul class="group-items">
@@ -288,7 +289,6 @@
                         <a href="${base}p_oferta.docx" download="p_oferta.docx">Публичная оферта</a>
                     </div>
                 </div>
-                
                 
                 <div class="legal-info">
                     Самозанятый: Конухин Алексей Денисович &nbsp;·&nbsp; ИНН: 701508269796

@@ -166,58 +166,14 @@
             line-height: 1.7;
         }
         
-        /* Мобильный навбар */
-        .antviz-mobile-nav {
-            display: none;
-            position: fixed;
-            bottom: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 200;
-            background: rgba(22,22,30,0.92);
-            backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,.12);
-            border-radius: 28px;
-            padding: 8px 6px;
-            width: calc(100% - 24px);
-            max-width: 360px;
-            justify-content: space-around;
-            align-items: center;
-            box-shadow: 0 8px 40px rgba(0,0,0,.5);
-        }
-        .antviz-mobile-nav__item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 3px;
-            text-decoration: none;
-            color: #777789;
-            font-size: .6rem;
-            font-family: 'Onest', sans-serif;
-            padding: 6px 10px;
-            border-radius: 14px;
-            transition: background .18s, color .18s;
-        }
-        .antviz-mobile-nav__item svg { width: 20px; height: 20px; }
-        .antviz-mobile-nav__item.active {
-            color: #a78bfa;
-            background: rgba(108,99,255,.13);
-        }
-        
         @media (max-width: 1023px) {
             .top-grid { grid-template-columns: 1fr; gap: 32px; padding-bottom: 32px; }
             .contacts { margin-top: 0; }
             .groups { grid-template-columns: 1fr 1fr; gap: 32px; }
             .bottom { flex-direction: column; align-items: flex-start; }
-            .antviz-mobile-nav { display: flex !important; }
-            .footer { padding-bottom: 90px; }
         }
         @media (max-width: 600px) {
             .groups { grid-template-columns: 1fr; gap: 24px; }
-        }
-        
-        .footer.no-mobile-nav {
-            padding-bottom: 2.5rem !important;
         }
     `;
     
@@ -232,7 +188,7 @@
     
     // HTML структура подвала
     const footerHTML = `
-        <footer class="footer${showMobileNav ? '' : ' no-mobile-nav'}">
+        <footer class="footer">
             <div class="inner">
                 <div class="top-grid">
                     <div class="brand-col">
@@ -343,39 +299,6 @@
                 </div>
             </div>
         </footer>
-        
-        ${showMobileNav ? `
-        <nav class="antviz-mobile-nav">
-            <a href="https://antviz.ru/" class="antviz-mobile-nav__item${activePage === 'home' ? ' active' : ''}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
-                    <path d="M9 21V12h6v9"/>
-                </svg>
-                Главная
-            </a>
-            <a href="${base}order" class="antviz-mobile-nav__item${activePage === 'order' ? ' active' : ''}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
-                Заказать
-            </a>
-            <a href="${base}faq" class="antviz-mobile-nav__item${activePage === 'faq' ? ' active' : ''}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
-                    <circle cx="12" cy="17" r=".5" fill="currentColor"/>
-                </svg>
-                FAQ
-            </a>
-            <a href="${base}profile" class="antviz-mobile-nav__item${activePage === 'profile' ? ' active' : ''}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
-                    <circle cx="12" cy="7" r="4"/>
-                </svg>
-                Кабинет
-            </a>
-        </nav>
-        ` : ''}
     `;
     
     // Функция для вставки подвала

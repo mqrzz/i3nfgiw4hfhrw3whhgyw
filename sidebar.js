@@ -25,13 +25,13 @@
 
   const CSS = `
     :root{
-      --sb-w: 248px;
+      --sb-w: 220px;
       --sb-top: 104px;
     }
     .sb-shell{
-      display:flex; align-items:flex-start; gap:48px;
-      max-width:1100px; margin:0 auto;
-      padding:104px 1.5rem 100px;
+      display:flex; align-items:flex-start; gap:32px;
+      max-width:1400px; margin:0;
+      padding:104px 2rem 100px 2.5rem;
     }
     .sb-nav{
       width:var(--sb-w); flex-shrink:0;

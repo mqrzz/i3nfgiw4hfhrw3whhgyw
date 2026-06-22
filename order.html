@@ -25,13 +25,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   --font:'Geologica','Inter','Arial',sans-serif;
   --sp-l:100px;
 }
+@media(max-width:768px){:root{--sp-l:60px}}
+@media(max-width:480px){:root{--sp-l:48px}}
+
 .container{max-width:1328px;margin:0 auto;padding:0 20px;width:100%}
 @media(min-width:1024px){.container{padding:0 64px}}
 @media(min-width:1280px){.container{padding:0 96px}}
+
 .reveal{opacity:0;transform:translateY(24px);transition:opacity .65s ease,transform .65s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
+
 .eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
 .eyebrow.g{color:var(--green)}
+
+.section-h2{font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06}
+
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:17px 32px;font-size:16px;letter-spacing:-0.01em;transition:background .1s,transform .12s;white-space:nowrap}
 .btn:hover{transform:translateY(-1px)}
 .btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:var(--dark2)}
@@ -39,6 +47,23 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .btn-inv{background:transparent;border:1.5px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7)}
 .btn-inv:hover{border-color:rgba(255,255,255,.4);color:#fff}
 .btn-lg{padding:20px 48px;font-size:18px;border-radius:12px}
+
+/* PROGRESS BAR */
+.progress-bar{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0}
+.progress-inner{display:flex;align-items:stretch;max-width:1328px;margin:0 auto;padding:0 20px}
+@media(min-width:1024px){.progress-inner{padding:0 64px}}
+@media(min-width:1280px){.progress-inner{padding:0 96px}}
+.progress-step{display:flex;align-items:center;gap:8px;padding:16px 0;flex:1;border-bottom:2px solid transparent;transition:border-color .3s;cursor:pointer;color:var(--border2);font-size:13px;font-weight:300;white-space:nowrap;text-decoration:none}
+.progress-step:hover{color:var(--muted)}
+.progress-step.active{border-bottom-color:var(--green);color:var(--text)}
+.progress-step.done{border-bottom-color:var(--border2);color:var(--muted)}
+.progress-step + .progress-step{margin-left:24px}
+.progress-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;background:var(--bg2);color:var(--border2);flex-shrink:0;transition:background .3s,color .3s}
+.progress-step.active .progress-num{background:var(--green);color:var(--dark)}
+.progress-step.done .progress-num{background:var(--border);color:var(--muted)}
+@media(max-width:600px){.progress-step-label{display:none}.progress-step{flex:none}.progress-inner{gap:4px}}
+
+/* HERO */
 .hero-wrap{padding:var(--sp-l) 0 0;background:var(--bg)}
 .hero-block{background:var(--dark);border-radius:64px;padding:80px 100px;text-align:center;overflow:hidden}
 @media(max-width:860px){.hero-block{padding:48px 32px;border-radius:32px}}
@@ -47,12 +72,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .hero-block h1 em{font-style:normal;color:var(--green)}
 .hero-block>p{font-size:clamp(16px,1.5vw,20px);color:rgba(255,255,255,.45);font-weight:300;line-height:1.5;max-width:560px;margin:0 auto 40px}
 .hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.hero-bar{border-top:1px solid rgba(255,255,255,.08);margin-top:60px;display:grid;grid-template-columns:repeat(4,1fr)}
-@media(max-width:720px){.hero-bar{grid-template-columns:1fr 1fr}}
-.hero-stat{padding:32px 0;border-right:1px solid rgba(255,255,255,.07);text-align:center}
-.hero-stat:last-child{border-right:none}
-.hero-stat-n{font-size:clamp(24px,3vw,40px);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
-.hero-stat-l{font-size:13px;color:rgba(255,255,255,.3);font-weight:300}
+
+/* FORMAT STEP */
 .types-wrap{padding:var(--sp-l) 0;background:var(--bg)}
 .types-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px}
 @media(max-width:860px){.types-grid{grid-template-columns:1fr}}
@@ -71,6 +92,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .type-feat::before{content:'--';color:var(--border2);flex-shrink:0}
 .type-card.sel .type-feat::before{color:var(--green-d)}
 .custom-wrap[hidden]{display:none}
+
+/* NAV HINT */
+.nav-hint{margin-top:40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.nav-btn{background:var(--green);color:var(--dark);border:none;font-family:var(--font);font-size:16px;font-weight:500;padding:18px 36px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .15s,transform .12s}
+.nav-btn:hover:not(:disabled){background:var(--green-h);transform:translateY(-1px)}
+.nav-btn:disabled{background:var(--bg2);color:var(--border2);cursor:default;transform:none}
+.nav-hint-note{font-size:13px;color:var(--border2);font-weight:300}
+
+/* TIERS */
 .tiers-wrap{padding:var(--sp-l) 0;background:var(--bg2)}
 .tiers-grid{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:16px;margin-top:48px}
 @media(max-width:900px){.tiers-grid{grid-template-columns:1fr}}
@@ -95,6 +125,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .tier.dark .tier-feats li{color:rgba(255,255,255,.4)}
 .tier-feats li::before{content:'--';color:var(--border2);flex-shrink:0}
 .tier.dark .tier-feats li::before{color:var(--green)}
+
+/* EXTRAS / CALC */
 .calc-wrap{padding:var(--sp-l) 0;background:var(--bg2)}
 .calc-block{background:var(--dark);border-radius:64px;padding:64px 80px}
 @media(max-width:860px){.calc-block{padding:48px 32px;border-radius:32px}}
@@ -119,7 +151,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .dopt{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.4);font-family:var(--font);font-size:13px;font-weight:300;padding:8px 10px;border-radius:8px;cursor:pointer;transition:all .15s;text-align:center}
 .dopt:hover{border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7)}
 .dopt.sel{border-color:var(--green);color:var(--green);background:rgba(30,222,123,.1)}
-.calc-result{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:32px 28px;position:sticky;top:24px}
+.calc-result{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:32px 28px;position:sticky;top:80px}
 .calc-result-lbl{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:8px}
 .calc-total{font-size:56px;font-weight:500;letter-spacing:-.04em;color:#fff;line-height:1;margin-bottom:4px;transition:color .25s}
 .calc-total.flash{color:var(--green)}
@@ -127,17 +159,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .calc-rows{display:flex;flex-direction:column;margin-bottom:24px}
 .calc-row{display:flex;justify-content:space-between;padding:8px 0;font-size:13px;border-bottom:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.4);font-weight:300}
 .calc-row:last-child{border-bottom:none}
-.why-wrap{padding:var(--sp-l) 0;background:var(--bg)}
-.why-inner{background:var(--bg2);border-radius:64px;padding:64px 80px}
-@media(max-width:860px){.why-inner{padding:48px 32px;border-radius:32px}}
-.why-strips{display:flex;flex-direction:column;margin-top:48px}
-.why-strip{display:grid;grid-template-columns:56px 1fr;gap:40px;padding:24px 0;border-bottom:1px solid var(--border);align-items:start;transition:padding-left .15s}
-.why-strip:last-child{border-bottom:none}
-.why-strip:hover{padding-left:10px}
-.why-n{font-size:13px;font-weight:500;color:var(--border2);letter-spacing:.06em;padding-top:5px}
-.why-body strong{font-size:clamp(18px,2vw,24px);font-weight:500;letter-spacing:-.02em;display:block;margin-bottom:6px}
-.why-body p{font-size:15px;color:var(--muted);font-weight:300;line-height:1.6}
-@media(max-width:600px){.why-strip{grid-template-columns:1fr;gap:6px}}
+
+/* DETAILS */
 .details-wrap{padding:var(--sp-l) 0;background:var(--bg)}
 .details-inner{max-width:760px;margin:0 auto}
 .field{margin-bottom:28px}
@@ -148,7 +171,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .field-textarea{resize:vertical;min-height:110px;line-height:1.6}
 .field-info{background:var(--green-lighter);border:1px solid var(--green-light);border-radius:12px;padding:14px 16px;font-size:14px;color:var(--green-d);font-weight:300;line-height:1.55;margin-bottom:12px}
 .filezone{border:1.5px dashed var(--border);border-radius:16px;padding:24px;text-align:center;cursor:pointer;transition:border-color .2s,background .15s;background:var(--bg3)}
-.filezone:hover{border-color:var(--border2);background:var(--bg)}
+.filezone:hover,.filezone.dragover{border-color:var(--green-d);background:var(--green-lighter)}
 .filezone-text{font-size:14px;color:var(--muted);font-weight:300}
 .filezone-text strong{color:var(--text);font-weight:500}
 .fav-preview{display:none;margin-top:12px;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
@@ -171,20 +194,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .agree-txt a:hover{text-decoration:underline}
 .err-msg{color:#dc2626;font-size:13px;margin-top:6px;display:none;font-weight:300}
 .err-msg.show{display:block}
-.submit-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:40px;padding-top:32px;border-top:1px solid var(--border);flex-wrap:wrap}
+
+/* ORDER SUMMARY CART */
+.order-summary{background:var(--bg2);border:1.5px solid var(--border);border-radius:32px;padding:36px 40px;margin-top:40px;margin-bottom:40px}
+@media(max-width:600px){.order-summary{padding:28px 24px;border-radius:24px}}
+.order-summary-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:24px}
+.order-summary-rows{display:flex;flex-direction:column;gap:0}
+.order-summary-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-bottom:1px solid var(--border);font-size:15px;font-weight:300;color:var(--text)}
+.order-summary-row:first-child{padding-top:0}
+.order-summary-row:last-child{border-bottom:none;padding-bottom:0}
+.order-summary-row .label{color:var(--muted)}
+.order-summary-row .val{font-weight:500;text-align:right}
+.order-summary-row.discount .val{color:var(--green-d)}
+.order-summary-row.total{border-top:2px solid var(--border);margin-top:4px;padding-top:20px}
+.order-summary-row.total .label{font-size:14px;font-weight:500;color:var(--text);text-transform:uppercase;letter-spacing:.06em}
+.order-summary-row.total .val{font-size:clamp(28px,4vw,40px);font-weight:500;letter-spacing:-.03em;color:var(--text)}
+.order-summary-empty{font-size:14px;color:var(--border2);font-weight:300;padding:8px 0}
+
+.submit-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:8px;flex-wrap:wrap}
 .submit-note{font-size:14px;color:var(--muted);font-weight:300;line-height:1.5}
 .btn-submit{background:var(--green);color:var(--dark);border:none;font-family:var(--font);font-size:17px;font-weight:500;border-radius:12px;padding:20px 48px;cursor:pointer;transition:background .15s,transform .12s,opacity .2s;display:flex;align-items:center;gap:8px}
 .btn-submit:hover:not(:disabled){background:var(--green-h);transform:translateY(-1px)}
 .btn-submit:disabled{opacity:.35;cursor:default}
-.nav-hint{margin-top:32px;text-align:right}
-.nav-hint button{background:var(--dark);color:#fff;border:none;font-family:var(--font);font-size:15px;font-weight:500;padding:14px 28px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:background .15s}
-.nav-hint button:hover{background:var(--dark2)}
-.nav-hint button:disabled{opacity:.3;cursor:default}
-.cta-wrap{padding:0 0 var(--sp-l);background:var(--bg)}
-.cta-block{background:var(--bg2);border-radius:64px;padding:80px 100px;text-align:center;border:1px solid var(--border)}
-@media(max-width:860px){.cta-block{padding:48px 32px;border-radius:32px}}
-.cta-block h2{font-size:clamp(36px,6vw,72px);font-weight:500;letter-spacing:-.04em;margin-bottom:12px;line-height:1.04}
-.cta-block p{font-size:18px;color:var(--muted);font-weight:300;margin-bottom:40px;line-height:1.5}
+
+/* TOAST / COOKIE */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);z-index:300;padding:10px 22px;border-radius:99px;font-size:14px;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:var(--green);color:var(--dark)}.toast.info{background:var(--dark);color:#fff}.toast.error{background:#dc2626;color:#fff}.toast.warn{background:#f59e0b;color:#1a1206}
@@ -200,6 +233,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <body>
 <script src="nav.js" data-page="order"></script>
 
+<!-- PROGRESS BAR -->
+<div class="progress-bar" id="progressBar">
+  <div class="progress-inner">
+    <a class="progress-step" id="ps1" href="#step-format" onclick="smoothTo('step-format',event)">
+      <span class="progress-num">1</span>
+      <span class="progress-step-label">Формат</span>
+    </a>
+    <a class="progress-step" id="ps2" href="#step-tier" onclick="smoothTo('step-tier',event)">
+      <span class="progress-num">2</span>
+      <span class="progress-step-label">Масштаб</span>
+    </a>
+    <a class="progress-step" id="ps3" href="#step-extras" onclick="smoothTo('step-extras',event)">
+      <span class="progress-num">3</span>
+      <span class="progress-step-label">Опции</span>
+    </a>
+    <a class="progress-step" id="ps4" href="#step-details" onclick="smoothTo('step-details',event)">
+      <span class="progress-num">4</span>
+      <span class="progress-step-label">Детали</span>
+    </a>
+  </div>
+</div>
+
 <section class="hero-wrap">
   <div class="container">
     <div class="hero-block reveal">
@@ -207,14 +262,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <h1>Сайт под ключ —<br/><em>за четыре шага</em></h1>
       <p>Выберите формат и масштаб, включите нужные опции — стоимость считается сразу. Ответим в течение часа.</p>
       <div class="hero-btns">
-        <a href="#step-format" class="btn btn-green btn-lg">Начать оформление</a>
+        <a href="#step-format" class="btn btn-green btn-lg" onclick="smoothTo('step-format',event)">Начать оформление</a>
         <a href="/" class="btn btn-inv btn-lg">На главную</a>
-      </div>
-      <div class="hero-bar">
-        <div class="hero-stat"><div class="hero-stat-n">от 3 900 ₽</div><div class="hero-stat-l">цена лендинга</div></div>
-        <div class="hero-stat"><div class="hero-stat-n">~2 дня</div><div class="hero-stat-l">срок запуска</div></div>
-        <div class="hero-stat"><div class="hero-stat-n">0 ₽/мес</div><div class="hero-stat-l">хостинг навсегда</div></div>
-        <div class="hero-stat"><div class="hero-stat-n">100%</div><div class="hero-stat-l">код — ваш</div></div>
       </div>
     </div>
   </div>
@@ -223,7 +272,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <section id="step-format" class="types-wrap">
   <div class="container">
     <p class="eyebrow reveal">Шаг 01 — Формат</p>
-    <h2 class="reveal" style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06">С чего начнём?</h2>
+    <h2 class="section-h2 reveal">С чего начнём?</h2>
     <p class="reveal" style="font-size:17px;color:var(--muted);font-weight:300;margin-top:12px;max-width:500px;line-height:1.6">Выберите формат, ближе всего к вашей задаче.</p>
     <div class="types-grid">
       <div class="type-card reveal" data-format="landing">
@@ -271,14 +320,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <label class="field-label" for="formatNote">В двух словах, что нужно</label>
       <textarea class="field-textarea" id="formatNote" placeholder="Например: квиз для отбора заявок, портал с личным кабинетом..."></textarea>
     </div>
-    <div class="nav-hint reveal"><button type="button" id="toTiersBtn" disabled onclick="document.getElementById('step-tier').scrollIntoView({behavior:'smooth'})">Выбрать масштаб →</button></div>
+    <div class="nav-hint reveal">
+      <button type="button" class="nav-btn" id="toTiersBtn" disabled onclick="smoothTo('step-tier')">
+        Выбрать масштаб
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="nav-hint-note" id="formatHint">Сначала выберите формат</span>
+    </div>
   </div>
 </section>
 
 <section id="step-tier" class="tiers-wrap">
   <div class="container">
     <p class="eyebrow reveal">Шаг 02 — Масштаб</p>
-    <h2 class="reveal" style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06">Какой масштаб нужен?</h2>
+    <h2 class="section-h2 reveal">Какой масштаб нужен?</h2>
     <div class="tiers-grid">
       <div class="tier reveal" data-tier="start">
         <div class="tier-price">3 900 <sup>₽</sup></div>
@@ -306,7 +361,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         </ul>
       </div>
     </div>
-    <div class="nav-hint reveal"><button type="button" id="toExtrasBtn" disabled onclick="document.getElementById('step-extras').scrollIntoView({behavior:'smooth'})">Выбрать опции →</button></div>
+    <div class="nav-hint reveal">
+      <button type="button" class="nav-btn" id="toExtrasBtn" disabled onclick="smoothTo('step-extras')">
+        Выбрать опции
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="nav-hint-note" id="tierHint">Сначала выберите тариф</span>
+    </div>
   </div>
 </section>
 
@@ -314,7 +375,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   <div class="container">
     <div class="calc-block">
       <p class="eyebrow g reveal">Шаг 03 — Опции</p>
-      <h2 class="reveal" style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;color:#fff;line-height:1.06">Что добавить?</h2>
+      <h2 class="section-h2 reveal" style="color:#fff">Что добавить?</h2>
       <div class="calc-grid">
         <div>
           <div class="calc-lbl" style="margin-top:0">Дополнения к заказу</div>
@@ -356,24 +417,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
             <div class="calc-total" id="calcTotal">0 ₽</div>
             <div class="calc-bd" id="calcBd">Выберите тариф выше</div>
             <div class="calc-rows" id="calcRows"></div>
-            <button type="button" class="btn btn-green" style="width:100%;justify-content:center;font-size:15px;padding:14px 24px" onclick="document.getElementById('step-details').scrollIntoView({behavior:'smooth'})">К деталям заказа →</button>
+            <button type="button" class="btn btn-green" style="width:100%;justify-content:center;font-size:15px;padding:14px 24px" onclick="smoothTo('step-details')">К деталям заказа →</button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="why-wrap">
-  <div class="container">
-    <div class="why-inner">
-      <p class="eyebrow reveal">Как это устроено</p>
-      <h2 class="reveal" style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06">От заявки<br/>до готового сайта</h2>
-      <div class="why-strips">
-        <div class="why-strip reveal"><span class="why-n">01</span><div class="why-body"><strong>Оставляете заявку</strong><p>Заполняете форму ниже — займёт 5 минут. Описываете проект в свободном виде.</p></div></div>
-        <div class="why-strip reveal"><span class="why-n">02</span><div class="why-body"><strong>Обсуждаем детали</strong><p>Созваниваемся или пишем в чат — согласовываем стиль, контент и функционал. Оплата онлайн через Robokassa: СБП, карты, T-Pay.</p></div></div>
-        <div class="why-strip reveal"><span class="why-n">03</span><div class="why-body"><strong>Разрабатываем</strong><p>Вёрстка и логика вручную. Уникальный дизайн, адаптив под все устройства. Без шаблонов.</p></div></div>
-        <div class="why-strip reveal"><span class="why-n">04</span><div class="why-body"><strong>Публикуем и передаём</strong><p>Размещаем на GitHub Pages — SSL автоматически. Передаём репозиторий и все доступы. Код полностью ваш.</p></div></div>
       </div>
     </div>
   </div>
@@ -383,28 +429,32 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   <div class="container">
     <div class="details-inner">
       <p class="eyebrow reveal">Шаг 04 — Детали</p>
-      <h2 class="reveal" style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06;margin-bottom:40px">Последний шаг</h2>
+      <h2 class="section-h2 reveal" style="margin-bottom:40px">Расскажите о проекте</h2>
+
       <div class="field reveal">
         <label class="field-label" for="briefText">О проекте</label>
         <textarea class="field-textarea" id="briefText" placeholder="Чем занимается компания, что должно быть на сайте, примеры стиля которые нравятся..."></textarea>
       </div>
+
       <div class="field reveal">
         <label class="field-label">Фавикон <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">(необязательно)</span></label>
         <div class="field-info"><strong>Фавикон</strong> — маленькая иконка во вкладке браузера. Обычно логотип 32×32 px. PNG, ICO или SVG.</div>
         <div class="filezone" id="favZone">
           <input type="file" id="fFav" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none"/>
-          <div class="filezone-text"><strong>Нажмите</strong>, чтобы загрузить файл</div>
+          <div class="filezone-text"><strong>Нажмите или перетащите</strong> файл сюда</div>
         </div>
         <div class="fav-preview" id="favPreview"></div>
       </div>
+
       <div class="field reveal">
         <label class="field-label">Материалы <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">фото, PDF, брендбук</span></label>
         <div class="filezone" id="filesZone">
           <input type="file" id="fFiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none"/>
-          <div class="filezone-text"><strong>Нажмите</strong> или перетащите файлы · до 10 МБ каждый</div>
+          <div class="filezone-text"><strong>Нажмите или перетащите</strong> файлы · до 10 МБ каждый</div>
         </div>
         <div class="chips" id="fileChips"></div>
       </div>
+
       <div class="field reveal">
         <label class="field-label">Промокод <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">(если есть)</span></label>
         <div class="promo-row">
@@ -413,28 +463,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         </div>
         <div class="promo-fb" id="promoFb"></div>
       </div>
+
+      <!-- ORDER SUMMARY -->
+      <div class="order-summary reveal" id="orderSummary">
+        <div class="order-summary-title">Ваш заказ</div>
+        <div class="order-summary-rows" id="summaryRows">
+          <div class="order-summary-empty">Выберите формат и тариф выше, чтобы увидеть состав заказа.</div>
+        </div>
+      </div>
+
       <div class="agree-row reveal" id="agreeRow">
         <div class="agree-box" id="agreeBox"></div>
         <div class="agree-txt">Принимаю <a href="rules" target="_blank">правила сервиса</a> и согласен на обработку персональных данных</div>
       </div>
       <div class="err-msg" id="errAgree">Нужно принять правила сервиса, чтобы продолжить</div>
+
       <div class="submit-row reveal">
         <p class="submit-note">Оплата онлайн через Robokassa.<br/>СБП, карты, T-Pay, SberPay. Чек сразу.</p>
         <button type="button" class="btn-submit" id="submitBtn" disabled>
-          Отправить заявку
+          Оплатить
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-    </div>
-  </div>
-</section>
-
-<section class="cta-wrap">
-  <div class="container">
-    <div class="cta-block reveal">
-      <h2>Есть вопросы?</h2>
-      <p>Напишите нам — ответим в чате поддержки в течение часа.</p>
-      <a href="profile#tickets" class="btn btn-dark btn-lg">Открыть чат поддержки</a>
     </div>
   </div>
 </section>
@@ -444,6 +494,30 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   <button class="cookie-btn" onclick="acceptCookies()">Принять</button>
 </div>
 <div class="toast" id="ovToast"></div>
+
+<script>
+function smoothTo(id,e){if(e)e.preventDefault();const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
+
+// Progress bar highlight
+const sections=['step-format','step-tier','step-extras','step-details'];
+const pSteps=[document.getElementById('ps1'),document.getElementById('ps2'),document.getElementById('ps3'),document.getElementById('ps4')];
+function updateProgress(){
+  let active=0;
+  sections.forEach((id,i)=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    const rect=el.getBoundingClientRect();
+    if(rect.top<=120)active=i;
+  });
+  pSteps.forEach((s,i)=>{
+    s.classList.remove('active','done');
+    if(i===active)s.classList.add('active');
+    else if(i<active)s.classList.add('done');
+  });
+}
+window.addEventListener('scroll',updateProgress,{passive:true});
+updateProgress();
+</script>
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
@@ -487,8 +561,14 @@ document.querySelectorAll('.tier[data-tier]').forEach(card=>{
 
 function updateUI(){
   const fOk=!!state.format&&(state.format!=='custom'||state.formatNote.trim().length>0);
-  document.getElementById('toTiersBtn').disabled=!fOk;
-  document.getElementById('toExtrasBtn').disabled=!state.tier;
+  const tBtn=document.getElementById('toTiersBtn');
+  const fHint=document.getElementById('formatHint');
+  const eBtn=document.getElementById('toExtrasBtn');
+  const tHint=document.getElementById('tierHint');
+  tBtn.disabled=!fOk;
+  fHint.style.display=fOk?'none':'';
+  eBtn.disabled=!state.tier;
+  tHint.style.display=state.tier?'none':'';
   document.getElementById('submitBtn').disabled=!state.format||!state.tier||!agreed;
 }
 
@@ -526,25 +606,45 @@ document.getElementById('promoBtn').addEventListener('click',async()=>{
 
 function compressImg(file,maxDim,q,mime){return new Promise((res,rej)=>{const u=URL.createObjectURL(file);const img=new Image();img.onload=()=>{let{width:w,height:h}=img;if(w>maxDim||h>maxDim){const r=Math.min(maxDim/w,maxDim/h);w=Math.round(w*r);h=Math.round(h*r);}const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');if((mime||'image/jpeg')==='image/jpeg'){ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);}ctx.drawImage(img,0,0,w,h);URL.revokeObjectURL(u);try{res(c.toDataURL(mime||'image/jpeg',q));}catch(err){rej(err);}}; img.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('fail'));};img.src=u;});}
 
+// Drag-and-drop: favZone
+['dragenter','dragover'].forEach(ev=>document.getElementById('favZone').addEventListener(ev,e=>{e.preventDefault();document.getElementById('favZone').classList.add('dragover');}));
+['dragleave','drop'].forEach(ev=>document.getElementById('favZone').addEventListener(ev,e=>{e.preventDefault();document.getElementById('favZone').classList.remove('dragover');}));
+document.getElementById('favZone').addEventListener('drop',async e=>{
+  const file=e.dataTransfer.files[0];if(!file)return;
+  await handleFavFile(file);
+});
 document.getElementById('favZone').addEventListener('click',()=>document.getElementById('fFav').click());
 document.getElementById('fFav').addEventListener('change',async e=>{
   const file=e.target.files[0];if(!file)return;
+  await handleFavFile(file);
+});
+async function handleFavFile(file){
   if(file.size>5*1024*1024){toast('Фавикон больше 5 МБ','error');return;}
   let dataUrl;try{dataUrl=await compressImg(file,512,.9,'image/png');}catch(err){toast('Не получилось обработать фавикон','error');return;}
   favFile={name:file.name,type:'image/png',dataUrl};
   const p=document.getElementById('favPreview');p.style.display='flex';p.innerHTML=`<img src="${dataUrl}" alt=""> ${escH(file.name)} <button type="button" id="favClear">×</button>`;
   document.getElementById('favClear').addEventListener('click',()=>{favFile=null;p.style.display='none';p.innerHTML='';document.getElementById('fFav').value='';});
-});
+}
 
+// Drag-and-drop: filesZone
+['dragenter','dragover'].forEach(ev=>document.getElementById('filesZone').addEventListener(ev,e=>{e.preventDefault();document.getElementById('filesZone').classList.add('dragover');}));
+['dragleave','drop'].forEach(ev=>document.getElementById('filesZone').addEventListener(ev,e=>{e.preventDefault();document.getElementById('filesZone').classList.remove('dragover');}));
+document.getElementById('filesZone').addEventListener('drop',async e=>{
+  await handleFiles(Array.from(e.dataTransfer.files));
+});
 document.getElementById('filesZone').addEventListener('click',()=>document.getElementById('fFiles').click());
 document.getElementById('fFiles').addEventListener('change',async e=>{
-  for(const f of Array.from(e.target.files)){
+  await handleFiles(Array.from(e.target.files));
+  e.target.value='';
+});
+async function handleFiles(files){
+  for(const f of files){
     if(uploadedFiles.find(u=>u.name===f.name))continue;
     if(f.type&&f.type.startsWith('image/')){try{const d=await compressImg(f,1600,.72,'image/jpeg');if(d.length*0.75>900*1024){toast(f.name+': слишком тяжёлый','error');continue;}uploadedFiles.push({name:f.name,type:'image/jpeg',size:Math.round(d.length*0.75),dataUrl:d});}catch(err){toast('Не удалось: '+f.name,'error');}}
     else{if(f.size>700*1024){toast(f.name+': больше 700 КБ — пришлите в чат поддержки','error');continue;}uploadedFiles.push(f);}
   }
-  renderChips();e.target.value='';
-});
+  renderChips();
+}
 function renderChips(){
   const el=document.getElementById('fileChips');el.innerHTML='';
   uploadedFiles.forEach((f,i)=>{const c=document.createElement('div');c.className='chip';c.innerHTML=escH(f.name)+' <button type="button">×</button>';c.querySelector('button').addEventListener('click',()=>{uploadedFiles.splice(i,1);renderChips();});el.appendChild(c);});
@@ -571,12 +671,23 @@ function calcAmounts(){
 
 function recalc(){
   const{rows,discount,total}=calcAmounts();
+  // mini calc (step 3)
   const el=document.getElementById('calcTotal');el.textContent=state.tier?fmt(total)+' ₽':'0 ₽';
   el.classList.add('flash');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('flash'),350);
   document.getElementById('calcBd').textContent=rows.length?rows.map(r=>r.label).join(' + '):'Выберите тариф выше';
   let html=rows.map(r=>`<div class="calc-row"><span>${escH(r.label)}</span><span>${r.free?'Бесплатно':fmt(r.amount)+' ₽'}</span></div>`).join('');
   if(discount>0&&state.promo)html+=`<div class="calc-row" style="color:var(--green)"><span>Промокод ${escH(state.promo.code)}</span><span>−${fmt(discount)} ₽</span></div>`;
   document.getElementById('calcRows').innerHTML=html;
+
+  // summary cart (step 4)
+  const sr=document.getElementById('summaryRows');
+  if(!state.format&&!state.tier){sr.innerHTML='<div class="order-summary-empty">Выберите формат и тариф выше, чтобы увидеть состав заказа.</div>';return;}
+  let shtml='';
+  if(state.format)shtml+=`<div class="order-summary-row"><span class="label">Формат</span><span class="val">${escH(FORMAT_LABELS[state.format]||state.format)}</span></div>`;
+  rows.forEach(r=>{shtml+=`<div class="order-summary-row"><span class="label">${escH(r.label)}</span><span class="val">${r.free?'Бесплатно':fmt(r.amount)+' ₽'}</span></div>`;});
+  if(discount>0&&state.promo)shtml+=`<div class="order-summary-row discount"><span class="label">Промокод ${escH(state.promo.code)}</span><span class="val">−${fmt(discount)} ₽</span></div>`;
+  if(state.tier)shtml+=`<div class="order-summary-row total"><span class="label">Итого</span><span class="val">${fmt(total)} ₽</span></div>`;
+  sr.innerHTML=shtml;
 }
 
 function f2b(file){if(file.dataUrl)return Promise.resolve(file.dataUrl);return new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(file);});}
@@ -604,16 +715,17 @@ document.getElementById('submitBtn').addEventListener('click',async()=>{
       clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
       uid:currentUser.uid,status:0,createdAt:serverTimestamp()
     });
-  }catch(e){btn.disabled=false;btn.textContent='Отправить заявку';toast('Не получилось сохранить. Проверьте соединение.','error');return;}
+  }catch(e){btn.disabled=false;btn.textContent='Оплатить';toast('Не получилось сохранить. Проверьте соединение.','error');return;}
   try{
     btn.textContent='Переходим к оплате...';
     const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:docRef.id,amount:total})});
     const data=await resp.json();
     if(data.paymentUrl){window.location.href=data.paymentUrl;}else throw new Error();
-  }catch(e){btn.disabled=false;btn.textContent='Отправить заявку';toast('Заявка сохранена. Не получилось открыть оплату — свяжемся в чате.','warn');}
+  }catch(e){btn.disabled=false;btn.textContent='Оплатить';toast('Заявка сохранена. Не получилось открыть оплату — свяжемся в чате.','warn');}
 });
 
 recalc();
+updateUI();
 </script>
 
 <script>

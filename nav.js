@@ -360,7 +360,7 @@
       .an-center { display: none; }
       .an-cta.show { display: none; }
       .an-burger { display: flex; }
-      .an-mobile-sheet { top: calc(14px + 58px + 8px); }
+      .an-mobile-sheet { display: flex; top: calc(14px + 58px + 8px); }
       .an-uname { display: none; }
       .an-user-btn { padding: 5px; }
       .an-user-btn.guest { padding: .5rem .7rem; }
@@ -369,8 +369,7 @@
   `;
 
   const PUBLIC_LINKS = [
-    { href: b+'faq',    label: 'Возможности', key: 'faq' },
-    { href: b+'order',  label: 'Цены',        key: 'order' },
+    { href: b+'order',  label: 'Сделать заказ', key: 'order' },
   ];
 
   // Дропдауны центрального навбара
@@ -401,7 +400,7 @@
       sections: [
         {
           items: [
-            { href: b+'faq',     label: 'Возможности',         icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
+            { href: 'https://antviz.ru/about', label: 'О компании', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
             { href: b+'rules',   label: 'Правила сервиса',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
             { href: b+'privacy', label: 'Конфиденциальность',  icon: '<path d="M12 3l8 4v5c0 5-3.5 8.5-8 10C7.5 20.5 4 17 4 12V7l8-4z"/>' },
           ]

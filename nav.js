@@ -83,6 +83,66 @@
       height: 2px; border-radius: 2px; background: var(--an-green);
     }
 
+    /* ── Кнопка с дропдауном в центре навбара ── */
+    .an-nav-drop { position: relative; display: flex; align-items: center; }
+    .an-nav-drop-btn {
+      color: var(--an-ink-dim);
+      font-family: var(--an-font); font-weight: 300; font-size: .88rem;
+      background: none; border: none; cursor: pointer;
+      padding: .5rem .9rem; border-radius: 10px;
+      transition: color .15s, background .15s;
+      white-space: nowrap; display: flex; align-items: center; gap: 5px;
+    }
+    .an-nav-drop-btn:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-nav-drop-btn.active { color: var(--an-ink); font-weight: 500; }
+    .an-nav-drop-chevron {
+      width: 10px; height: 10px; opacity: .4; flex-shrink: 0;
+      transition: transform .18s, opacity .18s;
+    }
+    .an-nav-drop-btn[aria-expanded="true"] .an-nav-drop-chevron { transform: rotate(180deg); opacity: .7; }
+
+    .an-nav-menu {
+      position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(-6px);
+      background: var(--an-card);
+      border: 1.5px solid var(--an-card-border);
+      border-radius: 20px; padding: 8px;
+      min-width: 220px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+      opacity: 0; pointer-events: none;
+      transition: opacity .16s ease, transform .16s ease;
+      z-index: 8990;
+      font-family: var(--an-font);
+    }
+    .an-nav-menu::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: var(--an-green); border-radius: 20px 20px 0 0;
+    }
+    .an-nav-drop:hover .an-nav-menu,
+    .an-nav-menu:hover { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+    .an-nav-drop-btn[aria-expanded="true"] ~ .an-nav-menu { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+
+    .an-nav-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 11px;
+      font-size: .84rem; color: var(--an-card-ink); font-weight: 300;
+      text-decoration: none; transition: background .12s, padding-left .12s;
+      white-space: nowrap;
+    }
+    .an-nav-menu-item:hover { background: var(--an-green-dim); padding-left: 14px; color: #fff; }
+    .an-nav-menu-ico {
+      width: 16px; height: 16px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--an-card-muted); transition: color .12s;
+    }
+    .an-nav-menu-item:hover .an-nav-menu-ico { color: var(--an-green); }
+    .an-nav-menu-ico svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .an-nav-menu-sep { height: 1px; background: var(--an-card-border); margin: 5px 8px; }
+    .an-nav-menu-label {
+      padding: 10px 10px 3px;
+      font-size: .65rem; color: var(--an-card-muted); font-weight: 500;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+
     .an-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 
     .an-cta {
@@ -313,6 +373,43 @@
     { href: b+'order',  label: 'Цены',        key: 'order' },
   ];
 
+  // Дропдауны центрального навбара
+  const NAV_DROPDOWNS = [
+    {
+      label: 'Услуги',
+      key: 'services',
+      sections: [
+        {
+          label: 'Примеры работ',
+          items: [
+            { href: b+'project1', label: 'Лендинг',            icon: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 8h18M8 3v5"/>' },
+            { href: b+'project2', label: 'Визитная карточка',   icon: '<rect x="3" y="5" width="18" height="14" rx="4"/><path d="M7 10h6M7 13h4"/>' },
+            { href: b+'project3', label: 'Портфолио',           icon: '<rect x="3" y="3" width="8" height="8" rx="3"/><rect x="13" y="3" width="8" height="8" rx="3"/><rect x="3" y="13" width="8" height="8" rx="3"/><rect x="13" y="13" width="8" height="8" rx="3"/>' },
+          ]
+        },
+        { sep: true },
+        {
+          items: [
+            { href: b+'order', label: 'Все тарифы \u2192', icon: '<path d="M5 12h14M12 5l7 7-7 7"/>' },
+          ]
+        }
+      ]
+    },
+    {
+      label: 'Компания',
+      key: 'company',
+      sections: [
+        {
+          items: [
+            { href: b+'faq',     label: 'Возможности',         icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
+            { href: b+'rules',   label: 'Правила сервиса',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
+            { href: b+'privacy', label: 'Конфиденциальность',  icon: '<path d="M12 3l8 4v5c0 5-3.5 8.5-8 10C7.5 20.5 4 17 4 12V7l8-4z"/>' },
+          ]
+        }
+      ]
+    },
+  ];
+
   const NAV_CONFIG = {
     home:     { centerLinks: PUBLIC_LINKS, showCta: true },
     faq:      { centerLinks: PUBLIC_LINKS, showCta: true },
@@ -353,13 +450,41 @@
     }).join('');
   }
 
+  function buildNavMenu(sections) {
+    return sections.map(sec => {
+      if (sec.sep) return '<div class="an-nav-menu-sep"></div>';
+      let html = sec.label ? '<div class="an-nav-menu-label">' + sec.label + '</div>' : '';
+      html += sec.items.map(item =>
+        '<a href="' + item.href + '" class="an-nav-menu-item">' +
+        '<span class="an-nav-menu-ico"><svg viewBox="0 0 24 24">' + item.icon + '</svg></span>' +
+        item.label + '</a>'
+      ).join('');
+      return html;
+    }).join('');
+  }
+
   function buildCenter() {
     if (cfg.inApp) return '';
     const links = cfg.centerLinks || [];
-    if (!links.length) return '';
-    return `<div class="an-center" id="anCenter">
-      ${links.map(l => `<a href="${l.href}" class="an-link${page === l.key ? ' active' : ''}">${l.label}</a>`).join('')}
-    </div>`;
+    const chevronSvg = '<svg class="an-nav-drop-chevron" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+
+    const dropdowns = NAV_DROPDOWNS.map(drop => {
+      const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
+      return '<div class="an-nav-drop">' +
+        '<button class="an-nav-drop-btn' + (isActive ? ' active' : '') + '" aria-expanded="false" data-drop="' + drop.key + '">' +
+        drop.label + chevronSvg +
+        '</button>' +
+        '<div class="an-nav-menu" id="anDrop-' + drop.key + '">' +
+        buildNavMenu(drop.sections) +
+        '</div></div>';
+    }).join('');
+
+    const plainLinks = links.map(l =>
+      '<a href="' + l.href + '" class="an-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+    ).join('');
+
+    if (!dropdowns && !plainLinks) return '';
+    return '<div class="an-center" id="anCenter">' + dropdowns + plainLinks + '</div>';
   }
 
   // Мобильная панель: те же ссылки, что и в центре десктопной капсулы,
@@ -367,11 +492,18 @@
   // нижний таб-бар из footer.js.
   function buildMobileSheet() {
     if (cfg.inApp) return '';
-    const links = cfg.centerLinks || [];
-    const linksHtml = links.map(l => `<a href="${l.href}" class="an-mobile-link${page === l.key ? ' active' : ''}">${l.label}</a>`).join('');
-    const ctaHtml = (!cfg.hideCta) ? `<a href="${b}order" class="an-mobile-cta">Заказать сайт</a>` : '';
+    // Собираем все ссылки: из дропдаунов + обычные ссылки
+    const dropLinks = NAV_DROPDOWNS.flatMap(drop =>
+      drop.sections.flatMap(sec => sec.sep ? [] : (sec.items || []))
+    );
+    const plainLinks = cfg.centerLinks || [];
+    const allLinks = dropLinks; // plain links уже входят в дропдауны
+    const linksHtml = allLinks.map(l =>
+      '<a href="' + l.href + '" class="an-mobile-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+    ).join('');
+    const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="an-mobile-cta">Заказать сайт</a>' : '';
     if (!linksHtml && !ctaHtml) return '';
-    return `<div class="an-mobile-sheet" id="anMobileSheet">${linksHtml}${ctaHtml}</div>`;
+    return '<div class="an-mobile-sheet" id="anMobileSheet">' + linksHtml + ctaHtml + '</div>';
   }
 
   const NAV_HTML = `
@@ -433,6 +565,23 @@ ${buildMobileSheet()}`;
   }
   userBtn?.addEventListener('click', onUserBtnClick);
 
+  // Дропдауны центрального навбара — открытие по клику
+  document.querySelectorAll('.an-nav-drop-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const key = btn.dataset.drop;
+      const menu = document.getElementById('anDrop-' + key);
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      // Закрываем все остальные
+      document.querySelectorAll('.an-nav-drop-btn').forEach(b => {
+        b.setAttribute('aria-expanded', 'false');
+      });
+      if (!isOpen) {
+        btn.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
   // Бургер мобильной капсулы — открывает/закрывает an-mobile-sheet
   const burger = document.getElementById('anBurger');
   const sheet  = document.getElementById('anMobileSheet');
@@ -456,9 +605,18 @@ ${buildMobileSheet()}`;
     if (burger && sheet && !burger.contains(e.target) && !sheet.contains(e.target)) {
       closeMobileSheet();
     }
+    // Закрыть дропдауны центра при клике вне
+    const inAnyDrop = e.target.closest('.an-nav-drop');
+    if (!inAnyDrop) {
+      document.querySelectorAll('.an-nav-drop-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    }
   });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') { dd?.classList.remove('open'); closeMobileSheet(); }
+    if (e.key === 'Escape') {
+      dd?.classList.remove('open');
+      closeMobileSheet();
+      document.querySelectorAll('.an-nav-drop-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
+    }
   });
 
   function setBadge(key, value, variant) {

@@ -151,14 +151,6 @@
     .section-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.82rem;color:var(--text)}
     .section-body{padding:1.2rem 1.4rem}
     .section-body.no-pad{padding:0}
-
-    .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .22s}
-    .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:var(--bg2);border-radius:20px;padding:1.8rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-    .modal-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between}
-    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0;line-height:1}
-    .modal-footer{display:flex;gap:.7rem;margin-top:1.4rem}
-    .modal-footer .btn{flex:1;justify-content:center}
   </style>
 </head>
 <body>
@@ -231,7 +223,6 @@
         <button class="btn btn-ghost btn-sm tab" onclick="switchFilter('open',this)">Открытые</button>
         <button class="btn btn-ghost btn-sm tab" onclick="switchFilter('done',this)">Закрытые</button>
       </div>
-      <button class="btn btn-primary" onclick="openCreateTicket()">➕ Создать тикет</button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 380px;gap:1.5rem;align-items:start">
@@ -247,37 +238,6 @@
         </div>
       </div>
 
-    </div>
-  </div>
-</div>
-
-<!-- Modal for creating ticket -->
-<div class="modal-overlay" id="createTicketModal" onclick="if(event.target===this)closeCreateTicket()">
-  <div class="modal">
-    <div class="modal-title">📝 Создать заявку <button class="modal-close" onclick="closeCreateTicket()">✕</button></div>
-    <div class="form-group">
-      <label class="form-label">Пользователь</label>
-      <select class="form-select" id="ticketUser">
-        <option value="">Выберите пользователя...</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Заголовок</label>
-      <input class="form-input" id="ticketTitle" type="text" placeholder="Краткий заголовок..."/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Описание</label>
-      <textarea class="form-textarea" id="ticketDesc" placeholder="Подробное описание проблемы..." rows="4"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Привязать к заказу (опционально)</label>
-      <select class="form-select" id="ticketOrder">
-        <option value="">Без заказа</option>
-      </select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closeCreateTicket()">Отмена</button>
-      <button class="btn btn-primary" onclick="createTicket()">Создать</button>
     </div>
   </div>
 </div>
@@ -320,7 +280,6 @@ function renderTickets(){
         <span>${escapeHtml(t.userEmail||'—')}</span>
         <span>·</span>
         <span>${fmtDT(t.createdAt)}</span>
-        ${t.createdBy === 'admin' ? `<span style="background:var(--accent);color:#fff;padding:0.1rem 0.5rem;border-radius:50px;font-size:0.55rem;font-weight:700;">АДМИН</span>` : ''}
       </div>
       ${t.orderId?`<a class="ticket-order-link" href="/admin/orders?id=${t.orderId}">
         <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
@@ -386,81 +345,6 @@ window.notifyExpiry=async uid=>{
   if(!uid)return;
   await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Обслуживание заканчивается',text:'До окончания обслуживания осталось менее 3 дней. Обратитесь в поддержку для продления.',read:false,createdAt:serverTimestamp()});
   toast('Уведомление отправлено ✓','success');
-};
-
-window.openCreateTicket = async () => {
-  const usersSnap = await getDocs(collection(db, 'users'));
-  const userSelect = document.getElementById('ticketUser');
-  userSelect.innerHTML = '<option value="">Выберите пользователя...</option>' + 
-    usersSnap.docs.map(d => `<option value="${d.id}">${escapeHtml(d.data().displayName || d.data().name || d.id)} · ${escapeHtml(d.data().email || '')}</option>`).join('');
-  
-  const ordersSnap = await getDocs(collection(db, 'orders'));
-  const orderSelect = document.getElementById('ticketOrder');
-  orderSelect.innerHTML = '<option value="">Без заказа</option>' + 
-    ordersSnap.docs.map(d => {
-      const data = d.data();
-      return `<option value="${d.id}">${escapeHtml(data.clientName || '—')} · ${escapeHtml(data.siteType || 'Сайт')}${data.domain ? ' · '+escapeHtml(data.domain) : ''}</option>`;
-    }).join('');
-  
-  document.getElementById('ticketTitle').value = '';
-  document.getElementById('ticketDesc').value = '';
-  document.getElementById('createTicketModal').classList.add('show');
-};
-
-window.closeCreateTicket = () => {
-  document.getElementById('createTicketModal').classList.remove('show');
-};
-
-window.createTicket = async () => {
-  const uid = document.getElementById('ticketUser').value;
-  const title = document.getElementById('ticketTitle').value.trim();
-  const desc = document.getElementById('ticketDesc').value.trim();
-  const orderId = document.getElementById('ticketOrder').value;
-  
-  if (!uid) { toast('Выберите пользователя', 'error'); return; }
-  if (!title) { toast('Введите заголовок', 'error'); return; }
-  if (!desc) { toast('Введите описание', 'error'); return; }
-  
-  try {
-    const userDoc = await getDoc(doc(db, 'users', uid));
-    const userData = userDoc.data();
-    
-    let orderData = {};
-    if (orderId) {
-      const orderDoc = await getDoc(doc(db, 'orders', orderId));
-      orderData = orderDoc.data() || {};
-    }
-    
-    await addDoc(collection(db, 'service_tickets'), {
-      uid: uid,
-      userName: userData?.displayName || userData?.name || 'Пользователь',
-      userEmail: userData?.email || '—',
-      title: title,
-      description: desc,
-      orderId: orderId || null,
-      orderDomain: orderData?.domain || null,
-      orderSiteType: orderData?.siteType || null,
-      orderTariff: orderData?.tariff || orderData?.package || null,
-      status: 'open',
-      adminReply: '',
-      createdAt: serverTimestamp(),
-      createdBy: 'admin'
-    });
-    
-    await addDoc(collection(db, 'notifications', uid, 'items'), {
-      title: '📝 Новая заявка от администратора',
-      text: `«${title}»: ${desc}`,
-      read: false,
-      createdAt: serverTimestamp()
-    });
-    
-    toast('Тикет создан и пользователь уведомлён ✅', 'success');
-    closeCreateTicket();
-    await loadTickets();
-    renderTickets();
-  } catch(e) {
-    toast('Ошибка: ' + e.message, 'error');
-  }
 };
 
 async function loadTickets(){

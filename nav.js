@@ -83,6 +83,12 @@
       height: 2px; border-radius: 2px; background: var(--an-green);
     }
 
+    /* Выделение для ссылки "Сделать заказ" в центре */
+    .an-link[href*="order"] {
+      color: var(--an-green);
+      font-weight: 500;
+    }
+
     /* ── Кнопка с дропдауном в центре навбара ── */
     .an-nav-drop { position: relative; display: flex; align-items: center; }
     .an-nav-drop-btn {
@@ -144,18 +150,6 @@
     }
 
     .an-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-
-    .an-cta {
-      display: none; align-items: center; gap: 8px;
-      background: var(--an-green); color: var(--an-green-ink);
-      font-family: var(--an-font); font-size: .85rem; font-weight: 500;
-      text-decoration: none; padding: .65rem 1.3rem;
-      border-radius: 14px; border: none; cursor: pointer;
-      transition: background .12s, transform .12s;
-      white-space: nowrap;
-    }
-    .an-cta:hover { background: var(--an-green-h); transform: translateY(-1px); }
-    .an-cta.show { display: inline-flex; }
 
     .an-user { position: relative; display: flex; }
     .an-user-btn {
@@ -358,7 +352,6 @@
       .an-logo { font-size: .88rem; }
       .an-logo img { width: 24px; height: 24px; }
       .an-center { display: none; }
-      .an-cta.show { display: none; }
       .an-burger { display: flex; }
       .an-mobile-sheet { display: flex; top: calc(14px + 58px + 8px); }
       .an-uname { display: none; }
@@ -487,17 +480,25 @@
   }
 
   // Мобильная панель: те же ссылки, что и в центре десктопной капсулы,
-  // плюс CTA снизу — раскрывается по тапу на бургер, заменяет собой
-  // нижний таб-бар из footer.js.
+  // раскрывается по тапу на бугер, заменяет собой нижний таб-бар из footer.js.
   function buildMobileSheet() {
     if (cfg.inApp) return '';
-    // Собираем все ссылки: из дропдаунов + обычные ссылки
     const dropLinks = NAV_DROPDOWNS.flatMap(drop =>
       drop.sections.flatMap(sec => sec.sep ? [] : (sec.items || []))
     );
     const plainLinks = cfg.centerLinks || [];
-    const allLinks = dropLinks; // plain links уже входят в дропдауны
-    const linksHtml = allLinks.map(l =>
+    const allLinks = [...dropLinks, ...plainLinks];
+
+    const uniqueLinks = [];
+    const seenHrefs = new Set();
+    for (const l of allLinks) {
+      if (!seenHrefs.has(l.href)) {
+        seenHrefs.add(l.href);
+        uniqueLinks.push(l);
+      }
+    }
+
+    const linksHtml = uniqueLinks.map(l =>
       '<a href="' + l.href + '" class="an-mobile-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
     ).join('');
     const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="an-mobile-cta">Заказать сайт</a>' : '';
@@ -515,8 +516,6 @@
   ${buildCenter()}
 
   <div class="an-right">
-    ${(!cfg.inApp && !cfg.hideCta) ? `<a href="${b}order" class="an-cta" id="anCta">Заказать сайт</a>` : ''}
-
     <div class="an-user" id="anUser">
       <a href="${b}auth" class="an-user-btn guest" id="anUserBtn" aria-expanded="false">
         <div class="an-avatar-ring" id="anAvatarRing">
@@ -644,7 +643,6 @@ ${buildMobileSheet()}`;
   }
 
   function applyAuthedUI(user) {
-    const ctaEl    = document.getElementById('anCta');
     const centerEl = document.getElementById('anCenter');
     const unameEl  = document.getElementById('anUname');
     const avatarEl = document.getElementById('anAvatar');
@@ -654,7 +652,6 @@ ${buildMobileSheet()}`;
     const ddHeadEm = document.getElementById('anDdHeadEmail');
 
     isAuthed = true;
-    ctaEl?.classList.remove('show');
     if (cfg.inApp && centerEl) centerEl.style.display = 'none';
 
     userBtn.classList.remove('guest');
@@ -676,7 +673,6 @@ ${buildMobileSheet()}`;
   }
 
   function applyGuestUI() {
-    const ctaEl    = document.getElementById('anCta');
     const unameEl  = document.getElementById('anUname');
     const avatarEl = document.getElementById('anAvatar');
     const avatarRing = document.getElementById('anAvatarRing');
@@ -689,7 +685,6 @@ ${buildMobileSheet()}`;
     if (avatarEl) avatarEl.innerHTML = '?';
     avatarRing?.classList.remove('notify');
     if (ddHead) ddHead.style.display = 'none';
-    if (!cfg.hideCta) ctaEl?.classList.add('show');
     ['support','orders','tickets'].forEach(k => setBadge(k, 0, null));
     refreshNotifyDot();
   }

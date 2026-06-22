@@ -356,13 +356,38 @@ window.toggleMaintenance=async()=>{
 };
 
 window.openNotifModal=async()=>{
-  const snap=await getDocs(collection(db,'users'));
-  const sel=document.getElementById('notifTarget');
-  sel.innerHTML='<option value="all">📢 Всем пользователям</option>'+snap.docs.map(d=>`<option value="${d.id}">${escapeHtml(d.data().name||d.id)} · ${escapeHtml(d.data().email||'')}</option>`).join('');
-  document.getElementById('notifTitle').value='';document.getElementById('notifText').value='';
-  document.getElementById('notifModal').classList.add('show');
+  try {
+    // Загружаем пользователей из коллекции users
+    const snap=await getDocs(collection(db,'users'));
+    console.log('Найдено пользователей:', snap.docs.length);
+    
+    const sel=document.getElementById('notifTarget');
+    sel.innerHTML='<option value="all">📢 Всем пользователям</option>';
+    
+    if (snap.docs.length === 0) {
+      toast('Нет пользователей в базе','warn');
+      // Добавляем заглушку для информации
+      sel.innerHTML += '<option value="" disabled>Нет пользователей</option>';
+    } else {
+      snap.docs.forEach(d => {
+        const data = d.data();
+        const name = data.displayName || data.name || d.id;
+        const email = data.email || '';
+        sel.innerHTML += `<option value="${d.id}">${escapeHtml(name)}${email ? ' · '+escapeHtml(email) : ''}</option>`;
+      });
+    }
+    
+    document.getElementById('notifTitle').value='';
+    document.getElementById('notifText').value='';
+    document.getElementById('notifModal').classList.add('show');
+  } catch(e) {
+    console.error('Ошибка загрузки пользователей:', e);
+    toast('Ошибка загрузки пользователей: '+e.message,'error');
+  }
 };
+
 window.closeNotifModal=()=>document.getElementById('notifModal').classList.remove('show');
+
 window.sendNotif=async()=>{
   const target=document.getElementById('notifTarget').value;
   const title=document.getElementById('notifTitle').value.trim();
@@ -370,10 +395,16 @@ window.sendNotif=async()=>{
   if(!title||!text){toast('Заполните все поля','error');return;}
   try{
     if(target==='all'){
+      // Отправляем всем пользователям из коллекции users
       const snp=await getDocs(collection(db,'users'));
+      if (snp.docs.length === 0) {
+        toast('Нет пользователей для отправки','error');
+        return;
+      }
       await Promise.all(snp.docs.map(d=>addDoc(collection(db,'notifications',d.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
       toast(`Отправлено ${snp.docs.length} пользователям ✓`,'success');
     } else {
+      // Отправляем конкретному пользователю
       await addDoc(collection(db,'notifications',target,'items'),{title,text,read:false,createdAt:serverTimestamp()});
       toast('Отправлено ✓','success');
     }

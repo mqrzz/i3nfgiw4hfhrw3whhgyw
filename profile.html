@@ -10,14 +10,13 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#191b1e;--bg2:#20242a;--bg3:#2b2f33;--card:#20242a;
-      --border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);
+      --bg:#ffffff;--bg2:#f9fafc;--bg3:#f2f4f7;--card:#f9fafc;
+      --border:#dfe3e8;--border-hi:#cbcdd6;
       --accent:#1ede7b;--accent2:#1ede7b;--accent3:#1ac16b;
-      --text:#ffffff;--muted:rgba(255,255,255,.45);--muted2:rgba(255,255,255,.55);
-      --success:#1ede7b;--error:#ff6b54;--warn:#f59e0b;
+      --text:#191b1e;--muted:#707a8a;--muted2:#5a6373;
+      --success:#1ede7b;--error:#e8634f;--warn:#f59e0b;
       --accent-ink:#191b1e;
       --nav-h:68px;--r:16px;--r-lg:22px;
-      --sidebar-w:260px;
       --font:'Geologica','Inter','Arial',sans-serif;
     }
     html{scroll-behavior:smooth;font-size:17px}
@@ -27,47 +26,14 @@
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
-    /* Mobile back bar */
-    .mobile-top-bar{display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;height:44px;
-      background:var(--bg2);border:1px solid var(--border-hi);
-      border-radius:18px;box-shadow:0 4px 24px rgba(0,0,0,.45);
-      align-items:center;padding:0 .75rem 0 .6rem;gap:.5rem;width:auto;min-width:220px;max-width:calc(100% - 32px)}
-    .mobile-top-bar a{display:flex;align-items:center;gap:4px;color:var(--muted);text-decoration:none;font-size:.78rem;transition:color .15s;flex-shrink:0;padding:.25rem .4rem;border-radius:10px}
-    .mobile-top-bar a:hover{color:var(--text)}
-    .mobile-top-bar a svg{width:15px;height:15px;stroke:currentColor;stroke-width:2}
-    .mobile-top-bar .mtb-title{font-family:var(--font);font-weight:500;font-size:.78rem;white-space:nowrap;flex:1;text-align:center}
-    @media(max-width:768px){.mobile-top-bar{display:flex!important}.page-wrap{padding-top:calc(44px + 24px)!important}}
-
     /* LOADING */
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
     .spinner{width:28px;height:28px;border:2px solid var(--border-hi);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
     .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem}
 
-    /* PAGE — двухколоночная раскладка на ПК: сайдбар слева + контент,
-       как в личном кабинете банка / Reg.ru. На мобильных сайдбар прячется
-       и работает текущий mobile-top-bar + одна узкая колонка. */
-    .app-shell{display:flex;max-width:1100px;margin:0 auto;padding:calc(52px + 16px + 24px) 1.4rem 80px;gap:48px;align-items:flex-start;position:relative;z-index:1}
-
-    .sidebar{width:var(--sidebar-w);flex-shrink:0;position:sticky;top:calc(52px + 16px + 24px);display:flex;flex-direction:column;gap:2px}
-    .sb-link{display:flex;align-items:center;gap:12px;padding:.85rem 1rem;border-radius:14px;color:var(--muted);
-      text-decoration:none;font-family:var(--font);font-weight:300;font-size:.9rem;background:none;border:none;cursor:pointer;width:100%;text-align:left;transition:background .15s,color .15s}
-    .sb-link svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;flex-shrink:0;fill:none}
-    .sb-link:hover{background:var(--bg2);color:var(--text)}
-    .sb-link.active{background:var(--bg2);color:var(--text);font-weight:500}
-    .sb-link.active svg{stroke:var(--accent)}
-    .sb-badge{margin-left:auto;background:var(--accent);color:var(--accent-ink);font-size:.62rem;font-weight:500;padding:.15rem .45rem;border-radius:6px;min-width:18px;text-align:center;flex-shrink:0}
-    .sb-sep{height:1px;background:var(--border);margin:12px 4px}
-    .sb-link.danger{color:rgba(255,140,122,.85)}
-    .sb-link.danger:hover{background:rgba(255,107,84,.08);color:var(--error)}
-    .sb-link.danger svg{stroke:rgba(255,140,122,.85)}
-
-    .content-col{flex:1;min-width:0;max-width:620px}
-
-    @media(max-width:980px){
-      .sidebar{display:none}
-      .app-shell{padding:calc(52px + 16px + 24px) 1.4rem 80px;display:block!important}
-      .content-col{max-width:620px;margin:0 auto}
-    }
+    /* CONTENT — sidebar.js оборачивает это в .sb-shell (flex: сайдбар + контент)
+       и задаёт верхний отступ под капсулу nav.js. Здесь только сама колонка. */
+    .page-col{max-width:620px;width:100%}
 
     /* SECTIONS */
     .section{display:none}
@@ -223,6 +189,7 @@
 </head>
 <body>
 <script src="nav.js" data-page="profile"></script>
+<script src="sidebar.js" data-page="profile"></script>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
@@ -250,71 +217,10 @@
   </div>
 </div>
 
-<!-- DELETE MODAL -->
-<div class="modal-overlay" id="deleteModal">
-  <div class="modal">
-    <div class="modal-icon">⚠️</div>
-    <h3>Удалить аккаунт?</h3>
-    <p class="modal-p">Это необратимо. Введите email для подтверждения:</p>
-    <input class="form-input" id="deleteConfirmInput" type="email" placeholder="Ваш email" style="margin-bottom:1rem"/>
-    <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeDeleteModal()">Отмена</button>
-      <button class="btn btn-danger" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">Удалить</button>
-    </div>
-  </div>
-</div>
 
-<!-- mobile top bar -->
-<div class="mobile-top-bar">
-  <a href="/">
-    <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>
-    Главная
-  </a>
-  <span style="flex:1"></span>
-  <span class="mtb-title">Кабинет</span>
-  <span style="flex:1"></span>
-</div>
 
-<div class="app-shell" id="appWrap" style="display:none">
-
-  <!-- SIDEBAR — постоянная навигация на ПК (≥981px); на мобильных скрыта,
-       вместо неё работает mobile-top-bar + menu-list внутри секции home -->
-  <nav class="sidebar">
-    <a href="#" class="sb-link active" id="sbHome" onclick="event.preventDefault();showSection('home')">
-      <svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/></svg>
-      Обзор
-    </a>
-    <a href="profile/orders" class="sb-link">
-      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg>
-      Мои заказы
-      <span class="sb-badge" id="sbOrdersBadge" style="display:none">0</span>
-    </a>
-    <a href="profile/support" class="sb-link">
-      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/></svg>
-      Чат с командой
-      <span class="sb-badge" id="sbSupportBadge" style="display:none">!</span>
-    </a>
-    <a href="profile/tickets" class="sb-link">
-      <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/></svg>
-      Обслуживание
-      <span class="sb-badge" id="sbTicketsBadge" style="display:none">!</span>
-    </a>
-    <a href="order" class="sb-link">
-      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-      Новый заказ
-    </a>
-    <div class="sb-sep"></div>
-    <a href="#" class="sb-link" id="sbSettings" onclick="event.preventDefault();showSection('settings')">
-      <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
-      Настройки
-    </a>
-    <a href="#" class="sb-link danger" onclick="event.preventDefault();doLogout()">
-      <svg viewBox="0 0 24 24"><path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/></svg>
-      Выйти
-    </a>
-  </nav>
-
-  <div class="content-col">
+<div id="sbContent" style="display:none">
+<div class="page-col" id="appWrap">
 
   <!-- HOME -->
   <div class="section active" id="section-home">
@@ -410,59 +316,17 @@
       </a>
     </div>
 
-  </div>
+  </div><!-- /section-home -->
 
-  <!-- SETTINGS -->
-  <div class="section" id="section-settings">
-    <button class="back-btn" onclick="showSection('home')">
-      <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Назад
-    </button>
-    <div class="sec-title">Настройки</div>
-    <div class="sec-sub">Управляйте профилем и аккаунтом</div>
+  </div><!-- /page-col -->
 
-    <div class="settings-section">
-      <div class="settings-section-title">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Личные данные
-      </div>
-      <div class="form-row">
-        <div class="form-group"><label class="form-label">Имя</label><input class="form-input" type="text" id="settingName"/></div>
-        <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="settingEmail" disabled/></div>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="saveSettings()">Сохранить изменения</button>
-    </div>
-
-    <div class="settings-section">
-      <div class="settings-section-title">
-        <svg viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-        Безопасность
-      </div>
-      <p style="font-size:.85rem;color:var(--muted);margin-bottom:1rem">Сбросить пароль — ссылка придёт на вашу почту</p>
-      <button class="btn btn-ghost btn-sm" onclick="sendPasswordReset()">Сбросить пароль</button>
-    </div>
-
-    <div class="settings-section">
-      <div class="danger-section-title">Опасная зона</div>
-      <div class="danger-row">
-        <div><h4>Выйти из аккаунта</h4><p>Завершить текущую сессию</p></div>
-        <button class="btn btn-danger btn-sm" onclick="doLogout()">Выйти</button>
-      </div>
-      <div class="danger-row">
-        <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить всё</p></div>
-        <button class="btn btn-danger btn-sm" onclick="openDeleteModal()">Удалить</button>
-      </div>
-    </div>
-  </div>
-
-  </div><!-- /content-col -->
-
-</div><!-- /app-shell -->
+</div><!-- /sbContent -->
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged, signOut, updateProfile, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser=null, unsubOrders=null, unsubChat=null;
 
@@ -485,8 +349,7 @@ function loadOrderStats(uid){
     const badge=document.getElementById('menuActiveCount');
     if(active>0){badge.textContent=active;badge.style.display='';}else badge.style.display='none';
     document.getElementById('menuOrdersSub').textContent=active>0?`${active} активных`:'История всех заявок';
-    const sbBadge=document.getElementById('sbOrdersBadge');
-    if(sbBadge){ if(active>0){sbBadge.textContent=active;sbBadge.style.display='';}else sbBadge.style.display='none'; }
+
   },err=>console.error('Orders:',err));
 }
 
@@ -497,13 +360,12 @@ async function watchSupportStatus(uid){
     const activeSupport=orders.find(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
     const sub=document.getElementById('menuTicketsSub');
     const badge=document.getElementById('menuTicketsBadge');
-    const sbBadge=document.getElementById('sbTicketsBadge');
     if(activeSupport){
       const exp=activeSupport.supportExpiresAt.toDate();
       const daysLeft=Math.ceil((exp-new Date())/(1000*60*60*24));
       sub.textContent=daysLeft<=2?`Истекает через ${daysLeft} дн.`:`Активно · осталось ${daysLeft} дн.`;
       sub.style.color=daysLeft<=2?'var(--warn)':'';
-      if(daysLeft<=2){badge.style.display='';badge.textContent='!';if(sbBadge){sbBadge.style.display='';sbBadge.textContent='!';}}
+      if(daysLeft<=2){badge.style.display='';badge.textContent='!';}
     } else {
       sub.textContent='Заявки на доработку';
     }
@@ -515,32 +377,12 @@ function watchChatBadge(uid){
   unsubChat=onSnapshot(q,snap=>{
     const menuBadge=document.getElementById('menuChatBadge');
     if(menuBadge) menuBadge.style.display=snap.size?'':'none';
-    const sbBadge=document.getElementById('sbSupportBadge');
-    if(sbBadge) sbBadge.style.display=snap.size?'':'none';
   },()=>{});
 }
 
-window.saveSettings=async function(){if(!currentUser) return;const name=document.getElementById('settingName').value.trim();if(!name){toast('Введите имя','error');return;}try{await updateProfile(currentUser,{displayName:name});await updateDoc(doc(db,'users',currentUser.uid),{name}).catch(()=>{});document.getElementById('heroName').textContent=name;document.getElementById('avatarLetter').textContent=name[0].toUpperCase();toast('Сохранено ✓','success');}catch(e){toast('Ошибка','error');}};
-window.sendPasswordReset=async function(){if(!currentUser) return;try{await sendPasswordResetEmail(auth,currentUser.email);toast('Письмо отправлено на '+currentUser.email,'success');}catch(e){toast('Ошибка','error');}};
-window.doLogout=async function(){if(unsubOrders) unsubOrders();if(unsubChat) unsubChat();await signOut(auth);window.location.href='auth';};
-
-window.openDeleteModal=function(){document.getElementById('deleteConfirmInput').value='';document.getElementById('deleteModal').classList.add('show');setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),200);};
-window.closeDeleteModal=function(){document.getElementById('deleteModal').classList.remove('show');};
-window.confirmDeleteAccount=async function(){if(!currentUser) return;if(document.getElementById('deleteConfirmInput').value.trim()!==currentUser.email){toast('Email не совпадает','error');return;}const btn=document.getElementById('deleteConfirmBtn');btn.textContent='Удаляю...';btn.disabled=true;try{
-  // Заказы не удаляем целиком — это история оплат/работ, нужная для бухгалтерии.
-  // Вместо этого обезличиваем: убираем личные данные, сумму/статус/даты оставляем.
-  const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
-  for(const d of ordSnap.docs) await updateDoc(d.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
-  const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
-  for(const d of chatSnap.docs) await deleteDoc(d.ref).catch(()=>{});
-  await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
-  await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
-  await deleteUser(currentUser);window.location.href='auth';
-}catch(e){if(e.code==='auth/requires-recent-login') toast('Для удаления нужен недавний вход: выйдите и зайдите снова, затем повторите','error');else toast('Ошибка. Попробуйте позже.','error');btn.textContent='Удалить';btn.disabled=false;}};
-
 window.openLightbox=function(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('show');};
 window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('show');document.getElementById('lightboxImg').src='';};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();closeDeleteModal();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();}});
 
 let unsubNotifs=null;
 function watchNotifications(uid){
@@ -571,13 +413,7 @@ window.openNotifModal=async function(){
 };
 window.closeNotifModal=function(){document.getElementById('notifModal').classList.remove('show');};
 
-window.showSection=function(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  const s=document.getElementById('section-'+id);if(s) s.classList.add('active');
-  document.querySelectorAll('.sb-link').forEach(l=>l.classList.remove('active'));
-  const sb=document.getElementById('sb'+id.charAt(0).toUpperCase()+id.slice(1));
-  if(sb) sb.classList.add('active');
-};
+
 
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='auth';return;}
@@ -586,10 +422,8 @@ onAuthStateChanged(auth,async user=>{
   const name=user.displayName||'Пользователь';
   document.getElementById('heroName').textContent=name;
   document.getElementById('avatarLetter').textContent=name[0].toUpperCase();
-  document.getElementById('settingName').value=name;
-  document.getElementById('settingEmail').value=user.email;
   document.getElementById('loadingScreen').style.display='none';
-  document.getElementById('appWrap').style.display='flex';
+  document.getElementById('sbContent').style.display='block';
   getDoc(doc(db,'users',user.uid)).then(snap=>{
     if(snap.exists()){const d=snap.data();
       if(d.createdAt) document.getElementById('heroSince').textContent='с нами с '+fmtDate(d.createdAt);

@@ -299,21 +299,61 @@ function renderTickets(){
 function renderSupports(){
   const el=document.getElementById('supportsList');
   const now=new Date();
-  const active=allOrders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>now);
-  document.getElementById('activeSupports').textContent=active.length;
-  if(!active.length){el.innerHTML=`<div class="empty-state"><span class="empty-state-icon" style="font-size:1.5rem">🔧</span><span class="empty-state-text">Нет активных</span></div>`;return;}
+  
+  // Ищем заказы с активным обслуживанием
+  const active = allOrders.filter(o => {
+    // Проверяем разные варианты названия поля
+    const hasSupport = o.supportActive === true || o.support === true || o.maintenance === true;
+    if (!hasSupport) return false;
+    
+    // Проверяем дату окончания
+    if (o.supportExpiresAt) {
+      const exp = o.supportExpiresAt.toDate ? o.supportExpiresAt.toDate() : new Date(o.supportExpiresAt);
+      return exp > now;
+    }
+    
+    // Если нет даты окончания, считаем активным
+    return true;
+  });
+  
+  document.getElementById('activeSupports').textContent = active.length;
+  
+  if(!active.length){
+    el.innerHTML=`<div class="empty-state"><span class="empty-state-icon" style="font-size:1.5rem">🔧</span><span class="empty-state-text">Нет активных обслуживаний</span></div>`;
+    return;
+  }
+  
   el.innerHTML=active.map(o=>{
-    const exp=o.supportExpiresAt.toDate();
-    const days=Math.ceil((exp-now)/864e5);
-    const pct=Math.max(0,Math.min(100,(exp-now)/(30*864e5)*100));
+    let days = '∞';
+    let pct = 100;
+    let isExpiring = false;
+    
+    if (o.supportExpiresAt) {
+      const exp = o.supportExpiresAt.toDate ? o.supportExpiresAt.toDate() : new Date(o.supportExpiresAt);
+      days = Math.ceil((exp - now) / 864e5);
+      pct = Math.max(0, Math.min(100, ((exp - now) / (30 * 864e5)) * 100));
+      isExpiring = days < 3;
+    }
+    
     return`<div style="margin-bottom:.85rem">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem">
-        <div><div style="font-size:.86rem;font-weight:500">${escapeHtml(o.clientName||'—')}</div><div style="font-size:.72rem;color:var(--muted)">${escapeHtml(o.clientEmail||'—')}</div></div>
-        <span style="font-size:.72rem;color:${days<3?'var(--error)':'var(--muted)'}">осталось ${days} дн.</span>
+        <div>
+          <div style="font-size:.86rem;font-weight:500">${escapeHtml(o.clientName || o.name || '—')}</div>
+          <div style="font-size:.72rem;color:var(--muted)">${escapeHtml(o.clientEmail || o.email || '—')}</div>
+          ${o.domain ? `<div style="font-size:.7rem;color:var(--muted2)">${escapeHtml(o.domain)}</div>` : ''}
+        </div>
+        <span style="font-size:.72rem;color:${isExpiring ? 'var(--error)' : 'var(--muted)'}">
+          ${days === '∞' ? 'бессрочно' : `осталось ${days} дн.`}
+        </span>
       </div>
-      <div style="height:4px;background:var(--bg);border-radius:2px"><div style="height:100%;border-radius:2px;background:${days<3?'var(--warn)':'var(--success)'};width:${pct}%"></div></div>
-      ${days<3?`<button class="btn btn-ghost btn-xs" style="margin-top:.4rem" onclick="notifyExpiry('${o.uid||''}')">🔔 Уведомить</button>`:''}
-    </div>`;}).join('');
+      ${days !== '∞' ? `
+        <div style="height:4px;background:var(--bg);border-radius:2px;margin-top:.3rem">
+          <div style="height:100%;border-radius:2px;background:${isExpiring ? 'var(--warn)' : 'var(--success)'};width:${pct}%"></div>
+        </div>
+      ` : ''}
+      ${isExpiring ? `<button class="btn btn-ghost btn-xs" style="margin-top:.4rem" onclick="notifyExpiry('${o.uid || ''}')">🔔 Уведомить</button>` : ''}
+    </div>`;
+  }).join('');
 }
 
 window.saveReply=async id=>{
@@ -343,16 +383,29 @@ window.deleteTick=async id=>{
 };
 window.notifyExpiry=async uid=>{
   if(!uid)return;
-  await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Обслуживание заканчивается',text:'До окончания обслуживания осталось менее 3 дней. Обратитесь в поддержку для продления.',read:false,createdAt:serverTimestamp()});
-  toast('Уведомление отправлено ✓','success');
+  try {
+    await addDoc(collection(db,'notifications',uid,'items'),{
+      title:'⚠️ Обслуживание заканчивается',
+      text:'До окончания обслуживания осталось менее 3 дней. Обратитесь в поддержку для продления.',
+      read:false,
+      createdAt:serverTimestamp()
+    });
+    toast('Уведомление отправлено ✓','success');
+  } catch(e) {
+    toast('Ошибка: '+e.message,'error');
+  }
 };
 
 async function loadTickets(){
-  const snap=await getDocs(collection(db,'service_tickets'));
-  allTickets=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
-    if((a.status==='done')!=(b.status==='done'))return a.status==='done'?1:-1;
-    return(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0);
-  });
+  try {
+    const snap=await getDocs(collection(db,'service_tickets'));
+    allTickets=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+      if((a.status==='done')!=(b.status==='done'))return a.status==='done'?1:-1;
+      return(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0);
+    });
+  } catch(e) {
+    console.error('Ошибка загрузки тикетов:', e);
+  }
 }
 
 onAuthStateChanged(auth,async user=>{
@@ -360,6 +413,8 @@ onAuthStateChanged(auth,async user=>{
   if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
   await loadTickets();renderTickets();
+  
+  // Подписываемся на заказы
   onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
     allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderSupports();
@@ -367,6 +422,7 @@ onAuthStateChanged(auth,async user=>{
     const open=allTickets.filter(t=>t.status!=='done').length;
     if(badge){badge.style.display=open?'':'none';badge.textContent=open;}
   });
+  
   setInterval(async()=>{await loadTickets();renderTickets();},30000);
 });
 </script>

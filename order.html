@@ -84,7 +84,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .type-n{font-size:12px;font-weight:500;letter-spacing:.1em;color:var(--border2);text-transform:uppercase;margin-bottom:20px}
 .type-card.sel .type-n{color:var(--green-d)}
 .type-card h3{font-size:clamp(28px,3vw,42px);font-weight:500;letter-spacing:-.03em;line-height:1.08;margin-bottom:16px}
-.type-card.sel h3{color:var(--green-d)}
+.type-card.sel h3, .type-card.sel h4{color:var(--green-d)}
 .type-card>p{font-size:16px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:32px}
 .type-feats{display:flex;flex-direction:column;gap:10px;border-top:1px solid var(--border);padding-top:24px}
 .type-card.sel .type-feats{border-color:rgba(30,222,123,.3)}
@@ -92,6 +92,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .type-feat::before{content:'--';color:var(--border2);flex-shrink:0}
 .type-card.sel .type-feat::before{color:var(--green-d)}
 .custom-wrap[hidden]{display:none}
+
+.logic-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:768px){.logic-grid{grid-template-columns:1fr}}
 
 /* NAV HINT */
 .nav-hint{margin-top:40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
@@ -233,7 +236,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <body>
 <script src="nav.js" data-page="order"></script>
 
-<!-- PROGRESS BAR -->
 <div class="progress-bar" id="progressBar">
   <div class="progress-inner">
     <a class="progress-step" id="ps1" href="#step-format" onclick="smoothTo('step-format',event)">
@@ -320,6 +322,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <label class="field-label" for="formatNote">В двух словах, что нужно</label>
       <textarea class="field-textarea" id="formatNote" placeholder="Например: квиз для отбора заявок, портал с личным кабинетом..."></textarea>
     </div>
+
+    <div class="logic-wrap reveal" style="margin-top:48px">
+      <label class="field-label">Какая архитектура сайта необходима?</label>
+      <div class="logic-grid">
+        <div class="type-card logic-card sel" data-logic="static" style="padding:32px 28px; border-radius:32px; margin-top:0;">
+          <h4 style="font-size:18px; font-weight:500; margin-bottom:8px;">Статический сайт</h4>
+          <p style="font-size:14px; color:var(--muted); font-weight:300; line-height:1.5; margin-bottom:0;">Подходит для визиток, личных блогов, портфолио, промо-страниц и стандартных лендингов. Обладает моментальной скоростью загрузки, максимальной надёжностью и безопасностью, так как не задействует серверные базы данных и сторонние скрипты выполнения.</p>
+        </div>
+        <div class="type-card logic-card" data-logic="dynamic" style="padding:32px 28px; border-radius:32px; margin-top:0;">
+          <h4 style="font-size:18px; font-weight:500; margin-bottom:8px;">С серверной логикой (Динамический)</h4>
+          <p style="font-size:14px; color:var(--muted); font-weight:300; line-height:1.5; margin-bottom:0;">Необходим для комплексных интернет-магазинов со сложными корзинами, веб-порталов с личными кабинетами пользователей, систем подписок, онлайн-авторизации, внутренних баз данных, форумов или кастомных интерактивных панелей управления.</p>
+        </div>
+      </div>
+    </div>
+
     <div class="nav-hint reveal">
       <button type="button" class="nav-btn" id="toTiersBtn" disabled onclick="smoothTo('step-tier')">
         Выбрать масштаб
@@ -464,7 +481,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <div class="promo-fb" id="promoFb"></div>
       </div>
 
-      <!-- ORDER SUMMARY -->
       <div class="order-summary reveal" id="orderSummary">
         <div class="order-summary-title">Ваш заказ</div>
         <div class="order-summary-rows" id="summaryRows">
@@ -488,6 +504,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     </div>
   </div>
 </section>
+
+<div id="paymentErrorModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(25,27,30,0.96); z-index:9999; align-items:center; justify-content:center; padding:20px; backdrop-filter:blur(16px); font-family:var(--font);">
+  <div style="background:var(--dark2); border:1px solid rgba(255,255,255,0.1); color:#fff; max-width:500px; width:100%; padding:48px 40px; border-radius:40px; text-align:center; box-shadow:var(--sh2);">
+    <div style="width:56px; height:56px; background:rgba(220,38,38,0.15); color:#dc2626; border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 24px; font-size:24px; font-weight:500;">!</div>
+    <h3 style="font-size:24px; font-weight:500; margin-bottom:12px; letter-spacing:-0.02em;">Оплата временно недоступна</h3>
+    <p style="font-size:15px; color:rgba(255,255,255,0.5); line-height:1.6; margin-bottom:32px; font-weight:300;">Не удалось запустить процесс оплаты. Пожалуйста, попробуйте повторить попытку через 10 минут или напрямую свяжитесь с нашей службой поддержки.</p>
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <a href="https://antviz.ru/support" target="_blank" class="btn btn-green" style="justify-content:center; border-radius:12px; font-size:15px; padding:14px 24px;">Написать в поддержку</a>
+      <button type="button" onclick="document.getElementById('paymentErrorModal').style.display='none'" class="btn btn-inv" style="justify-content:center; border-radius:12px; font-size:15px; padding:14px 24px; border:1px solid rgba(255,255,255,0.1);">Закрыть окно</button>
+    </div>
+  </div>
+</div>
 
 <div class="cookie-banner" id="cookieBanner">
   <div class="cookie-text">Мы используем файлы cookie. <a href="faq#rules">Политика конфиденциальности</a>.</div>
@@ -522,16 +550,17 @@ updateProgress();
 <script type="module">
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, setDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser=null,agreed=false,favFile=null,uploadedFiles=[];
 const FORMAT_LABELS={landing:'Лендинг-визитка',multipage:'Многостраничный сайт',shop:'Интернет-магазин',custom:'Особый случай'};
+const LOGIC_LABELS={static:'Статический сайт',dynamic:'С серверной логикой'};
 const TIERS={
   start:{name:'Старт',base:3900,pages:1,meta:'1 страница · 1–2 дня'},
   growth:{name:'Рост',base:9900,pages:5,meta:'до 5 страниц · 2–5 дней'},
   scale:{name:'Масштаб',base:19900,pages:10,meta:'до 10 страниц · 5–14 дней'}
 };
-let state={format:null,formatNote:'',tier:null,extras:{domain:false,domainOpt:'new',urgent:false,content:false,shop:false},promo:null};
+let state={format:null,formatNote:'',logic:'static',tier:null,extras:{domain:false,domainOpt:'new',urgent:false,content:false,shop:false},promo:null};
 const fmt=n=>Math.round(n).toLocaleString('ru');
 function escH(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg,type='info'){const el=document.getElementById('ovToast');el.textContent=msg;el.className='toast '+type+' show';setTimeout(()=>{el.className='toast';},3400);}
@@ -551,6 +580,15 @@ document.querySelectorAll('.type-card[data-format]').forEach(card=>{
   });
 });
 document.getElementById('formatNote').addEventListener('input',e=>{state.formatNote=e.target.value;updateUI();});
+
+// Обработка клика по картам логики
+document.querySelectorAll('.logic-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    document.querySelectorAll('.logic-card').forEach(c=>c.classList.remove('sel'));
+    card.classList.add('sel');state.logic=card.dataset.logic;
+    updateUI();recalc();
+  });
+});
 
 document.querySelectorAll('.tier[data-tier]').forEach(card=>{
   card.addEventListener('click',()=>{
@@ -684,6 +722,10 @@ function recalc(){
   if(!state.format&&!state.tier){sr.innerHTML='<div class="order-summary-empty">Выберите формат и тариф выше, чтобы увидеть состав заказа.</div>';return;}
   let shtml='';
   if(state.format)shtml+=`<div class="order-summary-row"><span class="label">Формат</span><span class="val">${escH(FORMAT_LABELS[state.format]||state.format)}</span></div>`;
+  
+  // Вывод логики в чек
+  shtml+=`<div class="order-summary-row"><span class="label">Архитектура</span><span class="val">${escH(LOGIC_LABELS[state.logic])}</span></div>`;
+  
   rows.forEach(r=>{shtml+=`<div class="order-summary-row"><span class="label">${escH(r.label)}</span><span class="val">${r.free?'Бесплатно':fmt(r.amount)+' ₽'}</span></div>`;});
   if(discount>0&&state.promo)shtml+=`<div class="order-summary-row discount"><span class="label">Промокод ${escH(state.promo.code)}</span><span class="val">−${fmt(discount)} ₽</span></div>`;
   if(state.tier)shtml+=`<div class="order-summary-row total"><span class="label">Итого</span><span class="val">${fmt(total)} ₽</span></div>`;
@@ -696,7 +738,7 @@ document.getElementById('submitBtn').addEventListener('click',async()=>{
   if(!agreed){document.getElementById('agreeBox').classList.add('err');document.getElementById('errAgree').classList.add('show');return;}
   if(!state.format||!state.tier){toast('Выберите формат и тариф','error');return;}
   if(!currentUser){toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
-  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Сохраняем заявку...';
+  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Инициализация оплаты...';
   const{total,discount}=calcAmounts();const t=TIERS[state.tier];
   const extrasArr=[];
   if(state.extras.domain&&state.extras.domainOpt==='new')extrasArr.push('domain');
@@ -704,24 +746,39 @@ document.getElementById('submitBtn').addEventListener('click',async()=>{
   let favData=null;if(favFile){try{favData=await f2b(favFile);}catch(e){toast('Не удалось прикрепить фавикон','error');}}
   const BUDGET=850*1024;let used=favData?Math.round(favData.length*0.75):0;const attachments=[];
   for(const f of uploadedFiles){try{const d=await f2b(f);const b=Math.round(d.length*0.75);if(used+b>BUDGET){toast(`«${f.name}» не поместился — пришлите в чат поддержки`,'error');continue;}used+=b;attachments.push({fileData:d,fileName:f.name,fileType:f.type});}catch(e){toast(`Не удалось: «${f.name}»`,'error');}}
-  let docRef;
-  try{
-    docRef=await addDoc(collection(db,'orders'),{
-      package:t.name,siteType:state.format==='custom'?`Особый случай: ${state.formatNote.trim()}`:FORMAT_LABELS[state.format],
-      pages:t.pages,totalPrice:total,extras:extrasArr,domainOption:state.extras.domainOpt,
-      promoCode:state.promo?.code||null,discountApplied:discount,
-      description:document.getElementById('briefText').value.trim()||'',
-      attachments:attachments.length?attachments:null,favicon:favData,
-      clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
-      uid:currentUser.uid,status:0,createdAt:serverTimestamp()
-    });
-  }catch(e){btn.disabled=false;btn.textContent='Оплатить';toast('Не получилось сохранить. Проверьте соединение.','error');return;}
+  
+  // Генерируем локальный ID документа Firestore заранее для платёжного шлюза
+  const ordersRef = collection(db, 'orders');
+  const docRef = doc(ordersRef);
+  
   try{
     btn.textContent='Переходим к оплате...';
     const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:docRef.id,amount:total})});
     const data=await resp.json();
-    if(data.paymentUrl){window.location.href=data.paymentUrl;}else throw new Error();
-  }catch(e){btn.disabled=false;btn.textContent='Оплатить';toast('Заявка сохранена. Не получилось открыть оплату — свяжемся в чате.','warn');}
+    
+    if(data.paymentUrl){
+      // Только если платежная ссылка успешно создана, пишем заказ в базу данных
+      await setDoc(docRef, {
+        package:t.name,
+        siteType:state.format==='custom'?`Особый случай: ${state.formatNote.trim()}`:FORMAT_LABELS[state.format],
+        siteLogic:LOGIC_LABELS[state.logic],
+        pages:t.pages,totalPrice:total,extras:extrasArr,domainOption:state.extras.domainOpt,
+        promoCode:state.promo?.code||null,discountApplied:discount,
+        description:document.getElementById('briefText').value.trim()||'',
+        attachments:attachments.length?attachments:null,favicon:favData,
+        clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
+        uid:currentUser.uid,status:0,createdAt:serverTimestamp()
+      });
+      window.location.href=data.paymentUrl;
+    } else {
+      throw new Error('Payment generation failed');
+    }
+  }catch(e){
+    // Если произошел сбой, заказ НЕ создается в БД, кнопка разблокируется и открывается модальное окно ошибки по центру
+    btn.disabled=false;
+    btn.textContent='Оплатить';
+    document.getElementById('paymentErrorModal').style.display='flex';
+  }
 });
 
 recalc();

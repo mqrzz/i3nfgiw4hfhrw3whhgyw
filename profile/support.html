@@ -6,23 +6,24 @@
   <title>Поддержка — Antviz</title>
   <link rel="icon" href="../img/favicon.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=Onest:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --bg:#0a0a0c; --surface:#111114; --surface-2:#15151a; --surface-3:#1a1a21;
-      --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
-      --ink:#f2f2f6; --ink-dim:rgba(255,255,255,.46); --ink-faint:rgba(255,255,255,.26);
-      --accent:#7D32FF; --accent-soft:#a78bfa; --accent-wash:rgba(125,50,255,.12);
-      --good:#34d399; --good-wash:rgba(52,211,153,.12);
-      --warn:#fbbf24; --warn-wash:rgba(251,191,36,.1);
-      --bad:#f87171; --bad-wash:rgba(248,113,113,.1);
-      --info:#60a5fa; --info-wash:rgba(96,165,250,.12);
+      --bg:#ffffff; --surface:#f9fafc; --surface-2:#f2f4f7; --surface-3:#e9ecf1;
+      --line:#dfe3e8; --line-strong:#cbcdd6;
+      --ink:#191b1e; --ink-dim:#707a8a; --ink-faint:#9aa2b1;
+      --accent:#1ede7b; --accent-soft:#1ac16b; --accent-wash:rgba(30,222,123,.12);
+      --good:#1ede7b; --good-wash:rgba(30,222,123,.12);
+      --warn:#f59e0b; --warn-wash:rgba(245,158,11,.1);
+      --bad:#e8634f; --bad-wash:rgba(232,99,79,.1);
+      --info:#3b82f6; --info-wash:rgba(59,130,246,.1);
       --r-xs:6px; --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:40px;
       --filter-height: 36px;
+      --font:'Geologica','Inter','Arial',sans-serif;
     }
     html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--ink);font-family:'Onest',sans-serif;font-weight:300;line-height:1.6;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased}
+    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased}
     @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
     :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
 
@@ -35,44 +36,34 @@
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
     .spinner{width:22px;height:22px;border:1.5px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
 
-    .mobile-top-bar{display:none;position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:200;height:44px;background:var(--surface);border:1px solid var(--line-strong);border-radius:99px;align-items:center;padding:0 16px;gap:8px;min-width:200px;max-width:calc(100% - 28px)}
-    .mobile-top-bar a{display:flex;align-items:center;gap:5px;color:var(--ink-faint);text-decoration:none;font-size:13px;transition:color .15s;flex-shrink:0}
-    .mobile-top-bar a:hover{color:var(--ink)}
-    .mobile-top-bar a svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
-    .mtb-title{font-family:'Unbounded',sans-serif;font-size:12.5px;font-weight:600;white-space:nowrap;flex:1;text-align:center}
-    .unread-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-size:10px;font-weight:600;width:18px;height:18px;border-radius:50%;margin-left:4px}
-    @media (max-width:840px){.mobile-top-bar{display:flex!important}.ticket-shell{padding-top:calc(44px + 28px)!important}.ticket-back{display:none}}
-
-    .ticket-shell{max-width:1100px;margin:0 auto;padding:104px 40px 120px;animation:fadeUp .25s ease}
-    .ticket-back{display:inline-flex;align-items:center;gap:6px;color:var(--ink-faint);font-size:.82rem;text-decoration:none;margin-bottom:28px;transition:color .15s}
-    .ticket-back:hover{color:var(--ink)}
-    .ticket-back svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+    .ticket-shell{max-width:1100px;width:100%;animation:fadeUp .25s ease}
 
     .ticket-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:36px}
-    .ticket-title{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.025em;margin-bottom:8px}
+    .ticket-title{font-family:var(--font);font-weight:500;font-size:clamp(1.7rem,3vw,2.3rem);letter-spacing:-.025em;margin-bottom:8px}
+    .unread-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-size:11px;font-weight:500;width:20px;height:20px;border-radius:50%;margin-left:8px;vertical-align:middle}
     .ticket-sub{color:var(--ink-dim);font-size:.92rem}
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:.7rem 1.3rem;border-radius:var(--r-md);font-family:'Onest',sans-serif;font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s;white-space:nowrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.7rem 1.3rem;border-radius:var(--r-md);font-family:var(--font);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s;white-space:nowrap}
     .btn svg{width:13px;height:13px}
-    .btn-primary{background:var(--accent);color:#fff}
-    .btn-primary:hover{background:#8f4eff}
+    .btn-primary{background:var(--accent);color:#191b1e}
+    .btn-primary:hover{background:var(--accent-soft)}
     .btn-ghost{background:transparent;border:1px solid var(--line-strong);color:var(--ink-dim)}
     .btn-ghost:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
     .btn-xs{padding:.36rem .7rem;font-size:.72rem}
 
     .ticket-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}
     .ticket-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .ticket-tabs{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px;height:var(--filter-height)}
-    .ticket-tab{border:none;background:transparent;color:var(--ink-faint);font-family:'Onest',sans-serif;font-size:.78rem;font-weight:500;padding:0 .9rem;border-radius:99px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;height:100%;display:flex;align-items:center}
+    .ticket-tabs{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:3px;gap:2px;height:var(--filter-height)}
+    .ticket-tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:0 .9rem;border-radius:12px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;height:100%;display:flex;align-items:center}
     .ticket-tab:hover{color:var(--ink)}
     .ticket-tab.is-active{background:var(--accent-wash);color:var(--accent-soft)}
     .ticket-search{position:relative;height:var(--filter-height)}
-    .ticket-search input{height:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:99px;padding:0 .9rem 0 2.2rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.8rem;outline:none;width:200px;transition:border-color .18s,width .2s}
+    .ticket-search input{height:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:14px;padding:0 .9rem 0 2.2rem;color:var(--ink);font-family:var(--font);font-size:.8rem;outline:none;width:200px;transition:border-color .18s,width .2s}
     .ticket-search input:focus{border-color:var(--accent);width:240px}
     .ticket-search input::placeholder{color:var(--ink-faint)}
     .ticket-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--ink-faint);stroke-width:2;fill:none}
     .ticket-count{color:var(--ink-faint);font-size:.78rem}
     .topic-filter{height:var(--filter-height)}
-    .topic-filter select{height:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:99px;padding:0 2rem 0 .9rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.78rem;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;min-width:160px}
+    .topic-filter select{height:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:14px;padding:0 2rem 0 .9rem;color:var(--ink);font-family:var(--font);font-size:.78rem;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;min-width:160px}
     .topic-filter select:focus{border-color:var(--accent)}
     .topic-filter select option{background:var(--surface-2);color:var(--ink)}
 
@@ -80,11 +71,11 @@
     .ticket-list{border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
     .ticket-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
     .ticket-row-wrap:last-child{border-bottom:none}
-    .ticket-row{all:unset;display:grid;grid-template-columns:1fr 120px 110px 100px 22px;gap:16px;align-items:center;width:100%;padding:18px 20px;cursor:pointer;transition:background .15s;font-family:'Onest',sans-serif}
+    .ticket-row{all:unset;display:grid;grid-template-columns:1fr 120px 110px 100px 22px;gap:16px;align-items:center;width:100%;padding:18px 20px;cursor:pointer;transition:background .15s;font-family:var(--font)}
     .ticket-row:hover{background:var(--surface)}
     .ticket-cell-main{display:flex;flex-direction:column;gap:3px;min-width:0}
     .ticket-subject{font-size:.92rem;font-weight:500;color:var(--ink)}
-    .ticket-subject.has-unread{font-weight:700;color:var(--accent-soft)}
+    .ticket-subject.has-unread{font-weight:500;color:var(--accent-soft)}
     .ticket-preview{font-size:.78rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:300px}
     .ticket-meta{font-size:.72rem;color:var(--ink-faint)}
     .ticket-tag{display:inline-flex;align-items:center;gap:6px;font-size:.74rem;font-weight:500;padding:.3rem .65rem;border-radius:var(--r-xs);width:fit-content}
@@ -109,7 +100,7 @@
     .msg-divider{font-size:.7rem;color:var(--ink-faint);text-align:center;padding:8px 0 4px;font-weight:500;letter-spacing:.04em}
 
     .chat-input-wrap{display:flex;gap:8px;margin-top:4px}
-    .chat-input-wrap input{flex:1;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.6rem .9rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.82rem;outline:none;transition:border-color .18s}
+    .chat-input-wrap input{flex:1;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.6rem .9rem;color:var(--ink);font-family:var(--font);font-size:.82rem;outline:none;transition:border-color .18s}
     .chat-input-wrap input:focus{border-color:var(--accent)}
     .chat-input-wrap input::placeholder{color:var(--ink-faint)}
     .chat-input-wrap .btn{flex-shrink:0}
@@ -122,13 +113,13 @@
     .ticket-form-overlay.show{opacity:1;pointer-events:all}
     .ticket-form-modal{background:var(--surface);border:1px solid var(--line-strong);border-radius:var(--r-xl);padding:36px 32px;width:100%;max-width:480px;transform:translateY(14px) scale(.98);transition:transform .2s}
     .ticket-form-overlay.show .ticket-form-modal{transform:translateY(0) scale(1)}
-    .ticket-form-modal h3{font-family:'Unbounded',sans-serif;font-size:1.1rem;font-weight:600;margin-bottom:20px;text-align:center}
+    .ticket-form-modal h3{font-family:var(--font);font-size:1.1rem;font-weight:500;margin-bottom:20px;text-align:center}
     .ticket-form-group{margin-bottom:14px}
     .ticket-form-group label{display:block;font-size:.72rem;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
-    .ticket-form-group select,.ticket-form-group input,.ticket-form-group textarea{width:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.65rem .8rem;color:var(--ink);font-family:'Onest',sans-serif;font-size:.86rem;outline:none;transition:border-color .18s}
+    .ticket-form-group select,.ticket-form-group input,.ticket-form-group textarea{width:100%;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:var(--r-sm);padding:.65rem .8rem;color:var(--ink);font-family:var(--font);font-size:.86rem;outline:none;transition:border-color .18s}
     .ticket-form-group select:focus,.ticket-form-group input:focus,.ticket-form-group textarea:focus{border-color:var(--accent)}
     .ticket-form-group textarea{min-height:80px;resize:vertical}
-    .ticket-form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;background-color:var(--surface-2)}
+    .ticket-form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;background-color:var(--surface-2)}
     .ticket-form-group select option{background:var(--surface-2);color:var(--ink)}
     .ticket-form-actions{display:flex;gap:10px;margin-top:20px}
     .ticket-form-actions .btn{flex:1;justify-content:center}
@@ -138,19 +129,18 @@
     .empty{text-align:center;padding:64px 16px;color:var(--ink-faint)}
     .empty-icon{margin-bottom:16px;display:flex;justify-content:center}
     .empty-icon svg{width:42px;height:42px;stroke:var(--ink-faint);stroke-width:1.2;fill:none;opacity:.5}
-    .empty h3{font-family:'Unbounded',sans-serif;font-size:1.05rem;font-weight:600;color:var(--ink);margin-bottom:6px}
+    .empty h3{font-family:var(--font);font-size:1.05rem;font-weight:500;color:var(--ink);margin-bottom:6px}
     .empty p{font-size:.86rem;margin-bottom:20px}
 
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.6rem 1.3rem;border-radius:99px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.6rem 1.3rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--good);color:#04140e}
-    .toast.error{background:var(--bad);color:#1a0606}
-    .toast.info{background:var(--accent);color:#fff}
+    .toast.success{background:var(--good);color:#0d3320}
+    .toast.error{background:var(--bad);color:#fff}
+    .toast.info{background:var(--accent);color:#191b1e}
 
     .ticket-mobile-tags{display:none}
 
     @media (max-width:840px){
-      .ticket-shell{padding-left:20px;padding-right:20px}
       .ticket-cols{display:none}
       .ticket-row{grid-template-columns:1fr;gap:6px}
       .ticket-cell-status,.ticket-cell-date{display:none}
@@ -178,27 +168,18 @@
 </head>
 <body>
 <script src="../nav.js" data-page="support"></script>
+<script src="../sidebar.js" data-page="support"></script>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
 </div>
 
-<div class="mobile-top-bar">
-  <a href="../profile"><svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Кабинет</a>
-  <span style="flex:1"></span>
-  <span class="mtb-title">Поддержка <span class="unread-badge" id="headerUnread" style="display:none">0</span></span>
-  <span style="flex:1"></span>
-</div>
-
-<div class="ticket-shell" id="appWrap" style="display:none">
-
-  <a href="../profile" class="ticket-back">
-    <svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>В личный кабинет
-  </a>
+<div id="sbContent" style="display:none">
+<div class="ticket-shell" id="appWrap">
 
   <div class="ticket-head">
     <div>
-      <div class="ticket-title">Поддержка</div>
+      <div class="ticket-title">Поддержка<span class="unread-badge" id="headerUnread" style="display:none">0</span></div>
       <div class="ticket-sub">Вопросы, идеи, сообщения об ошибках — мы на связи</div>
     </div>
     <button class="btn btn-primary" id="newTicketBtn">
@@ -241,7 +222,8 @@
     <div style="padding:32px;color:var(--ink-faint);font-size:.85rem;text-align:center">Загрузка...</div>
   </div>
 
-</div>
+</div><!-- /ticket-shell -->
+</div><!-- /sbContent -->
 
 <!-- Форма нового тикета -->
 <div class="ticket-form-overlay" id="ticketFormOverlay">
@@ -370,8 +352,10 @@ function renderTickets() {
   // unread badge в шапке
   const unreadCount = allTickets.filter(t => hasUnread(t)).length;
   const badge = document.getElementById('headerUnread');
-  badge.style.display = unreadCount ? 'inline-flex' : 'none';
-  badge.textContent = unreadCount;
+  if (badge) {
+    badge.style.display = unreadCount ? 'inline-flex' : 'none';
+    badge.textContent = unreadCount;
+  }
 
   document.getElementById('ticketCount').textContent = filtered.length
     ? `Показано ${filtered.length} из ${allTickets.length}`
@@ -667,7 +651,7 @@ onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = '../auth'; return; }
   currentUser = user;
   document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('appWrap').style.display = 'block';
+  document.getElementById('sbContent').style.display = 'block';
 
   const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
   unsubTickets = onSnapshot(q, async snap => {

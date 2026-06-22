@@ -76,10 +76,11 @@
     .list-search svg{width:14px;height:14px;stroke:var(--muted);flex-shrink:0}
     .list-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:.82rem;flex:1;min-width:0}
     .list-search input::placeholder{color:var(--muted2)}
-    .list-tabs{display:flex;gap:.3rem}
+    .list-tabs{display:flex;gap:.3rem;flex-wrap:wrap}
     .list-tab{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.72rem;padding:.22rem .6rem;border-radius:7px;cursor:pointer;transition:all .15s}
     .list-tab:hover{color:var(--text);background:rgba(0,0,0,.04)}
     .list-tab.active{background:rgba(30,222,123,.12);color:var(--accent2);border-color:rgba(30,222,123,.2)}
+    .list-actions{display:flex;gap:.4rem;margin-top:.5rem}
     .tickets-scroll{flex:1;overflow-y:auto}
     .ticket-item{padding:.8rem 1.1rem;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;position:relative}
     .ticket-item:hover{background:var(--bg3)}
@@ -137,6 +138,22 @@
     .lightbox.show{opacity:1;pointer-events:all}
     .lightbox img{max-width:94vw;max-height:92vh;border-radius:10px;object-fit:contain}
     .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.1);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .22s}
+    .modal-overlay.show{opacity:1;pointer-events:all}
+    .modal{background:var(--bg2);border-radius:20px;padding:1.8rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
+    .modal-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.95rem;margin-bottom:1.4rem;display:flex;align-items:center;justify-content:space-between}
+    .modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1.1rem;padding:0;line-height:1}
+    .modal-footer{display:flex;gap:.7rem;margin-top:1.4rem}
+    .modal-footer .btn{flex:1;justify-content:center}
+    .form-group{margin-bottom:1rem}
+    .form-label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.4rem;font-weight:600}
+    .form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;font-weight:400;outline:none;transition:border-color .18s}
+    .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,222,123,.15)}
+    .form-input::placeholder,.form-textarea::placeholder{color:var(--muted2)}
+    .form-textarea{resize:vertical;min-height:70px;line-height:1.55}
+    .form-select{cursor:pointer}
   </style>
 </head>
 <body>
@@ -211,6 +228,9 @@
         <button class="list-tab" onclick="switchTab('in-progress',this)">В работе</button>
         <button class="list-tab" onclick="switchTab('resolved',this)">Решённые</button>
       </div>
+      <div class="list-actions">
+        <button class="btn btn-primary btn-sm" onclick="openCreateTicket()">➕ Создать тикет</button>
+      </div>
     </div>
     <div class="tickets-scroll" id="ticketsList">
       <div class="empty-list">Загрузка...</div>
@@ -260,6 +280,43 @@
 
 </div>
 
+<!-- MODAL: Создание тикета -->
+<div class="modal-overlay" id="createTicketModal" onclick="if(event.target===this)closeCreateTicket()">
+  <div class="modal">
+    <div class="modal-title">📝 Создать тикет <button class="modal-close" onclick="closeCreateTicket()">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Пользователь</label>
+      <select class="form-select" id="ticketUser">
+        <option value="">Выберите пользователя...</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Тема</label>
+      <input class="form-input" id="ticketTopic" type="text" placeholder="Например: Техническая проблема"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Заголовок</label>
+      <input class="form-input" id="ticketSubject" type="text" placeholder="Краткий заголовок"/>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Сообщение</label>
+      <textarea class="form-textarea" id="ticketMessage" placeholder="Опишите проблему..." rows="4"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Приоритет</label>
+      <select class="form-select" id="ticketPriority">
+        <option value="low">Низкий</option>
+        <option value="medium" selected>Средний</option>
+        <option value="high">Высокий</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeCreateTicket()">Отмена</button>
+      <button class="btn btn-primary" onclick="createTicket()">Создать</button>
+    </div>
+  </div>
+</div>
+
 <div class="lightbox" id="lightbox" onclick="document.getElementById('lightbox').classList.remove('show')">
   <button class="lb-close">✕</button>
   <img id="lbImg" src="" alt=""/>
@@ -272,7 +329,7 @@ import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   collection, query, orderBy, onSnapshot, doc,
-  updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs
+  updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs, getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allTickets = [];
@@ -437,6 +494,87 @@ function renderChat(msgs) {
   el.scrollTop = el.scrollHeight;
 }
 
+// ─── CREATE TICKET ──────────────────────────────────────────────────────────
+window.openCreateTicket = async function() {
+  try {
+    const usersSnap = await getDocs(collection(db, 'users'));
+    const userSelect = document.getElementById('ticketUser');
+    userSelect.innerHTML = '<option value="">Выберите пользователя...</option>';
+    usersSnap.forEach(d => {
+      const data = d.data();
+      const name = data.displayName || data.name || d.id;
+      const email = data.email || '';
+      userSelect.innerHTML += `<option value="${d.id}">${esc(name)}${email ? ' · '+esc(email) : ''}</option>`;
+    });
+    
+    document.getElementById('ticketTopic').value = '';
+    document.getElementById('ticketSubject').value = '';
+    document.getElementById('ticketMessage').value = '';
+    document.getElementById('ticketPriority').value = 'medium';
+    document.getElementById('createTicketModal').classList.add('show');
+  } catch(e) {
+    toast('Ошибка загрузки пользователей: '+e.message, 'error');
+  }
+};
+
+window.closeCreateTicket = function() {
+  document.getElementById('createTicketModal').classList.remove('show');
+};
+
+window.createTicket = async function() {
+  const uid = document.getElementById('ticketUser').value;
+  const topic = document.getElementById('ticketTopic').value.trim();
+  const subject = document.getElementById('ticketSubject').value.trim();
+  const message = document.getElementById('ticketMessage').value.trim();
+  const priority = document.getElementById('ticketPriority').value;
+  
+  if (!uid) { toast('Выберите пользователя', 'error'); return; }
+  if (!subject) { toast('Введите заголовок', 'error'); return; }
+  if (!message) { toast('Введите сообщение', 'error'); return; }
+  
+  try {
+    const userDoc = await getDoc(doc(db, 'users', uid));
+    const userData = userDoc.data();
+    
+    // Создаём тикет
+    const ticketRef = await addDoc(collection(db, 'tickets'), {
+      uid: uid,
+      userName: userData?.displayName || userData?.name || 'Пользователь',
+      userEmail: userData?.email || '—',
+      topic: topic || 'Общий вопрос',
+      subject: subject,
+      status: 'open',
+      priority: priority,
+      _read: false,
+      _adminRead: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    
+    // Добавляем первое сообщение
+    await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
+      sender: 'support',
+      senderName: 'Поддержка',
+      text: message,
+      imageUrl: null,
+      createdAt: serverTimestamp()
+    });
+    
+    // Отправляем уведомление пользователю
+    await addDoc(collection(db, 'notifications', uid, 'items'), {
+      title: '📝 Новый тикет поддержки',
+      text: `«${subject}»: ${message}`,
+      read: false,
+      createdAt: serverTimestamp()
+    });
+    
+    toast('Тикет создан и пользователь уведомлён ✅', 'success');
+    closeCreateTicket();
+  } catch(e) {
+    toast('Ошибка: ' + e.message, 'error');
+  }
+};
+
 // ─── ACTIONS ──────────────────────────────────────────────────────────────────
 window.sendReply = async function() {
   if (!selectedId) return;
@@ -454,7 +592,7 @@ window.sendReply = async function() {
     });
     await updateDoc(doc(db, 'tickets', selectedId), {
       updatedAt: serverTimestamp(),
-      _read: false,   // клиент не видел ещё
+      _read: false,
       _adminRead: true
     });
   } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
@@ -476,7 +614,7 @@ window.sendImg = async function() {
         imageUrl: e.target.result,
         createdAt: serverTimestamp()
       });
-      await updateDoc(doc(db, 'tickets', selectedId), { updatedAt: serverTimestamp(), _read: false });
+      await updateDoc(doc(db, 'tickets', selectedId), { updatedAt: serverTimestamp(), _read: false, _adminRead: true });
       toast('Изображение отправлено ✓', 'success');
     } catch(err) { toast('Ошибка', 'error'); }
     inp.value = '';

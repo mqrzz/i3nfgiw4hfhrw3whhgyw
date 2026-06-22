@@ -193,18 +193,30 @@
 
     @media (max-width:840px){
       .ord-cols{display:none}
-      .ord-row,.ord-row-wrap .ord-row{grid-template-columns:1fr;gap:8px}
+      .ord-row,.ord-row-wrap .ord-row{grid-template-columns:1fr;gap:4px}
       .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
       .ord-row{position:relative}
-      .ord-chevron{position:absolute;top:18px;right:20px}
-      .ord-row-wrap .ord-row{padding-right:44px}
-      .ord-tags-mobile{display:flex;gap:8px;margin-top:6px;flex-wrap:wrap}
+      .ord-chevron{position:absolute;top:50%;right:16px;transform:translateY(-50%)}
+      .ord-row-wrap .ord-row{padding-right:44px;padding-top:16px;padding-bottom:16px}
+      .ord-tags-mobile{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;align-items:center}
+      .ord-num{font-size:.88rem}
+      .ord-meta{font-size:.76rem}
+      .ord-tag{font-size:.72rem;padding:.25rem .6rem}
+      .ord-pay{font-size:.72rem}
+      .ord-body{padding:18px 16px 20px}
+      .trk-lbl{font-size:.62rem;max-width:48px}
+      .trk-ico{width:26px;height:26px}
+      .ord-actions{flex-direction:column;gap:6px}
+      .ord-actions .btn{width:100%;justify-content:center}
     }
     @media (max-width:480px){
-      .ord-head{flex-direction:column;align-items:flex-start}
-      .ord-toolbar{flex-direction:column;align-items:flex-start}
-      .ord-tabs{overflow-x:auto;max-width:100%}
+      .ord-head{flex-direction:column;align-items:flex-start;gap:12px}
+      .ord-toolbar{flex-direction:column;align-items:flex-start;gap:10px}
+      .ord-tabs{overflow-x:auto;max-width:100%;width:100%}
+      .ord-shell{padding-bottom:72px}
     }
+    /* footer gap */
+    #sbContent{padding-bottom:80px}
   </style>
 </head>
 <body>
@@ -421,7 +433,7 @@ function orderCard(o){
       ${estDate?`<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">${estDate}</strong></div>`:''}
       ${siteBlock}
       <div class="ord-actions">
-        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();printReceipt(${JSON.stringify(o).replace(/"/g,'&quot;')})">
+        <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();printReceipt('${o.id}')">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;stroke-width:2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
           Квитанция
         </button>
@@ -482,12 +494,17 @@ window.submitReview = async function(){
   }catch(e){toast('Ошибка','error');}
 };
 
-window.printReceipt = function(o){
+// Кэш всех заказов для безопасного доступа из printReceipt
+let _ordersCache = [];
+window.printReceipt = function(id){
+  const o = _ordersCache.find(x=>x.id===id);
+  if(!o) return;
   const w = window.open('', '_blank', 'width=600,height=700');
   const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('ru', {day:'numeric', month:'long', year:'numeric'}) : '—';
-  const extrasHtml = (o.extras || []).length ? `<tr><td>Дополнения</td><td>${o.extras.join(', ')}</td></tr>` : '';
+  const extrasLabels = {domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+  const extrasHtml = (o.extras||[]).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e=>extrasLabels[e]||e).join(', ')}</td></tr>` : '';
   const totalHtml = `<tr class="total"><td>Итого</td><td>${o.totalPrice ? o.totalPrice.toLocaleString('ru') + ' ₽' : '—'}</td></tr>`;
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Design Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr>${totalHtml}</table><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr>${totalHtml}</table><script>window.onload=function(){window.print();};<\/script></body></html>`;
   w.document.write(html);
   w.document.close();
 };
@@ -495,9 +512,11 @@ window.printReceipt = function(o){
 function launchConfetti(){const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';const colors=['#1ede7b','#1ac16b','#191b1e','#3b82f6','#f59e0b','#e8634f','#dfe3e8'];for(let i=0;i<90;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}setTimeout(()=>{wrap.innerHTML='';},5000);}
 
 function watchChatBadge(uid){
-  const q = query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false));
+  // Уведомления о новых сообщениях поддержки — смотрим непрочитанные тикеты
+  const q = query(collection(db,'tickets'),where('uid','==',uid),where('_read','==',false));
   unsubChat = onSnapshot(q, snap=>{
-    document.getElementById('navChatBadge').style.display = snap.size?'':'none';
+    const badge = document.getElementById('navChatBadge');
+    if(badge) badge.style.display = snap.size?'':'none';
   }, ()=>{});
 }
 
@@ -507,6 +526,7 @@ function loadOrders(uid){
   unsubOrders = onSnapshot(q, snap=>{
     const orders = snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    _ordersCache = orders;
     renderOrders(orders);
     snap.docChanges().forEach(ch=>{
       if(ch.type==='modified'){

@@ -83,10 +83,13 @@
       height: 2px; border-radius: 2px; background: var(--an-green);
     }
 
-    /* Выделение для ссылки "Сделать заказ" в центре */
-    .an-link[href*="order"] {
+    /* Выделение для ссылки "Сделать заказ" в центре — теперь на одном уровне */
+    .an-link.cta-link {
       color: var(--an-green);
       font-weight: 500;
+    }
+    .an-link.cta-link.active::after {
+      background: var(--an-green);
     }
 
     /* ── Кнопка с дропдауном в центре навбара ── */
@@ -330,16 +333,61 @@
       transition: opacity .18s ease, transform .18s ease;
       font-family: var(--an-font);
       box-shadow: 0 16px 40px rgba(0,0,0,.4);
+      max-height: 70vh;
+      overflow-y: auto;
     }
     .an-mobile-sheet.open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+    .an-mobile-sheet.open { display: flex; }
+
     .an-mobile-link {
       display: block; color: var(--an-ink-dim);
       font-weight: 300; font-size: .95rem;
       text-decoration: none; padding: 14px 16px;
       border-radius: 14px; transition: background .12s, color .12s;
+      cursor: pointer;
     }
     .an-mobile-link:hover, .an-mobile-link.active { color: var(--an-ink); background: rgba(255,255,255,.05); }
     .an-mobile-link.active { font-weight: 500; }
+
+    .an-mobile-link.cta {
+      color: var(--an-green);
+      font-weight: 500;
+    }
+
+    .an-mobile-drop {
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .an-mobile-drop-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px;
+      color: var(--an-ink-dim);
+      font-weight: 300; font-size: .95rem;
+      cursor: pointer;
+      border-radius: 14px;
+      transition: background .12s, color .12s;
+      user-select: none;
+    }
+    .an-mobile-drop-header:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-mobile-drop-header.active { color: var(--an-ink); font-weight: 500; }
+    .an-mobile-drop-chevron {
+      width: 12px; height: 12px; opacity: .4; flex-shrink: 0;
+      transition: transform .18s, opacity .18s;
+    }
+    .an-mobile-drop-header.open .an-mobile-drop-chevron { transform: rotate(180deg); opacity: .7; }
+    .an-mobile-drop-body {
+      padding: 0 12px 8px 12px;
+      display: none;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .an-mobile-drop-body.open { display: flex; }
+    .an-mobile-drop-body .an-mobile-link {
+      padding: 10px 14px;
+      font-size: .88rem;
+      padding-left: 30px;
+    }
+
     .an-mobile-cta {
       display: block; text-align: center; margin-top: 4px;
       background: var(--an-green); color: var(--an-green-ink);
@@ -471,39 +519,56 @@
         '</div></div>';
     }).join('');
 
+    // Ссылка "Сделать заказ" теперь на одном уровне с дропдаунами
     const plainLinks = links.map(l =>
-      '<a href="' + l.href + '" class="an-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+      '<a href="' + l.href + '" class="an-link cta-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
     ).join('');
 
     if (!dropdowns && !plainLinks) return '';
     return '<div class="an-center" id="anCenter">' + dropdowns + plainLinks + '</div>';
   }
 
-  // Мобильная панель: те же ссылки, что и в центре десктопной капсулы,
-  // раскрывается по тапу на бугер, заменяет собой нижний таб-бар из footer.js.
+  // Мобильная панель: показывает дропдауны + ссылки на одном уровне
+  // с аккордеоном для раскрытия подменю
   function buildMobileSheet() {
     if (cfg.inApp) return '';
-    const dropLinks = NAV_DROPDOWNS.flatMap(drop =>
-      drop.sections.flatMap(sec => sec.sep ? [] : (sec.items || []))
-    );
-    const plainLinks = cfg.centerLinks || [];
-    const allLinks = [...dropLinks, ...plainLinks];
 
-    const uniqueLinks = [];
-    const seenHrefs = new Set();
-    for (const l of allLinks) {
-      if (!seenHrefs.has(l.href)) {
-        seenHrefs.add(l.href);
-        uniqueLinks.push(l);
-      }
-    }
+    // Строим мобильные дропдауны
+    const mobileDrops = NAV_DROPDOWNS.map(drop => {
+      const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
+      const itemsHtml = drop.sections.map(sec => {
+        if (sec.sep) return '';
+        let html = '';
+        if (sec.label) {
+          // метка в мобильной версии не нужна, пропускаем
+        }
+        html += sec.items.map(item =>
+          '<a href="' + item.href + '" class="an-mobile-link">' + item.label + '</a>'
+        ).join('');
+        return html;
+      }).join('');
 
-    const linksHtml = uniqueLinks.map(l =>
-      '<a href="' + l.href + '" class="an-mobile-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
-    ).join('');
-    const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="an-mobile-cta">Заказать сайт</a>' : '';
-    if (!linksHtml && !ctaHtml) return '';
-    return '<div class="an-mobile-sheet" id="anMobileSheet">' + linksHtml + ctaHtml + '</div>';
+      return '<div class="an-mobile-drop">' +
+        '<div class="an-mobile-drop-header' + (isActive ? ' active' : '') + '" data-mobile-drop="' + drop.key + '">' +
+        drop.label +
+        '<svg class="an-mobile-drop-chevron" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' +
+        '</div>' +
+        '<div class="an-mobile-drop-body" id="anMobileDrop-' + drop.key + '">' + itemsHtml + '</div>' +
+        '</div>';
+    }).join('');
+
+    // Ссылка "Сделать заказ" на одном уровне
+    const ctaLink = (cfg.centerLinks && cfg.centerLinks.length > 0)
+      ? cfg.centerLinks.map(l =>
+          '<a href="' + l.href + '" class="an-mobile-link cta' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+        ).join('')
+      : '';
+
+    // Если есть hideCta — не показываем отдельную кнопку заказа
+    const ctaBtn = (!cfg.hideCta) ? '<a href="' + b + 'order" class="an-mobile-cta">Заказать сайт</a>' : '';
+
+    if (!mobileDrops && !ctaLink && !ctaBtn) return '';
+    return '<div class="an-mobile-sheet" id="anMobileSheet">' + mobileDrops + ctaLink + ctaBtn + '</div>';
   }
 
   const NAV_HTML = `
@@ -580,6 +645,17 @@ ${buildMobileSheet()}`;
     });
   });
 
+  // Мобильный аккордеон для дропдаунов
+  document.querySelectorAll('.an-mobile-drop-header').forEach(header => {
+    header.addEventListener('click', function(e) {
+      e.stopPropagation();
+      const key = this.dataset.mobileDrop;
+      const body = document.getElementById('anMobileDrop-' + key);
+      const isOpen = this.classList.toggle('open');
+      body?.classList.toggle('open', isOpen);
+    });
+  });
+
   // Бургер мобильной капсулы — открывает/закрывает an-mobile-sheet
   const burger = document.getElementById('anBurger');
   const sheet  = document.getElementById('anMobileSheet');
@@ -592,6 +668,13 @@ ${buildMobileSheet()}`;
     burger?.classList.remove('open');
     burger?.setAttribute('aria-expanded', 'false');
     sheet?.classList.remove('open');
+    // Закрываем все раскрытые аккордеоны
+    document.querySelectorAll('.an-mobile-drop-header.open').forEach(h => {
+      h.classList.remove('open');
+      const key = h.dataset.mobileDrop;
+      const body = document.getElementById('anMobileDrop-' + key);
+      body?.classList.remove('open');
+    });
   }
 
   document.addEventListener('click', e => {

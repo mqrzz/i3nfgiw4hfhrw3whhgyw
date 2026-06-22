@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>О компании — Antviz</title>
+  <meta name="description" content="История, команда и философия компании веб-разработки Antviz." />
+  <link rel="icon" href="favicon.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth;overflow-x:hidden}
+    body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.4;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden;max-width:100%}
+    
+    :root{
+      --green:#1ede7b;
+      --green-h:#1ac16b;
+      --bg:#fff;
+      --bg2:#f2f4f7;
+      --bg3:#f9fafc;
+      --text:#191b1e;
+      --muted:#707a8a;
+      --border:#dfe3e8;
+      --border2:#cbcdd6;
+      --dark:#191b1e;
+      --dark2:#2b2f33;
+      --font:'Geologica','Inter','Arial',sans-serif;
+      --sp-xl:120px;
+      --sp-l:80px;
+    }
+    
+    .container{max-width:1328px;margin:0 auto;padding:0 20px;width:100%}
+    @media(min-width:1024px){.container{padding:0 64px}}
+    @media(min-width:1280px){.container{padding:0 96px}}
+
+    .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s cubic-bezier(0.2, 0.8, 0.2, 1), transform .7s cubic-bezier(0.2, 0.8, 0.2, 1)}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    .eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:16px;display:block}
+    .eyebrow.g{color:var(--green)}
+
+    /* КНОПКИ */
+    .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:17px 32px;font-size:16px;transition:background .15s,transform .15s;}
+    .btn:hover{transform:translateY(-2px)}
+    .btn-dark{background:var(--dark);color:#fff}
+    .btn-dark:hover{background:var(--dark2)}
+
+    /* 01 ABOUT HERO (НОВЫЙ) */
+    .ab-hero{padding:calc(var(--sp-xl) + 40px) 0 var(--sp-xl); background:var(--bg2); position:relative; overflow:hidden;}
+    .ab-hero-bg-text{position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:clamp(180px, 35vw, 600px); font-weight:500; color:var(--border); opacity:0.25; line-height:0.8; user-select:none; z-index:0; white-space:nowrap; pointer-events:none;}
+    .ab-hero-content{position:relative; z-index:1; max-width:840px;}
+    .ab-hero h1{font-size:clamp(48px, 6vw, 84px); font-weight:500; letter-spacing:-.04em; line-height:1.05; margin-bottom:32px;}
+    .ab-hero h1 em{font-style:normal; color:var(--green);}
+    .ab-hero p{font-size:clamp(18px, 2vw, 24px); color:var(--muted); line-height:1.5;}
+
+    /* 02 MANIFESTO (НОВЫЙ) */
+    .manifesto{padding:var(--sp-xl) 0; background:var(--bg);}
+    .manifesto-grid{display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;}
+    @media(max-width:900px){.manifesto-grid{grid-template-columns:1fr; gap:40px;}}
+    .m-text h2{font-size:clamp(32px, 4vw, 56px); font-weight:500; letter-spacing:-.03em; margin-bottom:24px; line-height:1.1;}
+    .m-text p{font-size:18px; color:var(--muted); margin-bottom:20px; line-height:1.6;}
+    .m-quote{background:var(--dark); border-radius:40px; padding:64px; position:relative;}
+    .m-quote::before{content:'"'; position:absolute; top:20px; left:30px; font-size:120px; color:var(--green); opacity:0.2; font-family:serif; line-height:1;}
+    .m-quote blockquote{font-size:clamp(24px, 3vw, 36px); font-weight:400; color:#fff; line-height:1.3; position:relative; z-index:1; letter-spacing:-.02em;}
+    .m-quote cite{display:block; margin-top:24px; font-size:15px; color:rgba(255,255,255,.5); font-style:normal;}
+
+    /* 03 VALUES (НОВЫЙ) */
+    .values{padding:var(--sp-xl) 0; background:var(--dark); color:#fff;}
+    .v-header{text-align:center; max-width:600px; margin:0 auto 64px;}
+    .v-header h2{font-size:clamp(36px, 5vw, 64px); font-weight:500; letter-spacing:-.03em;}
+    .v-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:24px;}
+    @media(max-width:800px){.v-grid{grid-template-columns:1fr;}}
+    .v-card{background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.08); border-radius:32px; padding:48px 40px; transition:background .2s;}
+    .v-card:hover{background:rgba(255,255,255,.06);}
+    .v-num{font-size:14px; font-weight:500; color:var(--green); margin-bottom:32px; display:block; letter-spacing:.05em;}
+    .v-card h3{font-size:24px; font-weight:500; margin-bottom:16px; letter-spacing:-.02em;}
+    .v-card p{font-size:15px; color:rgba(255,255,255,.6); line-height:1.6;}
+
+    /* 04 TIMELINE (НОВЫЙ) */
+    .timeline{padding:var(--sp-xl) 0; background:var(--bg);}
+    .tl-container{max-width:800px; margin:0 auto; position:relative;}
+    .tl-container::before{content:''; position:absolute; top:0; bottom:0; left:24px; width:1px; background:var(--border2); z-index:0;}
+    @media(max-width:600px){.tl-container::before{left:16px;}}
+    .tl-item{position:relative; z-index:1; padding-left:80px; margin-bottom:64px;}
+    @media(max-width:600px){.tl-item{padding-left:56px;}}
+    .tl-item:last-child{margin-bottom:0;}
+    .tl-dot{position:absolute; top:4px; left:17px; width:15px; height:15px; background:var(--green); border-radius:50%; box-shadow:0 0 0 6px var(--bg);}
+    @media(max-width:600px){.tl-dot{left:9px;}}
+    .tl-year{font-size:14px; font-weight:500; color:var(--muted); margin-bottom:8px; display:block; letter-spacing:.05em;}
+    .tl-content h3{font-size:28px; font-weight:500; margin-bottom:12px; letter-spacing:-.02em;}
+    .tl-content p{font-size:16px; color:var(--muted); line-height:1.6;}
+
+    /* 05 STACK (НОВЫЙ — РАСШИРЕННЫЙ) */
+    .stack{padding:var(--sp-xl) 0; background:var(--bg2);}
+    .stack-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px; margin-top:56px;}
+    .stack-card{background:var(--bg); border-radius:24px; padding:40px 32px; border:1px solid var(--border); transition:transform .2s, box-shadow .2s;}
+    .stack-card:hover{transform:translateY(-4px); box-shadow:0 12px 40px rgba(0,0,0,.04);}
+    .stack-card .svg-icon{width:48px; height:48px; display:block; margin-bottom:16px;}
+    .stack-card .svg-icon svg{width:100%; height:100%; stroke:var(--green); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+    .stack-card h4{font-size:20px; font-weight:500; margin-bottom:12px;}
+    .stack-card p{font-size:15px; color:var(--muted); line-height:1.6;}
+    .stack-card .tech-badge{display:inline-block; margin-top:16px; padding:6px 16px; background:var(--bg2); border-radius:100px; font-size:13px; font-weight:500; color:var(--text);}
+
+    /* 06 TEAM (УБРАН) */
+
+    /* 07 CTA */
+    .cta{padding:var(--sp-l) 0; background:var(--bg);}
+    .cta-inner{background:var(--dark); border-radius:40px; padding:80px 64px; text-align:center; color:#fff;}
+    .cta-inner h2{font-size:clamp(28px, 3vw, 42px); font-weight:500; margin-bottom:16px;}
+    .cta-inner p{color:rgba(255,255,255,.6); margin-bottom:32px;}
+
+    /* 08 LOGO БЛОК */
+    .logo-block{padding:var(--sp-l) 0; background:var(--bg); border-top:1px solid var(--border);}
+    .logo-wrap{display:flex; align-items:center; justify-content:center; gap:40px; flex-wrap:wrap;}
+    .logo-wrap img{height:64px; width:auto; opacity:.8; transition:opacity .2s;}
+    .logo-wrap img:hover{opacity:1;}
+    .logo-wrap span{font-size:14px; color:var(--muted); letter-spacing:.05em;}
+  </style>
+</head>
+<body>
+<script src="nav.js" data-page="about"></script>
+<script src="/GEOBLOCK.js"></script>
+
+<!-- 01 HERO -->
+<section class="ab-hero">
+  <div class="ab-hero-bg-text">СВОБОДА</div>
+  <div class="container">
+    <div class="ab-hero-content reveal">
+      <span class="eyebrow">О компании</span>
+      <h1>Мы строим сайты, которые <em>принадлежат вам</em></h1>
+      <p>Архитекторы вашей цифровой независимости. Мы создаём веб-продукты на чистом коде, избавляя бизнес от аренды, абонентских плат и шаблонных ограничений.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 02 MANIFESTO -->
+<section class="manifesto">
+  <div class="container manifesto-grid">
+    <div class="m-text reveal">
+      <h2>Зачем мы вообще появились?</h2>
+      <p>Современный интернет стал заложником платформ. Компании платят ежемесячно просто за то, чтобы их сайт «висел» в сети. Вложенные в дизайн и SEO усилия привязаны к конструкторам (Tilda, Wix), из которых нельзя вытащить исходный код.</p>
+      <p>Мы основали Antviz, чтобы разорвать этот круг. Мы считаем, что сайт — это цифровая недвижимость. Вы должны владеть им, а не снимать в аренду.</p>
+      <p>Пишем вручную. Размещаем на мощной и надёжной инфраструктуре Microsoft. Отдаём все права вам.</p>
+    </div>
+    <div class="m-quote reveal">
+      <blockquote>Сайт — это полноценный актив вашего бизнеса, а не бесконечный абонемент в фитнес-зал.</blockquote>
+      <cite>— Философия Antviz</cite>
+    </div>
+  </div>
+</section>
+
+<!-- 03 VALUES -->
+<section class="values">
+  <div class="container">
+    <div class="v-header reveal">
+      <span class="eyebrow g">Принципы</span>
+      <h2>Что нами движет</h2>
+    </div>
+    <div class="v-grid">
+      <div class="v-card reveal">
+        <span class="v-num">01 / НЕЗАВИСИМОСТЬ</span>
+        <h3>Код у клиента</h3>
+        <p>Мы не держим вас на крючке. Вы получаете архив с чистым кодом или доступ к репозиторию. Хотите уйти к другому разработчику? Без проблем, всё ваше.</p>
+      </div>
+      <div class="v-card reveal">
+        <span class="v-num">02 / ПЕРФЕКЦИОНИЗМ</span>
+        <h3>Ручная сборка</h3>
+        <p>Никаких лишних плагинов и тяжеловесных баз данных там, где они не нужны. Только выверенный HTML, CSS и JS. Результат: мгновенная загрузка.</p>
+      </div>
+      <div class="v-card reveal">
+        <span class="v-num">03 / ЧЕСТНОСТЬ</span>
+        <h3>Никаких скрытых плат</h3>
+        <p>Мы честно говорим: хостинг для статических сайтов сейчас бесплатен. Мы настраиваем инфраструктуру так, чтобы вы платили только за доменное имя раз в год.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 04 TIMELINE -->
+<section class="timeline">
+  <div class="container">
+    <span class="eyebrow text-center" style="text-align:center; margin-bottom:48px;">Как мы к этому пришли</span>
+    <div class="tl-container">
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <span class="tl-year">ОСОЗНАНИЕ ПРОБЛЕМЫ</span>
+        <div class="tl-content">
+          <h3>Усталость от конструкторов</h3>
+          <p>Работая с классическими CMS и конструкторами, мы поняли, что клиенты переплачивают за функционал, которым не пользуются, и теряют в скорости загрузки. Появилась идея делать сайты иначе.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <span class="tl-year">СМЕНА ПАРАДИГМЫ</span>
+        <div class="tl-content">
+          <h3>Переход на чистый код и инфраструктуру Microsoft</h3>
+          <p>Мы полностью отказались от платных хостингов в пользу статической генерации и надёжной инфраструктуры Microsoft. Это позволило нам обеспечить клиентам бесплатный SSL, глобальную CDN и 100% аптайм без ежемесячных платежей.</p>
+        </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <span class="tl-year">НАСТОЯЩЕЕ ВРЕМЯ</span>
+        <div class="tl-content">
+          <h3>Antviz сегодня</h3>
+          <p>Компания, которая разрабатывает уникальные, быстрые и независимые веб-решения. От лендингов-визиток до сложных клиентских порталов с серверной логикой.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 TECH STACK (РАСШИРЕННЫЙ) -->
+<section class="stack">
+  <div class="container">
+    <span class="eyebrow reveal">Арсенал</span>
+    <h2 class="reveal" style="font-size:clamp(28px, 3vw, 40px); font-weight:500; letter-spacing:-.02em;">Технологии, которые мы используем</h2>
+    <div class="stack-grid">
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </span>
+        <h4>Frontend-ядро</h4>
+        <p>Чистый HTML5, CSS3 и Vanilla JavaScript. Никаких фреймворков там, где они не нужны — только лёгкий, быстрый и понятный код.</p>
+        <span class="tech-badge">HTML5 / CSS3 / JS</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="2" width="20" height="20" rx="2.18"></rect>
+            <line x1="8" y1="2" x2="8" y2="22"></line>
+            <line x1="16" y1="2" x2="16" y2="22"></line>
+            <line x1="2" y1="8" x2="22" y2="8"></line>
+            <line x1="2" y1="16" x2="22" y2="16"></line>
+          </svg>
+        </span>
+        <h4>Инфраструктура Microsoft</h4>
+        <p>Размещаем проекты на надёжной и масштабируемой инфраструктуре Microsoft. Бесплатный SSL, глобальная сеть доставки и высокая доступность.</p>
+        <span class="tech-badge">Azure Static Web Apps</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </span>
+        <h4>Сеть и доставка</h4>
+        <p>Используем Cloudflare CDN для мгновенной загрузки контента по всему миру. Настраиваем кастомные домены и прокси-правила.</p>
+        <span class="tech-badge">Cloudflare CDN</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 4v16h16"></path>
+            <polyline points="20 10 12 18 8 14"></polyline>
+          </svg>
+        </span>
+        <h4>Интеграции и API</h4>
+        <p>Подключаем внешние сервисы через REST API: платёжные системы (Robokassa, ЮKassa), CRM, email-рассылки и другие.</p>
+        <span class="tech-badge">REST API / Robokassa</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </span>
+        <h4>Дизайн и прототипы</h4>
+        <p>Создаём интерфейсы в Figma — от прототипов до готовых макетов с продуманной типографикой, сетками и адаптивом.</p>
+        <span class="tech-badge">Figma</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+        </span>
+        <h4>Безопасность и домены</h4>
+        <p>Настраиваем SSL-сертификаты, правим DNS-записи, подключаем кастомные домены и обеспечиваем безопасность данных.</p>
+        <span class="tech-badge">DNS / SSL / HTTPS</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 CTA -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <h2>Разделяете наш подход?</h2>
+      <p>Давайте обсудим ваш проект — мы сделаем его быстрым, независимым и красивым.</p>
+      <a href="order" class="btn btn-dark" style="background:#fff; color:var(--dark);">Обсудить проект</a>
+    </div>
+  </div>
+</section>
+
+<!-- 07 LOGO БЛОК (НОВЫЙ) -->
+<section class="logo-block">
+  <div class="container">
+    <div class="logo-wrap reveal">
+      <span>Мы — часть экосистемы</span>
+      <img src="favicon.png" alt="Antviz logo" style="height:48px;" />
+      <span style="font-weight:500; color:var(--text);">Antviz</span>
+    </div>
+  </div>
+</section>
+
+<script>
+// Анимация появления
+const obs = new IntersectionObserver(e => {
+  e.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible') })
+}, {threshold: .1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+
+<script src="footer.js" data-page="about"></script>
+</body>
+</html>

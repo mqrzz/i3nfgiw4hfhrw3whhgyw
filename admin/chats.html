@@ -9,15 +9,16 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#f5f7fa; --bg2:#ffffff; --bg3:#f0f2f5; --card:#ffffff;
-      --border:#e8ecf0; --border2:#d0d5db;
-      --accent:#1ede7b; --accent2:#17b86a; --accent3:#0d9f56;
-      --text:#1a1a1e; --muted:#6b7280; --muted2:#9ca3af;
-      --success:#1ede7b; --error:#ff2d50; --warn:#ffd11a;
-      --sidebar-w:240px; --topbar-h:60px;
+      --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;--card:#fff;
+      --border:#dfe3e8;--border2:#cbcdd6;
+      --accent:#1ede7b;--accent2:#1ac16b;--accent3:#0d9f56;
+      --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
+      --text:#191b1e;--muted:#707a8a;--muted2:#9ca3af;
+      --success:#1ede7b;--error:#e8634f;--red:#e8634f;--warn:#f59e0b;--info:#3b82f6;
+      --sidebar-w:240px;--topbar-h:60px;
     }
     html,body{height:100%;font-size:16px;background:var(--bg)}
-    body{color:var(--text);font-family:'Inter',sans-serif;font-weight:400;display:flex;flex-direction:column}
+    body{color:var(--text);font-family:'Geologica','Inter',sans-serif;font-weight:400;display:flex;flex-direction:column}
     @keyframes spin{to{transform:rotate(360deg)}}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
     @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
@@ -31,14 +32,14 @@
     .sidebar-logo{padding:1.2rem 1.2rem 1rem;display:flex;align-items:center;gap:10px;text-decoration:none;border-bottom:1px solid var(--border)}
     .sidebar-logo img{width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0}
     .sidebar-logo-text{font-family:'Geologica',sans-serif;font-weight:700;font-size:.85rem;color:var(--text)}
-    .sidebar-logo-badge{background:rgba(255,45,80,.1);color:var(--error);border:1px solid rgba(255,45,80,.15);padding:.08rem .45rem;border-radius:50px;font-size:.55rem;font-weight:700;margin-left:auto;flex-shrink:0}
+    .sidebar-logo-badge{background:rgba(255,45,80,.1);color:var(--red);border:1px solid rgba(255,45,80,.15);padding:.08rem .45rem;border-radius:50px;font-size:.55rem;font-weight:700;margin-left:auto;flex-shrink:0}
     .sidebar-nav{flex:1;padding:1rem .7rem;overflow-y:auto;display:flex;flex-direction:column;gap:.15rem}
     .sidebar-section{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.6rem .6rem .3rem;font-weight:600}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:.6rem .85rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.84rem;transition:all .15s;cursor:pointer;border:none;background:none;width:100%;font-family:'Inter',sans-serif;position:relative}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:.6rem .85rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.84rem;transition:all .15s;cursor:pointer;border:none;background:none;width:100%;font-family:'Geologica','Inter',sans-serif;position:relative}
     .nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
     .nav-item.active{background:rgba(30,222,123,.12);color:var(--accent2)}
     .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none}
-    .nav-item-badge{position:absolute;right:.7rem;background:var(--error);color:#fff;font-size:.58rem;font-weight:700;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
+    .nav-badge{position:absolute;right:.7rem;background:var(--red);color:#fff;font-size:.58rem;font-weight:700;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
     .sidebar-footer{padding:.8rem .7rem;border-top:1px solid var(--border)}
 
     .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;z-index:90}
@@ -46,15 +47,15 @@
     .topbar-right{display:flex;align-items:center;gap:.7rem}
     .topbar-stat{display:flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.72rem;white-space:nowrap;color:var(--muted)}
     .topbar-stat-num{font-family:'Geologica',sans-serif;font-weight:700;font-size:.8rem;color:var(--text)}
-    .topbar-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Inter',sans-serif;font-size:.76rem;padding:.35rem .9rem;border-radius:9px;cursor:pointer;transition:all .18s}
+    .topbar-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Geologica','Inter',sans-serif;font-size:.76rem;padding:.35rem .9rem;border-radius:9px;cursor:pointer;transition:all .18s}
     .topbar-btn:hover{border-color:var(--border2);color:var(--text)}
 
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:.6rem 1.2rem;border-radius:9px;font-family:'Inter',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.6rem 1.2rem;border-radius:9px;font-family:'Geologica','Inter',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
     .btn-primary{background:var(--accent);color:#fff}
     .btn-primary:hover{box-shadow:0 4px 12px rgba(30,222,123,.35)}
     .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--muted)}
     .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-    .btn-danger{background:#fee2e2;border:1px solid #fca5a5;color:var(--error)}
+    .btn-danger{background:#fee2e2;border:1px solid #fca5a5;color:var(--red)}
     .btn-danger:hover{background:#fecaca}
     .btn-sm{padding:.38rem .8rem;font-size:.74rem;border-radius:7px}
     .btn-xs{padding:.22rem .55rem;font-size:.66rem;border-radius:6px}
@@ -62,7 +63,7 @@
     .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:600;padding:.6rem 1.3rem;border-radius:10px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;transform:translateY(8px)}
     .toast.show{opacity:1;transform:translateY(0)}
     .toast.success{background:var(--success);color:#fff}
-    .toast.error{background:var(--error);color:#fff}
+    .toast.error{background:var(--red);color:#fff}
     .toast.info{background:#3b82f6;color:#fff}
     .toast.warn{background:var(--warn);color:#1a1a1e}
 
@@ -74,10 +75,10 @@
     .list-header{padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--border);flex-shrink:0}
     .list-search{display:flex;align-items:center;gap:.5rem;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:.4rem .7rem;margin-bottom:.7rem}
     .list-search svg{width:14px;height:14px;stroke:var(--muted);flex-shrink:0}
-    .list-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:.82rem;flex:1;min-width:0}
+    .list-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Geologica','Inter',sans-serif;font-size:.82rem;flex:1;min-width:0}
     .list-search input::placeholder{color:var(--muted2)}
     .list-tabs{display:flex;gap:.3rem;flex-wrap:wrap}
-    .list-tab{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Inter',sans-serif;font-size:.72rem;padding:.22rem .6rem;border-radius:7px;cursor:pointer;transition:all .15s}
+    .list-tab{background:transparent;border:1px solid transparent;color:var(--muted);font-family:'Geologica','Inter',sans-serif;font-size:.72rem;padding:.22rem .6rem;border-radius:7px;cursor:pointer;transition:all .15s}
     .list-tab:hover{color:var(--text);background:rgba(0,0,0,.04)}
     .list-tab.active{background:rgba(30,222,123,.12);color:var(--accent2);border-color:rgba(30,222,123,.2)}
     .list-actions{display:flex;gap:.4rem;margin-top:.5rem}
@@ -88,7 +89,7 @@
     .ticket-item-subject{font-size:.84rem;font-weight:500;color:var(--text);margin-bottom:.2rem;display:flex;align-items:center;gap:.4rem}
     .ticket-item-meta{font-size:.72rem;color:var(--muted);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
     .ticket-item-preview{font-size:.74rem;color:var(--muted2);margin-top:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .unread-dot{width:7px;height:7px;border-radius:50%;background:var(--error);flex-shrink:0;animation:pulse 1.5s infinite}
+    .unread-dot{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.5s infinite}
     .empty-list{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:.82rem}
 
     /* status badges */
@@ -99,7 +100,7 @@
     .s-closed{background:#f3f4f6;color:var(--muted)}
 
     /* priority */
-    .pri-high{color:var(--error);font-size:.7rem;font-weight:600}
+    .pri-high{color:var(--red);font-size:.7rem;font-weight:600}
     .pri-medium{color:var(--warn);font-size:.7rem;font-weight:600}
     .pri-low{color:var(--muted);font-size:.7rem}
 
@@ -127,10 +128,10 @@
 
     .chat-input-area{padding:.9rem 1.4rem;border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
     .chat-input-row{display:flex;gap:.5rem;align-items:flex-end}
-    .chat-textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem .9rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.84rem;outline:none;resize:none;min-height:38px;max-height:120px;line-height:1.5;transition:border-color .18s}
+    .chat-textarea{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.6rem .9rem;color:var(--text);font-family:'Geologica','Inter',sans-serif;font-size:.84rem;outline:none;resize:none;min-height:38px;max-height:120px;line-height:1.5;transition:border-color .18s}
     .chat-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
     .chat-textarea::placeholder{color:var(--muted2)}
-    .status-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.38rem .7rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.76rem;outline:none;cursor:pointer;transition:border-color .18s}
+    .status-select{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:.38rem .7rem;color:var(--text);font-family:'Geologica','Inter',sans-serif;font-size:.76rem;outline:none;cursor:pointer;transition:border-color .18s}
     .status-select:focus{border-color:var(--accent)}
 
     /* lightbox */
@@ -149,7 +150,7 @@
     .modal-footer .btn{flex:1;justify-content:center}
     .form-group{margin-bottom:1rem}
     .form-label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:.4rem;font-weight:600}
-    .form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Inter',sans-serif;font-size:.86rem;font-weight:400;outline:none;transition:border-color .18s}
+    .form-input,.form-textarea,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:'Geologica','Inter',sans-serif;font-size:.86rem;font-weight:400;outline:none;transition:border-color .18s}
     .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(30,222,123,.15)}
     .form-input::placeholder,.form-textarea::placeholder{color:var(--muted2)}
     .form-textarea{resize:vertical;min-height:70px;line-height:1.55}
@@ -161,8 +162,7 @@
 
 <div class="sidebar">
   <a href="/admin" class="sidebar-logo">
-    <img src="../img/favicon.png" alt="Antviz">
-    <span class="sidebar-logo-text">Antviz</span>
+    <div class="sidebar-logo-mark" style="width:30px;height:30px;border-radius:10px;background:#191b1e;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 20 20" style="width:16px;height:16px;fill:#1ede7b"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div><span class="sidebar-logo-name" style="font-weight:500;font-size:.88rem;color:var(--text)">Antviz</span>
     <span class="sidebar-logo-badge">ADMIN</span>
   </a>
   <nav class="sidebar-nav">
@@ -174,18 +174,14 @@
     <a href="/admin/orders" class="nav-item" data-page="orders">
       <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
       Заказы
-      <span class="nav-item-badge" id="navBadgeOrders" style="display:none"></span>
+      <span class="nav-badge" id="navBadgeOrders" style="display:none"></span>
     </a>
-    <a href="/admin/chats" class="nav-item active" data-page="chats">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Тикеты
-      <span class="nav-item-badge" id="navBadgeChats" style="display:none"></span>
-    </a>
+    
     <div class="sidebar-section">Клиенты</div>
     <a href="/admin/tickets" class="nav-item" data-page="tickets">
       <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
       Обслуживание
-      <span class="nav-item-badge" id="navBadgeTickets" style="display:none"></span>
+      <span class="nav-badge" id="navBadgeTickets" style="display:none"></span>
     </a>
     <a href="/admin/promos" class="nav-item" data-page="promos">
       <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
@@ -198,7 +194,7 @@
     </a>
   </nav>
   <div class="sidebar-footer">
-    <button class="nav-item" onclick="doLogout()" style="color:var(--error)">
+    <button class="nav-item" onclick="doLogout()" style="color:var(--red)">
       <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Выйти
     </button>
@@ -208,7 +204,7 @@
 <div class="topbar">
   <div class="topbar-title">Тикеты поддержки</div>
   <div class="topbar-right">
-    <div class="topbar-stat">Открытых: <span class="topbar-stat-num" id="statOpen" style="color:var(--error)">—</span></div>
+    <div class="topbar-stat">Открытых: <span class="topbar-stat-num" id="statOpen" style="color:var(--red)">—</span></div>
     <div class="topbar-stat">Всего: <span class="topbar-stat-num" id="statTotal">—</span></div>
   </div>
 </div>

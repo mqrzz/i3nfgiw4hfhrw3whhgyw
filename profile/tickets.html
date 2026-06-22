@@ -168,12 +168,16 @@
       #sectionNoOrders .empty-state{grid-template-columns:1fr;gap:28px}
       #sectionNoOrders .empty-right{display:none}
       #sectionBuy .buy-grid,#sectionBuyOne .buy-grid,#sectionActive .active-grid{grid-template-columns:1fr;gap:20px}
-      .status-card,.plan-card{position:static}
+      /* убираем sticky у карточки тарифа на мобильном — она не должна ехать */
+      .status-card,.plan-card{position:static !important}
       .order-meta{display:none}
     }
     @media(max-width:480px){
       .page-head{margin-bottom:28px;padding-bottom:20px}
+      .site-switcher{gap:6px}
+      .site-switch-btn{padding:10px 14px}
     }
+    #sbContent{padding-bottom:80px}
   </style>
 </head>
 <body>
@@ -363,9 +367,9 @@
               <textarea class="field-textarea" id="ticketDesc" placeholder="Опишите подробнее: что изменить, куда добавить, как должно выглядеть..."></textarea>
             </div>
             <div>
-              <button class="btn btn-primary" onclick="submitTicket()">
+              <button class="btn btn-primary" id="submitTicketBtn" onclick="submitTicket()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
-                Отправить ещё одну заявку
+                Отправить заявку
               </button>
             </div>
           </div>
@@ -626,6 +630,8 @@ async function loadTickets(){
 
 function renderTickets(tickets){
   const el = document.getElementById('ticketsList');
+  const btn = document.getElementById('submitTicketBtn');
+  if(btn) btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>${tickets.length ? 'Ещё одна заявка' : 'Отправить заявку'}`;
   if(!tickets.length){el.innerHTML='<div class="tickets-empty">Заявок пока нет</div>';return;}
   el.innerHTML = tickets.map(t=>`
     <div class="ticket-item">

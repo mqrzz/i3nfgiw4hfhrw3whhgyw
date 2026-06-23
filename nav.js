@@ -389,12 +389,12 @@
       ]
     },
     {
-      label: 'Сервис',
+      label: 'Компания',
       key: 'company',
       sections: [
         {
           items: [
-            { href: 'https://antviz.ru/about', label: 'О сервисе', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
+            { href: 'https://antviz.ru/about', label: 'О компании', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
             { href: b+'rules',   label: 'Правила сервиса',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
             { href: b+'privacy', label: 'Конфиденциальность',  icon: '<path d="M12 3l8 4v5c0 5-3.5 8.5-8 10C7.5 20.5 4 17 4 12V7l8-4z"/>' },
           ]
@@ -406,13 +406,14 @@
   const NAV_CONFIG = {
     home:     { centerLinks: PUBLIC_LINKS, showCta: true },
     faq:      { centerLinks: PUBLIC_LINKS, showCta: true },
+    about:    { centerLinks: PUBLIC_LINKS, showCta: true },
     order:    { centerLinks: PUBLIC_LINKS, showCta: false, hideCta: true },
-    profile:  { inApp: true },
+    profile:  { centerLinks: PUBLIC_LINKS, showCta: true },
     auth:     { centerLinks: [], showCta: false, hideCta: true },
-    orders:   { inApp: true },
-    support:  { inApp: true },
-    settings: { inApp: true },
-    tickets:  { inApp: true },
+    orders:   { centerLinks: PUBLIC_LINKS, showCta: true },
+    support:  { centerLinks: PUBLIC_LINKS, showCta: true },
+    settings: { centerLinks: PUBLIC_LINKS, showCta: true },
+    tickets:  { centerLinks: PUBLIC_LINKS, showCta: true },
     default:  { centerLinks: PUBLIC_LINKS, showCta: true },
   };
 
@@ -547,6 +548,11 @@ ${buildMobileSheet()}`;
   const style = document.createElement('style');
   style.textContent = CSS;
   document.head.appendChild(style);
+
+  // Отступ под фиксированный навбар
+  const bodyPad = document.createElement('style');
+  bodyPad.textContent = 'body { padding-top: 104px; } @media(max-width:768px){ body { padding-top: 90px; } }';
+  document.head.appendChild(bodyPad);
 
   // Вставляем всю разметку NAV_HTML целиком, чтобы an-mobile-sheet попал в DOM
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);

@@ -1,204 +1,245 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Дашборд — Antviz Admin</title>
-  <link rel="icon" href="../img/favicon.png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <link rel="icon" href="../img/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet" />
   <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
-  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
-  --dark:#191b1e;--dark2:#2b2f33;
-  --red:#e8634f;--warn:#f59e0b;--info:#3b82f6;
-  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
-  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
-  --font:'Geologica','Inter','Arial',sans-serif;
-  --sidebar-w:240px;--topbar-h:60px;
-}
-html,body{height:100%;background:var(--bg2)}
-body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+    /* ===== БАЗА ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1ede7b;
+      --green-h: #1ac16b;
+      --green-d: #149955;
+      --green-light: #d2f8e5;
+      --bg: #fff;
+      --bg2: #f2f4f7;
+      --bg3: #f9fafc;
+      --text: #191b1e;
+      --muted: #707a8a;
+      --border: #dfe3e8;
+      --border2: #cbcdd6;
+      --dark: #191b1e;
+      --dark2: #2b2f33;
+      --red: #e8634f;
+      --warn: #f59e0b;
+      --info: #3b82f6;
+      --sh1: 0 4px 16px rgba(0,51,153,.04), 0 2px 2px rgba(0,51,153,.08);
+      --sh2: 0 8px 20px rgba(0,51,153,.08), 0 4px 8px rgba(0,51,153,.08);
+      --font: 'Geologica', 'Inter', 'Arial', sans-serif;
+      --sidebar-w: 240px;
+      --topbar-h: 60px;
+      --sp-l: 60px;
+      --sp-m: 40px;
+    }
+    html, body { height: 100%; background: var(--bg2); }
+    body { color: var(--text); font-family: var(--font); font-weight: 300; line-height: 1.25; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-.loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-.spinner{width:24px;height:24px;border:2px solid var(--border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-.loading-text{font-size:13px;color:var(--muted)}
+    .loading-screen { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
 
-/* SIDEBAR */
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:18px 20px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;border-bottom:1px solid var(--border)}
-.sidebar-logo-mark{width:30px;height:30px;border-radius:10px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sidebar-logo-mark svg{width:16px;height:16px;fill:var(--green)}
-.sidebar-logo-name{font-weight:500;font-size:.88rem;color:var(--text);letter-spacing:-.01em}
-.sidebar-logo-badge{margin-left:auto;font-size:.6rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:rgba(232,99,79,.1);color:var(--red);border:1px solid rgba(232,99,79,.2);padding:.1rem .45rem;border-radius:6px;flex-shrink:0}
-.sidebar-nav{flex:1;padding:12px 10px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.sidebar-section{font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:10px 10px 4px;margin-top:4px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;text-decoration:none;color:var(--muted);font-size:.84rem;font-weight:300;transition:background .15s,color .15s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
-.nav-item:hover{background:var(--bg2);color:var(--text)}
-.nav-item.active{background:rgba(30,222,123,.1);color:var(--green-d);font-weight:500}
-.nav-item svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none}
-.nav-badge{position:absolute;right:10px;background:var(--red);color:#fff;font-size:.58rem;font-weight:500;min-width:17px;height:17px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
-.sidebar-footer{padding:10px;border-top:1px solid var(--border)}
+    /* ===== REVEAL ===== */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
-/* TOPBAR */
-.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:90}
-.topbar-title{font-weight:500;font-size:.92rem;color:var(--text);letter-spacing:-.01em}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.topbar-pill{display:inline-flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:.3rem .9rem;font-size:.74rem;color:var(--muted)}
-.topbar-pill strong{font-weight:500;color:var(--text);font-size:.8rem}
-.topbar-btn{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:.78rem;font-weight:300;padding:.38rem .9rem;border-radius:10px;cursor:pointer;transition:border-color .15s,color .15s}
-.topbar-btn:hover{border-color:var(--border2);color:var(--text)}
-.maint-track{width:28px;height:16px;border-radius:50px;background:var(--border);position:relative;flex-shrink:0;transition:background .2s;border:1px solid var(--border2)}
-.maint-track::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
-.topbar-btn.on{border-color:rgba(245,158,11,.4);color:var(--warn)}
-.topbar-btn.on .maint-track{background:rgba(245,158,11,.15);border-color:rgba(245,158,11,.3)}
-.topbar-btn.on .maint-track::after{transform:translateX(12px);background:var(--warn)}
+    /* ===== SIDEBAR ===== */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 200; }
+    .sidebar-logo { padding: 18px 20px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; border-bottom: 1px solid var(--border); }
+    .sidebar-logo-mark { width: 30px; height: 30px; border-radius: 10px; background: var(--dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sidebar-logo-mark svg { width: 16px; height: 16px; fill: var(--green); }
+    .sidebar-logo-name { font-weight: 500; font-size: .88rem; color: var(--text); letter-spacing: -.01em; }
+    .sidebar-logo-badge { margin-left: auto; font-size: .6rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; background: rgba(232,99,79,.1); color: var(--red); border: 1px solid rgba(232,99,79,.2); padding: .1rem .45rem; border-radius: 6px; flex-shrink: 0; }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section { font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 10px 4px; margin-top: 4px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; text-decoration: none; color: var(--muted); font-size: .84rem; font-weight: 300; transition: background .15s, color .15s; cursor: pointer; border: none; background: none; width: 100%; font-family: var(--font); position: relative; }
+    .nav-item:hover { background: var(--bg2); color: var(--text); }
+    .nav-item.active { background: rgba(30,222,123,.1); color: var(--green-d); font-weight: 500; }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.7; fill: none; }
+    .nav-badge { position: absolute; right: 10px; background: var(--red); color: #fff; font-size: .58rem; font-weight: 500; min-width: 17px; height: 17px; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 4px; animation: pulse 2s infinite; }
+    .sidebar-footer { padding: 10px; border-top: 1px solid var(--border); }
 
-/* MAIN */
-.main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:28px 32px;min-height:calc(100vh - var(--topbar-h));animation:fadeUp .25s ease}
+    /* ===== TOPBAR ===== */
+    .topbar { position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: var(--topbar-h); background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
+    .topbar-title { font-weight: 500; font-size: .92rem; color: var(--text); letter-spacing: -.01em; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .topbar-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--bg2); border: 1.5px solid var(--border); color: var(--muted); font-family: var(--font); font-size: .78rem; font-weight: 300; padding: .38rem .9rem; border-radius: 10px; cursor: pointer; transition: border-color .15s, color .15s; }
+    .topbar-btn:hover { border-color: var(--border2); color: var(--text); }
+    .topbar-btn.on { border-color: rgba(245,158,11,.4); color: var(--warn); }
+    .maint-track { width: 28px; height: 16px; border-radius: 50px; background: var(--border); position: relative; flex-shrink: 0; transition: background .2s; border: 1px solid var(--border2); }
+    .maint-track::after { content: ''; position: absolute; top: 2px; left: 2px; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); transition: transform .2s, background .2s; }
+    .topbar-btn.on .maint-track { background: rgba(245,158,11,.15); border-color: rgba(245,158,11,.3); }
+    .topbar-btn.on .maint-track::after { transform: translateX(12px); background: var(--warn); }
 
-/* STAT GRID */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px}
-.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:20px 22px;transition:box-shadow .15s}
-.stat-card:hover{box-shadow:var(--sh1)}
-.stat-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:8px}
-.stat-num{font-size:1.8rem;font-weight:500;line-height:1;letter-spacing:-.03em;margin-bottom:4px;color:var(--text)}
-.stat-num.green{color:var(--green-d)}
-.stat-num.blue{color:var(--info)}
-.stat-num.warn{color:var(--warn)}
-.stat-num.red{color:var(--red)}
-.stat-sub{font-size:.72rem;color:var(--muted)}
+    /* ===== MAIN ===== */
+    .main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); padding: 28px 32px; min-height: calc(100vh - var(--topbar-h)); animation: fadeUp .25s ease; max-width: 1400px; }
+    @media (max-width: 700px) { .main { padding: 16px; } }
 
-/* SECTIONS */
-.section{background:var(--bg);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-bottom:16px}
-.section-hdr{padding:16px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.section-title{font-weight:500;font-size:.86rem;letter-spacing:-.01em}
-.section-body{padding:18px 22px}
-.section-body.no-pad{padding:0}
+    /* ===== STAT GRID ===== */
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px 22px; transition: box-shadow .15s, transform .15s; }
+    .stat-card:hover { box-shadow: var(--sh1); transform: translateY(-2px); }
+    .stat-label { font-size: .68rem; font-weight: 500; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 8px; }
+    .stat-num { font-size: 1.8rem; font-weight: 500; line-height: 1; letter-spacing: -.03em; margin-bottom: 4px; color: var(--text); }
+    .stat-num.green { color: var(--green-d); }
+    .stat-num.blue { color: var(--info); }
+    .stat-num.warn { color: var(--warn); }
+    .stat-num.red { color: var(--red); }
+    .stat-sub { font-size: .72rem; color: var(--muted); }
 
-/* TABLE */
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:.65rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:500;padding:10px 20px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg3)}
-.tbl td{padding:12px 20px;font-size:.84rem;border-bottom:1px solid var(--border);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--bg3);cursor:pointer}
-.tbl-id{font-size:.72rem;font-weight:500;color:var(--green-d)}
+    /* ===== TARIFF CARDS ===== */
+    .tariff-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 700px) { .tariff-grid { grid-template-columns: 1fr; } }
+    .tariff-card { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; transition: box-shadow .15s; }
+    .tariff-card:hover { box-shadow: var(--sh1); }
+    .tariff-name { font-weight: 500; font-size: .9rem; }
+    .tariff-count { font-weight: 500; font-size: 1.2rem; color: var(--green-d); }
 
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:.2rem .6rem;border-radius:8px;font-size:.68rem;font-weight:500;white-space:nowrap}
-.badge-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
-.b0{background:#f2f4f7;color:var(--muted)}
-.b1{background:rgba(245,158,11,.1);color:var(--warn)}
-.b2{background:rgba(59,130,246,.1);color:var(--info)}
-.b3{background:rgba(139,92,246,.1);color:#7c3aed}
-.b4{background:rgba(245,158,11,.1);color:var(--warn)}
-.b5{background:rgba(30,222,123,.12);color:var(--green-d)}
-.tag{display:inline-block;padding:.2rem .65rem;border-radius:8px;font-size:.72rem;font-weight:300}
-.tag-blue{background:rgba(59,130,246,.1);color:var(--info)}
-.tag-green{background:rgba(30,222,123,.12);color:var(--green-d)}
-.tag-purple{background:rgba(139,92,246,.1);color:#7c3aed}
-.tag-warn{background:rgba(245,158,11,.1);color:var(--warn)}
+    /* ===== SECTIONS ===== */
+    .section { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-bottom: 16px; }
+    .section-hdr { padding: 14px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .section-title { font-weight: 500; font-size: .86rem; letter-spacing: -.01em; }
+    .section-body { padding: 0; overflow-x: auto; }
+    .section-body.padded { padding: 16px 20px; }
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:.55rem 1.1rem;border-radius:10px;font-family:var(--font);font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:background .12s,transform .1s;text-decoration:none;white-space:nowrap}
-.btn:hover{transform:translateY(-1px)}
-.btn-green{background:var(--green);color:var(--dark)}
-.btn-green:hover{background:var(--green-h)}
-.btn-dark{background:var(--dark);color:#fff}
-.btn-dark:hover{background:var(--dark2)}
-.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--muted)}
-.btn-outline:hover{border-color:var(--text);color:var(--text)}
-.btn-danger{background:rgba(232,99,79,.1);color:var(--red);border:1px solid rgba(232,99,79,.2)}
-.btn-danger:hover{background:rgba(232,99,79,.18)}
-.btn-sm{padding:.38rem .75rem;font-size:.74rem;border-radius:8px}
+    /* ===== TABLE ===== */
+    .tbl { width: 100%; border-collapse: collapse; }
+    .tbl th { font-size: .65rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 500; padding: 10px 16px; text-align: left; border-bottom: 1px solid var(--border); background: var(--bg3); }
+    .tbl td { padding: 10px 16px; font-size: .82rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    .tbl tr:last-child td { border-bottom: none; }
+    .tbl tr:hover td { background: var(--bg3); cursor: pointer; }
+    .tbl-id { font-size: .7rem; font-weight: 500; color: var(--green-d); }
+    .tbl td .sub { font-size: .68rem; color: var(--muted); display: block; margin-top: 2px; }
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border-radius:24px;padding:28px;width:100%;max-width:460px;box-shadow:0 20px 60px rgba(0,0,0,.15)}
-.modal-title{font-weight:500;font-size:.95rem;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
-.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0}
-.form-group{margin-bottom:14px}
-.form-label{display:block;font-size:.66rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;font-weight:500}
-.form-input,.form-textarea,.form-select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.7rem 1rem;color:var(--text);font-family:var(--font);font-size:.86rem;font-weight:300;outline:none;transition:border-color .15s}
-.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
-.form-textarea{resize:vertical;min-height:80px;line-height:1.5}
-.form-select{cursor:pointer}
-.modal-footer{display:flex;gap:8px;margin-top:20px}
-.modal-footer .btn{flex:1;justify-content:center}
+    /* ===== BADGES ===== */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: .2rem .7rem; border-radius: 8px; font-size: .66rem; font-weight: 500; white-space: nowrap; }
+    .badge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .b0 { background: #f2f4f7; color: var(--muted); }
+    .b1 { background: rgba(245,158,11,.1); color: var(--warn); }
+    .b2 { background: rgba(59,130,246,.1); color: var(--info); }
+    .b3 { background: rgba(139,92,246,.1); color: #7c3aed; }
+    .b4 { background: rgba(245,158,11,.1); color: var(--warn); }
+    .b5 { background: rgba(30,222,123,.12); color: var(--green-d); }
+    .tag { display: inline-block; padding: .2rem .65rem; border-radius: 8px; font-size: .7rem; font-weight: 300; }
+    .tag-blue { background: rgba(59,130,246,.1); color: var(--info); }
+    .tag-green { background: rgba(30,222,123,.12); color: var(--green-d); }
+    .tag-purple { background: rgba(139,92,246,.1); color: #7c3aed; }
+    .tag-warn { background: rgba(245,158,11,.1); color: var(--warn); }
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;z-index:600;padding:.6rem 1.2rem;border-radius:12px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;transform:translateY(6px)}
-.toast.show{opacity:1;transform:translateY(0)}
-.toast.success{background:var(--green);color:#0d3320}
-.toast.error{background:var(--red);color:#fff}
-.toast.info{background:var(--dark);color:#fff}
-.toast.warn{background:var(--warn);color:#fff}
+    /* ===== BUTTONS ===== */
+    .btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font); font-weight: 500; text-decoration: none; cursor: pointer; border: none; border-radius: 10px; padding: .5rem 1rem; font-size: .78rem; letter-spacing: -.01em; transition: background .1s, transform .1s; white-space: nowrap; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-green { background: var(--green); color: var(--dark); }
+    .btn-green:hover { background: var(--green-h); }
+    .btn-dark { background: var(--dark); color: #fff; }
+    .btn-dark:hover { background: var(--dark2); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--border2); }
+    .btn-danger { background: rgba(232,99,79,.08); color: var(--red); border: 1px solid rgba(232,99,79,.2); }
+    .btn-danger:hover { background: rgba(232,99,79,.16); }
+    .btn-sm { padding: .3rem .7rem; font-size: .7rem; border-radius: 8px; }
+
+    /* ===== POPULAR EXTRAS ===== */
+    .extra-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: var(--bg2); border-radius: 10px; margin-bottom: 6px; }
+    .extra-name { font-size: .82rem; }
+    .extra-count { font-weight: 500; font-size: .78rem; color: var(--green-d); }
+
+    /* ===== TYPE STATS ===== */
+    .type-row { margin-bottom: 10px; }
+    .type-row:last-child { margin-bottom: 0; }
+    .type-label { display: flex; justify-content: space-between; font-size: .8rem; margin-bottom: 4px; }
+    .type-label span:last-child { font-weight: 500; color: var(--green-d); }
+    .type-bar { height: 4px; background: var(--bg2); border-radius: 2px; overflow: hidden; }
+    .type-bar-fill { height: 100%; border-radius: 2px; background: var(--green); transition: width .6s; }
+
+    /* ===== SUPPORT CARD ===== */
+    .support-item { background: var(--bg2); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; }
+    .support-item:last-child { margin-bottom: 0; }
+    .support-name { font-size: .82rem; font-weight: 500; margin-bottom: 2px; }
+    .support-meta { font-size: .72rem; color: var(--muted); display: flex; justify-content: space-between; align-items: center; }
+    .support-days { font-weight: 500; }
+    .support-days.urgent { color: var(--red); }
+    .support-progress { height: 3px; background: var(--bg); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+    .support-progress-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+    .support-progress-fill.green { background: var(--green-d); }
+    .support-progress-fill.warn { background: var(--warn); }
+    .support-progress-fill.red { background: var(--red); }
+
+    /* ===== MODAL ===== */
+    .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal { background: var(--bg); border-radius: 24px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
+    .modal-title { font-weight: 500; font-size: .95rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+    .form-input, .form-textarea, .form-select { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: .7rem 1rem; color: var(--text); font-family: var(--font); font-size: .86rem; font-weight: 300; outline: none; transition: border-color .15s; }
+    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.1); }
+    .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+    .form-select { cursor: pointer; }
+    .modal-footer { display: flex; gap: 8px; margin-top: 20px; }
+    .modal-footer .btn { flex: 1; justify-content: center; }
+
+    /* ===== TOAST ===== */
+    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 900; padding: .6rem 1.2rem; border-radius: 14px; font-size: .8rem; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; transform: translateY(6px); }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.success { background: var(--green); color: #0d3320; }
+    .toast.error { background: var(--red); color: #fff; }
+    .toast.info { background: var(--dark); color: #fff; }
+    .toast.warn { background: var(--warn); color: #fff; }
+
+    /* ===== TWO COLUMN LAYOUT ===== */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 860px) { .two-col { grid-template-columns: 1fr; } }
+
+    .empty-state { text-align: center; color: var(--muted); padding: 20px; font-size: .82rem; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 700px) {
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .topbar-btn span { display: none; }
+    }
   </style>
 </head>
 <body>
+
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <span class="loading-text">Загрузка...</span>
+  <span style="color:var(--muted);font-size:.8rem;">Загрузка...</span>
 </div>
 
+<!-- ===== SIDEBAR ===== -->
 <div class="sidebar">
   <a href="/admin" class="sidebar-logo">
-    <div class="sidebar-logo-mark">
-      <svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg>
-    </div>
+    <div class="sidebar-logo-mark"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
     <span class="sidebar-logo-name">Antviz</span>
     <span class="sidebar-logo-badge">Admin</span>
   </a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">Основное</div>
-    <a href="/admin" class="nav-item active">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Дашборд
-    </a>
-    <a href="/admin/orders" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-      Заказы
-      <span class="nav-badge" id="navBadgeOrders" style="display:none"></span>
-    </a>
+    <a href="/admin" class="nav-item active"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд</a>
+    <a href="/admin/orders" class="nav-item"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nav-badge" id="navBadgeOrders" style="display:none"></span></a>
     <div class="sidebar-section">Клиенты</div>
-    <a href="/admin/tickets" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
-      Обслуживание
-      <span class="nav-badge" id="navBadgeTickets" style="display:none"></span>
-    </a>
-    <a href="/admin/chats" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Тикеты поддержки
-      <span class="nav-badge" id="navBadgeChats" style="display:none"></span>
-    </a>
-    <a href="/admin/promos" class="nav-item">
-      <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
-      Промокоды
-    </a>
+    <a href="/admin/tickets" class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nav-badge" id="navBadgeTickets" style="display:none"></span></a>
+    <a href="/admin/chats" class="nav-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Поддержка<span class="nav-badge" id="navBadgeChats" style="display:none"></span></a>
+    <a href="/admin/promos" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
     <div class="sidebar-section">Система</div>
-    <a href="/admin/reviews" class="nav-item">
-      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Отзывы
-    </a>
+    <a href="/admin/reviews" class="nav-item"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="nav-item" onclick="doLogout()" style="color:var(--red)">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      Выйти
-    </button>
+    <button class="nav-item" onclick="doLogout()" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
   </div>
 </div>
 
-<div class="topbar">
+<!-- ===== TOPBAR ===== -->
+<div class="topbar" id="appTopbar" style="display:none">
   <span class="topbar-title">Дашборд</span>
   <div class="topbar-right">
     <button class="topbar-btn" id="maintBtn" onclick="toggleMaintenance()">
@@ -206,75 +247,90 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
       <span id="maintLabel">Техработы</span>
     </button>
     <button class="topbar-btn" onclick="openNotifModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:14px;height:14px"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" style="width:14px;height:14px;"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       Уведомление
     </button>
   </div>
 </div>
 
+<!-- ===== MAIN ===== -->
 <div class="main" id="appWrap" style="display:none">
 
+  <!-- СТАТИСТИКА -->
   <div class="stat-grid" id="statGrid">
-    <div class="stat-card"><div class="stat-label">Всего заказов</div><div class="stat-num" id="sAll">—</div><div class="stat-sub">за всё время</div></div>
-    <div class="stat-card"><div class="stat-label">Новых</div><div class="stat-num warn" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
-    <div class="stat-card"><div class="stat-label">В работе</div><div class="stat-num blue" id="sWork">—</div><div class="stat-sub">активных</div></div>
-    <div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num green" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
-    <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-num" id="sRev">—</div><div class="stat-sub">по завершённым</div></div>
-    <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
+    <div class="stat-card reveal"><div class="stat-label">Всего заказов</div><div class="stat-num" id="sAll">—</div><div class="stat-sub">за всё время</div></div>
+    <div class="stat-card reveal"><div class="stat-label">Новых</div><div class="stat-num warn" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
+    <div class="stat-card reveal"><div class="stat-label">В работе</div><div class="stat-num blue" id="sWork">—</div><div class="stat-sub">активных</div></div>
+    <div class="stat-card reveal"><div class="stat-label">Готово</div><div class="stat-num green" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
+    <div class="stat-card reveal"><div class="stat-label">Выручка</div><div class="stat-num" id="sRev">—</div><div class="stat-sub">по завершённым</div></div>
+    <div class="stat-card reveal"><div class="stat-label">Средний чек</div><div class="stat-num blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-    <div class="stat-card"><div class="stat-label">Старт</div><div class="stat-num" id="sStart">—</div></div>
-    <div class="stat-card"><div class="stat-label">Рост</div><div class="stat-num green" id="sGrowth">—</div></div>
-  </div>
-  <div style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:24px">
-    <div class="stat-card"><div class="stat-label">Масштаб</div><div class="stat-num" id="sScale">—</div></div>
+  <!-- ТАРИФЫ -->
+  <div class="tariff-grid reveal">
+    <div class="tariff-card"><span class="tariff-name">Старт</span><span class="tariff-count" id="sStart">—</span></div>
+    <div class="tariff-card"><span class="tariff-name">Рост</span><span class="tariff-count" id="sGrowth">—</span></div>
+    <div class="tariff-card"><span class="tariff-name">Масштаб</span><span class="tariff-count" id="sScale">—</span></div>
   </div>
 
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-
-    <div class="section">
+  <!-- ДВЕ КОЛОНКИ: ПОСЛЕДНИЕ ЗАКАЗЫ + ПОПУЛЯРНЫЕ ОПЦИИ -->
+  <div class="two-col">
+    <div class="section reveal">
       <div class="section-hdr">
         <span class="section-title">Последние заказы</span>
         <a href="/admin/orders" class="btn btn-outline btn-sm">Все →</a>
       </div>
-      <div class="section-body no-pad">
+      <div class="section-body">
         <table class="tbl" id="recentOrders">
           <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
-          <tbody><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">Загрузка...</td></tr></tbody>
+          <tbody><tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">Загрузка...</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <div class="section">
+    <div class="section reveal">
       <div class="section-hdr"><span class="section-title">Популярные опции</span></div>
-      <div class="section-body" id="popularExtras" style="display:flex;flex-direction:column;gap:8px">
-        <div style="text-align:center;color:var(--muted);font-size:.82rem">Загрузка...</div>
+      <div class="section-body padded" id="popularExtras">
+        <div style="text-align:center;color:var(--muted);font-size:.82rem;">Загрузка...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ДВЕ КОЛОНКИ: ТИПЫ САЙТОВ + АКТИВНЫЕ ОБСЛУЖИВАНИЯ -->
+  <div class="two-col">
+    <div class="section reveal">
+      <div class="section-hdr"><span class="section-title">Типы сайтов</span></div>
+      <div class="section-body padded" id="typeStats">
+        <div style="text-align:center;color:var(--muted);font-size:.82rem;">Загрузка...</div>
       </div>
     </div>
 
-  </div>
-
-  <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-top:16px">
-    <div class="section">
-      <div class="section-hdr"><span class="section-title">Типы сайтов</span></div>
-      <div class="section-body" id="typeStats"></div>
-    </div>
-    <div class="section">
+    <div class="section reveal">
       <div class="section-hdr"><span class="section-title">Активные обслуживания</span></div>
-      <div class="section-body" id="supportStats"></div>
+      <div class="section-body padded" id="supportStats">
+        <div style="text-align:center;color:var(--muted);font-size:.82rem;">Загрузка...</div>
+      </div>
     </div>
   </div>
 
 </div>
 
-<!-- NOTIF MODAL -->
+<!-- ===== MODAL: УВЕДОМЛЕНИЕ ===== -->
 <div class="modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
   <div class="modal">
-    <div class="modal-title">Уведомление <button class="modal-close" onclick="closeNotifModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">Получатель</label><select class="form-select" id="notifTarget"><option value="all">Всем пользователям</option></select></div>
-    <div class="form-group"><label class="form-label">Заголовок</label><input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
-    <div class="form-group"><label class="form-label">Текст</label><textarea class="form-textarea" id="notifText" placeholder="Текст..."></textarea></div>
+    <div class="modal-title">📨 Уведомление <button class="modal-close" onclick="closeNotifModal()">✕</button></div>
+    <div class="form-group">
+      <label class="form-label">Получатель</label>
+      <select class="form-select" id="notifTarget"><option value="all">Всем пользователям</option></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Заголовок</label>
+      <input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления..." />
+    </div>
+    <div class="form-group">
+      <label class="form-label">Текст</label>
+      <textarea class="form-textarea" id="notifText" placeholder="Текст уведомления..." rows="4"></textarea>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeNotifModal()">Отмена</button>
       <button class="btn btn-green" onclick="sendNotif()">Отправить</button>
@@ -282,6 +338,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
   </div>
 </div>
 
+<!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -289,113 +346,179 @@ import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, orderBy, onSnapshot, getDocs, addDoc, serverTimestamp, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
-function esc(s){return String(s??'').replace(/[&<>\"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c]));}
-function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
-function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
-function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
+// ===== UTILS =====
+const S_LABELS = ['Новая заявка', 'Обсуждение', 'В работе', 'На проверке', 'Правки', 'Готово'];
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function toast(m, t = 'info') { const el = document.getElementById('toast'); el.textContent = m; el.className = `toast ${t} show`; setTimeout(() => el.className = 'toast', 3400); }
+function fmtDate(ts) { if (!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' }); }
+function fmtPrice(n) { return n ? Math.round(n).toLocaleString('ru') + ' ₽' : '—'; }
 
-let maintEnabled=false;
-onSnapshot(doc(db,'settings','maintenance'),snap=>{
-  maintEnabled=snap.exists()&&snap.data().enabled===true;
-  document.getElementById('maintBtn').classList.toggle('on',maintEnabled);
-  document.getElementById('maintLabel').textContent=maintEnabled?'Сайт закрыт':'Техработы';
+// ===== REVEAL =====
+const revealObs = new IntersectionObserver(e => { e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }); }, { threshold: .07 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ===== MAINTENANCE =====
+let maintEnabled = false;
+onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
+  maintEnabled = snap.exists() && snap.data().enabled === true;
+  const btn = document.getElementById('maintBtn');
+  btn.classList.toggle('on', maintEnabled);
+  document.getElementById('maintLabel').textContent = maintEnabled ? 'Сайт закрыт' : 'Техработы';
 });
-window.toggleMaintenance=async()=>{
-  await setDoc(doc(db,'settings','maintenance'),{enabled:!maintEnabled},{merge:true});
-  toast(!maintEnabled?'Сайт закрыт 🔧':'Сайт открыт ✅',!maintEnabled?'warn':'success');
+window.toggleMaintenance = async () => {
+  await setDoc(doc(db, 'settings', 'maintenance'), { enabled: !maintEnabled }, { merge: true });
+  toast(!maintEnabled ? 'Сайт закрыт 🔧' : 'Сайт открыт ✅', !maintEnabled ? 'warn' : 'success');
 };
 
-window.openNotifModal=async()=>{
-  try{
-    const snap=await getDocs(collection(db,'users'));
-    const sel=document.getElementById('notifTarget');
-    sel.innerHTML='<option value="all">Всем пользователям</option>';
-    snap.docs.forEach(d=>{const data=d.data();sel.innerHTML+=`<option value="${d.id}">${esc(data.displayName||data.name||d.id)}${data.email?' · '+esc(data.email):''}</option>`;});
-    document.getElementById('notifTitle').value='';
-    document.getElementById('notifText').value='';
+// ===== NOTIFICATIONS =====
+window.openNotifModal = async () => {
+  try {
+    const snap = await getDocs(collection(db, 'users'));
+    const sel = document.getElementById('notifTarget');
+    sel.innerHTML = '<option value="all">Всем пользователям</option>';
+    snap.docs.forEach(d => {
+      const data = d.data();
+      const name = data.displayName || data.name || d.id;
+      sel.innerHTML += `<option value="${d.id}">${esc(name)}${data.email ? ' · ' + esc(data.email) : ''}</option>`;
+    });
+    document.getElementById('notifTitle').value = '';
+    document.getElementById('notifText').value = '';
     document.getElementById('notifModal').classList.add('show');
-  }catch(e){toast('Ошибка: '+e.message,'error');}
+  } catch (e) { toast('Ошибка: ' + e.message, 'error'); }
 };
-window.closeNotifModal=()=>document.getElementById('notifModal').classList.remove('show');
-window.sendNotif=async()=>{
-  const target=document.getElementById('notifTarget').value;
-  const title=document.getElementById('notifTitle').value.trim();
-  const text=document.getElementById('notifText').value.trim();
-  if(!title||!text){toast('Заполните все поля','error');return;}
-  try{
-    if(target==='all'){
-      const snp=await getDocs(collection(db,'users'));
-      if(!snp.docs.length){toast('Нет пользователей','error');return;}
-      await Promise.all(snp.docs.map(d=>addDoc(collection(db,'notifications',d.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
-      toast(`Отправлено ${snp.docs.length} пользователям ✓`,'success');
-    }else{
-      await addDoc(collection(db,'notifications',target,'items'),{title,text,read:false,createdAt:serverTimestamp()});
-      toast('Отправлено ✓','success');
+window.closeNotifModal = () => document.getElementById('notifModal').classList.remove('show');
+window.sendNotif = async () => {
+  const target = document.getElementById('notifTarget').value;
+  const title = document.getElementById('notifTitle').value.trim();
+  const text = document.getElementById('notifText').value.trim();
+  if (!title || !text) { toast('Заполните все поля', 'error'); return; }
+  try {
+    if (target === 'all') {
+      const snap = await getDocs(collection(db, 'users'));
+      if (!snap.docs.length) { toast('Нет пользователей', 'error'); return; }
+      await Promise.all(snap.docs.map(d => addDoc(collection(db, 'notifications', d.id, 'items'), { title, text, read: false, createdAt: serverTimestamp() })));
+      toast(`Отправлено ${snap.docs.length} пользователям ✓`, 'success');
+    } else {
+      await addDoc(collection(db, 'notifications', target, 'items'), { title, text, read: false, createdAt: serverTimestamp() });
+      toast('Отправлено ✓', 'success');
     }
     closeNotifModal();
-  }catch(e){toast('Ошибка: '+e.message,'error');}
+  } catch (e) { toast('Ошибка: ' + e.message, 'error'); }
 };
 
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+// ===== LOGOUT =====
+window.doLogout = async () => { await signOut(auth); window.location.href = '/'; };
 
-onAuthStateChanged(auth,async user=>{
-  document.getElementById('loadingScreen').style.display='none';
-  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
-  document.getElementById('appWrap').style.display='block';
+// ===== AUTH =====
+onAuthStateChanged(auth, async user => {
+  document.getElementById('loadingScreen').style.display = 'none';
+  if (!user || user.email !== ADMIN_EMAIL) { window.location.href = '/'; return; }
+  document.getElementById('appWrap').style.display = 'block';
+  document.getElementById('appTopbar').style.display = 'flex';
 
-  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
-    const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
-    const done=orders.filter(o=>o.status===5);
-    const rev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
-    document.getElementById('sAll').textContent=orders.length;
-    document.getElementById('sNew').textContent=orders.filter(o=>(o.status||0)===0).length;
-    document.getElementById('sWork').textContent=orders.filter(o=>o.status>=1&&o.status<=4).length;
-    document.getElementById('sDone').textContent=done.length;
-    document.getElementById('sRev').textContent=fmtPrice(rev);
-    document.getElementById('sAvg').textContent=done.length?fmtPrice(Math.round(rev/done.length)):'—';
-    document.getElementById('sStart').textContent=orders.filter(o=>o.package==='Старт'||o.tariff==='Старт').length;
-    document.getElementById('sGrowth').textContent=orders.filter(o=>o.package==='Рост'||o.tariff==='Рост').length;
-    document.getElementById('sScale').textContent=orders.filter(o=>o.package==='Масштаб'||o.tariff==='Масштаб').length;
+  // Подписка на заказы
+  onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), snap => {
+    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const done = orders.filter(o => o.status === 5);
+    const rev = done.reduce((s, o) => s + (o.totalPrice || 0), 0);
 
-    const recent=orders.filter(o=>o.status<5).slice(0,8);
-    const tbody=document.querySelector('#recentOrders tbody');
-    tbody.innerHTML=recent.length?recent.map(o=>{
-      const tariff=o.package||o.tariff||'—';
-      const cls=tariff==='Старт'?'tag-blue':tariff==='Рост'?'tag-green':'tag-purple';
-      return`<tr onclick="location.href='/admin/orders?id=${o.id}'" style="cursor:pointer">
-        <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.7rem;color:var(--muted);margin-top:2px">${fmtDate(o.createdAt)}</div></td>
-        <td><div style="font-size:.84rem;font-weight:500">${esc(o.clientName||'—')}</div><div style="font-size:.7rem;color:var(--muted)">${esc(o.clientEmail||'—')}</div></td>
-        <td><span class="tag ${cls}">${tariff}</span></td>
-        <td><span class="badge b${o.status||0}"><span class="badge-dot"></span>${S_LABELS[o.status||0]}</span></td>
-        <td style="font-weight:500;color:var(--green-d)">${fmtPrice(o.totalPrice)}</td>
-      </tr>`;}).join(''):'<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted)">Нет активных заказов</td></tr>';
+    // Статистика
+    document.getElementById('sAll').textContent = orders.length;
+    document.getElementById('sNew').textContent = orders.filter(o => (o.status || 0) === 0).length;
+    document.getElementById('sWork').textContent = orders.filter(o => o.status >= 1 && o.status <= 4).length;
+    document.getElementById('sDone').textContent = done.length;
+    document.getElementById('sRev').textContent = fmtPrice(rev);
+    document.getElementById('sAvg').textContent = done.length ? fmtPrice(Math.round(rev / done.length)) : '—';
 
-    const extrasMap={};
-    orders.forEach(o=>{(o.extras||[]).forEach(e=>{const l=e==='domain'?'Домен':e==='support'?'Обслуживание':e==='seo'?'SEO':e==='content'?'Контент':e==='shop'?'Каталог':e==='urgent'?'Срочно':e;extrasMap[l]=(extrasMap[l]||0)+1;});});
-    const sortedExtras=Object.entries(extrasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
-    document.getElementById('popularExtras').innerHTML=sortedExtras.length?sortedExtras.map(([name,count])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--bg2);border-radius:10px">
-        <span style="font-size:.82rem">${name}</span>
-        <span style="font-weight:500;font-size:.78rem;color:var(--green-d)">${count}</span>
-      </div>`):'<div style="text-align:center;color:var(--muted);font-size:.82rem">Нет данных</div>';
+    // Тарифы
+    document.getElementById('sStart').textContent = orders.filter(o => o.package === 'Старт' || o.tariff === 'Старт').length;
+    document.getElementById('sGrowth').textContent = orders.filter(o => o.package === 'Рост' || o.tariff === 'Рост').length;
+    document.getElementById('sScale').textContent = orders.filter(o => o.package === 'Масштаб' || o.tariff === 'Масштаб').length;
 
-    const byType={};orders.forEach(o=>{const t=o.siteType||'Другое';byType[t]=(byType[t]||0)+1;});
-    const sorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);const mx=sorted[0]?.[1]||1;
-    document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
-      <div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:4px"><span>${esc(t)}</span><span style="font-weight:500;color:var(--green-d)">${n}</span></div>
-        <div style="height:4px;background:var(--bg2);border-radius:2px"><div style="height:100%;border-radius:2px;background:var(--green);width:${n/mx*100}%"></div></div>
-      </div>`).join('')||'<div style="color:var(--muted);font-size:.82rem">Нет данных</div>';
+    // Последние заказы
+    const recent = orders.filter(o => o.status < 5).slice(0, 8);
+    const tbody = document.querySelector('#recentOrders tbody');
+    if (!recent.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--muted);">Нет активных заказов</td></tr>';
+    } else {
+      tbody.innerHTML = recent.map(o => {
+        const tariff = o.package || o.tariff || '—';
+        const cls = tariff === 'Старт' ? 'tag-blue' : tariff === 'Рост' ? 'tag-green' : 'tag-purple';
+        return `<tr onclick="location.href='/admin/orders?id=${o.id}'">
+          <td><span class="tbl-id">№${o.id.slice(0, 7).toUpperCase()}</span><span class="sub">${fmtDate(o.createdAt)}</span></td>
+          <td><div style="font-size:.82rem;font-weight:500;">${esc(o.clientName || '—')}</div><div style="font-size:.68rem;color:var(--muted);">${esc(o.clientEmail || '—')}</div></td>
+          <td><span class="tag ${cls}">${esc(tariff)}</span></td>
+          <td><span class="badge b${o.status || 0}"><span class="badge-dot"></span>${S_LABELS[o.status || 0]}</span></td>
+          <td style="font-weight:500;color:var(--green-d);">${fmtPrice(o.totalPrice)}</td>
+        </tr>`;
+      }).join('');
+    }
 
-    const now=new Date();
-    const withSupport=orders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>now);
-    document.getElementById('supportStats').innerHTML=withSupport.length?withSupport.slice(0,5).map(o=>{
-      const exp=o.supportExpiresAt.toDate();const days=Math.ceil((exp-now)/864e5);
-      return`<div style="background:var(--bg2);border-radius:12px;padding:10px 14px;margin-bottom:8px">
-        <div style="font-size:.82rem;font-weight:500;margin-bottom:2px">${esc(o.clientName||'—')}</div>
-        <div style="font-size:.72rem;color:${days<3?'var(--red)':'var(--muted)'}">Осталось ${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
-      </div>`;}).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Нет активных обслуживаний</div>';
+    // Популярные опции
+    const extrasMap = {};
+    orders.forEach(o => {
+      (o.extras || []).forEach(e => {
+        const labels = { domain: 'Домен', support: 'Обслуживание', seo: 'SEO', content: 'Контент', shop: 'Каталог', urgent: 'Срочно' };
+        const name = labels[e] || e;
+        extrasMap[name] = (extrasMap[name] || 0) + 1;
+      });
+    });
+    const sortedExtras = Object.entries(extrasMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+    const extrasEl = document.getElementById('popularExtras');
+    if (!sortedExtras.length) {
+      extrasEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.82rem;">Нет данных</div>';
+    } else {
+      extrasEl.innerHTML = sortedExtras.map(([name, count]) =>
+        `<div class="extra-item"><span class="extra-name">${esc(name)}</span><span class="extra-count">${count}</span></div>`
+      ).join('');
+    }
+
+    // Типы сайтов
+    const typeMap = {};
+    orders.forEach(o => { const t = o.siteType || 'Другое'; typeMap[t] = (typeMap[t] || 0) + 1; });
+    const sortedTypes = Object.entries(typeMap).sort((a, b) => b[1] - a[1]);
+    const maxType = sortedTypes[0]?.[1] || 1;
+    const typeEl = document.getElementById('typeStats');
+    if (!sortedTypes.length) {
+      typeEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.82rem;">Нет данных</div>';
+    } else {
+      typeEl.innerHTML = sortedTypes.map(([name, count]) =>
+        `<div class="type-row">
+          <div class="type-label"><span>${esc(name)}</span><span>${count}</span></div>
+          <div class="type-bar"><div class="type-bar-fill" style="width:${(count / maxType) * 100}%;"></div></div>
+        </div>`
+      ).join('');
+    }
+
+    // Активные обслуживания
+    const now = new Date();
+    const supports = orders.filter(o => o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > now);
+    const supEl = document.getElementById('supportStats');
+    if (!supports.length) {
+      supEl.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.82rem;">Нет активных обслуживаний</div>';
+    } else {
+      supEl.innerHTML = supports.slice(0, 5).map(o => {
+        const exp = o.supportExpiresAt.toDate();
+        const days = Math.ceil((exp - now) / 864e5);
+        const isUrgent = days < 3;
+        const pct = Math.max(0, Math.min(100, ((exp - now) / (30 * 864e5)) * 100));
+        const fillClass = isUrgent ? 'red' : days < 7 ? 'warn' : 'green';
+        return `<div class="support-item">
+          <div class="support-name">${esc(o.clientName || '—')}</div>
+          <div class="support-meta">
+            <span>${esc(o.clientEmail || '—')}${o.domain ? ' · ' + esc(o.domain) : ''}</span>
+            <span class="support-days${isUrgent ? ' urgent' : ''}">${days} дн.</span>
+          </div>
+          <div class="support-progress"><div class="support-progress-fill ${fillClass}" style="width:${pct}%;"></div></div>
+        </div>`;
+      }).join('');
+    }
+
+    // Бейджи в сайдбаре
+    const openOrders = orders.filter(o => (o.status || 0) === 0).length;
+    const badgeOrders = document.getElementById('navBadgeOrders');
+    badgeOrders.style.display = openOrders ? '' : 'none';
+    badgeOrders.textContent = openOrders;
   });
 });
 </script>

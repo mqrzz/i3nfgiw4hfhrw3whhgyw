@@ -30,12 +30,6 @@
       --sp-l:80px;
     }
     
-    /* ==========================================================================
-       ⚠️ ВАЖНО: СКОПИРУЙ СЮДА СТИЛИ ДЛЯ МЕНЮ И ФУТЕРА ИЗ ТЕГА <style> В INDEX.HTML
-       (Например: все свойства для nav, footer, .footer, .nav-links и т.д.)
-       Без них подвал так и останется белым неразмеченным блоком!
-       ========================================================================== */
-
     .container{max-width:1328px;margin:0 auto;padding:0 20px;width:100%}
     @media(min-width:1024px){.container{padding:0 64px}}
     @media(min-width:1280px){.container{padding:0 96px}}
@@ -52,7 +46,7 @@
     .btn-dark{background:var(--dark);color:#fff}
     .btn-dark:hover{background:var(--dark2)}
 
-    /* 01 ABOUT HERO */
+    /* 01 ABOUT HERO (НОВЫЙ) */
     .ab-hero{padding:calc(var(--sp-xl) + 40px) 0 var(--sp-xl); background:var(--bg2); position:relative; overflow:hidden;}
     .ab-hero-bg-text{position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); font-size:clamp(120px, 25vw, 600px); font-weight:500; color:var(--border); opacity:0.25; line-height:0.8; user-select:none; z-index:0; white-space:nowrap; pointer-events:none; max-width:100%; padding:0 20px;}
     .ab-hero-content{position:relative; z-index:1; max-width:840px;}
@@ -60,7 +54,7 @@
     .ab-hero h1 em{font-style:normal; color:var(--green);}
     .ab-hero p{font-size:clamp(18px, 2vw, 24px); color:var(--muted); line-height:1.5;}
 
-    /* 02 MANIFESTO */
+    /* 02 MANIFESTO (НОВЫЙ) */
     .manifesto{padding:var(--sp-xl) 0; background:var(--bg);}
     .manifesto-grid{display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;}
     @media(max-width:900px){.manifesto-grid{grid-template-columns:1fr; gap:40px;}}
@@ -71,7 +65,7 @@
     .m-quote blockquote{font-size:clamp(24px, 3vw, 36px); font-weight:400; color:#fff; line-height:1.3; position:relative; z-index:1; letter-spacing:-.02em;}
     .m-quote cite{display:block; margin-top:24px; font-size:15px; color:rgba(255,255,255,.5); font-style:normal;}
 
-    /* 03 VALUES */
+    /* 03 VALUES (НОВЫЙ) */
     .values{padding:var(--sp-xl) 0; background:var(--dark); color:#fff;}
     .v-header{text-align:center; max-width:600px; margin:0 auto 64px;}
     .v-header h2{font-size:clamp(36px, 5vw, 64px); font-weight:500; letter-spacing:-.03em;}
@@ -83,7 +77,7 @@
     .v-card h3{font-size:24px; font-weight:500; margin-bottom:16px; letter-spacing:-.02em;}
     .v-card p{font-size:15px; color:rgba(255,255,255,.6); line-height:1.6;}
 
-    /* 04 TIMELINE */
+    /* 04 TIMELINE (НОВЫЙ) */
     .timeline{padding:var(--sp-xl) 0; background:var(--bg);}
     .tl-container{max-width:800px; margin:0 auto; position:relative;}
     .tl-container::before{content:''; position:absolute; top:0; bottom:0; left:24px; width:1px; background:var(--border2); z-index:0;}
@@ -97,7 +91,7 @@
     .tl-content h3{font-size:28px; font-weight:500; margin-bottom:12px; letter-spacing:-.02em;}
     .tl-content p{font-size:16px; color:var(--muted); line-height:1.6;}
 
-    /* 05 STACK */
+    /* 05 STACK (НОВЫЙ — РАСШИРЕННЫЙ) */
     .stack{padding:var(--sp-xl) 0; background:var(--bg2);}
     .stack-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:32px; margin-top:56px;}
     .stack-card{background:var(--bg); border-radius:24px; padding:40px 32px; border:1px solid var(--border); transition:transform .2s, box-shadow .2s;}
@@ -108,6 +102,8 @@
     .stack-card p{font-size:15px; color:var(--muted); line-height:1.6;}
     .stack-card .tech-badge{display:inline-block; margin-top:16px; padding:6px 16px; background:var(--bg2); border-radius:100px; font-size:13px; font-weight:500; color:var(--text);}
 
+    /* 06 TEAM (УБРАН) */
+
     /* 07 CTA */
     .cta{padding:var(--sp-l) 0; background:var(--bg);}
     .cta-inner{background:var(--dark); border-radius:40px; padding:80px 64px; text-align:center; color:#fff;}
@@ -116,212 +112,199 @@
   </style>
 </head>
 <body>
+<script src="nav.js" data-page="about"></script>
+<script src="/GEOBLOCK.js"></script>
 
-  <script type="module" src="nav.js" data-page="about"></script>
-  <script src="/GEOBLOCK.js"></script>
+<!-- 01 HERO -->
+<section class="ab-hero">
+  <div class="ab-hero-bg-text">СВОБОДА</div>
+  <div class="container">
+    <div class="ab-hero-content reveal">
+      <span class="eyebrow">О сервисе</span>
+      <h1>Мы строим сайты, которые <em>принадлежат вам</em></h1>
+      <p>Архитекторы вашей цифровой независимости. Мы создаём веб-продукты на чистом коде, избавляя бизнес от аренды, абонентских плат и шаблонных ограничений.</p>
+    </div>
+  </div>
+</section>
 
-  <script type="module">
-    import { db } from './firebase-config.js';
-    import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-    let mo = null;
-    onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
-      const on = snap.exists() && snap.data().enabled === true;
-      if (on && !mo) {
-        mo = document.createElement('div');
-        mo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;font-family:Geologica,sans-serif;color:#191b1e';
-        mo.innerHTML = '<div style="font-size:40px">🔧</div><div style="font-size:24px;font-weight:500;letter-spacing:-.03em">Технические работы</div><div style="font-size:15px;color:#707a8a">Мы скоро вернемся.</div>';
-        document.body.appendChild(mo);
-      } else if (!on && mo) {
-        mo.remove();
-        mo = null;
-      }
-    });
-  </script>
+<!-- 02 MANIFESTO -->
+<section class="manifesto">
+  <div class="container manifesto-grid">
+    <div class="m-text reveal">
+      <h2>Зачем мы вообще появились?</h2>
+      <p>Современный интернет стал заложником платформ. Компании платят ежемесячно просто за то, чтобы их сайт «висел» в сети. Вложенные в дизайн и SEO усилия привязаны к конструкторам (Tilda, Wix), из которых нельзя вытащить исходный код.</p>
+      <p>Мы основали Antviz, чтобы разорвать этот круг. Мы считаем, что сайт — это цифровая недвижимость. Вы должны владеть им, а не снимать в аренду.</p>
+      <p>Пишем вручную. Размещаем на мощной и надёжной инфраструктуре Microsoft. Отдаём все права вам.</p>
+    </div>
+    <div class="m-quote reveal">
+      <blockquote>Сайт — это полноценный актив вашего бизнеса, а не бесконечный абонемент в фитнес-зал.</blockquote>
+      <cite>— Философия Antviz</cite>
+    </div>
+  </div>
+</section>
 
-  <section class="ab-hero">
-    <div class="ab-hero-bg-text">СВОБОДА</div>
-    <div class="container">
-      <div class="ab-hero-content reveal">
-        <span class="eyebrow">О сервисе</span>
-        <h1>Мы строим сайты, которые <em>принадлежат вам</em></h1>
-        <p>Архитекторы вашей цифровой независимости. Мы создаём веб-продукты на чистом коде, избавляя бизнес от аренды, абонентских плат и шаблонных ограничений.</p>
+<!-- 03 VALUES -->
+<section class="values">
+  <div class="container">
+    <div class="v-header reveal">
+      <span class="eyebrow g">Принципы</span>
+      <h2>Что нами движет</h2>
+    </div>
+    <div class="v-grid">
+      <div class="v-card reveal">
+        <span class="v-num">01 / НЕЗАВИСИМОСТЬ</span>
+        <h3>Код у клиента</h3>
+        <p>Мы не держим вас на крючке. Вы получаете архив с чистым кодом или доступ к репозиторию. Хотите уйти к другому разработчику? Без проблем, всё ваше.</p>
+      </div>
+      <div class="v-card reveal">
+        <span class="v-num">02 / ПЕРФЕКЦИОНИЗМ</span>
+        <h3>Ручная сборка</h3>
+        <p>Никаких лишних плагинов и тяжеловесных баз данных там, где они не нужны. Только выверенный HTML, CSS и JS. Результат: мгновенная загрузка.</p>
+      </div>
+      <div class="v-card reveal">
+        <span class="v-num">03 / ЧЕСТНОСТЬ</span>
+        <h3>Никаких скрытых плат</h3>
+        <p>Мы честно говорим: хостинг для статических сайтов сейчас бесплатен. Мы настраиваем инфраструктуру так, чтобы вы платили только за доменное имя раз в год.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="manifesto">
-    <div class="container manifesto-grid">
-      <div class="m-text reveal">
-        <h2>Зачем мы вообще появились?</h2>
-        <p>Современный internet стал заложником платформ. Компании платят ежемесячно просто за то, чтобы их сайт «висел» в сети. Вложенные в дизайн и SEO усилия привязаны к конструкторам (Tilda, Wix), из которых нельзя вытащить исходный код.</p>
-        <p>Мы основали Antviz, чтобы разорвать этот круг. Мы считаем, что сайт — это цифровая недвижимость. Вы должны владеть им, а не снимать в аренду.</p>
-        <p>Пишем вручную. Размещаем на мощной и надёжной инфраструктуре Microsoft. Отдаём все права вам.</p>
-      </div>
-      <div class="m-quote reveal">
-        <blockquote>Сайт — это полноценный актив вашего бизнеса, а не бесконечный абонемент в фитнес-зал.</blockquote>
-        <cite>— Философия Antviz</cite>
-      </div>
-    </div>
-  </section>
-
-  <section class="values">
-    <div class="container">
-      <div class="v-header reveal">
-        <span class="eyebrow g">Принципы</span>
-        <h2>Что нами движет</h2>
-      </div>
-      <div class="v-grid">
-        <div class="v-card reveal">
-          <span class="v-num">01 / НЕЗАВИСИМОСТЬ</span>
-          <h3>Код у клиента</h3>
-          <p>Мы не держим вас на крючке. Вы получаете архив с чистым кодом или доступ к репозиторию. Хотите уйти к другому разработчику? Без проблем, всё ваше.</p>
-        </div>
-        <div class="v-card reveal">
-          <span class="v-num">02 / ПЕРФЕКЦИОНИЗМ</span>
-          <h3>Ручная сборка</h3>
-          <p>Никаких лишних плагинов и тяжеловесных баз данных там, где они не нужны. Только выверенный HTML, CSS и JS. Результат: мгновенная загрузка.</p>
-        </div>
-        <div class="v-card reveal">
-          <span class="v-num">03 / ЧЕСТНОСТЬ</span>
-          <h3>Никаких скрытых плат</h3>
-          <p>Мы честно говорим: хостинг для статических сайтов сейчас бесплатен. Мы настраиваем инфраструктуру так, чтобы вы платили только за доменное имя раз в год.</p>
+<!-- 04 TIMELINE -->
+<section class="timeline">
+  <div class="container">
+    <span class="eyebrow text-center" style="text-align:center; margin-bottom:48px;">Как мы к этому пришли</span>
+    <div class="tl-container">
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <span class="tl-year">ОСОЗНАНИЕ ПРОБЛЕМЫ</span>
+        <div class="tl-content">
+          <h3>Усталость от конструкторов</h3>
+          <p>Работая с классическими CMS и конструкторами, мы поняли, что клиенты переплачивают за функционал, которым не пользуются, и теряют в скорости загрузки. Появилась идея делать сайты иначе.</p>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="timeline">
-    <div class="container">
-      <span class="eyebrow text-center" style="text-align:center; margin-bottom:48px;">Как мы к этому пришли</span>
-      <div class="tl-container">
-        <div class="tl-item reveal">
-          <div class="tl-dot"></div>
-          <span class="tl-year">ОСОЗНАНИЕ ПРОБЛЕМЫ</span>
-          <div class="tl-content">
-            <h3>Усталость от конструкторов</h3>
-            <p>Работая с классическими CMS и конструкторами, мы поняли, что клиенты переплачивают за функционал, которым не пользуются, и теряют в скорости загрузки. Появилась идея делать сайты иначе.</p>
-          </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <span class="tl-year">СМЕНА ПАРАДИГМЫ</span>
+        <div class="tl-content">
+          <h3>Переход на чистый код и инфраструктуру Microsoft</h3>
+          <p>Мы полностью отказались от платных хостингов в пользу статической генерации и надёжной инфраструктуры Microsoft. Это позволило нам обеспечить клиентам бесплатный SSL, глобальную CDN и 100% аптайм без ежемесячных платежей.</p>
         </div>
-        <div class="tl-item reveal">
-          <div class="tl-dot"></div>
-          <span class="tl-year">СМЕНА ПАРАДИГМЫ</span>
-          <div class="tl-content">
-            <h3>Переход на чистый код и инфраструктуру Microsoft</h3>
-            <p>Мы полностью отказались от платных хостингов в пользу статической генерации и надёжной инфраструктуры Microsoft. Это позволило нам обеспечить клиентам бесплатный SSL, глобальную CDN и 100% аптайм без ежемесячных платежей.</p>
-          </div>
-        </div>
-        <div class="tl-item reveal">
-          <div class="tl-dot"></div>
-          <span class="tl-year">НАСТОЯЩЕЕ ВРЕМЯ</span>
-          <div class="tl-content">
-            <h3>Antviz сегодня</h3>
-            <p>Компания, которая разрабатывает уникальные, быстрые и независимые веб-решения. От лендингов-визиток до сложных клиентских порталов с серверной логикой.</p>
-          </div>
+      </div>
+      <div class="tl-item reveal">
+        <div class="tl-dot"></div>
+        <span class="tl-year">НАСТОЯЩЕЕ ВРЕМЯ</span>
+        <div class="tl-content">
+          <h3>Antviz сегодня</h3>
+          <p>Компания, которая разрабатывает уникальные, быстрые и независимые веб-решения. От лендингов-визиток до сложных клиентских порталов с серверной логикой.</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="stack">
-    <div class="container">
-      <span class="eyebrow reveal">Арсенал</span>
-      <h2 class="reveal" style="font-size:clamp(28px, 3vw, 40px); font-weight:500; letter-spacing:-.02em;">Технологии, которые мы используем</h2>
-      <div class="stack-grid">
-        <div class="stack-card reveal">
-          <span class="svg-icon">
-            <svg viewBox="0 0 24 24">
-              <polyline points="16 18 22 12 16 6"></polyline>
-              <polyline points="8 6 2 12 8 18"></polyline>
-            </svg>
-          </span>
-          <h4>Frontend-ядро</h4>
-          <p>Чистый HTML5, CSS3 и Vanilla JavaScript. Никаких фреймворков там, где они не нужны — только лёгкий, быстрый и понятный код.</p>
-          <span class="tech-badge">HTML5 / CSS3 / JS</span>
-        </div>
-        <div class="stack-card reveal">
-          <span class="svg-icon">
-            <svg viewBox="0 0 24 24">
-              <rect x="2" y="2" width="20" height="20" rx="2.18"></rect>
-              <line x1="8" y1="2" x2="8" y2="22"></line>
-              <line x1="16" y1="2" x2="16" y2="22"></line>
-              <line x1="2" y1="8" x2="22" y2="8"></line>
-              <line x1="2" y1="16" x2="22" y2="16"></line>
-            </svg>
-          </span>
-          <h4>Инфраструктура Microsoft</h4>
-          <p>Размещаем проекты на надёжной и масштабируемой инфраструктуре Microsoft. Бесплатный SSL, глобальная сеть доставки и высокая доступность.</p>
-          <span class="tech-badge">Azure Static Web Apps</span>
-        </div>
-        <div class="stack-card reveal">
-          <span class="svg-icon">
-            <svg viewBox="0 0 24 24">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="2" y1="12" x2="22" y2="12"></line>
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-            </svg>
-          </span>
-          <h4>Сеть и доставка</h4>
-          <p>Используем Cloudflare CDN для мгновенной загрузки контента по всему миру. Настраиваем кастомные домены и прокси-правила.</p>
-          <span class="tech-badge">Cloudflare CDN</span>
-        </div>
-        <div class="stack-card reveal">
-          <span class="svg-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M4 4v16h16"></path>
-              <polyline points="20 10 12 18 8 14"></polyline>
-            </svg>
-          </span>
-          <h4>Интеграции и API</h4>
-          <p>Подключаем внешние сервисы через REST API: платёжные системы (Robokassa, ЮKassa), CRM, email-рассылки и другие.</p>
-          <span class="tech-badge">REST API / Robokassa</span>
-        </div>
-        <div class="stack-card reveal">
-          <span class="svg-icon">
-            <svg viewBox="0 0 24 24">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5"></path>
-              <path d="M2 12l10 5 10-5"></path>
-            </svg>
-          </span>
-          <h4>Дизайн и прототипы</h4>
-          <p>Создаём интерфейсы в Figma — от прототипов до готовых макетов с продуманной типографикой, сетками и адаптивом.</p>
-          <span class="tech-badge">Figma</span>
-        </div>
-        <div class="stack-card reveal">
-          <span class="svg-icon">
-            <svg viewBox="0 0 24 24">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="3" y1="9" x2="21" y2="9"></line>
-              <line x1="3" y1="15" x2="21" y2="15"></line>
-              <line x1="9" y1="21" x2="9" y2="9"></line>
-            </svg>
-          </span>
-          <h4>Безопасность и домены</h4>
-          <p>Настраиваем SSL-сертификаты, правим DNS-записи, подключаем кастомные домены и обеспечиваем безопасность данных.</p>
-          <span class="tech-badge">DNS / SSL / HTTPS</span>
-        </div>
+<!-- 05 TECH STACK (РАСШИРЕННЫЙ) -->
+<section class="stack">
+  <div class="container">
+    <span class="eyebrow reveal">Арсенал</span>
+    <h2 class="reveal" style="font-size:clamp(28px, 3vw, 40px); font-weight:500; letter-spacing:-.02em;">Технологии, которые мы используем</h2>
+    <div class="stack-grid">
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </span>
+        <h4>Frontend-ядро</h4>
+        <p>Чистый HTML5, CSS3 и Vanilla JavaScript. Никаких фреймворков там, где они не нужны — только лёгкий, быстрый и понятный код.</p>
+        <span class="tech-badge">HTML5 / CSS3 / JS</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="2" y="2" width="20" height="20" rx="2.18"></rect>
+            <line x1="8" y1="2" x2="8" y2="22"></line>
+            <line x1="16" y1="2" x2="16" y2="22"></line>
+            <line x1="2" y1="8" x2="22" y2="8"></line>
+            <line x1="2" y1="16" x2="22" y2="16"></line>
+          </svg>
+        </span>
+        <h4>Инфраструктура Microsoft</h4>
+        <p>Размещаем проекты на надёжной и масштабируемой инфраструктуре Microsoft. Бесплатный SSL, глобальная сеть доставки и высокая доступность.</p>
+        <span class="tech-badge">Azure Static Web Apps</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+        </span>
+        <h4>Сеть и доставка</h4>
+        <p>Используем Cloudflare CDN для мгновенной загрузки контента по всему миру. Настраиваем кастомные домены и прокси-правила.</p>
+        <span class="tech-badge">Cloudflare CDN</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 4v16h16"></path>
+            <polyline points="20 10 12 18 8 14"></polyline>
+          </svg>
+        </span>
+        <h4>Интеграции и API</h4>
+        <p>Подключаем внешние сервисы через REST API: платёжные системы (Robokassa, ЮKassa), CRM, email-рассылки и другие.</p>
+        <span class="tech-badge">REST API / Robokassa</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+        </span>
+        <h4>Дизайн и прототипы</h4>
+        <p>Создаём интерфейсы в Figma — от прототипов до готовых макетов с продуманной типографикой, сетками и адаптивом.</p>
+        <span class="tech-badge">Figma</span>
+      </div>
+      <div class="stack-card reveal">
+        <span class="svg-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+            <line x1="9" y1="21" x2="9" y2="9"></line>
+          </svg>
+        </span>
+        <h4>Безопасность и домены</h4>
+        <p>Настраиваем SSL-сертификаты, правим DNS-записи, подключаем кастомные домены и обеспечиваем безопасность данных.</p>
+        <span class="tech-badge">DNS / SSL / HTTPS</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="cta">
-    <div class="container">
-      <div class="cta-inner reveal">
-        <h2>Разделяете наш подход?</h2>
-        <p>Давайте обсудим ваш проект — мы сделаем его быстрым, независимым и красивым.</p>
-        <a href="order" class="btn btn-dark" style="background:#fff; color:var(--dark);">Обсудить проект</a>
-      </div>
+<!-- 06 CTA -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-inner reveal">
+      <h2>Разделяете наш подход?</h2>
+      <p>Давайте обсудим ваш проект — мы сделаем его быстрым, независимым и красивым.</p>
+      <a href="order" class="btn btn-dark" style="background:#fff; color:var(--dark);">Обсудить проект</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <script>
-  // Анимация появления
-  const obs = new IntersectionObserver(e => {
-    e.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible') })
-  }, {threshold: .1});
-  document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-  </script>
+<script>
+// Анимация появления
+const obs = new IntersectionObserver(e => {
+  e.forEach(el => { if(el.isIntersecting) el.target.classList.add('visible') })
+}, {threshold: .1});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
 
-  <script type="module" src="footer.js" data-page="about"></script>
+<script src="footer.js" data-page="about"></script>
 </body>
 </html>

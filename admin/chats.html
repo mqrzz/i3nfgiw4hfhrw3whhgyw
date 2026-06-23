@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Тикеты поддержки — Antviz Admin</title>
+  <title>Заказы — Antviz Admin</title>
   <link rel="icon" href="../img/favicon.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet" />
@@ -14,7 +14,6 @@
       --green: #1ede7b;
       --green-h: #1ac16b;
       --green-d: #149955;
-      --green-light: #d2f8e5;
       --bg: #fff;
       --bg2: #f2f4f7;
       --bg3: #f9fafc;
@@ -32,8 +31,6 @@
       --font: 'Geologica', 'Inter', 'Arial', sans-serif;
       --sidebar-w: 240px;
       --topbar-h: 60px;
-      --sp-l: 60px;
-      --sp-m: 40px;
     }
     html, body { height: 100%; background: var(--bg2); }
     body { color: var(--text); font-family: var(--font); font-weight: 300; line-height: 1.25; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
@@ -68,83 +65,150 @@
 
     /* ===== TOPBAR ===== */
     .topbar { position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: var(--topbar-h); background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
     .topbar-title { font-weight: 500; font-size: .92rem; color: var(--text); letter-spacing: -.01em; }
-    .topbar-right { display: flex; align-items: center; gap: 8px; }
-    .topbar-stat { display: flex; align-items: center; gap: 4px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: .2rem .7rem; font-size: .7rem; color: var(--muted); }
-    .topbar-stat-num { font-weight: 500; color: var(--text); }
+    .topbar-stats { display: flex; gap: 6px; }
+    .tstat { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: .2rem .7rem; font-size: .7rem; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .tstat strong { font-weight: 500; color: var(--text); }
+    .topbar-right { display: flex; align-items: center; gap: 6px; }
+    .tab { background: none; border: 1.5px solid var(--border); border-radius: 10px; padding: .3rem .85rem; font-family: var(--font); font-size: .78rem; font-weight: 300; color: var(--muted); cursor: pointer; transition: all .12s; }
+    .tab:hover { border-color: var(--border2); color: var(--text); }
+    .tab.active { background: var(--dark); border-color: var(--dark); color: #fff; font-weight: 500; }
 
-    /* ===== MAIN (две колонки) ===== */
-    .main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); display: grid; grid-template-columns: 320px 1fr; height: calc(100vh - var(--topbar-h)); animation: fadeUp .25s ease; }
-    @media (max-width: 860px) { .main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; } }
+    /* ===== WORKSPACE ===== */
+    .workspace { display: flex; position: fixed; top: var(--topbar-h); left: var(--sidebar-w); right: 0; bottom: 0; }
 
-    /* ===== ЛЕВАЯ КОЛОНКА: СПИСОК ТИКЕТОВ ===== */
-    .ticket-list-col { border-right: 1px solid var(--border); display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
-    @media (max-width: 860px) { .ticket-list-col { border-right: none; border-bottom: 1px solid var(--border); height: 50vh; } }
-    .list-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-    .list-search { display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px; padding: .5rem .9rem; transition: border-color .15s; margin-bottom: 10px; }
-    .list-search:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.08); }
-    .list-search svg { width: 14px; height: 14px; stroke: var(--muted); flex-shrink: 0; }
-    .list-search input { background: none; border: none; outline: none; font-family: var(--font); font-size: .82rem; font-weight: 300; color: var(--text); width: 100%; }
-    .list-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
-    .list-tab { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: .2rem .7rem; font-family: var(--font); font-size: .72rem; font-weight: 300; color: var(--muted); cursor: pointer; transition: all .12s; }
-    .list-tab:hover { border-color: var(--border2); color: var(--text); }
-    .list-tab.active { background: var(--dark); border-color: var(--dark); color: #fff; font-weight: 500; }
-    .list-actions { display: flex; gap: 6px; margin-top: 6px; }
-    .tickets-scroll { flex: 1; overflow-y: auto; padding: 8px; }
+    /* ===== КОЛОНКА 1: СПИСОК ===== */
+    .col-list { width: 320px; flex-shrink: 0; border-right: 1px solid var(--border); background: var(--bg); display: flex; flex-direction: column; overflow: hidden; }
+    .col-list-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px; padding: .5rem .9rem; transition: border-color .15s; }
+    .search-box:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.08); }
+    .search-box svg { width: 14px; height: 14px; stroke: var(--muted); flex-shrink: 0; }
+    .search-box input { background: none; border: none; outline: none; font-family: var(--font); font-size: .82rem; font-weight: 300; color: var(--text); width: 100%; }
+    .order-list { flex: 1; overflow-y: auto; padding: 8px; }
 
-    .ticket-item { padding: 12px 14px; border-radius: 16px; cursor: pointer; transition: background .15s, border-color .15s; border: 1.5px solid transparent; margin-bottom: 4px; background: var(--bg); }
-    .ticket-item:hover { background: var(--bg2); }
-    .ticket-item.selected { background: rgba(30,222,123,.06); border-color: rgba(30,222,123,.25); }
-    .ticket-item-subject { display: flex; align-items: center; gap: 6px; font-weight: 500; font-size: .84rem; margin-bottom: 4px; }
-    .ticket-item-meta { font-size: .72rem; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-    .ticket-item-preview { font-size: .74rem; color: var(--muted2); margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; animation: pulse 1.5s infinite; }
-    .empty-list { text-align: center; padding: 32px 16px; color: var(--muted); font-size: .82rem; }
+    .order-row { padding: 12px 14px; border-radius: 16px; cursor: pointer; transition: background .1s, border-color .15s; border: 1.5px solid transparent; margin-bottom: 4px; background: var(--bg); }
+    .order-row:hover { background: var(--bg2); }
+    .order-row.sel { background: rgba(30,222,123,.06); border-color: rgba(30,222,123,.3); }
+    .or-head { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .or-id { font-size: .7rem; font-weight: 500; color: var(--green-d); letter-spacing: .02em; }
+    .or-sub { font-size: .76rem; color: var(--muted); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .or-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .or-status-select { font-size: .68rem; padding: .1rem .4rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); font-family: var(--font); cursor: pointer; outline: none; }
+    .or-status-select:focus { border-color: var(--green); }
+
+    .empty-state { padding: 40px 20px; text-align: center; color: var(--muted); font-size: .84rem; display: flex; flex-direction: column; gap: 8px; align-items: center; }
 
     /* ===== BADGES ===== */
-    .sbadge { display: inline-flex; align-items: center; gap: 4px; padding: .15rem .6rem; border-radius: 6px; font-size: .62rem; font-weight: 500; white-space: nowrap; }
-    .sbadge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .s-open { background: rgba(59,130,246,.1); color: var(--info); }
-    .s-in-progress { background: rgba(245,158,11,.1); color: var(--warn); }
-    .s-resolved { background: rgba(30,222,123,.12); color: var(--green-d); }
-    .s-closed { background: #f2f4f7; color: var(--muted); }
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: .2rem .7rem; border-radius: 8px; font-size: .66rem; font-weight: 500; white-space: nowrap; }
+    .badge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .b0 { background: #f2f4f7; color: var(--muted); }
+    .b1 { background: rgba(245,158,11,.1); color: var(--warn); }
+    .b2 { background: rgba(59,130,246,.1); color: var(--info); }
+    .b3 { background: rgba(139,92,246,.1); color: #7c3aed; }
+    .b4 { background: rgba(245,158,11,.1); color: var(--warn); }
+    .b5 { background: rgba(30,222,123,.12); color: var(--green-d); }
+    .tag { display: inline-block; padding: .2rem .65rem; border-radius: 8px; font-size: .7rem; font-weight: 300; }
+    .tag-blue { background: rgba(59,130,246,.1); color: var(--info); }
+    .tag-green { background: rgba(30,222,123,.12); color: var(--green-d); }
+    .tag-purple { background: rgba(139,92,246,.1); color: #7c3aed; }
+    .tag-warn { background: rgba(245,158,11,.1); color: var(--warn); }
 
-    .pri-high { color: var(--red); font-size: .7rem; font-weight: 500; }
-    .pri-medium { color: var(--warn); font-size: .7rem; font-weight: 500; }
-    .pri-low { color: var(--muted); font-size: .7rem; }
+    /* ===== КОЛОНКА 2: ДЕТАЛИ ===== */
+    .col-detail { flex: 1; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: var(--bg3); }
+    .detail-empty { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--muted); }
+    .detail-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* ===== ПРАВАЯ КОЛОНКА: ЧАТ ===== */
-    .chat-col { display: flex; flex-direction: column; background: var(--bg3); overflow: hidden; }
-    .no-selection { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 10px; color: var(--muted); text-align: center; padding: 32px; }
-    .no-selection-icon { font-size: 2.5rem; opacity: .3; }
+    /* ===== ХЕДЕР ЗАКАЗА ===== */
+    .order-header { background: var(--dark); padding: 16px 24px; flex-shrink: 0; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; }
+    @media (max-width: 700px) { .order-header { grid-template-columns: 1fr; } }
+    .order-header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .order-number { font-size: 1.1rem; font-weight: 500; color: #fff; letter-spacing: -.02em; }
+    .order-client { color: rgba(255,255,255,.5); font-size: .82rem; }
+    .order-header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .order-header-status { display: flex; align-items: center; gap: 6px; }
+    .order-header-status select { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); color: #fff; border-radius: 8px; padding: .2rem .6rem; font-family: var(--font); font-size: .74rem; cursor: pointer; outline: none; }
+    .order-header-status select option { color: var(--text); background: #fff; }
+    .order-header-price { color: var(--green); font-size: 1.1rem; font-weight: 500; }
+    .order-header-date { color: rgba(255,255,255,.3); font-size: .72rem; }
 
-    .chat-topbar { padding: 12px 20px; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-    .chat-topbar-subject { font-weight: 500; font-size: .92rem; margin-bottom: 2px; }
-    .chat-topbar-meta { font-size: .74rem; color: var(--muted); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-    .chat-topbar-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+    /* ===== ВКЛАДКИ ===== */
+    .tabs { display: flex; gap: 4px; padding: 0 24px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; overflow-x: auto; }
+    .tab-btn { background: none; border: none; padding: 12px 16px; font-family: var(--font); font-size: .82rem; font-weight: 300; color: var(--muted); cursor: pointer; transition: color .15s, border-color .15s; border-bottom: 2px solid transparent; white-space: nowrap; }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--green-d); border-bottom-color: var(--green); font-weight: 500; }
 
-    .chat-msgs { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
-    .msg-divider { font-size: .7rem; color: var(--muted2); text-align: center; padding: 8px 0 4px; font-weight: 500; }
-    .msg-wrapper { display: flex; flex-direction: column; max-width: 78%; }
-    .msg-wrapper.user { align-self: flex-end; }
-    .msg-wrapper.support { align-self: flex-start; }
-    .msg-sender { font-size: .68rem; font-weight: 500; margin-bottom: 2px; }
-    .msg-sender.user { color: var(--muted); text-align: right; }
-    .msg-sender.support { color: var(--green-d); }
-    .msg-bubble { padding: .6rem .9rem; border-radius: 14px; font-size: .84rem; line-height: 1.5; word-wrap: break-word; }
-    .msg-wrapper.user .msg-bubble { background: var(--dark); color: #fff; border-bottom-right-radius: 2px; }
-    .msg-wrapper.support .msg-bubble { background: var(--bg); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 2px; }
-    .msg-time { font-size: .62rem; color: var(--muted2); margin-top: 2px; display: block; }
-    .msg-wrapper.user .msg-time { text-align: right; }
-    .msg-img { max-width: 200px; border-radius: 8px; margin-top: 6px; border: 1px solid var(--border); cursor: pointer; display: block; }
+    /* ===== СОДЕРЖИМОЕ ВКЛАДОК ===== */
+    .tab-content { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 16px; }
+    .tab-pane { display: none; flex-direction: column; gap: 16px; animation: fadeUp .25s ease; }
+    .tab-pane.active { display: flex; }
 
-    .chat-input-area { padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg); flex-shrink: 0; }
-    .chat-input-row { display: flex; gap: 8px; align-items: flex-end; }
-    .chat-textarea { flex: 1; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px; padding: .6rem .9rem; font-family: var(--font); font-size: .84rem; font-weight: 300; color: var(--text); outline: none; resize: none; min-height: 38px; max-height: 120px; line-height: 1.5; transition: border-color .15s; }
-    .chat-textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.08); }
-    .chat-textarea::placeholder { color: var(--muted2); }
-    .status-select { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 8px; padding: .35rem .7rem; font-family: var(--font); font-size: .76rem; font-weight: 300; color: var(--text); outline: none; cursor: pointer; transition: border-color .15s; }
-    .status-select:focus { border-color: var(--green); }
+    /* ===== КАРТОЧКИ ===== */
+    .d-card { background: var(--bg); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; }
+    .d-card-hdr { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .d-card-title { font-weight: 500; font-size: .82rem; letter-spacing: -.01em; }
+    .d-card-body { padding: 14px 18px; }
+
+    /* ===== СТАТУС КНОПКИ ===== */
+    .status-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .sbtn { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 10px; padding: .3rem .8rem; font-family: var(--font); font-size: .7rem; font-weight: 300; color: var(--muted); cursor: pointer; transition: all .12s; white-space: nowrap; }
+    .sbtn:hover { border-color: var(--border2); color: var(--text); }
+    .sbtn.cur { background: var(--dark); border-color: var(--dark); color: #fff; font-weight: 500; }
+    .sbtn.s0.cur { background: var(--muted); border-color: var(--muted); }
+    .sbtn.s1.cur { background: var(--warn); border-color: var(--warn); color: #000; }
+    .sbtn.s2.cur { background: var(--info); border-color: var(--info); }
+    .sbtn.s3.cur { background: #7c3aed; border-color: #7c3aed; }
+    .sbtn.s4.cur { background: var(--red); border-color: var(--red); }
+    .sbtn.s5.cur { background: var(--green-d); border-color: var(--green-d); }
+
+    /* ===== ОПЛАТА ===== */
+    .pay-row { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 12px; background: var(--bg2); cursor: pointer; transition: background .12s; border: 1.5px solid transparent; }
+    .pay-row:hover { background: var(--border); }
+    .pay-row.paid { background: rgba(30,222,123,.08); border-color: rgba(30,222,123,.2); }
+    .pay-pill { font-size: .68rem; font-weight: 500; padding: .2rem .7rem; border-radius: 8px; }
+    .pay-yes { background: rgba(30,222,123,.15); color: var(--green-d); }
+    .pay-no { background: rgba(232,99,79,.1); color: var(--red); }
+
+    /* ===== INFO GRID ===== */
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    @media (max-width: 500px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-cell { background: var(--bg2); border-radius: 10px; padding: 8px 12px; }
+    .info-lbl { font-size: .58rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 2px; font-weight: 500; }
+    .info-val { font-size: .82rem; color: var(--text); }
+
+    /* ===== ЭТАПЫ ===== */
+    .substep-row { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--border); }
+    .substep-row:last-child { border-bottom: none; }
+    .substep-check { width: 15px; height: 15px; cursor: pointer; accent-color: var(--green-d); }
+    .substep-text { font-size: .82rem; flex: 1; }
+    .substep-text.done { text-decoration: line-through; opacity: .5; }
+    .substep-date { font-size: .7rem; color: var(--muted); }
+    .substep-del { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .9rem; padding: 0 4px; }
+
+    /* ===== ПОЛЯ САЙТА ===== */
+    .site-fields { display: flex; flex-direction: column; gap: 8px; }
+    .site-field-row { display: flex; flex-direction: column; gap: 4px; }
+    .site-field-lbl { font-size: .6rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; }
+    .site-inp { background: var(--bg2); border: 1.5px solid var(--border); border-radius: 10px; padding: .5rem .8rem; font-family: var(--font); font-size: .82rem; font-weight: 300; color: var(--text); outline: none; transition: border-color .15s; width: 100%; }
+    .site-inp:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.08); }
+
+    /* ===== ОБСЛУЖИВАНИЕ ===== */
+    .sup-panel { background: rgba(30,222,123,.05); border: 1.5px solid rgba(30,222,123,.2); border-radius: 14px; padding: 14px 16px; }
+    .sup-title { font-weight: 500; font-size: .84rem; color: var(--green-d); margin-bottom: 8px; }
+    .sup-progress { height: 4px; background: var(--bg2); border-radius: 2px; margin: 8px 0; overflow: hidden; }
+    .sup-progress-fill { height: 100%; border-radius: 2px; transition: width .4s; }
+    .sup-progress-fill.green { background: var(--green-d); }
+    .sup-progress-fill.warn { background: var(--warn); }
+    .sup-progress-fill.red { background: var(--red); }
+
+    /* ===== ТИКЕТЫ ===== */
+    .ticket-item { padding: 10px 12px; border-radius: 12px; background: var(--bg2); border: 1.5px solid var(--border); margin-bottom: 6px; }
+    .ticket-item.open { border-color: rgba(59,130,246,.25); background: rgba(59,130,246,.04); }
+    .ticket-item-hdr { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .ticket-item-title { font-size: .82rem; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+    .ticket-item-desc { font-size: .76rem; color: var(--muted); line-height: 1.4; margin-bottom: 6px; }
+    .ticket-reply-inp { width: 100%; background: var(--bg3); border: 1.5px solid var(--border); border-radius: 10px; padding: .4rem .7rem; font-family: var(--font); font-size: .78rem; font-weight: 300; color: var(--text); outline: none; resize: none; margin-bottom: 6px; transition: border-color .15s; }
+    .ticket-reply-inp:focus { border-color: var(--green); }
 
     /* ===== BUTTONS ===== */
     .btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font); font-weight: 500; text-decoration: none; cursor: pointer; border: none; border-radius: 10px; padding: .5rem 1rem; font-size: .78rem; letter-spacing: -.01em; transition: background .1s, transform .1s; white-space: nowrap; }
@@ -157,29 +221,26 @@
     .btn-outline:hover { border-color: var(--border2); }
     .btn-danger { background: rgba(232,99,79,.08); color: var(--red); border: 1px solid rgba(232,99,79,.2); }
     .btn-danger:hover { background: rgba(232,99,79,.16); }
+    .btn-blue { background: rgba(59,130,246,.1); color: var(--info); border: 1px solid rgba(59,130,246,.2); }
+    .btn-blue:hover { background: rgba(59,130,246,.18); }
     .btn-sm { padding: .3rem .7rem; font-size: .7rem; border-radius: 8px; }
     .btn-xs { padding: .2rem .5rem; font-size: .65rem; border-radius: 6px; }
 
-    /* ===== MODAL ===== */
-    .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
-    .modal-overlay.show { opacity: 1; pointer-events: all; }
-    .modal { background: var(--bg); border-radius: 24px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.15); max-height: 90vh; overflow-y: auto; }
-    .modal-title { font-weight: 500; font-size: .95rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-    .form-input, .form-textarea, .form-select { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: .7rem 1rem; color: var(--text); font-family: var(--font); font-size: .86rem; font-weight: 300; outline: none; transition: border-color .15s; }
-    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.1); }
-    .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
-    .form-select { cursor: pointer; }
-    .modal-footer { display: flex; gap: 8px; margin-top: 20px; }
-    .modal-footer .btn { flex: 1; justify-content: center; }
+    /* ===== INPUTS ===== */
+    .inp { width: 100%; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px; padding: .65rem .9rem; color: var(--text); font-family: var(--font); font-size: .82rem; font-weight: 300; outline: none; transition: border-color .15s; }
+    .inp:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.08); }
+    .textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+    /* ===== ВЛОЖЕНИЯ ===== */
+    .attach-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+    .attach-thumb { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; cursor: pointer; transition: opacity .15s; border: 1.5px solid var(--border); }
+    .attach-thumb:hover { opacity: .8; }
 
     /* ===== LIGHTBOX ===== */
-    .lightbox { position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.9); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .lightbox { position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.9); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
     .lightbox.show { opacity: 1; pointer-events: all; }
-    .lightbox img { max-width: 94vw; max-height: 92vh; border-radius: 10px; object-fit: contain; }
-    .lb-close { position: fixed; top: 16px; right: 20px; background: rgba(255,255,255,.1); border: none; color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; }
+    .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 12px; object-fit: contain; }
+    .lb-close { position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,.15); border: none; color: #fff; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
 
     /* ===== TOAST ===== */
     .toast { position: fixed; bottom: 24px; right: 24px; z-index: 900; padding: .6rem 1.2rem; border-radius: 14px; font-size: .8rem; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; transform: translateY(6px); }
@@ -191,16 +252,27 @@
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 860px) {
-      .main { grid-template-columns: 1fr; grid-template-rows: auto 1fr; height: calc(100vh - var(--topbar-h)); }
-      .ticket-list-col { height: 45vh; border-right: none; border-bottom: 1px solid var(--border); }
-      .chat-col { height: 55vh; }
-      .topbar-stat { display: none; }
+      .workspace { flex-direction: column; }
+      .col-list { width: 100%; height: 40vh; border-right: none; border-bottom: 1px solid var(--border); }
+      .col-detail { height: 60vh; }
+      .order-header { grid-template-columns: 1fr; gap: 8px; padding: 12px 16px; }
+      .order-header-left { gap: 8px; }
+      .order-number { font-size: .95rem; }
+      .topbar-stats { display: none; }
+      .tabs { padding: 0 16px; }
+      .tab-content { padding: 12px 16px; }
+    }
+    @media (max-width: 500px) {
+      .col-list { height: 35vh; }
+      .col-detail { height: 65vh; }
+      .order-header-status select { font-size: .68rem; max-width: 100px; }
     }
   </style>
 </head>
 <body>
 
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button><img id="lightboxImg" src="" alt="" /></div>
 
 <!-- ===== SIDEBAR ===== -->
 <div class="sidebar">
@@ -212,10 +284,10 @@
   <nav class="sidebar-nav">
     <div class="sidebar-section">Основное</div>
     <a href="/admin" class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд</a>
-    <a href="/admin/orders" class="nav-item"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nav-badge" id="navBadgeOrders" style="display:none"></span></a>
+    <a href="/admin/orders" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nav-badge" id="navBadgeOrders" style="display:none"></span></a>
     <div class="sidebar-section">Клиенты</div>
     <a href="/admin/tickets" class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nav-badge" id="navBadgeTickets" style="display:none"></span></a>
-    <a href="/admin/chats" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Поддержка<span class="nav-badge" id="navBadgeChats" style="display:none"></span></a>
+    <a href="/admin/chats" class="nav-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Поддержка<span class="nav-badge" id="navBadgeChats" style="display:none"></span></a>
     <a href="/admin/promos" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
     <div class="sidebar-section">Система</div>
     <a href="/admin/reviews" class="nav-item"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
@@ -227,380 +299,637 @@
 
 <!-- ===== TOPBAR ===== -->
 <div class="topbar" id="appTopbar" style="display:none">
-  <span class="topbar-title">Поддержка</span>
+  <div class="topbar-left">
+    <span class="topbar-title">Заказы</span>
+    <div class="topbar-stats">
+      <div class="tstat">Новых: <strong id="tNew">—</strong></div>
+      <div class="tstat">В работе: <strong id="tWork">—</strong></div>
+      <div class="tstat">Готово: <strong id="tDone">—</strong></div>
+    </div>
+  </div>
   <div class="topbar-right">
-    <div class="topbar-stat">Открытых: <span class="topbar-stat-num" id="statOpen" style="color:var(--red)">—</span></div>
-    <div class="topbar-stat">Всего: <span class="topbar-stat-num" id="statTotal">—</span></div>
+    <button class="tab active" onclick="switchTab('active',this)">Активные</button>
+    <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
+    <button class="tab" onclick="switchTab('all',this)">Все</button>
   </div>
 </div>
 
-<!-- ===== MAIN ===== -->
-<div class="main" id="appWrap" style="display:none">
+<!-- ===== WORKSPACE ===== -->
+<div class="workspace" id="appWrap" style="display:none">
 
-  <!-- ЛЕВАЯ КОЛОНКА: СПИСОК -->
-  <div class="ticket-list-col">
-    <div class="list-header">
-      <div class="list-search">
+  <!-- КОЛОНКА 1: СПИСОК -->
+  <div class="col-list">
+    <div class="col-list-head">
+      <div class="search-box">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" id="listSearch" placeholder="Поиск..." oninput="filterList()" />
-      </div>
-      <div class="list-tabs">
-        <button class="list-tab active" onclick="switchTab('all',this)">Все</button>
-        <button class="list-tab" onclick="switchTab('open',this)">Открытые</button>
-        <button class="list-tab" onclick="switchTab('in-progress',this)">В работе</button>
-        <button class="list-tab" onclick="switchTab('resolved',this)">Решённые</button>
-      </div>
-      <div class="list-actions">
-        <button class="btn btn-green btn-sm" onclick="openCreateTicket()">➕ Создать тикет</button>
+        <input id="searchInp" type="text" placeholder="Поиск заказа..." oninput="renderList()" />
       </div>
     </div>
-    <div class="tickets-scroll" id="ticketsList">
-      <div class="empty-list">Загрузка...</div>
-    </div>
+    <div class="order-list" id="orderList"><div class="empty-state">📋 Загрузка...</div></div>
   </div>
 
-  <!-- ПРАВАЯ КОЛОНКА: ЧАТ -->
-  <div class="chat-col" id="chatCol">
-    <div class="no-selection" id="noSelection">
-      <div class="no-selection-icon">💬</div>
-      <div style="font-weight:500;font-size:.9rem;color:var(--text)">Выберите тикет</div>
-      <div style="font-size:.8rem;">Нажмите на тикет слева, чтобы открыть переписку</div>
+  <!-- КОЛОНКА 2: ДЕТАЛИ -->
+  <div class="col-detail">
+    <div class="detail-empty" id="detailEmpty">
+      <div style="font-size:2.5rem;opacity:.3">👆</div>
+      <div style="font-size:.86rem;color:var(--muted)">Выберите заказ слева</div>
     </div>
+    <div class="detail-wrap" id="detailWrap" style="display:none">
 
-    <div id="chatView" style="display:none;flex:1;flex-direction:column;overflow:hidden;">
-      <div class="chat-topbar">
-        <div>
-          <div class="chat-topbar-subject" id="chatSubject">—</div>
-          <div class="chat-topbar-meta" id="chatMeta"></div>
+      <!-- ХЕДЕР ЗАКАЗА -->
+      <div class="order-header" id="orderHeader">
+        <div class="order-header-left">
+          <span class="order-number" id="dId">—</span>
+          <span class="order-client" id="dClient">—</span>
         </div>
-        <div class="chat-topbar-actions">
-          <select class="status-select" id="statusSelect" onchange="changeStatus()">
-            <option value="open">Открыт</option>
-            <option value="in-progress">В обработке</option>
-            <option value="resolved">Решён</option>
-            <option value="closed">Закрыт</option>
-          </select>
-          <button class="btn btn-danger btn-sm" onclick="deleteTicket()">🗑</button>
-        </div>
-      </div>
-      <div class="chat-msgs" id="chatMsgs"></div>
-      <div class="chat-input-area">
-        <div class="chat-input-row">
-          <textarea class="chat-textarea" id="chatInp" rows="1" placeholder="Ответить клиенту..." onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
-          <label class="btn btn-outline btn-sm" style="cursor:pointer;" title="Прикрепить изображение">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <input type="file" id="fileInp" accept="image/*" style="display:none;" onchange="sendImg()" />
-          </label>
-          <button class="btn btn-green btn-sm" onclick="sendReply()">Отправить</button>
+        <div class="order-header-right">
+          <div class="order-header-status">
+            <span style="color:rgba(255,255,255,.4);font-size:.7rem;">Статус:</span>
+            <select id="headerStatusSelect" onchange="setStatusFromHeader(this.value)">
+              <option value="0">Новая</option>
+              <option value="1">Обсуждение</option>
+              <option value="2">В работе</option>
+              <option value="3">На проверке</option>
+              <option value="4">Правки</option>
+              <option value="5">Готово ✓</option>
+            </select>
+          </div>
+          <span class="order-header-price" id="dPrice">—</span>
+          <span class="order-header-date" id="dDate">—</span>
         </div>
       </div>
-    </div>
-  </div>
 
-</div>
+      <!-- ВКЛАДКИ -->
+      <div class="tabs" id="tabsContainer">
+        <button class="tab-btn active" data-tab="main" onclick="switchTabPane('main',this)">Основное</button>
+        <button class="tab-btn" data-tab="work" onclick="switchTabPane('work',this)">Работа</button>
+        <button class="tab-btn" data-tab="support" onclick="switchTabPane('support',this)">Обслуживание</button>
+        <button class="tab-btn" data-tab="tickets" onclick="switchTabPane('tickets',this)">Тикеты</button>
+      </div>
 
-<!-- ===== MODAL: СОЗДАНИЕ ТИКЕТА ===== -->
-<div class="modal-overlay" id="createTicketModal" onclick="if(event.target===this)closeCreateTicket()">
-  <div class="modal">
-    <div class="modal-title">📝 Создать тикет <button class="modal-close" onclick="closeCreateTicket()">✕</button></div>
-    <div class="form-group">
-      <label class="form-label">Пользователь</label>
-      <select class="form-select" id="ticketUser"><option value="">Выберите пользователя...</option></select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Тема</label>
-      <input class="form-input" id="ticketTopic" type="text" placeholder="Например: Техническая проблема" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Заголовок</label>
-      <input class="form-input" id="ticketSubject" type="text" placeholder="Краткий заголовок" />
-    </div>
-    <div class="form-group">
-      <label class="form-label">Сообщение</label>
-      <textarea class="form-textarea" id="ticketMessage" placeholder="Опишите проблему..." rows="4"></textarea>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Приоритет</label>
-      <select class="form-select" id="ticketPriority">
-        <option value="low">Низкий</option>
-        <option value="medium" selected>Средний</option>
-        <option value="high">Высокий</option>
-      </select>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeCreateTicket()">Отмена</button>
-      <button class="btn btn-green" onclick="createTicket()">Создать</button>
-    </div>
-  </div>
-</div>
+      <!-- СОДЕРЖИМОЕ ВКЛАДОК -->
+      <div class="tab-content">
 
-<!-- ===== LIGHTBOX ===== -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
-  <img id="lbImg" src="" alt="" />
-</div>
+        <!-- ВКЛАДКА: ОСНОВНОЕ -->
+        <div class="tab-pane active" id="pane-main">
+          <!-- Статус -->
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Статус заказа</span></div>
+            <div class="d-card-body">
+              <div class="status-row" id="statusRow">
+                <button class="sbtn s0" onclick="setStatus(0)">Новая</button>
+                <button class="sbtn s1" onclick="setStatus(1)">Обсуждение</button>
+                <button class="sbtn s2" onclick="setStatus(2)">В работе</button>
+                <button class="sbtn s3" onclick="setStatus(3)">На проверке</button>
+                <button class="sbtn s4" onclick="setStatus(4)">Правки</button>
+                <button class="sbtn s5" onclick="setStatus(5)">Готово ✓</button>
+              </div>
+              <div style="margin-top:10px">
+                <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;font-weight:500">Комментарий</div>
+                <textarea class="inp textarea" id="commentInp" placeholder="Внутренний комментарий..." rows="2" oninput="autoSaveComment()"></textarea>
+                <div style="font-size:.7rem;color:var(--muted);margin-top:4px" id="commentStatus">✓ Сохранено</div>
+              </div>
+            </div>
+          </div>
 
-<!-- ===== TOAST ===== -->
+          <!-- Оплата -->
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Оплата</span></div>
+            <div class="d-card-body">
+              <div class="pay-row" id="payRow" onclick="togglePayment()">
+                <span class="pay-pill" id="payPill">✕ НЕ ОПЛАЧЕН</span>
+                <span id="payLabel" style="font-size:.82rem;color:var(--muted)">Нажмите чтобы изменить</span>
+              </div>
+              <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                <input class="site-inp" id="payLinkInp" type="text" placeholder="Ссылка на оплату..." style="flex:1;min-width:150px;" />
+                <button class="btn btn-blue btn-sm" onclick="sendPayLink(selOrderId, selUid)">Отправить</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Клиент + Детали -->
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Клиент и заказ</span></div>
+            <div class="d-card-body">
+              <div class="info-grid" id="clientInfo"></div>
+              <div style="height:12px;"></div>
+              <div class="info-grid" id="orderInfo"></div>
+            </div>
+          </div>
+
+          <!-- Дополнения -->
+          <div class="d-card" id="extrasSec" style="display:none">
+            <div class="d-card-hdr"><span class="d-card-title">Дополнения</span></div>
+            <div class="d-card-body"><div style="display:flex;gap:6px;flex-wrap:wrap" id="extrasList"></div></div>
+          </div>
+
+          <!-- Описание -->
+          <div class="d-card" id="descSec" style="display:none">
+            <div class="d-card-hdr"><span class="d-card-title">Описание от клиента</span></div>
+            <div class="d-card-body"><div id="descBox" style="font-size:.84rem;line-height:1.6;color:var(--muted)"></div></div>
+          </div>
+
+          <!-- Вложения -->
+          <div class="d-card" id="favSec" style="display:none">
+            <div class="d-card-hdr"><span class="d-card-title">Favicon</span></div>
+            <div class="d-card-body"><div class="attach-grid" id="favGrid"></div></div>
+          </div>
+          <div class="d-card" id="attachSec" style="display:none">
+            <div class="d-card-hdr"><span class="d-card-title">Прикреплённые файлы</span></div>
+            <div class="d-card-body"><div class="attach-grid" id="attachGrid"></div></div>
+          </div>
+        </div>
+
+        <!-- ВКЛАДКА: РАБОТА -->
+        <div class="tab-pane" id="pane-work">
+          <!-- Этапы -->
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Этапы работы</span></div>
+            <div class="d-card-body">
+              <div id="substepList" style="margin-bottom:10px"></div>
+              <div style="display:flex;gap:7px">
+                <input class="inp" id="substepInp" type="text" placeholder="Новый этап..." style="font-size:.8rem;" />
+                <button class="btn btn-dark btn-sm" onclick="addSubstep()">Добавить</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Даты -->
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Даты</span></div>
+            <div class="d-card-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                <div>
+                  <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;font-weight:500">Начало работы</div>
+                  <input class="site-inp" type="date" id="dateStarted" onchange="saveDate('startedAt',this.value)" />
+                </div>
+                <div>
+                  <div style="font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;font-weight:500">Дата готовности</div>
+                  <input class="site-inp" type="date" id="dateDone" onchange="saveDate('doneAt',this.value)" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Сайт -->
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Готовый сайт</span><button class="btn btn-green btn-sm" onclick="saveSite()">Сохранить и уведомить</button></div>
+            <div class="d-card-body">
+              <div class="site-fields">
+                <div class="site-field-row"><div class="site-field-lbl">Домен</div><input class="site-inp" id="siteDomain" type="text" placeholder="antviz.ru" /></div>
+                <div class="site-field-row"><div class="site-field-lbl">URL сайта</div><input class="site-inp" id="siteUrl" type="text" placeholder="https://..." /></div>
+                <div class="site-field-row"><div class="site-field-lbl">URL favicon</div><input class="site-inp" id="siteFavicon" type="text" placeholder="https://.../favicon.png" /></div>
+                <div class="site-field-row"><div class="site-field-lbl">Количество страниц</div><input class="site-inp" id="sitePages" type="text" placeholder="5" /></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ВКЛАДКА: ОБСЛУЖИВАНИЕ -->
+        <div class="tab-pane" id="pane-support">
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Обслуживание</span></div>
+            <div class="d-card-body" id="supBody"></div>
+          </div>
+        </div>
+
+        <!-- ВКЛАДКА: ТИКЕТЫ -->
+        <div class="tab-pane" id="pane-tickets">
+          <div class="d-card">
+            <div class="d-card-hdr"><span class="d-card-title">Заявки на обслуживание</span></div>
+            <div class="d-card-body" id="ticketList">
+              <div style="text-align:center;color:var(--muted);font-size:.8rem;padding:8px">Выберите заказ</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tab-content -->
+    </div><!-- /detail-wrap -->
+  </div><!-- /col-detail -->
+</div><!-- /workspace -->
+
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, getDocs, Timestamp, where, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ===== CONSTANTS =====
+const S_LABELS = ['Новая заявка', 'Обсуждение', 'В работе', 'На проверке', 'Правки', 'Готово'];
+const EXTRAS = { domain: 'Домен', seo: 'SEO', content: 'Контент', shop: 'Каталог', urgent: 'Срочно', support: 'Обслуживание' };
+let allOrders = [], allReviews = [];
+let selOrderId = null, selUid = null, unsubTickets = null;
+let currentTab = 'active', currentPaid = false, currentSubsteps = [];
+let commentSaveTimer = null;
 
 // ===== UTILS =====
 function toast(m, t = 'info') { const el = document.getElementById('toast'); el.textContent = m; el.className = `toast ${t} show`; setTimeout(() => el.className = 'toast', 3400); }
 function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function fmtDate(ts) { if (!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' }); }
 function fmtDT(ts) { if (!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('ru', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }); }
-function fmtTime(ts) { if (!ts) return ''; const d = ts.toDate ? ts.toDate() : new Date(ts); const now = new Date(); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()); if (d >= today) return d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }); return d.toLocaleDateString('ru', { day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' }); }
-function statusBadge(s) { const map = { open: ['s-open', 'Открыт'], 'in-progress': ['s-in-progress', 'В обработке'], resolved: ['s-resolved', 'Решён'], closed: ['s-closed', 'Закрыт'] }; const [cls, label] = map[s] || ['s-closed', s]; return `<span class="sbadge ${cls}"><span class="sbadge-dot"></span>${label}</span>`; }
-function priorityLabel(p) { if (p === 'high') return '<span class="pri-high">Высокий</span>'; if (p === 'medium') return '<span class="pri-medium">Средний</span>'; return '<span class="pri-low">Низкий</span>'; }
+function fmtPrice(n) { return n ? Math.round(n).toLocaleString('ru') + ' ₽' : '—'; }
+function tsToInput(ts) { if (!ts) return ''; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toISOString().split('T')[0]; }
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
 
-let allTickets = [], selectedId = null, currentFilter = 'all', unsubMsgs = null;
-
-// ===== REVEAL =====
+// ===== REVEAL OBSERVER =====
 const revealObs = new IntersectionObserver(e => { e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }); }, { threshold: .07 });
 document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
 
-// ===== LIST =====
-window.switchTab = (f, btn) => {
-  currentFilter = f;
-  document.querySelectorAll('.list-tab').forEach(b => b.classList.toggle('active', b === btn));
+// ===== LIGHTBOX =====
+window.openLightbox = s => { document.getElementById('lightboxImg').src = s; document.getElementById('lightbox').classList.add('show'); };
+window.closeLightbox = () => document.getElementById('lightbox').classList.remove('show');
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+// ===== TABS =====
+window.switchTabPane = (tab, btn) => {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('pane-' + tab).classList.add('active');
+};
+
+// ===== TAB (topbar) =====
+window.switchTab = (tab, btn) => {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
   renderList();
 };
-window.filterList = () => renderList();
 
+// ===== RENDER LIST =====
 function renderList() {
-  const q = (document.getElementById('listSearch').value || '').toLowerCase();
-  let list = allTickets.filter(t => {
-    if (currentFilter !== 'all' && t.status !== currentFilter) return false;
-    if (q) return (t.subject || '').toLowerCase().includes(q) || (t.userName || '').toLowerCase().includes(q) || (t.topic || '').toLowerCase().includes(q);
-    return true;
-  });
-
-  const open = allTickets.filter(t => t.status === 'open' || t.status === 'in-progress').length;
-  document.getElementById('statOpen').textContent = open;
-  document.getElementById('statTotal').textContent = allTickets.length;
-
-  const badge = document.getElementById('navBadgeChats');
-  badge.style.display = open ? '' : 'none';
-  badge.textContent = open;
-
-  const el = document.getElementById('ticketsList');
-  if (!list.length) { el.innerHTML = `<div class="empty-list">${allTickets.length ? 'Ничего не найдено' : 'Тикетов пока нет'}</div>`; return; }
-  el.innerHTML = list.map(t => {
-    const isSelected = t.id === selectedId;
-    const lastMsg = (t._lastMsg || '');
-    const unread = t.status === 'open' && !t._adminRead;
-    return `<div class="ticket-item${isSelected ? ' selected' : ''}" onclick="selectTicket('${t.id}')">
-      <div class="ticket-item-subject">
-        ${unread ? '<span class="unread-dot"></span>' : ''}
-        ${esc(t.subject || 'Без темы')}
+  const el = document.getElementById('orderList');
+  const q = (document.getElementById('searchInp')?.value || '').toLowerCase();
+  let list = currentTab === 'active' ? allOrders.filter(o => o.status < 5) : currentTab === 'done' ? allOrders.filter(o => o.status === 5) : allOrders;
+  if (q) list = list.filter(o => (o.clientName || '').toLowerCase().includes(q) || (o.clientEmail || '').toLowerCase().includes(q) || o.id.toLowerCase().includes(q));
+  if (!list.length) { el.innerHTML = '<div class="empty-state">📋 Нет заказов</div>'; return; }
+  el.innerHTML = list.map(o => {
+    const t = o.package || o.tariff || '—';
+    const tc = t === 'Старт' ? 'tag-blue' : t === 'Рост' ? 'tag-green' : t === 'Масштаб' ? 'tag-purple' : '';
+    return `<div class="order-row${o.id === selOrderId ? ' sel' : ''}" onclick="selectOrder('${o.id}')">
+      <div class="or-head">
+        <span class="or-id">№${o.id.slice(0, 7).toUpperCase()}</span>
+        <span class="badge b${o.status || 0}"><span class="badge-dot"></span>${S_LABELS[o.status || 0]}</span>
       </div>
-      <div class="ticket-item-meta">
-        ${statusBadge(t.status)}
-        <span>·</span>
-        <span>${esc(t.userName || '—')}</span>
-        ${t.priority ? `<span>·</span>${priorityLabel(t.priority)}` : ''}
+      <div class="or-sub">${esc(o.clientName || '—')} · ${esc(o.clientEmail || '')}</div>
+      <div class="or-foot">
+        <span class="tag ${tc}" style="font-size:.64rem;padding:.12rem .5rem">${esc(t)}</span>
+        <span style="font-size:.7rem;${o.paid ? 'color:var(--green-d)' : 'color:var(--red)'}">${o.paid ? '✓ Оплачен' : '✕ Не оплачен'}</span>
+        <span style="font-size:.7rem;font-weight:500;margin-left:auto;color:var(--green-d)">${fmtPrice(o.totalPrice)}</span>
+        <select class="or-status-select" onchange="quickStatusChange('${o.id}', this.value)" onclick="event.stopPropagation();">
+          ${S_LABELS.map((l, i) => `<option value="${i}" ${i === (o.status || 0) ? 'selected' : ''}>${l}</option>`).join('')}
+        </select>
       </div>
-      ${lastMsg ? `<div class="ticket-item-preview">${esc(lastMsg)}</div>` : ''}
-      <div style="font-size:.66rem;color:var(--muted2);margin-top:2px;">${fmtDT(t.updatedAt || t.createdAt)}</div>
     </div>`;
   }).join('');
 }
 
-// ===== SELECT & CHAT =====
-window.selectTicket = function(id) {
-  selectedId = id;
-  const ticket = allTickets.find(t => t.id === id);
-  if (!ticket) return;
-
-  document.getElementById('noSelection').style.display = 'none';
-  const cv = document.getElementById('chatView');
-  cv.style.display = 'flex';
-  cv.style.flexDirection = 'column';
-  cv.style.overflow = 'hidden';
-  cv.style.flex = '1';
-
-  document.getElementById('chatSubject').textContent = `${ticket.topic || ''} · ${ticket.subject || ''}`;
-  document.getElementById('chatMeta').innerHTML = `
-    <span>${esc(ticket.userName || '—')}</span>
-    <span>·</span>
-    <span>${esc(ticket.userEmail || '—')}</span>
-    <span>·</span>
-    <span>${fmtDT(ticket.createdAt)}</span>
-    ${ticket.priority ? `<span>·</span>${priorityLabel(ticket.priority)}` : ''}
-  `;
-  document.getElementById('statusSelect').value = ticket.status || 'open';
-
-  updateDoc(doc(db, 'tickets', id), { _adminRead: true }).catch(() => {});
-  ticket._adminRead = true;
-  renderList();
-
-  if (unsubMsgs) unsubMsgs();
-  const q = query(collection(db, 'tickets', id, 'messages'), orderBy('createdAt', 'asc'));
-  unsubMsgs = onSnapshot(q, snap => {
-    const msgs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    renderChat(msgs);
-    const last = msgs[msgs.length - 1];
-    if (last && ticket) ticket._lastMsg = last.text || '';
-    renderList();
-  });
-};
-
-function renderChat(msgs) {
-  const el = document.getElementById('chatMsgs');
-  if (!msgs.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted2);font-size:.8rem;padding:32px;">Нет сообщений</div>'; return; }
-  let html = '', lastDate = null;
-  msgs.forEach(m => {
-    const d = m.createdAt?.toDate ? m.createdAt.toDate() : new Date(m.createdAt || 0);
-    const dateStr = d.toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' });
-    if (lastDate !== dateStr) {
-      html += `<div class="msg-divider">${dateStr}</div>`;
-      lastDate = dateStr;
-    }
-    const isUser = m.sender === 'user';
-    const senderName = isUser ? (allTickets.find(t => t.id === selectedId)?.userName || 'Клиент') : 'Поддержка';
-    html += `
-      <div class="msg-wrapper ${isUser ? 'user' : 'support'}">
-        <div class="msg-sender ${isUser ? 'user' : 'support'}">${esc(senderName)}</div>
-        <div class="msg-bubble">
-          ${esc(m.text)}
-          ${m.imageUrl ? `<img class="msg-img" src="${m.imageUrl}" alt="вложение" onclick="showLightbox('${m.imageUrl}')" />` : ''}
-          <span class="msg-time">${fmtTime(m.createdAt)}</span>
-        </div>
-      </div>`;
-  });
-  el.innerHTML = html;
-  el.scrollTop = el.scrollHeight;
+function updateStats() {
+  document.getElementById('tNew').textContent = allOrders.filter(o => (o.status || 0) === 0).length;
+  document.getElementById('tWork').textContent = allOrders.filter(o => o.status >= 1 && o.status <= 4).length;
+  document.getElementById('tDone').textContent = allOrders.filter(o => o.status === 5).length;
 }
 
-// ===== CREATE TICKET =====
-window.openCreateTicket = async function() {
-  try {
-    const usersSnap = await getDocs(collection(db, 'users'));
-    const userSelect = document.getElementById('ticketUser');
-    userSelect.innerHTML = '<option value="">Выберите пользователя...</option>';
-    usersSnap.forEach(d => {
-      const data = d.data();
-      const name = data.displayName || data.name || d.id;
-      const email = data.email || '';
-      userSelect.innerHTML += `<option value="${d.id}">${esc(name)}${email ? ' · ' + esc(email) : ''}</option>`;
-    });
-    document.getElementById('ticketTopic').value = '';
-    document.getElementById('ticketSubject').value = '';
-    document.getElementById('ticketMessage').value = '';
-    document.getElementById('ticketPriority').value = 'medium';
-    document.getElementById('createTicketModal').classList.add('show');
-  } catch(e) { toast('Ошибка загрузки пользователей: ' + e.message, 'error'); }
-};
-window.closeCreateTicket = () => document.getElementById('createTicketModal').classList.remove('show');
-window.createTicket = async function() {
-  const uid = document.getElementById('ticketUser').value;
-  const topic = document.getElementById('ticketTopic').value.trim();
-  const subject = document.getElementById('ticketSubject').value.trim();
-  const message = document.getElementById('ticketMessage').value.trim();
-  const priority = document.getElementById('ticketPriority').value;
-  if (!uid) { toast('Выберите пользователя', 'error'); return; }
-  if (!subject) { toast('Введите заголовок', 'error'); return; }
-  if (!message) { toast('Введите сообщение', 'error'); return; }
-  try {
-    const userDoc = await getDoc(doc(db, 'users', uid));
-    const userData = userDoc.data();
-    const ticketRef = await addDoc(collection(db, 'tickets'), {
-      uid, userName: userData?.displayName || userData?.name || 'Пользователь',
-      userEmail: userData?.email || '—', topic: topic || 'Общий вопрос',
-      subject, status: 'open', priority, _read: false, _adminRead: true,
-      createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-    });
-    await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
-      sender: 'support', senderName: 'Поддержка', text: message, imageUrl: null, createdAt: serverTimestamp()
-    });
-    await addDoc(collection(db, 'notifications', uid, 'items'), {
-      title: '📝 Новый тикет поддержки', text: `«${subject}»: ${message}`, read: false, createdAt: serverTimestamp()
-    });
-    toast('Тикет создан и пользователь уведомлён ✅', 'success');
-    closeCreateTicket();
-  } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
+window.quickStatusChange = async (id, val) => {
+  const s = parseInt(val);
+  const upd = { status: s };
+  const o = allOrders.find(x => x.id === id);
+  if (s >= 2 && !o?.startedAt) upd.startedAt = serverTimestamp();
+  if (s === 5 && !o?.doneAt) upd.doneAt = serverTimestamp();
+  await updateDoc(doc(db, 'orders', id), upd).catch(() => {});
+  toast('Статус → ' + S_LABELS[s] + ' ✓', 'success');
+  if (id === selOrderId) {
+    const ord = allOrders.find(x => x.id === id);
+    if (ord) showDetail(ord);
+  }
 };
 
-// ===== ACTIONS =====
-window.sendReply = async function() {
-  if (!selectedId) return;
-  const inp = document.getElementById('chatInp');
-  const text = inp.value.trim();
-  if (!text) return toast('Напишите сообщение', 'error');
-  inp.value = ''; inp.style.height = 'auto';
-  try {
-    await addDoc(collection(db, 'tickets', selectedId, 'messages'), {
-      sender: 'support', senderName: 'Поддержка', text, imageUrl: null, createdAt: serverTimestamp()
-    });
-    await updateDoc(doc(db, 'tickets', selectedId), { updatedAt: serverTimestamp(), _read: false, _adminRead: true });
-  } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
+// ===== SELECT ORDER =====
+window.selectOrder = id => {
+  selOrderId = id;
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  selUid = o.uid || null;
+  renderList();
+  showDetail(o);
+  loadTickets(o.uid);
 };
-window.sendImg = async function() {
-  if (!selectedId) return;
-  const inp = document.getElementById('fileInp');
-  const file = inp.files[0];
-  if (!file) return;
-  if (file.size > 4 * 1024 * 1024) return toast('Файл слишком большой (макс. 4 МБ)', 'error');
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try {
-      await addDoc(collection(db, 'tickets', selectedId, 'messages'), {
-        sender: 'support', senderName: 'Поддержка', text: 'Изображение', imageUrl: e.target.result, createdAt: serverTimestamp()
-      });
-      await updateDoc(doc(db, 'tickets', selectedId), { updatedAt: serverTimestamp(), _read: false, _adminRead: true });
-      toast('Изображение отправлено ✓', 'success');
-    } catch(err) { toast('Ошибка', 'error'); }
-    inp.value = '';
-  };
-  reader.readAsDataURL(file);
-};
-window.changeStatus = async function() {
-  if (!selectedId) return;
-  const val = document.getElementById('statusSelect').value;
-  try { await updateDoc(doc(db, 'tickets', selectedId), { status: val, updatedAt: serverTimestamp() }); toast('Статус обновлён ✓', 'success'); } catch(e) { toast('Ошибка', 'error'); }
-};
-window.deleteTicket = async function() {
-  if (!selectedId || !confirm('Удалить тикет и все сообщения?')) return;
-  try {
-    const snap = await getDocs(collection(db, 'tickets', selectedId, 'messages'));
-    await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
-    await deleteDoc(doc(db, 'tickets', selectedId));
-    toast('Тикет удалён', 'info');
-    selectedId = null;
-    document.getElementById('chatView').style.display = 'none';
-    document.getElementById('noSelection').style.display = 'flex';
-    if (unsubMsgs) { unsubMsgs(); unsubMsgs = null; }
-  } catch(e) { toast('Ошибка', 'error'); }
-};
-window.onKey = function(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); window.sendReply(); } };
-window.autoResize = function(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; };
-window.showLightbox = function(src) { document.getElementById('lbImg').src = src; document.getElementById('lightbox').classList.add('show'); };
-window.closeLightbox = function() { document.getElementById('lightbox').classList.remove('show'); };
-window.doLogout = async () => { await signOut(auth); window.location.href = '/'; };
 
-// ===== INIT =====
-onAuthStateChanged(auth, user => {
+// ===== SHOW DETAIL =====
+function showDetail(o) {
+  document.getElementById('detailEmpty').style.display = 'none';
+  document.getElementById('detailWrap').style.display = 'flex';
+
+  const t = o.package || o.tariff || '—';
+  document.getElementById('dId').textContent = '№ ' + o.id.slice(0, 8).toUpperCase();
+  document.getElementById('dClient').textContent = esc(o.clientName || '—');
+  document.getElementById('dPrice').textContent = fmtPrice(o.totalPrice);
+  document.getElementById('dDate').textContent = fmtDate(o.createdAt);
+
+  // header status select
+  const sel = document.getElementById('headerStatusSelect');
+  sel.value = o.status || 0;
+
+  // status buttons
+  document.querySelectorAll('.sbtn').forEach((b, i) => b.classList.toggle('cur', i === (o.status || 0)));
+
+  currentPaid = o.paid || false;
+  renderPayRow();
+  document.getElementById('commentInp').value = o.statusComment || '';
+  document.getElementById('commentStatus').textContent = '✓ Сохранено';
+
+  currentSubsteps = JSON.parse(JSON.stringify(o.substeps || []));
+  renderSubsteps();
+  document.getElementById('dateStarted').value = tsToInput(o.startedAt);
+  document.getElementById('dateDone').value = tsToInput(o.doneAt);
+  document.getElementById('siteDomain').value = o.siteDomain || '';
+  document.getElementById('siteUrl').value = o.siteUrl || '';
+  document.getElementById('siteFavicon').value = o.siteFaviconUrl || '';
+  document.getElementById('sitePages').value = o.sitePages || '';
+
+  document.getElementById('clientInfo').innerHTML = `
+    <div class="info-cell"><div class="info-lbl">Имя</div><div class="info-val">${esc(o.clientName || '—')}</div></div>
+    <div class="info-cell"><div class="info-lbl">Email</div><div class="info-val">${esc(o.clientEmail || '—')}</div></div>
+  `;
+
+  const domOpt = o.domainOption === 'new' ? 'Регистрация .ru' : o.domainOption === 'own' ? 'Свой домен' : '—';
+  document.getElementById('orderInfo').innerHTML = `
+    <div class="info-cell"><div class="info-lbl">Тип</div><div class="info-val">${esc(o.siteType || '—')}</div></div>
+    <div class="info-cell"><div class="info-lbl">Тариф</div><div class="info-val">${esc(t)}</div></div>
+    <div class="info-cell"><div class="info-lbl">Страниц</div><div class="info-val">${o.pages || '—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Домен</div><div class="info-val">${domOpt}</div></div>
+    <div class="info-cell"><div class="info-lbl">Промокод</div><div class="info-val">${o.promoCode ? esc(o.promoCode) + (o.discountApplied ? ' (-' + fmtPrice(o.discountApplied) + ')' : '') : '—'}</div></div>
+    <div class="info-cell"><div class="info-lbl">Создан</div><div class="info-val">${fmtDT(o.createdAt)}</div></div>
+  `;
+
+  const ea = o.extras || [];
+  const es = document.getElementById('extrasSec');
+  if (ea.length) { es.style.display = 'block'; document.getElementById('extrasList').innerHTML = ea.map(e => { const l = EXTRAS[e] || e; const ec = e === 'domain' ? 'tag-blue' : e === 'support' ? 'tag-green' : e === 'seo' ? 'tag-purple' : 'tag-warn'; return `<span class="tag ${ec}">${esc(l)}</span>`; }).join(''); } else es.style.display = 'none';
+
+  const ds = document.getElementById('descSec');
+  if (o.description) { ds.style.display = 'block'; document.getElementById('descBox').textContent = o.description; } else ds.style.display = 'none';
+
+  const fs = document.getElementById('favSec');
+  if (o.favicon) { fs.style.display = 'block'; document.getElementById('favGrid').innerHTML = `<img class="attach-thumb" src="${esc(o.favicon)}" alt="favicon" onclick="openLightbox('${o.favicon.replace(/'/g, "\\'")}')" />`; } else fs.style.display = 'none';
+
+  const as = document.getElementById('attachSec'); const ag = document.getElementById('attachGrid');
+  if (o.attachments?.length) { as.style.display = 'block'; ag.innerHTML = o.attachments.map(a => a.fileType?.startsWith('image/') ? `<img class="attach-thumb" src="${a.fileData}" alt="${esc(a.fileName || '')}" onclick="openLightbox('${a.fileData.replace(/'/g, "\\'")}')" />` : ` <a class="btn btn-outline btn-xs" href="${a.fileData}" download="${esc(a.fileName || 'file')}">📎 ${esc(a.fileName || 'Файл')}</a>`).join(''); } else as.style.display = 'none';
+
+  renderSupport(o);
+
+  const rev = allReviews.find(r => r.orderId === o.id);
+  // отзыв не выводим в отдельной секции, можно добавить позже
+
+  // переключиться на первую вкладку
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.tab-btn[data-tab="main"]').classList.add('active');
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.getElementById('pane-main').classList.add('active');
+}
+
+// ===== PAY ROW =====
+function renderPayRow() {
+  const row = document.getElementById('payRow');
+  row.classList.toggle('paid', currentPaid);
+  document.getElementById('payLabel').textContent = currentPaid ? 'Оплачен — нажмите чтобы изменить' : 'Не оплачен — нажмите чтобы изменить';
+  const pill = document.getElementById('payPill');
+  pill.className = currentPaid ? 'pay-pill pay-yes' : 'pay-pill pay-no';
+  pill.textContent = currentPaid ? '✓ ОПЛАЧЕН' : '✕ НЕ ОПЛАЧЕН';
+}
+
+// ===== SUBSTEPS =====
+function renderSubsteps() {
+  const el = document.getElementById('substepList');
+  if (!currentSubsteps.length) { el.innerHTML = '<div style="font-size:.78rem;color:var(--muted);padding:4px 0">Нет этапов</div>'; return; }
+  el.innerHTML = currentSubsteps.map((ss, i) => `<div class="substep-row">
+    <input type="checkbox" class="substep-check" ${ss.done ? 'checked' : ''} onchange="toggleSS(${i},this.checked)" />
+    <span class="substep-text${ss.done ? ' done' : ''}">${esc(ss.label)}</span>
+    ${ss.date ? `<span class="substep-date">${ss.date}</span>` : ''}
+    <button class="substep-del" onclick="deleteSS(${i})">✕</button>
+  </div>`).join('');
+}
+
+// ===== SUPPORT =====
+function renderSupport(o) {
+  const body = document.getElementById('supBody');
+  const now = new Date();
+  if (o.supportActive && o.supportExpiresAt) {
+    const exp = o.supportExpiresAt.toDate();
+    const days = Math.ceil((exp - now) / 864e5);
+    const pct = Math.max(0, Math.min(100, ((exp - now) / (30 * 864e5)) * 100));
+    const fillClass = days < 3 ? 'red' : days < 7 ? 'warn' : 'green';
+    body.innerHTML = `<div class="sup-panel">
+      <div class="sup-title">✅ Обслуживание активно</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:6px">Истекает: ${exp.toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' })} · осталось <strong style="color:${days < 3 ? 'var(--red)' : 'var(--green-d)'}">${days} дн.</strong></div>
+      <div class="sup-progress"><div class="sup-progress-fill ${fillClass}" style="width:${pct}%;"></div></div>
+      <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-green btn-sm" onclick="renewSupport('${o.id}')">Продлить на 30 дней</button>
+        ${days < 3 ? `<button class="btn btn-outline btn-sm" onclick="sendExpiryNotif('${o.uid || ''}')">Уведомить об истечении</button>` : ''}
+      </div>
+    </div>`;
+  } else if (o.supportRequested) {
+    body.innerHTML = `<div style="background:rgba(245,158,11,.08);border:1.5px solid rgba(245,158,11,.25);border-radius:14px;padding:14px 16px;margin-bottom:10px">
+      <div style="font-size:.84rem;font-weight:500;color:var(--warn);margin-bottom:8px">⏳ Клиент запросил обслуживание</div>
+      <button class="btn btn-green btn-sm" onclick="activateSupport('${o.id}','${o.uid || ''}')">Активировать</button>
+    </div>
+    <div style="margin-top:10px">
+      <div style="font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px;font-weight:500">Ссылка на оплату (500 ₽)</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input class="site-inp" id="payLink_${o.id}" type="text" placeholder="https://..." style="flex:1;min-width:150px;" />
+        <button class="btn btn-blue btn-sm" onclick="sendPayLink('${o.id}','${o.uid || ''}')">Отправить</button>
+      </div>
+    </div>`;
+  } else {
+    body.innerHTML = `<div style="color:var(--muted);font-size:.82rem">Обслуживание не подключено.</div>`;
+  }
+}
+
+// ===== TICKETS =====
+function loadTickets(uid) {
+  if (unsubTickets) unsubTickets();
+  const el = document.getElementById('ticketList');
+  if (!uid) { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:8px">Нет UID для этого заказа</div>'; return; }
+  el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:8px">Загрузка...</div>';
+  const q = query(collection(db, 'service_tickets'), where('uid', '==', uid), orderBy('createdAt', 'desc'));
+  unsubTickets = onSnapshot(q, snap => {
+    const tickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (!tickets.length) { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:8px">✅ Заявок нет</div>'; return; }
+    el.innerHTML = tickets.map(t => `<div class="ticket-item ${t.status === 'done' ? '' : 'open'}">
+      <div class="ticket-item-hdr">
+        <div class="ticket-item-title">${esc(t.title || 'Без темы')}</div>
+        <span class="badge ${t.status === 'done' ? 'b5' : 'b2'}" style="flex-shrink:0">${t.status === 'done' ? 'Закрыта' : 'Открыта'}</span>
+      </div>
+      ${t.description ? `<div class="ticket-item-desc">${esc(t.description.slice(0, 120))}${t.description.length > 120 ? '…' : ''}</div>` : ''}
+      ${t.adminReply ? `<div style="font-size:.74rem;color:var(--green-d);margin-bottom:6px">💬 ${esc(t.adminReply.slice(0, 80))}</div>` : ''}
+      <textarea class="ticket-reply-inp" id="treply_${t.id}" rows="2" placeholder="Ответить клиенту...">${esc(t.adminReply || '')}</textarea>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <button class="btn btn-green btn-xs" onclick="saveTicketReply('${t.id}','${uid}','${esc(t.title || '')}')">Ответить</button>
+        ${t.status !== 'done' ? `<button class="btn btn-outline btn-xs" onclick="closeTicket('${t.id}')">Закрыть</button>` : `<button class="btn btn-outline btn-xs" onclick="reopenTicket('${t.id}')">Открыть</button>`}
+        <button class="btn btn-danger btn-xs" onclick="deleteTicket('${t.id}')">✕</button>
+      </div>
+    </div>`).join('');
+  }, () => { el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:.8rem;padding:8px">Ошибка загрузки</div>'; });
+}
+
+// ===== TICKET ACTIONS =====
+window.saveTicketReply = async (id, uid, title) => {
+  const val = document.getElementById('treply_' + id)?.value.trim() || '';
+  if (!val) { toast('Введите ответ', 'error'); return; }
+  try {
+    await updateDoc(doc(db, 'service_tickets', id), { adminReply: val });
+    if (uid) await addDoc(collection(db, 'notifications', uid, 'items'), { title: '💬 Ответ на заявку', text: `«${title}»: ${val}`, read: false, createdAt: serverTimestamp() }).catch(() => {});
+    toast('Ответ сохранён и клиент уведомлён ✓', 'success');
+  } catch (e) { toast('Ошибка', 'error'); }
+};
+window.closeTicket = async id => { try { await updateDoc(doc(db, 'service_tickets', id), { status: 'done' }); toast('Закрыта ✓', 'success'); } catch (e) { toast('Ошибка', 'error'); } };
+window.reopenTicket = async id => { try { await updateDoc(doc(db, 'service_tickets', id), { status: 'open' }); toast('Открыта', 'info'); } catch (e) { toast('Ошибка', 'error'); } };
+window.deleteTicket = async id => { if (!confirm('Удалить заявку?')) return; try { await deleteDoc(doc(db, 'service_tickets', id)); toast('Удалено', 'info'); } catch (e) { toast('Ошибка', 'error'); } };
+
+// ===== ORDER ACTIONS =====
+window.togglePayment = async () => {
+  if (!selOrderId) return;
+  currentPaid = !currentPaid;
+  renderPayRow();
+  await updateDoc(doc(db, 'orders', selOrderId), { paid: currentPaid }).catch(() => {});
+  toast(currentPaid ? 'Оплачен ✓' : 'Не оплачен', 'success');
+};
+window.setStatus = async s => {
+  if (!selOrderId) return;
+  const upd = { status: s };
+  const o = allOrders.find(x => x.id === selOrderId);
+  if (s >= 2 && !o?.startedAt) upd.startedAt = serverTimestamp();
+  if (s === 5 && !o?.doneAt) upd.doneAt = serverTimestamp();
+  await updateDoc(doc(db, 'orders', selOrderId), upd).catch(() => {});
+  document.getElementById('headerStatusSelect').value = s;
+  toast('Статус → ' + S_LABELS[s] + ' ✓', 'success');
+  // обновить кнопки
+  document.querySelectorAll('.sbtn').forEach((b, i) => b.classList.toggle('cur', i === s));
+};
+window.setStatusFromHeader = async val => {
+  const s = parseInt(val);
+  await window.setStatus(s);
+};
+window.autoSaveComment = () => {
+  clearTimeout(commentSaveTimer);
+  document.getElementById('commentStatus').textContent = '⏳ Сохранение...';
+  commentSaveTimer = setTimeout(async () => {
+    if (!selOrderId) return;
+    await updateDoc(doc(db, 'orders', selOrderId), { statusComment: document.getElementById('commentInp').value.trim() }).catch(() => {});
+    document.getElementById('commentStatus').textContent = '✓ Сохранено';
+  }, 600);
+};
+window.toggleSS = async (i, done) => {
+  currentSubsteps[i].done = done;
+  if (done) currentSubsteps[i].date = new Date().toLocaleDateString('ru', { day: 'numeric', month: 'short' });
+  else delete currentSubsteps[i].date;
+  renderSubsteps();
+  if (selOrderId) await updateDoc(doc(db, 'orders', selOrderId), { substeps: currentSubsteps }).catch(() => {});
+};
+window.addSubstep = async () => {
+  const inp = document.getElementById('substepInp');
+  const label = inp.value.trim();
+  if (!label) return;
+  currentSubsteps.push({ label, done: false });
+  inp.value = '';
+  renderSubsteps();
+  if (selOrderId) await updateDoc(doc(db, 'orders', selOrderId), { substeps: currentSubsteps }).catch(() => {});
+};
+window.deleteSS = async i => {
+  currentSubsteps.splice(i, 1);
+  renderSubsteps();
+  if (selOrderId) await updateDoc(doc(db, 'orders', selOrderId), { substeps: currentSubsteps }).catch(() => {});
+};
+window.saveDate = async (field, val) => {
+  if (!selOrderId || !val) return;
+  await updateDoc(doc(db, 'orders', selOrderId), { [field]: Timestamp.fromDate(new Date(val + 'T12:00:00')) }).catch(() => {});
+  toast('Дата сохранена ✓', 'success');
+};
+window.saveSite = async () => {
+  if (!selOrderId) return;
+  const domain = document.getElementById('siteDomain').value.trim();
+  const url = document.getElementById('siteUrl').value.trim();
+  const fav = document.getElementById('siteFavicon').value.trim();
+  const pages = document.getElementById('sitePages').value.trim();
+  await updateDoc(doc(db, 'orders', selOrderId), { siteDomain: domain, siteUrl: url, siteFaviconUrl: fav, sitePages: pages, status: 5, doneAt: serverTimestamp() }).catch(() => {});
+  if (selUid && domain) await addDoc(collection(db, 'notifications', selUid, 'items'), { title: '🎉 Ваш сайт готов!', text: `Сайт готов и опубликован: ${domain}${url ? ' — ' + url : ''}. Посмотрите в разделе «Мои заказы».`, read: false, createdAt: serverTimestamp() }).catch(() => {});
+  toast('Сохранено и клиент уведомлён ✓', 'success');
+};
+window.activateSupport = async (orderId, uid) => {
+  const exp = new Date(Date.now() + 30 * 864e5);
+  await updateDoc(doc(db, 'orders', orderId), { supportActive: true, supportStartedAt: serverTimestamp(), supportExpiresAt: Timestamp.fromDate(exp), supportRequested: false });
+  if (uid) await addDoc(collection(db, 'notifications', uid, 'items'), { title: '✅ Обслуживание активировано', text: 'Обслуживание подключено на 30 дней. Создавайте заявки в разделе «Обслуживание сайта».', read: false, createdAt: serverTimestamp() });
+  toast('Активировано ✓', 'success');
+};
+window.renewSupport = async orderId => {
+  const exp = new Date(Date.now() + 30 * 864e5);
+  await updateDoc(doc(db, 'orders', orderId), { supportExpiresAt: Timestamp.fromDate(exp) });
+  toast('Продлено на 30 дней ✓', 'success');
+};
+window.sendPayLink = async (orderId, uid) => {
+  const inp = document.getElementById('payLink_' + orderId) || document.getElementById('payLinkInp');
+  const link = inp?.value.trim();
+  if (!link) { toast('Введите ссылку', 'error'); return; }
+  if (!uid) { toast('UID не найден', 'error'); return; }
+  await addDoc(collection(db, 'notifications', uid, 'items'), { title: '💳 Ссылка на оплату обслуживания', text: `Ссылка для оплаты обслуживания (500 ₽/мес): ${link}`, read: false, createdAt: serverTimestamp() });
+  toast('Ссылка отправлена ✓', 'success');
+  if (inp) inp.value = '';
+};
+window.sendExpiryNotif = async uid => {
+  if (!uid) return;
+  await addDoc(collection(db, 'notifications', uid, 'items'), { title: '⚠️ Истекает обслуживание', text: 'Ваше обслуживание истекает через несколько дней. Свяжитесь с нами для продления.', read: false, createdAt: serverTimestamp() });
+  toast('Уведомление отправлено ✓', 'success');
+};
+window.archiveOrder = async () => {
+  if (!selOrderId) return;
+  if (!confirm('Архивировать заказ?')) return;
+  await updateDoc(doc(db, 'orders', selOrderId), { archived: true }).catch(() => {});
+  toast('В архиве ✓', 'info');
+};
+
+// ===== PRINT RECEIPT =====
+let _ordersCache = [];
+window.printReceipt = id => {
+  const o = _ordersCache.find(x => x.id === id);
+  if (!o) return;
+  const w = window.open('', '_blank', 'width=600,height=700');
+  const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' }) : '—';
+  const extrasHtml = (o.extras || []).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e => EXTRAS[e] || e).join(', ')}</td></tr>` : '';
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;font-size:13px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.tot td{font-weight:700;font-size:14px;border-bottom:none;padding-top:10px}</style></head><body><h2>Antviz — Квитанция</h2><table><tr><td>№</td><td>${o.id.slice(0, 8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName || '—'}</td></tr><tr><td>Email</td><td>${o.clientEmail || '—'}</td></tr><tr><td>Тип</td><td>${o.siteType || '—'}</td></tr><tr><td>Тариф</td><td>${o.package || o.tariff || '—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid ? 'Оплачен' : 'Не оплачен'}</td></tr><tr class="tot"><td>Итого</td><td>${fmtPrice(o.totalPrice)}</td></tr></table><script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.close();
+};
+
+// ===== LOGOUT =====
+window.doLogout = async () => { if (unsubTickets) unsubTickets(); await signOut(auth); window.location.href = '/'; };
+
+// ===== AUTH =====
+onAuthStateChanged(auth, async user => {
   document.getElementById('loadingScreen').style.display = 'none';
   if (!user || user.email !== ADMIN_EMAIL) { window.location.href = '/'; return; }
-  document.getElementById('appWrap').style.display = 'grid';
+  document.getElementById('appWrap').style.display = 'flex';
   document.getElementById('appTopbar').style.display = 'flex';
 
-  const q = query(collection(db, 'tickets'), orderBy('createdAt', 'desc'));
-  onSnapshot(q, snap => {
-    const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    incoming.forEach(t => { const old = allTickets.find(x => x.id === t.id); t._lastMsg = old?._lastMsg || ''; });
-    allTickets = incoming;
+  onSnapshot(query(collection(db, 'orders'), orderBy('createdAt', 'desc')), snap => {
+    allOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    _ordersCache = [...allOrders];
+    updateStats();
     renderList();
-    allTickets.forEach(t => {
-      if (!t._lastMsg) {
-        getDocs(query(collection(db, 'tickets', t.id, 'messages'), orderBy('createdAt', 'desc')))
-          .then(s => { if (s.docs.length) { t._lastMsg = s.docs[0].data().text || ''; renderList(); } }).catch(()=>{});
-      }
-    });
+    if (selOrderId) {
+      const o = allOrders.find(x => x.id === selOrderId);
+      if (o) showDetail(o);
+    }
   });
+
+  onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc')), snap => {
+    allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (selOrderId) {
+      const o = allOrders.find(x => x.id === selOrderId);
+      if (o) showDetail(o);
+    }
+  });
+
+  const urlId = new URLSearchParams(location.search).get('id');
+  if (urlId) setTimeout(() => selectOrder(urlId), 600);
 });
 </script>
 </body>

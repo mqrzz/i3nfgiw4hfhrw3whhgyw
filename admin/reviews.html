@@ -1,221 +1,286 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Отзывы — Antviz Admin</title>
-  <link rel="icon" href="../img/favicon.png"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="icon" href="../img/favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet" />
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;--card:#fff;
-      --border:#dfe3e8;--border2:#cbcdd6;
-      --accent:#1ede7b;--accent2:#1ac16b;--accent3:#0d9f56;
-      --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
-      --text:#191b1e;--muted:#707a8a;--muted2:#9ca3af;
-      --success:#1ede7b;--error:#e8634f;--red:#e8634f;--warn:#f59e0b;--info:#3b82f6;
-      --sidebar-w:240px;--topbar-h:60px;
+    /* ===== БАЗА ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #1ede7b;
+      --green-h: #1ac16b;
+      --green-d: #149955;
+      --green-light: #d2f8e5;
+      --bg: #fff;
+      --bg2: #f2f4f7;
+      --bg3: #f9fafc;
+      --text: #191b1e;
+      --muted: #707a8a;
+      --border: #dfe3e8;
+      --border2: #cbcdd6;
+      --dark: #191b1e;
+      --dark2: #2b2f33;
+      --red: #e8634f;
+      --warn: #f59e0b;
+      --info: #3b82f6;
+      --sh1: 0 4px 16px rgba(0,51,153,.04), 0 2px 2px rgba(0,51,153,.08);
+      --sh2: 0 8px 20px rgba(0,51,153,.08), 0 4px 8px rgba(0,51,153,.08);
+      --font: 'Geologica', 'Inter', 'Arial', sans-serif;
+      --sidebar-w: 240px;
+      --topbar-h: 60px;
     }
-    html,body{height:100%;font-size:16px;background:var(--bg)}
-    body{color:var(--text);font-family:'Geologica','Inter',sans-serif;font-weight:400;display:flex;flex-direction:column}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-    @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    ::-webkit-scrollbar{width:4px;height:4px}
-    ::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:2px}
+    html, body { height: 100%; background: var(--bg2); }
+    body { color: var(--text); font-family: var(--font); font-weight: 300; line-height: 1.25; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
 
-    .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem}
-    .spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+    .loading-screen { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
 
-    .sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
-    .sidebar-logo{padding:1.2rem 1.2rem 1rem;display:flex;align-items:center;gap:10px;text-decoration:none;border-bottom:1px solid var(--border)}
-    .sidebar-logo img{width:28px;height:28px;border-radius:8px;object-fit:cover;flex-shrink:0}
-    .sidebar-logo-text{font-family:'Geologica',sans-serif;font-weight:700;font-size:.85rem;color:var(--text)}
-    .sidebar-logo-badge{background:rgba(255,45,80,.1);color:var(--red);border:1px solid rgba(255,45,80,.15);padding:.08rem .45rem;border-radius:50px;font-size:.55rem;font-weight:700;margin-left:auto;flex-shrink:0}
-    .sidebar-nav{flex:1;padding:1rem .7rem;overflow-y:auto;display:flex;flex-direction:column;gap:.15rem}
-    .sidebar-section{font-size:.58rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:.6rem .6rem .3rem;font-weight:600}
-    .nav-item{display:flex;align-items:center;gap:10px;padding:.6rem .85rem;border-radius:10px;text-decoration:none;color:var(--muted);font-size:.84rem;transition:all .15s;cursor:pointer;border:none;background:none;width:100%;font-family:'Geologica','Inter',sans-serif;position:relative}
-    .nav-item:hover{background:rgba(0,0,0,.04);color:var(--text)}
-    .nav-item.active{background:rgba(30,222,123,.12);color:var(--accent2)}
-    .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none}
-    .nav-badge{position:absolute;right:.7rem;background:var(--red);color:#fff;font-size:.58rem;font-weight:700;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
-    .sidebar-footer{padding:.8rem .7rem;border-top:1px solid var(--border)}
+    /* ===== REVEAL ===== */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    .topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.6rem;z-index:90}
-    .topbar-title{font-family:'Geologica',sans-serif;font-weight:600;font-size:.95rem;color:var(--text)}
-    .topbar-right{display:flex;align-items:center;gap:.7rem}
-    .topbar-stat{display:flex;align-items:center;gap:.4rem;background:var(--bg3);border:1px solid var(--border);border-radius:50px;padding:.28rem .85rem;font-size:.72rem;white-space:nowrap;color:var(--muted)}
-    .topbar-stat-num{font-family:'Geologica',sans-serif;font-weight:700;font-size:.8rem;color:var(--text)}
-    .topbar-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);font-family:'Geologica','Inter',sans-serif;font-size:.76rem;padding:.35rem .9rem;border-radius:9px;cursor:pointer;transition:all .18s}
-    .topbar-btn:hover{border-color:var(--border2);color:var(--text)}
-    .topbar-btn.danger:hover{border-color:rgba(255,45,80,.3);color:var(--red)}
-    .maint-btn{display:flex;align-items:center;gap:.5rem}
-    .maint-btn.on{border-color:rgba(255,209,26,.4)!important;color:var(--warn)!important}
-    .toggle-track{width:28px;height:16px;background:var(--bg);border-radius:50px;position:relative;border:1px solid var(--border);flex-shrink:0;transition:background .2s}
-    .maint-btn.on .toggle-track{background:rgba(255,209,26,.15);border-color:rgba(255,209,26,.3)}
-    .toggle-track::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:var(--muted);transition:transform .2s,background .2s}
-    .maint-btn.on .toggle-track::after{transform:translateX(12px);background:var(--warn)}
+    /* ===== SIDEBAR ===== */
+    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 200; }
+    .sidebar-logo { padding: 18px 20px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; border-bottom: 1px solid var(--border); }
+    .sidebar-logo-mark { width: 30px; height: 30px; border-radius: 10px; background: var(--dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sidebar-logo-mark svg { width: 16px; height: 16px; fill: var(--green); }
+    .sidebar-logo-name { font-weight: 500; font-size: .88rem; color: var(--text); letter-spacing: -.01em; }
+    .sidebar-logo-badge { margin-left: auto; font-size: .6rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; background: rgba(232,99,79,.1); color: var(--red); border: 1px solid rgba(232,99,79,.2); padding: .1rem .45rem; border-radius: 6px; flex-shrink: 0; }
+    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section { font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 10px 4px; margin-top: 4px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; text-decoration: none; color: var(--muted); font-size: .84rem; font-weight: 300; transition: background .15s, color .15s; cursor: pointer; border: none; background: none; width: 100%; font-family: var(--font); position: relative; }
+    .nav-item:hover { background: var(--bg2); color: var(--text); }
+    .nav-item.active { background: rgba(30,222,123,.1); color: var(--green-d); font-weight: 500; }
+    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.7; fill: none; }
+    .nav-badge { position: absolute; right: 10px; background: var(--red); color: #fff; font-size: .58rem; font-weight: 500; min-width: 17px; height: 17px; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 4px; animation: pulse 2s infinite; }
+    .sidebar-footer { padding: 10px; border-top: 1px solid var(--border); }
 
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:.6rem 1.2rem;border-radius:9px;font-family:'Geologica','Inter',sans-serif;font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:all .15s;text-decoration:none}
-    .btn-primary{background:var(--accent);color:#fff}
-    .btn-primary:hover{box-shadow:0 4px 12px rgba(30,222,123,.35)}
-    .btn-ghost{background:var(--bg3);border:1px solid var(--border);color:var(--muted)}
-    .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-    .btn-danger{background:#fee2e2;border:1px solid #fca5a5;color:var(--red)}
-    .btn-danger:hover{background:#fecaca}
-    .btn-success{background:#d1fae5;border:1px solid #a7f3d0;color:#065f46}
-    .btn-success:hover{background:#a7f3d0}
-    .btn-sm{padding:.38rem .8rem;font-size:.74rem;border-radius:7px}
-    .btn-xs{padding:.22rem .55rem;font-size:.66rem;border-radius:6px}
+    /* ===== TOPBAR ===== */
+    .topbar { position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: var(--topbar-h); background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
+    .topbar-title { font-weight: 500; font-size: .92rem; color: var(--text); letter-spacing: -.01em; }
+    .topbar-right { display: flex; align-items: center; gap: 8px; }
+    .topbar-stat { display: flex; align-items: center; gap: 4px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: .2rem .7rem; font-size: .7rem; color: var(--muted); }
+    .topbar-stat-num { font-weight: 500; color: var(--text); }
+    .topbar-stat-num.rating { color: var(--warn); }
 
-    .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem;color:var(--muted);gap:.7rem;text-align:center}
-    .empty-state-icon{font-size:2.5rem;opacity:.3}
-    .empty-state-text{font-size:.84rem}
+    /* ===== MAIN ===== */
+    .main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); padding: 28px 32px; min-height: calc(100vh - var(--topbar-h)); animation: fadeUp .25s ease; max-width: 1400px; }
 
-    .toast{position:fixed;bottom:1.5rem;right:1.5rem;z-index:600;padding:.6rem 1.3rem;border-radius:10px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;transform:translateY(8px)}
-    .toast.show{opacity:1;transform:translateY(0)}
-    .toast.success{background:var(--success);color:#fff}
-    .toast.error{background:var(--red);color:#fff}
-    .toast.info{background:#3b82f6;color:#fff}
-    .toast.warn{background:var(--warn);color:#1a1a1e}
+    /* ===== BUTTONS ===== */
+    .btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font); font-weight: 500; text-decoration: none; cursor: pointer; border: none; border-radius: 10px; padding: .5rem 1rem; font-size: .78rem; letter-spacing: -.01em; transition: background .1s, transform .1s; white-space: nowrap; }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-green { background: var(--green); color: var(--dark); }
+    .btn-green:hover { background: var(--green-h); }
+    .btn-dark { background: var(--dark); color: #fff; }
+    .btn-dark:hover { background: var(--dark2); }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
+    .btn-outline:hover { border-color: var(--border2); }
+    .btn-danger { background: rgba(232,99,79,.08); color: var(--red); border: 1px solid rgba(232,99,79,.2); }
+    .btn-danger:hover { background: rgba(232,99,79,.16); }
+    .btn-success { background: rgba(30,222,123,.12); color: var(--green-d); border: 1px solid rgba(30,222,123,.2); }
+    .btn-success:hover { background: rgba(30,222,123,.18); }
+    .btn-sm { padding: .3rem .7rem; font-size: .7rem; border-radius: 8px; }
+    .btn-xs { padding: .2rem .5rem; font-size: .65rem; border-radius: 6px; }
 
-    .sbadge{display:inline-flex;align-items:center;gap:.2rem;padding:.22rem .65rem;border-radius:50px;font-size:.66rem;font-weight:600;white-space:nowrap}
-    .sdot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .s0{background:#f3f4f6;color:var(--muted);border:1px solid var(--border)}
-    .s1{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
-    .s2{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe}
-    .s3{background:#e0e7ff;color:#4f46e5;border:1px solid #c7d2fe}
-    .s4{background:#fef3c7;color:#b45309;border:1px solid #fde68a}
-    .s5{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0}
+    /* ===== FILTER TABS ===== */
+    .tab { background: none; border: 1.5px solid var(--border); border-radius: 10px; padding: .3rem .85rem; font-family: var(--font); font-size: .78rem; font-weight: 300; color: var(--muted); cursor: pointer; transition: all .12s; }
+    .tab:hover { border-color: var(--border2); color: var(--text); }
+    .tab.active { background: var(--dark); border-color: var(--dark); color: #fff; font-weight: 500; }
 
-    .tab{background:transparent;border:1px solid transparent;color:var(--muted);font-family:"Inter",sans-serif;font-size:.72rem;padding:.28rem .65rem;border-radius:7px;cursor:pointer;transition:all .15s;white-space:nowrap}
-    .tab:hover{color:var(--text);background:rgba(0,0,0,.04)}
-    .tab.active{background:rgba(30,222,123,.12);color:var(--accent2);border-color:rgba(30,222,123,.25)}
+    /* ===== REVIEW CARDS ===== */
+    .review-card { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 20px 24px; margin-bottom: 12px; transition: box-shadow .15s, opacity .15s; }
+    .review-card:hover { box-shadow: var(--sh1); }
+    .review-card.hidden-card { opacity: .5; border-style: dashed; }
+    .review-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+    .review-author { display: flex; align-items: center; gap: 10px; }
+    .review-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--dark); color: #fff; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 500; flex-shrink: 0; }
+    .review-name { font-weight: 500; font-size: .9rem; }
+    .review-stars { color: var(--warn); font-size: .9rem; letter-spacing: .05em; }
+    .review-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .review-date { font-size: .72rem; color: var(--muted); }
+    .review-text { font-size: .84rem; color: var(--text); line-height: 1.6; margin-bottom: 12px; }
+    .review-order { font-size: .7rem; color: var(--muted); margin-top: 4px; }
+    .review-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
 
-    .review-card{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:1.2rem 1.4rem;margin-bottom:.8rem;transition:border-color .15s;box-shadow:0 1px 2px rgba(0,0,0,.03)}
-    .review-card:hover{border-color:var(--border2)}
-    .review-card.hidden-card{opacity:.5;border-style:dashed}
-    .stars{color:var(--warn);font-size:1rem;letter-spacing:.1em}
+    /* ===== BADGE ===== */
+    .sbadge { display: inline-flex; align-items: center; gap: 4px; padding: .2rem .7rem; border-radius: 8px; font-size: .66rem; font-weight: 500; white-space: nowrap; }
+    .sbadge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+    .s0 { background: #f2f4f7; color: var(--muted); }
+    .s5 { background: rgba(30,222,123,.12); color: var(--green-d); }
+
+    /* ===== TOAST ===== */
+    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 900; padding: .6rem 1.2rem; border-radius: 14px; font-size: .8rem; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; transform: translateY(6px); }
+    .toast.show { opacity: 1; transform: none; }
+    .toast.success { background: var(--green); color: #0d3320; }
+    .toast.error { background: var(--red); color: #fff; }
+    .toast.info { background: var(--dark); color: #fff; }
+    .toast.warn { background: var(--warn); color: #fff; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 700px) {
+      .main { padding: 16px; }
+      .review-header { flex-direction: column; align-items: flex-start; }
+      .review-actions { width: 100%; justify-content: flex-start; }
+      .topbar-stat { display: none; }
+    }
   </style>
 </head>
 <body>
+
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
-<div class="sidebar" id="sidebar">
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
   <a href="/admin" class="sidebar-logo">
-    <div class="sidebar-logo-mark" style="width:30px;height:30px;border-radius:10px;background:#191b1e;display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 20 20" style="width:16px;height:16px;fill:#1ede7b"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div><span class="sidebar-logo-name" style="font-weight:500;font-size:.88rem;color:var(--text)">Antviz</span>
-    <span class="sidebar-logo-badge">ADMIN</span>
+    <div class="sidebar-logo-mark"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
+    <span class="sidebar-logo-name">Antviz</span>
+    <span class="sidebar-logo-badge">Admin</span>
   </a>
   <nav class="sidebar-nav">
     <div class="sidebar-section">Основное</div>
-    <a href="/admin" class="nav-item" data-page="index">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      Дашборд
-    </a>
-    <a href="/admin/orders" class="nav-item" data-page="orders">
-      <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
-      Заказы
-      <span class="nav-badge" id="navBadgeOrders" style="display:none"></span>
-    </a>
-    
+    <a href="/admin" class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд</a>
+    <a href="/admin/orders" class="nav-item"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nav-badge" id="navBadgeOrders" style="display:none"></span></a>
     <div class="sidebar-section">Клиенты</div>
-    <a href="/admin/tickets" class="nav-item" data-page="tickets">
-      <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
-      Обслуживание
-      <span class="nav-badge" id="navBadgeTickets" style="display:none"></span>
-    </a>
-    <a href="/admin/promos" class="nav-item" data-page="promos">
-      <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
-      Промокоды
-    </a>
+    <a href="/admin/tickets" class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nav-badge" id="navBadgeTickets" style="display:none"></span></a>
+    <a href="/admin/chats" class="nav-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Поддержка<span class="nav-badge" id="navBadgeChats" style="display:none"></span></a>
+    <a href="/admin/promos" class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
     <div class="sidebar-section">Система</div>
-    <a href="/admin/reviews" class="nav-item active" data-page="reviews">
-      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      Отзывы
-    </a>
+    <a href="/admin/reviews" class="nav-item active"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
   </nav>
   <div class="sidebar-footer">
-    <button class="nav-item" onclick="doLogout()" style="color:var(--red)">
-      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-      Выйти
-    </button>
+    <button class="nav-item" onclick="doLogout()" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
   </div>
 </div>
 
-<div class="topbar">
-  <div class="topbar-title">Отзывы</div>
+<!-- ===== TOPBAR ===== -->
+<div class="topbar" id="appTopbar" style="display:none">
+  <span class="topbar-title">Отзывы</span>
   <div class="topbar-right">
     <div class="topbar-stat">Всего: <span class="topbar-stat-num" id="totalCount">—</span></div>
-    <div class="topbar-stat">Средняя: <span class="topbar-stat-num" id="avgRating" style="color:var(--warn)">—</span> ★</div>
+    <div class="topbar-stat">Средняя: <span class="topbar-stat-num rating" id="avgRating">—</span> ★</div>
   </div>
 </div>
 
-<div style="margin-left:var(--sidebar-w);margin-top:var(--topbar-h)" id="appWrap" style="display:none">
-  <div class="main-inner" style="padding:1.8rem 2rem;max-width:1400px;animation:fadeIn .25s ease">
+<!-- ===== MAIN ===== -->
+<div class="main" id="appWrap" style="display:none">
 
-    <div style="display:flex;gap:.6rem;margin-bottom:1.5rem;flex-wrap:wrap">
-      <button class="btn btn-ghost btn-sm tab active" onclick="switchFilter('all',this)">Все</button>
-      <button class="btn btn-ghost btn-sm tab" onclick="switchFilter('visible',this)">Опубликованные</button>
-      <button class="btn btn-ghost btn-sm tab" onclick="switchFilter('hidden',this)">Скрытые</button>
-    </div>
-
-    <div id="reviewsList"><div class="empty-state"><span class="empty-state-icon">⭐</span><span class="empty-state-text">Загрузка...</span></div></div>
-
+  <div style="display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap;">
+    <button class="tab active" onclick="switchFilter('all',this)">Все</button>
+    <button class="tab" onclick="switchFilter('visible',this)">Опубликованные</button>
+    <button class="tab" onclick="switchFilter('hidden',this)">Скрытые</button>
   </div>
+
+  <div id="reviewsList">
+    <div style="text-align:center;color:var(--muted);padding:32px;">Загрузка...</div>
+  </div>
+
 </div>
 
+<!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let allReviews=[], currentFilter='all';
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
-function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
-function stars(n){return '★'.repeat(n)+'☆'.repeat(5-n);}
-document.querySelectorAll('.nav-item[data-page]').forEach(el=>{if(el.dataset.page==='reviews')el.classList.add('active');});
-window.doLogout=async()=>{const {signOut}=await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");await signOut(auth);window.location.href='/';};
-window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderReviews();};
+// ===== UTILS =====
+function toast(m, t = 'info') { const el = document.getElementById('toast'); el.textContent = m; el.className = `toast ${t} show`; setTimeout(() => el.className = 'toast', 3400); }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+function fmtDate(ts) { if (!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' }); }
+function stars(n) { return '★'.repeat(n) + '☆'.repeat(5 - n); }
 
-function renderReviews(){
-  const el=document.getElementById('reviewsList');
-  let list=allReviews;
-  if(currentFilter==='visible') list=list.filter(r=>!r.hidden);
-  else if(currentFilter==='hidden') list=list.filter(r=>r.hidden);
-  document.getElementById('totalCount').textContent=allReviews.length;
-  const avg=allReviews.length?allReviews.reduce((s,r)=>s+(r.stars||0),0)/allReviews.length:0;
-  document.getElementById('avgRating').textContent=avg.toFixed(1);
-  if(!list.length){el.innerHTML=`<div class="empty-state"><span class="empty-state-icon">⭐</span><span class="empty-state-text">Нет отзывов</span></div>`;return;}
-  el.innerHTML=list.map(r=>`
-    <div class="review-card${r.hidden?' hidden-card':''}">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:.6rem">
-        <div>
-          <div style="font-weight:500;font-size:.9rem;margin-bottom:.2rem">${escapeHtml(r.clientName||r.authorName||'Аноним')}</div>
-          <div class="stars">${stars(r.stars||0)}</div>
+let allReviews = [], currentFilter = 'all';
+
+// ===== REVEAL =====
+const revealObs = new IntersectionObserver(e => { e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }); }, { threshold: .07 });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ===== FILTER =====
+window.switchFilter = (f, btn) => {
+  currentFilter = f;
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderReviews();
+};
+
+// ===== RENDER =====
+function renderReviews() {
+  const el = document.getElementById('reviewsList');
+  let list = allReviews;
+  if (currentFilter === 'visible') list = list.filter(r => !r.hidden);
+  else if (currentFilter === 'hidden') list = list.filter(r => r.hidden);
+
+  document.getElementById('totalCount').textContent = allReviews.length;
+  const avg = allReviews.length ? (allReviews.reduce((s, r) => s + (r.stars || 0), 0) / allReviews.length) : 0;
+  document.getElementById('avgRating').textContent = avg.toFixed(1);
+
+  if (!list.length) {
+    el.innerHTML = `<div style="text-align:center;color:var(--muted);padding:40px;">⭐ Нет отзывов</div>`;
+    return;
+  }
+
+  el.innerHTML = list.map(r => {
+    const initials = (r.clientName || r.authorName || '?').split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    return `<div class="review-card${r.hidden ? ' hidden-card' : ''} reveal">
+      <div class="review-header">
+        <div class="review-author">
+          <div class="review-avatar">${esc(initials)}</div>
+          <div>
+            <div class="review-name">${esc(r.clientName || r.authorName || 'Аноним')}</div>
+            <div class="review-stars">${stars(r.stars || 0)}</div>
+          </div>
         </div>
-        <div style="display:flex;gap:.4rem;align-items:center;flex-shrink:0">
-          <span style="font-size:.72rem;color:var(--muted)">${fmtDate(r.createdAt)}</span>
-          <button class="btn ${r.hidden?'btn-success':'btn-ghost'} btn-xs" onclick="toggleReview('${r.id}',${!r.hidden})">${r.hidden?'👁 Показать':'🙈 Скрыть'}</button>
+        <div class="review-actions">
+          <span class="sbadge ${r.hidden ? 's0' : 's5'}"><span class="sbadge-dot"></span>${r.hidden ? 'Скрыт' : 'Опубликован'}</span>
+          <button class="btn ${r.hidden ? 'btn-success' : 'btn-outline'} btn-xs" onclick="toggleReview('${r.id}', ${!r.hidden})">${r.hidden ? '👁 Показать' : '🙈 Скрыть'}</button>
           <button class="btn btn-danger btn-xs" onclick="deleteReview('${r.id}')">🗑</button>
         </div>
       </div>
-      <div style="font-size:.86rem;color:var(--muted2);line-height:1.6">${escapeHtml(r.text||'Без текста')}</div>
-      ${r.orderId?`<div style="font-size:.7rem;color:var(--muted);margin-top:.5rem">Заказ: №${r.orderId.slice(0,8).toUpperCase()}</div>`:''}
-    </div>`).join('');
-}
-window.toggleReview=async(id,hidden)=>{await updateDoc(doc(db,'reviews',id),{hidden});toast(hidden?'Скрыт':'Опубликован',hidden?'info':'success');};
-window.deleteReview=async id=>{if(!confirm('Удалить отзыв?'))return;await deleteDoc(doc(db,'reviews',id));toast('Удалён','info');};
+      <div class="review-text">${esc(r.text || 'Без текста')}</div>
+      <div class="review-meta">
+        <span class="review-date">${fmtDate(r.createdAt)}</span>
+        ${r.orderId ? `<span class="review-order">Заказ: №${r.orderId.slice(0, 8).toUpperCase()}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
 
-onAuthStateChanged(auth,async user=>{
-  document.getElementById('loadingScreen').style.display='none';
-  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
-  document.getElementById('appWrap').style.display='block';
-  onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')),snap=>{
-    allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));
+  // повторно инициализируем reveal для новых элементов
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObs.observe(el));
+}
+
+// ===== ACTIONS =====
+window.toggleReview = async (id, hidden) => {
+  await updateDoc(doc(db, 'reviews', id), { hidden });
+  toast(hidden ? 'Скрыт' : 'Опубликован', hidden ? 'info' : 'success');
+};
+window.deleteReview = async id => {
+  if (!confirm('Удалить отзыв?')) return;
+  await deleteDoc(doc(db, 'reviews', id));
+  toast('Удалён', 'info');
+};
+
+// ===== LOGOUT =====
+window.doLogout = async () => { await signOut(auth); window.location.href = '/'; };
+
+// ===== AUTH =====
+onAuthStateChanged(auth, async user => {
+  document.getElementById('loadingScreen').style.display = 'none';
+  if (!user || user.email !== ADMIN_EMAIL) { window.location.href = '/'; return; }
+  document.getElementById('appWrap').style.display = 'block';
+  document.getElementById('appTopbar').style.display = 'flex';
+
+  onSnapshot(query(collection(db, 'reviews'), orderBy('createdAt', 'desc')), snap => {
+    allReviews = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderReviews();
   });
 });

@@ -415,7 +415,8 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, Timestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
-const EX={domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 let allOrders=[],allReviews=[],_cache=[];
 let selOrderId=null,selUid=null;
 let currentTab='active',currentPaid=false,currentSubsteps=[];
@@ -477,7 +478,8 @@ function showDetail(o){
   document.getElementById('dHeroInfo').innerHTML=`
     <div class="hc"><div class="hc-l">Клиент</div><div class="hc-v">${esc(o.clientName||'—')}</div></div>
     <div class="hc"><div class="hc-l">Сумма</div><div class="hc-v green">${fmtP(o.totalPrice)}</div></div>
-    <div class="hc"><div class="hc-l">Тип сайта</div><div class="hc-v">${esc(o.siteType||'—')}</div></div>
+    <div class="hc"><div class="hc-l">Формат сайта</div><div class="hc-v">${esc(o.siteType||'—')}</div></div>
+    <div class="hc"><div class="hc-l">Тип</div><div class="hc-v">${esc(SITE_KIND[o.siteKind]||o.siteKind||'—')}</div></div>
     <div class="hc"><div class="hc-l">Создан</div><div class="hc-v">${fmtD(o.createdAt)}</div></div>`;
   document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===(o.status||0)));
   currentPaid=o.paid||false;renderPayRow();
@@ -492,16 +494,18 @@ function showDetail(o){
   document.getElementById('clientInfo').innerHTML=`
     <div class="ic"><div class="ic-l">Имя</div><div class="ic-v">${esc(o.clientName||'—')}</div></div>
     <div class="ic"><div class="ic-l">Email</div><div class="ic-v">${esc(o.clientEmail||'—')}</div></div>`;
-  const domOpt=o.domainOption==='new'?'Регистрация .ru':o.domainOption==='own'?'Свой домен':'—';
+  const domOpt=o.domainOption==='new'?'Регистрация на рег.ру':o.domainOption==='own'?'Свой домен':'—';
+  const domainDisplay=o.domainName?`<span style="color:var(--green-d);font-weight:500">${esc(o.domainName)}</span>`:domOpt;
   document.getElementById('orderInfo').innerHTML=`
-    <div class="ic"><div class="ic-l">Тип</div><div class="ic-v">${esc(o.siteType||'—')}</div></div>
+    <div class="ic"><div class="ic-l">Формат</div><div class="ic-v">${esc(o.siteType||'—')}</div></div>
+    <div class="ic"><div class="ic-l">Тип</div><div class="ic-v">${esc(SITE_KIND[o.siteKind]||o.siteKind||'—')}</div></div>
     <div class="ic"><div class="ic-l">Тариф</div><div class="ic-v">${esc(t)}</div></div>
     <div class="ic"><div class="ic-l">Страниц</div><div class="ic-v">${o.pages||'—'}</div></div>
-    <div class="ic"><div class="ic-l">Домен</div><div class="ic-v">${domOpt}</div></div>
+    <div class="ic"><div class="ic-l">Домен</div><div class="ic-v">${domainDisplay}</div></div>
     <div class="ic"><div class="ic-l">Промокод</div><div class="ic-v">${o.promoCode?esc(o.promoCode)+(o.discountApplied?' (-'+fmtP(o.discountApplied)+')':''):'—'}</div></div>
     <div class="ic"><div class="ic-l">Создан</div><div class="ic-v">${fmtDT(o.createdAt)}</div></div>`;
   const ea=o.extras||[];const es=document.getElementById('extrasSec');
-  if(ea.length){es.style.display='';document.getElementById('extrasList').innerHTML=ea.map(e=>{const l=EX[e]||e;const ec=e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':'tag-warn';return`<span class="tag ${ec}">${esc(l)}</span>`;}).join('');}else es.style.display='none';
+  if(ea.length){es.style.display='';document.getElementById('extrasList').innerHTML=ea.map(e=>{const l=EX[e]||e;const ec=e==='domain_reg'?'tag-blue':e==='domain_own'?'tag-green':e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':'tag-warn';return`<span class="tag ${ec}">${esc(l)}</span>`;}).join('');}else es.style.display='none';
   const ds=document.getElementById('descSec');if(o.description){ds.style.display='';document.getElementById('descBox').textContent=o.description;}else ds.style.display='none';
   const fs=document.getElementById('favSec');if(o.favicon){fs.style.display='';document.getElementById('favGrid').innerHTML=`<img class="at" src="${esc(o.favicon)}" alt="favicon" onclick="openLightbox('${o.favicon.replace(/'/g,"\\'")}')">`;} else fs.style.display='none';
   const as=document.getElementById('attachSec');

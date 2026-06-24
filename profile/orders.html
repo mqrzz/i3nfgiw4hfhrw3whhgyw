@@ -420,8 +420,10 @@ function orderCard(o){
 
   // Domain banner
   const extras = o.extras || [];
+  const hasRegDomain = extras.includes('domain_reg') || (extras.includes('domain') && o.domainOption !== 'own');
+  const hasOwnDomain = extras.includes('domain_own') || (extras.includes('domain') && o.domainOption === 'own') || o.domainOption === 'own';
   let domainBanner = '';
-  if (extras.includes('domain_reg')) {
+  if (hasRegDomain) {
     domainBanner = `<div class="domain-banner">
       <div class="domain-banner-ico">🌐</div>
       <div class="domain-banner-body">
@@ -433,7 +435,7 @@ function orderCard(o){
         </a>
       </div>
     </div>`;
-  } else if (extras.includes('domain_own')) {
+  } else if (hasOwnDomain) {
     const domName = o.domainName ? `<strong>${escapeHtml(o.domainName)}</strong> — ` : '';
     domainBanner = `<div class="domain-banner">
       <div class="domain-banner-ico">🌐</div>

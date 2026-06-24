@@ -157,6 +157,20 @@
     .ticket-date{font-size:.72rem;color:var(--ink-faint)}
     .tickets-empty{text-align:center;padding:40px 24px;color:var(--ink-faint);font-size:.84rem}
 
+    /* PHOTO UPLOAD */
+    .photo-upload-area{margin-top:4px}
+    .photo-upload-label{display:inline-flex;align-items:center;gap:7px;padding:.55rem 1rem;background:var(--surface-2);border:1.5px dashed var(--line-strong);border-radius:var(--r-sm);font-size:.82rem;color:var(--ink-faint);cursor:pointer;transition:border-color .15s,background .15s;font-family:var(--font)}
+    .photo-upload-label:hover{border-color:var(--accent);color:var(--ink)}
+    .photo-upload-label svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
+    .photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+    .photo-preview-wrap{position:relative;width:72px;height:72px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+    .photo-preview-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+    .photo-preview-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+    /* fix mobile overflow */
+    .ticket-item{overflow:hidden;word-break:break-word}
+    .ticket-desc{overflow:hidden;word-break:break-word}
+    .page-wrap{overflow-x:hidden}
+
     /* TOAST */
     .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.6rem 1.3rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -365,6 +379,17 @@
             <div>
               <label class="field-label">Описание</label>
               <textarea class="field-textarea" id="ticketDesc" placeholder="Опишите подробнее: что изменить, куда добавить, как должно выглядеть..."></textarea>
+            </div>
+            <div>
+              <label class="field-label">Фото / скриншот <span style="color:var(--ink-faint);font-weight:300">(необязательно)</span></label>
+              <div class="photo-upload-area">
+                <label class="photo-upload-label">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  Прикрепить изображение
+                  <input type="file" id="ticketPhoto" accept="image/*" multiple style="display:none" onchange="previewPhotos()"/>
+                </label>
+                <div class="photo-previews" id="photoPreviews"></div>
+              </div>
             </div>
             <div>
               <button class="btn btn-primary" id="submitTicketBtn" onclick="submitTicket()">

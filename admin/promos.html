@@ -1,269 +1,162 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Промокоды — Antviz Admin</title>
-  <link rel="icon" href="../img/favicon.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet" />
-  <style>
-    /* ===== БАЗА ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --green: #1ede7b;
-      --green-h: #1ac16b;
-      --green-d: #149955;
-      --green-light: #d2f8e5;
-      --bg: #fff;
-      --bg2: #f2f4f7;
-      --bg3: #f9fafc;
-      --text: #191b1e;
-      --muted: #707a8a;
-      --border: #dfe3e8;
-      --border2: #cbcdd6;
-      --dark: #191b1e;
-      --dark2: #2b2f33;
-      --red: #e8634f;
-      --warn: #f59e0b;
-      --info: #3b82f6;
-      --sh1: 0 4px 16px rgba(0,51,153,.04), 0 2px 2px rgba(0,51,153,.08);
-      --sh2: 0 8px 20px rgba(0,51,153,.08), 0 4px 8px rgba(0,51,153,.08);
-      --font: 'Geologica', 'Inter', 'Arial', sans-serif;
-      --sidebar-w: 240px;
-      --topbar-h: 60px;
-      --sp-l: 60px;
-      --sp-m: 40px;
-    }
-    html, body { height: 100%; background: var(--bg2); }
-    body { color: var(--text); font-family: var(--font); font-weight: 300; line-height: 1.25; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
-    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Промокоды — Antviz Admin</title>
+<link rel="icon" href="../img/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f2f4f7}
+:root{--green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;--bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;--text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;--dark:#191b1e;--dark2:#2b2f33;--red:#e8634f;--warn:#f59e0b;--info:#3b82f6;--font:'Geologica','Inter',sans-serif;--sw:256px;--th:68px}
+body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoothing:antialiased}
+@keyframes spin{to{transform:rotate(360deg)}}@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.35)}
+.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:200}
+.sb-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07)}
+.lm{width:34px;height:34px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lm svg{width:18px;height:18px;fill:var(--dark)}
+.ln{font-weight:500;font-size:.95rem;color:#fff;letter-spacing:-.02em}
+.lbadge{margin-left:auto;font-size:.58rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;background:rgba(232,99,79,.15);color:var(--red);border:1px solid rgba(232,99,79,.25);padding:.15rem .5rem;border-radius:7px}
+.sb-nav{flex:1;padding:14px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.ns{font-size:.6rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.25);padding:14px 10px 5px;margin-top:6px}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;text-decoration:none;color:rgba(255,255,255,.45);font-size:.85rem;font-weight:300;transition:background .12s,color .12s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
+.ni:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.ni.active{background:rgba(30,222,123,.12);color:var(--green)}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nb{position:absolute;right:10px;background:var(--red);color:#fff;font-size:.58rem;font-weight:500;min-width:17px;height:17px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
+.tb{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100}
+.tb-l{display:flex;align-items:center;gap:16px}
+.tb-title{font-weight:500;font-size:1rem;letter-spacing:-.02em}
+.ts{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.3rem .85rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.ts strong{font-weight:500;color:var(--green-d)}
+.main{margin-left:var(--sw);margin-top:var(--th);padding:36px 40px;min-height:calc(100vh - var(--th));animation:fadeIn .25s ease}
 
-    .loading-screen { position: fixed; inset: 0; z-index: 9999; background: var(--bg); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
-    .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--green); border-radius: 50%; animation: spin .7s linear infinite; }
+/* HERO */
+.hero{background:var(--dark);border-radius:32px;padding:36px 40px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.hero-text h1{font-size:clamp(22px,2vw,32px);font-weight:500;color:#fff;letter-spacing:-.03em;margin-bottom:6px}
+.hero-text p{font-size:.88rem;color:rgba(255,255,255,.4)}
 
-    /* ===== REVEAL ===== */
-    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+/* SEARCH ROW */
+.row{display:flex;align-items:center;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.sb-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:.65rem 1.1rem;transition:border-color .15s;flex:1;max-width:440px}
+.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.sb-box svg{width:15px;height:15px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);width:100%}
+.tab-row{display:flex;gap:5px}
+.tab{background:none;border:1.5px solid var(--border);border-radius:10px;padding:.35rem .9rem;font-family:var(--font);font-size:.8rem;font-weight:300;color:var(--muted);cursor:pointer;transition:all .12s}
+.tab:hover{border-color:var(--border2);color:var(--text)}
+.tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
 
-    /* ===== SIDEBAR ===== */
-    .sidebar { position: fixed; top: 0; left: 0; bottom: 0; width: var(--sidebar-w); background: var(--bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 200; }
-    .sidebar-logo { padding: 18px 20px 14px; display: flex; align-items: center; gap: 10px; text-decoration: none; border-bottom: 1px solid var(--border); }
-    .sidebar-logo-mark { width: 30px; height: 30px; border-radius: 10px; background: var(--dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .sidebar-logo-mark svg { width: 16px; height: 16px; fill: var(--green); }
-    .sidebar-logo-name { font-weight: 500; font-size: .88rem; color: var(--text); letter-spacing: -.01em; }
-    .sidebar-logo-badge { margin-left: auto; font-size: .6rem; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; background: rgba(232,99,79,.1); color: var(--red); border: 1px solid rgba(232,99,79,.2); padding: .1rem .45rem; border-radius: 6px; flex-shrink: 0; }
-    .sidebar-nav { flex: 1; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
-    .sidebar-section { font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); padding: 10px 10px 4px; margin-top: 4px; }
-    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; text-decoration: none; color: var(--muted); font-size: .84rem; font-weight: 300; transition: background .15s, color .15s; cursor: pointer; border: none; background: none; width: 100%; font-family: var(--font); position: relative; }
-    .nav-item:hover { background: var(--bg2); color: var(--text); }
-    .nav-item.active { background: rgba(30,222,123,.1); color: var(--green-d); font-weight: 500; }
-    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; stroke: currentColor; stroke-width: 1.7; fill: none; }
-    .nav-badge { position: absolute; right: 10px; background: var(--red); color: #fff; font-size: .58rem; font-weight: 500; min-width: 17px; height: 17px; border-radius: 50px; display: flex; align-items: center; justify-content: center; padding: 0 4px; animation: pulse 2s infinite; }
-    .sidebar-footer { padding: 10px; border-top: 1px solid var(--border); }
+/* PROMO GRID */
+.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+.pc{background:var(--bg);border:1.5px solid var(--border);border-radius:24px;padding:24px 28px;transition:border-color .15s,box-shadow .15s}
+.pc:hover{border-color:var(--border2);box-shadow:0 6px 20px rgba(0,0,0,.06)}
+.pc.off{opacity:.55;border-style:dashed}
+.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.pc-code{font-size:1.4rem;font-weight:500;color:var(--green-d);letter-spacing:.04em}
+.pc-disc{font-size:.78rem;font-weight:500;padding:.28rem .75rem;border-radius:9px;background:rgba(139,92,246,.1);color:#7c3aed;white-space:nowrap}
+.pc-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+.pm{background:var(--bg2);border-radius:12px;padding:10px 14px}
+.pm-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px;font-weight:500}
+.pm-v{font-size:.86rem;color:var(--text)}
+.pm-v.red{color:var(--red)}
+.pc-actions{display:flex;gap:8px}
 
-    /* ===== TOPBAR ===== */
-    .topbar { position: fixed; top: 0; left: var(--sidebar-w); right: 0; height: var(--topbar-h); background: rgba(255,255,255,.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 28px; z-index: 100; }
-    .topbar-title { font-weight: 500; font-size: .92rem; color: var(--text); letter-spacing: -.01em; }
-    .topbar-right { display: flex; align-items: center; gap: 8px; }
-    .topbar-stat { display: flex; align-items: center; gap: 4px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: .2rem .7rem; font-size: .7rem; color: var(--muted); }
-    .topbar-stat-num { font-weight: 500; color: var(--text); }
+/* EMPTY */
+.empty{padding:64px 32px;text-align:center;color:var(--muted);display:flex;flex-direction:column;gap:12px;align-items:center}
+.empty-icon{font-size:2.5rem}
 
-    /* ===== MAIN ===== */
-    .main { margin-left: var(--sidebar-w); margin-top: var(--topbar-h); padding: 28px 32px; min-height: calc(100vh - var(--topbar-h)); animation: fadeUp .25s ease; max-width: 1400px; }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-weight:500;font-size:.84rem;border:none;border-radius:12px;padding:.55rem 1.1rem;cursor:pointer;transition:background .1s,transform .1s;text-decoration:none;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:var(--dark2)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--muted)}.btn-outline:hover{border-color:var(--text);color:var(--text)}
+.btn-danger{background:rgba(232,99,79,.08);color:var(--red);border:1px solid rgba(232,99,79,.2)}.btn-danger:hover{background:rgba(232,99,79,.15)}
+.btn-sm{padding:.4rem .9rem;font-size:.8rem;border-radius:10px}
 
-    /* ===== BUTTONS ===== */
-    .btn { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font); font-weight: 500; text-decoration: none; cursor: pointer; border: none; border-radius: 10px; padding: .5rem 1rem; font-size: .78rem; letter-spacing: -.01em; transition: background .1s, transform .1s; white-space: nowrap; }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-green { background: var(--green); color: var(--dark); }
-    .btn-green:hover { background: var(--green-h); }
-    .btn-dark { background: var(--dark); color: #fff; }
-    .btn-dark:hover { background: var(--dark2); }
-    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text); }
-    .btn-outline:hover { border-color: var(--border2); }
-    .btn-danger { background: rgba(232,99,79,.08); color: var(--red); border: 1px solid rgba(232,99,79,.2); }
-    .btn-danger:hover { background: rgba(232,99,79,.16); }
-    .btn-sm { padding: .3rem .7rem; font-size: .7rem; border-radius: 8px; }
-    .btn-xs { padding: .2rem .5rem; font-size: .65rem; border-radius: 6px; }
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--bg);border-radius:28px;padding:32px;width:100%;max-width:500px;box-shadow:0 24px 64px rgba(0,0,0,.15)}
+.modal-title{font-weight:500;font-size:1rem;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.02em}
+.mc{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s}
+.mc:hover{background:var(--bg2)}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:500}
+.fi,.fsel{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:var(--font);font-size:.88rem;font-weight:300;outline:none;transition:border-color .15s}
+.fi:focus,.fsel:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.fsel{cursor:pointer}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mf{display:flex;gap:8px;margin-top:24px}
+.mf .btn{flex:1;justify-content:center}
 
-    /* ===== SEARCH & FILTERS ===== */
-    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg2); border: 1.5px solid var(--border); border-radius: 12px; padding: .5rem .9rem; transition: border-color .15s; flex: 1; min-width: 200px; }
-    .search-box:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.08); }
-    .search-box svg { width: 14px; height: 14px; stroke: var(--muted); flex-shrink: 0; }
-    .search-box input { background: none; border: none; outline: none; font-family: var(--font); font-size: .82rem; font-weight: 300; color: var(--text); width: 100%; }
-
-    .tab { background: none; border: 1.5px solid var(--border); border-radius: 10px; padding: .3rem .85rem; font-family: var(--font); font-size: .78rem; font-weight: 300; color: var(--muted); cursor: pointer; transition: all .12s; }
-    .tab:hover { border-color: var(--border2); color: var(--text); }
-    .tab.active { background: var(--dark); border-color: var(--dark); color: #fff; font-weight: 500; }
-
-    /* ===== TABLE (карточки) ===== */
-    .section { background: var(--bg); border: 1px solid var(--border); border-radius: 20px; overflow: hidden; margin-top: 16px; }
-    .section-body { padding: 0; overflow-x: auto; }
-    .tbl { width: 100%; border-collapse: collapse; }
-    .tbl th { font-size: .65rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); font-weight: 500; padding: 12px 20px; text-align: left; border-bottom: 1px solid var(--border); background: var(--bg3); }
-    .tbl td { padding: 12px 20px; font-size: .82rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
-    .tbl tr:last-child td { border-bottom: none; }
-    .tbl tr:hover td { background: var(--bg3); }
-
-    .code-cell { font-family: var(--font); font-weight: 500; font-size: .9rem; letter-spacing: .05em; color: var(--green-d); }
-    .sbadge { display: inline-flex; align-items: center; gap: 4px; padding: .2rem .7rem; border-radius: 8px; font-size: .66rem; font-weight: 500; white-space: nowrap; }
-    .sbadge-dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-    .s0 { background: #f2f4f7; color: var(--muted); }
-    .s1 { background: rgba(245,158,11,.1); color: var(--warn); }
-    .s2 { background: rgba(59,130,246,.1); color: var(--info); }
-    .s3 { background: rgba(139,92,246,.1); color: #7c3aed; }
-    .s4 { background: rgba(245,158,11,.1); color: var(--warn); }
-    .s5 { background: rgba(30,222,123,.12); color: var(--green-d); }
-
-    /* ===== MODAL ===== */
-    .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s; }
-    .modal-overlay.show { opacity: 1; pointer-events: all; }
-    .modal { background: var(--bg); border-radius: 24px; padding: 32px; width: 100%; max-width: 480px; box-shadow: 0 20px 60px rgba(0,0,0,.15); }
-    .modal-title { font-weight: 500; font-size: .95rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-    .modal-close { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1rem; padding: 0; }
-    .form-group { margin-bottom: 16px; }
-    .form-label { display: block; font-size: .66rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-    .form-input, .form-textarea, .form-select { width: 100%; background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: .7rem 1rem; color: var(--text); font-family: var(--font); font-size: .86rem; font-weight: 300; outline: none; transition: border-color .15s; }
-    .form-input:focus, .form-textarea:focus, .form-select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(30,222,123,.1); }
-    .form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
-    .form-select { cursor: pointer; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .modal-footer { display: flex; gap: 8px; margin-top: 20px; }
-    .modal-footer .btn { flex: 1; justify-content: center; }
-
-    /* ===== TOAST ===== */
-    .toast { position: fixed; bottom: 24px; right: 24px; z-index: 900; padding: .6rem 1.2rem; border-radius: 14px; font-size: .8rem; font-weight: 500; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; transform: translateY(6px); }
-    .toast.show { opacity: 1; transform: none; }
-    .toast.success { background: var(--green); color: #0d3320; }
-    .toast.error { background: var(--red); color: #fff; }
-    .toast.info { background: var(--dark); color: #fff; }
-    .toast.warn { background: var(--warn); color: #fff; }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 700px) {
-      .main { padding: 16px; }
-      .form-row { grid-template-columns: 1fr; }
-      .tbl th, .tbl td { padding: 8px 12px; font-size: .72rem; }
-      .topbar-stat { display: none; }
-      .modal { padding: 20px; }
-    }
-  </style>
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast.show{opacity:1;transform:none}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}
+</style>
 </head>
 <body>
+<div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
 
-<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
-
-<!-- ===== SIDEBAR ===== -->
-<div class="sidebar">
-  <a href="/admin" class="sidebar-logo">
-    <div class="sidebar-logo-mark"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
-    <span class="sidebar-logo-name">Antviz</span>
-    <span class="sidebar-logo-badge">Admin</span>
-  </a>
-  <nav class="sidebar-nav">
-    <div class="sidebar-section">Основное</div>
-    <a href="/admin" class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Дашборд</a>
-    <a href="/admin/orders" class="nav-item"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nav-badge" id="navBadgeOrders" style="display:none"></span></a>
-    <div class="sidebar-section">Клиенты</div>
-    <a href="/admin/tickets" class="nav-item"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nav-badge" id="navBadgeTickets" style="display:none"></span></a>
-    <a href="/admin/chats" class="nav-item"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Поддержка<span class="nav-badge" id="navBadgeChats" style="display:none"></span></a>
-    <a href="/admin/promos" class="nav-item active"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
-    <div class="sidebar-section">Система</div>
-    <a href="/admin/reviews" class="nav-item"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
+<div class="sb">
+  <a href="/admin" class="sb-logo"><div class="lm"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div><span class="ln">Antviz</span><span class="lbadge">Admin</span></a>
+  <nav class="sb-nav">
+    <span class="ns">Основное</span>
+    <a href="/admin" class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Дашборд</a>
+    <a href="/admin/orders" class="ni"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nb" id="navBadgeOrders" style="display:none"></span></a>
+    <span class="ns">Клиенты</span>
+    <a href="/admin/tickets" class="ni"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание</a>
+    <a href="/admin/chats" class="ni"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чаты</a>
+    <a href="/admin/promos" class="ni active"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
+    <span class="ns">Система</span>
+    <a href="/admin/reviews" class="ni"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
   </nav>
-  <div class="sidebar-footer">
-    <button class="nav-item" onclick="doLogout()" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
-  </div>
+  <div class="sb-foot"><button class="ni" onclick="doLogout()" style="color:rgba(232,99,79,.8)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button></div>
 </div>
 
-<!-- ===== TOPBAR ===== -->
-<div class="topbar" id="appTopbar" style="display:none">
-  <span class="topbar-title">Промокоды</span>
-  <div class="topbar-right">
-    <div class="topbar-stat">Активных: <span class="topbar-stat-num" id="activeCount" style="color:var(--green-d)">—</span></div>
-    <button class="btn btn-green btn-sm" onclick="openModal()">+ Создать промокод</button>
-  </div>
+<div class="tb">
+  <div class="tb-l"><span class="tb-title">Промокоды</span><div class="ts">Активных: <strong id="activeCount">—</strong></div></div>
+  <button class="btn btn-green btn-sm" onclick="openModal()">+ Создать промокод</button>
 </div>
 
-<!-- ===== MAIN ===== -->
 <div class="main" id="appWrap" style="display:none">
-
-  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:16px;">
-    <div class="search-box" style="flex:1;">
-      <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" placeholder="Поиск по коду..." id="searchInp" oninput="renderPromos()" />
-    </div>
-    <button class="tab active" onclick="switchFilter('all',this)">Все</button>
-    <button class="tab" onclick="switchFilter('active',this)">Активные</button>
-    <button class="tab" onclick="switchFilter('disabled',this)">Отключённые</button>
+  <div class="hero">
+    <div class="hero-text"><h1>Промокоды 🏷</h1><p>Создавайте скидки для клиентов — фиксированные или процентные</p></div>
+    <button class="btn btn-green" onclick="openModal()">+ Создать промокод</button>
   </div>
-
-  <div class="section reveal" id="promosSection">
-    <div class="section-body">
-      <table class="tbl" id="promosTable">
-        <thead>
-          <tr>
-            <th>Код</th>
-            <th>Скидка</th>
-            <th>Срок</th>
-            <th>Для кого</th>
-            <th>Использований</th>
-            <th>Статус</th>
-            <th style="text-align:right;">Действия</th>
-          </tr>
-        </thead>
-        <tbody id="promosBody">
-          <tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">Загрузка...</td></tr>
-        </tbody>
-      </table>
+  <div class="row">
+    <div class="sb-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Поиск по коду..." id="searchInp" oninput="renderPromos()"/></div>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchFilter('all',this)">Все</button>
+      <button class="tab" onclick="switchFilter('active',this)">Активные</button>
+      <button class="tab" onclick="switchFilter('disabled',this)">Отключённые</button>
     </div>
   </div>
-
+  <div id="promosList"><div class="empty"><span class="empty-icon">🏷</span>Загрузка...</div></div>
 </div>
 
-<!-- ===== MODAL ===== -->
 <div class="modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
   <div class="modal">
-    <div class="modal-title">🏷 Новый промокод <button class="modal-close" onclick="closeModal()">✕</button></div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Код</label>
-        <input class="form-input" id="pCode" type="text" placeholder="SALE20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Тип скидки</label>
-        <select class="form-select" id="pType">
-          <option value="percent">Процент (%)</option>
-          <option value="fixed">Фиксированная (₽)</option>
-        </select>
-      </div>
+    <div class="modal-title">Новый промокод <button class="mc" onclick="closeModal()">✕</button></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Код</label><input class="fi" id="pCode" type="text" placeholder="SALE20" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="fg"><label class="fl">Тип скидки</label><select class="fsel" id="pType"><option value="percent">Процент (%)</option><option value="fixed">Фиксированная (₽)</option></select></div>
     </div>
-    <div class="form-row">
-      <div class="form-group">
-        <label class="form-label">Размер скидки</label>
-        <input class="form-input" id="pValue" type="number" placeholder="20" min="1" />
-      </div>
-      <div class="form-group">
-        <label class="form-label">Срок действия</label>
-        <input class="form-input" id="pExpires" type="date" />
-      </div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Размер скидки</label><input class="fi" id="pValue" type="number" placeholder="20" min="1"/></div>
+      <div class="fg"><label class="fl">Срок действия</label><input class="fi" id="pExpires" type="date"/></div>
     </div>
-    <div class="form-group">
-      <label class="form-label">Для конкретного пользователя (UID)</label>
-      <input class="form-input" id="pUid" type="text" placeholder="Оставьте пустым — для всех" />
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeModal()">Отмена</button>
-      <button class="btn btn-green" onclick="createPromo()">Создать промокод</button>
-    </div>
+    <div class="fg"><label class="fl">Для конкретного пользователя (UID)</label><input class="fi" id="pUid" type="text" placeholder="UID или оставьте пустым — для всех"/></div>
+    <div class="mf"><button class="btn btn-outline" onclick="closeModal()">Отмена</button><button class="btn btn-green" onclick="createPromo()">Создать</button></div>
   </div>
 </div>
-
-<!-- ===== TOAST ===== -->
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -271,123 +164,73 @@ import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// ===== UTILS =====
-function toast(m, t = 'info') { const el = document.getElementById('toast'); el.textContent = m; el.className = `toast ${t} show`; setTimeout(() => el.className = 'toast', 3400); }
-function fmtDate(ts) { if (!ts) return '—'; const d = ts.toDate ? ts.toDate() : new Date(ts); return d.toLocaleDateString('ru', { day: 'numeric', month: 'short', year: 'numeric' }); }
-function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+let allPromos=[], currentFilter='all';
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(ts){if(!ts)return'∞';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderPromos();};
+window.openModal=()=>document.getElementById('modal').classList.add('show');
+window.closeModal=()=>document.getElementById('modal').classList.remove('show');
 
-let allPromos = [], currentFilter = 'all';
-
-// ===== REVEAL =====
-const revealObs = new IntersectionObserver(e => { e.forEach(el => { if (el.isIntersecting) el.target.classList.add('visible'); }); }, { threshold: .07 });
-document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
-
-// ===== FILTER =====
-window.switchFilter = (f, btn) => {
-  currentFilter = f;
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  renderPromos();
-};
-
-// ===== RENDER =====
-function renderPromos() {
-  const q = (document.getElementById('searchInp').value || '').toLowerCase();
-  let list = allPromos;
-  if (currentFilter === 'active') list = list.filter(p => p.active);
-  else if (currentFilter === 'disabled') list = list.filter(p => !p.active);
-  if (q) list = list.filter(p => (p.code || '').toLowerCase().includes(q));
-
-  document.getElementById('activeCount').textContent = allPromos.filter(p => p.active).length;
-
-  const tbody = document.getElementById('promosBody');
-  if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:32px;color:var(--muted);">Нет промокодов</td></tr>`;
-    return;
-  }
-
-  const now = new Date();
-  tbody.innerHTML = list.map(p => {
-    const expired = p.expiresAt && p.expiresAt.toDate && p.expiresAt.toDate() < now;
-    const statusClass = (p.active && !expired) ? 's5' : 's0';
-    const statusText = (p.active && !expired) ? 'Активен' : 'Отключён';
-    const discount = p.discountType === 'percent' ? `-${p.discountValue}%` : `-${p.discountValue} ₽`;
-    return `<tr>
-      <td><span class="code-cell">${esc(p.code)}</span></td>
-      <td><span class="sbadge s3">${discount}</span></td>
-      <td style="font-size:.78rem;color:${expired ? 'var(--red)' : 'var(--muted)'}">${p.expiresAt ? fmtDate(p.expiresAt) : '∞'}</td>
-      <td style="font-size:.78rem;color:var(--muted)">${p.forUid ? esc(p.forUid.slice(0, 14) + '...') : 'Для всех'}</td>
-      <td style="font-size:.78rem;text-align:center;">${p.usedCount || 0}</td>
-      <td><span class="sbadge ${statusClass}"><span class="sbadge-dot"></span>${statusText}</span></td>
-      <td style="text-align:right;">
-        <button class="btn btn-outline btn-xs" onclick="togglePromo('${p.id}', ${!p.active})">${p.active ? 'Откл' : 'Вкл'}</button>
-        <button class="btn btn-danger btn-xs" onclick="deletePromo('${p.id}')">🗑</button>
-      </td>
-    </tr>`;
-  }).join('');
+function renderPromos(){
+  const el=document.getElementById('promosList');
+  const q=(document.getElementById('searchInp').value||'').toLowerCase();
+  let list=allPromos;
+  if(currentFilter==='active') list=list.filter(p=>p.active);
+  else if(currentFilter==='disabled') list=list.filter(p=>!p.active);
+  if(q) list=list.filter(p=>(p.code||'').toLowerCase().includes(q));
+  document.getElementById('activeCount').textContent=allPromos.filter(p=>p.active).length;
+  if(!list.length){el.innerHTML=`<div class="empty"><span class="empty-icon">🏷</span>Нет промокодов</div>`;return;}
+  el.innerHTML=`<div class="promo-grid">${list.map(p=>{
+    const now=new Date();
+    const expired=p.expiresAt?.toDate&&p.expiresAt.toDate()<now;
+    const active=p.active&&!expired;
+    const disc=p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`;
+    return`<div class="pc${active?'':' off'}">
+      <div class="pc-top"><span class="pc-code">${esc(p.code)}</span><span class="pc-disc">${disc}</span></div>
+      <div class="pc-meta">
+        <div class="pm"><div class="pm-l">Истекает</div><div class="pm-v${expired?' red':''}">${fmtDate(p.expiresAt)}</div></div>
+        <div class="pm"><div class="pm-l">Использований</div><div class="pm-v">${p.usedCount||0}</div></div>
+        <div class="pm"><div class="pm-l">Для кого</div><div class="pm-v">${p.forUid?'Конкретный':'Для всех'}</div></div>
+        <div class="pm"><div class="pm-l">Статус</div><div class="pm-v" style="color:${active?'var(--green-d)':'var(--muted)'}">${active?'Активен':'Отключён'}</div></div>
+      </div>
+      <div class="pc-actions">
+        <button class="btn btn-${active?'outline':'dark'} btn-sm" onclick="togglePromo('${p.id}',${!p.active})">${p.active?'Отключить':'Включить'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePromo('${p.id}')">Удалить</button>
+      </div>
+    </div>`;}).join('')}</div>`;
 }
 
-// ===== MODAL =====
-window.openModal = () => document.getElementById('modal').classList.add('show');
-window.closeModal = () => document.getElementById('modal').classList.remove('show');
-
-// ===== CREATE =====
-window.createPromo = async () => {
-  const code = document.getElementById('pCode').value.trim().toUpperCase();
-  const type = document.getElementById('pType').value;
-  const value = +document.getElementById('pValue').value;
-  const expires = document.getElementById('pExpires').value;
-  const uid = document.getElementById('pUid').value.trim();
-
-  if (!code || !value) { toast('Заполните код и скидку', 'error'); return; }
-  try {
-    const data = { code, discountType: type, discountValue: value, active: true, usedCount: 0, createdAt: serverTimestamp() };
-    if (expires) data.expiresAt = Timestamp.fromDate(new Date(expires + 'T23:59:59'));
-    if (uid) data.forUid = uid;
-    await addDoc(collection(db, 'promoCodes'), data);
-    toast('Промокод создан ✓', 'success');
-    closeModal();
-    document.getElementById('pCode').value = '';
-    document.getElementById('pValue').value = '';
-    document.getElementById('pExpires').value = '';
-    document.getElementById('pUid').value = '';
-    await loadPromos();
-    renderPromos();
-  } catch (e) { toast('Ошибка: ' + e.message, 'error'); }
+window.createPromo=async()=>{
+  const code=document.getElementById('pCode').value.trim().toUpperCase();
+  const type=document.getElementById('pType').value;
+  const value=+document.getElementById('pValue').value;
+  const expires=document.getElementById('pExpires').value;
+  const uid=document.getElementById('pUid').value.trim();
+  if(!code||!value){toast('Заполните код и скидку','error');return;}
+  try{
+    const data={code,discountType:type,discountValue:value,active:true,usedCount:0,createdAt:serverTimestamp()};
+    if(expires)data.expiresAt=Timestamp.fromDate(new Date(expires+'T23:59:59'));
+    if(uid)data.forUid=uid;
+    await addDoc(collection(db,'promoCodes'),data);
+    toast('Промокод создан ✓','success');closeModal();
+    ['pCode','pValue','pExpires','pUid'].forEach(id=>document.getElementById(id).value='');
+    await loadPromos();renderPromos();
+  }catch(e){toast('Ошибка: '+e.message,'error');}
 };
+window.deletePromo=async id=>{if(!confirm('Удалить промокод?'))return;await deleteDoc(doc(db,'promoCodes',id));toast('Удалён','info');await loadPromos();renderPromos();};
+window.togglePromo=async(id,active)=>{await updateDoc(doc(db,'promoCodes',id),{active});toast(active?'Активирован ✓':'Отключён',active?'success':'info');await loadPromos();renderPromos();};
 
-// ===== DELETE & TOGGLE =====
-window.deletePromo = async id => {
-  if (!confirm('Удалить промокод?')) return;
-  await deleteDoc(doc(db, 'promoCodes', id));
-  toast('Удалён', 'info');
-  await loadPromos();
-  renderPromos();
-};
-window.togglePromo = async (id, active) => {
-  await updateDoc(doc(db, 'promoCodes', id), { active });
-  toast(active ? 'Активирован' : 'Отключён', active ? 'success' : 'info');
-  await loadPromos();
-  renderPromos();
-};
-
-// ===== LOAD =====
-async function loadPromos() {
-  const snap = await getDocs(collection(db, 'promoCodes'));
-  allPromos = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+async function loadPromos(){
+  const snap=await getDocs(collection(db,'promoCodes'));
+  allPromos=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
 }
-
-// ===== LOGOUT =====
-window.doLogout = async () => { await signOut(auth); window.location.href = '/'; };
-
-// ===== AUTH =====
-onAuthStateChanged(auth, async user => {
-  document.getElementById('loadingScreen').style.display = 'none';
-  if (!user || user.email !== ADMIN_EMAIL) { window.location.href = '/'; return; }
-  document.getElementById('appWrap').style.display = 'block';
-  document.getElementById('appTopbar').style.display = 'flex';
-  await loadPromos();
-  renderPromos();
+onAuthStateChanged(auth,async user=>{
+  document.getElementById('loadingScreen').style.display='none';
+  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
+  document.getElementById('appWrap').style.display='block';
+  await loadPromos();renderPromos();
 });
 </script>
 </body>

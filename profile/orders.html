@@ -99,55 +99,54 @@
     .ord-body{display:none;border-top:1px solid var(--line);padding:24px 20px 26px;background:var(--surface)}
     .ord-body.open{display:block;animation:fadeUp .2s ease}
 
-    /* TRACKER */
-    .trk{margin-bottom:18px}
-    .trk-row{display:flex;align-items:flex-start;gap:0}
-    .trk-step{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1;min-width:44px;position:relative}
-    .trk-step:not(:last-child)::after{content:'';position:absolute;top:15px;left:calc(50% + 16px);right:calc(-50% + 16px);height:1px;background:var(--line);z-index:0;transition:background .3s}
-    .trk-step.done:not(:last-child)::after{background:var(--accent)}
-    .trk-step.current:not(:last-child)::after{background:linear-gradient(to right,var(--accent),var(--line))}
-    .trk-ico{width:30px;height:30px;border-radius:50%;border:1px solid var(--line-strong);background:var(--surface-2);display:flex;align-items:center;justify-content:center;z-index:1;position:relative;transition:all .25s;flex-shrink:0}
-    .trk-ico svg{width:13px;height:13px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;transition:stroke .25s}
-    .trk-step.done .trk-ico{border-color:var(--accent);background:var(--accent-wash)}
-    .trk-step.done .trk-ico svg{stroke:var(--accent-soft)}
-    .trk-step.done .trk-ico .check-icon{display:block}
-    .trk-step.done .trk-ico .step-icon{display:none}
-    .check-icon{display:none}
-    .trk-step.current .trk-ico{border-color:var(--accent-soft);background:var(--accent-wash);box-shadow:0 0 0 3px var(--accent-wash)}
-    .trk-step.current .trk-ico svg{stroke:var(--accent-soft)}
-    .trk-step.pending .trk-ico{opacity:.35}
-    .trk-lbl{font-size:.66rem;color:var(--ink-faint);text-align:center;line-height:1.3;max-width:56px}
-    .trk-step.done .trk-lbl{color:var(--ink-dim)}
-    .trk-step.current .trk-lbl{color:var(--ink);font-weight:500}
-    .trk-info{margin-top:14px;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);display:flex;align-items:flex-start;gap:11px}
-    .trk-info-ico{width:30px;height:30px;border-radius:var(--r-xs);flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .trk-info-ico svg{width:14px;height:14px;stroke-width:1.8}
-    .trk-info-title{font-size:.86rem;font-weight:500;margin-bottom:2px}
-    .trk-info-sub{font-size:.78rem;color:var(--ink-faint);line-height:1.5}
+    /* TRACKER — полосы в стиле index */
+    .trk{margin-bottom:20px}
+    .trk-strips{display:flex;flex-direction:column}
+    .trk-strip{display:grid;grid-template-columns:28px 1fr auto;gap:20px;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+    .trk-strip:last-child{border-bottom:none}
+    .trk-strip.done .trk-n{color:var(--accent-soft)}
+    .trk-strip.current .trk-n{color:var(--ink)}
+    .trk-strip.pending .trk-n{color:var(--line-strong)}
+    .trk-n{font-size:13px;font-weight:500;letter-spacing:.04em;color:var(--line-strong);transition:color .2s}
+    .trk-body strong{font-size:clamp(15px,1.5vw,18px);font-weight:500;letter-spacing:-.02em;display:block;color:var(--ink-faint);transition:color .2s}
+    .trk-strip.done .trk-body strong{color:var(--ink-dim)}
+    .trk-strip.current .trk-body strong{color:var(--ink)}
+    .trk-strip.pending .trk-body strong{color:var(--line-strong)}
+    .trk-strip-status{font-size:12px;font-weight:500;white-space:nowrap}
+    .trk-strip.done .trk-strip-status{color:var(--accent-soft)}
+    .trk-strip.current .trk-strip-status{color:var(--ink-dim)}
+    .trk-strip.pending .trk-strip-status{}
+
+    /* STATUS HERO — тёмный блок текущего статуса */
+    .status-hero{background:var(--ink);border-radius:32px;padding:28px 32px;margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+    .status-hero-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+    .status-hero-title{font-size:clamp(22px,3vw,32px);font-weight:500;letter-spacing:-.03em;color:#fff;line-height:1.1;margin-bottom:6px}
+    .status-hero-sub{font-size:14px;color:rgba(255,255,255,.35);font-weight:300;line-height:1.5}
+    .status-hero-price{font-size:clamp(28px,3vw,40px);font-weight:500;letter-spacing:-.04em;color:#fff;white-space:nowrap}
+    .status-hero-price sup{font-size:16px;font-weight:300;color:rgba(255,255,255,.3)}
 
     /* SUBSTEPS */
-    .sub-list{display:flex;flex-direction:column;gap:5px;margin:14px 0;padding:12px 14px;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm)}
-    .sub-item{display:flex;align-items:center;gap:9px;font-size:.8rem}
-    .sub-ico{width:16px;height:16px;border-radius:50%;border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .sub-ico svg{width:8px;height:8px;stroke:var(--ink-faint);stroke-width:2.5;fill:none}
-    .sub-item.done .sub-ico{border-color:var(--good);background:var(--good-wash)}
-    .sub-item.done .sub-ico svg{stroke:var(--good)}
-    .sub-lbl{flex:1;color:var(--ink-faint)}
+    .sub-list{display:flex;flex-direction:column;margin:0 0 20px}
+    .sub-item{display:grid;grid-template-columns:24px 1fr auto;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}
+    .sub-item:last-child{border-bottom:none}
+    .sub-n{font-size:12px;font-weight:500;color:var(--line-strong);letter-spacing:.04em}
+    .sub-item.done .sub-n{color:var(--accent-soft)}
+    .sub-lbl{font-size:15px;font-weight:300;color:var(--ink-faint)}
     .sub-item.done .sub-lbl{color:var(--ink)}
-    .sub-date{font-size:.72rem;color:var(--ink-faint);white-space:nowrap}
+    .sub-date{font-size:12px;color:var(--ink-faint);white-space:nowrap}
 
-    /* DELIVERY CARD (also reused inside the delivery modal) */
-    .delivery-card{background:var(--good-wash);border:1px solid rgba(52,211,153,.2);border-radius:var(--r-sm);padding:16px;margin-bottom:14px}
-    .delivery-card h4{font-size:.72rem;font-weight:500;color:var(--good);margin-bottom:10px;display:flex;align-items:center;gap:6px;letter-spacing:.04em;text-transform:uppercase}
-    .delivery-card h4 svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none}
-    .site-domain-big{font-size:1rem;font-weight:500;margin-bottom:4px;letter-spacing:-.01em}
-    .site-favicon{width:24px;height:24px;border-radius:5px;object-fit:contain;background:var(--surface-2);border:1px solid var(--line);margin-bottom:8px}
-    .site-pages-list{display:flex;flex-direction:column;gap:3px;margin-bottom:12px}
-    .site-page-item{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--ink-dim)}
-    .site-page-item::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--good);flex-shrink:0}
+    /* DELIVERY CARD */
+    .delivery-card{background:var(--ink);border-radius:32px;padding:28px 32px;margin-bottom:20px}
+    .delivery-card-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
+    .site-domain-big{font-size:clamp(20px,2.5vw,28px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:16px}
+    .site-favicon{width:28px;height:28px;border-radius:6px;object-fit:contain;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);margin-bottom:12px}
+    .site-pages-list{display:flex;flex-direction:column;gap:0;margin-bottom:20px;border-top:1px solid rgba(255,255,255,.08);padding-top:16px}
+    .site-page-item{display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px;color:rgba(255,255,255,.4);font-weight:300}
+    .site-page-item:last-child{border-bottom:none}
+    .site-page-item::before{content:'—';color:var(--accent);flex-shrink:0}
 
-    .ord-eta{display:flex;align-items:center;gap:7px;background:var(--info-wash);border-radius:var(--r-sm);padding:9px 13px;font-size:.8rem;color:var(--info);margin-bottom:14px}
-    .ord-eta svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+    .ord-eta{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-size:14px;color:var(--ink-dim);margin-bottom:20px;font-weight:300}
+    .ord-eta svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;color:var(--ink-faint)}
     .ord-actions{display:flex;gap:8px;flex-wrap:wrap}
 
     /* EMPTY */
@@ -365,32 +364,32 @@ window.closeBanner=()=>document.getElementById('statusBanner').classList.remove(
 
 function buildTracker(o){
   const s = o.status || 0;
-  const stepLabels = ['Заявка','Обсуждение','В работе','Проверка','Правки','Готово'];
-  const steps = stepLabels.map((label, i) => {
+  const steps = [
+    {label:'Заявка', sub:'Получена и зарегистрирована'},
+    {label:'Обсуждение', sub:'Уточняем детали проекта'},
+    {label:'В работе', sub:'Ведётся активная разработка'},
+    {label:'На проверке', sub:'Отправлено на согласование'},
+    {label:'Правки', sub:'Вносим правки по пожеланиям'},
+    {label:'Готово', sub:'Проект завершён и сдан'},
+  ];
+  const strips = steps.map((step, i) => {
     const state = i < s ? 'done' : i === s ? 'current' : 'pending';
-    return `<div class="trk-step ${state}">
-      <div class="trk-ico">${STEP_ICONS[i]}${CHECK_SVG}</div>
-      <div class="trk-lbl">${label}</div>
+    const statusText = state === 'done' ? '— выполнено' : state === 'current' ? '← сейчас' : '';
+    return `<div class="trk-strip ${state}">
+      <div class="trk-n">${String(i+1).padStart(2,'0')}</div>
+      <div class="trk-body"><strong>${step.label}</strong></div>
+      <div class="trk-strip-status">${statusText}</div>
     </div>`;
   }).join('');
-  return `<div class="trk">
-    <div class="trk-row">${steps}</div>
-    <div class="trk-info">
-      <div class="trk-info-ico" style="background:${INFO_COLORS[s]};color:${INFO_STROKE[s]}">${INFO_ICONS[s]}</div>
-      <div>
-        <div class="trk-info-title">${STATUS_LABELS[s]}</div>
-        <div class="trk-info-sub">${STATUS_SUBS[s]}</div>
-      </div>
-    </div>
-  </div>`;
+  return `<div class="trk"><div class="trk-strips">${strips}</div></div>`;
 }
 
 function buildSubsteps(o){
   const ss = o.substeps || [];
   if (!ss.length) return '';
-  return `<div class="sub-list">${ss.map(s=>`
+  return `<div class="sub-list">${ss.map((s,i)=>`
     <div class="sub-item ${s.done?'done':''}">
-      <div class="sub-ico"><svg viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="sub-n">${String(i+1).padStart(2,'0')}</div>
       <span class="sub-lbl">${s.label}</span>
       <span class="sub-date">${s.done&&s.date?s.date:''}</span>
     </div>`).join('')}</div>`;
@@ -406,11 +405,11 @@ function orderCard(o){
     const siteHref = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : (o.siteDomain ? 'https://'+o.siteDomain : '#');
     const pages = (o.sitePages||'').split('\n').filter(Boolean);
     siteBlock = `<div class="delivery-card">
-      <h4><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>Ваш сайт</h4>
+      <div class="delivery-card-eyebrow">Ваш сайт</div>
       ${o.siteFaviconUrl?`<img class="site-favicon" src="${o.siteFaviconUrl}" alt=""/>`:''}
       ${o.siteDomain?`<div class="site-domain-big">${escapeHtml(o.siteDomain)}</div>`:''}
       ${pages.length?`<div class="site-pages-list">${pages.map(p=>`<div class="site-page-item">${escapeHtml(p)}</div>`).join('')}</div>`:''}
-      <a href="${siteHref}" target="_blank" rel="noopener" class="btn btn-success btn-sm" onclick="event.stopPropagation()">Открыть сайт →</a>
+      <a href="${siteHref}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" onclick="event.stopPropagation()" style="background:var(--accent);color:#191b1e">Открыть сайт →</a>
     </div>`;
   }
 

@@ -191,6 +191,15 @@
     .ord-banner-close{background:none;border:none;color:var(--ink-faint);cursor:pointer;padding:0;display:flex}
     .ord-banner-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 
+    /* DOMAIN BANNER */
+    .domain-banner{display:flex;align-items:flex-start;gap:11px;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:var(--r-sm);padding:13px 15px;margin-bottom:14px}
+    .domain-banner-ico{font-size:1.1rem;flex-shrink:0;line-height:1.4}
+    .domain-banner-body{flex:1;min-width:0}
+    .domain-banner-title{font-size:.82rem;font-weight:500;color:var(--info);margin-bottom:3px}
+    .domain-banner-text{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
+    .domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:.78rem;font-weight:500;color:var(--info);text-decoration:none}
+    .domain-banner-link:hover{text-decoration:underline}
+
     @media (max-width:840px){
       .ord-cols{display:none}
       .ord-row,.ord-row-wrap .ord-row{grid-template-columns:1fr;gap:4px}
@@ -409,6 +418,36 @@ function orderCard(o){
     ? `<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${escapeHtml(o.statusComment)}</div>`
     : '';
 
+  // Domain banner
+  const extras = o.extras || [];
+  let domainBanner = '';
+  if (extras.includes('domain_reg')) {
+    domainBanner = `<div class="domain-banner">
+      <div class="domain-banner-ico">🌐</div>
+      <div class="domain-banner-body">
+        <div class="domain-banner-title">Домен: покупка на рег.ру</div>
+        <div class="domain-banner-text">После оплаты на рег.ру напишите нам в поддержку — подключим домен бесплатно.</div>
+        <a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;stroke-width:2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Инструкция по домену →
+        </a>
+      </div>
+    </div>`;
+  } else if (extras.includes('domain_own')) {
+    const domName = o.domainName ? `<strong>${escapeHtml(o.domainName)}</strong> — ` : '';
+    domainBanner = `<div class="domain-banner">
+      <div class="domain-banner-ico">🌐</div>
+      <div class="domain-banner-body">
+        <div class="domain-banner-title">Домен: подключение</div>
+        <div class="domain-banner-text">${domName}напишите в поддержку — скажем какие DNS-записи прописать.</div>
+        <a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;stroke-width:2"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Инструкция по домену →
+        </a>
+      </div>
+    </div>`;
+  }
+
   return `<div class="ord-row-wrap" data-status="${s}" data-paid="${paid?1:0}">
     <button type="button" class="ord-row" onclick="toggleOrder(this)">
       <div class="ord-cell-main">
@@ -428,6 +467,7 @@ function orderCard(o){
     </button>
     ${statusComment}
     <div class="ord-body">
+      ${domainBanner}
       ${buildTracker(o)}
       ${buildSubsteps(o)}
       ${estDate?`<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">${estDate}</strong></div>`:''}
@@ -501,7 +541,7 @@ window.printReceipt = function(id){
   if(!o) return;
   const w = window.open('', '_blank', 'width=600,height=700');
   const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('ru', {day:'numeric', month:'long', year:'numeric'}) : '—';
-  const extrasLabels = {domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+  const extrasLabels = {domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
   const extrasHtml = (o.extras||[]).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e=>extrasLabels[e]||e).join(', ')}</td></tr>` : '';
   const totalHtml = `<tr class="total"><td>Итого</td><td>${o.totalPrice ? o.totalPrice.toLocaleString('ru') + ' ₽' : '—'}</td></tr>`;
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr>${totalHtml}</table><script>window.onload=function(){window.print();};<\/script></body></html>`;

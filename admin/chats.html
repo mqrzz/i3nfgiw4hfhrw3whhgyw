@@ -437,7 +437,7 @@ window.createTicket=async function(){
     const userDoc=await getDoc(doc(db,'users',uid));const userData=userDoc.data();
     const ref=await addDoc(collection(db,'tickets'),{uid,userName:userData?.displayName||userData?.name||'Пользователь',userEmail:userData?.email||'—',topic:topic||'Общий вопрос',subject,status:'open',priority,_read:false,_adminRead:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
     await addDoc(collection(db,'tickets',ref.id,'messages'),{sender:'support',senderName:'Поддержка',text:message,imageUrl:null,createdAt:serverTimestamp()});
-    await addDoc(collection(db,'notifications',uid,'items'),{title:'📝 Новый тикет поддержки',text:`«${subject}»: ${message}`,read:false,createdAt:serverTimestamp()});
+    await addDoc(collection(db,'notifications',uid,'items'),{title:'💬 Новый тикет от поддержки',text:`Сообщаем вам, что сотрудник службы поддержки создал тикет «${subject}». Просим вас перейти в раздел "Чат с командой".`,link:'/profile/support',read:false,createdAt:serverTimestamp()});
     toast('Тикет создан и пользователь уведомлён ✅','success');closeCreateTicket();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };

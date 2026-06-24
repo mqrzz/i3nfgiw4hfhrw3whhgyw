@@ -355,7 +355,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           <div class="stype-desc">Страницы не меняются сами, контент редактируем вручную. Быстрый, дешевле в обслуживании.</div>
         </div>
         <div class="stype-card" data-stype="dynamic">
-          <div class="stype-title">Динамический / с CMS</div>
+          <div class="stype-title">Сайт с серверной частью / динамический</div>
           <div class="stype-desc">Блог, каталог, новости — контент добавляется через панель без программиста. Для магазинов и порталов.</div>
         </div>
       </div>
@@ -636,12 +636,13 @@ document.querySelectorAll('.tier[data-tier]').forEach(card=>{
 });
 
 function updateUI(){
-  const fOk=!!state.format&&(state.format!=='custom'||state.formatNote.trim().length>0);
+  const fOk=!!state.format&&(state.format!=='custom'||state.formatNote.trim().length>0)&&!!state.siteType;
   const tBtn=document.getElementById('toTiersBtn');
   const fHint=document.getElementById('formatHint');
   const eBtn=document.getElementById('toExtrasBtn');
   const tHint=document.getElementById('tierHint');
   tBtn.disabled=!fOk;
+  fHint.textContent=!state.format?'Сначала выберите формат':(!state.siteType?'Выберите тип сайта':'');
   fHint.style.display=fOk?'none':'';
   eBtn.disabled=!state.tier;
   tHint.style.display=state.tier?'none':'';

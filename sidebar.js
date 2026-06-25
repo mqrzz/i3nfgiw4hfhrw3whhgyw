@@ -29,9 +29,10 @@
       --sb-top: 104px;
     }
     .sb-shell{
-      display:flex; align-items:flex-start; gap:32px;
-      max-width:1400px; margin:0;
-      padding:104px 2rem 100px 2.5rem;
+      display:flex; align-items:flex-start; gap:48px;
+      max-width:1400px; margin:0 auto;
+      padding:104px 64px 100px;
+      width:100%;
     }
     .sb-nav{
       width:var(--sb-w); flex-shrink:0;
@@ -61,7 +62,7 @@
     .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
     .sb-link.danger svg{ stroke:#d95a48; }
 
-    .sb-content{ flex:1; min-width:0; }
+    .sb-content{ flex:1; min-width:0; max-width:none; }
 
     @media (max-width:980px){
       .sb-nav{ display:none; }

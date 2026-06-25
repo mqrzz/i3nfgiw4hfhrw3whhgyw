@@ -669,10 +669,38 @@ function renderTickets(tickets){
         ${escapeHtml(t.orderDomain || (t.orderId ? '№ '+t.orderId.slice(0,8).toUpperCase() : 'Сайт'))}
       </div>
       ${t.description?`<div class="ticket-desc">${escapeHtml(t.description)}</div>`:''}
+      ${t.images&&t.images.length?`<div class="photo-previews" style="pointer-events:none">${t.images.map(src=>`<div class="photo-preview-wrap"><img src="${src}" alt=""/></div>`).join('')}</div>`:''}
       ${t.adminReply?`<div class="ticket-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${escapeHtml(t.adminReply)}</div>`:''}
       <div class="ticket-date">${t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
     </div>`).join('');
 }
+
+let ticketPhotos = [];
+
+window.previewPhotos = function(){
+  const input = document.getElementById('ticketPhoto');
+  const files = Array.from(input.files);
+  if(!files.length) return;
+  if(ticketPhotos.length + files.length > 3){ toast('Максимум 3 фото','error'); input.value=''; return; }
+  files.forEach(file=>{
+    if(file.size > 4*1024*1024){ toast('Файл больше 4 МБ','error'); return; }
+    const reader = new FileReader();
+    reader.onload = e=>{ ticketPhotos.push(e.target.result); renderPhotoPreviews(); };
+    reader.readAsDataURL(file);
+  });
+  input.value='';
+};
+
+function renderPhotoPreviews(){
+  const el = document.getElementById('photoPreviews'); if(!el) return;
+  el.innerHTML = ticketPhotos.map((src,i)=>`
+    <div class="photo-preview-wrap">
+      <img src="${src}" alt=""/>
+      <button class="photo-preview-remove" onclick="removePhoto(${i})">✕</button>
+    </div>`).join('');
+}
+
+window.removePhoto = function(i){ ticketPhotos.splice(i,1); renderPhotoPreviews(); };
 
 window.submitTicket = async function(){
   const title = document.getElementById('ticketTitle').value.trim();
@@ -682,6 +710,7 @@ window.submitTicket = async function(){
   try{
     await addDoc(collection(db,'service_tickets'),{
       title, description: desc||'',
+      images: ticketPhotos.length ? ticketPhotos : null,
       uid: currentUser.uid,
       userName: currentUser.displayName||'Пользователь',
       userEmail: currentUser.email||'',
@@ -694,6 +723,7 @@ window.submitTicket = async function(){
     });
     document.getElementById('ticketTitle').value='';
     document.getElementById('ticketDesc').value='';
+    ticketPhotos=[]; renderPhotoPreviews();
     toast('Заявка отправлена ✓','success');
     loadTickets();
   }catch(e){ toast('Ошибка: '+e.message,'error'); }

@@ -277,6 +277,7 @@
                             <li><a href="${base}privacy">Конфиденциальность</a></li>
                             <li><a href="${base}terms">Соглашение</a></li>
                             <li><a href="${base}p_oferta.docx" download="p_oferta.docx">Публичная оферта ↓</a></li>
+                            <li><a href="${base}requisites">Реквизиты</a></li>
                         </ul>
                     </div>
                 </div>
@@ -288,10 +289,6 @@
                         <a href="${base}terms">Пользовательское соглашение</a>
                         <a href="${base}p_oferta.docx" download="p_oferta.docx">Публичная оферта</a>
                     </div>
-                </div>
-                
-                <div class="legal-info">
-                    Самозанятый: Конухин Алексей Денисович &nbsp;·&nbsp; ИНН: 701508269796
                 </div>
                 
                 <div class="meta-note">

@@ -229,9 +229,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .stype-desc{font-size:13px;color:var(--muted);font-weight:300;line-height:1.55}
 
 /* DOMAIN INPUT */
-.domain-input-wrap{margin-top:6px;padding:10px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:10px}
-.domain-input-wrap input{width:100%;background:none;border:none;outline:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:300;placeholder-color:rgba(255,255,255,.3)}
+.domain-input-wrap{margin-top:6px;padding:10px 14px;background:rgba(255,255,255,.04);border:1.5px solid rgba(255,255,255,.12);border-radius:10px;display:flex;align-items:center;gap:8px;transition:border-color .15s}
+.domain-input-wrap:focus-within{border-color:rgba(255,255,255,.3)}
+.domain-input-wrap.valid{border-color:var(--green)}
+.domain-input-wrap.error{border-color:#ff6b54}
+.domain-input-wrap input{flex:1;background:none;border:none;outline:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:300}
 .domain-input-wrap input::placeholder{color:rgba(255,255,255,.25)}
+.domain-confirm-btn{width:28px;height:28px;border-radius:8px;background:rgba(30,222,123,.15);border:1px solid rgba(30,222,123,.3);color:var(--green);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,opacity .15s;opacity:0;pointer-events:none}
+.domain-confirm-btn.active{opacity:1;pointer-events:all}
+.domain-confirm-btn:hover{background:rgba(30,222,123,.25)}
+.domain-confirm-btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.5;fill:none}
+.domain-confirmed{margin-top:6px;font-size:12px;color:var(--green);font-weight:300;display:none;align-items:center;gap:5px}
+.domain-confirmed.show{display:flex}
+.domain-error{margin-top:6px;font-size:12px;color:#ff6b54;font-weight:300;display:none}
+.domain-error.show{display:block}
 
 /* PAYMENT ERROR MODAL */
 .pay-error-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -442,7 +453,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
               <!-- Domain input (shown when dOptOwn selected) -->
               <div class="domain-input-wrap" id="domainInputWrap" hidden style="margin-top:6px">
                 <input type="text" id="domainInput" placeholder="например: myshop.ru" autocomplete="off" spellcheck="false"/>
+                <button type="button" class="domain-confirm-btn" id="domainConfirmBtn" title="Подтвердить домен">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </button>
               </div>
+              <div class="domain-confirmed" id="domainConfirmed">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:12px;height:12px;stroke-width:2.5;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="domainConfirmedText">Домен добавлен</span>
+              </div>
+              <div class="domain-error" id="domainError">Введите корректный домен, например: myshop.ru</div>
             </div>
             <div class="calc-extra" id="xContent">
               <div class="calc-extra-row">
@@ -686,9 +705,54 @@ document.getElementById('dOptOwn').addEventListener('click',e=>{
   document.getElementById('xDomain').classList.add('on');
   document.getElementById('domainRegHint').hidden=true;
   document.getElementById('domainInputWrap').hidden=false;
+  document.getElementById('domainConfirmed').classList.remove('show');
+  document.getElementById('domainError').classList.remove('show');
+  document.getElementById('domainInputWrap').classList.remove('valid','error');
+  state.domainName='';
   recalc();
 });
-document.getElementById('domainInput').addEventListener('input',e=>{state.domainName=e.target.value.trim();});
+function isDomain(val){return /^[a-zA-Zа-яёА-ЯЁ0-9][a-zA-Zа-яёА-ЯЁ0-9\-\.]*\.[a-zA-Zа-яёА-ЯЁ]{2,}$/.test(val.trim());}
+
+const domainInput=document.getElementById('domainInput');
+const domainConfirmBtn=document.getElementById('domainConfirmBtn');
+const domainConfirmed=document.getElementById('domainConfirmed');
+const domainConfirmedText=document.getElementById('domainConfirmedText');
+const domainError=document.getElementById('domainError');
+const domainInputWrap=document.getElementById('domainInputWrap');
+
+domainInput.addEventListener('input',e=>{
+  const val=e.target.value.trim();
+  state.domainName='';
+  domainConfirmed.classList.remove('show');
+  domainError.classList.remove('show');
+  domainInputWrap.classList.remove('valid','error');
+  domainConfirmBtn.classList.toggle('active',isDomain(val));
+  recalc();
+});
+
+domainInput.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();confirmDomain();}
+});
+
+domainConfirmBtn.addEventListener('click',e=>{e.stopPropagation();confirmDomain();});
+
+function confirmDomain(){
+  const val=domainInput.value.trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+  if(!isDomain(val)){
+    domainInputWrap.classList.add('error');
+    domainError.classList.add('show');
+    return;
+  }
+  domainInput.value=val;
+  state.domainName=val;
+  domainInputWrap.classList.add('valid');
+  domainInputWrap.classList.remove('error');
+  domainError.classList.remove('show');
+  domainConfirmedText.textContent='Домен добавлен: '+val;
+  domainConfirmed.classList.add('show');
+  domainConfirmBtn.classList.remove('active');
+  recalc();
+}
 
 document.getElementById('promoBtn').addEventListener('click',async()=>{
   const code=document.getElementById('promoInp').value.trim().toUpperCase();

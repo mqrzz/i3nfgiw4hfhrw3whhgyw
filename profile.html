@@ -35,7 +35,8 @@
     .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem}
 
     /* CONTENT */
-    .page-col{max-width:620px;width:100%}
+    .page-col{width:100%}
+    @media(max-width:980px){.page-col{max-width:640px;margin:0 auto}}
 
     /* SECTIONS */
     .section{display:none}
@@ -124,8 +125,28 @@
     @media(min-width:981px){.menu-list{display:none}}
 
     /* ══════════════════════════════════
-       RECENT ORDERS — карточка
+       ПК — двухколоночная сетка под hero
     ══════════════════════════════════ */
+    .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .home-grid-full{grid-column:1/-1}
+    @media(max-width:980px){.home-grid{grid-template-columns:1fr}}
+
+    /* ══════════════════════════════════
+       УВЕДОМЛЕНИЯ (блок на ПК)
+    ══════════════════════════════════ */
+    .notif-inline-item{padding:14px 0;border-bottom:1px solid var(--border);font-size:.82rem;line-height:1.55}
+    .notif-inline-item:last-child{border-bottom:none;padding-bottom:0}
+    .notif-inline-item:first-child{padding-top:0}
+    .notif-inline-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:3px}
+    .notif-inline-title{font-weight:500;font-size:.8rem}
+    .notif-inline-time{font-size:.68rem;color:var(--muted);white-space:nowrap}
+    .notif-inline-text{color:var(--muted2);font-size:.78rem;line-height:1.5}
+    .notif-inline-item.unread .notif-inline-title{color:var(--accent)}
+    .notif-inline-unread-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+    .notif-show-more{display:block;width:100%;text-align:center;padding:.7rem;border:none;background:var(--bg3);border-radius:10px;color:var(--muted);font-family:var(--font);font-size:.78rem;cursor:pointer;margin-top:10px;transition:background .15s}
+    .notif-show-more:hover{background:var(--border)}
+    .notif-limit-note{font-size:.7rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5}
+    .notif-empty-inline{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
     .home-card{
       background:var(--bg3);border:1.5px solid var(--border);border-radius:32px;
       padding:28px 32px;margin-bottom:12px;
@@ -297,15 +318,16 @@
   <!-- HOME -->
   <div class="section active" id="section-home">
 
-    <!-- HERO — тёмный блок как на главной -->
-    <div class="profile-hero">
+    <!-- HERO — тёмный блок, на всю ширину -->
+    <div class="profile-hero home-grid-full">
       <div class="hero-top-row">
         <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
           <span id="avatarLetter">А</span>
           <div class="avatar-overlay"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
         </div>
         <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
-        <div class="notif-btn" id="notifBtn" onclick="openNotifModal()" title="Уведомления">
+        <!-- Колокольчик — только на мобильных -->
+        <div class="notif-btn" id="notifBtn" onclick="openNotifModal()" title="Уведомления" style="display:none">
           <svg id="notifIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
           <div class="notif-dot" id="notifDot" style="display:none"></div>
         </div>
@@ -315,7 +337,6 @@
       <div class="hero-name" id="heroName">...</div>
       <div class="hero-since" id="heroSince"></div>
 
-      <!-- STATS внутри hero -->
       <div class="hero-stats">
         <div class="stat-box">
           <div class="stat-num" id="statTotal">—</div>
@@ -332,12 +353,10 @@
       </div>
     </div>
 
-    <!-- MOBILE MENU — только мобильные -->
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
     <div class="menu-list">
       <a href="profile/orders" class="menu-item">
-        <div class="menu-ico">
-          <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        </div>
+        <div class="menu-ico"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
         <div class="menu-text">
           <div class="menu-title">Мои заказы</div>
           <div class="menu-sub" id="menuOrdersSub">История всех заявок</div>
@@ -346,9 +365,7 @@
         <span class="menu-arrow">›</span>
       </a>
       <a href="profile/support" class="menu-item">
-        <div class="menu-ico">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        </div>
+        <div class="menu-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="menu-text">
           <div class="menu-title">Чат с командой</div>
           <div class="menu-sub">Задайте вопрос по проекту</div>
@@ -357,9 +374,7 @@
         <span class="menu-arrow">›</span>
       </a>
       <a href="order" class="menu-item">
-        <div class="menu-ico">
-          <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
-        </div>
+        <div class="menu-ico"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></div>
         <div class="menu-text">
           <div class="menu-title">Новый заказ</div>
           <div class="menu-sub">Оформить заявку на сайт</div>
@@ -367,9 +382,7 @@
         <span class="menu-arrow">›</span>
       </a>
       <a href="profile/tickets" class="menu-item" id="menuTickets">
-        <div class="menu-ico">
-          <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
-        </div>
+        <div class="menu-ico"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div>
         <div class="menu-text">
           <div class="menu-title">Обслуживание сайта</div>
           <div class="menu-sub" id="menuTicketsSub">Заявки на доработку</div>
@@ -378,54 +391,70 @@
         <span class="menu-arrow">›</span>
       </a>
       <a href="profile/settings" class="menu-item">
-        <div class="menu-ico">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        </div>
+        <div class="menu-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg></div>
         <div class="menu-text">
           <div class="menu-title">Настройки</div>
           <div class="menu-sub">Профиль и аккаунт</div>
         </div>
         <span class="menu-arrow">›</span>
       </a>
-    </div>
-
-    <!-- SUPPORT STATUS — только на ПК, показывается если поддержка активна -->
-    <div class="support-card" id="supportCard">
-      <div class="support-card-label">Обслуживание активно</div>
-      <div class="support-card-title" id="supportCardTitle">Тариф поддержки</div>
-      <div class="support-card-sub" id="supportCardSub">Осталось дней</div>
-      <div class="support-progress-track">
-        <div class="support-progress-fill" id="supportProgressFill" style="width:0%"></div>
-      </div>
-      <div class="support-progress-labels">
-        <span>Начало</span>
-        <span id="supportProgressLabel">0 дн. осталось</span>
+      <!-- Колокольчик — только мобильный, показываем в меню -->
+      <div class="menu-item" onclick="openNotifModal()" style="cursor:pointer">
+        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+        <div class="menu-text">
+          <div class="menu-title">Уведомления</div>
+          <div class="menu-sub">Последние события</div>
+        </div>
+        <span class="menu-badge" id="menuNotifBadge" style="display:none">!</span>
+        <span class="menu-arrow">›</span>
       </div>
     </div>
 
-    <!-- ПОСЛЕДНИЕ ЗАКАЗЫ -->
-    <div class="home-card">
-      <div class="home-card-head">
-        <div class="home-card-title">Последние заказы</div>
-        <a href="profile/orders" class="home-card-link">
-          Все заказы
-          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-      <div id="recentOrdersList">
-        <div class="orders-empty">Загрузка...</div>
-      </div>
-    </div>
+    <!-- ДВУХКОЛОНОЧНАЯ СЕТКА (ПК) -->
+    <div class="home-grid">
 
-    <!-- ЛЕНТА АКТИВНОСТИ -->
-    <div class="home-card">
-      <div class="home-card-head">
-        <div class="home-card-title">Активность</div>
+      <!-- УВЕДОМЛЕНИЯ — ПК блок -->
+      <div class="home-card" id="notifDesktopCard">
+        <div class="home-card-head">
+          <div class="home-card-title">Уведомления</div>
+        </div>
+        <div id="notifInlineList"><div class="notif-empty-inline">Загрузка...</div></div>
+        <button class="notif-show-more" id="notifShowMore" style="display:none" onclick="expandNotifs()">Посмотреть ещё</button>
+        <div class="notif-limit-note" id="notifLimitNote" style="display:none">Хранятся последние 10 уведомлений. Старые удаляются автоматически.</div>
       </div>
-      <div class="timeline-list" id="activityTimeline">
-        <div class="timeline-empty">Загрузка...</div>
+
+      <!-- СТАТУС ПОДДЕРЖКИ -->
+      <div class="support-card" id="supportCard">
+        <div class="support-card-label">Обслуживание активно</div>
+        <div class="support-card-title" id="supportCardTitle">Тариф поддержки</div>
+        <div class="support-card-sub" id="supportCardSub">Включает доработки и приоритетный чат</div>
+        <div class="support-progress-track">
+          <div class="support-progress-fill" id="supportProgressFill" style="width:0%"></div>
+        </div>
+        <div class="support-progress-labels">
+          <span>Начало</span>
+          <span id="supportProgressLabel">0 дн. осталось</span>
+        </div>
       </div>
-    </div>
+
+      <!-- ПОСЛЕДНИЕ ЗАКАЗЫ -->
+      <div class="home-card">
+        <div class="home-card-head">
+          <div class="home-card-title">Последние заказы</div>
+          <a href="profile/orders" class="home-card-link">Все заказы <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+        </div>
+        <div id="recentOrdersList"><div class="orders-empty">Загрузка...</div></div>
+      </div>
+
+      <!-- ЛЕНТА АКТИВНОСТИ -->
+      <div class="home-card">
+        <div class="home-card-head">
+          <div class="home-card-title">Активность</div>
+        </div>
+        <div class="timeline-list" id="activityTimeline"><div class="timeline-empty">Загрузка...</div></div>
+      </div>
+
+    </div><!-- /home-grid -->
 
   </div><!-- /section-home -->
 
@@ -565,17 +594,79 @@ window.closeLightbox=function(){document.getElementById('lightbox').classList.re
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();}});
 
 let unsubNotifs=null;
+let allNotifDocs=[];
+let notifsExpanded=false;
+
+function renderNotifInline(docs){
+  const list=document.getElementById('notifInlineList');
+  const showMoreBtn=document.getElementById('notifShowMore');
+  const limitNote=document.getElementById('notifLimitNote');
+  if(!list) return;
+  if(!docs.length){
+    list.innerHTML='<div class="notif-empty-inline">Нет уведомлений</div>';
+    if(showMoreBtn) showMoreBtn.style.display='none';
+    if(limitNote) limitNote.style.display='none';
+    return;
+  }
+  const visible=notifsExpanded?docs.slice(0,10):docs.slice(0,3);
+  list.innerHTML=visible.map(d=>{
+    const n=d.data();
+    const t=n.createdAt?.toDate?n.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    return `<div class="notif-inline-item ${n.read?'':'unread'}">
+      <div class="notif-inline-head">
+        <span class="notif-inline-title">${!n.read?'<span class="notif-inline-unread-dot"></span> ':''} ${n.title||'Уведомление'}</span>
+        <span class="notif-inline-time">${t}</span>
+      </div>
+      <div class="notif-inline-text">${(n.text||'').replace(/\n/g,'<br>')}</div>
+    </div>`;
+  }).join('');
+  if(showMoreBtn){
+    if(!notifsExpanded&&docs.length>3){showMoreBtn.style.display='block';showMoreBtn.textContent=`Посмотреть ещё (${docs.length-3})`;}
+    else showMoreBtn.style.display='none';
+  }
+  if(limitNote) limitNote.style.display=docs.length>=8?'block':'none';
+}
+
+window.expandNotifs=function(){
+  notifsExpanded=true;
+  renderNotifInline(allNotifDocs);
+};
+
+async function pruneOldNotifs(uid,docs){
+  // Если больше 10 — удаляем лишние (самые старые)
+  if(docs.length<=10) return;
+  const toDelete=docs.slice(10);
+  const {deleteDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  for(const d of toDelete){
+    try{await deleteDoc(d.ref);}catch(e){}
+  }
+}
+
 function watchNotifications(uid){
   const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
-  unsubNotifs=onSnapshot(q,snap=>{
+  unsubNotifs=onSnapshot(q,async snap=>{
+    allNotifDocs=snap.docs;
     const hasUnread=snap.docs.some(d=>!d.data().read);
-    document.getElementById('notifDot').style.display=hasUnread?'block':'none';
-    if(hasUnread) document.getElementById('notifIcon').style.stroke='var(--accent2)';
-    else document.getElementById('notifIcon').style.stroke='';
-    const list=document.getElementById('notifList');
-    if(!list) return;
-    if(snap.empty){list.innerHTML='<div class="notif-empty">Нет уведомлений</div>';return;}
-    list.innerHTML=snap.docs.map(d=>{
+
+    // Мобильный бейдж в меню
+    const menuBadge=document.getElementById('menuNotifBadge');
+    if(menuBadge) menuBadge.style.display=hasUnread?'':'none';
+
+    // ПК — инлайн блок
+    renderNotifInline(allNotifDocs);
+
+    // Автоудаление старше 10
+    await pruneOldNotifs(uid,snap.docs);
+  },()=>{});
+}
+
+window.openNotifModal=async function(){
+  document.getElementById('notifModal').classList.add('show');
+  if(!currentUser) return;
+  // Обновляем notifList для мобильной модалки
+  const list=document.getElementById('notifList');
+  if(list&&allNotifDocs.length){
+    list.innerHTML=allNotifDocs.slice(0,10).map(d=>{
       const n=d.data();
       const t=n.createdAt?.toDate?n.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
       return `<div class="notif-item ${n.read?'':'unread'}">
@@ -583,12 +674,7 @@ function watchNotifications(uid){
         <div class="notif-item-text">${(n.text||'').replace(/\n/g,'<br>')}</div>
       </div>`;
     }).join('');
-  },()=>{});
-}
-
-window.openNotifModal=async function(){
-  document.getElementById('notifModal').classList.add('show');
-  if(!currentUser) return;
+  }
   try{const snap=await getDocs(query(collection(db,'notifications',currentUser.uid,'items'),where('read','==',false)));for(const d of snap.docs) updateDoc(d.ref,{read:true}).catch(()=>{});}catch(e){}
 };
 window.closeNotifModal=function(){document.getElementById('notifModal').classList.remove('show');};
@@ -614,6 +700,12 @@ onAuthStateChanged(auth,async user=>{
   watchChatBadge(user.uid);
   watchNotifications(user.uid);
   watchSupportStatus(user.uid);
+  // На ПК помечаем уведомления прочитанными через 2 секунды (пользователь их видит)
+  if(window.innerWidth>=981){
+    setTimeout(async()=>{
+      try{const snap=await getDocs(query(collection(db,'notifications',user.uid,'items'),where('read','==',false)));for(const d of snap.docs) updateDoc(d.ref,{read:true}).catch(()=>{});}catch(e){}
+    },2000);
+  }
 });
 </script>
 

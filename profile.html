@@ -14,8 +14,11 @@
       --border:#dfe3e8;--border-hi:#cbcdd6;
       --accent:#1ede7b;--accent2:#1ede7b;--accent3:#1ac16b;
       --text:#191b1e;--muted:#707a8a;--muted2:#5a6373;
+      --dark:#191b1e;--dark2:#2b2f33;
       --success:#1ede7b;--error:#e8634f;--warn:#f59e0b;
       --accent-ink:#191b1e;
+      --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+      --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
       --nav-h:68px;--r:16px;--r-lg:22px;
       --font:'Geologica','Inter','Arial',sans-serif;
     }
@@ -31,15 +34,14 @@
     .spinner{width:28px;height:28px;border:2px solid var(--border-hi);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
     .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem}
 
-    /* CONTENT — sidebar.js оборачивает это в .sb-shell (flex: сайдбар + контент)
-       и задаёт верхний отступ под капсулу nav.js. Здесь только сама колонка. */
+    /* CONTENT */
     .page-col{max-width:620px;width:100%}
 
     /* SECTIONS */
     .section{display:none}
     .section.active{display:block;animation:fadeUp .25s ease}
 
-    /* BACK BTN — на ПК скрыта, т.к. навигация через сайдбар */
+    /* BACK BTN */
     .back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.82rem;font-weight:300;background:none;border:none;cursor:pointer;padding:0;margin-bottom:2rem;transition:color .15s;font-family:var(--font)}
     .back-btn:hover{color:var(--text)}
     .back-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;flex-shrink:0}
@@ -62,44 +64,56 @@
     .modal-btns{display:flex;gap:.6rem}
     .modal-btns .btn{flex:1;justify-content:center}
 
-    /* HERO — плоский, без карточки */
-    .hero-top{display:flex;align-items:center;gap:1.1rem;padding-bottom:2rem;border-bottom:1px solid var(--border);margin-bottom:0}
-    .avatar{width:64px;height:64px;border-radius:18px;background:var(--bg3);
+    /* ══════════════════════════════════
+       HERO — тёмный блок как на главной
+    ══════════════════════════════════ */
+    .profile-hero{
+      background:var(--dark);border-radius:40px;padding:40px 44px 36px;
+      margin-bottom:16px;position:relative;overflow:hidden;
+    }
+    @media(max-width:980px){.profile-hero{border-radius:28px;padding:32px 28px 28px}}
+
+    .hero-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:32px}
+
+    .avatar{width:72px;height:72px;border-radius:20px;
       display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:500;
-      font-size:1.6rem;color:var(--accent-ink);background:var(--accent);overflow:hidden;cursor:pointer;position:relative;transition:opacity .2s;flex-shrink:0}
+      font-size:1.8rem;color:var(--accent-ink);background:var(--accent);overflow:hidden;cursor:pointer;position:relative;transition:opacity .2s;flex-shrink:0}
     .avatar:hover{opacity:.85}
     .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:18px}
+    .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:20px}
     .avatar:hover .avatar-overlay{opacity:1}
-    .avatar-overlay svg{width:18px;height:18px;stroke:#fff;stroke-width:1.8}
+    .avatar-overlay svg{width:20px;height:20px;stroke:#fff;stroke-width:1.8}
     #avatarInput{display:none}
-    .hero-info{flex:1;min-width:0}
-    .hero-greeting{color:var(--muted);font-size:.85rem;margin-bottom:.2rem}
-    .hero-name{font-family:var(--font);font-weight:500;font-size:1.55rem;letter-spacing:-.02em;line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .hero-since{color:var(--muted2);font-size:.78rem;margin-top:.3rem}
-    .notif-btn{width:44px;height:44px;border-radius:12px;background:transparent;border:none;
-      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;transition:opacity .18s}
-    .notif-btn:hover{opacity:.7}
-    .notif-btn svg{width:20px;height:20px;stroke:var(--muted);stroke-width:1.8}
-    .notif-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--error);border:1.5px solid var(--bg);display:none}
+
+    .notif-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
+      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;transition:background .18s}
+    .notif-btn:hover{background:rgba(255,255,255,.14)}
+    .notif-btn svg{width:20px;height:20px;stroke:rgba(255,255,255,.6);stroke-width:1.8}
+    .notif-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--error);border:1.5px solid var(--dark);display:none}
     .notif-dot.show{display:block}
 
-    /* STATS — крупные цифры на разделителях */
-    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;padding:2rem 0;border-bottom:1px solid var(--border)}
-    .stat-box{padding:0;border-left:1px solid var(--border);padding-left:1.2rem}
-    .stat-box:first-child{border-left:none;padding-left:0}
-    .stat-num{font-family:var(--font);font-weight:500;font-size:2.2rem;letter-spacing:-.02em;line-height:1;margin-bottom:.35rem}
-    .stat-lbl{color:var(--muted);font-size:.78rem}
+    .hero-greeting{color:rgba(255,255,255,.35);font-size:.82rem;font-weight:300;margin-bottom:6px;letter-spacing:.01em;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem}
+    .hero-name{font-family:var(--font);font-weight:500;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.05;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .hero-since{color:rgba(255,255,255,.25);font-size:.76rem;margin-top:.5rem;font-weight:300}
 
-    /* MENU LIST — строки на разделителях, без карточек (показывается только на мобильных,
-       т.к. на ПК навигация — через сайдбар) */
+    /* STATS внутри hero — как hero-bar на главной */
+    .hero-stats{
+      display:grid;grid-template-columns:repeat(3,1fr);
+      border-top:1px solid rgba(255,255,255,.08);
+      padding-top:24px;margin-top:0;gap:0;
+    }
+    .stat-box{padding:0;border-left:1px solid rgba(255,255,255,.08);padding-left:20px}
+    .stat-box:first-child{border-left:none;padding-left:0}
+    .stat-num{font-family:var(--font);font-weight:500;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-.04em;line-height:1;margin-bottom:.3rem;color:#fff}
+    .stat-lbl{color:rgba(255,255,255,.3);font-size:.72rem;font-weight:300}
+
+    /* MENU LIST — только мобильные */
     .menu-list{display:flex;flex-direction:column}
     .menu-item{display:flex;align-items:center;gap:1.1rem;padding:1.15rem 0;background:transparent;
       border:none;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s;
       text-decoration:none;color:var(--text);font-family:var(--font);width:100%;text-align:left}
     .menu-item:first-child{border-top:1px solid var(--border)}
     .menu-item:hover{opacity:.7}
-    /* Иконка — одного цвета, простая, зелёная подложка как у menu-ico на сайте */
     .menu-ico{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(30,222,123,.1)}
     .menu-ico svg{width:18px;height:18px;stroke:var(--accent);stroke-width:1.8;fill:none}
     .menu-text{flex:1}
@@ -107,10 +121,64 @@
     .menu-sub{font-size:.78rem;color:var(--muted)}
     .menu-arrow{color:var(--muted2);font-size:.85rem;flex-shrink:0}
     .menu-badge{background:var(--accent);color:var(--accent-ink);font-size:.6rem;font-weight:500;padding:.15rem .5rem;border-radius:8px;min-width:20px;text-align:center;flex-shrink:0}
+    @media(min-width:981px){.menu-list{display:none}}
 
-    /* На ПК разделы дублируются сайдбаром — прячем мобильное меню-список,
-       оставляем только статистику (она информативна сама по себе) */
-    @media(min-width:981px){ .menu-list{display:none} }
+    /* ══════════════════════════════════
+       RECENT ORDERS — карточка
+    ══════════════════════════════════ */
+    .home-card{
+      background:var(--bg3);border:1.5px solid var(--border);border-radius:32px;
+      padding:28px 32px;margin-bottom:12px;
+      transition:box-shadow .15s;
+    }
+    .home-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+    .home-card-title{font-family:var(--font);font-weight:500;font-size:1rem;letter-spacing:-.02em}
+    .home-card-link{font-size:.76rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .15s}
+    .home-card-link:hover{color:var(--text)}
+    .home-card-link svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
+
+    .order-strip{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;text-decoration:none;color:inherit;transition:opacity .15s}
+    .order-strip:last-child{border-bottom:none;padding-bottom:0}
+    .order-strip:first-of-type{padding-top:0}
+    .order-strip:hover{opacity:.7}
+    .order-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .order-strip-info{flex:1;min-width:0}
+    .order-strip-name{font-size:.88rem;font-weight:500;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .order-strip-meta{font-size:.74rem;color:var(--muted);margin-top:2px}
+    .order-strip-badge{font-size:.64rem;font-weight:500;padding:3px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap}
+
+    .orders-empty{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
+
+    /* ══════════════════════════════════
+       SUPPORT STATUS — карточка
+    ══════════════════════════════════ */
+    .support-card{
+      background:var(--dark);border-radius:32px;
+      padding:28px 32px;margin-bottom:12px;
+      display:none;
+    }
+    .support-card.visible{display:block}
+    .support-card-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+    .support-card-title{font-family:var(--font);font-weight:500;font-size:1.35rem;letter-spacing:-.03em;color:#fff;margin-bottom:4px}
+    .support-card-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:20px}
+    .support-progress-track{background:rgba(255,255,255,.1);border-radius:100px;height:5px;margin-bottom:8px}
+    .support-progress-fill{background:var(--accent);height:5px;border-radius:100px;transition:width .6s ease}
+    .support-progress-labels{display:flex;justify-content:space-between;font-size:.68rem;color:rgba(255,255,255,.25)}
+
+    /* ══════════════════════════════════
+       ACTIVITY TIMELINE — карточка
+    ══════════════════════════════════ */
+    .timeline-list{display:flex;flex-direction:column}
+    .tl-item{display:grid;grid-template-columns:32px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);align-items:start}
+    .tl-item:last-child{border-bottom:none;padding-bottom:0}
+    .tl-item:first-child{padding-top:0}
+    .tl-dot-wrap{display:flex;flex-direction:column;align-items:center;padding-top:4px}
+    .tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .tl-body-title{font-size:.85rem;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
+    .tl-body-sub{font-size:.74rem;color:var(--muted)}
+    .tl-time{font-size:.7rem;color:var(--muted2);margin-top:3px}
+
+    .timeline-empty{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
 
     /* EMPTY */
     .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
@@ -118,7 +186,7 @@
     .empty h3{font-family:var(--font);font-weight:500;font-size:.9rem;color:var(--text);margin-bottom:.3rem}
     .empty p{font-size:.8rem;margin-bottom:1.2rem}
 
-    /* SETTINGS — плоские секции на разделителях */
+    /* SETTINGS */
     .settings-section{padding-bottom:2rem;margin-bottom:2rem;border-bottom:1px solid var(--border)}
     .settings-section:last-of-type{border-bottom:none}
     .settings-section-title{font-family:var(--font);font-weight:500;font-size:1rem;letter-spacing:-.01em;margin-bottom:1.3rem;display:flex;align-items:center;gap:.7rem}
@@ -151,6 +219,16 @@
     .btn-xs{padding:.32rem .8rem;font-size:.72rem;border-radius:8px}
     .btn-sm{padding:.55rem 1.1rem;font-size:.82rem;border-radius:10px}
 
+    @media(max-width:600px){
+      .profile-hero{border-radius:20px;padding:24px 20px 20px}
+      .hero-stats{gap:0}
+      .stat-num{font-size:1.8rem}
+      .form-row{grid-template-columns:1fr}
+      .sec-title{font-size:1.4rem}
+      .home-card{border-radius:20px;padding:20px}
+      .support-card{border-radius:20px;padding:20px}
+    }
+
     /* LIGHTBOX */
     .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
     .lightbox.show{opacity:1;pointer-events:all}
@@ -179,12 +257,6 @@
     .toast.error{background:var(--error);color:#fff}
     .toast.info{background:var(--accent);color:var(--accent-ink)}
 
-    @media(max-width:600px){
-      .hero-stats{gap:0}
-      .stat-num{font-size:1.8rem}
-      .form-row{grid-template-columns:1fr}
-      .sec-title{font-size:1.4rem}
-    }
   </style>
 </head>
 <body>
@@ -225,41 +297,42 @@
   <!-- HOME -->
   <div class="section active" id="section-home">
 
-    <!-- HERO — плоский -->
-    <div class="hero-top">
-      <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
-        <span id="avatarLetter">А</span>
-        <div class="avatar-overlay"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+    <!-- HERO — тёмный блок как на главной -->
+    <div class="profile-hero">
+      <div class="hero-top-row">
+        <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
+          <span id="avatarLetter">А</span>
+          <div class="avatar-overlay"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
+        </div>
+        <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
+        <div class="notif-btn" id="notifBtn" onclick="openNotifModal()" title="Уведомления">
+          <svg id="notifIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          <div class="notif-dot" id="notifDot" style="display:none"></div>
+        </div>
       </div>
-      <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
-      <div class="hero-info">
-        <div class="hero-greeting">Привет,</div>
-        <div class="hero-name" id="heroName">...</div>
-        <div class="hero-since" id="heroSince"></div>
-      </div>
-      <div class="notif-btn" id="notifBtn" onclick="openNotifModal()" title="Уведомления">
-        <svg id="notifIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-        <div class="notif-dot" id="notifDot" style="display:none"></div>
+
+      <div class="hero-greeting">Личный кабинет</div>
+      <div class="hero-name" id="heroName">...</div>
+      <div class="hero-since" id="heroSince"></div>
+
+      <!-- STATS внутри hero -->
+      <div class="hero-stats">
+        <div class="stat-box">
+          <div class="stat-num" id="statTotal">—</div>
+          <div class="stat-lbl">Всего заказов</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statActive">—</div>
+          <div class="stat-lbl">В работе</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-num" id="statDone">—</div>
+          <div class="stat-lbl">Завершено</div>
+        </div>
       </div>
     </div>
 
-    <!-- STATS — крупные цифры -->
-    <div class="hero-stats">
-      <div class="stat-box">
-        <div class="stat-num" id="statTotal">—</div>
-        <div class="stat-lbl">Всего заказов</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="statActive">—</div>
-        <div class="stat-lbl">В работе</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num" id="statDone">—</div>
-        <div class="stat-lbl">Завершено</div>
-      </div>
-    </div>
-
-    <!-- MENU — строки с разделителями, иконки одного цвета -->
+    <!-- MOBILE MENU — только мобильные -->
     <div class="menu-list">
       <a href="profile/orders" class="menu-item">
         <div class="menu-ico">
@@ -316,6 +389,44 @@
       </a>
     </div>
 
+    <!-- SUPPORT STATUS — только на ПК, показывается если поддержка активна -->
+    <div class="support-card" id="supportCard">
+      <div class="support-card-label">Обслуживание активно</div>
+      <div class="support-card-title" id="supportCardTitle">Тариф поддержки</div>
+      <div class="support-card-sub" id="supportCardSub">Осталось дней</div>
+      <div class="support-progress-track">
+        <div class="support-progress-fill" id="supportProgressFill" style="width:0%"></div>
+      </div>
+      <div class="support-progress-labels">
+        <span>Начало</span>
+        <span id="supportProgressLabel">0 дн. осталось</span>
+      </div>
+    </div>
+
+    <!-- ПОСЛЕДНИЕ ЗАКАЗЫ -->
+    <div class="home-card">
+      <div class="home-card-head">
+        <div class="home-card-title">Последние заказы</div>
+        <a href="profile/orders" class="home-card-link">
+          Все заказы
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div id="recentOrdersList">
+        <div class="orders-empty">Загрузка...</div>
+      </div>
+    </div>
+
+    <!-- ЛЕНТА АКТИВНОСТИ -->
+    <div class="home-card">
+      <div class="home-card-head">
+        <div class="home-card-title">Активность</div>
+      </div>
+      <div class="timeline-list" id="activityTimeline">
+        <div class="timeline-empty">Загрузка...</div>
+      </div>
+    </div>
+
   </div><!-- /section-home -->
 
   </div><!-- /page-col -->
@@ -332,10 +443,66 @@ let currentUser=null, unsubOrders=null, unsubChat=null;
 
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
 
 async function checkMaintenance(){try{const snap=await getDoc(doc(db,'settings','maintenance'));if(snap.exists()&&snap.data().enabled===true){document.getElementById('loadingScreen').style.display='none';document.getElementById('maintScreen').style.display='flex';return true;}}catch(e){}return false;}
 
 window.handleAvatarUpload=async function(file){if(!file) return;if(file.size>3*1024*1024){toast('Файл больше 3 МБ','error');return;}const reader=new FileReader();reader.onload=async function(e){const dataUrl=e.target.result;const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';let img=av.querySelector('img');if(!img){img=document.createElement('img');av.insertBefore(img,av.firstChild);}img.src=dataUrl;try{await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl});toast('Фото обновлено ✓','success');}catch(e){console.error(e);}};reader.readAsDataURL(file);};
+
+const STATUS_LABELS={0:'Новый',1:'В работе',2:'В работе',3:'На проверке',4:'Финал',5:'Завершён'};
+const STATUS_COLORS={0:'#707a8a',1:'#1ede7b',2:'#1ede7b',3:'#f59e0b',4:'#1ede7b',5:'#cbcdd6'};
+const STATUS_BG={0:'rgba(112,122,138,.12)',1:'rgba(30,222,123,.12)',2:'rgba(30,222,123,.12)',3:'rgba(245,158,11,.12)',4:'rgba(30,222,123,.12)',5:'rgba(203,205,214,.15)'};
+
+function renderRecentOrders(orders){
+  const list=document.getElementById('recentOrdersList');
+  if(!list) return;
+  const recent=orders.slice(0,3);
+  if(!recent.length){list.innerHTML='<div class="orders-empty">Заказов пока нет</div>';return;}
+  list.innerHTML=recent.map(o=>{
+    const st=o.status||0;
+    const label=STATUS_LABELS[st]||'Неизвестно';
+    const color=STATUS_COLORS[st]||'#707a8a';
+    const bg=STATUS_BG[st]||'rgba(112,122,138,.12)';
+    const date=fmtDateShort(o.createdAt);
+    const name=o.siteName||o.type||'Заказ';
+    return `<a href="profile/orders" class="order-strip">
+      <div class="order-status-dot" style="background:${color}"></div>
+      <div class="order-strip-info">
+        <div class="order-strip-name">${name}</div>
+        <div class="order-strip-meta">${date?'Создан '+date:''}</div>
+      </div>
+      <div class="order-strip-badge" style="color:${color};background:${bg}">${label}</div>
+    </a>`;
+  }).join('');
+}
+
+function buildTimeline(orders){
+  const events=[];
+  orders.forEach(o=>{
+    const name=o.siteName||o.type||'Заказ';
+    if(o.createdAt) events.push({ts:o.createdAt,title:'Создан заказ',sub:name,color:'#1ede7b'});
+    if(o.status===5&&o.updatedAt) events.push({ts:o.updatedAt,title:'Заказ завершён',sub:name,color:'#cbcdd6'});
+    if(o.status>=1&&o.status<=4&&o.updatedAt) events.push({ts:o.updatedAt,title:'Статус обновлён',sub:`${name} — ${STATUS_LABELS[o.status]}`,color:'#f59e0b'});
+    if(o.supportActive&&o.supportExpiresAt) events.push({ts:o.supportExpiresAt,title:'Поддержка активна',sub:name,color:'#1ede7b'});
+  });
+  events.sort((a,b)=>{
+    const ta=a.ts?.toDate?a.ts.toDate():new Date(a.ts);
+    const tb=b.ts?.toDate?b.ts.toDate():new Date(b.ts);
+    return tb-ta;
+  });
+  const tl=document.getElementById('activityTimeline');
+  if(!tl) return;
+  const top=events.slice(0,5);
+  if(!top.length){tl.innerHTML='<div class="timeline-empty">Активность появится после первого заказа</div>';return;}
+  tl.innerHTML=top.map(e=>`<div class="tl-item">
+    <div class="tl-dot-wrap"><div class="tl-dot" style="background:${e.color}"></div></div>
+    <div>
+      <div class="tl-body-title">${e.title}</div>
+      <div class="tl-body-sub">${e.sub}</div>
+      <div class="tl-time">${fmtDateShort(e.ts)}</div>
+    </div>
+  </div>`).join('');
+}
 
 function loadOrderStats(uid){
   if(unsubOrders) unsubOrders();
@@ -349,7 +516,8 @@ function loadOrderStats(uid){
     const badge=document.getElementById('menuActiveCount');
     if(active>0){badge.textContent=active;badge.style.display='';}else badge.style.display='none';
     document.getElementById('menuOrdersSub').textContent=active>0?`${active} активных`:'История всех заявок';
-
+    renderRecentOrders(orders);
+    buildTimeline(orders);
   },err=>console.error('Orders:',err));
 }
 
@@ -360,14 +528,26 @@ async function watchSupportStatus(uid){
     const activeSupport=orders.find(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
     const sub=document.getElementById('menuTicketsSub');
     const badge=document.getElementById('menuTicketsBadge');
+    const card=document.getElementById('supportCard');
     if(activeSupport){
       const exp=activeSupport.supportExpiresAt.toDate();
       const daysLeft=Math.ceil((exp-new Date())/(1000*60*60*24));
       sub.textContent=daysLeft<=2?`Истекает через ${daysLeft} дн.`:`Активно · осталось ${daysLeft} дн.`;
       sub.style.color=daysLeft<=2?'var(--warn)':'';
       if(daysLeft<=2){badge.style.display='';badge.textContent='!';}
+      // Карточка поддержки
+      if(card){
+        card.classList.add('visible');
+        const totalDays=30;
+        const pct=Math.max(0,Math.min(100,Math.round(daysLeft/totalDays*100)));
+        document.getElementById('supportCardTitle').textContent=activeSupport.siteName||'Обслуживание сайта';
+        document.getElementById('supportCardSub').textContent=`Включает доработки и приоритетный чат`;
+        document.getElementById('supportProgressFill').style.width=pct+'%';
+        document.getElementById('supportProgressLabel').textContent=daysLeft+' дн. осталось';
+      }
     } else {
       sub.textContent='Заявки на доработку';
+      if(card) card.classList.remove('visible');
     }
   }catch(e){}
 }

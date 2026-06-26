@@ -8,309 +8,231 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#ffffff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
-      --line:#dfe3e8;--line-strong:#cbcdd6;
-      --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
-      --accent:#1ede7b;--accent-soft:#1ac16b;--accent-wash:rgba(30,222,123,.12);
-      --good:#1ede7b;--good-wash:rgba(30,222,123,.12);
-      --warn:#f59e0b;--warn-wash:rgba(245,158,11,.10);
-      --bad:#e8634f;--bad-wash:rgba(232,99,79,.10);
-      --dark:#191b1e;
-      --font:'Geologica','Inter','Arial',sans-serif;
-    }
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-    :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
+  --green:#1ede7b;--green-h:#1ac16b;--dark:#191b1e;--dark2:#2b2f33;
+  --bad:#e8634f;--warn:#f59e0b;
+  --font:'Geologica','Inter','Arial',sans-serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.25;letter-spacing:-.02em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 
-    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-    .spinner{width:24px;height:24px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
-    .loading-text{color:var(--ink-faint);font-size:.75rem}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.spinner{width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .65s linear infinite}
 
-    .page-wrap{width:100%;animation:fadeUp .25s ease}
+.shell{width:100%;animation:fadeUp .3s ease}
 
-    /* HERO */
-    .page-hero{background:var(--dark);border-radius:40px;padding:44px 48px 40px;margin-bottom:28px}
-    .page-hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
-    .page-hero-title{font-family:var(--font);font-weight:500;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:8px}
-    .page-hero-sub{color:rgba(255,255,255,.3);font-size:.88rem;font-weight:300}
+/* HERO */
+.hero{background:var(--dark);border-radius:64px;padding:72px 80px 64px;margin-bottom:16px}
+.hero-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--green);margin-bottom:20px}
+.hero-title{font-size:clamp(48px,6vw,80px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:12px}
+.hero-sub{font-size:clamp(15px,1.4vw,18px);color:rgba(255,255,255,.38);font-weight:300;line-height:1.5}
 
-    /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;gap:7px;padding:.75rem 1.4rem;border-radius:14px;font-family:var(--font);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,border-color .15s,color .15s,transform .12s;white-space:nowrap}
-    .btn:hover{transform:translateY(-1px)}
-    .btn svg{width:14px;height:14px;flex-shrink:0}
-    .btn-primary{background:var(--accent);color:#191b1e}
-    .btn-primary:hover{background:var(--accent-soft)}
-    .btn-ghost{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
-    .btn-ghost:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
-    .btn-full{width:100%;justify-content:center}
-    .btn:disabled{opacity:.5;cursor:default;transform:none}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.btn-green{background:var(--green);color:var(--dark)}
+.btn-green:hover{background:var(--green-h)}
+.btn-dark{background:var(--dark);color:#fff}
+.btn-dark:hover{background:var(--dark2)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--muted)}
+.btn-outline:hover{border-color:var(--dark);color:var(--dark)}
+.btn-outline-warn{background:transparent;border:1.5px solid rgba(245,158,11,.35);color:var(--warn)}
+.btn-outline-warn:hover{background:rgba(245,158,11,.08)}
+.btn-full{width:100%;justify-content:center}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
 
-    /* INPUTS */
-    .field-label{display:block;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;font-weight:500}
-    .field-input,.field-textarea{width:100%;background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:14px;padding:.82rem 1rem;color:var(--ink);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .18s,box-shadow .18s}
-    .field-input:focus,.field-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
-    .field-input::placeholder,.field-textarea::placeholder{color:var(--ink-faint)}
-    .field-textarea{resize:vertical;min-height:96px;line-height:1.6}
-    .field-group{display:flex;flex-direction:column;gap:16px}
+/* SWITCHER */
+.switcher{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.sw-btn{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:20px;padding:11px 18px;transition:border-color .15s,background .15s;font-family:var(--font)}
+.sw-btn:hover{border-color:var(--border2)}
+.sw-btn.on{border-color:var(--green);background:rgba(30,222,123,.07)}
+.sw-ico{width:30px;height:30px;border-radius:50%;background:rgba(30,222,123,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sw-ico svg{width:13px;height:13px;stroke:var(--green-h);stroke-width:2;fill:none}
+.sw-btn.warn .sw-ico{background:rgba(245,158,11,.1)}
+.sw-btn.warn .sw-ico svg{stroke:var(--warn)}
+.sw-btn.inactive .sw-ico{background:var(--bg2)}
+.sw-btn.inactive .sw-ico svg{stroke:var(--border2)}
+.sw-btn.inactive{opacity:.7}
+.sw-name{font-size:.88rem;font-weight:500;letter-spacing:-.01em;color:var(--text)}
+.sw-meta{font-size:.72rem;color:var(--muted);font-weight:300}
 
-    /* NO ORDERS */
-    #sectionNoOrders .empty-state{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center;padding:48px 0}
-    #sectionNoOrders .empty-left h2{font-family:var(--font);font-size:1.6rem;font-weight:500;letter-spacing:-.02em;margin-bottom:14px;line-height:1.3}
-    #sectionNoOrders .empty-left p{color:var(--ink-dim);font-size:.9rem;line-height:1.7;margin-bottom:24px}
-    #sectionNoOrders .empty-right{background:var(--dark);border-radius:28px;padding:36px;display:flex;align-items:center;justify-content:center}
-    #sectionNoOrders .empty-icon-wrap{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
-    #sectionNoOrders .empty-icon-wrap svg{width:56px;height:56px;stroke:rgba(255,255,255,.2);stroke-width:1;fill:none}
-    #sectionNoOrders .empty-icon-wrap span{font-size:.82rem;color:rgba(255,255,255,.3)}
+/* NO ORDERS — type-card style */
+.no-orders-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0}
+.no-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:64px;padding:60px 56px}
+.no-card.dark{background:var(--dark);border-color:var(--dark);display:flex;align-items:center;justify-content:center}
+.no-card h2{font-size:clamp(28px,3vw,40px);font-weight:500;letter-spacing:-.03em;margin-bottom:16px;line-height:1.1}
+.no-card p{font-size:16px;color:var(--muted);font-weight:300;line-height:1.65;margin-bottom:28px}
+.no-card-ico svg{width:64px;height:64px;stroke:rgba(255,255,255,.15);stroke-width:.8;fill:none}
 
-    /* BUY SECTIONS */
-    .buy-grid{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
-    .plan-card{background:var(--dark);border-radius:32px;padding:32px;position:sticky;top:28px}
-    .plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:.65rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);background:rgba(30,222,123,.12);border-radius:8px;padding:.3rem .75rem;margin-bottom:20px}
-    .plan-badge svg{width:10px;height:10px;stroke:currentColor;stroke-width:1.8}
-    .plan-price{font-family:var(--font);font-size:2.6rem;font-weight:500;letter-spacing:-.04em;line-height:1;margin-bottom:4px;color:#fff}
-    .plan-period{font-size:.82rem;color:rgba(255,255,255,.3);margin-bottom:24px}
-    .plan-divider{height:1px;background:rgba(255,255,255,.08);margin:24px 0}
-    .plan-feature{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}
-    .plan-feature:last-child{margin-bottom:0}
-    .pf-ico{width:30px;height:30px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(30,222,123,.12)}
-    .pf-ico svg{width:14px;height:14px;stroke:var(--accent-soft);stroke-width:1.8;fill:none}
-    .pf-text h4{font-size:.86rem;font-weight:500;margin-bottom:2px;color:#fff}
-    .pf-text p{font-size:.78rem;color:rgba(255,255,255,.3)}
-    .orders-panel{background:var(--surface);border:1.5px solid var(--line);border-radius:32px;overflow:hidden}
-    .orders-panel-head{padding:28px 32px 20px;border-bottom:1px solid var(--line)}
-    .orders-panel-title{font-family:var(--font);font-size:1rem;font-weight:500;margin-bottom:5px}
-    .orders-panel-sub{font-size:.82rem;color:var(--ink-faint)}
-    .order-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 32px;border-bottom:1px solid var(--line);cursor:pointer;transition:background .15s}
-    .order-card:last-child{border-bottom:none}
-    .order-card:hover{background:var(--surface-2)}
-    .order-head{display:flex;align-items:center;gap:10px}
-    .order-num{font-size:.9rem;font-weight:500;color:var(--ink)}
-    .ok-pill{font-size:.65rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:.22rem .65rem;border-radius:8px;background:var(--good-wash);color:var(--good);border:1px solid rgba(52,211,153,.22)}
-    .order-type{font-size:.8rem;color:var(--ink-faint)}
-    .order-meta{font-size:.75rem;color:var(--ink-faint)}
-    .order-card-arrow{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;flex-shrink:0;transition:stroke .15s}
-    .order-card:hover .order-card-arrow{stroke:var(--accent-soft)}
+/* BUY — type-card style */
+.buy-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.plan-card{background:var(--dark);border-radius:64px;padding:60px 56px}
+.plan-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--green);margin-bottom:20px}
+.plan-price{font-size:clamp(52px,6vw,80px);font-weight:500;letter-spacing:-.05em;line-height:1;color:#fff;margin-bottom:6px}
+.plan-per{font-size:16px;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:40px}
+.plan-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:32px}
+.feat{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
+.feat:last-child{margin-bottom:0}
+.feat-ico{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(30,222,123,.12)}
+.feat-ico svg{width:14px;height:14px;stroke:var(--green);stroke-width:1.8;fill:none}
+.feat h4{font-size:.9rem;font-weight:500;color:#fff;margin-bottom:3px;letter-spacing:-.01em}
+.feat p{font-size:.78rem;color:rgba(255,255,255,.3);font-weight:300;line-height:1.5}
+.buy-panel{background:var(--bg3);border:1.5px solid var(--border);border-radius:64px;padding:60px 56px;display:flex;flex-direction:column;gap:0}
+.buy-panel-title{font-size:clamp(24px,2.5vw,34px);font-weight:500;letter-spacing:-.03em;margin-bottom:10px}
+.buy-panel-sub{font-size:16px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:40px}
+.order-strip{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding-left .15s}
+.order-strip:last-of-type{border-bottom:none}
+.order-strip:hover{padding-left:8px}
+.order-strip-left{}
+.order-num{font-size:.95rem;font-weight:500;letter-spacing:-.01em;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.ok-pill{font-size:.62rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .6rem;border-radius:7px;background:rgba(30,222,123,.12);color:var(--green-h);border:1px solid rgba(30,222,123,.25)}
+.order-type{font-size:.8rem;color:var(--muted);font-weight:300}
+.order-arrow{width:16px;height:16px;stroke:var(--border2);stroke-width:2;fill:none;transition:stroke .15s}
+.order-strip:hover .order-arrow{stroke:var(--green-h)}
 
-    /* ACTIVE SECTION */
-    .active-grid{display:grid;grid-template-columns:340px 1fr;gap:28px;align-items:start}
-    .status-card{background:var(--surface);border:1.5px solid var(--line);border-radius:32px;padding:30px;position:sticky;top:28px}
-    .status-card.active{border-color:rgba(30,222,123,.2)}
-    .status-card.expiring{border-color:rgba(251,191,36,.22)}
-    .status-ico-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
-    .status-icon-wrap{width:46px;height:46px;border-radius:50%;background:var(--good-wash);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .status-card.expiring .status-icon-wrap{background:var(--warn-wash);border-color:rgba(251,191,36,.22)}
-    .status-icon svg{width:20px;height:20px;stroke-width:1.7;fill:none}
-    .status-title{font-family:var(--font);font-size:1rem;font-weight:500;letter-spacing:-.01em;margin-bottom:3px}
-    #activeSub{font-size:.82rem;color:var(--ink-dim)}
-    #activeSiteLabel{font-size:.78rem;color:var(--ink-faint);margin-top:2px}
-    .progress-block{margin-bottom:22px}
-    .progress-label{display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink-faint);margin-bottom:8px}
-    .progress-bar{height:5px;border-radius:99px;background:var(--surface-3);overflow:hidden}
-    .progress-fill{height:100%;background:var(--good);border-radius:99px;transition:width .4s ease}
-    .progress-fill.warn{background:var(--warn)}
+/* ACTIVE */
+.active-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;align-items:start}
+.status-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:64px;padding:48px 48px;position:sticky;top:24px}
+.status-card.active-state{border-color:rgba(30,222,123,.25)}
+.status-card.warn-state{border-color:rgba(245,158,11,.3)}
+.status-top{display:flex;align-items:center;gap:14px;margin-bottom:32px}
+.status-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(30,222,123,.12)}
+.status-ico svg{width:20px;height:20px;stroke:var(--green-h);stroke-width:1.7;fill:none}
+.status-card.warn-state .status-ico{background:rgba(245,158,11,.1)}
+.status-card.warn-state .status-ico svg{stroke:var(--warn)}
+.status-name{font-size:1.05rem;font-weight:500;letter-spacing:-.02em;margin-bottom:3px}
+.status-till{font-size:.8rem;color:var(--muted);font-weight:300}
+.status-site{font-size:.75rem;color:var(--muted);font-weight:300;margin-top:1px}
+.prog-wrap{margin-bottom:28px}
+.prog-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:8px;font-weight:300}
+.prog-bar{height:4px;border-radius:99px;background:var(--border2);overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:99px;transition:width .5s ease}
+.prog-fill.warn{background:var(--warn)}
 
-    /* SITE SWITCHER */
-    .site-switcher{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:28px}
-    .site-switch-btn{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:12px 18px;transition:border-color .15s,background .15s}
-    .site-switch-btn:hover{border-color:var(--line-strong)}
-    .site-switch-btn.is-active{border-color:var(--accent-soft);background:var(--accent-wash)}
-    .site-switch-ico{width:32px;height:32px;border-radius:50%;background:var(--good-wash);border:1px solid rgba(52,211,153,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .site-switch-ico svg{width:14px;height:14px;stroke:var(--good);stroke-width:2;fill:none}
-    .site-switch-btn.is-expiring .site-switch-ico{background:var(--warn-wash);border-color:rgba(251,191,36,.22)}
-    .site-switch-btn.is-expiring .site-switch-ico svg{stroke:var(--warn)}
-    .site-switch-btn.is-inactive .site-switch-ico{background:var(--surface-3);border-color:var(--line-strong)}
-    .site-switch-btn.is-inactive .site-switch-ico svg{stroke:var(--ink-faint)}
-    .site-switch-btn.is-inactive{opacity:.75}
-    .site-switch-name{font-size:.85rem;font-weight:500;color:var(--ink);line-height:1.3}
-    .site-switch-meta{font-size:.72rem;color:var(--ink-faint)}
+/* RIGHT COL */
+.right-col{display:flex;flex-direction:column;gap:16px}
+.card{background:var(--bg3);border:1.5px solid var(--border);border-radius:48px;overflow:hidden}
+.card-head{padding:32px 36px 24px;border-bottom:1px solid var(--border)}
+.card-title{font-size:1.05rem;font-weight:500;letter-spacing:-.02em;margin-bottom:5px}
+.card-sub{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.55}
+.card-body{padding:32px 36px}
+.field-g{display:flex;flex-direction:column;gap:14px}
+.field label{display:block;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px}
+.field input,.field textarea{width:100%;background:#fff;border:1.5px solid var(--border2);border-radius:14px;padding:.82rem 1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s,box-shadow .15s}
+.field input:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
+.field textarea{resize:vertical;min-height:88px;line-height:1.6}
+.photo-lbl{display:inline-flex;align-items:center;gap:7px;padding:.6rem 1rem;background:#fff;border:1.5px dashed var(--border2);border-radius:12px;font-size:.82rem;color:var(--muted);cursor:pointer;transition:border-color .15s;font-family:var(--font)}
+.photo-lbl:hover{border-color:var(--green);color:var(--text)}
+.photo-lbl svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
+.previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.prev-wrap{position:relative;width:68px;height:68px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
+.prev-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.prev-rm{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:rgba(25,27,30,.7);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
-    /* TICKETS COL */
-    .tickets-col{display:flex;flex-direction:column;gap:20px}
-    .tickets-form-card{background:var(--surface);border:1.5px solid var(--line);border-radius:32px;padding:32px}
-    .card-head{margin-bottom:22px}
-    .card-title{font-family:var(--font);font-size:1rem;font-weight:500;letter-spacing:-.01em;margin-bottom:5px}
-    .card-sub{font-size:.82rem;color:var(--ink-faint)}
-    .tickets-list-card{background:var(--surface);border:1.5px solid var(--line);border-radius:32px;overflow:hidden}
-    .tickets-list-head{padding:24px 32px 18px;border-bottom:1px solid var(--line)}
-    .ticket-item{padding:20px 32px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;overflow:hidden;word-break:break-word}
-    .ticket-item:last-child{border-bottom:none}
-    .ticket-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-    .ticket-item-title{font-size:.9rem;font-weight:500;color:var(--ink);flex:1}
-    .ticket-order-tag{font-size:.68rem;color:var(--ink-faint);display:flex;align-items:center;gap:5px}
-    .ticket-order-tag svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
-    .t-open{font-size:.65rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:.22rem .65rem;border-radius:8px;background:var(--accent-wash);color:var(--accent-soft);border:1px solid rgba(30,222,123,.25);white-space:nowrap}
-    .t-done{font-size:.65rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:.22rem .65rem;border-radius:8px;background:var(--good-wash);color:var(--good);border:1px solid rgba(52,211,153,.2);white-space:nowrap}
-    .ticket-desc{font-size:.82rem;color:var(--ink-dim);line-height:1.6;overflow:hidden;word-break:break-word}
-    .ticket-reply{display:flex;align-items:flex-start;gap:9px;background:var(--accent-wash);border:1px solid rgba(30,222,123,.2);border-radius:12px;padding:12px 14px;font-size:.82rem;color:var(--accent-soft);line-height:1.55}
-    .ticket-reply svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;margin-top:1px}
-    .ticket-date{font-size:.72rem;color:var(--ink-faint)}
-    .tickets-empty{text-align:center;padding:40px 24px;color:var(--ink-faint);font-size:.84rem}
+/* TICKETS LIST */
+.t-list{display:flex;flex-direction:column}
+.t-item{padding:24px 36px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;overflow:hidden;word-break:break-word}
+.t-item:last-child{border-bottom:none}
+.t-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.t-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;flex:1}
+.t-pill{font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .6rem;border-radius:7px;white-space:nowrap}
+.t-pill.open{background:rgba(30,222,123,.12);color:var(--green-h);border:1px solid rgba(30,222,123,.25)}
+.t-pill.done{background:var(--bg2);color:var(--muted);border:1px solid var(--border2)}
+.t-desc{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6}
+.t-reply{display:flex;align-items:flex-start;gap:9px;background:rgba(30,222,123,.07);border:1px solid rgba(30,222,123,.18);border-radius:12px;padding:12px 14px;font-size:.82rem;color:var(--green-h);line-height:1.55}
+.t-reply svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;margin-top:1px}
+.t-date{font-size:.7rem;color:var(--muted);font-weight:300}
+.t-empty{text-align:center;padding:36px;color:var(--muted);font-size:.85rem;font-weight:300}
 
-    /* PHOTO UPLOAD */
-    .photo-upload-area{margin-top:4px}
-    .photo-upload-label{display:inline-flex;align-items:center;gap:7px;padding:.55rem 1rem;background:var(--surface-2);border:1.5px dashed var(--line-strong);border-radius:12px;font-size:.82rem;color:var(--ink-faint);cursor:pointer;transition:border-color .15s,background .15s;font-family:var(--font)}
-    .photo-upload-label:hover{border-color:var(--accent);color:var(--ink)}
-    .photo-upload-label svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
-    .photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-    .photo-preview-wrap{position:relative;width:72px;height:72px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
-    .photo-preview-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-    .photo-preview-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.5rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;letter-spacing:-.01em}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green);color:var(--dark)}
+.toast.error{background:var(--bad);color:#fff}
 
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--good);color:#0d3320}
-    .toast.error{background:var(--bad);color:#fff}
-    .toast.info{background:var(--accent);color:#191b1e}
-
-    @media(max-width:840px){
-      .page-hero{border-radius:24px;padding:28px 24px 24px}
-      .page-hero-title{font-size:1.8rem}
-      #sectionNoOrders .empty-state{grid-template-columns:1fr;gap:28px}
-      #sectionNoOrders .empty-right{display:none}
-      .buy-grid,.active-grid{grid-template-columns:1fr;gap:20px}
-      .status-card,.plan-card{position:static!important}
-      .order-meta{display:none}
-    }
-    @media(max-width:480px){
-      .page-hero{border-radius:18px;padding:22px 20px}
-      .site-switcher{gap:6px}
-      .site-switch-btn{padding:10px 14px}
-      .tickets-form-card,.tickets-list-card{border-radius:20px;padding:20px}
-      .ticket-item{padding:16px 20px}
-      .order-card{padding:16px 20px}
-      .orders-panel-head{padding:20px}
-    }
-    #sbContent{padding-bottom:80px}
+@media(max-width:860px){
+  .hero{border-radius:32px;padding:48px 36px 40px}
+  .hero-title{font-size:clamp(36px,8vw,56px)}
+  .no-orders-grid,.buy-grid,.active-grid{grid-template-columns:1fr;gap:12px}
+  .no-card,.plan-card,.buy-panel,.status-card{border-radius:32px;padding:36px 28px}
+  .status-card{position:static}
+  .card{border-radius:28px}
+  .card-head,.card-body,.t-item{padding:20px 22px}
+}
+@media(max-width:480px){
+  .hero{border-radius:20px;padding:32px 24px}
+  .switcher{gap:6px}
+  .sw-btn{padding:9px 14px}
+  .no-card,.plan-card,.buy-panel{border-radius:20px;padding:24px 20px}
+}
+#sbContent{padding-bottom:80px}
   </style>
 </head>
 <body>
 <script src="../nav.js" data-page="tickets"></script>
 <script src="../sidebar.js" data-page="tickets"></script>
-
-<div class="loading-screen" id="loadingScreen">
-  <div class="spinner"></div>
-  <span class="loading-text">Загружаю...</span>
-</div>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
 <div id="sbContent" style="display:none">
-<div class="page-wrap" id="appWrap">
+<div class="shell">
 
-  <div class="page-hero">
-    <div class="page-hero-eyebrow">Личный кабинет</div>
-    <div class="page-hero-title">Обслуживание</div>
-    <div class="page-hero-sub">Управление подпиской и заявки на доработку сайта</div>
+  <div class="hero">
+    <div class="hero-eyebrow">Обслуживание</div>
+    <div class="hero-title">Поддержка сайта</div>
+    <div class="hero-sub">Подписка на правки, доработки и приоритетный ответ</div>
   </div>
 
-  <div id="sectionLoading" style="color:var(--ink-faint);font-size:.85rem;padding:20px 0">Загрузка...</div>
+  <div id="switcher" class="switcher" style="display:none"></div>
 
-  <div id="siteSwitcher" class="site-switcher" style="display:none"></div>
+  <div id="secLoad" style="color:var(--muted);font-size:.85rem;padding:20px 0">Загрузка...</div>
 
   <!-- НЕТ ГОТОВЫХ ЗАКАЗОВ -->
-  <div id="sectionNoOrders" style="display:none">
-    <div class="empty-state">
-      <div class="empty-left">
+  <div id="secNone" style="display:none">
+    <div class="no-orders-grid">
+      <div class="no-card">
         <h2>Обслуживание сайта</h2>
-        <p>Подключите ежемесячное обслуживание к любому готовому проекту и получите возможность отправлять заявки на правки, замену контента и мелкие доработки — без новых заказов.</p>
-        <p style="color:var(--ink-faint);font-size:.86rem;margin-bottom:28px">Для подключения обслуживания сначала нужен завершённый заказ.</p>
-        <a href="../order" class="btn btn-primary">
+        <p>Подключите ежемесячную поддержку — и отправляйте заявки на правки, замену контента и доработки без новых заказов.</p>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:28px">Для подключения сначала нужен завершённый проект.</p>
+        <a href="../order" class="btn btn-dark">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
           Оформить сайт
         </a>
       </div>
-      <div class="empty-right">
-        <div class="empty-icon-wrap">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          <span>Нет готовых проектов</span>
-        </div>
+      <div class="no-card dark">
+        <div class="no-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
       </div>
     </div>
   </div>
 
-  <!-- ОБСЛУЖИВАНИЕ НЕ КУПЛЕНО (все готовые заказы) -->
-  <div id="sectionBuy" style="display:none">
+  <!-- КУПИТЬ (один или все заказы) -->
+  <div id="secBuy" style="display:none">
     <div class="buy-grid">
       <div class="plan-card">
-        <div class="plan-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Ежемесячно
-        </div>
+        <div class="plan-eyebrow">Тариф</div>
         <div class="plan-price">500 ₽</div>
-        <div class="plan-period">в месяц · без автопродления</div>
+        <div class="plan-per">в месяц · без автопродления</div>
         <div class="plan-divider"></div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-          <div class="pf-text"><h4>Правки текстов и контента</h4><p>Изменение любых текстов, заголовков, описаний</p></div>
-        </div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
-          <div class="pf-text"><h4>Замена изображений</h4><p>Обновление фотографий и графики</p></div>
-        </div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div>
-          <div class="pf-text"><h4>Мелкие стилевые правки</h4><p>Цвета, отступы, шрифты, разметка</p></div>
-        </div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-          <div class="pf-text"><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь</p></div>
-        </div>
+        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><h4>Правки текстов</h4><p>Изменение любых текстов, заголовков, описаний</p></div></div>
+        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div><h4>Замена изображений</h4><p>Обновление фотографий и графики</p></div></div>
+        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div><div><h4>Стилевые правки</h4><p>Цвета, отступы, шрифты, разметка</p></div></div>
+        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь</p></div></div>
       </div>
-      <div class="orders-panel">
-        <div class="orders-panel-head">
-          <div class="orders-panel-title">Выберите проект для подключения</div>
-          <div class="orders-panel-sub">Обслуживание подключается к конкретному готовому сайту</div>
-        </div>
-        <div id="ordersList"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- КОНКРЕТНЫЙ САЙТ БЕЗ ОБСЛУЖИВАНИЯ -->
-  <div id="sectionBuyOne" style="display:none">
-    <div class="buy-grid">
-      <div class="plan-card">
-        <div class="plan-badge">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-          Ежемесячно
-        </div>
-        <div class="plan-price">500 ₽</div>
-        <div class="plan-period">в месяц · без автопродления</div>
-        <div class="plan-divider"></div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-          <div class="pf-text"><h4>Правки текстов и контента</h4><p>Изменение любых текстов, заголовков, описаний</p></div>
-        </div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
-          <div class="pf-text"><h4>Замена изображений</h4><p>Обновление фотографий и графики</p></div>
-        </div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div>
-          <div class="pf-text"><h4>Мелкие стилевые правки</h4><p>Цвета, отступы, шрифты, разметка</p></div>
-        </div>
-        <div class="plan-feature">
-          <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-          <div class="pf-text"><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь</p></div>
-        </div>
-      </div>
-      <div class="orders-panel">
-        <div class="orders-panel-head">
-          <div class="orders-panel-title">Подключить обслуживание</div>
-          <div class="orders-panel-sub" id="buyOneSub">Для выбранного сайта обслуживание ещё не подключено</div>
-        </div>
-        <div style="padding:24px 32px">
-          <div style="background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:16px;padding:18px 20px;margin-bottom:18px">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px">
-              <span class="order-num" id="buyOneName">—</span>
-              <span class="ok-pill">Готов</span>
-            </div>
+      <div class="buy-panel">
+        <div class="buy-panel-title" id="buyTitle">Выберите проект</div>
+        <div class="buy-panel-sub" id="buySub">Обслуживание подключается к конкретному готовому сайту</div>
+        <div id="buyList"></div>
+        <div id="buyOneWrap" style="display:none;margin-top:24px">
+          <div style="background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;padding:16px 20px;margin-bottom:16px">
+            <div class="order-num" id="buyOneName">—</div>
             <div class="order-type" id="buyOneType"></div>
           </div>
-          <button class="btn btn-primary btn-full" id="buyOneBtn" onclick="requestSupport(pendingBuyOrderId)">
+          <button class="btn btn-green btn-full" id="buyOneBtn" onclick="payForSupport(false)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             Подключить за 500 ₽
           </button>
@@ -319,74 +241,57 @@
     </div>
   </div>
 
-  <!-- ПОДДЕРЖКА АКТИВНА -->
-  <div id="sectionActive" style="display:none">
+  <!-- АКТИВНО -->
+  <div id="secActive" style="display:none">
     <div class="active-grid">
-      <div class="status-card active" id="activeCard">
-        <div class="status-ico-row">
-          <div class="status-icon-wrap">
-            <span class="status-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="1.7"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-            </span>
-          </div>
+      <div class="status-card active-state" id="statusCard">
+        <div class="status-top">
+          <div class="status-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
           <div>
-            <div class="status-title">Обслуживание активно</div>
-            <div id="activeSub">Загрузка...</div>
-            <div id="activeSiteLabel"></div>
+            <div class="status-name" id="statusName">Обслуживание активно</div>
+            <div class="status-till" id="statusTill">—</div>
+            <div class="status-site" id="statusSite"></div>
           </div>
         </div>
-        <div class="progress-block">
-          <div class="progress-label">
-            <span>Начало</span>
-            <span id="progressLabel">осталось...</span>
-          </div>
-          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:100%"></div></div>
+        <div class="prog-wrap">
+          <div class="prog-labels"><span>Начало</span><span id="progLabel">—</span></div>
+          <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:100%"></div></div>
         </div>
-        <button class="btn btn-ghost btn-full" id="renewBtn" onclick="payForSupport(true)">
+        <button class="btn btn-outline btn-full" id="renewBtn" onclick="payForSupport(true)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-          Продлить на 30 дней — 500 ₽
+          Продлить · 500 ₽
         </button>
       </div>
-      <div class="tickets-col">
-        <div class="tickets-form-card">
+
+      <div class="right-col">
+        <div class="card">
           <div class="card-head">
             <div class="card-title">Новая заявка</div>
             <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить</div>
           </div>
-          <div class="field-group">
-            <div>
-              <label class="field-label">Тема заявки</label>
-              <input class="field-input" id="ticketTitle" type="text" placeholder="Что нужно сделать?"/>
-            </div>
-            <div>
-              <label class="field-label">Описание</label>
-              <textarea class="field-textarea" id="ticketDesc" placeholder="Опишите подробнее: что изменить, куда добавить, как должно выглядеть..."></textarea>
-            </div>
-            <div>
-              <label class="field-label">Фото / скриншот <span style="color:var(--ink-faint);font-weight:300">(необязательно)</span></label>
-              <div class="photo-upload-area">
-                <label class="photo-upload-label">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                  Прикрепить изображение
-                  <input type="file" id="ticketPhoto" accept="image/*" multiple style="display:none" onchange="previewPhotos()"/>
-                </label>
-                <div class="photo-previews" id="photoPreviews"></div>
+          <div class="card-body">
+            <div class="field-g">
+              <div class="field"><label>Тема заявки</label><input id="tTitle" type="text" placeholder="Что нужно сделать?"/></div>
+              <div class="field"><label>Описание</label><textarea id="tDesc" placeholder="Подробнее: что изменить, где, как должно выглядеть..."></textarea></div>
+              <div class="field">
+                <label>Фото <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--muted)">(необязательно)</span></label>
+                <label class="photo-lbl"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Прикрепить<input type="file" id="tPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos()"/></label>
+                <div class="previews" id="tPreviews"></div>
               </div>
-            </div>
-            <div>
-              <button class="btn btn-primary" id="submitTicketBtn" onclick="submitTicket()">
+              <button class="btn btn-green" id="submitBtn" onclick="submitTicket()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
                 Отправить заявку
               </button>
             </div>
           </div>
         </div>
-        <div class="tickets-list-card">
-          <div class="tickets-list-head">
-            <div class="card-title" style="margin-bottom:4px">История заявок</div>
-            <div class="card-sub" id="listSub">Все ваши обращения по этому сайту</div>
+
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">История заявок</div>
+            <div class="card-sub" id="listSub">Все обращения по этому сайту</div>
           </div>
-          <div id="ticketsList"><div class="tickets-empty">Заявок пока нет</div></div>
+          <div class="t-list" id="tList"><div class="t-empty">Заявок пока нет</div></div>
         </div>
       </div>
     </div>
@@ -394,189 +299,164 @@
 
 </div>
 </div>
-
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  collection, query, where, orderBy, getDocs, addDoc,
-  serverTimestamp, doc, updateDoc, getDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{auth,db}from'../firebase-config.js';
+import{onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{collection,query,where,orderBy,getDocs,addDoc,serverTimestamp,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const SUPPORT_PRICE = 500;
-const CREATE_PAYMENT_URL = 'https://api-lac-six-78.vercel.app/api/createPayment';
+const PAY_URL='https://api-lac-six-78.vercel.app/api/createPayment';
+let cu=null,orders=[],done=[],active=[],sel=null,pendId=null,pendBuyId=null,inFlight=false,photos=[];
 
-let currentUser = null, userOrders = [], doneOrders = [], activeOrders = [];
-let selectedOrder = null, pendingSupportOrderId = null, pendingBuyOrderId = null, paymentInFlight = false;
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200)}
+function fmt(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+function olabel(o){return`${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'—')}`}
+function hide(...ids){ids.forEach(id=>document.getElementById(id).style.display='none')}
+function show(id,d='block'){document.getElementById(id).style.display=d}
 
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
-function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
-function orderLabel(o){return`${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'—')}`;}
-
-async function init(user){
-  currentUser=user;
-  try{const snap=await getDocs(query(collection(db,'orders'),where('uid','==',user.uid)));userOrders=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}catch(e){userOrders=[];}
-  doneOrders=userOrders.filter(o=>o.status===5);
-  activeOrders=doneOrders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
-  document.getElementById('sectionLoading').style.display='none';
-  if(doneOrders.length===0){document.getElementById('sectionNoOrders').style.display='block';return;}
-  const urlOrderId=new URLSearchParams(location.search).get('order');
-  selectedOrder=doneOrders.find(o=>o.id===urlOrderId)||activeOrders[0]||doneOrders[0];
-  renderSiteSwitcher();
-  showForSelectedOrder();
+async function init(u){
+  cu=u;
+  try{const s=await getDocs(query(collection(db,'orders'),where('uid','==',u.uid)));orders=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}catch(e){orders=[];}
+  done=orders.filter(o=>o.status===5);
+  active=done.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
+  hide('secLoad');
+  if(!done.length){show('secNone');return;}
+  const urlId=new URLSearchParams(location.search).get('order');
+  sel=done.find(o=>o.id===urlId)||active[0]||done[0];
+  renderSwitcher();showForSel();
 }
 
-function renderSiteSwitcher(){
-  const wrap=document.getElementById('siteSwitcher');
-  if(doneOrders.length<2){wrap.style.display='none';return;}
-  wrap.style.display='flex';
-  wrap.innerHTML=doneOrders.map(o=>{
-    const hasSupport=o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date();
-    const daysLeft=hasSupport?Math.ceil((o.supportExpiresAt.toDate()-new Date())/864e5):null;
-    const expiring=hasSupport&&daysLeft<=2;
-    const domain=o.siteDomain?o.siteDomain:('№ '+o.id.slice(0,8).toUpperCase());
-    const meta=hasSupport?(expiring?`осталось ${daysLeft} дн.`:`до ${fmtDate(o.supportExpiresAt)}`):'обслуживание не подключено';
-    return `<button class="site-switch-btn ${o.id===selectedOrder.id?'is-active':''} ${expiring?'is-expiring':''} ${!hasSupport?'is-inactive':''}" onclick="switchSite('${o.id}')">
-      <span class="site-switch-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">${!hasSupport?'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>':expiring?'<path d="M12 9v4M12 17h.01M10.29 3.86l-8.18 14.18A2 2 0 003.82 21h16.36a2 2 0 001.71-2.96L13.71 3.86a2 2 0 00-3.42 0z"/>':'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'}</svg></span>
-      <span><div class="site-switch-name">${esc(domain)}</div><div class="site-switch-meta">${meta}</div></span>
+function renderSwitcher(){
+  const w=document.getElementById('switcher');
+  if(done.length<2){w.style.display='none';return;}
+  w.style.display='flex';
+  w.innerHTML=done.map(o=>{
+    const hs=o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date();
+    const dl=hs?Math.ceil((o.supportExpiresAt.toDate()-new Date())/864e5):null;
+    const exp=hs&&dl<=2;
+    const dom=o.siteDomain||'№ '+o.id.slice(0,8).toUpperCase();
+    const meta=hs?(exp?`Истекает через ${dl} дн.`:`До ${fmt(o.supportExpiresAt)}`):'Обслуживание не подключено';
+    return`<button class="sw-btn ${o.id===sel.id?'on':''} ${exp?'warn':''} ${!hs?'inactive':''}" onclick="switchSite('${o.id}')">
+      <span class="sw-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">${!hs?'<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>':exp?'<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>':'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'}</svg></span>
+      <span><div class="sw-name">${esc(dom)}</div><div class="sw-meta">${meta}</div></span>
     </button>`;
   }).join('');
 }
 
-window.switchSite=function(orderId){
-  const o=doneOrders.find(x=>x.id===orderId);if(!o)return;
-  selectedOrder=o;const url=new URL(location.href);url.searchParams.set('order',o.id);history.replaceState(null,'',url);
-  renderSiteSwitcher();showForSelectedOrder();
+window.switchSite=function(id){
+  const o=done.find(x=>x.id===id);if(!o)return;sel=o;
+  const u=new URL(location.href);u.searchParams.set('order',o.id);history.replaceState(null,'',u);
+  renderSwitcher();showForSel();
 };
 
-function showForSelectedOrder(){
-  ['sectionNoOrders','sectionBuy','sectionBuyOne','sectionActive'].forEach(id=>document.getElementById(id).style.display='none');
-  const hasSupport=selectedOrder.supportActive&&selectedOrder.supportExpiresAt&&selectedOrder.supportExpiresAt.toDate()>new Date();
-  if(hasSupport){pendingSupportOrderId=selectedOrder.id;showActiveSection();}
-  else if(doneOrders.length===1){showBuySectionAll(doneOrders);}
-  else{showBuyOneSection(selectedOrder);}
+function showForSel(){
+  hide('secNone','secBuy','secActive');
+  const hs=sel.supportActive&&sel.supportExpiresAt&&sel.supportExpiresAt.toDate()>new Date();
+  if(hs){pendId=sel.id;showActive();}
+  else if(done.length===1){showBuyAll();}
+  else{showBuyOne(sel);}
 }
 
-function showBuySectionAll(orders){
-  document.getElementById('sectionBuy').style.display='block';
-  const el=document.getElementById('ordersList');
-  el.innerHTML=orders.map(o=>`<div class="order-card" onclick="requestSupport('${o.id}')">
-    <div><div class="order-head"><span class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</span><span class="ok-pill">Готов</span></div><div class="order-type">${orderLabel(o)}</div></div>
-    <svg class="order-card-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
+function showBuyAll(){
+  show('secBuy');pendBuyId=null;
+  document.getElementById('buyTitle').textContent='Выберите проект';
+  document.getElementById('buySub').textContent='Обслуживание подключается к конкретному готовому сайту';
+  document.getElementById('buyOneWrap').style.display='none';
+  document.getElementById('buyList').innerHTML=done.map(o=>`<div class="order-strip" onclick="requestSupport('${o.id}')">
+    <div class="order-strip-left"><div class="order-num">№ ${o.id.slice(0,8).toUpperCase()} <span class="ok-pill">Готов</span></div><div class="order-type">${olabel(o)}</div></div>
+    <svg class="order-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
   </div>`).join('');
 }
 
-function showBuyOneSection(o){
-  document.getElementById('sectionBuyOne').style.display='block';
-  pendingBuyOrderId=o.id;
-  const siteName=o.siteDomain||('№ '+o.id.slice(0,8).toUpperCase());
-  document.getElementById('buyOneSub').textContent=`Для сайта «${siteName}» обслуживание ещё не подключено`;
-  document.getElementById('buyOneName').textContent=siteName;
-  document.getElementById('buyOneType').innerHTML=orderLabel(o);
+function showBuyOne(o){
+  show('secBuy');pendBuyId=o.id;
+  const name=o.siteDomain||'№ '+o.id.slice(0,8).toUpperCase();
+  document.getElementById('buyTitle').textContent='Подключить обслуживание';
+  document.getElementById('buySub').textContent=`Для сайта «${name}» обслуживание ещё не активно`;
+  document.getElementById('buyList').innerHTML='';
+  document.getElementById('buyOneName').textContent=name;
+  document.getElementById('buyOneType').innerHTML=olabel(o);
+  document.getElementById('buyOneWrap').style.display='block';
   const btn=document.getElementById('buyOneBtn');btn.disabled=false;
-  btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Подключить за 500 ₽`;
+  btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Подключить за 500 ₽`;
 }
 
-function showActiveSection(){
-  document.getElementById('sectionActive').style.display='block';
-  const exp=selectedOrder.supportExpiresAt.toDate();
-  const left=exp-new Date();const daysLeft=Math.ceil(left/(1000*60*60*24));const pct=Math.max(0,Math.min(100,left/(30*24*60*60*1000)*100));
-  document.getElementById('activeSub').textContent=`Активно до ${fmtDate(selectedOrder.supportExpiresAt)}`;
-  document.getElementById('activeSiteLabel').textContent=(selectedOrder.siteDomain?selectedOrder.siteDomain+' · ':'№ '+selectedOrder.id.slice(0,8).toUpperCase()+' · ')+orderLabel(selectedOrder).replace(/<[^>]+>/g,'');
-  document.getElementById('progressLabel').textContent=`осталось ${daysLeft} дн.`;
-  const fill=document.getElementById('progressFill');fill.style.width=pct+'%';fill.classList.toggle('warn',daysLeft<=2);
-  const card=document.getElementById('activeCard');card.classList.toggle('expiring',daysLeft<=2);card.classList.toggle('active',daysLeft>2);
-  document.querySelector('#activeCard .status-title').textContent=daysLeft<=2?'Обслуживание истекает':'Обслуживание активно';
-  const siteName=selectedOrder.siteDomain||('заказу № '+selectedOrder.id.slice(0,8).toUpperCase());
-  document.getElementById('formSub').textContent=`Заявка будет привязана к сайту: ${siteName}`;
-  document.getElementById('listSub').textContent=`Обращения по сайту: ${siteName}`;
-  document.getElementById('ticketTitle').value='';document.getElementById('ticketDesc').value='';
-  loadTickets();
+function showActive(){
+  show('secActive');
+  const exp=sel.supportExpiresAt.toDate();
+  const left=exp-new Date();const dl=Math.ceil(left/(864e5));const pct=Math.max(0,Math.min(100,left/(30*864e5)*100));
+  const card=document.getElementById('statusCard');card.className=`status-card ${dl<=2?'warn-state':'active-state'}`;
+  const ico=card.querySelector('.status-ico svg');
+  if(dl<=2){ico.outerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;}
+  document.getElementById('statusName').textContent=dl<=2?'Истекает скоро':'Обслуживание активно';
+  document.getElementById('statusTill').textContent='До '+fmt(sel.supportExpiresAt);
+  document.getElementById('statusSite').textContent=sel.siteDomain||(olabel(sel).replace(/<[^>]+>/g,''));
+  document.getElementById('progLabel').textContent=`осталось ${dl} дн.`;
+  const fill=document.getElementById('progFill');fill.style.width=pct+'%';fill.classList.toggle('warn',dl<=2);
+  const name=sel.siteDomain||('заказу № '+sel.id.slice(0,8).toUpperCase());
+  document.getElementById('formSub').textContent=`Заявка для: ${name}`;
+  document.getElementById('listSub').textContent=`Обращения: ${name}`;
+  document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';
+  photos=[];renderPreviews();loadTickets();
 }
 
-window.requestSupport=async function(orderId){
-  if(paymentInFlight)return;pendingSupportOrderId=orderId;
-  const btn=document.getElementById('buyOneBtn');
-  if(btn&&orderId===pendingBuyOrderId){btn.disabled=true;btn.textContent='Переходим к оплате...';}
-  await payForSupport(false);
-};
+window.requestSupport=async function(id){if(inFlight)return;pendId=id;pendBuyId=id;await payForSupport(false);};
 
-window.payForSupport=async function(isRenewal){
-  if(!pendingSupportOrderId){toast('Не найден заказ','error');return;}
-  if(paymentInFlight)return;paymentInFlight=true;
-  const btn=isRenewal?document.getElementById('renewBtn'):document.getElementById('buyOneBtn');
-  if(btn){btn.disabled=true;btn.textContent='Переходим к оплате...';}
-  try{
-    const resp=await fetch(CREATE_PAYMENT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:pendingSupportOrderId,amount:SUPPORT_PRICE,type:'support'})});
-    const data=await resp.json();
-    if(data.paymentUrl){window.location.href=data.paymentUrl;return;}
-    throw new Error('no payment url');
-  }catch(e){
-    paymentInFlight=false;
-    if(btn){btn.disabled=false;btn.innerHTML=isRenewal?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Продлить на 30 дней — 500 ₽':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Подключить за 500 ₽';}
-    toast('Не получилось открыть оплату. Попробуйте ещё раз.','error');
-  }
+window.payForSupport=async function(renew){
+  const id=renew?pendId:pendBuyId||pendId;if(!id){toast('Не найден заказ','error');return;}if(inFlight)return;inFlight=true;pendId=id;
+  const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;btn.textContent='Переходим к оплате...';}
+  try{const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:id,amount:500,type:'support'})});const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();}
+  catch(e){inFlight=false;if(btn){btn.disabled=false;btn.textContent=renew?'Продлить · 500 ₽':'Подключить за 500 ₽';}toast('Не удалось открыть оплату','error');}
 };
 
 async function loadTickets(){
-  if(!selectedOrder)return;const orderIdAtLoad=selectedOrder.id;
-  try{
-    const snap=await getDocs(query(collection(db,'service_tickets'),where('orderId','==',orderIdAtLoad)));
-    if(!selectedOrder||selectedOrder.id!==orderIdAtLoad)return;
-    const tickets=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    renderTickets(tickets);
-  }catch(e){}
+  if(!sel)return;const oid=sel.id;
+  try{const s=await getDocs(query(collection(db,'service_tickets'),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
+  const ts=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  renderTickets(ts);}catch(e){}
 }
 
-function renderTickets(tickets){
-  const el=document.getElementById('ticketsList');
-  const btn=document.getElementById('submitTicketBtn');
-  if(btn)btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>${tickets.length?'Ещё одна заявка':'Отправить заявку'}`;
-  if(!tickets.length){el.innerHTML='<div class="tickets-empty">Заявок пока нет</div>';return;}
-  el.innerHTML=tickets.map(t=>`<div class="ticket-item">
-    <div class="ticket-item-head">
-      <span class="ticket-item-title">${esc(t.title)}</span>
-      <span class="${t.status==='done'?'t-done':'t-open'}">${t.status==='done'?'Готово':'Открыта'}</span>
-    </div>
-    <div class="ticket-order-tag"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(t.orderDomain||(t.orderId?'№ '+t.orderId.slice(0,8).toUpperCase():'Сайт'))}</div>
-    ${t.description?`<div class="ticket-desc">${esc(t.description)}</div>`:''}
-    ${t.images&&t.images.length?`<div class="photo-previews" style="pointer-events:none">${t.images.map(src=>`<div class="photo-preview-wrap"><img src="${src}" alt=""/></div>`).join('')}</div>`:''}
-    ${t.adminReply?`<div class="ticket-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${esc(t.adminReply)}</div>`:''}
-    <div class="ticket-date">${t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
+function renderTickets(ts){
+  const el=document.getElementById('tList');
+  if(!ts.length){el.innerHTML='<div class="t-empty">Заявок пока нет</div>';return;}
+  el.innerHTML=ts.map(t=>`<div class="t-item">
+    <div class="t-head"><span class="t-title">${esc(t.title)}</span><span class="t-pill ${t.status==='done'?'done':'open'}">${t.status==='done'?'Готово':'Открыта'}</span></div>
+    ${t.description?`<div class="t-desc">${esc(t.description)}</div>`:''}
+    ${t.images?.length?`<div class="previews" style="pointer-events:none">${t.images.map(s=>`<div class="prev-wrap"><img src="${s}" alt=""/></div>`).join('')}</div>`:''}
+    ${t.adminReply?`<div class="t-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${esc(t.adminReply)}</div>`:''}
+    <div class="t-date">${t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
   </div>`).join('');
 }
 
-let ticketPhotos=[];
-window.previewPhotos=function(){
-  const input=document.getElementById('ticketPhoto');const files=Array.from(input.files);
-  if(!files.length)return;if(ticketPhotos.length+files.length>3){toast('Максимум 3 фото','error');input.value='';return;}
-  files.forEach(file=>{if(file.size>4*1024*1024){toast('Файл больше 4 МБ','error');return;}const reader=new FileReader();reader.onload=e=>{ticketPhotos.push(e.target.result);renderPhotoPreviews();};reader.readAsDataURL(file);});
-  input.value='';
+window.addPhotos=function(){
+  const f=Array.from(document.getElementById('tPhoto').files);
+  if(!f.length)return;if(photos.length+f.length>3){toast('Максимум 3 фото','error');return;}
+  f.forEach(file=>{if(file.size>4*1024*1024){toast('Файл больше 4 МБ','error');return;}const r=new FileReader();r.onload=e=>{photos.push(e.target.result);renderPreviews();};r.readAsDataURL(file);});
+  document.getElementById('tPhoto').value='';
 };
-function renderPhotoPreviews(){const el=document.getElementById('photoPreviews');if(!el)return;el.innerHTML=ticketPhotos.map((src,i)=>`<div class="photo-preview-wrap"><img src="${src}" alt=""/><button class="photo-preview-remove" onclick="removePhoto(${i})">✕</button></div>`).join('');}
-window.removePhoto=function(i){ticketPhotos.splice(i,1);renderPhotoPreviews();};
+function renderPreviews(){const el=document.getElementById('tPreviews');if(!el)return;el.innerHTML=photos.map((s,i)=>`<div class="prev-wrap"><img src="${s}" alt=""/><button class="prev-rm" onclick="rmPhoto(${i})">✕</button></div>`).join('');}
+window.rmPhoto=function(i){photos.splice(i,1);renderPreviews();};
 
 window.submitTicket=async function(){
-  const title=document.getElementById('ticketTitle').value.trim();const desc=document.getElementById('ticketDesc').value.trim();
-  if(!title){toast('Введите название заявки','error');return;}if(!selectedOrder){toast('Не выбран сайт','error');return;}
+  const title=document.getElementById('tTitle').value.trim(),desc=document.getElementById('tDesc').value.trim();
+  if(!title){toast('Введите тему заявки','error');return;}if(!sel){toast('Не выбран сайт','error');return;}
+  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Отправка...';
   try{
-    await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:ticketPhotos.length?ticketPhotos:null,uid:currentUser.uid,userName:currentUser.displayName||'Пользователь',userEmail:currentUser.email||'',orderId:selectedOrder.id,orderSiteType:selectedOrder.siteType||'',orderTariff:selectedOrder.tariff||selectedOrder.package||'',orderDomain:selectedOrder.siteDomain||'',status:'open',createdAt:serverTimestamp()});
-    document.getElementById('ticketTitle').value='';document.getElementById('ticketDesc').value='';
-    ticketPhotos=[];renderPhotoPreviews();toast('Заявка отправлена ✓','success');loadTickets();
-  }catch(e){toast('Ошибка: '+e.message,'error');}
+    await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:photos.length?photos:null,uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',orderId:sel.id,orderSiteType:sel.siteType||'',orderTariff:sel.tariff||sel.package||'',orderDomain:sel.siteDomain||'',status:'open',createdAt:serverTimestamp()});
+    document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена ✓','success');loadTickets();
+  }catch(e){toast('Ошибка','error');}
+  btn.disabled=false;btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>Отправить заявку`;
 };
 
-onAuthStateChanged(auth,async user=>{
-  if(!user){window.location.href='../auth';return;}
+onAuthStateChanged(auth,async u=>{
+  if(!u){window.location.href='../auth';return;}
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
-  await init(user);
+  await init(u);
 });
 </script>
-
 <script src="../footer.js" data-page="profile"></script>
 </body>
 </html>

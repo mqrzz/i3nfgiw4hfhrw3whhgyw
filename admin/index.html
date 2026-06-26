@@ -350,7 +350,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 <div class="modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
   <div class="modal">
     <div class="modal-title">Уведомление <button class="modal-close" onclick="closeNotifModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">Получатель</label><select class="form-select" id="notifTarget"><option value="all">Всем пользователям</option></select></div>
+    <div class="form-group"><label class="form-label">Получатель</label><input class="form-input" id="notifSearch" type="text" placeholder="Поиск по имени или email..." style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/><select class="form-select" id="notifTarget" size="6" style="height:auto;min-height:44px;max-height:180px;overflow-y:auto"><option value="all">Всем пользователям</option></select></div>
     <div class="form-group"><label class="form-label">Заголовок</label><input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
     <div class="form-group"><label class="form-label">Текст</label><textarea class="form-textarea" id="notifText" placeholder="Текст..."></textarea></div>
     <div class="modal-footer">
@@ -387,15 +387,27 @@ window.toggleMaintenance=async()=>{
   toast(next?'Сайт закрыт 🔧':'Сайт открыт ✅',next?'warn':'success');
 };
 
+let _allUsers=[];
+function renderUserOptions(filter=''){
+  const sel=document.getElementById('notifTarget');
+  const q=filter.toLowerCase();
+  const filtered=_allUsers.filter(u=>!q||u.label.toLowerCase().includes(q));
+  sel.innerHTML='<option value="all">Всем пользователям</option>';
+  filtered.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${esc(u.label)}</option>`;});
+  if(filtered.length===1) sel.selectedIndex=1;
+  else sel.selectedIndex=0;
+}
+window.filterNotifTarget=function(val){renderUserOptions(val);}
 window.openNotifModal=async()=>{
   try{
     const snap=await getDocs(collection(db,'users'));
-    const sel=document.getElementById('notifTarget');
-    sel.innerHTML='<option value="all">Всем пользователям</option>';
-    snap.docs.forEach(d=>{const data=d.data();sel.innerHTML+=`<option value="${d.id}">${esc(data.displayName||data.name||d.id)}${data.email?' · '+esc(data.email):''}</option>`;});
+    _allUsers=snap.docs.map(d=>{const data=d.data();return{id:d.id,label:(data.displayName||data.name||d.id)+(data.email?' · '+data.email:'')};});
+    document.getElementById('notifSearch').value='';
+    renderUserOptions('');
     document.getElementById('notifTitle').value='';
     document.getElementById('notifText').value='';
     document.getElementById('notifModal').classList.add('show');
+    setTimeout(()=>document.getElementById('notifSearch').focus(),120);
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 window.closeNotifModal=()=>document.getElementById('notifModal').classList.remove('show');

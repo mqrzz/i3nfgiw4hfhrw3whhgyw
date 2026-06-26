@@ -11,62 +11,59 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;overflow-x:hidden}
 :root{
-  --green:#1ede7b;
-  --green-h:#1ac16b;
-  --green-d:#149955;
+  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
   --green-light:rgba(30,222,123,.10);
-  --bg:#fff;
-  --bg2:#f2f4f7;
-  --bg3:#f9fafc;
-  --text:#191b1e;
-  --muted:#707a8a;
-  --border:#dfe3e8;
-  --border2:#cbcdd6;
-  --dark:#191b1e;
-  --dark2:#2b2f33;
-  --warn:#f59e0b;
-  --warn-wash:rgba(245,158,11,.10);
-  --bad:#e8634f;
-  --bad-wash:rgba(232,99,79,.10);
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --text:#191b1e;--muted:#707a8a;
+  --border:#dfe3e8;--border2:#cbcdd6;
+  --dark:#191b1e;--dark2:#2b2f33;
+  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.10);
+  --bad:#e8634f;--bad-wash:rgba(232,99,79,.10);
   --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
   --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
   --font:'Geologica','Inter','Arial',sans-serif;
+  --sp:80px;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;letter-spacing:-0.02em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── LOADING ── */
 .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 .spinner{width:22px;height:22px;border:1.5px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .65s linear infinite}
-.loading-text{color:var(--muted);font-size:12px;letter-spacing:.02em}
+.loading-text{color:var(--muted);font-size:12px;letter-spacing:.04em;text-transform:uppercase}
 
-/* ── MAIN CONTENT SHELL ── */
-#sbContent{animation:fadeUp .3s ease;padding-bottom:100px}
+/* ── WRAP ── */
+#sbContent{animation:fadeUp .35s ease;padding-bottom:120px}
+.container{max-width:1328px;margin:0 auto;padding:0 20px;width:100%}
+@media(min-width:1024px){.container{padding:0 64px}}
+@media(min-width:1280px){.container{padding:0 96px}}
 
-/* ── PAGE HERO ── */
-.page-hero{background:var(--dark);border-radius:64px;padding:64px 80px;margin-bottom:0;position:relative;overflow:hidden}
-@media(max-width:860px){.page-hero{padding:48px 32px;border-radius:32px}}
-.page-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(30,222,123,.07) 0%,transparent 70%);pointer-events:none}
-.page-hero-eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:20px}
-.page-hero h1{font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.04em;line-height:1.04;color:#fff;margin-bottom:14px}
-.page-hero h1 em{font-style:normal;color:var(--green)}
-.page-hero p{font-size:clamp(14px,1.5vw,17px);color:rgba(255,255,255,.4);font-weight:300;line-height:1.6;max-width:480px}
-
-/* ── CONTAINER ── */
-.wrap{max-width:1200px;margin:0 auto;padding:0 20px}
-@media(min-width:1024px){.wrap{padding:0 64px}}
-@media(min-width:1280px){.wrap{padding:0 96px}}
-.section{padding:48px 0}
+/* ── HERO ── */
+.hero-wrap{padding:var(--sp) 0 0}
+.hero-block{background:var(--dark);border-radius:64px;padding:80px 100px;position:relative;overflow:hidden}
+@media(max-width:860px){.hero-block{padding:48px 32px;border-radius:32px}}
+.hero-block::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 100% at 100% 50%,rgba(30,222,123,.06),transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:20px}
+.hero-block h1{font-size:clamp(48px,7vw,96px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:20px}
+.hero-block h1 em{font-style:normal;color:var(--green)}
+.hero-block p{font-size:clamp(15px,1.5vw,19px);color:rgba(255,255,255,.4);font-weight:300;line-height:1.6;max-width:520px}
+.hero-bar{border-top:1px solid rgba(255,255,255,.08);margin-top:56px;display:grid;grid-template-columns:repeat(3,1fr)}
+@media(max-width:600px){.hero-bar{grid-template-columns:1fr 1fr}}
+.hero-stat{padding:28px 0;border-right:1px solid rgba(255,255,255,.07);text-align:center}
+.hero-stat:last-child{border-right:none}
+.hero-stat-n{font-size:clamp(22px,2.5vw,36px);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:5px}
+.hero-stat-n em{font-style:normal;color:var(--green)}
+.hero-stat-l{font-size:12px;color:rgba(255,255,255,.3);font-weight:300}
 
 /* ── EYEBROW ── */
-.eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
+.eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
 .eyebrow.g{color:var(--green)}
 
 /* ── BUTTONS ── */
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .1s,color .1s;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:17px 32px;font-size:16px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .1s,color .1s;white-space:nowrap}
 .btn:hover{transform:translateY(-1px)}
-.btn:disabled{opacity:.5;cursor:default;transform:none}
+.btn:disabled{opacity:.5;cursor:default;transform:none!important}
 .btn svg{width:14px;height:14px;flex-shrink:0}
 .btn-green{background:var(--green);color:var(--dark)}
 .btn-green:hover{background:var(--green-h)}
@@ -74,152 +71,253 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .btn-dark:hover{background:var(--dark2)}
 .btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text)}
 .btn-outline:hover{border-color:var(--border2)}
-.btn-outline-dark{background:transparent;border:1.5px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7)}
-.btn-outline-dark:hover{border-color:rgba(255,255,255,.4);color:#fff}
+.btn-outline-inv{background:transparent;border:1.5px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7)}
+.btn-outline-inv:hover{border-color:rgba(255,255,255,.4);color:#fff}
+.btn-sm{padding:12px 24px;font-size:14px;border-radius:10px}
 .btn-full{width:100%;justify-content:center}
-.btn-sm{padding:11px 20px;font-size:14px}
 
 /* ── SITE SWITCHER ── */
-.switcher-wrap{padding:32px 0 0;border-bottom:1px solid var(--border)}
-.switcher-label{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-.switcher-tabs{display:flex;gap:8px;flex-wrap:wrap;padding-bottom:0}
-.stab{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:12px 12px 0 0;border:1.5px solid transparent;border-bottom:none;font-family:var(--font);font-size:14px;font-weight:500;color:var(--muted);transition:color .15s,background .15s,border-color .15s;position:relative;bottom:-1px;background:var(--bg3)}
-.stab:hover{color:var(--text)}
-.stab.is-active{background:var(--bg);border-color:var(--border);border-bottom-color:var(--bg);color:var(--text)}
-.stab-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0}
+.switcher-section{padding:48px 0 0}
+.switcher-label{font-size:12px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.switcher-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.stab{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 20px;border-radius:16px;font-family:var(--font);font-size:15px;font-weight:500;color:var(--muted);background:var(--bg3);border:1.5px solid var(--border);transition:color .15s,background .15s,border-color .15s}
+.stab:hover{color:var(--text);border-color:var(--border2)}
+.stab.is-active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.stab-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
+.stab.is-active .stab-dot{background:var(--green)}
 .stab.is-expiring .stab-dot{background:var(--warn)}
 .stab.is-inactive .stab-dot{background:var(--border2)}
-.stab.is-inactive{opacity:.7}
+.stab.is-inactive{opacity:.65}
+.stab-count{font-size:11px;background:var(--green-light);color:var(--green-d);border-radius:100px;padding:2px 8px;font-weight:500}
+.stab.is-active .stab-count{background:rgba(30,222,123,.15)}
 
-/* ── SECTION: NO ORDERS ── */
-.no-orders-block{background:var(--dark);border-radius:64px;padding:80px 100px;text-align:center;margin-top:48px;position:relative;overflow:hidden}
+/* ── NO ORDERS ── */
+.no-orders-section{padding:var(--sp) 0}
+.no-orders-block{background:var(--dark);border-radius:64px;padding:80px 100px;text-align:center;position:relative;overflow:hidden}
 @media(max-width:860px){.no-orders-block{padding:48px 32px;border-radius:32px}}
-.no-orders-block::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 50% 60% at 50% 100%,rgba(30,222,123,.06) 0%,transparent 70%);pointer-events:none}
-.no-orders-block h2{font-size:clamp(32px,4vw,52px);font-weight:500;letter-spacing:-.04em;color:#fff;margin-bottom:16px;line-height:1.05}
-.no-orders-block p{font-size:16px;color:rgba(255,255,255,.4);font-weight:300;line-height:1.65;max-width:480px;margin:0 auto 36px}
+.no-orders-block::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 80% at 50% 120%,rgba(30,222,123,.06),transparent 70%);pointer-events:none}
+.no-orders-block h2{font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.04em;line-height:1.04;color:#fff;margin:16px 0 20px}
+.no-orders-block p{font-size:clamp(15px,1.5vw,18px);color:rgba(255,255,255,.4);font-weight:300;line-height:1.65;max-width:500px;margin:0 auto 40px}
 
-/* ── SECTION: BUY ── */
-.buy-block{margin-top:48px}
-.buy-grid{display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
-@media(max-width:900px){.buy-grid{grid-template-columns:1fr}}
+/* ── BUY SECTION ── */
+.buy-section{padding:var(--sp) 0}
+.buy-grid{display:grid;grid-template-columns:380px 1fr;gap:20px;align-items:start;margin-top:48px}
+@media(max-width:960px){.buy-grid{grid-template-columns:1fr}}
 
-/* plan card — тёмный */
-.plan-card{background:var(--dark);border-radius:40px;padding:44px 40px;position:sticky;top:24px}
-@media(max-width:900px){.plan-card{position:static;border-radius:32px;padding:36px 28px}}
-.plan-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--green);background:rgba(30,222,123,.1);border-radius:100px;padding:4px 14px;margin-bottom:24px}
-.plan-badge svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
-.plan-price{font-size:clamp(48px,5vw,64px);font-weight:500;letter-spacing:-.04em;line-height:1;color:#fff;margin-bottom:4px}
-.plan-price sup{font-size:20px;font-weight:300;color:rgba(255,255,255,.3)}
-.plan-period{font-size:14px;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:32px}
-.plan-divider{height:1px;background:rgba(255,255,255,.08);margin:0 0 28px}
-.plan-feats{display:flex;flex-direction:column;gap:14px}
-.plan-feat{display:flex;align-items:flex-start;gap:12px}
-.pf-ico{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(30,222,123,.1)}
-.pf-ico svg{width:14px;height:14px;stroke:var(--green);stroke-width:1.8;fill:none}
-.pf-text h4{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px;letter-spacing:-.01em}
-.pf-text p{font-size:13px;color:rgba(255,255,255,.35);font-weight:300;line-height:1.5}
+/* plan card dark */
+.plan-card{background:var(--dark);border-radius:64px;padding:60px 56px;position:sticky;top:24px}
+@media(max-width:960px){.plan-card{position:static;border-radius:40px;padding:44px 36px}}
+@media(max-width:600px){.plan-card{border-radius:32px;padding:36px 28px}}
+.plan-badge{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--green);background:rgba(30,222,123,.1);border-radius:100px;padding:5px 16px;margin-bottom:28px}
+.plan-price{font-size:clamp(56px,6vw,80px);font-weight:500;letter-spacing:-.05em;line-height:1;color:#fff;margin-bottom:6px}
+.plan-price sup{font-size:24px;font-weight:300;color:rgba(255,255,255,.3)}
+.plan-period{font-size:15px;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:36px}
+.plan-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:32px}
+.plan-feats{display:flex;flex-direction:column;gap:18px}
+.plan-feat{display:flex;align-items:flex-start;gap:14px}
+.pf-ico{width:36px;height:36px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(30,222,123,.1)}
+.pf-ico svg{width:15px;height:15px;stroke:var(--green);stroke-width:1.8;fill:none}
+.pf-text h4{font-size:15px;font-weight:500;color:#fff;margin-bottom:3px;letter-spacing:-.01em}
+.pf-text p{font-size:13px;color:rgba(255,255,255,.35);font-weight:300;line-height:1.55}
 
-/* orders panel — светлый */
-.orders-panel{background:var(--bg3);border:1.5px solid var(--border);border-radius:40px;overflow:hidden}
-@media(max-width:900px){.orders-panel{border-radius:32px}}
-.orders-panel-head{padding:32px 36px 24px}
-.orders-panel-title{font-size:clamp(18px,2vw,24px);font-weight:500;letter-spacing:-.025em;margin-bottom:6px}
-.orders-panel-sub{font-size:14px;color:var(--muted);font-weight:300}
-.orders-divider{height:1px;background:var(--border);margin:0}
+/* what's NOT included strip */
+.plan-not{margin-top:28px;padding-top:28px;border-top:1px solid rgba(255,255,255,.08)}
+.plan-not-label{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:14px}
+.plan-not-list{display:flex;flex-direction:column;gap:8px}
+.plan-not-item{font-size:13px;color:rgba(255,255,255,.25);font-weight:300;display:flex;gap:10px;align-items:flex-start}
+.plan-not-item::before{content:'×';color:rgba(255,255,255,.2);flex-shrink:0;font-size:14px;font-weight:500}
 
-/* order-card — используется JS showBuySectionAll */
-.order-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 36px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;text-decoration:none;color:inherit}
+/* orders panel */
+.orders-panel{background:var(--bg3);border:1.5px solid var(--border);border-radius:64px;overflow:hidden}
+@media(max-width:960px){.orders-panel{border-radius:40px}}
+@media(max-width:600px){.orders-panel{border-radius:32px}}
+.orders-panel-head{padding:48px 56px 36px}
+@media(max-width:600px){.orders-panel-head{padding:36px 28px 24px}}
+.orders-panel-title{font-size:clamp(28px,3vw,40px);font-weight:500;letter-spacing:-.03em;margin-bottom:10px}
+.orders-panel-sub{font-size:16px;color:var(--muted);font-weight:300;line-height:1.6}
+.orders-divider{height:1px;background:var(--border)}
+/* order-card JS-generated */
+.order-card{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:24px 56px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s}
+@media(max-width:600px){.order-card{padding:20px 28px}}
 .order-card:last-child{border-bottom:none}
 .order-card:hover{background:var(--bg2)}
-.order-card:hover .order-card-arrow{stroke:var(--green);transform:translateX(4px)}
+.order-card:hover .order-card-arrow{stroke:var(--green);transform:translateX(5px)}
 .order-head{display:flex;align-items:center;gap:10px}
-.order-num{font-size:15px;font-weight:500;letter-spacing:-.01em}
-.ok-pill{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:var(--green-light);color:var(--green-d)}
-.order-type{font-size:13px;color:var(--muted);font-weight:300}
-.order-meta{font-size:12px;color:var(--muted)}
+.order-num{font-size:16px;font-weight:500;letter-spacing:-.01em}
+.ok-pill{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 12px;border-radius:100px;background:var(--green-light);color:var(--green-d)}
+.order-type{font-size:14px;color:var(--muted);font-weight:300}
+.order-meta{font-size:13px;color:var(--border2)}
 .order-card-arrow{width:16px;height:16px;stroke:var(--border2);stroke-width:2;fill:none;flex-shrink:0;transition:stroke .15s,transform .15s}
 
-/* buyOne inline order card */
-.buy-one-order-row{padding:20px 36px;border-bottom:1px solid var(--border)}
-.buy-one-order-card{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:18px 24px}
-.buy-one-actions{padding:24px 36px 36px;display:flex;flex-direction:column;gap:10px}
+/* buy-one inline */
+.buy-one-site-row{padding:24px 56px;border-bottom:1px solid var(--border)}
+@media(max-width:600px){.buy-one-site-row{padding:20px 28px}}
+.buy-one-site-card{background:var(--bg);border:1.5px solid var(--border);border-radius:16px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.buy-one-cta{padding:28px 56px 48px;display:flex;flex-direction:column;gap:12px}
+@media(max-width:600px){.buy-one-cta{padding:20px 28px 36px}}
+.buy-one-hint{font-size:13px;color:var(--muted);font-weight:300;line-height:1.6}
 
-/* ── SECTION: ACTIVE ── */
-.active-grid{display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start;margin-top:48px}
-@media(max-width:900px){.active-grid{grid-template-columns:1fr}}
+/* ── ACTIVE SECTION ── */
+.active-section{padding:var(--sp) 0}
 
-/* status card — тёмный, как plan-card */
-.status-card{background:var(--dark);border-radius:40px;padding:44px 40px;position:sticky;top:24px}
-@media(max-width:900px){.status-card{position:static;border-radius:32px;padding:36px 28px}}
-.status-card.expiring{background:#1c1100}
-.status-icon-row{display:flex;align-items:center;gap:14px;margin-bottom:28px}
-.status-dot{width:44px;height:44px;border-radius:50%;background:rgba(30,222,123,.15);border:1px solid rgba(30,222,123,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.status-card.expiring .status-dot{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25)}
+/* status banner */
+.status-banner{background:var(--dark);border-radius:40px;padding:40px 56px;margin-bottom:0;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center}
+@media(max-width:860px){.status-banner{border-radius:32px;padding:32px 36px;grid-template-columns:1fr}}
+@media(max-width:600px){.status-banner{border-radius:24px;padding:28px 24px}}
+.status-banner.expiring{background:#1c1300}
+.sb-left{display:flex;align-items:center;gap:20px}
+.sb-dot{width:48px;height:48px;border-radius:50%;background:rgba(30,222,123,.15);border:1px solid rgba(30,222,123,.25);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.status-banner.expiring .sb-dot{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.3)}
 .status-icon{display:contents}
 .status-icon svg{width:20px;height:20px;stroke-width:1.7;fill:none}
-.status-title{font-size:16px;font-weight:500;color:#fff;letter-spacing:-.015em;margin-bottom:3px}
-.status-sub-row{display:flex;flex-direction:column;gap:3px;margin-bottom:28px}
-.status-sub{font-size:13px;color:rgba(255,255,255,.4);font-weight:300}
-#activeSub{font-size:13px;color:rgba(255,255,255,.55);font-weight:300}
-.progress-block{margin-bottom:28px}
-.progress-label{display:flex;justify-content:space-between;font-size:12px;color:rgba(255,255,255,.3);margin-bottom:10px;font-weight:500;letter-spacing:.02em}
-.progress-bar{height:3px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.sb-info{}
+.status-title{font-size:17px;font-weight:500;color:#fff;letter-spacing:-.015em;margin-bottom:4px}
+.sb-meta{font-size:14px;color:rgba(255,255,255,.4);font-weight:300}
+#activeSub{color:rgba(255,255,255,.4);font-size:14px;font-weight:300}
+.sb-progress{display:flex;align-items:center;gap:16px;margin-top:12px}
+.sb-bar{flex:1;height:3px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;max-width:200px}
 .progress-fill{height:100%;background:var(--green);border-radius:99px;transition:width .4s ease}
 .progress-fill.warn{background:var(--warn)}
+#progressLabel{font-size:12px;color:rgba(255,255,255,.3);font-weight:300;white-space:nowrap}
+.sb-right{display:flex;align-items:center;gap:10px}
+@media(max-width:860px){.sb-right{justify-content:flex-start}}
 
-/* ── RIGHT COL: tickets ── */
+/* ── LIMIT BAR ── */
+.limit-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:32px;overflow:hidden;margin-top:20px}
+@media(max-width:600px){.limit-bar{grid-template-columns:1fr 1fr;border-radius:24px}}
+.lb-cell{background:var(--bg3);padding:28px 32px;text-align:center;transition:background .15s}
+.lb-cell:hover{background:var(--bg)}
+.lb-n{font-size:clamp(28px,3vw,40px);font-weight:500;letter-spacing:-.03em;color:var(--text);margin-bottom:6px}
+.lb-n em{font-style:normal;color:var(--green)}
+.lb-l{font-size:13px;color:var(--muted);font-weight:300}
+
+/* ── MAIN CONTENT GRID ── */
+.content-section{padding:48px 0 0}
+.content-grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+@media(max-width:960px){.content-grid{grid-template-columns:1fr}}
+
+/* ── TICKETS COLUMN ── */
 .tickets-col{display:flex;flex-direction:column;gap:20px}
 
-/* form card */
-.form-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:40px;padding:44px 40px}
-@media(max-width:860px){.form-card{border-radius:32px;padding:32px 24px}}
-.card-eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:16px}
-.card-title{font-size:clamp(20px,2vw,26px);font-weight:500;letter-spacing:-.025em;margin-bottom:8px}
-.card-sub{font-size:14px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:28px}
+/* filter tabs */
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap}
+.ftab{all:unset;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:500;padding:10px 20px;border-radius:100px;border:1.5px solid var(--border);color:var(--muted);transition:color .15s,background .15s,border-color .15s}
+.ftab:hover{color:var(--text);border-color:var(--border2)}
+.ftab.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.ftab-count{font-size:11px;opacity:.6;margin-left:4px}
 
-/* inputs */
-.field-group{display:flex;flex-direction:column;gap:18px}
-.field-label{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;font-weight:500}
-.field-input,.field-textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:14px 18px;color:var(--text);font-family:var(--font);font-size:15px;font-weight:300;outline:none;transition:border-color .18s,box-shadow .18s;letter-spacing:-.01em}
-.field-input:focus,.field-textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.12)}
-.field-input::placeholder,.field-textarea::placeholder{color:var(--border2)}
-.field-textarea{resize:vertical;min-height:100px;line-height:1.6}
+/* tickets list */
+.tickets-list-wrap{background:var(--bg3);border:1.5px solid var(--border);border-radius:40px;overflow:hidden}
+@media(max-width:600px){.tickets-list-wrap{border-radius:28px}}
+.tl-head{padding:36px 40px 0}
+@media(max-width:600px){.tl-head{padding:28px 24px 0}}
+.tl-title{font-size:clamp(22px,2.5vw,32px);font-weight:500;letter-spacing:-.03em;margin-bottom:8px}
+.tl-sub{font-size:15px;color:var(--muted);font-weight:300}
+.tl-divider{height:1px;background:var(--border);margin-top:28px}
 
-/* photo upload */
-.photo-upload-area{margin-top:2px}
-.photo-upload-label{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:var(--bg);border:1.5px dashed var(--border2);border-radius:12px;font-size:13px;color:var(--muted);cursor:pointer;transition:border-color .15s,color .15s;font-family:var(--font);font-weight:300}
-.photo-upload-label:hover{border-color:var(--green);color:var(--text)}
-.photo-upload-label svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
-.photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
-.photo-preview-wrap{position:relative;width:72px;height:72px;border-radius:12px;overflow:hidden;border:1.5px solid var(--border)}
-.photo-preview-wrap img{width:100%;height:100%;object-fit:cover;display:block}
-.photo-preview-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.65);border:none;color:#fff;font-size:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
-
-/* tickets list card */
-.list-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:40px;overflow:hidden}
-@media(max-width:860px){.list-card{border-radius:32px}}
-.list-card-head{padding:36px 40px 24px;border-bottom:1px solid var(--border)}
-@media(max-width:860px){.list-card-head{padding:28px 24px 20px}}
-
-/* ticket-item — JS renderTickets */
-.ticket-item{padding:24px 40px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:10px;overflow:hidden;word-break:break-word;transition:background .15s}
+/* ticket-item — используется JS */
+.ticket-item{padding:28px 40px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;overflow:hidden;word-break:break-word}
 .ticket-item:last-child{border-bottom:none}
 .ticket-item:hover{background:var(--bg2)}
-@media(max-width:860px){.ticket-item{padding:20px 24px}}
-.ticket-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.ticket-item-title{font-size:15px;font-weight:500;color:var(--text);flex:1;letter-spacing:-.01em}
+@media(max-width:600px){.ticket-item{padding:20px 24px}}
+.ticket-item-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:8px}
+.ticket-item-title{font-size:16px;font-weight:500;color:var(--text);flex:1;letter-spacing:-.01em}
+.ticket-desc{font-size:14px;color:var(--muted);line-height:1.65;font-weight:300;overflow:hidden;word-break:break-word;margin-bottom:12px}
+.ticket-meta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ticket-date{font-size:12px;color:var(--border2);font-weight:300}
 .ticket-order-tag{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:5px;font-weight:300}
 .ticket-order-tag svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
-.t-open{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:var(--green-light);color:var(--green-d);white-space:nowrap}
-.t-done{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 10px;border-radius:100px;background:var(--bg2);color:var(--muted);white-space:nowrap}
-.ticket-desc{font-size:14px;color:var(--muted);line-height:1.65;font-weight:300;overflow:hidden;word-break:break-word}
-.ticket-reply{display:flex;align-items:flex-start;gap:10px;background:rgba(30,222,123,.07);border:1px solid rgba(30,222,123,.18);border-radius:12px;padding:12px 16px;font-size:13px;color:var(--green-d);line-height:1.6;font-weight:300}
-.ticket-reply svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;margin-top:2px}
-.ticket-date{font-size:12px;color:var(--border2);font-weight:300}
-.tickets-empty{text-align:center;padding:56px 24px;color:var(--muted);font-size:14px;font-weight:300}
+
+/* status pills */
+.pill{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 12px;border-radius:100px;white-space:nowrap}
+.pill-open{background:var(--green-light);color:var(--green-d)}
+.pill-seen{background:rgba(99,179,237,.12);color:#2b6cb0}
+.pill-progress{background:rgba(245,158,11,.12);color:#b45309}
+.pill-review{background:rgba(159,122,234,.12);color:#6b46c1}
+.pill-done{background:var(--bg2);color:var(--muted)}
+.pill-rejected{background:var(--bad-wash);color:var(--bad)}
+/* t-open and t-done kept for JS compatibility */
+.t-open{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 12px;border-radius:100px;white-space:nowrap;background:var(--green-light);color:var(--green-d)}
+.t-done{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;padding:3px 12px;border-radius:100px;white-space:nowrap;background:var(--bg2);color:var(--muted)}
+
+/* ── TIMELINE inside ticket-item (раскрывается) ── */
+.ticket-timeline{margin-top:16px;padding-top:16px;border-top:1px solid var(--border);display:none;flex-direction:column;gap:0}
+.ticket-item.expanded .ticket-timeline{display:flex}
+.tl-step{display:flex;gap:16px;align-items:flex-start;position:relative}
+.tl-step:not(:last-child)::before{content:'';position:absolute;left:11px;top:22px;bottom:-4px;width:1px;background:var(--border)}
+.tl-dot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;z-index:1}
+.tl-dot.done-dot{background:var(--green);border-color:var(--green)}
+.tl-dot svg{width:10px;height:10px;stroke:#fff;stroke-width:2.5;fill:none}
+.tl-step-body{padding-bottom:16px;flex:1}
+.tl-step-label{font-size:14px;font-weight:500;color:var(--text);letter-spacing:-.01em;margin-bottom:2px}
+.tl-step.pending .tl-step-label{color:var(--border2)}
+.tl-step-date{font-size:12px;color:var(--muted);font-weight:300}
+
+/* messages thread */
+.ticket-messages{margin-top:4px;display:flex;flex-direction:column;gap:8px}
+.tmsg{border-radius:12px;padding:10px 14px;font-size:13px;line-height:1.6;font-weight:300}
+.tmsg-client{background:var(--bg2);color:var(--text);align-self:flex-start;max-width:85%}
+.tmsg-admin{background:var(--dark);color:rgba(255,255,255,.85);align-self:flex-end;max-width:85%}
+.tmsg-meta{font-size:11px;color:var(--border2);margin-top:4px}
+.tmsg-admin .tmsg-meta{color:rgba(255,255,255,.25)}
+
+/* ticket confirm row */
+.ticket-confirm-row{margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;gap:8px;flex-wrap:wrap}
+
+/* comment form inside ticket */
+.ticket-comment-form{margin-top:12px;display:flex;gap:8px}
+.ticket-comment-input{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:10px 14px;font-family:var(--font);font-size:14px;font-weight:300;color:var(--text);outline:none;transition:border-color .18s}
+.ticket-comment-input:focus{border-color:var(--green)}
+.ticket-comment-input::placeholder{color:var(--border2)}
+
+.tickets-empty{text-align:center;padding:64px 24px}
+.tickets-empty-icon{width:56px;height:56px;border-radius:50%;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+.tickets-empty-icon svg{width:24px;height:24px;stroke:var(--border2);stroke-width:1.5;fill:none}
+.tickets-empty h3{font-size:20px;font-weight:500;letter-spacing:-.02em;margin-bottom:8px}
+.tickets-empty p{font-size:15px;color:var(--muted);font-weight:300;line-height:1.6}
+
+/* ── FORM COLUMN ── */
+.form-col{display:flex;flex-direction:column;gap:20px}
+
+/* form card */
+.form-card{background:var(--dark);border-radius:40px;padding:44px 40px;position:sticky;top:24px}
+@media(max-width:960px){.form-card{position:static;border-radius:32px;padding:36px 28px}}
+.form-eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:16px}
+.form-title{font-size:clamp(22px,2.5vw,32px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:10px}
+.form-sub{font-size:14px;color:rgba(255,255,255,.35);font-weight:300;line-height:1.6;margin-bottom:28px}
+.form-sub span{color:rgba(255,255,255,.55)}
+.field-group{display:flex;flex-direction:column;gap:16px}
+.field-label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:8px;font-weight:500}
+.field-input,.field-textarea{width:100%;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 18px;color:#fff;font-family:var(--font);font-size:15px;font-weight:300;outline:none;transition:border-color .18s,box-shadow .18s;letter-spacing:-.01em}
+.field-input:focus,.field-textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+.field-input::placeholder,.field-textarea::placeholder{color:rgba(255,255,255,.2)}
+.field-textarea{resize:vertical;min-height:96px;line-height:1.6}
+.field-footer{display:flex;justify-content:flex-end}
+.char-count{font-size:11px;color:rgba(255,255,255,.2);font-weight:300}
+
+/* photo upload */
+.photo-upload-label{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;background:rgba(255,255,255,.04);border:1.5px dashed rgba(255,255,255,.15);border-radius:12px;font-size:13px;color:rgba(255,255,255,.4);cursor:pointer;transition:border-color .15s,color .15s;font-family:var(--font);font-weight:300}
+.photo-upload-label:hover{border-color:var(--green);color:rgba(255,255,255,.7)}
+.photo-upload-label svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
+.photo-previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.photo-preview-wrap{position:relative;width:68px;height:68px;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.1)}
+.photo-preview-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-preview-remove{position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.7);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+
+/* limit warning */
+.limit-warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 16px;font-size:13px;color:#b45309;font-weight:300;line-height:1.5}
+
+/* что входит strip */
+.rules-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:32px;padding:32px}
+.rules-title{font-size:15px;font-weight:500;letter-spacing:-.01em;margin-bottom:16px}
+.rules-strips{display:flex;flex-direction:column}
+.rules-strip{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);font-size:13px;font-weight:300;color:var(--muted);align-items:flex-start;line-height:1.5}
+.rules-strip:last-child{border-bottom:none}
+.rules-strip::before{content:'—';color:var(--green);flex-shrink:0;font-weight:500}
+.rules-strip.no::before{content:'×';color:var(--border2)}
 
 /* ── TOAST ── */
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:10px 22px;border-radius:100px;font-size:14px;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;letter-spacing:-.01em}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:11px 24px;border-radius:100px;font-size:14px;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;letter-spacing:-.01em}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:var(--green);color:var(--dark)}
 .toast.error{background:var(--bad);color:#fff}
@@ -227,17 +325,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
 /* ── MOBILE ── */
 @media(max-width:840px){
-  .active-grid,.buy-grid{grid-template-columns:1fr}
-  .status-card{position:static!important}
-  .plan-card{position:static!important}
+  .content-grid{grid-template-columns:1fr}
+  .form-card{position:static!important}
   .order-meta{display:none}
+  .sb-right .btn{width:100%}
 }
-@media(max-width:480px){
-  .switcher-tabs{gap:4px}
-  .stab{padding:10px 14px;font-size:13px}
-  .form-card,.list-card{border-radius:24px}
-  .list-card-head{padding:20px 20px 14px}
-  .ticket-item{padding:16px 20px}
+@media(max-width:600px){
+  .switcher-tabs{gap:6px}
+  .stab{padding:11px 16px;font-size:14px}
+  .hero-bar{grid-template-columns:1fr 1fr}
 }
   </style>
 </head>
@@ -252,37 +348,53 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
 <div id="sbContent" style="display:none">
 
-  <!-- ── PAGE HERO ── -->
-  <div class="wrap">
-    <div class="page-hero">
-      <div class="page-hero-eyebrow">Личный кабинет</div>
-      <h1>Обслужива<em>ние</em></h1>
-      <p>Подписка на правки и доработки — всё под рукой</p>
+  <!-- ══ HERO ══ -->
+  <section class="hero-wrap">
+    <div class="container">
+      <div class="hero-block">
+        <div class="hero-eyebrow">Antviz · Личный кабинет</div>
+        <h1>Обслужи<em>вание</em></h1>
+        <p>Правки, контент, стилевые доработки — просто напишите что нужно. Ответим и сделаем в течение 3 рабочих дней.</p>
+        <div class="hero-bar">
+          <div class="hero-stat">
+            <div class="hero-stat-n"><em>5</em></div>
+            <div class="hero-stat-l">активных заявок одновременно</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-n">3 дня</div>
+            <div class="hero-stat-l">максимальный срок правки</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-n"><em>500</em> ₽</div>
+            <div class="hero-stat-l">в месяц, 30 дней доступа</div>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- ══ LOADING ══ -->
+  <div class="container">
+    <div id="sectionLoading" style="color:var(--muted);font-size:15px;font-weight:300;padding:48px 0">Загрузка...</div>
   </div>
 
-  <!-- ── LOADING STATE ── -->
-  <div class="wrap">
-    <div id="sectionLoading" style="color:var(--muted);font-size:14px;font-weight:300;padding:40px 0">Загрузка...</div>
-  </div>
-
-  <!-- ── SITE SWITCHER ── -->
-  <div class="wrap">
-    <div id="siteSwitcher" class="switcher-wrap" style="display:none">
-      <div class="switcher-label">Ваши сайты</div>
+  <!-- ══ ПЕРЕКЛЮЧАТЕЛЬ САЙТОВ ══ -->
+  <div class="container">
+    <div id="siteSwitcher" class="switcher-section" style="display:none">
+      <div class="switcher-label">Ваши проекты</div>
       <div class="switcher-tabs" id="switcherTabs"></div>
     </div>
   </div>
 
-  <!-- ── SECTION: НЕТ ГОТОВЫХ ЗАКАЗОВ ── -->
+  <!-- ══ НЕТ ГОТОВЫХ ЗАКАЗОВ ══ -->
   <div id="sectionNoOrders" style="display:none">
-    <div class="wrap">
-      <div class="section">
+    <div class="container">
+      <div class="no-orders-section">
         <div class="no-orders-block">
           <div class="eyebrow g">Обслуживание</div>
-          <h2>Пока нет готовых проектов</h2>
-          <p>Подключите ежемесячное обслуживание к любому завершённому проекту — отправляйте заявки на правки, контент и доработки без новых заказов.</p>
-          <a href="../order" class="btn btn-green btn-sm">
+          <h2>Пока нет<br/>готовых проектов</h2>
+          <p>Подключить обслуживание можно только к завершённому сайту. Оформите заказ — и после сдачи получите доступ к правкам, контенту и доработкам.</p>
+          <a href="../order" class="btn btn-green">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
             Оформить сайт
           </a>
@@ -291,177 +403,229 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     </div>
   </div>
 
-  <!-- ── SECTION: ПОДПИСКА НЕ КУПЛЕНА НИГДЕ (один заказ) ── -->
+  <!-- ══ ПОДПИСКА НЕ КУПЛЕНА (один сайт) ══ -->
   <div id="sectionBuy" style="display:none">
-    <div class="wrap">
-      <div class="section">
-        <div class="buy-block">
-          <div class="buy-grid">
+    <div class="container">
+      <div class="buy-section">
+        <p class="eyebrow">Тариф</p>
+        <h2 style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06;margin-top:10px">Подключить обслуживание</h2>
+        <div class="buy-grid">
 
-            <div class="plan-card">
-              <div class="plan-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                Ежемесячно
+          <div class="plan-card">
+            <div class="plan-badge">Ежемесячно</div>
+            <div class="plan-price">500 <sup>₽</sup></div>
+            <div class="plan-period">в месяц · 30 дней доступа</div>
+            <div class="plan-divider"></div>
+            <div class="plan-feats">
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
+                <div class="pf-text"><h4>Правки текстов</h4><p>Заголовки, описания, контакты, цены — любые тексты</p></div>
               </div>
-              <div class="plan-price">500 <sup>₽</sup></div>
-              <div class="plan-period">в месяц · 30 дней доступа</div>
-              <div class="plan-divider"></div>
-              <div class="plan-feats">
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-                  <div class="pf-text"><h4>Правки текстов и контента</h4><p>Тексты, заголовки, описания — всё что нужно</p></div>
-                </div>
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
-                  <div class="pf-text"><h4>Замена изображений</h4><p>Обновление фотографий и графики на сайте</p></div>
-                </div>
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div>
-                  <div class="pf-text"><h4>Мелкие стилевые правки</h4><p>Цвета, отступы, шрифты, разметка</p></div>
-                </div>
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-                  <div class="pf-text"><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь</p></div>
-                </div>
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="pf-text"><h4>Замена изображений</h4><p>Фотографии, иконки, баннеры — обновим быстро</p></div>
+              </div>
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div>
+                <div class="pf-text"><h4>Стилевые правки</h4><p>Цвета, отступы, шрифты, выравнивание</p></div>
+              </div>
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div class="pf-text"><h4>Ответ в приоритете</h4><p>Заявки от клиентов обслуживания идут первыми</p></div>
               </div>
             </div>
-
-            <div class="orders-panel">
-              <div class="orders-panel-head">
-                <div class="orders-panel-title">Выберите проект</div>
-                <div class="orders-panel-sub">Обслуживание подключается к конкретному готовому сайту</div>
+            <div class="plan-not">
+              <div class="plan-not-label">Не входит в тариф</div>
+              <div class="plan-not-list">
+                <div class="plan-not-item">Новые страницы и разделы с нуля</div>
+                <div class="plan-not-item">Новый функционал и интеграции</div>
+                <div class="plan-not-item">Редизайн существующих блоков</div>
               </div>
-              <div class="orders-divider"></div>
-              <div id="ordersList"></div>
             </div>
-
           </div>
+
+          <div class="orders-panel">
+            <div class="orders-panel-head">
+              <div class="orders-panel-title">Выберите проект</div>
+              <div class="orders-panel-sub">Обслуживание подключается к конкретному готовому сайту. Можно подключить к нескольким — отдельно для каждого.</div>
+            </div>
+            <div class="orders-divider"></div>
+            <div id="ordersList"></div>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION: ВЫБРАННЫЙ В ПЕРЕКЛЮЧАТЕЛЕ САЙТ БЕЗ ПОДПИСКИ ── -->
+  <!-- ══ ВЫБРАННЫЙ САЙТ БЕЗ ПОДПИСКИ ══ -->
   <div id="sectionBuyOne" style="display:none">
-    <div class="wrap">
-      <div class="section">
-        <div class="buy-block">
-          <div class="buy-grid">
+    <div class="container">
+      <div class="buy-section">
+        <p class="eyebrow">Тариф</p>
+        <h2 style="font-size:clamp(36px,5vw,64px);font-weight:500;letter-spacing:-.03em;line-height:1.06;margin-top:10px">Подключить обслуживание</h2>
+        <div class="buy-grid">
 
-            <div class="plan-card">
-              <div class="plan-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                Ежемесячно
+          <div class="plan-card">
+            <div class="plan-badge">Ежемесячно</div>
+            <div class="plan-price">500 <sup>₽</sup></div>
+            <div class="plan-period">в месяц · 30 дней доступа</div>
+            <div class="plan-divider"></div>
+            <div class="plan-feats">
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4z"/></svg></div>
+                <div class="pf-text"><h4>Правки текстов</h4><p>Заголовки, описания, контакты, цены — любые тексты</p></div>
               </div>
-              <div class="plan-price">500 <sup>₽</sup></div>
-              <div class="plan-period">в месяц · 30 дней доступа</div>
-              <div class="plan-divider"></div>
-              <div class="plan-feats">
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
-                  <div class="pf-text"><h4>Правки текстов и контента</h4><p>Тексты, заголовки, описания — всё что нужно</p></div>
-                </div>
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
-                  <div class="pf-text"><h4>Замена изображений</h4><p>Обновление фотографий и графики на сайте</p></div>
-                </div>
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div>
-                  <div class="pf-text"><h4>Мелкие стилевые правки</h4><p>Цвета, отступы, шрифты, разметка</p></div>
-                </div>
-                <div class="plan-feat">
-                  <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-                  <div class="pf-text"><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь</p></div>
-                </div>
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div>
+                <div class="pf-text"><h4>Замена изображений</h4><p>Фотографии, иконки, баннеры — обновим быстро</p></div>
+              </div>
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div>
+                <div class="pf-text"><h4>Стилевые правки</h4><p>Цвета, отступы, шрифты, выравнивание</p></div>
+              </div>
+              <div class="plan-feat">
+                <div class="pf-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+                <div class="pf-text"><h4>Ответ в приоритете</h4><p>Заявки от клиентов обслуживания идут первыми</p></div>
               </div>
             </div>
-
-            <div class="orders-panel">
-              <div class="orders-panel-head">
-                <div class="orders-panel-title">Подключить обслуживание</div>
-                <div class="orders-panel-sub" id="buyOneSub">Для выбранного сайта обслуживание ещё не подключено</div>
-              </div>
-              <div class="orders-divider"></div>
-              <div class="buy-one-order-row">
-                <div class="buy-one-order-card" id="buyOneCard">
-                  <div class="order-head">
-                    <span class="order-num" id="buyOneName">—</span>
-                    <span class="ok-pill">Готов</span>
-                  </div>
-                  <div class="order-type" id="buyOneType"></div>
-                </div>
-              </div>
-              <div class="buy-one-actions">
-                <button class="btn btn-green btn-full" id="buyOneBtn" onclick="requestSupport(pendingBuyOrderId)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                  Подключить за 500 ₽
-                </button>
+            <div class="plan-not">
+              <div class="plan-not-label">Не входит в тариф</div>
+              <div class="plan-not-list">
+                <div class="plan-not-item">Новые страницы и разделы с нуля</div>
+                <div class="plan-not-item">Новый функционал и интеграции</div>
+                <div class="plan-not-item">Редизайн существующих блоков</div>
               </div>
             </div>
-
           </div>
+
+          <div class="orders-panel">
+            <div class="orders-panel-head">
+              <div class="orders-panel-title">Подключить к сайту</div>
+              <div class="orders-panel-sub" id="buyOneSub">Для выбранного сайта обслуживание ещё не подключено</div>
+            </div>
+            <div class="orders-divider"></div>
+            <div class="buy-one-site-row">
+              <div class="buy-one-site-card" id="buyOneCard">
+                <div class="order-head">
+                  <span class="order-num" id="buyOneName">—</span>
+                  <span class="ok-pill">Готов</span>
+                </div>
+                <span class="order-type" id="buyOneType"></span>
+              </div>
+            </div>
+            <div class="buy-one-cta">
+              <button class="btn btn-green btn-full" id="buyOneBtn" onclick="requestSupport(pendingBuyOrderId)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                Подключить за 500 ₽
+              </button>
+              <div class="buy-one-hint">Оплата через Robokassa — СБП, карты, T-Pay, SberPay. Доступ откроется сразу после оплаты на 30 дней.</div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION: ПОДПИСКА АКТИВНА ── -->
+  <!-- ══ ПОДПИСКА АКТИВНА ══ -->
   <div id="sectionActive" style="display:none">
-    <div class="wrap">
-      <div class="section">
-        <div class="active-grid">
+    <div class="container">
+      <div class="active-section">
 
-          <!-- LEFT: статус -->
-          <div class="status-card active" id="activeCard">
-            <div class="status-icon-row">
-              <div class="status-dot">
-                <span class="status-icon">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </span>
-              </div>
-              <div>
-                <div class="status-title">Обслуживание активно</div>
-                <div id="activeSiteLabel" style="font-size:12px;color:rgba(255,255,255,.3);font-weight:300;margin-top:2px"></div>
-              </div>
+        <!-- STATUS BANNER -->
+        <div class="status-banner active" id="activeCard">
+          <div class="sb-left">
+            <div class="sb-dot">
+              <span class="status-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="1.7"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </span>
             </div>
-
-            <div class="status-sub-row">
+            <div class="sb-info">
+              <div class="status-title">Обслуживание активно</div>
               <div id="activeSub">Загрузка...</div>
-            </div>
-
-            <div class="progress-block">
-              <div class="progress-label">
-                <span>Начало</span>
-                <span id="progressLabel">осталось...</span>
+              <div class="sb-progress">
+                <div class="sb-bar"><div class="progress-fill" id="progressFill" style="width:100%"></div></div>
+                <span id="progressLabel">...</span>
               </div>
-              <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:100%"></div></div>
             </div>
-
-            <button class="btn btn-outline-dark btn-full btn-sm" id="renewBtn" onclick="payForSupport(true)">
+          </div>
+          <div class="sb-right">
+            <button class="btn btn-outline-inv btn-sm" id="renewBtn" onclick="payForSupport(true)">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
-              Продлить на 30 дней — 500 ₽
+              Продлить — 500 ₽
             </button>
           </div>
+        </div>
 
-          <!-- RIGHT: форма + список -->
-          <div class="tickets-col">
+        <!-- LIMIT BAR -->
+        <div class="limit-bar" id="limitBar">
+          <div class="lb-cell">
+            <div class="lb-n"><em id="limitUsed">0</em> / 5</div>
+            <div class="lb-l">активных заявок</div>
+          </div>
+          <div class="lb-cell">
+            <div class="lb-n" id="limitInWork">0</div>
+            <div class="lb-l">в работе сейчас</div>
+          </div>
+          <div class="lb-cell">
+            <div class="lb-n">3 дня</div>
+            <div class="lb-l">срок выполнения</div>
+          </div>
+        </div>
 
-            <div class="form-card">
-              <div class="card-eyebrow">Новая заявка</div>
-              <div class="card-title">Что нужно сделать?</div>
-              <div class="card-sub" id="formSub">Опишите задачу — ответим в ближайшее время</div>
-              <div class="field-group">
-                <div>
-                  <label class="field-label">Тема заявки</label>
-                  <input class="field-input" id="ticketTitle" type="text" placeholder="Что нужно изменить или добавить?"/>
+        <!-- MAIN GRID -->
+        <div class="content-section">
+          <div class="content-grid">
+
+            <!-- LEFT: tickets -->
+            <div class="tickets-col">
+
+              <!-- filter -->
+              <div class="filter-tabs" id="filterTabs">
+                <button class="ftab active" data-filter="active" onclick="setFilter('active',this)">Активные <span class="ftab-count" id="countActive"></span></button>
+                <button class="ftab" data-filter="done" onclick="setFilter('done',this)">Закрытые <span class="ftab-count" id="countDone"></span></button>
+                <button class="ftab" data-filter="all" onclick="setFilter('all',this)">Все</button>
+              </div>
+
+              <!-- list -->
+              <div class="tickets-list-wrap">
+                <div class="tl-head">
+                  <div class="tl-title" id="listTitle">Заявки</div>
+                  <div class="tl-sub" id="listSub">Все ваши обращения по этому сайту</div>
                 </div>
-                <div>
-                  <label class="field-label">Описание</label>
-                  <textarea class="field-textarea" id="ticketDesc" placeholder="Подробнее: что изменить, куда добавить, как должно выглядеть..."></textarea>
+                <div class="tl-divider"></div>
+                <div id="ticketsList">
+                  <div class="tickets-empty">
+                    <div class="tickets-empty-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+                    <h3>Заявок пока нет</h3>
+                    <p>Опишите задачу в форме — ответим<br/>и возьмём в работу в течение дня</p>
+                  </div>
                 </div>
-                <div>
-                  <label class="field-label">Фото / скриншот <span style="color:var(--border2);font-weight:300;text-transform:none;letter-spacing:0">(необязательно)</span></label>
-                  <div class="photo-upload-area">
+              </div>
+
+            </div>
+
+            <!-- RIGHT: form + rules -->
+            <div class="form-col">
+
+              <div class="form-card" id="formCard">
+                <div class="form-eyebrow">Новая заявка</div>
+                <div class="form-title">Что нужно сделать?</div>
+                <div class="form-sub" id="formSub">Опишите задачу — ответим в течение дня и возьмём в работу.<br/><span>Осталось мест: <span id="slotsLeft">5</span> из 5</span></div>
+                <div id="limitWarnWrap"></div>
+                <div class="field-group" id="ticketFormFields">
+                  <div>
+                    <label class="field-label">Тема заявки</label>
+                    <input class="field-input" id="ticketTitle" type="text" maxlength="120" placeholder="Что нужно изменить?"/>
+                  </div>
+                  <div>
+                    <label class="field-label">Описание</label>
+                    <textarea class="field-textarea" id="ticketDesc" maxlength="500" placeholder="Подробнее: что изменить, где, как должно выглядеть..." oninput="updateCharCount(this)"></textarea>
+                    <div class="field-footer"><span class="char-count" id="charCount">0 / 500</span></div>
+                  </div>
+                  <div>
+                    <label class="field-label">Скриншот <span style="color:rgba(255,255,255,.2);text-transform:none;letter-spacing:0;font-size:11px">(необязательно, до 3 файлов)</span></label>
                     <label class="photo-upload-label">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                       Прикрепить изображение
@@ -469,30 +633,34 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
                     </label>
                     <div class="photo-previews" id="photoPreviews"></div>
                   </div>
-                </div>
-                <div>
-                  <button class="btn btn-dark" id="submitTicketBtn" onclick="submitTicket()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
-                    Отправить заявку
-                  </button>
+                  <div>
+                    <button class="btn btn-green btn-full" id="submitTicketBtn" onclick="submitTicket()">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
+                      Отправить заявку
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              <div class="rules-card">
+                <div class="rules-title">Что входит в обслуживание</div>
+                <div class="rules-strips">
+                  <div class="rules-strip">Правки текстов, заголовков, описаний, цен</div>
+                  <div class="rules-strip">Замена и добавление изображений</div>
+                  <div class="rules-strip">Мелкие стилевые правки — цвет, отступ, шрифт</div>
+                  <div class="rules-strip">Добавление/удаление блока если он уже в коде</div>
+                  <div class="rules-strip">Исправление багов вёрстки</div>
+                  <div class="rules-strip no">Новые страницы и разделы с нуля</div>
+                  <div class="rules-strip no">Новый функционал и интеграции</div>
+                  <div class="rules-strip no">Редизайн существующих блоков</div>
+                </div>
+              </div>
+
             </div>
 
-            <div class="list-card">
-              <div class="list-card-head">
-                <div class="eyebrow">История</div>
-                <div class="card-title" style="margin-bottom:4px">Заявки</div>
-                <div class="card-sub" style="margin-bottom:0" id="listSub">Все ваши обращения по этому сайту</div>
-              </div>
-              <div id="ticketsList">
-                <div class="tickets-empty">Заявок пока нет</div>
-              </div>
-            </div>
+          </div>
+        </div>
 
-          </div><!-- /tickets-col -->
-
-        </div><!-- /active-grid -->
       </div>
     </div>
   </div>
@@ -505,27 +673,55 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  collection, query, where, orderBy, getDocs, addDoc,
-  serverTimestamp, doc, updateDoc, getDoc
+  collection, query, where, getDocs, addDoc, doc, getDoc,
+  serverTimestamp, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
 const SUPPORT_PRICE = 500;
+const MAX_ACTIVE = 5;
 const CREATE_PAYMENT_URL = 'https://api-lac-six-78.vercel.app/api/createPayment';
 
-let currentUser = null;
-let userOrders = [];
-let doneOrders = [];
-let activeOrders = [];
-let selectedOrder = null;
-let pendingSupportOrderId = null;
-let pendingBuyOrderId = null;
-let paymentInFlight = false;
+const STATUS_META = {
+  open:      { label:'Ожидает',       cls:'pill-open' },
+  seen:      { label:'Принята',       cls:'pill-seen' },
+  in_progress:{ label:'В работе',     cls:'pill-progress' },
+  review:    { label:'На проверке',   cls:'pill-review' },
+  done:      { label:'Готово',        cls:'pill-done' },
+  rejected:  { label:'Отклонена',     cls:'pill-rejected' },
+};
+const TIMELINE_STEPS = [
+  { key:'open',       label:'Заявка отправлена' },
+  { key:'seen',       label:'Принята в работу' },
+  { key:'in_progress',label:'Выполняется' },
+  { key:'review',     label:'На проверке у вас' },
+  { key:'done',       label:'Завершена' },
+];
 
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
-function fmtDate(ts){if(!ts) return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
-function orderLabel(o){ return `${escapeHtml(o.siteType||'Сайт')} · ${escapeHtml(o.tariff||o.package||'—')}`; }
+let currentUser = null;
+let userOrders = [], doneOrders = [], activeOrders = [];
+let selectedOrder = null;
+let pendingSupportOrderId = null, pendingBuyOrderId = null;
+let paymentInFlight = false;
+let allTickets = [];
+let currentFilter = 'active';
+
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
+function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+function fmtDateShort(ts){if(!ts)return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}
+function orderLabel(o){return `${escapeHtml(o.siteType||'Сайт')} · ${escapeHtml(o.tariff||o.package||'—')}`}
+
+window.updateCharCount = function(el){
+  const c = document.getElementById('charCount');
+  if(c) c.textContent = el.value.length+' / 500';
+};
+
+window.setFilter = function(f, btn){
+  currentFilter = f;
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTicketsList();
+};
 
 async function init(user){
   currentUser = user;
@@ -543,15 +739,10 @@ async function init(user){
 
   document.getElementById('sectionLoading').style.display='none';
 
-  if(doneOrders.length===0){
-    document.getElementById('sectionNoOrders').style.display='block';
-    return;
-  }
+  if(!doneOrders.length){ document.getElementById('sectionNoOrders').style.display='block'; return; }
 
   const urlOrderId = new URLSearchParams(location.search).get('order');
-  selectedOrder = doneOrders.find(o=>o.id===urlOrderId)
-    || activeOrders[0]
-    || doneOrders[0];
+  selectedOrder = doneOrders.find(o=>o.id===urlOrderId) || activeOrders[0] || doneOrders[0];
   renderSiteSwitcher();
   showForSelectedOrder();
 }
@@ -565,54 +756,40 @@ function renderSiteSwitcher(){
     const hasSupport = o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > new Date();
     const daysLeft = hasSupport ? Math.ceil((o.supportExpiresAt.toDate()-new Date())/864e5) : null;
     const expiring = hasSupport && daysLeft<=2;
-    const domain = o.siteDomain ? o.siteDomain : ('№ '+o.id.slice(0,8).toUpperCase());
+    const domain = o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase());
+    const openCount = allTickets.filter(t=>t.orderId===o.id && t.status!=='done' && t.status!=='rejected').length;
     return `
     <button class="stab ${o.id===selectedOrder.id?'is-active':''} ${expiring?'is-expiring':''} ${!hasSupport?'is-inactive':''}" onclick="switchSite('${o.id}')">
       <span class="stab-dot"></span>
       ${escapeHtml(domain)}
+      ${openCount>0?`<span class="stab-count">${openCount}</span>`:''}
     </button>`;
   }).join('');
 }
 
 window.switchSite = function(orderId){
-  const o = doneOrders.find(x=>x.id===orderId);
-  if(!o) return;
+  const o = doneOrders.find(x=>x.id===orderId); if(!o) return;
   selectedOrder = o;
   const url = new URL(location.href);
-  url.searchParams.set('order', o.id);
+  url.searchParams.set('order',o.id);
   history.replaceState(null,'',url);
   renderSiteSwitcher();
   showForSelectedOrder();
 };
 
 function showForSelectedOrder(){
-  document.getElementById('sectionNoOrders').style.display='none';
-  document.getElementById('sectionBuy').style.display='none';
-  document.getElementById('sectionBuyOne').style.display='none';
-  document.getElementById('sectionActive').style.display='none';
-
-  const hasSupport = selectedOrder.supportActive && selectedOrder.supportExpiresAt
-    && selectedOrder.supportExpiresAt.toDate() > new Date();
-
-  if(hasSupport){
-    pendingSupportOrderId = selectedOrder.id;
-    showActiveSection();
-  } else if(doneOrders.length===1){
-    showBuySectionAll(doneOrders);
-  } else {
-    showBuyOneSection(selectedOrder);
-  }
+  ['sectionNoOrders','sectionBuy','sectionBuyOne','sectionActive'].forEach(id=>document.getElementById(id).style.display='none');
+  const hasSupport = selectedOrder.supportActive && selectedOrder.supportExpiresAt && selectedOrder.supportExpiresAt.toDate() > new Date();
+  if(hasSupport){ pendingSupportOrderId=selectedOrder.id; showActiveSection(); }
+  else if(doneOrders.length===1){ showBuySectionAll(doneOrders); }
+  else { showBuyOneSection(selectedOrder); }
 }
 
 function showBuySectionAll(orders){
   document.getElementById('sectionBuy').style.display='block';
-  const el = document.getElementById('ordersList');
-  el.innerHTML = orders.map(o=>`
+  document.getElementById('ordersList').innerHTML = orders.map(o=>`
     <div class="order-card" onclick="requestSupport('${o.id}')" style="${paymentInFlight?'pointer-events:none;opacity:.6':''}">
-      <div class="order-head">
-        <span class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</span>
-        <span class="ok-pill">Готов</span>
-      </div>
+      <div class="order-head"><span class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</span><span class="ok-pill">Готов</span></div>
       <div class="order-type">${orderLabel(o)}</div>
       <div class="order-meta">${fmtDate(o.createdAt)}</div>
       <svg class="order-card-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
@@ -622,13 +799,13 @@ function showBuySectionAll(orders){
 function showBuyOneSection(o){
   document.getElementById('sectionBuyOne').style.display='block';
   pendingBuyOrderId = o.id;
-  const siteName = o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase());
+  const siteName = o.siteDomain||('№ '+o.id.slice(0,8).toUpperCase());
   document.getElementById('buyOneSub').textContent = `Для сайта «${siteName}» обслуживание ещё не подключено`;
   document.getElementById('buyOneName').textContent = siteName;
   document.getElementById('buyOneType').innerHTML = orderLabel(o);
   const btn = document.getElementById('buyOneBtn');
-  btn.disabled = false;
-  btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Подключить за 500 ₽`;
+  btn.disabled=false;
+  btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Подключить за 500 ₽`;
 }
 
 function showActiveSection(){
@@ -637,99 +814,237 @@ function showActiveSection(){
   const total = 30*24*60*60*1000;
   const left = exp - new Date();
   const daysLeft = Math.ceil(left/(1000*60*60*24));
-  const pct = Math.max(0,Math.min(100, left/total*100));
+  const pct = Math.max(0,Math.min(100,left/total*100));
 
   document.getElementById('activeSub').textContent = `Активно до ${fmtDate(selectedOrder.supportExpiresAt)}`;
-  document.getElementById('activeSiteLabel').textContent =
-    (selectedOrder.siteDomain ? selectedOrder.siteDomain+' · ' : '№ '+selectedOrder.id.slice(0,8).toUpperCase()+' · ') + orderLabel(selectedOrder).replace(/<[^>]+>/g,'');
   document.getElementById('progressLabel').textContent = `осталось ${daysLeft} дн.`;
   const fill = document.getElementById('progressFill');
-  fill.style.width = pct+'%';
-  fill.classList.toggle('warn', daysLeft<=2);
+  fill.style.width=pct+'%';
+  fill.classList.toggle('warn',daysLeft<=2);
 
-  const card = document.getElementById('activeCard');
-  card.classList.toggle('expiring', daysLeft<=2);
-  card.classList.toggle('active', daysLeft>2);
-  document.querySelector('#activeCard .status-title').textContent = daysLeft<=2 ? 'Обслуживание истекает' : 'Обслуживание активно';
+  const card=document.getElementById('activeCard');
+  card.classList.toggle('expiring',daysLeft<=2);
+  card.classList.toggle('active',daysLeft>2);
+  document.querySelector('#activeCard .status-title').textContent = daysLeft<=2?'Обслуживание истекает':'Обслуживание активно';
 
-  const siteName = selectedOrder.siteDomain || ('заказу № '+selectedOrder.id.slice(0,8).toUpperCase());
-  document.getElementById('formSub').textContent = `Заявка будет привязана к сайту: ${siteName}`;
+  const siteName = selectedOrder.siteDomain||('заказу № '+selectedOrder.id.slice(0,8).toUpperCase());
   document.getElementById('listSub').textContent = `Обращения по сайту: ${siteName}`;
 
   document.getElementById('ticketTitle').value='';
   document.getElementById('ticketDesc').value='';
+  ticketPhotos=[];
+  renderPhotoPreviews();
 
   loadTickets();
 }
-
-window.requestSupport = async function(orderId){
-  if(paymentInFlight){ return; }
-  pendingSupportOrderId = orderId;
-  const btn = document.getElementById('buyOneBtn');
-  if(btn && orderId===pendingBuyOrderId){ btn.disabled = true; btn.textContent = 'Переходим к оплате...'; }
-  await payForSupport(false);
-};
-
-window.payForSupport = async function(isRenewal){
-  if(!pendingSupportOrderId){ toast('Не найден заказ для обслуживания','error'); return; }
-  if(paymentInFlight){ return; }
-  paymentInFlight = true;
-  const btn = isRenewal ? document.getElementById('renewBtn') : document.getElementById('buyOneBtn');
-  if(btn){ btn.disabled = true; btn.textContent = 'Переходим к оплате...'; }
-  try{
-    const resp = await fetch(CREATE_PAYMENT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orderId: pendingSupportOrderId, amount: SUPPORT_PRICE, type: 'support' })
-    });
-    const data = await resp.json();
-    if(data.paymentUrl){ window.location.href = data.paymentUrl; return; }
-    throw new Error('no payment url');
-  }catch(e){
-    paymentInFlight = false;
-    if(btn){
-      btn.disabled = false;
-      btn.innerHTML = isRenewal
-        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Продлить на 30 дней — 500 ₽'
-        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Подключить за 500 ₽';
-    }
-    toast('Не получилось открыть оплату. Попробуйте ещё раз.','error');
-  }
-};
 
 async function loadTickets(){
   if(!selectedOrder) return;
   const orderIdAtLoad = selectedOrder.id;
   try{
     const snap = await getDocs(query(collection(db,'service_tickets'),where('orderId','==',orderIdAtLoad)));
-    if(!selectedOrder || selectedOrder.id!==orderIdAtLoad) return;
-    const tickets = snap.docs.map(d=>({id:d.id,...d.data()}))
+    if(!selectedOrder||selectedOrder.id!==orderIdAtLoad) return;
+    allTickets = snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    renderTickets(tickets);
+    updateLimitBar();
+    renderTicketsList();
+    renderSiteSwitcher();
   }catch(e){}
 }
 
-function renderTickets(tickets){
-  const el = document.getElementById('ticketsList');
-  const btn = document.getElementById('submitTicketBtn');
-  if(btn) btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>${tickets.length ? 'Ещё одна заявка' : 'Отправить заявку'}`;
-  if(!tickets.length){el.innerHTML='<div class="tickets-empty">Заявок пока нет</div>';return;}
-  el.innerHTML = tickets.map(t=>`
-    <div class="ticket-item">
+function updateLimitBar(){
+  const activeCount = allTickets.filter(t=>t.status!=='done'&&t.status!=='rejected').length;
+  const inWork = allTickets.filter(t=>t.status==='in_progress').length;
+  document.getElementById('limitUsed').textContent = activeCount;
+  document.getElementById('limitInWork').textContent = inWork;
+  const slotsLeft = Math.max(0, MAX_ACTIVE - activeCount);
+  const sl = document.getElementById('slotsLeft');
+  if(sl) sl.textContent = slotsLeft;
+
+  const warn = document.getElementById('limitWarnWrap');
+  if(slotsLeft===0){
+    warn.innerHTML=`<div class="limit-warn">Достигнут лимит активных заявок (5 из 5). Дождитесь завершения одной из текущих заявок, чтобы отправить новую.</div>`;
+    document.getElementById('ticketFormFields').style.opacity='.4';
+    document.getElementById('ticketFormFields').style.pointerEvents='none';
+  } else {
+    warn.innerHTML='';
+    document.getElementById('ticketFormFields').style.opacity='';
+    document.getElementById('ticketFormFields').style.pointerEvents='';
+  }
+}
+
+function renderTicketsList(){
+  let filtered = allTickets;
+  if(currentFilter==='active') filtered = allTickets.filter(t=>t.status!=='done'&&t.status!=='rejected');
+  if(currentFilter==='done') filtered = allTickets.filter(t=>t.status==='done'||t.status==='rejected');
+
+  const cntActive = allTickets.filter(t=>t.status!=='done'&&t.status!=='rejected').length;
+  const cntDone = allTickets.filter(t=>t.status==='done'||t.status==='rejected').length;
+  const ca=document.getElementById('countActive'); if(ca) ca.textContent=cntActive||'';
+  const cd=document.getElementById('countDone'); if(cd) cd.textContent=cntDone||'';
+
+  const el=document.getElementById('ticketsList');
+  const lt=document.getElementById('listTitle');
+  if(lt) lt.textContent = currentFilter==='done'?'Закрытые заявки':currentFilter==='active'?'Активные заявки':'Все заявки';
+
+  if(!filtered.length){
+    el.innerHTML=`<div class="tickets-empty">
+      <div class="tickets-empty-icon"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
+      <h3>${currentFilter==='done'?'Закрытых заявок нет':'Активных заявок нет'}</h3>
+      <p>${currentFilter==='done'?'Здесь появятся завершённые обращения':'Опишите задачу в форме — ответим<br/>и возьмём в работу в течение дня'}</p>
+    </div>`;
+    return;
+  }
+
+  el.innerHTML = filtered.map(t=>{
+    const sm = STATUS_META[t.status]||STATUS_META.open;
+    const tlSteps = buildTimeline(t);
+    const msgs = (t.messages||[]);
+    const showConfirm = t.status==='review';
+
+    return `<div class="ticket-item" id="ti-${t.id}" onclick="toggleTicket('${t.id}')">
       <div class="ticket-item-head">
         <span class="ticket-item-title">${escapeHtml(t.title)}</span>
-        <span class="${t.status==='done'?'t-done':'t-open'}">${t.status==='done'?'Готово':'Открыта'}</span>
-      </div>
-      <div class="ticket-order-tag">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
-        ${escapeHtml(t.orderDomain || (t.orderId ? '№ '+t.orderId.slice(0,8).toUpperCase() : 'Сайт'))}
+        <span class="pill ${sm.cls}">${sm.label}</span>
       </div>
       ${t.description?`<div class="ticket-desc">${escapeHtml(t.description)}</div>`:''}
-      ${t.images&&t.images.length?`<div class="photo-previews" style="pointer-events:none">${t.images.map(src=>`<div class="photo-preview-wrap"><img src="${src}" alt=""/></div>`).join('')}</div>`:''}
-      ${t.adminReply?`<div class="ticket-reply"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${escapeHtml(t.adminReply)}</div>`:''}
-      <div class="ticket-date">${t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):''}</div>
-    </div>`).join('');
+      <div class="ticket-meta-row">
+        <span class="ticket-date">${fmtDateShort(t.createdAt)}</span>
+        ${t.orderDomain?`<span class="ticket-order-tag"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${escapeHtml(t.orderDomain)}</span>`:''}
+      </div>
+      ${t.images&&t.images.length?`<div class="photo-previews" style="pointer-events:none;margin-top:8px">${t.images.map(src=>`<div class="photo-preview-wrap"><img src="${src}" alt=""/></div>`).join('')}</div>`:''}
+
+      <!-- TIMELINE -->
+      <div class="ticket-timeline">
+        ${tlSteps}
+
+        <!-- MESSAGES -->
+        ${msgs.length?`<div class="tl-step"><div class="tl-dot done-dot"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div><div class="tl-step-body">
+          <div class="tl-step-label">Переписка</div>
+          <div class="ticket-messages">
+            ${msgs.map(m=>`<div class="tmsg ${m.fromAdmin?'tmsg-admin':'tmsg-client'}">
+              ${escapeHtml(m.text)}
+              <div class="tmsg-meta">${m.fromAdmin?'Antviz · ':'Вы · '}${fmtDateShort(m.createdAt)}</div>
+            </div>`).join('')}
+          </div>
+          <div class="ticket-comment-form" style="margin-top:10px">
+            <input class="ticket-comment-input" id="cmnt-${t.id}" placeholder="Написать уточнение..." maxlength="500" onclick="event.stopPropagation()"/>
+            <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();sendComment('${t.id}')">Отправить</button>
+          </div>
+        </div></div>`:
+        `<div class="tl-step"><div class="tl-dot"><svg viewBox="0 0 24 24" fill="none" stroke="var(--border2)" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><div class="tl-step-body">
+          <div class="tl-step-label" style="color:var(--muted)">Написать уточнение</div>
+          <div class="ticket-comment-form">
+            <input class="ticket-comment-input" id="cmnt-${t.id}" placeholder="Уточнить детали или добавить информацию..." maxlength="500" onclick="event.stopPropagation()"/>
+            <button class="btn btn-dark btn-sm" onclick="event.stopPropagation();sendComment('${t.id}')">Отправить</button>
+          </div>
+        </div></div>`}
+
+        <!-- CONFIRM ROW -->
+        ${showConfirm?`<div class="ticket-confirm-row" onclick="event.stopPropagation()">
+          <button class="btn btn-green btn-sm" onclick="confirmTicket('${t.id}',true)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><polyline points="20 6 9 17 4 12"/></svg>
+            Принять — всё готово
+          </button>
+          <button class="btn btn-outline btn-sm" onclick="confirmTicket('${t.id}',false)">Вернуть на доработку</button>
+        </div>`:''}
+      </div>
+    </div>`;
+  }).join('');
 }
+
+function buildTimeline(t){
+  const stepOrder = ['open','seen','in_progress','review','done'];
+  const curIdx = stepOrder.indexOf(t.status);
+  if(t.status==='rejected'){
+    return `<div class="tl-step"><div class="tl-dot done-dot" style="background:var(--bad);border-color:var(--bad)"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke="#fff" stroke-width="2.5"/><line x1="6" y1="6" x2="18" y2="18" stroke="#fff" stroke-width="2.5"/></svg></div><div class="tl-step-body"><div class="tl-step-label">Отклонена</div><div class="tl-step-date">${t.rejectedReason?escapeHtml(t.rejectedReason):''}</div></div></div>`;
+  }
+  return TIMELINE_STEPS.map((step,i)=>{
+    const isDone = i<=curIdx;
+    const isPending = i>curIdx;
+    const ts = t.timeline?.find(e=>e.status===step.key)?.ts;
+    return `<div class="tl-step ${isPending?'pending':''}">
+      <div class="tl-dot ${isDone?'done-dot':''}">
+        ${isDone?'<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':''}
+      </div>
+      <div class="tl-step-body">
+        <div class="tl-step-label">${step.label}</div>
+        ${ts?`<div class="tl-step-date">${fmtDateShort(ts)}</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+window.toggleTicket = function(id){
+  const el = document.getElementById('ti-'+id);
+  if(!el) return;
+  el.classList.toggle('expanded');
+};
+
+window.sendComment = async function(ticketId){
+  const input = document.getElementById('cmnt-'+ticketId);
+  const text = input?.value.trim();
+  if(!text){ toast('Напишите сообщение','error'); return; }
+  try{
+    const { addDoc: ad, collection: col, serverTimestamp: sts } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await ad(col(db,'service_tickets',ticketId,'messages'),{
+      text, fromAdmin:false,
+      authorName: currentUser.displayName||'Клиент',
+      createdAt: sts()
+    });
+    if(input) input.value='';
+    toast('Сообщение отправлено','success');
+    await loadTickets();
+  }catch(e){ toast('Ошибка: '+e.message,'error'); }
+};
+
+window.confirmTicket = async function(ticketId, accepted){
+  try{
+    const { updateDoc: ud, doc: dc, serverTimestamp: sts, arrayUnion: au } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    const newStatus = accepted ? 'done' : 'in_progress';
+    await ud(dc(db,'service_tickets',ticketId),{
+      status: newStatus,
+      timeline: au({ status: newStatus, label: accepted?'Принято клиентом':'Возвращено на доработку', ts: sts() })
+    });
+    toast(accepted ? 'Заявка закрыта ✓' : 'Заявка возвращена в работу', accepted?'success':'info');
+    await loadTickets();
+  }catch(e){ toast('Ошибка: '+e.message,'error'); }
+};
+
+window.requestSupport = async function(orderId){
+  if(paymentInFlight) return;
+  pendingSupportOrderId = orderId;
+  const btn = document.getElementById('buyOneBtn');
+  if(btn && orderId===pendingBuyOrderId){ btn.disabled=true; btn.textContent='Переходим к оплате...'; }
+  await payForSupport(false);
+};
+
+window.payForSupport = async function(isRenewal){
+  if(!pendingSupportOrderId){ toast('Не найден заказ для обслуживания','error'); return; }
+  if(paymentInFlight) return;
+  paymentInFlight=true;
+  const btn = isRenewal?document.getElementById('renewBtn'):document.getElementById('buyOneBtn');
+  if(btn){ btn.disabled=true; btn.textContent='Переходим к оплате...'; }
+  try{
+    const resp = await fetch(CREATE_PAYMENT_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({orderId:pendingSupportOrderId,amount:SUPPORT_PRICE,type:'support'})
+    });
+    const data = await resp.json();
+    if(data.paymentUrl){ window.location.href=data.paymentUrl; return; }
+    throw new Error('no payment url');
+  }catch(e){
+    paymentInFlight=false;
+    if(btn){
+      btn.disabled=false;
+      btn.innerHTML = isRenewal
+        ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg> Продлить — 500 ₽'
+        : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Подключить за 500 ₽';
+    }
+    toast('Не получилось открыть оплату. Попробуйте ещё раз.','error');
+  }
+};
 
 let ticketPhotos = [];
 
@@ -737,55 +1052,68 @@ window.previewPhotos = function(){
   const input = document.getElementById('ticketPhoto');
   const files = Array.from(input.files);
   if(!files.length) return;
-  if(ticketPhotos.length + files.length > 3){ toast('Максимум 3 фото','error'); input.value=''; return; }
+  if(ticketPhotos.length+files.length>3){ toast('Максимум 3 фото','error'); input.value=''; return; }
   files.forEach(file=>{
-    if(file.size > 4*1024*1024){ toast('Файл больше 4 МБ','error'); return; }
-    const reader = new FileReader();
-    reader.onload = e=>{ ticketPhotos.push(e.target.result); renderPhotoPreviews(); };
+    if(file.size>4*1024*1024){ toast('Файл больше 4 МБ','error'); return; }
+    const reader=new FileReader();
+    reader.onload=e=>{ ticketPhotos.push(e.target.result); renderPhotoPreviews(); };
     reader.readAsDataURL(file);
   });
   input.value='';
 };
 
 function renderPhotoPreviews(){
-  const el = document.getElementById('photoPreviews'); if(!el) return;
-  el.innerHTML = ticketPhotos.map((src,i)=>`
+  const el=document.getElementById('photoPreviews'); if(!el) return;
+  el.innerHTML=ticketPhotos.map((src,i)=>`
     <div class="photo-preview-wrap">
       <img src="${src}" alt=""/>
       <button class="photo-preview-remove" onclick="removePhoto(${i})">✕</button>
     </div>`).join('');
 }
 
-window.removePhoto = function(i){ ticketPhotos.splice(i,1); renderPhotoPreviews(); };
+window.removePhoto=function(i){ ticketPhotos.splice(i,1); renderPhotoPreviews(); };
 
 window.submitTicket = async function(){
-  const title = document.getElementById('ticketTitle').value.trim();
-  const desc = document.getElementById('ticketDesc').value.trim();
-  if(!title){ toast('Введите название заявки','error'); return; }
-  if(!selectedOrder){ toast('Не выбран сайт для заявки','error'); return; }
+  const title=document.getElementById('ticketTitle').value.trim();
+  const desc=document.getElementById('ticketDesc').value.trim();
+  if(!title){ toast('Введите тему заявки','error'); return; }
+  if(!selectedOrder){ toast('Не выбран сайт','error'); return; }
+
+  const activeCount = allTickets.filter(t=>t.status!=='done'&&t.status!=='rejected').length;
+  if(activeCount>=MAX_ACTIVE){ toast('Лимит активных заявок достигнут (5 из 5)','error'); return; }
+
+  const btn=document.getElementById('submitTicketBtn');
+  btn.disabled=true; btn.textContent='Отправляем...';
   try{
     await addDoc(collection(db,'service_tickets'),{
-      title, description: desc||'',
-      images: ticketPhotos.length ? ticketPhotos : null,
-      uid: currentUser.uid,
-      userName: currentUser.displayName||'Пользователь',
-      userEmail: currentUser.email||'',
-      orderId: selectedOrder.id,
-      orderSiteType: selectedOrder.siteType||'',
-      orderTariff: selectedOrder.tariff||selectedOrder.package||'',
-      orderDomain: selectedOrder.siteDomain||'',
+      title, description:desc||'',
+      images:ticketPhotos.length?ticketPhotos:null,
+      uid:currentUser.uid,
+      userName:currentUser.displayName||'Пользователь',
+      userEmail:currentUser.email||'',
+      orderId:selectedOrder.id,
+      orderSiteType:selectedOrder.siteType||'',
+      orderTariff:selectedOrder.tariff||selectedOrder.package||'',
+      orderDomain:selectedOrder.siteDomain||'',
       status:'open',
-      createdAt: serverTimestamp()
+      timeline:[{status:'open',label:'Заявка отправлена',ts:new Date()}],
+      messages:[],
+      createdAt:serverTimestamp()
     });
     document.getElementById('ticketTitle').value='';
     document.getElementById('ticketDesc').value='';
+    const cc=document.getElementById('charCount'); if(cc) cc.textContent='0 / 500';
     ticketPhotos=[]; renderPhotoPreviews();
     toast('Заявка отправлена ✓','success');
-    loadTickets();
+    await loadTickets();
   }catch(e){ toast('Ошибка: '+e.message,'error'); }
+  finally{
+    btn.disabled=false;
+    btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg> Отправить заявку`;
+  }
 };
 
-onAuthStateChanged(auth, async user=>{
+onAuthStateChanged(auth,async user=>{
   if(!user){ window.location.href='../auth'; return; }
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';

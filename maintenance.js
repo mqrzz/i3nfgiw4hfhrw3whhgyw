@@ -13,19 +13,22 @@
     let currentUser = null;
     const ADMIN = 'wbtipoofficialcom@gmail.com';
 
-    // Ждём пока auth инициализируется
     onAuthStateChanged(auth, user => { currentUser = user; });
 
     onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
       const on = snap.exists() && snap.data().enabled === true;
-      // Администратор не видит экран тех.работ
-      if (on && currentUser?.email === ADMIN) return;
-      if (!on && currentUser?.email === ADMIN) return;
+      if (currentUser?.email === ADMIN) return;
 
       if (on && !mo) {
         mo = document.createElement('div');
-        mo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:32px;font-family:Geologica,sans-serif;color:#191b1e';
-        mo.innerHTML = '<div style="font-size:40px">🔧</div><div style="font-size:24px;font-weight:500;letter-spacing:-.03em">Технические работы</div><div style="font-size:15px;color:#707a8a;max-width:360px;font-weight:300;line-height:1.6">Сайт временно недоступен — скоро всё будет готово.</div>';
+        mo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#191b1e;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Geologica,Inter,Arial,sans-serif';
+        mo.innerHTML = `
+          <div style="background:#191b1e;border-radius:64px;padding:80px 100px;text-align:center;position:relative;overflow:hidden;max-width:700px;width:100%;border:1px solid rgba(255,255,255,.06)">
+            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(30,222,123,.10),transparent);pointer-events:none"></div>
+            <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#1ede7b;margin-bottom:24px">Технические работы</div>
+            <h1 style="font-size:clamp(40px,7vw,80px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin:0 0 20px">Скоро <em style="font-style:normal;color:#1ede7b">вернёмся</em></h1>
+            <p style="font-size:clamp(15px,1.5vw,18px);color:rgba(255,255,255,.45);font-weight:300;line-height:1.6;max-width:440px;margin:0 auto">Сайт временно недоступен — мы уже работаем над улучшениями. Обычно это занимает не больше часа.</p>
+          </div>`;
         document.body.appendChild(mo);
         document.body.style.overflow = 'hidden';
       } else if (!on && mo) {

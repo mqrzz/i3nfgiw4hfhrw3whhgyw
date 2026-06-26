@@ -8,172 +8,20 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet" />
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#ffffff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
-      --line:#dfe3e8;--line-strong:#cbcdd6;
-      --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
-      --accent:#1ede7b;--accent-soft:#1ac16b;--accent-wash:rgba(30,222,123,.12);
-      --good:#1ede7b;--good-wash:rgba(30,222,123,.12);
-      --warn:#f59e0b;--warn-wash:rgba(245,158,11,.1);
-      --bad:#e8634f;--bad-wash:rgba(232,99,79,.1);
-      --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
-      --dark:#191b1e;
-      --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:#ffffff; --surface:#f9fafc; --surface-2:#f2f4f7; --surface-3:#e9ecf1;
+      --line:#dfe3e8; --line-strong:#cbcdd6;
+      --ink:#191b1e; --ink-dim:#707a8a; --ink-faint:#9aa2b1;
+      --accent:#1ede7b; --accent-soft:#1ac16b; --accent-wash:rgba(30,222,123,.12);
+      --good:#1ede7b; --good-wash:rgba(30,222,123,.12);
+      --warn:#f59e0b; --warn-wash:rgba(245,158,11,.1);
+      --bad:#e8634f; --bad-wash:rgba(232,99,79,.1);
+      --info:#3b82f6; --info-wash:rgba(59,130,246,.1);
+      --r-xs:6px; --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:40px;
+      --filter-height: 36px;
       --font:'Geologica','Inter','Arial',sans-serif;
     }
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-    :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes rowIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-
-    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-    .spinner{width:24px;height:24px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
-
-    .ticket-shell{width:100%;animation:fadeUp .25s ease}
-
-    /* HERO */
-    .page-hero{background:var(--dark);border-radius:40px;padding:44px 48px 40px;margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-    .page-hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
-    .page-hero-title{font-family:var(--font);font-weight:500;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:8px;display:flex;align-items:center;gap:12px}
-    .page-hero-sub{color:rgba(255,255,255,.3);font-size:.88rem;font-weight:300}
-    .unread-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-size:.65rem;font-weight:500;width:22px;height:22px;border-radius:50%;vertical-align:middle;flex-shrink:0}
-
-    /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:.75rem 1.4rem;border-radius:14px;font-family:var(--font);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,transform .12s,border-color .15s,color .15s;white-space:nowrap}
-    .btn:hover{transform:translateY(-1px)}
-    .btn svg{width:14px;height:14px;flex-shrink:0}
-    .btn-primary{background:var(--accent);color:#191b1e}
-    .btn-primary:hover{background:var(--accent-soft)}
-    .btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
-    .btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
-    .btn-ghost-light{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
-    .btn-ghost-light:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
-    .btn-xs{padding:.36rem .75rem;font-size:.72rem;border-radius:10px}
-
-    /* TOOLBAR */
-    .ticket-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-    .ticket-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-    .ticket-tabs{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:4px;gap:2px}
-    .ticket-tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1rem;border-radius:14px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
-    .ticket-tab:hover{color:var(--ink)}
-    .ticket-tab.is-active{background:var(--accent-wash);color:var(--accent-soft)}
-    .ticket-search{position:relative}
-    .ticket-search input{background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:14px;padding:.5rem .9rem .5rem 2.2rem;color:var(--ink);font-family:var(--font);font-size:.8rem;outline:none;width:200px;transition:border-color .18s,width .2s}
-    .ticket-search input:focus{border-color:var(--accent);width:240px}
-    .ticket-search input::placeholder{color:var(--ink-faint)}
-    .ticket-search svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--ink-faint);stroke-width:2;fill:none}
-    .ticket-count{color:var(--ink-faint);font-size:.76rem}
-    .topic-filter select{background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:14px;padding:.5rem 2rem .5rem .9rem;color:var(--ink);font-family:var(--font);font-size:.78rem;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;min-width:160px}
-    .topic-filter select:focus{border-color:var(--accent)}
-
-    /* LIST */
-    .ticket-cols{display:grid;grid-template-columns:1fr 130px 120px 110px 22px;gap:16px;padding:0 24px 12px;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
-    .ticket-list{border:1.5px solid var(--line);border-radius:28px;overflow:hidden}
-    .ticket-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
-    .ticket-row-wrap:last-child{border-bottom:none}
-    .ticket-row{all:unset;display:grid;grid-template-columns:1fr 130px 120px 110px 22px;gap:16px;align-items:center;width:100%;padding:20px 24px;cursor:pointer;transition:background .15s;font-family:var(--font)}
-    .ticket-row:hover{background:var(--surface)}
-    .ticket-cell-main{display:flex;flex-direction:column;gap:4px;min-width:0}
-    .ticket-subject{font-size:.9rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-    .ticket-subject.has-unread{color:var(--accent-soft)}
-    .ticket-preview{font-size:.76rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
-    .ticket-meta{font-size:.7rem;color:var(--ink-faint)}
-    .ticket-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .65rem;border-radius:8px;width:fit-content}
-    .ticket-tag.open{background:var(--info-wash);color:var(--info)}
-    .ticket-tag.in-progress{background:var(--warn-wash);color:var(--warn)}
-    .ticket-tag.resolved{background:var(--good-wash);color:var(--good)}
-    .ticket-tag.closed{background:var(--surface-3);color:var(--ink-faint)}
-    .ticket-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
-    .ticket-row-wrap:has(.ticket-body.open) .ticket-chevron{transform:rotate(180deg)}
-    .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--bad);display:inline-block;flex-shrink:0;animation:pulse 1.5s infinite}
-    .ticket-mobile-tags{display:none}
-
-    /* BODY */
-    .ticket-body{display:none;border-top:1px solid var(--line);padding:28px 24px 30px;background:var(--surface)}
-    .ticket-body.open{display:block;animation:fadeUp .2s ease}
-
-    /* CHAT */
-    .chat-wrapper{position:relative}
-    .chat-box{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;max-height:460px;overflow-y:auto;padding-right:6px;scroll-behavior:smooth}
-    .chat-msg{padding:11px 15px;border-radius:16px;max-width:84%;font-size:.84rem;line-height:1.55;animation:fadeUp .15s ease}
-    .chat-msg.user{background:var(--accent-wash);color:var(--ink);align-self:flex-end;border-bottom-right-radius:4px}
-    .chat-msg.support{background:var(--surface-2);color:var(--ink-dim);align-self:flex-start;border-bottom-left-radius:4px;border:1px solid var(--line)}
-    .chat-msg .msg-date{font-size:.62rem;color:var(--ink-faint);display:block;margin-top:4px}
-    .chat-msg .msg-img{max-width:160px;border-radius:10px;margin-top:6px;border:1px solid var(--line)}
-    .msg-divider{font-size:.68rem;color:var(--ink-faint);text-align:center;padding:8px 0 4px;font-weight:500;letter-spacing:.04em}
-    .chat-input-wrap{display:flex;gap:8px;margin-top:6px}
-    .chat-input-wrap input{flex:1;background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:14px;padding:.65rem 1rem;color:var(--ink);font-family:var(--font);font-size:.84rem;outline:none;transition:border-color .18s}
-    .chat-input-wrap input:focus{border-color:var(--accent)}
-    .chat-input-wrap input::placeholder{color:var(--ink-faint)}
-    .scroll-down-btn{position:absolute;bottom:64px;right:12px;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink-faint);transition:all .2s;opacity:0;pointer-events:none}
-    .scroll-down-btn.visible{opacity:1;pointer-events:all}
-    .scroll-down-btn:hover{background:var(--surface-2);border-color:var(--accent-soft);color:var(--accent-soft)}
-    .scroll-down-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
-
-    /* FORM MODAL */
-    .ticket-form-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-    .ticket-form-overlay.show{opacity:1;pointer-events:all}
-    .ticket-form-modal{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:32px;padding:36px 32px;width:100%;max-width:480px;transform:translateY(14px) scale(.98);transition:transform .2s}
-    .ticket-form-overlay.show .ticket-form-modal{transform:translateY(0) scale(1)}
-    .ticket-form-modal h3{font-family:var(--font);font-size:1.15rem;font-weight:500;margin-bottom:24px;text-align:center}
-    .ticket-form-group{margin-bottom:14px}
-    .ticket-form-group label{display:block;font-size:.68rem;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px}
-    .ticket-form-group select,.ticket-form-group input,.ticket-form-group textarea{width:100%;background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:12px;padding:.7rem .9rem;color:var(--ink);font-family:var(--font);font-size:.88rem;outline:none;transition:border-color .18s}
-    .ticket-form-group select:focus,.ticket-form-group input:focus,.ticket-form-group textarea:focus{border-color:var(--accent)}
-    .ticket-form-group textarea{min-height:84px;resize:vertical}
-    .ticket-form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;background-color:var(--surface-2)}
-    .ticket-form-group select option{background:var(--surface-2);color:var(--ink)}
-    .ticket-form-actions{display:flex;gap:10px;margin-top:22px}
-    .ticket-form-actions .btn{flex:1;justify-content:center}
-    .file-preview{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--ink-faint);margin-top:6px}
-    .file-preview .remove-file{cursor:pointer;color:var(--bad)}
-
-    .empty{text-align:center;padding:72px 16px;color:var(--ink-faint)}
-    .empty-icon{margin-bottom:20px;display:flex;justify-content:center}
-    .empty-icon svg{width:48px;height:48px;stroke:var(--accent);stroke-width:1.2;fill:none;opacity:.5}
-    .empty h3{font-family:var(--font);font-size:1.05rem;font-weight:500;color:var(--ink);margin-bottom:8px}
-    .empty p{font-size:.86rem;margin-bottom:22px}
-
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--good);color:#0d3320}
-    .toast.error{background:var(--bad);color:#fff}
-    .toast.info{background:var(--accent);color:#191b1e}
-
-    @media(max-width:840px){
-      .page-hero{border-radius:24px;padding:28px 24px 24px}
-      .page-hero-title{font-size:1.8rem}
-      .ticket-cols{display:none}
-      .ticket-list{border-radius:20px}
-      .ticket-row{grid-template-columns:1fr;gap:4px;padding:18px 48px 18px 20px;position:relative}
-      .ticket-cell-status,.ticket-cell-date{display:none}
-      .ticket-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
-      .ticket-row-wrap:has(.ticket-body.open) .ticket-chevron{transform:translateY(-50%) rotate(180deg)}
-      .ticket-mobile-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
-      .ticket-preview{max-width:100%}
-      .chat-box{max-height:55vh;min-height:200px}
-      .ticket-body{padding:18px 18px 22px}
-      .chat-input-wrap{flex-wrap:wrap}
-    }
-    @media(max-width:480px){
-      .page-hero{border-radius:18px;padding:22px 20px}
-      .ticket-toolbar{flex-direction:column;align-items:stretch;gap:8px}
-      .ticket-search{width:100%}
-      .ticket-search input{width:100%}
-      .ticket-search input:focus{width:100%}
-      .ticket-form-modal{padding:24px 18px}
-      .chat-box{max-height:60vh;min-height:220px}
-      .ticket-filters{flex-direction:column;align-items:stretch;gap:8px}
-      .ticket-tabs{width:100%;overflow-x:auto}
-      .topic-filter select{width:100%}
-    }
-    #sbContent{padding-bottom:80px}
-  </style>
     html{scroll-behavior:smooth}
     body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:15px;-webkit-font-smoothing:antialiased}
     @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
@@ -337,18 +185,13 @@
 <div id="sbContent" style="display:none">
 <div class="ticket-shell" id="appWrap">
 
-  <!-- HERO -->
-  <div class="page-hero">
+  <div class="ticket-head">
     <div>
-      <div class="page-hero-eyebrow">Личный кабинет</div>
-      <div class="page-hero-title">
-        Поддержка
-        <span class="unread-badge" id="headerUnread" style="display:none">0</span>
-      </div>
-      <div class="page-hero-sub">Вопросы, идеи, сообщения об ошибках — мы на связи</div>
+      <div class="ticket-title">Поддержка<span class="unread-badge" id="headerUnread" style="display:none">0</span></div>
+      <div class="ticket-sub">Вопросы, идеи, сообщения об ошибках — мы на связи</div>
     </div>
-    <button class="btn btn-ghost" id="newTicketBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+    <button class="btn btn-primary" id="newTicketBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
       Новый тикет
     </button>
   </div>
@@ -373,7 +216,7 @@
       </div>
       <div class="ticket-search">
         <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Поиск..."/>
+        <input type="text" id="searchInput" placeholder="Поиск..." />
       </div>
     </div>
     <span class="ticket-count" id="ticketCount"></span>

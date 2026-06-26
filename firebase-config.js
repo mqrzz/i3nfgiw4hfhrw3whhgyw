@@ -1,3 +1,6 @@
+// Версия Firebase — меняй только здесь
+export const FIREBASE_VERSION = '10.12.0';
+
 // firebase-config.js — общий модуль, импортируется всеми страницами
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";

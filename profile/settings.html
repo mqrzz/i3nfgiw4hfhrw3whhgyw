@@ -8,19 +8,148 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --bg:#ffffff; --surface:#f9fafc; --surface-2:#f2f4f7; --surface-3:#e9ecf1;
-      --line:#dfe3e8; --line-strong:#cbcdd6;
-      --ink:#191b1e; --ink-dim:#707a8a; --ink-faint:#9aa2b1;
-      --accent:#1ede7b; --accent-soft:#1ac16b; --accent-wash:rgba(30,222,123,.12);
-      --good:#1ede7b; --good-wash:rgba(30,222,123,.12);
-      --warn:#f59e0b; --warn-wash:rgba(245,158,11,.08);
-      --bad:#e8634f; --bad-wash:rgba(232,99,79,.08);
-      --r-xs:6px; --r-sm:10px; --r-md:16px; --r-lg:24px; --r-xl:40px;
-      --nav-h:64px;
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#ffffff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
+      --line:#dfe3e8;--line-strong:#cbcdd6;
+      --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+      --accent:#1ede7b;--accent-soft:#1ac16b;--accent-wash:rgba(30,222,123,.12);
+      --good:#1ede7b;--good-wash:rgba(30,222,123,.12);
+      --warn:#f59e0b;--warn-wash:rgba(245,158,11,.08);
+      --bad:#e8634f;--bad-wash:rgba(232,99,79,.08);
+      --dark:#191b1e;
+      --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
       --font:'Geologica','Inter','Arial',sans-serif;
     }
+    html{scroll-behavior:smooth}
+    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+    :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+    .spinner{width:24px;height:24px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+    .loading-text{color:var(--ink-faint);font-size:.75rem}
+
+    /* SHELL */
+    .set-shell{width:100%;animation:fadeUp .25s ease}
+
+    /* HERO */
+    .page-hero{background:var(--dark);border-radius:40px;padding:44px 48px 40px;margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    .page-hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
+    .page-hero-title{font-family:var(--font);font-weight:500;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:8px}
+    .page-hero-sub{color:rgba(255,255,255,.3);font-size:.88rem;font-weight:300}
+
+    /* IDENTITY CHIP */
+    .set-identity{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:8px 18px 8px 8px}
+    .set-avatar{width:38px;height:38px;border-radius:12px;background:var(--accent);color:#191b1e;display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:.88rem;font-weight:500;flex-shrink:0}
+    .set-identity-name{font-size:.84rem;font-weight:500;color:#fff}
+    .set-identity-mail{font-size:.72rem;color:rgba(255,255,255,.35)}
+
+    /* CONTENT */
+    .set-main{display:flex;flex-direction:column;gap:20px;min-width:0}
+
+    /* SECTION CARD */
+    .set-section-card{background:var(--surface);border:1.5px solid var(--line);border-radius:32px;padding:36px}
+    .set-section-head{margin-bottom:24px}
+    .set-section-title{font-family:var(--font);font-weight:500;font-size:1.1rem;letter-spacing:-.02em;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+    .set-section-title svg{width:18px;height:18px;stroke:var(--accent);stroke-width:1.8;fill:none;flex-shrink:0}
+    .set-section-sub{color:var(--ink-dim);font-size:.84rem}
+
+    /* FORM */
+    .set-row{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    @media(max-width:640px){.set-row{grid-template-columns:1fr}}
+    .set-label{display:block;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:9px;font-weight:500}
+    .set-input{width:100%;background:#fff;border:1.5px solid var(--line-strong);border-radius:14px;padding:.82rem 1rem;color:var(--ink);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .18s,box-shadow .18s}
+    .set-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+    .set-input:disabled{opacity:.5;cursor:default;background:var(--surface-2)}
+    .set-input::placeholder{color:var(--ink-faint)}
+    .set-field-foot{display:flex;justify-content:flex-end;margin-top:22px}
+
+    /* AUTH METHOD */
+    .auth-method-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .auth-method-icon.google{background:var(--surface-2)}
+    .auth-method-icon.email{background:var(--accent-wash)}
+    .auth-method-icon svg{width:20px;height:20px}
+    .auth-method-icon.email svg{stroke:var(--accent-soft)}
+    .auth-method-info{flex:1}
+    .auth-method-label{font-size:.7rem;color:var(--ink-faint);margin-bottom:2px}
+    .auth-method-value{font-size:.9rem;font-weight:500;color:var(--ink)}
+    .auth-method-badge{font-size:.7rem;font-weight:500;padding:.25rem .65rem;border-radius:8px;background:var(--good-wash);color:#149955;border:1px solid rgba(30,222,123,.25)}
+    #authMethodRow{display:flex;align-items:center;gap:14px}
+
+    .set-divider-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin:28px 0 18px;padding-top:28px;border-top:1px solid var(--line);font-weight:500}
+
+    .google-alert{display:flex;align-items:flex-start;gap:10px;background:var(--warn-wash);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 16px;font-size:.84rem;color:#b97a0a;line-height:1.55}
+    .google-alert svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;flex-shrink:0;margin-top:1px;fill:none}
+
+    .reset-form{display:none}
+    .reset-form.visible{display:block;animation:fadeUp .18s ease}
+    .reset-hint{font-size:.84rem;color:var(--ink-dim);margin-bottom:16px;line-height:1.6}
+
+    /* NOTIFICATIONS */
+    .notif-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .notif-row-info{flex:1}
+    .notif-row-title{font-size:.92rem;font-weight:500;margin-bottom:3px;color:var(--ink)}
+    .notif-row-sub{font-size:.8rem;color:var(--ink-faint)}
+    .toggle-wrap{position:relative;width:46px;height:26px;flex-shrink:0}
+    .toggle-wrap input{opacity:0;width:0;height:0;position:absolute}
+    .toggle-track{position:absolute;inset:0;background:var(--surface-3);border:1px solid var(--line-strong);border-radius:99px;cursor:pointer;transition:.2s}
+    .toggle-track::before{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+    input:checked+.toggle-track{background:var(--accent);border-color:var(--accent)}
+    input:checked+.toggle-track::before{transform:translateX(20px)}
+    .notif-status{font-size:.78rem;color:var(--ink-faint);margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+
+    /* DANGER */
+    .danger-card{background:var(--surface);border:1.5px solid var(--line);border-radius:32px;padding:8px 36px}
+    .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:24px 0;border-bottom:1px solid var(--line)}
+    .danger-row:last-child{border-bottom:none}
+    .danger-row h4{font-size:.92rem;font-weight:500;margin-bottom:3px;color:var(--ink)}
+    .danger-row p{font-size:.8rem;color:var(--ink-faint)}
+
+    /* BUTTONS */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.75rem 1.4rem;border-radius:14px;font-family:var(--font);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s,transform .12s;white-space:nowrap}
+    .btn:hover{transform:translateY(-1px)}
+    .btn svg{width:14px;height:14px}
+    .btn-primary{background:var(--accent);color:#191b1e}
+    .btn-primary:hover{background:var(--accent-soft)}
+    .btn-ghost{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
+    .btn-ghost:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
+    .btn-danger{background:var(--bad-wash);color:#c44432;border:1px solid rgba(232,99,79,.25)}
+    .btn-danger:hover{background:rgba(232,99,79,.16)}
+    .btn:disabled{opacity:.5;cursor:default;transform:none}
+
+    /* MODAL */
+    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(25,27,30,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay.show{opacity:1;pointer-events:all}
+    .modal{background:#fff;border:1.5px solid var(--line);border-radius:32px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .2s;box-shadow:0 20px 60px rgba(0,51,153,.12)}
+    .modal-overlay.show .modal{transform:translateY(0) scale(1)}
+    .modal-icon-wrap{width:50px;height:50px;border-radius:50%;background:var(--bad-wash);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .modal-icon-wrap svg{width:22px;height:22px;stroke:#c44432;stroke-width:1.7;fill:none}
+    .modal h3{font-family:var(--font);font-size:1.1rem;font-weight:500;margin-bottom:8px;text-align:center}
+    .modal-p{color:var(--ink-dim);font-size:.86rem;text-align:center;margin-bottom:20px;line-height:1.6}
+    .modal-btns{display:flex;gap:10px}
+    .modal-btns .btn{flex:1;justify-content:center}
+
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+    .toast.success{background:var(--good);color:#0d3320}
+    .toast.error{background:#e8634f;color:#fff}
+    .toast.info{background:var(--accent);color:#191b1e}
+
+    @media(max-width:880px){
+      .page-hero{border-radius:24px;padding:28px 24px 24px}
+      .page-hero-title{font-size:1.8rem}
+      .set-section-card,.danger-card{padding:24px}
+    }
+    @media(max-width:480px){
+      .page-hero{border-radius:18px;padding:22px 20px;flex-direction:column;align-items:flex-start}
+      .danger-row{flex-direction:column;align-items:flex-start}
+      .danger-row .btn{align-self:flex-start}
+    }
+    #sbContent{padding-bottom:80px}
+  </style>
     html{scroll-behavior:smooth}
     body{
       background:var(--bg); color:var(--ink);
@@ -118,41 +247,41 @@
     .danger-row p{font-size:.8rem;color:var(--ink-faint)}
 
     /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:.7rem 1.4rem;border-radius:var(--r-md);font-family:var(--font,'Geologica',sans-serif);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s,transform .12s;white-space:nowrap}
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:.75rem 1.4rem;border-radius:14px;font-family:var(--font);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,border-color .15s,color .15s,transform .12s;white-space:nowrap}
     .btn:hover{transform:translateY(-1px)}
     .btn svg{width:14px;height:14px}
     .btn-primary{background:var(--accent);color:#191b1e}
     .btn-primary:hover{background:var(--accent-soft)}
-    .btn-ghost{background:transparent;border:1px solid var(--line-strong);color:var(--ink-dim)}
+    .btn-ghost{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
     .btn-ghost:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
     .btn-danger{background:var(--bad-wash);color:#c44432;border:1px solid rgba(232,99,79,.25)}
     .btn-danger:hover{background:rgba(232,99,79,.16)}
     .btn:disabled{opacity:.5;cursor:default}
 
     /* MODAL */
-    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(25,27,30,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(25,27,30,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
     .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:#fff;border:1px solid var(--line);border-radius:var(--r-xl);padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .2s;box-shadow:0 20px 60px rgba(0,51,153,.15)}
+    .modal{background:#fff;border:1.5px solid var(--line);border-radius:32px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .2s;box-shadow:0 20px 60px rgba(0,51,153,.12)}
     .modal-overlay.show .modal{transform:translateY(0) scale(1)}
-    .modal-icon-wrap{width:46px;height:46px;border-radius:50%;background:var(--bad-wash);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+    .modal-icon-wrap{width:50px;height:50px;border-radius:50%;background:var(--bad-wash);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
     .modal-icon-wrap svg{width:22px;height:22px;stroke:#c44432;stroke-width:1.7;fill:none}
-    .modal h3{font-family:var(--font,'Geologica',sans-serif);font-size:1.1rem;font-weight:500;margin-bottom:8px;text-align:center}
+    .modal h3{font-family:var(--font);font-size:1.1rem;font-weight:500;margin-bottom:8px;text-align:center}
     .modal-p{color:var(--ink-dim);font-size:.86rem;text-align:center;margin-bottom:20px;line-height:1.6}
     .modal-btns{display:flex;gap:10px}
     .modal-btns .btn{flex:1;justify-content:center}
 
     /* TOAST */
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.6rem 1.3rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--good);color:#0d3320}
     .toast.error{background:#e8634f;color:#fff}
     .toast.info{background:var(--accent);color:#191b1e}
 
-    @media (max-width:880px){
-      .set-block,.danger-block{padding:22px}
+    @media(max-width:880px){
+      .set-section-card,.danger-card{padding:22px}
     }
-    @media (max-width:480px){
-      .set-head{flex-direction:column;align-items:flex-start;gap:16px}
+    @media(max-width:480px){
+      .page-hero{border-radius:18px;padding:22px 20px;flex-direction:column;align-items:flex-start}
       .danger-row{flex-direction:column;align-items:flex-start}
       .danger-row .btn{align-self:flex-start}
     }
@@ -187,14 +316,15 @@
 <div id="sbContent" style="display:none">
 <div class="set-shell" id="appWrap">
 
-  <div class="set-head">
+  <div class="page-hero">
     <div>
-      <div class="set-title">Настройки аккаунта</div>
-      <div class="set-sub">Профиль, доступ и уведомления — в одном месте</div>
+      <div class="page-hero-eyebrow">Личный кабинет</div>
+      <div class="page-hero-title">Настройки</div>
+      <div class="page-hero-sub">Профиль, доступ и уведомления</div>
     </div>
     <div class="set-identity">
       <div class="set-avatar" id="identityAvatar">A</div>
-      <div class="set-identity-text">
+      <div>
         <div class="set-identity-name" id="identityName">—</div>
         <div class="set-identity-mail" id="identityMail">—</div>
       </div>
@@ -204,84 +334,89 @@
     <div class="set-main">
 
       <!-- ПРОФИЛЬ -->
-      <section class="set-section" id="sec-profile">
+      <section class="set-section-card" id="sec-profile">
         <div class="set-section-head">
-          <div class="set-section-title">Профиль</div>
+          <div class="set-section-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            Профиль
+          </div>
           <div class="set-section-sub">Эти данные видны в личном кабинете и приходят вместе с заявками.</div>
         </div>
-        <div class="set-block">
-          <div class="set-row">
-            <div class="set-field">
-              <label class="set-label">Имя</label>
-              <input class="set-input" type="text" id="settingName"/>
-            </div>
-            <div class="set-field">
-              <label class="set-label">Email</label>
-              <input class="set-input" id="settingEmail" disabled/>
-            </div>
+        <div class="set-row">
+          <div>
+            <label class="set-label">Имя</label>
+            <input class="set-input" type="text" id="settingName"/>
           </div>
-          <div class="set-field-foot">
-            <button class="btn btn-primary" onclick="saveSettings()">Сохранить изменения</button>
+          <div>
+            <label class="set-label">Email</label>
+            <input class="set-input" id="settingEmail" disabled/>
           </div>
+        </div>
+        <div class="set-field-foot">
+          <button class="btn btn-primary" onclick="saveSettings()">Сохранить изменения</button>
         </div>
       </section>
 
       <!-- ВХОД И БЕЗОПАСНОСТЬ -->
-      <section class="set-section" id="sec-access">
+      <section class="set-section-card" id="sec-access">
         <div class="set-section-head">
-          <div class="set-section-title">Вход и безопасность</div>
+          <div class="set-section-title">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Вход и безопасность
+          </div>
           <div class="set-section-sub">Способ входа в аккаунт и восстановление пароля.</div>
         </div>
-        <div class="set-block">
-          <div id="authMethodRow"><!-- filled by JS --></div>
-
-          <div class="set-divider-label">Сброс пароля</div>
-          <div class="google-alert" id="googleResetAlert" style="display:none">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span>Вы вошли через Google — управляйте паролем в настройках Google-аккаунта.</span>
+        <div id="authMethodRow"><!-- filled by JS --></div>
+        <div class="set-divider-label">Сброс пароля</div>
+        <div class="google-alert" id="googleResetAlert" style="display:none">
+          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span>Вы вошли через Google — управляйте паролем в настройках Google-аккаунта.</span>
+        </div>
+        <div class="reset-form" id="resetForm">
+          <p class="reset-hint">Введите email — пришлём ссылку для сброса пароля.</p>
+          <div style="margin-bottom:16px">
+            <label class="set-label">Email для подтверждения</label>
+            <input class="set-input" type="email" id="resetEmailInput" placeholder="your@email.com"/>
           </div>
-          <div class="reset-form" id="resetForm">
-            <p class="reset-hint">Введите email — пришлём ссылку для сброса пароля.</p>
-            <div class="set-field" style="margin-bottom:16px">
-              <label class="set-label">Email для подтверждения</label>
-              <input class="set-input" type="email" id="resetEmailInput" placeholder="your@email.com"/>
-            </div>
-            <button class="btn btn-ghost" onclick="sendPasswordReset()">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-              Отправить ссылку
-            </button>
-          </div>
+          <button class="btn btn-ghost" onclick="sendPasswordReset()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Отправить ссылку
+          </button>
         </div>
       </section>
 
       <!-- УВЕДОМЛЕНИЯ -->
-      <section class="set-section" id="sec-notifications">
+      <section class="set-section-card" id="sec-notifications">
         <div class="set-section-head">
-          <div class="set-section-title">Уведомления</div>
+          <div class="set-section-title">
+            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            Уведомления
+          </div>
           <div class="set-section-sub">Получайте статусы заказа сразу, как только что-то меняется.</div>
         </div>
-        <div class="set-block">
-          <div class="notif-row">
-            <div class="notif-row-info">
-              <div class="notif-row-title">Push-уведомления</div>
-              <div class="notif-row-sub">Статусы заказа в реальном времени, прямо в браузере</div>
-            </div>
-            <label class="toggle-wrap">
-              <input type="checkbox" id="pushToggle" onchange="handlePushToggle(this.checked)"/>
-              <span class="toggle-track"></span>
-            </label>
+        <div class="notif-row">
+          <div class="notif-row-info">
+            <div class="notif-row-title">Push-уведомления</div>
+            <div class="notif-row-sub">Статусы заказа в реальном времени, прямо в браузере</div>
           </div>
-          <p class="notif-status" id="pushStatus">Статус: не включены</p>
+          <label class="toggle-wrap">
+            <input type="checkbox" id="pushToggle" onchange="handlePushToggle(this.checked)"/>
+            <span class="toggle-track"></span>
+          </label>
         </div>
+        <p class="notif-status" id="pushStatus">Статус: не включены</p>
       </section>
 
       <!-- ОПАСНАЯ ЗОНА -->
-      <section class="set-section" id="sec-danger">
-        <div class="set-section-head">
-          <div class="set-section-title">Опасная зона</div>
+      <section id="sec-danger">
+        <div class="set-section-head" style="margin-bottom:16px">
+          <div class="set-section-title">
+            <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Опасная зона
+          </div>
           <div class="set-section-sub">Действия с аккаунтом, которые нельзя отменить.</div>
         </div>
-        <div class="danger-block">
+        <div class="danger-card">
           <div class="danger-row">
             <div><h4>Выйти из аккаунта</h4><p>Завершить текущую сессию на этом устройстве</p></div>
             <button class="btn btn-danger" onclick="doLogout()">Выйти</button>

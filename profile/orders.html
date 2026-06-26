@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="../global.css"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Мои заказы — Antviz</title>
   <link rel="icon" href="../img/favicon.png" type="image/png"/>
@@ -9,22 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#ffffff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
-      --line:#dfe3e8;--line-strong:#cbcdd6;
-      --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
-      --accent:#1ede7b;--accent-soft:#1ac16b;--accent-wash:rgba(30,222,123,.12);
-      --good:#1ede7b;--good-wash:rgba(30,222,123,.12);
-      --warn:#f59e0b;--warn-wash:rgba(245,158,11,.1);
-      --bad:#e8634f;--bad-wash:rgba(232,99,79,.1);
-      --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
-      --dark:#191b1e;
-      --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
-      --font:'Geologica','Inter','Arial',sans-serif;
-    }
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}}
     :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
 
     @keyframes spin{to{transform:rotate(360deg)}}
@@ -233,6 +219,7 @@
   </style>
 </head>
 <body>
+<script src="../GEOBLOCK.js"></script>
 <script src="../nav.js" data-page="orders"></script>
 <script src="../sidebar.js" data-page="orders"></script>
 
@@ -552,7 +539,8 @@ window.printReceipt = function(id){
   const extrasLabels = {domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
   const extrasHtml = (o.extras||[]).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e=>extrasLabels[e]||e).join(', ')}</td></tr>` : '';
   const totalHtml = `<tr class="total"><td>Итого</td><td>${o.totalPrice ? o.totalPrice.toLocaleString('ru') + ' ₽' : '—'}</td></tr>`;
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr>${totalHtml}</table><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr>${totalHtml}</table><script>window.onload=function(){window.print();};<\/script><script src="../maintenance.js"></script>
+</body></html>`;
   w.document.write(html);
   w.document.close();
 };

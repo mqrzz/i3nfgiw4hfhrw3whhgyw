@@ -2,6 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/>
+  <link rel="stylesheet" href="global.css"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Новый заказ — Antviz</title>
 <meta name="description" content="Оформите заказ на сайт в Antviz: выберите формат, тариф и дополнения."/>
@@ -272,6 +273,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 </style>
 </head>
 <body>
+<script src="GEOBLOCK.js"></script>
 <script src="nav.js" data-page="order"></script>
 
 <!-- PROGRESS BAR -->
@@ -623,7 +625,6 @@ function escH(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&
 function toast(msg,type='info'){const el=document.getElementById('ovToast');el.textContent=msg;el.className='toast '+type+' show';setTimeout(()=>{el.className='toast';},3400);}
 
 onAuthStateChanged(auth,async user=>{
-  try{const s=await getDoc(doc(db,'settings','maintenance'));if(s.exists()&&s.data().enabled){document.body.innerHTML='<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:Geologica,sans-serif;color:#191b1e;background:#fff;gap:1rem;text-align:center;padding:2rem"><div style="font-size:24px;font-weight:500">Технические работы</div><div style="color:#707a8a;font-size:15px;max-width:360px;line-height:1.65;font-weight:300;margin-top:8px">Страница временно недоступна.</div><a href="/" style="color:#149955;text-decoration:none;font-size:14px;margin-top:.5rem">← На главную</a></div>';return;}}catch(e){}
   if(!user){window.location.href='auth';return;}
   currentUser=user;
 });
@@ -933,5 +934,6 @@ window.acceptCookies=function(){localStorage.setItem('cookie_consent','true');co
 </script>
 
 <script src="footer.js" data-page="order"></script>
+<script src="maintenance.js"></script>
 </body>
 </html>

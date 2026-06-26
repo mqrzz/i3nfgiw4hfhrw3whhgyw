@@ -476,6 +476,7 @@
   function setLoading(id,on){const b=document.getElementById(id);if(b){b.disabled=on; b.textContent=on?'Подождите...':(id==='loginBtn'?'Войти':'Создать аккаунт');}}
 
   async function saveProfile(user,name){
+    await user.getIdToken(true);
     const r=doc(db,'users',user.uid);
     const s=await getDoc(r);
     if(!s.exists()) await setDoc(r,{uid:user.uid,name:name||user.displayName||'Пользователь',email:user.email,createdAt:serverTimestamp(),ordersCount:0});

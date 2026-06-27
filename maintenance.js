@@ -1,14 +1,22 @@
 (async () => {
   try {
-    const { getApps } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const { initializeApp, getApps, getApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const { getFirestore, doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
 
-    const apps = getApps();
-    if (!apps.length) return;
+    // Используем уже существующее приложение или создаём новое
+    const firebaseConfig = {
+      apiKey: "AIzaSyBLGr2hpmnmj1Mxf9072m8vQXJkLUN6YyY",
+      authDomain: "antviz-515c8.firebaseapp.com",
+      projectId: "antviz-515c8",
+      storageBucket: "antviz-515c8.firebasestorage.app",
+      messagingSenderId: "140073712504",
+      appId: "1:140073712504:web:8a844268e38229cebde68d"
+    };
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-    const db = getFirestore(apps[0]);
-    const auth = getAuth(apps[0]);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
     let mo = null;
     let currentUser = null;
     const ADMIN = 'wbtipoofficialcom@gmail.com';

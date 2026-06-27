@@ -32,7 +32,7 @@
     /* LOADING */
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
     .spinner{width:28px;height:28px;border:2px solid var(--border-hi);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
-    .maint-screen{position:fixed;inset:0;z-index:2000;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;text-align:center;padding:2rem}
+
 
     /* CONTENT */
     .page-col{width:100%}
@@ -288,11 +288,6 @@
   <div class="spinner"></div>
   <p style="color:var(--muted);font-size:.76rem;margin-top:.3rem">Загружаю кабинет...</p>
 </div>
-<div class="maint-screen" id="maintScreen" style="display:none">
-  <div style="font-size:3rem">🔧</div>
-  <div style="font-family:var(--font);font-weight:500;font-size:1.15rem;margin-bottom:.4rem">Технические работы</div>
-  <div style="color:var(--muted);font-size:.84rem;max-width:330px;line-height:1.6">Сайт временно недоступен. Скоро всё будет готово!</div>
-</div>
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
@@ -474,7 +469,7 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
 
-async function checkMaintenance(){try{const snap=await getDoc(doc(db,'settings','maintenance'));if(snap.exists()&&snap.data().enabled===true){document.getElementById('loadingScreen').style.display='none';document.getElementById('maintScreen').style.display='flex';return true;}}catch(e){}return false;}
+
 
 window.handleAvatarUpload=async function(file){if(!file) return;if(file.size>3*1024*1024){toast('Файл больше 3 МБ','error');return;}const reader=new FileReader();reader.onload=async function(e){const dataUrl=e.target.result;const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';let img=av.querySelector('img');if(!img){img=document.createElement('img');av.insertBefore(img,av.firstChild);}img.src=dataUrl;try{await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl});toast('Фото обновлено ✓','success');}catch(e){console.error(e);}};reader.readAsDataURL(file);};
 
@@ -683,7 +678,7 @@ window.closeNotifModal=function(){document.getElementById('notifModal').classLis
 
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='auth';return;}
-  if(await checkMaintenance()) return;
+
   currentUser=user;
   const name=user.displayName||'Пользователь';
   document.getElementById('heroName').textContent=name;

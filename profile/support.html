@@ -80,7 +80,8 @@
     .ticket-cell-main{display:flex;flex-direction:column;gap:4px;min-width:0}
     .ticket-subject{font-size:.9rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
     .ticket-subject.has-unread{color:var(--accent-soft)}
-    .ticket-preview{font-size:.76rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:320px}
+    .ticket-preview{font-size:.76rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;min-width:0}
+    .ticket-desktop-only{}
     .ticket-meta{font-size:.7rem;color:var(--ink-faint)}
     .ticket-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .65rem;border-radius:8px;width:fit-content}
     .ticket-tag.open{background:var(--info-wash);color:var(--info)}
@@ -151,10 +152,11 @@
       .ticket-list{border-radius:20px}
       .ticket-row{grid-template-columns:1fr;gap:4px;padding:18px 48px 18px 20px;position:relative}
       .ticket-cell-status,.ticket-cell-date{display:none}
+      .ticket-desktop-only{display:none!important}
       .ticket-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
       .ticket-row-wrap:has(.ticket-body.open) .ticket-chevron{transform:translateY(-50%) rotate(180deg)}
       .ticket-mobile-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
-      .ticket-preview{max-width:100%}
+      .ticket-preview{max-width:100%;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
       .chat-box{max-height:55vh;min-height:200px}
       .ticket-body{padding:18px 18px 22px}
       .chat-input-wrap{flex-wrap:wrap}
@@ -369,11 +371,12 @@ function renderTickets() {
           <div class="ticket-preview">${preview || esc(t.topic || '')}</div>
           <div class="ticket-mobile-tags">
             <span class="ticket-tag ${sc}">${statusLabel(t.status)}</span>
+            <span class="ticket-tag" style="background:var(--surface);color:var(--ink-faint)">${msgCount} сообщ.</span>
           </div>
         </div>
-        <span class="ticket-tag ${sc}">${statusLabel(t.status)}</span>
-        <span class="ticket-meta">${formatDate(t.updatedAt || t.createdAt)}</span>
-        <span class="ticket-meta">${msgCount}</span>
+        <span class="ticket-tag ${sc} ticket-desktop-only">${statusLabel(t.status)}</span>
+        <span class="ticket-meta ticket-desktop-only">${formatDate(t.updatedAt || t.createdAt)}</span>
+        <span class="ticket-meta ticket-desktop-only">${msgCount}</span>
         <svg class="ticket-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <div class="ticket-body" id="ticketBody_${t.id}">
@@ -590,6 +593,6 @@ onAuthStateChanged(auth, async user => {
 
 <script src="../footer.js" data-page="profile"></script>
 <script src="../GEOBLOCK.js"></script>
-<script src="../maintenance.js"></script>
+<script type="module" src="../maintenance.js"></script>
 </body>
 </html>

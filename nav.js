@@ -389,13 +389,13 @@
       ]
     },
     {
-      label: 'Сервис',
+      label: 'Обо мне',
       key: 'company',
       sections: [
         {
           items: [
-            { href: 'https://antviz.ru/about', label: 'О сервисе', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
-            { href: b+'rules',   label: 'Правила сервиса',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
+            { href: 'https://antviz.ru/about', label: 'Обо мне', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
+            { href: b+'rules',   label: 'Правила',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
             { href: b+'privacy', label: 'Конфиденциальность',  icon: '<path d="M12 3l8 4v5c0 5-3.5 8.5-8 10C7.5 20.5 4 17 4 12V7l8-4z"/>' },
           ]
         }

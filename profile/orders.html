@@ -570,11 +570,11 @@ window.openOrderModal = function(id) {
   document.body.style.overflow = 'hidden';
 };
 
-window.payRemaining = async function(orderId, amount) {
+window.payRemaining = async function(orderId) {
   try {
     const resp = await fetch('https://api-lac-six-78.vercel.app/api/createPayment', {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({orderId, amount})
+      body: JSON.stringify({ orderId, type: 'remaining' })
     });
     const data = await resp.json();
     if (data.paymentUrl) { window.location.href = data.paymentUrl; }

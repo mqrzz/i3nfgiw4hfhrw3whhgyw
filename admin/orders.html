@@ -278,6 +278,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
             <button class="sbtn s3" onclick="setStatus(3)">На проверке</button>
             <button class="sbtn s4" onclick="setStatus(4)">Правки</button>
             <button class="sbtn s5" onclick="setStatus(5)">Готово ✓</button>
+            <button class="sbtn s6" onclick="setStatus(6)" style="background:rgba(245,158,11,.12);color:#b45309;border-color:rgba(245,158,11,.3)">Ожидает доплаты</button>
           </div>
           <textarea class="textarea" id="commentInp" placeholder="Внутренний комментарий..." rows="2"></textarea>
           <div style="margin-top:10px"><button class="btn btn-dark btn-sm" onclick="saveComment()">Сохранить</button></div>
@@ -292,6 +293,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
             <span class="pay-pill" id="payPill">✕ НЕ ОПЛАЧЕН</span>
             <span class="pay-lbl" id="payLabel">Нажмите чтобы изменить</span>
           </div>
+          <div id="partialPayInfo"></div>
           <div style="display:flex;gap:10px">
             <input class="si" id="payLinkInp" type="text" placeholder="Ссылка на оплату..." style="flex:1"/>
             <button class="btn btn-blue btn-sm" onclick="sendPayLink(selOrderId,selUid)">Отправить</button>
@@ -414,7 +416,7 @@ import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, Timestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
+const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
 const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 let allOrders=[],allReviews=[],_cache=[];
@@ -458,7 +460,7 @@ function renderList(){
 function updateStats(){
   document.getElementById('tNew').textContent=allOrders.filter(o=>(o.status||0)===0).length;
   document.getElementById('tWork').textContent=allOrders.filter(o=>o.status>=1&&o.status<=4).length;
-  document.getElementById('tDone').textContent=allOrders.filter(o=>o.status===5).length;
+  document.getElementById('tDone').textContent=allOrders.filter(o=>o.status===5||o.status===6).length;
 }
 
 window.selectOrder=id=>{
@@ -482,6 +484,17 @@ function showDetail(o){
     <div class="hc"><div class="hc-l">Тип</div><div class="hc-v">${esc(SITE_KIND[o.siteKind]||o.siteKind||'—')}</div></div>
     <div class="hc"><div class="hc-l">Создан</div><div class="hc-v">${fmtD(o.createdAt)}</div></div>`;
   document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===(o.status||0)));
+  // Show partial payment info
+  const pInfoEl = document.getElementById('partialPayInfo');
+  if(pInfoEl){
+    if(o.paymentType==='partial'){
+      const pAmt = o.paidAmount||0;
+      const rAmt = o.remainingAmount||Math.ceil((o.totalPrice||0)/2);
+      const fp = o.paid||(pAmt>=(o.totalPrice||0));
+      pInfoEl.style.display='block';
+      pInfoEl.innerHTML='<div style="font-size:.78rem;color:#b45309;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:10px 14px;margin-top:10px"><strong>Предоплата 50%</strong><br>Оплачено: '+(pAmt?pAmt.toLocaleString('ru')+' ₽':'—')+' · Остаток: '+(fp?'полностью оплачен':rAmt.toLocaleString('ru')+' ₽')+'</div>';
+    } else { pInfoEl.style.display='none'; pInfoEl.innerHTML=''; }
+  }
   currentPaid=o.paid||false;renderPayRow();
   document.getElementById('commentInp').value=o.statusComment||'';
   currentSubsteps=JSON.parse(JSON.stringify(o.substeps||[]));renderSubsteps();
@@ -560,7 +573,22 @@ function renderSupport(o){
 }
 
 window.togglePayment=async()=>{if(!selOrderId)return;currentPaid=!currentPaid;renderPayRow();await updateDoc(doc(db,'orders',selOrderId),{paid:currentPaid}).catch(()=>{});toast(currentPaid?'Оплачен ✓':'Не оплачен','success');};
-window.setStatus=async s=>{if(!selOrderId)return;const upd={status:s};const o=allOrders.find(x=>x.id===selOrderId);if(s>=2&&!o?.startedAt)upd.startedAt=serverTimestamp();if(s===5&&!o?.doneAt)upd.doneAt=serverTimestamp();await updateDoc(doc(db,'orders',selOrderId),upd).catch(()=>{});toast('Статус → '+S[s]+' ✓','success');};
+window.setStatus=async s=>{
+  if(!selOrderId)return;
+  const upd={status:s};
+  const o=allOrders.find(x=>x.id===selOrderId);
+  if(s>=2&&!o?.startedAt)upd.startedAt=serverTimestamp();
+  if(s===5){
+    // If partial payment and not fully paid, auto-switch to "Ожидает доплаты"
+    const isPartial = o?.paymentType==='partial';
+    const paidAmt = o?.paidAmount||0;
+    const totalPrice = o?.totalPrice||0;
+    const fullyPaid = o?.paid || (isPartial && paidAmt>=totalPrice);
+    if(isPartial && !fullyPaid){ upd.status=6; toast('Предоплата — статус → Ожидает доплаты ✓','success'); }
+    else { upd.doneAt=serverTimestamp(); toast('Статус → '+S[s]+' ✓','success'); }
+  } else { toast('Статус → '+S[s]+' ✓','success'); }
+  await updateDoc(doc(db,'orders',selOrderId),upd).catch(()=>{});
+};
 window.saveComment=async()=>{if(!selOrderId)return;await updateDoc(doc(db,'orders',selOrderId),{statusComment:document.getElementById('commentInp').value.trim()}).catch(()=>{});toast('Сохранено ✓','success');};
 window.toggleSS=async(i,done)=>{currentSubsteps[i].done=done;if(done)currentSubsteps[i].date=new Date().toLocaleDateString('ru',{day:'numeric',month:'short'});else delete currentSubsteps[i].date;renderSubsteps();if(selOrderId)await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});};
 window.addSubstep=async()=>{const inp=document.getElementById('substepInp');const label=inp.value.trim();if(!label)return;currentSubsteps.push({label,done:false});inp.value='';renderSubsteps();if(selOrderId)await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});};
@@ -604,7 +632,7 @@ window.printReceipt=id=>{
   const o=_cache.find(x=>x.id===id);if(!o)return;
   const w=window.open('','_blank','width=600,height=700');
   const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;font-size:13px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.tot td{font-weight:700;font-size:14px;border-bottom:none;padding-top:10px}</style></head><body><h2>Antviz — Квитанция</h2><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr><tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr><tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
 };
 window.doLogout=async()=>{await signOut(auth);window.location.href='/';};

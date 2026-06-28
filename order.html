@@ -245,18 +245,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .domain-error.show{display:block}
 
 /* PAYMENT ERROR MODAL */
-.pay-error-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.pay-error-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);z-index:400;display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
 .pay-error-overlay.show{opacity:1;pointer-events:all}
-.pay-error-modal{background:#fff;border-radius:32px;padding:48px 40px;max-width:440px;width:100%;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,.18);transform:translateY(16px);transition:transform .25s}
-.pay-error-overlay.show .pay-error-modal{transform:translateY(0)}
-.pay-error-icon{font-size:40px;margin-bottom:16px}
+.pay-error-modal{background:#fff;border-radius:32px;padding:48px 40px 40px;max-width:440px;width:100%;text-align:center;box-shadow:0 24px 80px rgba(0,0,0,.2);transform:translateY(20px) scale(.97);transition:transform .28s cubic-bezier(.22,1,.36,1),opacity .25s;position:relative}
+.pay-error-overlay.show .pay-error-modal{transform:translateY(0) scale(1)}
+.pay-error-close{position:absolute;top:16px;right:16px;width:32px;height:32px;border-radius:50%;border:none;background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:background .15s,color .15s}
+.pay-error-close:hover{background:var(--border);color:var(--dark)}
+.pay-error-close svg{width:14px;height:14px}
+.pay-error-icon-wrap{margin:0 auto 20px;width:72px;height:72px}
+.pay-error-icon-wrap svg{width:72px;height:72px}
 .pay-error-title{font-size:22px;font-weight:500;letter-spacing:-.02em;color:var(--dark);margin-bottom:10px}
-.pay-error-text{font-size:15px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:32px}
+.pay-error-text{font-size:15px;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:28px}
 .pay-error-btns{display:flex;flex-direction:column;gap:10px}
-.pay-error-retry{background:var(--green);color:var(--dark);border:none;font-family:var(--font);font-size:16px;font-weight:500;padding:16px 24px;border-radius:12px;cursor:pointer;transition:background .15s}
-.pay-error-retry:hover{background:var(--green-h)}
-.pay-error-support{background:var(--bg2);color:var(--text);border:none;font-family:var(--font);font-size:15px;font-weight:300;padding:14px 24px;border-radius:12px;cursor:pointer;text-decoration:none;display:block;transition:background .15s}
-.pay-error-support:hover{background:var(--border)}
+.pay-error-retry{background:var(--green);color:var(--dark);border:none;font-family:var(--font);font-size:16px;font-weight:500;padding:16px 24px;border-radius:12px;cursor:pointer;transition:background .15s,transform .12s}
+.pay-error-retry:hover{background:var(--green-h);transform:translateY(-1px)}
+.pay-error-support{background:var(--bg2);color:var(--muted);border:none;font-family:var(--font);font-size:14px;font-weight:400;padding:14px 24px;border-radius:12px;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s,color .15s}
+.pay-error-support:hover{background:var(--border);color:var(--dark)}
 
 /* TOAST / COOKIE */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);z-index:300;padding:10px 22px;border-radius:99px;font-size:14px;font-weight:500;opacity:0;transition:opacity .28s,transform .28s;pointer-events:none;white-space:nowrap;max-width:90vw}
@@ -565,12 +569,26 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <!-- PAYMENT ERROR MODAL -->
 <div class="pay-error-overlay" id="payErrorOverlay">
   <div class="pay-error-modal">
-    <div class="pay-error-icon">⚠️</div>
-    <div class="pay-error-title">Не удалось перейти к оплате</div>
+    <button type="button" class="pay-error-close" id="payErrorClose" aria-label="Закрыть">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <div class="pay-error-icon-wrap">
+      <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="30" fill="rgba(232,99,79,.10)" stroke="rgba(232,99,79,.25)" stroke-width="1.5"/>
+        <circle cx="32" cy="32" r="20" fill="rgba(232,99,79,.12)"/>
+        <path d="M32 20v14" stroke="#e8634f" stroke-width="2.5" stroke-linecap="round"/>
+        <circle cx="32" cy="41" r="2" fill="#e8634f"/>
+        <path d="M20 44 L32 22 L44 44" stroke="#e8634f" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" fill="none" opacity=".3"/>
+      </svg>
+    </div>
+    <div class="pay-error-title">Не удалось оплатить</div>
     <div class="pay-error-text">Заявка сохранена, но платёжная страница не открылась. Попробуйте ещё раз или напишите нам — разберёмся вместе.</div>
     <div class="pay-error-btns">
       <button type="button" class="pay-error-retry" id="payRetryBtn">Попробовать ещё раз</button>
-      <a href="profile/support" class="pay-error-support">Написать в поддержку</a>
+      <a href="profile/support" class="pay-error-support">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="width:15px;height:15px"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Обратиться в поддержку
+      </a>
     </div>
   </div>
 </div>
@@ -914,6 +932,9 @@ document.getElementById('payRetryBtn').addEventListener('click',async()=>{
   if(!lastOrderId)return;
   const{total}=calcAmounts();
   await tryPayment(null,lastOrderId,total);
+});
+document.getElementById('payErrorClose').addEventListener('click',()=>{
+  document.getElementById('payErrorOverlay').classList.remove('show');
 });
 document.getElementById('payErrorOverlay').addEventListener('click',e=>{
   if(e.target===document.getElementById('payErrorOverlay'))document.getElementById('payErrorOverlay').classList.remove('show');

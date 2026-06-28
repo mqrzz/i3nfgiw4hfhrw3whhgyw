@@ -13,6 +13,7 @@
   <link rel="icon" href="img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root {
@@ -369,6 +370,11 @@
     @media(max-width:500px){
       .toast{white-space:normal;max-width:90vw;text-align:center;}
     }
+    .cf-turnstile{
+      display:flex;
+      justify-content:center;
+      margin-bottom:.5rem;
+    }
   </style>
 </head>
 <body>
@@ -394,6 +400,7 @@
       <div class="fg"><label class="label">Email</label><input class="inp" type="email" id="l-email" placeholder="your@email.com"/><div class="errmsg" id="err-l-email"></div></div>
       <div class="fg"><label class="label">Пароль</label><input class="inp" type="password" id="l-pass" placeholder="••••••••"/><div class="errmsg" id="err-l-pass"></div></div>
       <a href="#" class="forgot" onclick="openForgot(event)">Забыли пароль?</a>
+      <div class="cf-turnstile" id="turnstile-login" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal"></div>
       <button class="btn-main" id="loginBtn" onclick="doLogin()">Войти</button>
       <div class="divider">или</div>
       <button class="btn-google" onclick="openGoogleRestrictedModal(event)"> 
@@ -406,6 +413,7 @@
       <div class="fg"><label class="label">Ваше имя <span style="color:var(--green)">*</span></label><input class="inp" type="text" id="r-name" placeholder="Как вас зовут?"/><div class="errmsg" id="err-r-name">Введите имя</div></div>
       <div class="fg"><label class="label">Email <span style="color:var(--green)">*</span></label><input class="inp" type="email" id="r-email" placeholder="your@email.com"/><div class="errmsg" id="err-r-email"></div></div>
       <div class="fg"><label class="label">Пароль <span style="color:var(--green)">*</span></label><input class="inp" type="password" id="r-pass" placeholder="Минимум 6 символов"/><div class="errmsg" id="err-r-pass"></div></div>
+      <div class="cf-turnstile" id="turnstile-register" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal"></div>
       <button class="btn-main" id="registerBtn" onclick="doRegister()">Создать аккаунт</button>
       <div class="divider">или</div>
       <button class="btn-google" onclick="openGoogleRestrictedModal(event)">
@@ -483,12 +491,19 @@
     if(!email){document.getElementById('l-email').classList.add('err');document.getElementById('err-l-email').textContent='Введите email';document.getElementById('err-l-email').className='errmsg show';ok=false;}
     if(!pass){document.getElementById('l-pass').classList.add('err');document.getElementById('err-l-pass').textContent='Введите пароль';document.getElementById('err-l-pass').className='errmsg show';ok=false;}
     if(!ok)return;
+    const cfToken=turnstile.getResponse(document.getElementById('turnstile-login'));
+    if(!cfToken){toast('Пройдите проверку капчи','error');return;}
     setLoading('loginBtn',true);
+    try{
+      const vResp=await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:cfToken})});
+      const vData=await vResp.json();
+      if(!vData.success){toast('Проверка капчи не пройдена','error');turnstile.reset(document.getElementById('turnstile-login'));setLoading('loginBtn',false);return;}
+    }catch(e){toast('Ошибка проверки капчи','error');turnstile.reset(document.getElementById('turnstile-login'));setLoading('loginBtn',false);return;}
     try{
       const cred=await signInWithEmailAndPassword(auth,email,pass);
       try{await saveProfile(cred.user,cred.user.displayName);}catch(fsErr){console.error('Firestore saveProfile error:',fsErr);}
     }
-    catch(e){setLoading('loginBtn',false);const msg=e.code==='auth/invalid-credential'?'Неверный email или пароль':e.code==='auth/too-many-requests'?'Слишком много попыток, подождите':'Ошибка: '+e.message;toast(msg,'error');}
+    catch(e){setLoading('loginBtn',false);turnstile.reset(document.getElementById('turnstile-login'));const msg=e.code==='auth/invalid-credential'?'Неверный email или пароль':e.code==='auth/too-many-requests'?'Слишком много попыток, подождите':'Ошибка: '+e.message;toast(msg,'error');}
   };
 
   window.doRegister=async function(){
@@ -501,7 +516,14 @@
     if(!email){document.getElementById('r-email').classList.add('err');document.getElementById('err-r-email').textContent='Введите email';document.getElementById('err-r-email').className='errmsg show';ok=false;}
     if(pass.length<6){document.getElementById('r-pass').classList.add('err');document.getElementById('err-r-pass').textContent='Минимум 6 символов';document.getElementById('err-r-pass').className='errmsg show';ok=false;}
     if(!ok)return;
+    const cfToken=turnstile.getResponse(document.getElementById('turnstile-register'));
+    if(!cfToken){toast('Пройдите проверку капчи','error');return;}
     setLoading('registerBtn',true);
+    try{
+      const vResp=await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:cfToken})});
+      const vData=await vResp.json();
+      if(!vData.success){toast('Проверка капчи не пройдена','error');turnstile.reset(document.getElementById('turnstile-register'));setLoading('registerBtn',false);return;}
+    }catch(e){toast('Ошибка проверки капчи','error');turnstile.reset(document.getElementById('turnstile-register'));setLoading('registerBtn',false);return;}
     _registering=true;
     try{
       const cred=await createUserWithEmailAndPassword(auth,email,pass);
@@ -514,7 +536,7 @@
       const ref=document.referrer;
       window.location.href=(ref&&ref.includes('order'))?'order':'profile';
     }
-    catch(e){_registering=false;setLoading('registerBtn',false);const msg=e.code==='auth/email-already-in-use'?'Этот email уже зарегистрирован':e.code==='auth/invalid-email'?'Некорректный email':'Ошибка: '+e.message;toast(msg,'error');}
+    catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));const msg=e.code==='auth/email-already-in-use'?'Этот email уже зарегистрирован':e.code==='auth/invalid-email'?'Некорректный email':'Ошибка: '+e.message;toast(msg,'error');}
   };
 
   window.openGoogleRestrictedModal = function(e){if(e)e.preventDefault();document.getElementById('googleRestrictModal').classList.add('show');};

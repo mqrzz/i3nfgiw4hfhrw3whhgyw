@@ -89,13 +89,24 @@
     .ticket-tag.resolved{background:var(--good-wash);color:var(--good)}
     .ticket-tag.closed{background:var(--surface-3);color:var(--ink-faint)}
     .ticket-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
-    .ticket-row-wrap:has(.ticket-body.open) .ticket-chevron{transform:rotate(180deg)}
     .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--bad);display:inline-block;flex-shrink:0;animation:pulse 1.5s infinite}
     .ticket-mobile-tags{display:none}
 
     /* BODY */
-    .ticket-body{display:none;border-top:1px solid var(--line);padding:28px 24px 30px;background:var(--surface)}
-    .ticket-body.open{display:block;animation:fadeUp .2s ease}
+    /* TICKET FULLSCREEN MODAL */
+    .ticket-modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .ticket-modal-overlay.show{opacity:1;pointer-events:all}
+    .ticket-modal{background:var(--bg);border-radius:32px;width:100%;max-width:680px;height:80vh;min-height:400px;display:flex;flex-direction:column;position:relative;transform:translateY(24px) scale(.97);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 100px rgba(0,0,0,.25)}
+    .ticket-modal-overlay.show .ticket-modal{transform:translateY(0) scale(1)}
+    .ticket-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:24px 24px 0;flex-shrink:0}
+    .ticket-modal-info{flex:1;min-width:0}
+    .ticket-modal-title{font-size:1.05rem;font-weight:500;color:var(--ink);letter-spacing:-.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .ticket-modal-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;align-items:center}
+    .ticket-modal-close{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line-strong);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-faint);transition:all .15s;flex-shrink:0}
+    .ticket-modal-close:hover{background:var(--surface-3);border-color:var(--ink-faint);color:var(--ink)}
+    .ticket-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+    .ticket-modal-chat{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:16px 24px 0}
+    .ticket-modal-input{padding:14px 24px 20px;flex-shrink:0;border-top:1px solid var(--line)}
 
     /* CHAT */
     .chat-wrapper{position:relative}
@@ -154,11 +165,9 @@
       .ticket-cell-status,.ticket-cell-date{display:none}
       .ticket-desktop-only{display:none!important}
       .ticket-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
-      .ticket-row-wrap:has(.ticket-body.open) .ticket-chevron{transform:translateY(-50%) rotate(180deg)}
       .ticket-mobile-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
       .ticket-preview{max-width:100%;white-space:normal;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
       .chat-box{max-height:55vh;min-height:200px}
-      .ticket-body{padding:18px 18px 22px}
       .chat-input-wrap{flex-wrap:wrap}
     }
     @media(max-width:480px){
@@ -283,6 +292,48 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- TICKET CHAT MODAL -->
+<div class="ticket-modal-overlay" id="ticketModalOverlay">
+  <div class="ticket-modal">
+    <div class="ticket-modal-head">
+      <div class="ticket-modal-info">
+        <div class="ticket-modal-title" id="ticketModalTitle"></div>
+        <div class="ticket-modal-tags" id="ticketModalTags"></div>
+      </div>
+      <button class="ticket-modal-close" onclick="closeTicketModal()" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="ticket-modal-chat">
+      <div class="chat-box" id="ticketModalChatBox" style="flex:1;max-height:none;padding-right:4px"></div>
+      <button class="scroll-down-btn" id="ticketModalScrollBtn" onclick="document.getElementById('ticketModalChatBox').scrollTop=document.getElementById('ticketModalChatBox').scrollHeight">
+        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>
+    <div class="ticket-modal-input">
+      <div class="chat-input-wrap">
+        <input id="ticketModalInput" type="text" placeholder="Написать сообщение…" onkeydown="if(event.key==='Enter')sendChatModal()"/>
+        <label class="btn btn-ghost-light btn-xs" style="cursor:pointer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <input type="file" accept="image/*" style="display:none" onchange="attachImgModal(this)"/>
+        </label>
+        <button class="btn btn-primary btn-xs" onclick="sendChatModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('ticketModalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('ticketModalOverlay')) closeTicketModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeTicketModal();
+});
+</script>
+
 <script type="module">
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -362,7 +413,7 @@ function renderTickets() {
     const lastMsg = t._messages?.[t._messages.length - 1];
     const preview = lastMsg ? esc(lastMsg.text || '').slice(0, 60) : '';
     return `<div class="ticket-row-wrap" style="animation-delay:${i*30}ms">
-      <button class="ticket-row" onclick="toggleTicket('${t.id}')">
+      <button class="ticket-row" onclick="openTicketModal('${t.id}')">
         <div class="ticket-cell-main">
           <div class="ticket-subject${unread?' has-unread':''}">
             ${unread ? '<span class="unread-dot"></span>' : ''}
@@ -379,24 +430,6 @@ function renderTickets() {
         <span class="ticket-meta ticket-desktop-only">${msgCount}</span>
         <svg class="ticket-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="ticket-body" id="ticketBody_${t.id}">
-        <div class="chat-wrapper">
-          <div class="chat-box" id="chatBox_${t.id}">${buildChat(t._messages || [])}</div>
-          <button class="scroll-down-btn" id="scrollBtn_${t.id}" onclick="scrollToBottom('${t.id}')">
-            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>
-        <div class="chat-input-wrap">
-          <input id="chatInput_${t.id}" type="text" placeholder="Написать сообщение…" onkeydown="if(event.key==='Enter')sendChat('${t.id}')"/>
-          <label class="btn btn-ghost-light btn-xs" style="cursor:pointer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <input type="file" accept="image/*" style="display:none" onchange="attachImg('${t.id}',this)"/>
-          </label>
-          <button class="btn btn-primary btn-xs" onclick="sendChat('${t.id}')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
-      </div>
     </div>`;
   }).join('');
 }
@@ -428,26 +461,77 @@ function updateScrollBtn(id) {
   btn.classList.toggle('visible', !atBottom);
 }
 
-window.toggleTicket = async function(id) {
-  const body = document.getElementById('ticketBody_' + id);
-  if (!body) return;
-  const isOpen = body.classList.contains('open');
-  document.querySelectorAll('.ticket-body.open').forEach(b => b.classList.remove('open'));
-  if (!isOpen) {
-    body.classList.add('open');
-    const ticket = allTickets.find(t => t.id === id);
-    if (ticket) {
-      if (ticket._read === false) {
-        ticket._read = true;
-        updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
-        renderTickets();
-      }
-      const box = document.getElementById('chatBox_' + id);
-      if (box) { box.innerHTML = buildChat(ticket._messages || []); box.addEventListener('scroll', () => updateScrollBtn(id)); }
-    }
-    setTimeout(() => scrollToBottom(id), 80);
+let _activeTicketId = null;
+
+window.openTicketModal = async function(id) {
+  const ticket = allTickets.find(t => t.id === id);
+  if (!ticket) return;
+  _activeTicketId = id;
+
+  // Mark as read
+  if (ticket._read === false) {
+    ticket._read = true;
+    updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
+    renderTickets();
   }
+
+  const sc = statusClass(ticket.status);
+  document.getElementById('ticketModalTitle').textContent = ticket.subject || ticket.topic || 'Тикет';
+  document.getElementById('ticketModalTags').innerHTML =
+    '<span class="ticket-tag ' + sc + '">' + statusLabel(ticket.status) + '</span>' +
+    '<span class="ticket-meta" style="font-size:.75rem;color:var(--ink-faint)">' + formatDate(ticket.updatedAt || ticket.createdAt) + '</span>';
+
+  const chatBox = document.getElementById('ticketModalChatBox');
+  chatBox.innerHTML = buildChat(ticket._messages || []);
+  chatBox.onscroll = () => {
+    const btn = document.getElementById('ticketModalScrollBtn');
+    if (btn) btn.classList.toggle('visible', chatBox.scrollHeight - chatBox.scrollTop - chatBox.clientHeight > 60);
+  };
+
+  document.getElementById('ticketModalInput').value = '';
+  document.getElementById('ticketModalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 80);
 };
+
+window.closeTicketModal = function() {
+  document.getElementById('ticketModalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  _activeTicketId = null;
+};
+
+window.sendChatModal = async function() {
+  if (!_activeTicketId) return;
+  const inp = document.getElementById('ticketModalInput');
+  const text = inp?.value.trim();
+  if (!text) return toast('Напишите сообщение', 'error');
+  inp.value = '';
+  try {
+    await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), { sender: 'user', text, imageUrl: null, createdAt: serverTimestamp() });
+    await updateDoc(doc(db, 'tickets', _activeTicketId), { updatedAt: serverTimestamp(), _read: true, status: 'open' });
+    setTimeout(() => { const b = document.getElementById('ticketModalChatBox'); if(b) b.scrollTop = b.scrollHeight; }, 100);
+  } catch(e) { toast('Ошибка отправки', 'error'); }
+};
+
+window.attachImgModal = async function(fileInput) {
+  if (!_activeTicketId) return;
+  const file = fileInput.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), { sender: 'user', text: 'Вложение', imageUrl: e.target.result, createdAt: serverTimestamp() });
+      await updateDoc(doc(db, 'tickets', _activeTicketId), { updatedAt: serverTimestamp(), _read: true });
+      toast('Изображение отправлено ✓', 'success');
+      setTimeout(() => { const b = document.getElementById('ticketModalChatBox'); if(b) b.scrollTop = b.scrollHeight; }, 100);
+    } catch(err) { toast('Ошибка', 'error'); }
+  };
+  reader.readAsDataURL(file);
+  fileInput.value = '';
+};
+
+window.toggleTicket = function(id) { openTicketModal(id); };
 
 window.sendChat = async function(ticketId) {
   const inp = document.getElementById('chatInput_' + ticketId);
@@ -552,13 +636,13 @@ function subscribeMessages(ticketId) {
     const ticket = allTickets.find(t => t.id === ticketId);
     if (!ticket) return;
     ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    const body = document.getElementById('ticketBody_' + ticketId);
-    if (body) {
-      const box = document.getElementById('chatBox_' + ticketId);
+    // If this ticket is open in the modal, update it
+    if (_activeTicketId === ticketId) {
+      const box = document.getElementById('ticketModalChatBox');
       if (box) {
         const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
         box.innerHTML = buildChat(ticket._messages);
-        if (wasAtBottom) setTimeout(() => scrollToBottom(ticketId), 50);
+        if (wasAtBottom) setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
       }
     }
     renderTickets();

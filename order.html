@@ -216,6 +216,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .btn-submit{background:var(--green);color:var(--dark);border:none;font-family:var(--font);font-size:17px;font-weight:500;border-radius:12px;padding:20px 48px;cursor:pointer;transition:background .15s,transform .12s,opacity .2s;display:flex;align-items:center;gap:8px}
 .btn-submit:hover:not(:disabled){background:var(--green-h);transform:translateY(-1px)}
 .btn-submit:disabled{opacity:.35;cursor:default}
+.submit-btns{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.btn-submit-half{background:transparent;color:var(--dark);border:1.5px solid var(--border);font-family:var(--font);font-size:15px;font-weight:500;border-radius:12px;padding:19px 28px;cursor:pointer;transition:background .15s,border-color .15s,transform .12s,opacity .2s;display:flex;align-items:center;gap:8px}
+.btn-submit-half:hover:not(:disabled){background:var(--bg2);border-color:var(--dark);transform:translateY(-1px)}
+.btn-submit-half:disabled{opacity:.35;cursor:default}
+.pay-hint-wrap{position:relative;display:inline-flex;align-items:center}
+.pay-hint-ico{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:11px;font-weight:600;transition:border-color .15s,color .15s;user-select:none;flex-shrink:0}
+.pay-hint-ico:hover{border-color:var(--dark);color:var(--dark)}
+.pay-hint-box{position:absolute;bottom:calc(100% + 8px);right:0;background:var(--dark);color:#fff;font-size:12px;font-weight:300;line-height:1.5;padding:10px 14px;border-radius:10px;width:220px;pointer-events:none;opacity:0;transition:opacity .15s;z-index:10;white-space:normal}
+.pay-hint-box::after{content:'';position:absolute;top:100%;right:6px;border:5px solid transparent;border-top-color:var(--dark)}
+.pay-hint-wrap:hover .pay-hint-box,.pay-hint-wrap.open .pay-hint-box{opacity:1}
 
 /* SITE TYPE (static/dynamic) */
 .stype-wrap{margin-top:32px;padding-top:32px;border-top:1px solid var(--border)}
@@ -556,11 +566,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <div class="err-msg" id="errAgree">Нужно принять правила сервиса, чтобы продолжить</div>
 
       <div class="submit-row reveal">
-        <p class="submit-note">Оплата онлайн через ЮKassa.<br/>СБП, карты, T-Pay, SberPay и др. Вся информация о заказе и получение - в Профиле.</p>
-        <button type="button" class="btn-submit" id="submitBtn" disabled>
-          Оплатить
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <p class="submit-note">Оплата онлайн через ЮKassa.<br/>СБП, карты, T-Pay, SberPay и др. Вся информация о заказе и получение — в Профиле.</p>
+        <div class="submit-btns">
+          <div class="pay-hint-wrap" id="halfHintWrap">
+            <button type="button" class="btn-submit-half" id="submitBtnHalf" disabled>
+              Оплатить 50%
+            </button>
+            <div class="pay-hint-ico" id="halfHintIco" tabindex="0" aria-label="Что такое оплата 50%">?</div>
+            <div class="pay-hint-box">Оплатите половину сейчас — мы начнём работу. Остаток оплачивается после согласования макета, прямо в вашем профиле.</div>
+          </div>
+          <button type="button" class="btn-submit" id="submitBtn" disabled>
+            Оплатить
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -683,6 +702,7 @@ function updateUI(){
   eBtn.disabled=!state.tier;
   tHint.style.display=state.tier?'none':'';
   document.getElementById('submitBtn').disabled=!state.format||!state.tier||!agreed;
+  document.getElementById('submitBtnHalf').disabled=!state.format||!state.tier||!agreed;
 }
 
 function bindExtra(id,key){
@@ -881,13 +901,27 @@ function recalc(){
 function f2b(file){if(file.dataUrl)return Promise.resolve(file.dataUrl);return new Promise((r,j)=>{const rd=new FileReader();rd.onload=()=>r(rd.result);rd.onerror=j;rd.readAsDataURL(file);});}
 
 let lastOrderId=null;
+let lastPaymentType='full';
 
-document.getElementById('submitBtn').addEventListener('click',async()=>{
+// Hint toggle on mobile (tap)
+document.getElementById('halfHintIco').addEventListener('click', function(e){
+  e.stopPropagation();
+  document.getElementById('halfHintWrap').classList.toggle('open');
+});
+document.addEventListener('click', () => document.getElementById('halfHintWrap').classList.remove('open'));
+
+async function submitOrder(paymentType) {
   if(!agreed){document.getElementById('agreeBox').classList.add('err');document.getElementById('errAgree').classList.add('show');return;}
   if(!state.format||!state.tier){toast('Выберите формат и тариф','error');return;}
   if(!currentUser){toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
-  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Сохраняем заявку...';
+  const btnFull=document.getElementById('submitBtn');
+  const btnHalf=document.getElementById('submitBtnHalf');
+  const isHalf = paymentType === 'partial';
+  const activeBtn = isHalf ? btnHalf : btnFull;
+  btnFull.disabled=true; btnHalf.disabled=true;
+  activeBtn.textContent='Сохраняем заявку...';
   const{total,discount}=calcAmounts();const t=TIERS[state.tier];
+  const payAmount = isHalf ? Math.ceil(total / 2) : total;
   const extrasArr=[];
   if(state.extras.domain&&state.extras.domainOpt==='new')extrasArr.push('domain_reg');
   if(state.extras.domain&&state.extras.domainOpt==='own')extrasArr.push('domain_own');
@@ -906,23 +940,34 @@ document.getElementById('submitBtn').addEventListener('click',async()=>{
       description:document.getElementById('briefText').value.trim()||'',
       attachments:attachments.length?attachments:null,favicon:favData,
       clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
-      uid:currentUser.uid,status:0,createdAt:serverTimestamp()
+      uid:currentUser.uid,status:0,createdAt:serverTimestamp(),
+      paymentType: paymentType,
+      paidAmount: 0,
+      remainingAmount: isHalf ? Math.ceil(total / 2) : 0
     });
     lastOrderId=docRef.id;
-  }catch(e){btn.disabled=false;btn.textContent='Оплатить';toast('Не получилось сохранить. Проверьте соединение.','error');return;}
-  await tryPayment(btn,docRef.id,total);
-});
+    lastPaymentType=paymentType;
+  }catch(e){btnFull.disabled=false;btnHalf.disabled=false;activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';toast('Не получилось сохранить. Проверьте соединение.','error');return;}
+  await tryPayment(activeBtn,docRef.id,payAmount,paymentType);
+}
 
-async function tryPayment(btn,orderId,total){
+document.getElementById('submitBtn').addEventListener('click', () => submitOrder('full'));
+document.getElementById('submitBtnHalf').addEventListener('click', () => submitOrder('partial'));
+
+async function tryPayment(btn,orderId,amount,paymentType){
   if(!btn)btn=document.getElementById('submitBtn');
+  const isHalf = paymentType === 'partial';
   btn.disabled=true;btn.textContent='Переходим к оплате...';
   try{
-    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,amount:total})});
+    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,amount})});
     const data=await resp.json();
     if(data.paymentUrl){window.location.href=data.paymentUrl;}
     else throw new Error();
   }catch(e){
-    btn.disabled=false;btn.textContent='Оплатить';
+    const btnFull=document.getElementById('submitBtn');
+    const btnHalf=document.getElementById('submitBtnHalf');
+    btnFull.disabled=false; btnHalf.disabled=false;
+    btn.textContent=isHalf?'Оплатить 50%':'Оплатить';
     document.getElementById('payErrorOverlay').classList.add('show');
   }
 }
@@ -931,7 +976,9 @@ document.getElementById('payRetryBtn').addEventListener('click',async()=>{
   document.getElementById('payErrorOverlay').classList.remove('show');
   if(!lastOrderId)return;
   const{total}=calcAmounts();
-  await tryPayment(null,lastOrderId,total);
+  const retryAmount = lastPaymentType==='partial' ? Math.ceil(total/2) : total;
+  const retryBtn = lastPaymentType==='partial' ? document.getElementById('submitBtnHalf') : document.getElementById('submitBtn');
+  await tryPayment(retryBtn,lastOrderId,retryAmount,lastPaymentType);
 });
 document.getElementById('payErrorClose').addEventListener('click',()=>{
   document.getElementById('payErrorOverlay').classList.remove('show');

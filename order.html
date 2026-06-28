@@ -959,7 +959,7 @@ async function tryPayment(btn,orderId,amount,paymentType){
   const isHalf = paymentType === 'partial';
   btn.disabled=true;btn.textContent='Переходим к оплате...';
   try{
-    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,amount})});
+    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,type:paymentType==='partial'?'partial':'order'})});
     const data=await resp.json();
     if(data.paymentUrl){window.location.href=data.paymentUrl;}
     else throw new Error();

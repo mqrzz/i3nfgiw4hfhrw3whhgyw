@@ -256,7 +256,7 @@
                     <div>
                         <span class="group-title">Услуги</span>
                         <ul class="group-items">
-                            <li><a href="${base}order">Лендинг от 250 ₽</a></li>
+                            <li><a href="${base}order">Лендинг и визитка</a></li>
                             <li><a href="${base}order">Многостраничный сайт</a></li>
                             <li><a href="${base}order">Портфолио</a></li>
                             <li><a href="${base}order">Поддержка сайта</a></li>

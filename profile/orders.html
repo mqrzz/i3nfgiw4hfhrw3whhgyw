@@ -57,13 +57,23 @@
     .btn-primary:hover{background:var(--accent-soft)}
     .btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
     .btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
-    .btn-ghost-light{background:transparent;border:1px solid var(--line-strong);color:var(--ink-dim)}
-    .btn-ghost-light:hover{border-color:var(--accent-soft);color:var(--accent-soft)}
-    .btn-success{background:var(--good-wash);color:var(--good);border:1px solid rgba(52,211,153,.22)}
-    .btn-success:hover{background:rgba(52,211,153,.18)}
+    .btn-ghost-light{background:transparent;border:1px solid var(--line-strong);color:var(--ink-faint);font-weight:400}
+    .btn-ghost-light:hover{border-color:var(--ink-dim);color:var(--ink)}
+    .btn-success{background:#1ede7b;color:#0a1f12;border:none;font-weight:500}
+    .btn-success:hover{background:#1ac96e}
     .btn-warn{background:var(--warn-wash);color:var(--warn);border:1px solid rgba(251,191,36,.22)}
     .btn-warn:hover{background:rgba(251,191,36,.16)}
-    .btn-xs{padding:.36rem .75rem;font-size:.72rem;border-radius:10px}
+    .btn-xs{padding:.42rem .9rem;font-size:.75rem;border-radius:10px;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+    .btn-pay-remaining{background:#1ede7b;color:#0a1f12;border:none;font-family:inherit;font-size:.88rem;font-weight:500;padding:.7rem 1.4rem;border-radius:14px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;gap:8px;width:100%}
+    .btn-pay-remaining:hover{background:#1ac96e;transform:translateY(-1px)}
+    .pay-remaining-banner{background:linear-gradient(135deg,rgba(30,222,123,.08) 0%,rgba(30,222,123,.04) 100%);border:1.5px solid rgba(30,222,123,.25);border-radius:18px;padding:18px 20px;margin-bottom:20px}
+    .pay-remaining-title{font-size:.95rem;font-weight:500;color:var(--ink);margin-bottom:4px}
+    .pay-remaining-sub{font-size:.8rem;color:var(--ink-faint);margin-bottom:14px;font-weight:300;line-height:1.5}
+    .pay-gate-banner{background:rgba(232,99,79,.06);border:1.5px solid rgba(232,99,79,.2);border-radius:18px;padding:18px 20px;margin-bottom:20px}
+    .pay-gate-title{font-size:.95rem;font-weight:500;color:#c94f30;margin-bottom:4px}
+    .pay-gate-sub{font-size:.8rem;color:var(--ink-faint);margin-bottom:14px;font-weight:300;line-height:1.5}
+    .btn-pay-gate{background:#e8634f;color:#fff;border:none;font-family:inherit;font-size:.88rem;font-weight:500;padding:.7rem 1.4rem;border-radius:14px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;gap:8px;width:100%}
+    .btn-pay-gate:hover{background:#d4543f;transform:translateY(-1px)}
     .btn-sm{padding:.55rem 1.1rem;font-size:.78rem;border-radius:11px}
 
     /* TOOLBAR */
@@ -97,6 +107,7 @@
     .ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:500}
     .ord-pay.is-paid{color:var(--good)}
     .ord-pay.is-unpaid{color:var(--bad)}
+    .ord-pay.is-half{color:#f59e0b}
     .ord-pay svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none}
     .ord-price{font-size:.9rem;font-weight:500;text-align:right}
     .ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
@@ -431,6 +442,12 @@ function buildSubsteps(o){
 function orderCard(o){
   const s = o.status || 0;
   const paid = o.paid || false;
+  const isPartialCard = o.paymentType === 'partial';
+  const paidAmtCard = o.paidAmount || 0;
+  const fullyPaidCard = paid || (isPartialCard && paidAmtCard >= (o.totalPrice||0));
+  const halfPaidCard = isPartialCard && paidAmtCard > 0 && !fullyPaidCard;
+  const payLabelCard = fullyPaidCard ? 'Оплачен' : (halfPaidCard ? '50% оплачено' : 'Не оплачен');
+  const payClassCard = fullyPaidCard ? 'is-paid' : (halfPaidCard ? 'is-half' : 'is-unpaid');
   const estDate = getEstimate(o.pages, o.extras, s);
   const hasSite = s >= 5 && (o.siteUrl || o.siteDomain);
   let siteBlock = '';
@@ -482,20 +499,18 @@ function orderCard(o){
     </div>`;
   }
 
-  return `<div class="ord-row-wrap" data-status="${s}" data-paid="${paid?1:0}">
+  return `<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaidCard?1:0}">
     <button type="button" class="ord-row" onclick="openOrderModal('${o.id}')">
       <div class="ord-cell-main">
         <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${escapeHtml(o.siteType||'Сайт')}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
         <div class="ord-tags-mobile">
           <span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span>
-          <span class="ord-pay ${paid?'is-paid':'is-unpaid'}">${paid?'Оплачен':'Не оплачен'}</span>
+          <span class="ord-pay ${payClassCard}">${payLabelCard}</span>
         </div>
       </div>
       <div class="ord-cell-status"><span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span></div>
-      <div class="ord-cell-pay"><span class="ord-pay ${paid?'is-paid':'is-unpaid'}">
-        <svg viewBox="0 0 24 24">${paid?'<polyline points="20 6 9 17 4 12"/>':'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>'}</svg>
-        ${paid?'Оплачен':'Не оплачен'}</span></div>
+      <div class="ord-cell-pay"><span class="ord-pay ${payClassCard}">${payLabelCard}</span></div>
       <div class="ord-cell-price ord-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div>
       <svg class="ord-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
@@ -524,14 +539,47 @@ window.openOrderModal = function(id) {
   let domainBanner = '';
   if (hasRegDomain) { domainBanner = '<div class="domain-banner"><div class="domain-banner-body"><div class="domain-banner-title">Домен: покупка на рег.ру</div><div class="domain-banner-text">После оплаты на рег.ру напишите нам в поддержку.</div></div></div>'; }
   else if (hasOwnDomain) { const domName = o.domainName ? '<strong>'+escapeHtml(o.domainName)+'</strong> — ' : ''; domainBanner = '<div class="domain-banner"><div class="domain-banner-body"><div class="domain-banner-title">Домен: подключение</div><div class="domain-banner-text">'+domName+'напишите в поддержку.</div></div></div>'; }
-  const actBtns = (s>=5&&!o.reviewed?'<button class="btn btn-xs btn-success" onclick="openReview(\''+o.id+'\')" style="pointer-events:all">★ Отзыв</button>':'')+(s===3?'<button class="btn btn-xs btn-warn" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all">Запросить правки</button>':'');
-  const actionsHtml = '<div class="ord-actions"><button class="btn btn-ghost-light btn-xs" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:11px;height:11px;stroke-width:2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Квитанция</button>'+actBtns+'</div>';
+  // Partial payment logic
+  const isPartial = o.paymentType === 'partial';
+  const paidAmount = o.paidAmount || 0;
+  const totalPrice = o.totalPrice || 0;
+  const remainingAmount = o.remainingAmount || (isPartial && totalPrice ? Math.ceil(totalPrice/2) : 0);
+  const fullyPaid = paid || (isPartial && paidAmount >= totalPrice);
+  const halfPaid = isPartial && paidAmount > 0 && !fullyPaid;
+
+  // Payment banners
+  let payBanner = '';
+  if (isPartial && halfPaid && s < 5) {
+    // Has made 50% payment, work in progress — show "pay remaining" option
+    payBanner = '<div class="pay-remaining-banner"><div class="pay-remaining-title">Предоплата получена ✓</div><div class="pay-remaining-sub">Вы оплатили '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ можно оплатить сейчас или после согласования результата.</div><button class="btn-pay-remaining" onclick="payRemaining(\''+o.id+'\','+remainingAmount+')" style="pointer-events:all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
+  } else if (isPartial && halfPaid && s === 5) {
+    // Done but not fully paid — must pay to receive
+    payBanner = '<div class="pay-gate-banner"><div class="pay-gate-title">Заказ готов — нужна доплата</div><div class="pay-gate-sub">Для получения готового сайта необходимо оплатить оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽.</div><button class="btn-pay-gate" onclick="payRemaining(\''+o.id+'\','+remainingAmount+')" style="pointer-events:all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ и получить сайт</button></div>';
+  }
+
+  const payLabel = fullyPaid ? 'Оплачен' : (halfPaid ? 'Предоплата 50%' : 'Не оплачен');
+  const payClass = fullyPaid ? 'is-paid' : (halfPaid ? 'is-half' : 'is-unpaid');
+
+  const actBtns = (s>=5&&fullyPaid&&!o.reviewed?'<button class="btn btn-xs btn-success" onclick="openReview(\''+o.id+'\')" style="pointer-events:all">★ Отзыв</button>':'')+(s===3?'<button class="btn btn-xs btn-warn" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all">Запросить правки</button>':'');
+  const actionsHtml = '<div class="ord-actions"><button class="btn btn-ghost-light btn-xs" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all">Квитанция</button>'+actBtns+'</div>';
   document.getElementById('ordModalTitle').textContent = '№ ' + o.id.slice(0,8).toUpperCase() + ' · ' + (o.siteType||'Сайт');
   document.getElementById('ordModalMeta').textContent = fmtDate(o.createdAt)||'—';
-  document.getElementById('ordModalTags').innerHTML = '<span class="ord-tag s'+s+'"><span class="ord-dot"></span>'+STATUS_LABELS[s]+'</span>'+'<span class="ord-pay '+(paid?'is-paid':'is-unpaid')+'">'+(paid?'Оплачен':'Не оплачен')+'</span>'+(o.totalPrice?'<span style="font-size:.85rem;font-weight:500;color:var(--ink);margin-left:auto">'+o.totalPrice.toLocaleString('ru')+' ₽</span>':'');
-  document.getElementById('ordModalBody').innerHTML = statusComment + domainBanner + buildTracker(o) + buildSubsteps(o) + (estDate?'<div class="ord-eta">Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">'+estDate+'</strong></div>':'') + siteBlock + actionsHtml;
+  document.getElementById('ordModalTags').innerHTML = '<span class="ord-tag s'+s+'"><span class="ord-dot"></span>'+STATUS_LABELS[s]+'</span>'+'<span class="ord-pay '+payClass+'">'+payLabel+'</span>'+(o.totalPrice?'<span style="font-size:.85rem;font-weight:500;color:var(--ink);margin-left:auto">'+o.totalPrice.toLocaleString('ru')+' ₽</span>':'');
+  document.getElementById('ordModalBody').innerHTML = payBanner + statusComment + domainBanner + buildTracker(o) + buildSubsteps(o) + (estDate?'<div class="ord-eta">Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">'+estDate+'</strong></div>':'') + siteBlock + actionsHtml;
   document.getElementById('ordModalOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
+};
+
+window.payRemaining = async function(orderId, amount) {
+  try {
+    const resp = await fetch('https://api-lac-six-78.vercel.app/api/createPayment', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({orderId, amount})
+    });
+    const data = await resp.json();
+    if (data.paymentUrl) { window.location.href = data.paymentUrl; }
+    else toast('Ошибка создания платежа','error');
+  } catch(e) { toast('Не удалось создать платёж','error'); }
 };
 
 window.closeOrderModal = function() {
@@ -596,8 +644,14 @@ window.printReceipt = function(id){
   const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('ru', {day:'numeric', month:'long', year:'numeric'}) : '—';
   const extrasLabels = {domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
   const extrasHtml = (o.extras||[]).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e=>extrasLabels[e]||e).join(', ')}</td></tr>` : '';
+  const isPartialReceipt = o.paymentType === 'partial';
+  const paidAmt = o.paidAmount || 0;
+  const remainAmt = o.remainingAmount || (isPartialReceipt ? Math.ceil((o.totalPrice||0)/2) : 0);
+  const fullyPaidReceipt = o.paid || (isPartialReceipt && paidAmt >= (o.totalPrice||0));
+  const payStatusText = fullyPaidReceipt ? 'Оплачен полностью' : (isPartialReceipt && paidAmt > 0 ? 'Предоплата 50%' : 'Не оплачен');
+  const partialRows = isPartialReceipt ? `<tr><td>Оплачено</td><td>${paidAmt.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fullyPaidReceipt ? '—' : remainAmt.toLocaleString('ru')+' ₽'}</td></tr>` : '';
   const totalHtml = `<tr class="total"><td>Итого</td><td>${o.totalPrice ? o.totalPrice.toLocaleString('ru') + ' ₽' : '—'}</td></tr>`;
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция</title><style>body{font-family:system-ui,sans-serif;max-width:500px;margin:36px auto;padding:0 18px;color:#111;font-size:13px}h1{font-size:17px}table{width:100%;border-collapse:collapse}td{padding:6px 0;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total td{font-size:14px;font-weight:700;border-bottom:none;padding-top:11px}</style></head><body><h1>Antviz</h1><p style="color:#666;font-size:11px">Квитанция по заказу</p><table><tr><td>Номер</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Оплата</td><td>${o.paid?'Оплачен':'Не оплачен'}</td></tr>${totalHtml}</table><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a;font-weight:400}td:last-child{text-align:right;font-weight:500;color:#191b1e}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e;color:#191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Статус оплаты</td><td>${payStatusText}</td></tr>${partialRows}${totalHtml}</table><div class="footer">antviz.ru · Документ сформирован ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
   w.document.write(html);
   w.document.close();
 };

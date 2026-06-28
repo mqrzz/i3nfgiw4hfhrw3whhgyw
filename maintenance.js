@@ -4,7 +4,6 @@
     const { getFirestore, doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
 
-    // Используем уже существующее приложение или создаём новое
     const firebaseConfig = {
       apiKey: "AIzaSyBLGr2hpmnmj1Mxf9072m8vQXJkLUN6YyY",
       authDomain: "antviz-515c8.firebaseapp.com",
@@ -29,13 +28,12 @@
 
       if (on && !mo) {
         mo = document.createElement('div');
-        mo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#191b1e;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Geologica,Inter,Arial,sans-serif';
+        mo.style.cssText = 'position:fixed;inset:0;z-index:99999;background:#fff;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Geologica,Inter,Arial,sans-serif';
         mo.innerHTML = `
-          <div style="background:#191b1e;border-radius:64px;padding:80px 100px;text-align:center;position:relative;overflow:hidden;max-width:700px;width:100%;border:1px solid rgba(255,255,255,.06)">
-            <div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(30,222,123,.10),transparent);pointer-events:none"></div>
+          <div style="background:#f2f4f7;border-radius:64px;padding:80px 100px;text-align:center;position:relative;overflow:hidden;max-width:700px;width:100%;border:1.5px solid #dfe3e8">
             <div style="font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#1ede7b;margin-bottom:24px">Технические работы</div>
-            <h1 style="font-size:clamp(40px,7vw,80px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin:0 0 20px">Скоро <em style="font-style:normal;color:#1ede7b">вернёмся</em></h1>
-            <p style="font-size:clamp(15px,1.5vw,18px);color:rgba(255,255,255,.45);font-weight:300;line-height:1.6;max-width:440px;margin:0 auto">Сайт временно недоступен — мы уже работаем над улучшениями. Обычно это занимает не больше часа.</p>
+            <h1 style="font-size:clamp(40px,7vw,80px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#191b1e;margin:0 0 20px">Скоро <em style="font-style:normal;color:#1ede7b">вернёмся</em></h1>
+            <p style="font-size:clamp(15px,1.5vw,18px);color:#707a8a;font-weight:300;line-height:1.6;max-width:440px;margin:0 auto">Сайт временно недоступен — мы уже работаем над улучшениями. Обычно это занимает не больше часа.</p>
           </div>`;
         document.body.appendChild(mo);
         document.body.style.overflow = 'hidden';

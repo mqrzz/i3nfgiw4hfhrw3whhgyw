@@ -652,12 +652,7 @@ updateProgress();
   window._orderCaptchaOk = false;
   window.onOrderVerified = function() {
     window._orderCaptchaOk = true;
-    // re-evaluate button state
-    var s = window.state;
-    var agreed = document.getElementById('agreeBox') && document.getElementById('agreeBox').classList.contains('checked');
-    var ok = s && s.format && s.tier && agreed;
-    document.getElementById('submitBtn').disabled = !ok;
-    document.getElementById('submitBtnHalf').disabled = !ok;
+    if(window._updateUI) window._updateUI();
   };
   window.onOrderExpired = function() {
     window._orderCaptchaOk = false;
@@ -729,6 +724,7 @@ function updateUI(){
   document.getElementById('submitBtn').disabled=!state.format||!state.tier||!agreed||!_cfOk;
   document.getElementById('submitBtnHalf').disabled=!state.format||!state.tier||!agreed||!_cfOk;
 }
+window._updateUI=updateUI;
 
 function bindExtra(id,key){
   document.getElementById(id).querySelector('.calc-extra-row').addEventListener('click',e=>{

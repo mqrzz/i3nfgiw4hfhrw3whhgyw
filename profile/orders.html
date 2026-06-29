@@ -846,6 +846,7 @@ function loadOrders(uid){
   const q = query(collection(db,'orders'),where('uid','==',uid));
   unsubOrders = onSnapshot(q, snap=>{
     const orders = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o => (o.status ?? 0) !== -1)
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     _ordersCache = orders;
     allOrders = orders;

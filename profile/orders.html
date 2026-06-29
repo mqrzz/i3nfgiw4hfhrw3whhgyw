@@ -68,13 +68,13 @@
     .ord-count{color:var(--ink-faint);font-size:.76rem}
 
     /* ── LIST ── */
-    .ord-cols{display:grid;grid-template-columns:1fr 160px 120px 20px;gap:16px;padding:0 28px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+    .ord-cols{display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;padding:0 28px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
     .ord-list{border:1.5px solid var(--line);border-radius:28px;overflow:hidden;background:var(--bg)}
     .ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
     .ord-row-wrap:last-child{border-bottom:none}
     .ord-row-wrap.is-filtered{display:none}
 
-    .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 120px 20px;gap:16px;align-items:center;width:100%;padding:22px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
+    .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;align-items:center;width:100%;padding:22px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
     .ord-row:hover{background:var(--surface)}
     .ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
     .ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
@@ -283,7 +283,7 @@
       .ord-modal{max-height:95vh}
       .ord-cols{display:none}
       .ord-row{grid-template-columns:1fr;gap:4px;padding:18px 20px;padding-right:48px;position:relative}
-      .ord-cell-pay,.ord-cell-price{display:none}
+      .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
       .ord-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
       .trk-steps{flex-wrap:wrap;gap:12px}
       .trk-steps::before{display:none}
@@ -406,7 +406,7 @@
   </div>
 
   <div class="ord-cols">
-    <span>Заказ</span><span>Оплата</span><span>Сумма</span><span></span>
+    <span>Заказ</span><span>Статус</span><span>Оплата</span><span>Сумма</span><span></span>
   </div>
   <div class="ord-list" id="ordersList">
     <div style="padding:24px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
@@ -489,18 +489,18 @@ function buildTracker(o){
   }
   // Filled SVG иконки — объёмные, не stroke
   const icons = [
-    // 0 Заявка — document
-    '<rect x="5" y="2" width="14" height="20" rx="2" fill="currentColor" opacity=".15"/><rect x="5" y="2" width="14" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="11.5" x2="15" y2="11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="15" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
-    // 1 Обсуждение — chat bubble filled
-    '<path d="M20 2H4a2 2 0 00-2 2v13a2 2 0 002 2h3l3 3 3-3h7a2 2 0 002-2V4a2 2 0 00-2-2z" fill="currentColor" opacity=".2"/><path d="M20 2H4a2 2 0 00-2 2v13a2 2 0 002 2h3l3 3 3-3h7a2 2 0 002-2V4a2 2 0 00-2-2z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/><circle cx="12" cy="10.5" r="1" fill="currentColor"/><circle cx="16" cy="10.5" r="1" fill="currentColor"/>',
-    // 2 В работе — wrench/code
-    '<polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><rect x="9" y="5" width="6" height="14" rx="1" fill="currentColor" opacity=".12"/>',
-    // 3 На проверке — eye filled
-    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="currentColor" opacity=".3"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>',
-    // 4 Правки — pencil filled
-    '<path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
-    // 5 Готово — checkmark in circle filled
-    '<circle cx="12" cy="12" r="10" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.5"/><polyline points="7 12.5 10.5 16 17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+    // 0 Заявка — inbox tray
+    '<path d="M22 12h-6l-2 3H10l-2-3H2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M5.45 5.11L2 12v6a2 2 0 002 2h16a2 2 0 002-2v-6l-3.45-6.89A2 2 0 0016.76 4H7.24a2 2 0 00-1.79 1.11z" fill="currentColor" opacity=".12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    // 1 Обсуждение — message square with dots
+    '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="currentColor" opacity=".12" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="12" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/>',
+    // 2 В работе — settings/gear
+    '<circle cx="12" cy="12" r="3" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" fill="currentColor" opacity=".1" stroke="currentColor" stroke-width="1.6"/>',
+    // 3 На проверке — eye
+    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="currentColor" opacity=".1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" fill="currentColor" opacity=".25" stroke="currentColor" stroke-width="1.6"/>',
+    // 4 Правки — edit / pen
+    '<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" fill="currentColor" opacity=".1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>',
+    // 5 Готово — check circle filled
+    '<path d="M22 11.08V12a10 10 0 11-5.93-9.14" fill="currentColor" opacity=".08" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="10" fill="currentColor" opacity=".08"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
   ];
   const labels = ['Заявка принята','Обсуждение','В работе','На проверке','Правки','Готово'];
   const subs   = ['Заявка получена и зарегистрирована','Уточняем детали проекта','Ведётся активная разработка','Отправлено на ваше согласование','Вносим правки по пожеланиям','Проект завершён и сдан'];
@@ -603,9 +603,10 @@ function orderCard(o){
         <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${escapeHtml(o.siteType||'Сайт')}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
         <div class="ord-tags-mobile">
-          <span class="ord-pay ${payClassCard}">${payLabelCard}</span>
+          <span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span>
         </div>
       </div>
+      <div class="ord-cell-status"><span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span></div>
       <div class="ord-cell-pay"><span class="ord-pay ${payClassCard}">${payLabelCard}</span></div>
       <div class="ord-cell-price ord-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div>
       <svg class="ord-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>

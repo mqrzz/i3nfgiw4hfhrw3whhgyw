@@ -473,9 +473,9 @@ function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Da
 
 window.handleAvatarUpload=async function(file){if(!file) return;if(file.size>3*1024*1024){toast('Файл больше 3 МБ','error');return;}const reader=new FileReader();reader.onload=async function(e){const dataUrl=e.target.result;const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';let img=av.querySelector('img');if(!img){img=document.createElement('img');av.insertBefore(img,av.firstChild);}img.src=dataUrl;try{await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl});toast('Фото обновлено ✓','success');}catch(e){console.error(e);}};reader.readAsDataURL(file);};
 
-const STATUS_LABELS={0:'Новый',1:'В работе',2:'В работе',3:'На проверке',4:'Финал',5:'Завершён'};
-const STATUS_COLORS={0:'#707a8a',1:'#1ede7b',2:'#1ede7b',3:'#f59e0b',4:'#1ede7b',5:'#cbcdd6'};
-const STATUS_BG={0:'rgba(112,122,138,.12)',1:'rgba(30,222,123,.12)',2:'rgba(30,222,123,.12)',3:'rgba(245,158,11,.12)',4:'rgba(30,222,123,.12)',5:'rgba(203,205,214,.15)'};
+const STATUS_LABELS={0:'Новый',1:'В работе',2:'В работе',3:'На проверке',4:'Финал',5:'Завершён',6:'Ожидает доплаты'};
+const STATUS_COLORS={0:'#707a8a',1:'#1ede7b',2:'#1ede7b',3:'#f59e0b',4:'#1ede7b',5:'#cbcdd6',6:'#b45309'};
+const STATUS_BG={0:'rgba(112,122,138,.12)',1:'rgba(30,222,123,.12)',2:'rgba(30,222,123,.12)',3:'rgba(245,158,11,.12)',4:'rgba(30,222,123,.12)',5:'rgba(203,205,214,.15)',6:'rgba(180,83,9,.12)'};
 
 function renderRecentOrders(orders){
   const list=document.getElementById('recentOrdersList');

@@ -10,244 +10,285 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
-      --bg:#ffffff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
+      --bg:#fff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
       --line:#dfe3e8;--line-strong:#cbcdd6;
       --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
       --accent:#1ede7b;--accent-soft:#1ac16b;--accent-wash:rgba(30,222,123,.12);
-      --good:#1ede7b;--good-wash:rgba(30,222,123,.12);
-      --warn:#f59e0b;--warn-wash:rgba(245,158,11,.1);
-      --bad:#e8634f;--bad-wash:rgba(232,99,79,.1);
-      --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
       --dark:#191b1e;
-      --r-xs:6px;--r-sm:10px;--r-md:16px;--r-lg:24px;--r-xl:40px;
       --font:'Geologica','Inter','Arial',sans-serif;
     }
     html{scroll-behavior:smooth}
     body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
     :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
 
     @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
     @keyframes cFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
     @keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
     .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
     .spinner{width:24px;height:24px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
     .loading-text{color:var(--ink-faint);font-size:.75rem}
-
     .confetti-wrap{position:fixed;inset:0;z-index:1000;pointer-events:none;overflow:hidden}
     .c-piece{position:absolute;top:-10px;border-radius:2px;animation:cFall linear forwards}
 
-    /* SHELL */
+    /* ── SHELL ── */
     .ord-shell{width:100%;animation:fadeUp .25s ease}
 
-    /* HERO — тёмный блок страницы */
-    .page-hero{background:var(--dark);border-radius:40px;padding:44px 48px 40px;margin-bottom:20px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-    .page-hero-left{}
-    .page-hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
-    .page-hero-title{font-family:var(--font);font-weight:500;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:8px}
-    .page-hero-sub{color:rgba(255,255,255,.3);font-size:.88rem;font-weight:300}
+    /* ── HERO ── */
+    .page-hero{background:var(--dark);border-radius:40px;padding:48px 52px 44px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    .page-hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:14px}
+    .page-hero-title{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:500;letter-spacing:-.05em;line-height:1.02;color:#fff;margin-bottom:8px}
+    .page-hero-title em{color:var(--accent);font-style:normal}
+    .page-hero-sub{color:rgba(255,255,255,.3);font-size:.9rem;font-weight:300}
 
-    /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;gap:6px;padding:.75rem 1.4rem;border-radius:14px;font-family:var(--font);font-size:.84rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,transform .12s,border-color .15s,color .15s;white-space:nowrap}
-    .btn:hover{transform:translateY(-1px)}
-    .btn svg{width:14px;height:14px;flex-shrink:0}
-    .btn-primary{background:var(--accent);color:#191b1e}
+    /* ── BUTTONS ── */
+    .btn{display:inline-flex;align-items:center;gap:7px;padding:.8rem 1.5rem;border-radius:14px;font-family:var(--font);font-size:.88rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,transform .12s,opacity .15s,border-color .15s,color .15s;white-space:nowrap}
+    .btn:hover:not(:disabled){transform:translateY(-1px)}
+    .btn svg{width:15px;height:15px;flex-shrink:0;stroke-width:2;fill:none;stroke:currentColor}
+    .btn-primary{background:var(--accent);color:var(--dark)}
     .btn-primary:hover{background:var(--accent-soft)}
-    .btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
-    .btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
-    .btn-ghost-light{background:transparent;border:1px solid var(--line-strong);color:var(--ink-faint);font-weight:400}
-    .btn-ghost-light:hover{border-color:var(--ink-dim);color:var(--ink)}
-    .btn-success{background:#1ede7b;color:#0a1f12;border:none;font-weight:500}
-    .btn-success:hover{background:#1ac96e}
-    .btn-warn{background:var(--warn-wash);color:var(--warn);border:1px solid rgba(251,191,36,.22)}
-    .btn-warn:hover{background:rgba(251,191,36,.16)}
-    .btn-xs{padding:.42rem .9rem;font-size:.75rem;border-radius:10px;font-family:inherit;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
-    .btn-pay-remaining{background:#1ede7b;color:#0a1f12;border:none;font-family:inherit;font-size:.88rem;font-weight:500;padding:.7rem 1.4rem;border-radius:14px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;gap:8px;width:100%}
-    .btn-pay-remaining:hover{background:#1ac96e;transform:translateY(-1px)}
-    .pay-remaining-banner{background:linear-gradient(135deg,rgba(30,222,123,.08) 0%,rgba(30,222,123,.04) 100%);border:1.5px solid rgba(30,222,123,.25);border-radius:18px;padding:18px 20px;margin-bottom:20px}
-    .pay-remaining-title{font-size:.95rem;font-weight:500;color:var(--ink);margin-bottom:4px}
-    .pay-remaining-sub{font-size:.8rem;color:var(--ink-faint);margin-bottom:14px;font-weight:300;line-height:1.5}
-    .pay-gate-banner{background:rgba(232,99,79,.06);border:1.5px solid rgba(232,99,79,.2);border-radius:18px;padding:18px 20px;margin-bottom:20px}
-    .pay-gate-title{font-size:.95rem;font-weight:500;color:#c94f30;margin-bottom:4px}
-    .pay-gate-sub{font-size:.8rem;color:var(--ink-faint);margin-bottom:14px;font-weight:300;line-height:1.5}
-    .btn-pay-gate{background:#e8634f;color:#fff;border:none;font-family:inherit;font-size:.88rem;font-weight:500;padding:.7rem 1.4rem;border-radius:14px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;gap:8px;width:100%}
-    .btn-pay-gate:hover{background:#d4543f;transform:translateY(-1px)}
-    .btn-sm{padding:.55rem 1.1rem;font-size:.78rem;border-radius:11px}
+    .btn-dark{background:var(--dark);color:#fff;border:1.5px solid rgba(255,255,255,.1)}
+    .btn-dark:hover{background:#2a2d32}
+    .btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
+    .btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
+    .btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
+    .btn-outline:hover{border-color:var(--ink);color:var(--ink);background:var(--surface)}
+    .btn-sm{padding:.55rem 1.1rem;font-size:.8rem;border-radius:11px}
+    .btn-lg{padding:1rem 2rem;font-size:1rem;border-radius:16px}
 
-    /* TOOLBAR */
+    /* ── TOOLBAR ── */
     .ord-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-    .ord-tabs{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:4px;gap:2px}
-    .ord-tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1rem;border-radius:14px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+    .ord-tabs{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
+    .ord-tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
     .ord-tab:hover{color:var(--ink)}
-    .ord-tab.is-active{background:var(--accent-wash);color:var(--accent-soft)}
+    .ord-tab.is-active{background:var(--dark);color:#fff}
     .ord-count{color:var(--ink-faint);font-size:.76rem}
 
-    /* LIST */
-    .ord-cols{display:grid;grid-template-columns:1fr 140px 130px 120px 22px;gap:16px;padding:0 24px 12px;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
-    .ord-list{border:1.5px solid var(--line);border-radius:28px;overflow:hidden}
+    /* ── LIST ── */
+    .ord-cols{display:grid;grid-template-columns:1fr 160px 140px 120px 20px;gap:16px;padding:0 28px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+    .ord-list{border:1.5px solid var(--line);border-radius:28px;overflow:hidden;background:var(--bg)}
     .ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
     .ord-row-wrap:last-child{border-bottom:none}
     .ord-row-wrap.is-filtered{display:none}
-    .ord-row{all:unset;display:grid;grid-template-columns:1fr 140px 130px 120px 22px;gap:16px;align-items:center;width:100%;padding:20px 24px;cursor:pointer;transition:background .15s;font-family:var(--font)}
+
+    .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 140px 120px 20px;gap:16px;align-items:center;width:100%;padding:22px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
     .ord-row:hover{background:var(--surface)}
-    .ord-cell-main{display:flex;flex-direction:column;gap:4px;min-width:0}
-    .ord-num{font-size:.9rem;font-weight:500;color:var(--ink)}
+    .ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
+    .ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
     .ord-meta{font-size:.76rem;color:var(--ink-faint)}
     .ord-tags-mobile{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
-    .ord-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .65rem;border-radius:8px;width:fit-content}
+
+    /* Status tags — только тёмный/белый/зелёный */
+    .ord-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.3rem .7rem;border-radius:8px;width:fit-content}
     .ord-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .ord-tag.s0{background:var(--surface-3);color:var(--ink-faint)}
-    .ord-tag.s1{background:var(--warn-wash);color:var(--warn)}
-    .ord-tag.s2{background:var(--info-wash);color:var(--info)}
+    .ord-tag.s0{background:var(--surface-3);color:var(--ink-dim)}
+    .ord-tag.s1{background:var(--dark);color:rgba(255,255,255,.7)}
+    .ord-tag.s2{background:var(--dark);color:var(--accent)}
     .ord-tag.s3{background:var(--accent-wash);color:var(--accent-soft)}
-    .ord-tag.s4{background:var(--warn-wash);color:var(--warn)}
-    .ord-tag.s5{background:var(--good-wash);color:var(--good)}
-    .ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.74rem;font-weight:500}
-    .ord-pay.is-paid{color:var(--good)}
-    .ord-pay.is-unpaid{color:var(--bad)}
-    .ord-pay.is-half{color:#f59e0b}
-    .ord-pay svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none}
-    .ord-price{font-size:.9rem;font-weight:500;text-align:right}
+    .ord-tag.s4{background:var(--dark);color:rgba(255,255,255,.7)}
+    .ord-tag.s5{background:var(--accent);color:var(--dark)}
+    .ord-tag.s6{background:var(--dark);color:rgba(255,255,255,.6)}
+
+    /* Pay status */
+    .ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:500}
+    .ord-pay.is-paid{color:var(--accent-soft)}
+    .ord-pay.is-unpaid{color:var(--ink-faint)}
+    .ord-pay.is-half{color:var(--ink-dim)}
+
+    .ord-price{font-size:.92rem;font-weight:500;text-align:right;color:var(--ink)}
     .ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
 
-    /* ORDER FULLSCREEN MODAL */
-    .ord-modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.6);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+    /* ── ORDER MODAL ── */
+    .ord-modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
     .ord-modal-overlay.show{opacity:1;pointer-events:all}
-    .ord-modal{background:var(--bg);border-radius:32px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(24px) scale(.97);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 100px rgba(0,0,0,.25)}
+    .ord-modal{background:var(--bg);border-radius:36px;width:100%;max-width:1120px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(28px) scale(.97);transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 40px 120px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.05)}
     .ord-modal-overlay.show .ord-modal{transform:translateY(0) scale(1)}
-    .ord-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:28px 28px 0}
-    .ord-modal-title{font-size:1.15rem;font-weight:500;color:var(--ink);letter-spacing:-.02em}
-    .ord-modal-meta{font-size:.78rem;color:var(--ink-faint);margin-top:4px}
-    .ord-modal-close{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--line-strong);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-faint);transition:all .15s;flex-shrink:0}
-    .ord-modal-close:hover{background:var(--surface-3);border-color:var(--ink-faint);color:var(--ink)}
+
+    /* Modal header — dark */
+    .ord-modal-header{background:var(--dark);padding:32px 36px 28px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-shrink:0}
+    .ord-modal-header-left{flex:1;min-width:0}
+    .ord-modal-eyebrow{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+    .ord-modal-title{font-size:clamp(1.4rem,2.5vw,2rem);font-weight:500;letter-spacing:-.04em;color:#fff;line-height:1.1;margin-bottom:10px}
+    .ord-modal-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .ord-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .7rem;border-radius:8px}
+    .ord-chip.status{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+    .ord-chip.status.active{background:var(--accent);color:var(--dark)}
+    .ord-chip.paid-yes{background:rgba(30,222,123,.15);color:var(--accent)}
+    .ord-chip.paid-half{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+    .ord-chip.paid-no{background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
+    .ord-chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+    .ord-modal-price{font-size:clamp(1.6rem,3vw,2.4rem);font-weight:500;letter-spacing:-.04em;color:#fff;white-space:nowrap;flex-shrink:0}
+    .ord-modal-price small{font-size:.55em;font-weight:300;color:rgba(255,255,255,.3);margin-right:2px}
+    .ord-modal-close{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);transition:all .15s;flex-shrink:0;margin-top:2px}
+    .ord-modal-close:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff}
     .ord-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
-    .ord-modal-tags{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:14px 28px 0}
-    .ord-modal-body{padding:20px 28px 32px}
 
-    .ord-comment{display:flex;align-items:flex-start;gap:8px;margin-bottom:16px;padding:12px 16px;background:var(--accent-wash);border-radius:12px;font-size:.8rem;color:var(--accent-soft);line-height:1.55}
-    .ord-comment svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none}
+    /* Modal body — two columns */
+    .ord-modal-body{display:grid;grid-template-columns:1fr 340px;flex:1;overflow:hidden;min-height:0}
+    .ord-modal-left{overflow-y:auto;padding:32px 36px;border-right:1px solid var(--line)}
+    .ord-modal-right{overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
 
-    /* TRACKER */
-    .trk{margin-bottom:20px}
-    .trk-strips{display:flex;flex-direction:column}
-    .trk-strip{display:grid;grid-template-columns:32px 1fr auto;gap:20px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line)}
-    .trk-strip:last-child{border-bottom:none}
-    .trk-strip.done .trk-n{color:var(--accent-soft)}
-    .trk-strip.current .trk-n{color:var(--ink)}
-    .trk-strip.pending .trk-n{color:var(--line-strong)}
-    .trk-n{font-size:.72rem;font-weight:500;letter-spacing:.05em;color:var(--line-strong);transition:color .2s}
-    .trk-body strong{font-size:clamp(15px,1.6vw,19px);font-weight:500;letter-spacing:-.02em;display:block;transition:color .2s}
-    .trk-strip.done .trk-body strong{color:var(--ink-dim)}
-    .trk-strip.current .trk-body strong{color:var(--ink)}
-    .trk-strip.pending .trk-body strong{color:var(--line-strong)}
-    .trk-strip-status{font-size:.72rem;font-weight:500;white-space:nowrap}
-    .trk-strip.done .trk-strip-status{color:var(--accent-soft)}
-    .trk-strip.current .trk-strip-status{color:var(--ink-dim)}
+    /* ── TRACKER (horizontal stepper) ── */
+    .trk{margin-bottom:28px}
+    .trk-label{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:16px}
+    .trk-steps{display:flex;gap:0;position:relative}
+    .trk-steps::before{content:'';position:absolute;top:20px;left:20px;right:20px;height:2px;background:var(--line);z-index:0}
+    .trk-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1}
+    .trk-ico{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);background:var(--bg);transition:all .2s;flex-shrink:0}
+    .trk-ico svg{width:16px;height:16px;stroke-width:1.8;fill:none;stroke:var(--ink-faint)}
+    .trk-step.done .trk-ico{background:var(--dark);border-color:var(--dark)}
+    .trk-step.done .trk-ico svg{stroke:#fff}
+    .trk-step.current .trk-ico{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px rgba(30,222,123,.2)}
+    .trk-step.current .trk-ico svg{stroke:var(--dark)}
+    .trk-step.pending .trk-ico{opacity:.35}
+    .trk-name{font-size:.68rem;font-weight:500;color:var(--ink-faint);text-align:center;line-height:1.3}
+    .trk-step.done .trk-name{color:var(--ink-dim)}
+    .trk-step.current .trk-name{color:var(--ink);font-weight:500}
 
-    /* STATUS HERO */
-    .status-hero{background:var(--dark);border-radius:28px;padding:28px 32px;margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
-    .status-hero-eyebrow{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
-    .status-hero-title{font-size:clamp(20px,2.5vw,30px);font-weight:500;letter-spacing:-.03em;color:#fff;line-height:1.1;margin-bottom:6px}
-    .status-hero-sub{font-size:.82rem;color:rgba(255,255,255,.3);font-weight:300;line-height:1.5}
-    .status-hero-price{font-size:clamp(26px,3vw,38px);font-weight:500;letter-spacing:-.04em;color:#fff;white-space:nowrap}
-    .status-hero-price sup{font-size:14px;font-weight:300;color:rgba(255,255,255,.3)}
-
-    /* SUBSTEPS */
-    .sub-list{display:flex;flex-direction:column;margin:0 0 20px}
-    .sub-item{display:grid;grid-template-columns:28px 1fr auto;gap:16px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}
+    /* ── SUBSTEPS ── */
+    .sub-list{display:flex;flex-direction:column;margin:0 0 24px;border:1.5px solid var(--line);border-radius:18px;overflow:hidden}
+    .sub-item{display:grid;grid-template-columns:32px 1fr auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
     .sub-item:last-child{border-bottom:none}
-    .sub-n{font-size:.68rem;font-weight:500;color:var(--line-strong);letter-spacing:.05em}
+    .sub-n{font-size:.65rem;font-weight:500;color:var(--line-strong);letter-spacing:.05em}
     .sub-item.done .sub-n{color:var(--accent-soft)}
-    .sub-lbl{font-size:.9rem;font-weight:300;color:var(--ink-faint)}
+    .sub-lbl{font-size:.88rem;font-weight:300;color:var(--ink-faint)}
     .sub-item.done .sub-lbl{color:var(--ink)}
     .sub-date{font-size:.72rem;color:var(--ink-faint);white-space:nowrap}
 
-    /* DELIVERY CARD */
-    .delivery-card{background:var(--dark);border-radius:28px;padding:28px 32px;margin-bottom:20px}
-    .delivery-card-eyebrow{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
-    .site-domain-big{font-size:clamp(18px,2.2vw,26px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:16px}
-    .site-favicon{width:28px;height:28px;border-radius:8px;object-fit:contain;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);margin-bottom:12px}
-    .site-pages-list{display:flex;flex-direction:column;margin-bottom:20px;border-top:1px solid rgba(255,255,255,.08);padding-top:16px}
-    .site-page-item{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.84rem;color:rgba(255,255,255,.4);font-weight:300}
+    /* ── STATUS COMMENT ── */
+    .ord-comment{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;padding:14px 18px;background:var(--dark);border-radius:16px;font-size:.84rem;color:rgba(255,255,255,.6);line-height:1.6}
+    .ord-comment svg{width:15px;height:15px;stroke:var(--accent);stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none;min-width:15px}
+
+    /* ── ETA ── */
+    .ord-eta{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:12px 16px;font-size:.84rem;color:var(--ink-dim);margin-bottom:20px;font-weight:300}
+    .ord-eta svg{width:15px;height:15px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;flex-shrink:0}
+
+    /* ── DELIVERY CARD ── */
+    .delivery-card{background:var(--dark);border-radius:22px;padding:24px 26px;margin-bottom:0}
+    .delivery-card-eyebrow{font-size:.63rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+    .site-domain-big{font-size:clamp(16px,2vw,22px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:14px}
+    .site-favicon{width:26px;height:26px;border-radius:7px;object-fit:contain;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);margin-bottom:10px}
+    .site-pages-list{display:flex;flex-direction:column;margin-bottom:18px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
+    .site-page-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;color:rgba(255,255,255,.4);font-weight:300}
     .site-page-item:last-child{border-bottom:none}
-    .site-page-item svg{width:12px;height:12px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0}
+    .site-page-item svg{width:11px;height:11px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0}
 
-    .ord-eta{display:flex;align-items:center;gap:10px;background:var(--surface-2);border:1.5px solid var(--line);border-radius:16px;padding:14px 18px;font-size:.86rem;color:var(--ink-dim);margin-bottom:20px;font-weight:300}
-    .ord-eta svg{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;flex-shrink:0}
-    .ord-actions{display:flex;gap:8px;flex-wrap:wrap}
-
-    /* DOMAIN BANNER — SVG вместо эмодзи */
-    .domain-banner{display:flex;align-items:flex-start;gap:12px;background:rgba(59,130,246,.07);border:1.5px solid rgba(59,130,246,.18);border-radius:16px;padding:16px 18px;margin-bottom:16px}
-    .domain-banner-ico{width:32px;height:32px;border-radius:9px;background:rgba(59,130,246,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .domain-banner-ico svg{width:15px;height:15px;stroke:var(--info);stroke-width:1.8;fill:none}
+    /* ── DOMAIN BANNER ── */
+    .domain-banner{display:flex;align-items:flex-start;gap:12px;background:var(--surface-2);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:16px}
+    .domain-banner-ico{width:30px;height:30px;border-radius:8px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .domain-banner-ico svg{width:13px;height:13px;stroke:var(--accent);stroke-width:1.8;fill:none}
     .domain-banner-body{flex:1;min-width:0}
-    .domain-banner-title{font-size:.82rem;font-weight:500;color:var(--info);margin-bottom:4px}
-    .domain-banner-text{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
-    .domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:.78rem;font-weight:500;color:var(--info);text-decoration:none}
+    .domain-banner-title{font-size:.8rem;font-weight:500;color:var(--ink);margin-bottom:3px}
+    .domain-banner-text{font-size:.76rem;color:var(--ink-dim);line-height:1.55}
+    .domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:.76rem;font-weight:500;color:var(--accent-soft);text-decoration:none}
     .domain-banner-link:hover{text-decoration:underline}
-    .domain-banner-link svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
+    .domain-banner-link svg{width:10px;height:10px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* EMPTY */
-    .empty{text-align:center;padding:72px 16px;color:var(--ink-faint)}
+    /* ── PAY BANNERS ── */
+    .pay-remaining-banner{background:var(--accent-wash);border:1.5px solid rgba(30,222,123,.2);border-radius:18px;padding:18px 20px}
+    .pay-remaining-title{font-size:.9rem;font-weight:500;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+    .pay-remaining-title svg{width:14px;height:14px;stroke:var(--accent-soft);stroke-width:2;fill:none}
+    .pay-remaining-sub{font-size:.78rem;color:var(--ink-dim);margin-bottom:14px;font-weight:300;line-height:1.55}
+    .btn-pay-remaining{background:var(--dark);color:#fff;border:none;font-family:inherit;font-size:.85rem;font-weight:500;padding:.7rem 1.3rem;border-radius:12px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+    .btn-pay-remaining:hover{background:#2a2d32;transform:translateY(-1px)}
+    .btn-pay-remaining svg{width:14px;height:14px;stroke:var(--accent);stroke-width:2;fill:none}
+
+    .pay-gate-banner{background:var(--dark);border-radius:18px;padding:18px 20px}
+    .pay-gate-title{font-size:.9rem;font-weight:500;color:var(--accent);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+    .pay-gate-title svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+    .pay-gate-sub{font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:14px;font-weight:300;line-height:1.55}
+    .btn-pay-gate{background:var(--accent);color:var(--dark);border:none;font-family:inherit;font-size:.88rem;font-weight:500;padding:.75rem 1.4rem;border-radius:12px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
+    .btn-pay-gate:hover{background:var(--accent-soft);transform:translateY(-1px)}
+    .btn-pay-gate svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+
+    /* ── ACTIONS (right column) ── */
+    .ord-actions-title{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:10px}
+    .ord-action-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem;font-weight:400;cursor:pointer;transition:background .15s,border-color .15s;text-decoration:none}
+    .ord-action-btn:hover{background:var(--surface);border-color:var(--line-strong)}
+    .ord-action-btn.green{background:var(--accent);border-color:var(--accent);color:var(--dark);font-weight:500}
+    .ord-action-btn.green:hover{background:var(--accent-soft);border-color:var(--accent-soft)}
+    .ord-action-btn.dark{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:400}
+    .ord-action-btn.dark:hover{background:#2a2d32;border-color:#2a2d32}
+    .ord-action-ico{width:34px;height:34px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .ord-action-btn.green .ord-action-ico{background:rgba(0,0,0,.12)}
+    .ord-action-btn.dark .ord-action-ico{background:rgba(255,255,255,.07)}
+    .ord-action-ico svg{width:15px;height:15px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
+    .ord-action-btn.green .ord-action-ico svg{stroke:var(--dark)}
+    .ord-action-btn.dark .ord-action-ico svg{stroke:rgba(255,255,255,.6)}
+    .ord-actions-group{display:flex;flex-direction:column;gap:8px}
+
+    /* ── EMPTY ── */
+    .empty{text-align:center;padding:80px 16px;color:var(--ink-faint)}
     .empty-icon{margin-bottom:20px;display:flex;justify-content:center}
-    .empty-icon svg{width:48px;height:48px;stroke:var(--accent);stroke-width:1.2;fill:none;opacity:.5}
-    .empty h3{font-family:var(--font);font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:8px}
+    .empty-icon svg{width:52px;height:52px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
+    .empty h3{font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:8px}
     .empty p{font-size:.86rem;margin-bottom:24px}
 
-    /* TOAST */
+    /* ── TOAST ── */
     .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--good);color:#0d3320}
-    .toast.error{background:var(--bad);color:#fff}
-    .toast.info{background:var(--accent);color:#191b1e}
+    .toast.success{background:var(--accent);color:var(--dark)}
+    .toast.error{background:var(--dark);color:#fff}
+    .toast.info{background:var(--dark);color:#fff}
 
-    /* MODAL */
-    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    /* ── REVIEW MODAL ── */
+    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(15,17,20,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
     .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:var(--surface);border:1.5px solid var(--line-strong);border-radius:32px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .2s}
+    .modal{background:var(--bg);border:1.5px solid var(--line);border-radius:28px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .22s}
     .modal-overlay.show .modal{transform:translateY(0) scale(1)}
-    .modal-icon-wrap{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-    .modal-icon-wrap svg{width:22px;height:22px;stroke-width:1.7;fill:none}
-    .modal h3{font-family:var(--font);font-size:1.1rem;font-weight:500;margin-bottom:8px;text-align:center}
-    .modal-p{color:var(--ink-dim);font-size:.85rem;text-align:center;margin-bottom:20px;line-height:1.6}
-    .modal-btns{display:flex;gap:10px}
+    .modal-icon-wrap{width:52px;height:52px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+    .modal-icon-wrap svg{width:22px;height:22px;stroke:var(--accent);stroke-width:1.7;fill:none}
+    .modal h3{font-size:1.15rem;font-weight:500;margin-bottom:8px;text-align:center;color:var(--ink)}
+    .modal-p{color:var(--ink-dim);font-size:.86rem;text-align:center;margin-bottom:22px;line-height:1.6}
+    .modal-btns{display:flex;gap:10px;margin-top:4px}
     .modal-btns .btn{flex:1;justify-content:center}
-    .stars-row{display:flex;justify-content:center;gap:8px;margin-bottom:16px}
-    .star{width:32px;height:32px;cursor:pointer;color:var(--line-strong);transition:color .14s,transform .12s}
+    .stars-row{display:flex;justify-content:center;gap:10px;margin-bottom:18px}
+    .star{width:34px;height:34px;cursor:pointer;color:var(--line-strong);transition:color .14s,transform .12s}
     .star svg{width:100%;height:100%;fill:currentColor}
-    .star.on{color:var(--warn)}
+    .star.on{color:var(--accent)}
     .star:hover{transform:scale(1.12)}
     .review-textarea{width:100%;background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:12px;padding:.75rem .9rem;color:var(--ink);font-family:var(--font);font-size:.88rem;outline:none;resize:vertical;min-height:88px;margin-bottom:16px;transition:border-color .18s}
     .review-textarea:focus{border-color:var(--accent)}
     .review-textarea::placeholder{color:var(--ink-faint)}
 
-    /* BANNER */
-    .ord-banner{position:fixed;top:82px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:300;background:var(--surface);border:1.5px solid var(--line-strong);border-radius:20px;padding:.6rem 1.1rem .6rem .9rem;display:flex;align-items:center;gap:10px;font-size:.84rem;font-weight:500;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.1)}
+    /* ── DELIVERY MODAL ── */
+    .delivery-modal-inner{background:var(--dark);border-radius:22px;padding:22px 24px;margin-bottom:20px}
+    .delivery-site-name{font-size:1.1rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
+    .delivery-site-url{font-size:.8rem;color:rgba(255,255,255,.35);font-weight:300}
+
+    /* ── BANNER ── */
+    .ord-banner{position:fixed;top:82px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:300;background:var(--dark);border:1.5px solid rgba(255,255,255,.1);border-radius:20px;padding:.6rem 1rem .6rem .9rem;display:flex;align-items:center;gap:10px;font-size:.83rem;font-weight:400;color:rgba(255,255,255,.8);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.2)}
     .ord-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
-    #bannerIcon:empty::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent-soft);display:inline-block}
-    .ord-banner-close{background:none;border:none;color:var(--ink-faint);cursor:pointer;padding:0;display:flex}
+    .ord-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+    .ord-banner-close{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;padding:0;display:flex;transition:color .15s}
+    .ord-banner-close:hover{color:#fff}
     .ord-banner-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* MOBILE */
-    @media(max-width:840px){
+    /* ── MOBILE ── */
+    @media(max-width:900px){
       .page-hero{border-radius:24px;padding:28px 24px 24px}
-      .page-hero-title{font-size:1.8rem}
+      .page-hero-title{font-size:1.9rem}
+      .ord-modal-body{grid-template-columns:1fr}
+      .ord-modal-right{border-top:1px solid var(--line);border-right:none}
+      .ord-modal{max-height:95vh}
       .ord-cols{display:none}
-      .ord-list{border-radius:20px}
-      .ord-row{grid-template-columns:1fr;gap:4px;padding:18px 20px 18px 20px;padding-right:50px;position:relative}
+      .ord-row{grid-template-columns:1fr;gap:4px;padding:18px 20px;padding-right:48px;position:relative}
       .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
       .ord-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
-      .ord-modal{max-height:95vh;border-radius:24px}
-      .ord-actions{flex-direction:column}
-      .ord-actions .btn{width:100%;justify-content:center}
+      .trk-steps{flex-wrap:wrap;gap:12px}
+      .trk-steps::before{display:none}
     }
     @media(max-width:480px){
-      .page-hero{border-radius:18px;padding:22px 20px}
-      .page-hero-title{font-size:1.5rem}
+      .page-hero{border-radius:18px;padding:22px 18px}
+      .page-hero-title{font-size:1.6rem}
       .ord-toolbar{flex-direction:column;align-items:flex-start;gap:10px}
       .ord-tabs{overflow-x:auto;max-width:100%;width:100%}
+      .ord-modal-header{padding:22px 20px 18px}
+      .ord-modal-left{padding:20px}
+      .ord-modal-right{padding:18px 20px}
     }
     #sbContent{padding-bottom:80px}
   </style>
@@ -260,35 +301,34 @@
   <div class="spinner"></div>
   <span class="loading-text">Загружаю заказы...</span>
 </div>
-
 <div class="confetti-wrap" id="confettiWrap"></div>
 
 <div class="ord-banner" id="statusBanner">
-  <span id="bannerIcon"></span>
+  <div class="ord-banner-dot"></div>
   <span id="bannerText">Статус заказа изменился</span>
   <button class="ord-banner-close" onclick="closeBanner()">
-    <svg viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
   </button>
 </div>
 
 <!-- REVIEW MODAL -->
 <div class="modal-overlay" id="reviewModal">
   <div class="modal">
-    <div class="modal-icon-wrap" style="background:var(--warn-wash)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--warn)" stroke-width="1.6"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+    <div class="modal-icon-wrap">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     </div>
     <h3>Оставить отзыв</h3>
-    <p class="modal-p">Расскажите, как прошла работа над проектом</p>
+    <p class="modal-p">Расскажите как прошла работа над проектом</p>
     <div class="stars-row">
-      <span class="star" data-v="1" onclick="setStar(1)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" data-v="2" onclick="setStar(2)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" data-v="3" onclick="setStar(3)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" data-v="4" onclick="setStar(4)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" data-v="5" onclick="setStar(5)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" onclick="setStar(1)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" onclick="setStar(2)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" onclick="setStar(3)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" onclick="setStar(4)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" onclick="setStar(5)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
     </div>
     <textarea class="review-textarea" id="reviewText" placeholder="Пару слов о сотрудничестве (необязательно)..."></textarea>
     <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeReview()">Позже</button>
+      <button class="btn btn-outline" onclick="closeReview()">Позже</button>
       <button class="btn btn-primary" onclick="submitReview()">Отправить</button>
     </div>
   </div>
@@ -297,14 +337,14 @@
 <!-- DELIVERY MODAL -->
 <div class="modal-overlay" id="deliveryModal">
   <div class="modal">
-    <div class="modal-icon-wrap" style="background:var(--good-wash)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="var(--good)" stroke-width="1.7"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    <div class="modal-icon-wrap">
+      <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
     <h3>Ваш сайт готов!</h3>
     <p class="modal-p">Работа завершена — можно посмотреть результат</p>
     <div id="deliveryModalContent"></div>
     <div class="modal-btns">
-      <button class="btn btn-ghost" onclick="closeDelivery()">Закрыть</button>
+      <button class="btn btn-outline" onclick="closeDelivery()">Закрыть</button>
       <a class="btn btn-primary" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть сайт →</a>
     </div>
   </div>
@@ -313,32 +353,37 @@
 <!-- ORDER DETAIL MODAL -->
 <div class="ord-modal-overlay" id="ordModalOverlay">
   <div class="ord-modal">
-    <div class="ord-modal-head">
-      <div>
+    <div class="ord-modal-header">
+      <div class="ord-modal-header-left">
+        <div class="ord-modal-eyebrow">Antviz · Детали заказа</div>
         <div class="ord-modal-title" id="ordModalTitle"></div>
-        <div class="ord-modal-meta" id="ordModalMeta"></div>
+        <div class="ord-modal-chips" id="ordModalChips"></div>
       </div>
-      <button class="ord-modal-close" onclick="closeOrderModal()" aria-label="Закрыть">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
-      </button>
+      <div style="display:flex;align-items:flex-start;gap:16px;flex-shrink:0">
+        <div class="ord-modal-price" id="ordModalPrice"></div>
+        <button class="ord-modal-close" onclick="closeOrderModal()" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
     </div>
-    <div class="ord-modal-tags" id="ordModalTags"></div>
-    <div class="ord-modal-body" id="ordModalBody"></div>
+    <div class="ord-modal-body">
+      <div class="ord-modal-left" id="ordModalLeft"></div>
+      <div class="ord-modal-right" id="ordModalRight"></div>
+    </div>
   </div>
 </div>
 
 <div id="sbContent" style="display:none">
 <div class="ord-shell" id="appWrap">
 
-  <!-- HERO -->
   <div class="page-hero">
     <div class="page-hero-left">
       <div class="page-hero-eyebrow">Личный кабинет</div>
-      <div class="page-hero-title">Мои заказы</div>
-      <div class="page-hero-sub">Статусы, документы и история работ по вашим сайтам</div>
+      <div class="page-hero-title">Мои <em>заказы</em></div>
+      <div class="page-hero-sub">Статусы, документы и история работ</div>
     </div>
     <a href="../order" class="btn btn-ghost">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       Новый заказ
     </a>
   </div>
@@ -356,17 +401,17 @@
   <div class="ord-cols">
     <span>Заказ</span><span>Статус</span><span>Оплата</span><span>Сумма</span><span></span>
   </div>
-
   <div class="ord-list" id="ordersList">
     <div style="padding:24px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
   </div>
 
-</div><!-- /ord-shell -->
-</div><!-- /sbContent -->
+</div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
+
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, getDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -390,8 +435,8 @@ const INFO_ICONS = [
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
   `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
 ];
-const INFO_COLORS = ['var(--surface-3)','var(--warn-wash)','var(--info-wash)','var(--accent-wash)','var(--warn-wash)','var(--good-wash)'];
-const INFO_STROKE = ['var(--ink-faint)','var(--warn)','var(--info)','var(--accent-soft)','var(--warn)','var(--good)'];
+const INFO_COLORS = ['var(--surface-3)','var(--surface-2)','var(--dark)','var(--accent-wash)','var(--surface-2)','var(--accent-wash)'];
+const INFO_STROKE = ['var(--ink-faint)','var(--ink-dim)','var(--accent)','var(--accent-soft)','var(--ink-dim)','var(--accent)'];
 const CHECK_SVG = `<svg class="check-icon" viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>`;
 
 let currentUser = null, unsubOrders = null, unsubChat = null;
@@ -403,29 +448,24 @@ function toast(msg, type='info'){const t=document.getElementById('toast');t.text
 function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function getEstimate(pages=1,extras=[],status=0){if(status>=5) return null;let days=Math.max(2,Math.ceil(pages/3));if((extras||[]).includes('urgent')) days=1;const d=new Date();d.setDate(d.getDate()+days);return d.toLocaleDateString('ru',{day:'numeric',month:'long'});}
 
-function showBanner(text, icon=''){clearTimeout(bannerTimer);document.getElementById('bannerText').textContent=text;document.getElementById('bannerIcon').innerHTML=icon;document.getElementById('statusBanner').classList.add('show');bannerTimer=setTimeout(closeBanner,6500);}
+function showBanner(text){clearTimeout(bannerTimer);document.getElementById('bannerText').textContent=text;document.getElementById('statusBanner').classList.add('show');bannerTimer=setTimeout(closeBanner,6500);}
 window.closeBanner=()=>document.getElementById('statusBanner').classList.remove('show');
 
 function buildTracker(o){
   const s = o.status || 0;
   const steps = [
-    {label:'Заявка', sub:'Получена и зарегистрирована'},
-    {label:'Обсуждение', sub:'Уточняем детали проекта'},
-    {label:'В работе', sub:'Ведётся активная разработка'},
-    {label:'На проверке', sub:'Отправлено на согласование'},
-    {label:'Правки', sub:'Вносим правки по пожеланиям'},
-    {label:'Готово', sub:'Проект завершён и сдан'},
+    {label:'Заявка', icon:'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>'},
+    {label:'Обсуждение', icon:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
+    {label:'В работе', icon:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'},
+    {label:'На проверке', icon:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'},
+    {label:'Правки', icon:'<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>'},
+    {label:'Готово', icon:'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'},
   ];
-  const strips = steps.map((step, i) => {
+  const stepsHtml = steps.map((step, i) => {
     const state = i < s ? 'done' : i === s ? 'current' : 'pending';
-    const statusText = state === 'done' ? '— выполнено' : state === 'current' ? '← сейчас' : '';
-    return `<div class="trk-strip ${state}">
-      <div class="trk-n">${String(i+1).padStart(2,'0')}</div>
-      <div class="trk-body"><strong>${step.label}</strong></div>
-      <div class="trk-strip-status">${statusText}</div>
-    </div>`;
+    return '<div class="trk-step '+state+'"><div class="trk-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">'+step.icon+'</svg></div><div class="trk-name">'+step.label+'</div></div>';
   }).join('');
-  return `<div class="trk"><div class="trk-strips">${strips}</div></div>`;
+  return '<div class="trk"><div class="trk-label">Прогресс</div><div class="trk-steps">'+stepsHtml+'</div></div>';
 }
 
 function buildSubsteps(o){
@@ -525,47 +565,116 @@ window.openOrderModal = function(id) {
   const s = o.status || 0;
   const paid = o.paid || false;
   const estDate = getEstimate(o.pages, o.extras, s);
-  const hasSite = s >= 5 && (o.siteUrl || o.siteDomain);
-  let siteBlock = '';
-  if(hasSite){
-    const siteHref = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : (o.siteDomain ? 'https://'+o.siteDomain : '#');
-    const pages = (o.sitePages||'').split('\n').filter(Boolean);
-    siteBlock = '<div class="delivery-card"><div class="delivery-card-eyebrow">Ваш сайт</div>'+(o.siteFaviconUrl?'<img class="site-favicon" src="'+o.siteFaviconUrl+'" alt=""/>':'')+(o.siteDomain?'<div class="site-domain-big">'+escapeHtml(o.siteDomain)+'</div>':'')+(pages.length?'<div class="site-pages-list">'+pages.map(p=>'<div class="site-page-item">'+escapeHtml(p)+'</div>').join('')+'</div>':'')+'<a href="'+siteHref+'" target="_blank" rel="noopener" class="btn btn-primary btn-sm" style="background:var(--accent);color:#191b1e">Открыть сайт →</a></div>';
-  }
-  const statusComment = o.statusComment ? '<div class="ord-comment">'+escapeHtml(o.statusComment)+'</div>' : '';
-  const extras = o.extras || [];
-  const hasRegDomain = extras.includes('domain_reg') || (extras.includes('domain') && o.domainOption !== 'own');
-  const hasOwnDomain = extras.includes('domain_own') || (extras.includes('domain') && o.domainOption === 'own') || o.domainOption === 'own';
-  let domainBanner = '';
-  if (hasRegDomain) { domainBanner = '<div class="domain-banner"><div class="domain-banner-body"><div class="domain-banner-title">Домен: покупка на рег.ру</div><div class="domain-banner-text">После оплаты на рег.ру напишите нам в поддержку.</div></div></div>'; }
-  else if (hasOwnDomain) { const domName = o.domainName ? '<strong>'+escapeHtml(o.domainName)+'</strong> — ' : ''; domainBanner = '<div class="domain-banner"><div class="domain-banner-body"><div class="domain-banner-title">Домен: подключение</div><div class="domain-banner-text">'+domName+'напишите в поддержку.</div></div></div>'; }
-  // Partial payment logic
+
+  // Payment state
   const isPartial = o.paymentType === 'partial';
   const paidAmount = o.paidAmount || 0;
   const totalPrice = o.totalPrice || 0;
   const remainingAmount = o.remainingAmount || (isPartial && totalPrice ? Math.ceil(totalPrice/2) : 0);
   const fullyPaid = paid || (isPartial && paidAmount >= totalPrice);
   const halfPaid = isPartial && paidAmount > 0 && !fullyPaid;
+  const payLabel = fullyPaid ? 'Оплачен' : (halfPaid ? 'Предоплата 50%' : 'Не оплачен');
+  const payChipClass = fullyPaid ? 'paid-yes' : (halfPaid ? 'paid-half' : 'paid-no');
 
-  // Payment banners
-  let payBanner = '';
-  if (isPartial && halfPaid && s < 5) {
-    // Has made 50% payment, work in progress — show "pay remaining" option
-    payBanner = '<div class="pay-remaining-banner"><div class="pay-remaining-title">Предоплата получена ✓</div><div class="pay-remaining-sub">Вы оплатили '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ можно оплатить сейчас или после согласования результата.</div><button class="btn-pay-remaining" onclick="payRemaining(\''+o.id+'\','+remainingAmount+')" style="pointer-events:all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
-  } else if (isPartial && halfPaid && s === 5) {
-    // Done but not fully paid — must pay to receive
-    payBanner = '<div class="pay-gate-banner"><div class="pay-gate-title">Заказ готов — нужна доплата</div><div class="pay-gate-sub">Для получения готового сайта необходимо оплатить оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽.</div><button class="btn-pay-gate" onclick="payRemaining(\''+o.id+'\','+remainingAmount+')" style="pointer-events:all"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ и получить сайт</button></div>';
+  // Header
+  document.getElementById('ordModalTitle').textContent = (o.siteType||'Сайт') + ' · № ' + o.id.slice(0,8).toUpperCase();
+  document.getElementById('ordModalPrice').innerHTML = totalPrice ? '<small>₽</small>' + totalPrice.toLocaleString('ru') : '';
+  document.getElementById('ordModalChips').innerHTML =
+    '<span class="ord-chip status'+(s===5?' active':'')+'">'
+      +'<span class="ord-chip-dot"></span>'+STATUS_LABELS[s]
+    +'</span>'
+    +'<span class="ord-chip '+payChipClass+'">'+(halfPaid?'<span class="ord-chip-dot"></span>':'')+payLabel+'</span>'
+    +(fmtDate(o.createdAt)?'<span style="font-size:.68rem;color:rgba(255,255,255,.25);font-weight:300">'+fmtDate(o.createdAt)+'</span>':'');
+
+  // Site block
+  const hasSite = (s >= 5 || s === 6) && (o.siteUrl || o.siteDomain);
+  let siteBlock = '';
+  if(hasSite){
+    const siteHref = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : ('https://'+(o.siteDomain||''));
+    const pages = (o.sitePages||'').split('\n').filter(Boolean);
+    siteBlock = '<div class="delivery-card">'
+      +'<div class="delivery-card-eyebrow">Готовый сайт</div>'
+      +(o.siteFaviconUrl?'<img class="site-favicon" src="'+o.siteFaviconUrl+'" alt=""/>':'')
+      +(o.siteDomain?'<div class="site-domain-big">'+escapeHtml(o.siteDomain)+'</div>':'')
+      +(pages.length?'<div class="site-pages-list">'+pages.map(p=>'<div class="site-page-item"><svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>'+escapeHtml(p)+'</div>').join('')+'</div>':'')
+      +'<a href="'+siteHref+'" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">'
+        +'<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
+        +'Открыть сайт</a>'
+      +'</div>';
   }
 
-  const payLabel = fullyPaid ? 'Оплачен' : (halfPaid ? 'Предоплата 50%' : 'Не оплачен');
-  const payClass = fullyPaid ? 'is-paid' : (halfPaid ? 'is-half' : 'is-unpaid');
+  // Domain banner
+  const extras = o.extras || [];
+  const hasRegDomain = extras.includes('domain_reg') || (extras.includes('domain') && o.domainOption !== 'own');
+  const hasOwnDomain = extras.includes('domain_own') || (extras.includes('domain') && o.domainOption === 'own') || o.domainOption === 'own';
+  let domainBanner = '';
+  if (hasRegDomain) {
+    domainBanner = '<div class="domain-banner"><div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="domain-banner-body"><div class="domain-banner-title">Домен: покупка на рег.ру</div><div class="domain-banner-text">После покупки на рег.ру напишите в поддержку — подключим бесплатно.</div><a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank">Инструкция →</a></div></div>';
+  } else if (hasOwnDomain) {
+    const domName = o.domainName ? '<strong>'+escapeHtml(o.domainName)+'</strong> — ' : '';
+    domainBanner = '<div class="domain-banner"><div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="domain-banner-body"><div class="domain-banner-title">Домен: подключение</div><div class="domain-banner-text">'+domName+'Напишите в поддержку — скажем какие DNS прописать.</div><a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank">Инструкция →</a></div></div>';
+  }
 
-  const actBtns = (s>=5&&fullyPaid&&!o.reviewed?'<button class="btn btn-xs btn-success" onclick="openReview(\''+o.id+'\')" style="pointer-events:all">★ Отзыв</button>':'')+(s===3?'<button class="btn btn-xs btn-warn" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all">Запросить правки</button>':'');
-  const actionsHtml = '<div class="ord-actions"><button class="btn btn-ghost-light btn-xs" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all">Квитанция</button>'+actBtns+'</div>';
-  document.getElementById('ordModalTitle').textContent = '№ ' + o.id.slice(0,8).toUpperCase() + ' · ' + (o.siteType||'Сайт');
-  document.getElementById('ordModalMeta').textContent = fmtDate(o.createdAt)||'—';
-  document.getElementById('ordModalTags').innerHTML = '<span class="ord-tag s'+s+'"><span class="ord-dot"></span>'+STATUS_LABELS[s]+'</span>'+'<span class="ord-pay '+payClass+'">'+payLabel+'</span>'+(o.totalPrice?'<span style="font-size:.85rem;font-weight:500;color:var(--ink);margin-left:auto">'+o.totalPrice.toLocaleString('ru')+' ₽</span>':'');
-  document.getElementById('ordModalBody').innerHTML = payBanner + statusComment + domainBanner + buildTracker(o) + buildSubsteps(o) + (estDate?'<div class="ord-eta">Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">'+estDate+'</strong></div>':'') + siteBlock + actionsHtml;
+  // Status comment
+  const statusComment = o.statusComment
+    ? '<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'+escapeHtml(o.statusComment)+'</div>'
+    : '';
+
+  // LEFT column: tracker + substeps + comment + eta
+  let leftHtml = buildTracker(o) + buildSubsteps(o);
+  if (statusComment) leftHtml += statusComment;
+  if (domainBanner) leftHtml += domainBanner;
+  if (estDate) leftHtml += '<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">'+estDate+'</strong></div>';
+
+  // RIGHT column: pay banners + site + actions
+  let rightHtml = '';
+
+  // Pay gate (done, needs payment)
+  if (isPartial && halfPaid && (s === 5 || s === 6)) {
+    rightHtml += '<div class="pay-gate-banner">'
+      +'<div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div>'
+      +'<div class="pay-gate-sub">Для получения сайта оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div>'
+      +'<button class="btn-pay-gate" onclick="payRemaining(_modalOrderId)" style="pointer-events:all">'
+        +'<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'
+        +'Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить сайт'
+      +'</button>'
+      +'</div>';
+  } else if (isPartial && halfPaid) {
+    rightHtml += '<div class="pay-remaining-banner">'
+      +'<div class="pay-remaining-title"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Предоплата получена</div>'
+      +'<div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ — после согласования макета.</div>'
+      +'<button class="btn-pay-remaining" onclick="payRemaining(_modalOrderId)" style="pointer-events:all">'
+        +'<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'
+        +'Доплатить '+remainingAmount.toLocaleString('ru')+' ₽ сейчас'
+      +'</button>'
+      +'</div>';
+  }
+
+  if (siteBlock) rightHtml += siteBlock;
+
+  // Actions
+  rightHtml += '<div class="ord-actions-title">Действия</div><div class="ord-actions-group">';
+  rightHtml += '<button class="ord-action-btn" onclick="printReceipt(_modalOrderId)" style="pointer-events:all">'
+    +'<span class="ord-action-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>'
+    +'Скачать квитанцию'
+    +'</button>';
+  if (s >= 5 && fullyPaid && !o.reviewed) {
+    rightHtml += '<button class="ord-action-btn green" onclick="openReview(_modalOrderId)" style="pointer-events:all">'
+      +'<span class="ord-action-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>'
+      +'Оставить отзыв'
+      +'</button>';
+  }
+  if (s === 3) {
+    rightHtml += '<button class="ord-action-btn dark" onclick="requestRevision(_modalOrderId)" style="pointer-events:all">'
+      +'<span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>'
+      +'Запросить правки'
+      +'</button>';
+  }
+  rightHtml += '</div>';
+
+  window._modalOrderId = o.id;
+  document.getElementById('ordModalLeft').innerHTML = leftHtml;
+  document.getElementById('ordModalRight').innerHTML = rightHtml;
   document.getElementById('ordModalOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
 };
@@ -612,10 +721,14 @@ function showDeliveryPopup(o){
   link.href = siteHref||'#';
   if(!siteHref) link.style.display='none'; else link.style.display='';
   const pages = (o.sitePages||'').split('\n').filter(Boolean);
-  document.getElementById('deliveryModalContent').innerHTML =
-    `${o.siteDomain?`<div class="site-domain-big" style="margin-bottom:6px">${o.siteDomain}</div>`:''}
-     ${o.siteFaviconUrl?`<img class="site-favicon" src="${o.siteFaviconUrl}" alt="fav"/>`:''}
-     ${pages.length?`<div class="site-pages-list">${pages.map(p=>`<div class="site-page-item"><svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>${escapeHtml(p)}</div>`).join('')}</div>`:''}`;
+  document.getElementById('deliveryModalContent').innerHTML = o.siteDomain
+    ? '<div class="delivery-modal-inner">'
+        +(o.siteFaviconUrl?'<img class="site-favicon" src="'+o.siteFaviconUrl+'" alt=""/>':'')
+        +'<div class="delivery-site-name">'+escapeHtml(o.siteDomain)+'</div>'
+        +'<div class="delivery-site-url">Готов к работе</div>'
+        +(pages.length?'<div class="site-pages-list" style="margin-top:10px;margin-bottom:0">'+pages.map(p=>'<div class="site-page-item"><svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>'+escapeHtml(p)+'</div>').join('')+'</div>':'')
+        +'</div>'
+    : '';
   document.getElementById('deliveryModal').classList.add('show');
   launchConfetti();
 }
@@ -656,7 +769,7 @@ window.printReceipt = function(id){
   w.document.close();
 };
 
-function launchConfetti(){const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';const colors=['#1ede7b','#1ac16b','#191b1e','#3b82f6','#f59e0b','#e8634f','#dfe3e8'];for(let i=0;i<90;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}setTimeout(()=>{wrap.innerHTML='';},5000);}
+function launchConfetti(){const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';const colors=['#1ede7b','#1ac16b','#191b1e','#a8f5d4','#0d3320','#fff','#dfe3e8'];for(let i=0;i<90;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}setTimeout(()=>{wrap.innerHTML='';},5000);}
 
 function watchChatBadge(uid){
   // Уведомления о новых сообщениях поддержки — смотрим непрочитанные тикеты
@@ -713,6 +826,7 @@ onAuthStateChanged(auth, async user=>{
   loadOrders(user.uid);
   watchChatBadge(user.uid);
 });
+
 </script>
 
 <script>
@@ -762,6 +876,7 @@ onAuthStateChanged(auth, async user=>{
     apply();
   }
 })();
+
 </script>
 
 <script src="../footer.js" data-page="orders"></script>

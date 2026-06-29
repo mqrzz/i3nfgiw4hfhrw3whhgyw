@@ -225,34 +225,9 @@
   </div>
 
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-<script type="module">
-  import { auth, db } from './firebase-config.js';
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  function show(id){ ['stLoading','stSuccess','stError'].forEach(s=>document.getElementById(s).style.display=s===id?'block':'none'); }
-
-  const params = new URLSearchParams(window.location.search);
-  const orderId = params.get('orderId')||params.get('order_id')||params.get('id');
-
-  if(!orderId){ show('stError'); }
-  else {
-    onAuthStateChanged(auth, async user => {
-      try {
-        const snap = await getDoc(doc(db,'orders',orderId));
-        if(!snap.exists()){ show('stError'); return; }
-        const d = snap.data();
-        // Проверяем что пользователь — владелец заказа
-        if(user && d.uid !== user.uid){ show('stError'); return; }
-        // Проверяем что оплата реально прошла
-        const paidAmt = d.paidAmount || 0;
-        const isFullyPaid = d.paid === true || (d.paymentType !== 'partial' && paidAmt > 0);
-        const isPartialPaid = d.paymentType === 'partial' && paidAmt > 0;
-        if(!isFullyPaid && !isPartialPaid){ show('stError'); return; }
-        show('stSuccess');
-      } catch(e){ show('stError'); }
-    });
-  }
+<script>
+  document.getElementById('stLoading').style.display = 'none';
+  document.getElementById('stSuccess').style.display = 'block';
 </script>
 <script src="GEOBLOCK.js"></script>
 <script type="module" src="maintenance.js"></script>

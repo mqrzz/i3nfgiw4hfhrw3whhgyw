@@ -68,13 +68,13 @@
     .ord-count{color:var(--ink-faint);font-size:.76rem}
 
     /* ── LIST ── */
-    .ord-cols{display:grid;grid-template-columns:1fr 160px 140px 120px 20px;gap:16px;padding:0 28px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+    .ord-cols{display:grid;grid-template-columns:1fr 160px 120px 20px;gap:16px;padding:0 28px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
     .ord-list{border:1.5px solid var(--line);border-radius:28px;overflow:hidden;background:var(--bg)}
     .ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
     .ord-row-wrap:last-child{border-bottom:none}
     .ord-row-wrap.is-filtered{display:none}
 
-    .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 140px 120px 20px;gap:16px;align-items:center;width:100%;padding:22px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
+    .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 120px 20px;gap:16px;align-items:center;width:100%;padding:22px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
     .ord-row:hover{background:var(--surface)}
     .ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
     .ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
@@ -131,22 +131,29 @@
     .ord-modal-left{overflow-y:auto;padding:32px 36px;border-right:1px solid var(--line)}
     .ord-modal-right{overflow-y:auto;padding:28px 32px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
 
-    /* ── TRACKER (horizontal stepper) ── */
-    .trk{margin-bottom:28px}
-    .trk-label{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:16px}
-    .trk-steps{display:flex;gap:0;position:relative}
-    .trk-steps::before{content:'';position:absolute;top:20px;left:20px;right:20px;height:2px;background:var(--line);z-index:0}
-    .trk-step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;z-index:1}
-    .trk-ico{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid var(--line);background:var(--bg);transition:all .2s;flex-shrink:0}
-    .trk-ico svg{width:16px;height:16px;stroke-width:1.8;fill:none;stroke:var(--ink-faint)}
-    .trk-step.done .trk-ico{background:var(--dark);border-color:var(--dark)}
-    .trk-step.done .trk-ico svg{stroke:#fff}
-    .trk-step.current .trk-ico{background:var(--accent);border-color:var(--accent);box-shadow:0 0 0 4px rgba(30,222,123,.2)}
-    .trk-step.current .trk-ico svg{stroke:var(--dark)}
-    .trk-step.pending .trk-ico{opacity:.35}
-    .trk-name{font-size:.68rem;font-weight:500;color:var(--ink-faint);text-align:center;line-height:1.3}
-    .trk-step.done .trk-name{color:var(--ink-dim)}
-    .trk-step.current .trk-name{color:var(--ink);font-weight:500}
+    /* ── TRACKER (vertical timeline) ── */
+    .trk{margin-bottom:24px;display:flex;flex-direction:column}
+    .trk-row{display:flex;gap:16px;min-height:64px}
+    .trk-last{min-height:0}
+    .trk-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:40px}
+    .trk-ball{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;border:2px solid var(--line);background:var(--bg)}
+    .trk-ball svg{width:18px;height:18px}
+    .trk-ball.done{background:var(--dark);border-color:var(--dark);color:#fff}
+    .trk-ball.current{background:var(--accent);border-color:var(--accent);color:var(--dark);box-shadow:0 0 0 5px rgba(30,222,123,.18)}
+    .trk-ball.pending{color:var(--line-strong)}
+    .trk-line{flex:1;width:2px;background:var(--line);margin:4px 0;border-radius:2px;transition:background .3s}
+    .trk-line.done{background:var(--dark)}
+    .trk-content{padding:8px 0 20px;flex:1;min-width:0}
+    .trk-last .trk-content{padding-bottom:4px}
+    .trk-step-label{font-size:.9rem;font-weight:500;color:var(--line-strong);line-height:1.3;display:flex;align-items:center;gap:8px}
+    .trk-step-label.done{color:var(--ink-dim)}
+    .trk-step-label.current{color:var(--ink)}
+    .trk-now{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;background:var(--accent);color:var(--dark);padding:.15rem .5rem;border-radius:6px}
+    .trk-step-sub{font-size:.78rem;color:var(--ink-faint);font-weight:300;margin-top:2px}
+    .trk-step-label.done + .trk-step-sub{color:var(--ink-faint)}
+    .trk-step-label.current + .trk-step-sub{color:var(--ink-dim)}
+    .trk-step-label.pending + .trk-step-sub{opacity:.4}
+    .trk-step-date{font-size:.72rem;color:var(--accent-soft);font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
 
     /* ── SUBSTEPS ── */
     .sub-list{display:flex;flex-direction:column;margin:0 0 24px;border:1.5px solid var(--line);border-radius:18px;overflow:hidden}
@@ -235,7 +242,7 @@
     .toast.info{background:var(--dark);color:#fff}
 
     /* ── REVIEW MODAL ── */
-    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(15,17,20,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay{position:fixed;inset:0;z-index:950;background:rgba(15,17,20,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
     .modal-overlay.show{opacity:1;pointer-events:all}
     .modal{background:var(--bg);border:1.5px solid var(--line);border-radius:28px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .22s}
     .modal-overlay.show .modal{transform:translateY(0) scale(1)}
@@ -276,7 +283,7 @@
       .ord-modal{max-height:95vh}
       .ord-cols{display:none}
       .ord-row{grid-template-columns:1fr;gap:4px;padding:18px 20px;padding-right:48px;position:relative}
-      .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
+      .ord-cell-pay,.ord-cell-price{display:none}
       .ord-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
       .trk-steps{flex-wrap:wrap;gap:12px}
       .trk-steps::before{display:none}
@@ -320,11 +327,11 @@
     <h3>Оставить отзыв</h3>
     <p class="modal-p">Расскажите как прошла работа над проектом</p>
     <div class="stars-row">
-      <span class="star" onclick="setStar(1)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" onclick="setStar(2)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" onclick="setStar(3)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" onclick="setStar(4)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
-      <span class="star" onclick="setStar(5)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="1" onclick="setStar(1)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="2" onclick="setStar(2)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="3" onclick="setStar(3)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="4" onclick="setStar(4)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
+      <span class="star" data-v="5" onclick="setStar(5)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>
     </div>
     <textarea class="review-textarea" id="reviewText" placeholder="Пару слов о сотрудничестве (необязательно)..."></textarea>
     <div class="modal-btns">
@@ -399,7 +406,7 @@
   </div>
 
   <div class="ord-cols">
-    <span>Заказ</span><span>Статус</span><span>Оплата</span><span>Сумма</span><span></span>
+    <span>Заказ</span><span>Оплата</span><span>Сумма</span><span></span>
   </div>
   <div class="ord-list" id="ordersList">
     <div style="padding:24px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
@@ -446,26 +453,77 @@ let isInitialLoad = true;
 function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(msg, type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
-function getEstimate(pages=1,extras=[],status=0){if(status>=5) return null;let days=Math.max(2,Math.ceil(pages/3));if((extras||[]).includes('urgent')) days=1;const d=new Date();d.setDate(d.getDate()+days);return d.toLocaleDateString('ru',{day:'numeric',month:'long'});}
+function getEstimate(pkg,extras=[],status=0){
+  if(status>=5) return null;
+  const urgent = (extras||[]).includes('urgent');
+  // Диапазон дней по тарифу
+  const ranges = {'Старт':[1,2],'Рост':[2,5],'Масштаб':[5,14]};
+  const [minD, maxD] = ranges[pkg] || [2,7];
+  if(urgent) {
+    const d=new Date(); d.setDate(d.getDate()+1);
+    return d.toLocaleDateString('ru',{day:'numeric',month:'long'});
+  }
+  const dMin=new Date(); dMin.setDate(dMin.getDate()+minD);
+  const dMax=new Date(); dMax.setDate(dMax.getDate()+maxD);
+  const fmt = d=>d.toLocaleDateString('ru',{day:'numeric',month:'long'});
+  return fmt(dMin)+' — '+fmt(dMax);
+}
 
 function showBanner(text){clearTimeout(bannerTimer);document.getElementById('bannerText').textContent=text;document.getElementById('statusBanner').classList.add('show');bannerTimer=setTimeout(closeBanner,6500);}
 window.closeBanner=()=>document.getElementById('statusBanner').classList.remove('show');
 
 function buildTracker(o){
   const s = o.status || 0;
-  const steps = [
-    {label:'Заявка', icon:'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>'},
-    {label:'Обсуждение', icon:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>'},
-    {label:'В работе', icon:'<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'},
-    {label:'На проверке', icon:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>'},
-    {label:'Правки', icon:'<path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>'},
-    {label:'Готово', icon:'<path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>'},
+  // История статусов — если есть — массив {status, at}
+  const hist = o.statusHistory || [];
+  function histDate(idx){
+    // Для шага 0 всегда берём createdAt
+    if(idx===0 && o.createdAt){
+      const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
+      return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    }
+    const h = hist.find(x=>x.status===idx);
+    if(!h) return null;
+    const d = h.at?.toDate ? h.at.toDate() : new Date(h.at);
+    return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  }
+  // Filled SVG иконки — объёмные, не stroke
+  const icons = [
+    // 0 Заявка — document
+    '<rect x="5" y="2" width="14" height="20" rx="2" fill="currentColor" opacity=".15"/><rect x="5" y="2" width="14" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="9" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="11.5" x2="15" y2="11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><line x1="9" y1="15" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
+    // 1 Обсуждение — chat bubble filled
+    '<path d="M20 2H4a2 2 0 00-2 2v13a2 2 0 002 2h3l3 3 3-3h7a2 2 0 002-2V4a2 2 0 00-2-2z" fill="currentColor" opacity=".2"/><path d="M20 2H4a2 2 0 00-2 2v13a2 2 0 002 2h3l3 3 3-3h7a2 2 0 002-2V4a2 2 0 00-2-2z" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="10.5" r="1" fill="currentColor"/><circle cx="12" cy="10.5" r="1" fill="currentColor"/><circle cx="16" cy="10.5" r="1" fill="currentColor"/>',
+    // 2 В работе — wrench/code
+    '<polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><rect x="9" y="5" width="6" height="14" rx="1" fill="currentColor" opacity=".12"/>',
+    // 3 На проверке — eye filled
+    '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="currentColor" opacity=".3"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/>',
+    // 4 Правки — pencil filled
+    '<path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z" fill="currentColor" opacity=".2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>',
+    // 5 Готово — checkmark in circle filled
+    '<circle cx="12" cy="12" r="10" fill="currentColor" opacity=".15" stroke="currentColor" stroke-width="1.5"/><polyline points="7 12.5 10.5 16 17 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
   ];
-  const stepsHtml = steps.map((step, i) => {
+  const labels = ['Заявка принята','Обсуждение','В работе','На проверке','Правки','Готово'];
+  const subs   = ['Заявка получена и зарегистрирована','Уточняем детали проекта','Ведётся активная разработка','Отправлено на ваше согласование','Вносим правки по пожеланиям','Проект завершён и сдан'];
+
+  const stepsHtml = icons.map((ico, i) => {
     const state = i < s ? 'done' : i === s ? 'current' : 'pending';
-    return '<div class="trk-step '+state+'"><div class="trk-ico"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8">'+step.icon+'</svg></div><div class="trk-name">'+step.label+'</div></div>';
+    const dateStr = (state === 'done' || state === 'current') ? histDate(i) : null;
+    const isLast = i === icons.length - 1;
+    return '<div class="trk-row '+(isLast?'trk-last':'')+'">'
+      +'<div class="trk-left">'
+        +'<div class="trk-ball '+state+'">'
+          +'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">'+ico+'</svg>'
+        +'</div>'
+        +(!isLast?'<div class="trk-line '+(i<s?'done':'')+'"></div>':'')
+      +'</div>'
+      +'<div class="trk-content">'
+        +'<div class="trk-step-label '+state+'">'+labels[i]+(state==='current'?' <span class="trk-now">сейчас</span>':'')+'</div>'
+        +'<div class="trk-step-sub">'+subs[i]+'</div>'
+        +(dateStr?'<div class="trk-step-date">'+dateStr+'</div>':'')
+      +'</div>'
+      +'</div>';
   }).join('');
-  return '<div class="trk"><div class="trk-label">Прогресс</div><div class="trk-steps">'+stepsHtml+'</div></div>';
+  return '<div class="trk">'+stepsHtml+'</div>';
 }
 
 function buildSubsteps(o){
@@ -488,7 +546,7 @@ function orderCard(o){
   const halfPaidCard = isPartialCard && paidAmtCard > 0 && !fullyPaidCard;
   const payLabelCard = fullyPaidCard ? 'Оплачен' : (halfPaidCard ? '50% оплачено' : 'Не оплачен');
   const payClassCard = fullyPaidCard ? 'is-paid' : (halfPaidCard ? 'is-half' : 'is-unpaid');
-  const estDate = getEstimate(o.pages, o.extras, s);
+  const estDate = getEstimate(o.package, o.extras, s);
   const hasSite = s >= 5 && (o.siteUrl || o.siteDomain);
   let siteBlock = '';
   if(hasSite){
@@ -545,11 +603,9 @@ function orderCard(o){
         <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${escapeHtml(o.siteType||'Сайт')}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
         <div class="ord-tags-mobile">
-          <span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span>
           <span class="ord-pay ${payClassCard}">${payLabelCard}</span>
         </div>
       </div>
-      <div class="ord-cell-status"><span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span></div>
       <div class="ord-cell-pay"><span class="ord-pay ${payClassCard}">${payLabelCard}</span></div>
       <div class="ord-cell-price ord-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div>
       <svg class="ord-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
@@ -564,7 +620,7 @@ window.openOrderModal = function(id) {
   if (!o) return;
   const s = o.status || 0;
   const paid = o.paid || false;
-  const estDate = getEstimate(o.pages, o.extras, s);
+  const estDate = getEstimate(o.package, o.extras, s);
 
   // Payment state
   const isPartial = o.paymentType === 'partial';
@@ -734,7 +790,15 @@ function showDeliveryPopup(o){
 }
 window.closeDelivery = function(){document.getElementById('deliveryModal').classList.remove('show');};
 
-window.openReview = function(id){reviewOrderId=id;reviewStars=0;document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));document.getElementById('reviewText').value='';document.getElementById('reviewModal').classList.add('show');};
+window.openReview = function(id){
+  reviewOrderId=id;reviewStars=0;
+  document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
+  document.getElementById('reviewText').value='';
+  // Закрываем модалку заказа, потом открываем отзыв
+  document.getElementById('ordModalOverlay').classList.remove('show');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>document.getElementById('reviewModal').classList.add('show'),80);
+};
 window.closeReview = function(){document.getElementById('reviewModal').classList.remove('show');};
 window.setStar = function(n){reviewStars=n;document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));};
 window.submitReview = async function(){

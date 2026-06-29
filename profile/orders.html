@@ -624,7 +624,7 @@ window.openOrderModal = function(id) {
   const isPartial = o.paymentType === 'partial';
   const paidAmount = o.paidAmount || 0;
   const totalPrice = o.totalPrice || 0;
-  const remainingAmount = o.remainingAmount || (isPartial && totalPrice ? Math.ceil(totalPrice/2) : 0);
+  const remainingAmount = o.remainingAmount > 0 ? o.remainingAmount : (isPartial && totalPrice ? Math.max(0, totalPrice - paidAmount) : 0);
   const fullyPaid = paid || (isPartial && paidAmount >= totalPrice);
   const halfPaid = isPartial && paidAmount > 0 && !fullyPaid;
   const payLabel = fullyPaid ? 'Оплачен' : (halfPaid ? 'Предоплата 50%' : 'Не оплачен');
@@ -820,7 +820,7 @@ window.printReceipt = function(id){
   const extrasHtml = (o.extras||[]).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e=>extrasLabels[e]||e).join(', ')}</td></tr>` : '';
   const isPartialReceipt = o.paymentType === 'partial';
   const paidAmt = o.paidAmount || 0;
-  const remainAmt = o.remainingAmount || (isPartialReceipt ? Math.ceil((o.totalPrice||0)/2) : 0);
+  const remainAmt = o.remainingAmount > 0 ? o.remainingAmount : (isPartialReceipt ? Math.max(0, (o.totalPrice||0) - paidAmt) : 0);
   const fullyPaidReceipt = o.paid || (isPartialReceipt && paidAmt >= (o.totalPrice||0));
   const payStatusText = fullyPaidReceipt ? 'Оплачен полностью' : (isPartialReceipt && paidAmt > 0 ? 'Предоплата 50%' : 'Не оплачен');
   const partialRows = isPartialReceipt ? `<tr><td>Оплачено</td><td>${paidAmt.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fullyPaidReceipt ? '—' : remainAmt.toLocaleString('ru')+' ₽'}</td></tr>` : '';

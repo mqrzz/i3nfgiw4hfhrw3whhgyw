@@ -204,7 +204,6 @@
       </div>
       <h1 class="success-title">Оплата <em>прошла</em></h1>
       <p class="success-desc">Спасибо, что выбрали Antviz. Все готово — посмотрите статус в личном кабинете.</p>
-      <div id="orderMeta" style="background:var(--bg2);border-radius:16px;padding:14px 18px;margin-bottom:24px;text-align:left;font-size:14px;display:none"></div>
       <div class="btn-group">
         <a href="profile" class="btn btn-primary">Перейти в личный кабинет</a>
         <a href="/" class="btn btn-secondary">На главную</a>
@@ -214,8 +213,8 @@
 
     <div id="stError" style="display:none">
       <div class="icon-wrap"><div class="icon-circle" style="background:rgba(232,99,79,.1);animation:none"><svg viewBox="0 0 44 44" fill="none" width="44" height="44"><path d="M14 14L30 30M30 14L14 30" stroke="#e8634f" stroke-width="3" stroke-linecap="round"/></svg></div></div>
-      <h1 class="success-title" style="animation:none">Заказ <em style="color:#e8634f">не найден</em></h1>
-      <p class="success-desc" style="animation:none">Оплата ещё не подтверждена или заказ не найден. Если вы только что оплатили — зайдите в личный кабинет через минуту.</p>
+      <h1 class="success-title" style="animation:none">Оплата <em style="color:#e8634f">не подтверждена</em></h1>
+      <p class="success-desc" style="animation:none">Оплата не найдена или ещё не обработана. Если вы только что оплатили — зайдите в личный кабинет через минуту.</p>
       <div class="btn-group" style="animation:none">
         <a href="profile" class="btn btn-primary">Личный кабинет</a>
         <a href="/" class="btn btn-secondary">На главную</a>
@@ -236,23 +235,20 @@
   const params = new URLSearchParams(window.location.search);
   const orderId = params.get('orderId')||params.get('order_id')||params.get('id');
 
-  if(!orderId){ show('stSuccess'); }
+  if(!orderId){ show('stError'); }
   else {
     onAuthStateChanged(auth, async user => {
       try {
         const snap = await getDoc(doc(db,'orders',orderId));
         if(!snap.exists()){ show('stError'); return; }
         const d = snap.data();
+        // Проверяем что пользователь — владелец заказа
         if(user && d.uid !== user.uid){ show('stError'); return; }
-        const meta = document.getElementById('orderMeta');
-        const labels = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
-        meta.innerHTML = `
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Заказ</span><span style="font-weight:500">№${orderId.slice(0,7).toUpperCase()}</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Тариф</span><span style="font-weight:500">${d.package||d.tariff||'—'}</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)"><span style="color:var(--muted)">Сумма</span><span style="font-weight:500">${d.totalPrice?Math.round(d.totalPrice).toLocaleString('ru')+' ₽':'—'}</span></div>
-          <div style="display:flex;justify-content:space-between;padding:4px 0"><span style="color:var(--muted)">Статус</span><span style="font-weight:500">${labels[d.status||0]||'—'}</span></div>
-        `;
-        meta.style.display='block';
+        // Проверяем что оплата реально прошла
+        const paidAmt = d.paidAmount || 0;
+        const isFullyPaid = d.paid === true || (d.paymentType !== 'partial' && paidAmt > 0);
+        const isPartialPaid = d.paymentType === 'partial' && paidAmt > 0;
+        if(!isFullyPaid && !isPartialPaid){ show('stError'); return; }
         show('stSuccess');
       } catch(e){ show('stError'); }
     });

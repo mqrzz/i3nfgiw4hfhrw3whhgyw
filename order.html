@@ -681,6 +681,16 @@ function toast(msg,type='info'){const el=document.getElementById('ovToast');el.t
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='auth';return;}
   currentUser=user;
+  // Чистим зависшие заказы этого юзера со статусом -1 (не дошли до оплаты)
+  try{
+    const staleQ=query(collection(db,'orders'),where('uid','==',user.uid),where('status','==,-1'));
+    const staleSnap=await getDocs(staleQ);
+    const cutoff=Date.now()-10*60*1000; // старше 10 минут
+    for(const d of staleSnap.docs){
+      const ts=d.data().createdAt?.toMillis?.();
+      if(!ts||ts<cutoff) await deleteDoc(doc(db,'orders',d.id));
+    }
+  }catch(_){}
 });
 
 document.querySelectorAll('.type-card[data-format]').forEach(card=>{
@@ -981,8 +991,8 @@ async function submitOrder(paymentType) {
   const payAmount = isHalf ? Math.ceil(total / 2) : total;
   const extrasArr=[];
   if(state.extras.domain&&state.extras.domainOpt==='new')extrasArr.push('domain_reg');
-  if(state.extras.domain&&state.extras.domainOpt==='own')extrasArr.push('domain_own');
-  if(state.extras.content)extrasArr.push('content');if(state.extras.shop)extrasArr.push('shop');if(state.extras.urgent)extrasArr.push('urgent');
+  if(state.extras.domain&&state.extras.domainOpt==='own')extrasArr.push('domain');
+  if(state.extras.content)extrasArr.push('content');if(state.extras.shop)extrasArr.push('shop');if(state.extras.urgent)extrasArr.push('urgent');if(state.extras.support)extrasArr.push('support');
   let favData=null;if(favFile){try{favData=await f2b(favFile);}catch(e){toast('Не удалось прикрепить фавикон','error');}}
   const BUDGET=850*1024;let used=favData?Math.round(favData.length*0.75):0;const attachments=[];
   for(const f of uploadedFiles){try{const d=await f2b(f);const b=Math.round(d.length*0.75);if(used+b>BUDGET){toast(`«${f.name}» не поместился — пришлите в чат поддержки`,'error');continue;}used+=b;attachments.push({fileData:d,fileName:f.name,fileType:f.type});}catch(e){toast(`Не удалось: «${f.name}»`,'error');}}
@@ -1000,7 +1010,7 @@ async function submitOrder(paymentType) {
       uid:currentUser.uid,status:-1,createdAt:serverTimestamp(),
       paymentType: paymentType,
       paidAmount: 0,
-      remainingAmount: isHalf ? Math.ceil(total / 2) : 0
+      remainingAmount: 0
     });
     lastOrderId=docRef.id;
     lastPaymentType=paymentType;

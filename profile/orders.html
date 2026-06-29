@@ -102,7 +102,7 @@
     .ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
 
     /* ── ORDER MODAL ── */
-    .ord-modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+    .ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
     .ord-modal-overlay.show{opacity:1;pointer-events:all}
     .ord-modal{background:var(--bg);border-radius:36px;width:100%;max-width:1340px;max-height:94vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(28px) scale(.97);transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 40px 120px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.05)}
     .ord-modal-overlay.show .ord-modal{transform:translateY(0) scale(1)}
@@ -235,14 +235,14 @@
     .empty p{font-size:.86rem;margin-bottom:24px}
 
     /* ── TOAST ── */
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     .toast.success{background:var(--accent);color:var(--dark)}
     .toast.error{background:var(--dark);color:#fff}
     .toast.info{background:var(--dark);color:#fff}
 
     /* ── REVIEW MODAL ── */
-    .modal-overlay{position:fixed;inset:0;z-index:950;background:rgba(15,17,20,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+    .modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(15,17,20,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
     .modal-overlay.show{opacity:1;pointer-events:all}
     .modal{background:var(--bg);border:1.5px solid var(--line);border-radius:28px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .22s}
     .modal-overlay.show .modal{transform:translateY(0) scale(1)}
@@ -751,7 +751,6 @@ window.closeOrderModal = function() {
 };
 
 window.toggleOrder = function(el){};
-window.requestRevision = async function(id){closeOrderModal();try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
 window.requestRevision = async function(id){try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
 
 function renderOrders(orders){

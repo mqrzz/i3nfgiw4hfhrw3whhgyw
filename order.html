@@ -949,6 +949,33 @@ async function submitOrder(paymentType) {
   const isHalf = paymentType === 'partial';
   const activeBtn = isHalf ? btnHalf : btnFull;
   btnFull.disabled=true; btnHalf.disabled=true;
+  activeBtn.textContent='Проверяем капчу...';
+
+  // ШАГ 1: сначала проверяем капчу — до создания заказа в Firebase
+  try{
+    const cfToken=turnstile.getResponse(document.getElementById('turnstile-order'));
+    if(!cfToken){
+      toast('Пройдите проверку капчи','error');
+      btnFull.disabled=false; btnHalf.disabled=false;
+      activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';
+      window._orderCaptchaOk=false; turnstile.reset(document.getElementById('turnstile-order')); return;
+    }
+    const vResp=await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:cfToken})});
+    const vData=await vResp.json();
+    if(!vData.success){
+      toast('Проверка капчи не пройдена','error');
+      btnFull.disabled=false; btnHalf.disabled=false;
+      activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';
+      window._orderCaptchaOk=false; turnstile.reset(document.getElementById('turnstile-order')); return;
+    }
+  }catch(e){
+    toast('Ошибка проверки капчи','error');
+    btnFull.disabled=false; btnHalf.disabled=false;
+    activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';
+    window._orderCaptchaOk=false; turnstile.reset(document.getElementById('turnstile-order')); return;
+  }
+
+  // ШАГ 2: капча прошла — собираем данные и создаём заказ в Firebase
   activeBtn.textContent='Сохраняем заявку...';
   const{total,discount}=calcAmounts();const t=TIERS[state.tier];
   const payAmount = isHalf ? Math.ceil(total / 2) : total;
@@ -977,43 +1004,31 @@ async function submitOrder(paymentType) {
     });
     lastOrderId=docRef.id;
     lastPaymentType=paymentType;
-  }catch(e){btnFull.disabled=true;btnHalf.disabled=true;if(window.turnstile)turnstile.reset(document.getElementById('turnstile-order'));window._orderCaptchaOk=false;activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';toast('Не получилось сохранить. Проверьте соединение.','error');return;}
-  await tryPayment(activeBtn,docRef.id,payAmount,paymentType);
-}
+  }catch(e){
+    btnFull.disabled=false; btnHalf.disabled=false;
+    activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';
+    toast('Не получилось сохранить. Проверьте соединение.','error'); return;
+  }
 
-document.getElementById('submitBtn').addEventListener('click', () => submitOrder('full'));
-document.getElementById('submitBtnHalf').addEventListener('click', () => submitOrder('partial'));
-
-async function tryPayment(btn,orderId,amount,paymentType){
-  if(!btn)btn=document.getElementById('submitBtn');
-  const isHalf = paymentType === 'partial';
-  btn.disabled=true;btn.textContent='Переходим к оплате...';
-  // verify captcha server-side
+  // ШАГ 3: заказ создан — редиректим на оплату
+  activeBtn.textContent='Переходим к оплате...';
   try{
-    const cfToken=turnstile.getResponse(document.getElementById('turnstile-order'));
-    if(!cfToken){toast('Пройдите проверку капчи','error');btnFull.disabled=true;btnHalf.disabled=true;window._orderCaptchaOk=false;turnstile.reset(document.getElementById('turnstile-order'));return;}
-    const vResp=await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:cfToken})});
-    const vData=await vResp.json();
-    if(!vData.success){toast('Проверка капчи не пройдена','error');btnFull.disabled=true;btnHalf.disabled=true;window._orderCaptchaOk=false;turnstile.reset(document.getElementById('turnstile-order'));return;}
-  }catch(e){toast('Ошибка проверки капчи','error');btnFull.disabled=true;btnHalf.disabled=true;window._orderCaptchaOk=false;turnstile.reset(document.getElementById('turnstile-order'));return;}
-  try{
-    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,type:paymentType==='partial'?'partial':'order'})});
+    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:docRef.id,type:paymentType==='partial'?'partial':'order'})});
     const data=await resp.json();
     if(data.paymentUrl){window.location.href=data.paymentUrl;}
     else throw new Error();
   }catch(e){
-    const btnFull=document.getElementById('submitBtn');
-    const btnHalf=document.getElementById('submitBtnHalf');
+    // Оплата не запустилась — удаляем заказ из Firebase
+    try{ await deleteDoc(doc(db,'orders',docRef.id)); }catch(_){}
+    lastOrderId=null;
     btnFull.disabled=false; btnHalf.disabled=false;
-    btn.textContent=isHalf?'Оплатить 50%':'Оплатить';
-    // Удаляем заказ из Firebase — платёж не прошёл, не оставляем мусор
-    if(orderId){
-      try{ await deleteDoc(doc(db,'orders',orderId)); }catch(_){}
-      lastOrderId=null;
-    }
+    activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';
     document.getElementById('payErrorOverlay').classList.add('show');
   }
 }
+
+document.getElementById('submitBtn').addEventListener('click', () => submitOrder('full'));
+document.getElementById('submitBtnHalf').addEventListener('click', () => submitOrder('partial'));
 
 document.getElementById('payRetryBtn').addEventListener('click',async()=>{
   document.getElementById('payErrorOverlay').classList.remove('show');

@@ -367,7 +367,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <div class="type-card reveal" data-format="custom">
         <div class="type-n">04</div>
         <h3>Особый случай</h3>
-        <p>Формат не подходит? Опишите задачу — подберём решение вместе.</p>
+        <p>Формат не подходит? Опишите задачу — подберу решение.</p>
         <div class="type-feats">
           <div class="type-feat">Квиз или воронка</div>
           <div class="type-feat">Портал с личным кабинетом</div>
@@ -410,7 +410,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     <h2 class="section-h2 reveal">Какой масштаб нужен?</h2>
     <div class="tiers-grid">
       <div class="tier reveal" data-tier="start">
-        <div class="tier-price">3 900 <sup>₽</sup></div>
+        <div class="tier-price">2 900 <sup>₽</sup></div>
         <div class="tier-name">Старт</div>
         <div class="tier-meta">1 страница · 1—2 дня</div>
         <ul class="tier-feats">
@@ -419,7 +419,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </div>
       <div class="tier dark reveal" data-tier="growth">
         <div class="tier-badge">Чаще выбирают</div>
-        <div class="tier-price">9 900 <sup>₽</sup></div>
+        <div class="tier-price">5 900 <sup>₽</sup></div>
         <div class="tier-name">Рост</div>
         <div class="tier-meta">до 5 страниц · 2—5 дней</div>
         <ul class="tier-feats">
@@ -427,7 +427,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         </ul>
       </div>
       <div class="tier reveal" data-tier="scale">
-        <div class="tier-price">19 900 <sup>₽</sup></div>
+        <div class="tier-price">11 900 <sup>₽</sup></div>
         <div class="tier-name">Масштаб</div>
         <div class="tier-meta">до 10 страниц · 5—14 дней</div>
         <ul class="tier-feats">
@@ -465,7 +465,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
               </div>
               <!-- Ref link hint (shown when dOptNew selected) -->
               <div id="domainRegHint" hidden style="margin-top:8px;padding:10px 14px;background:rgba(30,222,123,.07);border:1px solid rgba(30,222,123,.2);border-radius:10px;font-size:13px;color:rgba(255,255,255,.5);font-weight:300;line-height:1.55">
-                Откроем рег.ру — выберите домен и оплатите там. Мы подключим его бесплатно.
+                Открою рег.ру — выберите домен и оплатите там. Я подключу его бесплатно.
                 <br/><a id="domainRegLink" href="https://www.reg.ru/domain/new/?rlink=reflink-31947115" target="_blank" rel="noopener" style="color:var(--green);text-decoration:none;font-weight:500;margin-top:6px;display:inline-block">Перейти на рег.ру →</a>
               </div>
               <!-- Domain input (shown when dOptOwn selected) -->
@@ -583,7 +583,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
               Оплатить 50%
               <div class="pay-hint-ico" id="halfHintIco" tabindex="0" aria-label="Что такое оплата 50%">?</div>
             </button>
-            <div class="pay-hint-box">Оплатите половину сейчас — мы начнём работу. Остаток можно оплатить в любое время в вашем профиле.</div>
+            <div class="pay-hint-box">Оплатите половину сейчас — я сразу начну работу. Остаток можно оплатить в любое время в вашем профиле.</div>
           </div>
         </div>
       </div>
@@ -607,7 +607,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </svg>
     </div>
     <div class="pay-error-title">Не удалось оплатить</div>
-    <div class="pay-error-text">Заявка сохранена, но платёжная страница не открылась. Попробуйте ещё раз или напишите нам — разберёмся вместе.</div>
+    <div class="pay-error-text">Заявка сохранена, но платёжная страница не открылась. Попробуйте ещё раз или напишите мне — разберёмся.</div>
     <div class="pay-error-btns">
       <button type="button" class="pay-error-retry" id="payRetryBtn">Попробовать ещё раз</button>
       <a href="profile/support" class="pay-error-support">
@@ -664,14 +664,14 @@ updateProgress();
 <script type="module">
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser=null,agreed=false,favFile=null,uploadedFiles=[];
 const FORMAT_LABELS={landing:'Лендинг-визитка',multipage:'Многостраничный сайт',shop:'Интернет-магазин',custom:'Особый случай'};
 const TIERS={
-  start:{name:'Старт',base:3900,pages:1,meta:'1 страница · 1–2 дня'},
-  growth:{name:'Рост',base:9900,pages:5,meta:'до 5 страниц · 2–5 дней'},
-  scale:{name:'Масштаб',base:19900,pages:10,meta:'до 10 страниц · 5–14 дней'}
+  start:{name:'Старт',base:2900,pages:1,meta:'1 страница · 1–2 дня'},
+  growth:{name:'Рост',base:5900,pages:5,meta:'до 5 страниц · 2–5 дней'},
+  scale:{name:'Масштаб',base:11900,pages:10,meta:'до 10 страниц · 5–14 дней'}
 };
 let state={format:null,formatNote:'',siteType:null,tier:null,extras:{domain:false,domainOpt:'new',urgent:false,content:false,shop:false},domainName:'',promo:null};
 const fmt=n=>Math.round(n).toLocaleString('ru');
@@ -997,17 +997,19 @@ async function tryPayment(btn,orderId,amount,paymentType){
     const btnHalf=document.getElementById('submitBtnHalf');
     btnFull.disabled=false; btnHalf.disabled=false;
     btn.textContent=isHalf?'Оплатить 50%':'Оплатить';
+    // Удаляем заказ из Firebase — платёж не прошёл, не оставляем мусор
+    if(orderId){
+      try{ await deleteDoc(doc(db,'orders',orderId)); }catch(_){}
+      lastOrderId=null;
+    }
     document.getElementById('payErrorOverlay').classList.add('show');
   }
 }
 
 document.getElementById('payRetryBtn').addEventListener('click',async()=>{
   document.getElementById('payErrorOverlay').classList.remove('show');
-  if(!lastOrderId)return;
-  const{total}=calcAmounts();
-  const retryAmount = lastPaymentType==='partial' ? Math.ceil(total/2) : total;
-  const retryBtn = lastPaymentType==='partial' ? document.getElementById('submitBtnHalf') : document.getElementById('submitBtn');
-  await tryPayment(retryBtn,lastOrderId,retryAmount,lastPaymentType);
+  // Заказ был удалён при ошибке — создаём новый
+  await submitOrder(lastPaymentType||'full');
 });
 document.getElementById('payErrorClose').addEventListener('click',()=>{
   document.getElementById('payErrorOverlay').classList.remove('show');

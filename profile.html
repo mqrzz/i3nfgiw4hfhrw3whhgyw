@@ -294,19 +294,6 @@
   <img id="lightboxImg" src="" alt=""/>
 </div>
 
-<!-- NOTIF MODAL -->
-<div class="notif-modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
-  <div class="notif-modal">
-    <div class="notif-modal-head">
-      <span>Уведомления</span>
-      <button class="notif-modal-close" onclick="closeNotifModal()">✕</button>
-    </div>
-    <div id="notifList"><div class="notif-empty">Загрузка...</div></div>
-  </div>
-</div>
-
-
-
 <div id="sbContent" style="display:none">
 <div class="page-col" id="appWrap">
 
@@ -322,10 +309,10 @@
         </div>
         <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
         <!-- Колокольчик — только на мобильных -->
-        <div class="notif-btn" id="notifBtn" onclick="openNotifModal()" title="Уведомления" style="display:none">
+        <a class="notif-btn" id="notifBtn" href="profile/notifications" title="Уведомления" style="display:none">
           <svg id="notifIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
           <div class="notif-dot" id="notifDot" style="display:none"></div>
-        </div>
+        </a>
       </div>
 
       <div class="hero-greeting">Личный кабинет</div>
@@ -393,8 +380,8 @@
         </div>
         <span class="menu-arrow">›</span>
       </a>
-      <!-- Колокольчик — только мобильный, показываем в меню -->
-      <div class="menu-item" onclick="openNotifModal()" style="cursor:pointer">
+      <!-- Колокольчик — только мобильный, ведёт на страницу уведомлений -->
+      <a href="profile/notifications" class="menu-item">
         <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
         <div class="menu-text">
           <div class="menu-title">Уведомления</div>
@@ -402,20 +389,19 @@
         </div>
         <span class="menu-badge" id="menuNotifBadge" style="display:none">!</span>
         <span class="menu-arrow">›</span>
-      </div>
+      </a>
     </div>
 
     <!-- ДВУХКОЛОНОЧНАЯ СЕТКА (ПК) -->
     <div class="home-grid">
 
-      <!-- УВЕДОМЛЕНИЯ — ПК блок -->
-      <div class="home-card" id="notifDesktopCard">
+      <!-- УВЕДОМЛЕНИЯ — переехали на отдельную страницу -->
+      <div class="home-card">
         <div class="home-card-head">
           <div class="home-card-title">Уведомления</div>
+          <a href="profile/notifications" class="home-card-link">Все уведомления <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
         <div id="notifInlineList"><div class="notif-empty-inline">Загрузка...</div></div>
-        <button class="notif-show-more" id="notifShowMore" style="display:none" onclick="expandNotifs()">Посмотреть ещё</button>
-        <div class="notif-limit-note" id="notifLimitNote" style="display:none">Хранятся последние 10 уведомлений. Старые удаляются автоматически.</div>
       </div>
 
       <!-- СТАТУС ПОДДЕРЖКИ -->
@@ -594,16 +580,12 @@ let notifsExpanded=false;
 
 function renderNotifInline(docs){
   const list=document.getElementById('notifInlineList');
-  const showMoreBtn=document.getElementById('notifShowMore');
-  const limitNote=document.getElementById('notifLimitNote');
   if(!list) return;
   if(!docs.length){
     list.innerHTML='<div class="notif-empty-inline">Нет уведомлений</div>';
-    if(showMoreBtn) showMoreBtn.style.display='none';
-    if(limitNote) limitNote.style.display='none';
     return;
   }
-  const visible=notifsExpanded?docs.slice(0,10):docs.slice(0,3);
+  const visible=docs.slice(0,3);
   list.innerHTML=visible.map(d=>{
     const n=d.data();
     const t=n.createdAt?.toDate?n.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
@@ -615,26 +597,6 @@ function renderNotifInline(docs){
       <div class="notif-inline-text">${(n.text||'').replace(/\n/g,'<br>')}</div>
     </div>`;
   }).join('');
-  if(showMoreBtn){
-    if(!notifsExpanded&&docs.length>3){showMoreBtn.style.display='block';showMoreBtn.textContent=`Посмотреть ещё (${docs.length-3})`;}
-    else showMoreBtn.style.display='none';
-  }
-  if(limitNote) limitNote.style.display=docs.length>=8?'block':'none';
-}
-
-window.expandNotifs=function(){
-  notifsExpanded=true;
-  renderNotifInline(allNotifDocs);
-};
-
-async function pruneOldNotifs(uid,docs){
-  // Если больше 10 — удаляем лишние (самые старые)
-  if(docs.length<=10) return;
-  const toDelete=docs.slice(10);
-  const {deleteDoc}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-  for(const d of toDelete){
-    try{await deleteDoc(d.ref);}catch(e){}
-  }
 }
 
 function watchNotifications(uid){
@@ -647,32 +609,10 @@ function watchNotifications(uid){
     const menuBadge=document.getElementById('menuNotifBadge');
     if(menuBadge) menuBadge.style.display=hasUnread?'':'none';
 
-    // ПК — инлайн блок
+    // ПК — инлайн тизер (3 последних)
     renderNotifInline(allNotifDocs);
-
-    // Автоудаление старше 10
-    await pruneOldNotifs(uid,snap.docs);
   },()=>{});
 }
-
-window.openNotifModal=async function(){
-  document.getElementById('notifModal').classList.add('show');
-  if(!currentUser) return;
-  // Обновляем notifList для мобильной модалки
-  const list=document.getElementById('notifList');
-  if(list&&allNotifDocs.length){
-    list.innerHTML=allNotifDocs.slice(0,10).map(d=>{
-      const n=d.data();
-      const t=n.createdAt?.toDate?n.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-      return `<div class="notif-item ${n.read?'':'unread'}">
-        <div class="notif-item-head"><span class="notif-item-title">${n.title||'Уведомление'}</span><span class="notif-item-time">${t}</span></div>
-        <div class="notif-item-text">${(n.text||'').replace(/\n/g,'<br>')}</div>
-      </div>`;
-    }).join('');
-  }
-  try{const snap=await getDocs(query(collection(db,'notifications',currentUser.uid,'items'),where('read','==',false)));for(const d of snap.docs) updateDoc(d.ref,{read:true}).catch(()=>{});}catch(e){}
-};
-window.closeNotifModal=function(){document.getElementById('notifModal').classList.remove('show');};
 
 
 

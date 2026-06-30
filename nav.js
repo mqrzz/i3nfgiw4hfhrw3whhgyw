@@ -178,7 +178,7 @@
       position: relative; padding: 2px;
     }
     .an-avatar-ring.notify {
-      background: conic-gradient(from -45deg, var(--an-warn), var(--an-green) 60%);
+      background: var(--an-green);
     }
     .an-avatar {
       width: 100%; height: 100%; border-radius: 9px;
@@ -377,6 +377,7 @@
     {
       label: 'Услуги',
       key: 'services',
+      pages: ['order', 'project1', 'project2', 'project3'],
       sections: [
         {
           label: 'Примеры работ',
@@ -397,6 +398,7 @@
     {
       label: 'Обо мне',
       key: 'company',
+      pages: ['about', 'rules', 'privacy'],
       sections: [
         {
           items: [
@@ -469,7 +471,7 @@
     const chevronSvg = '<svg class="an-nav-drop-chevron" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
 
     const dropdowns = NAV_DROPDOWNS.map(drop => {
-      const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
+      const isActive = (drop.pages || []).includes(page);
       return '<div class="an-nav-drop">' +
         '<button class="an-nav-drop-btn' + (isActive ? ' active' : '') + '" aria-expanded="false" data-drop="' + drop.key + '">' +
         drop.label + chevronSvg +
@@ -494,18 +496,14 @@
 
     let html = '';
 
-    // Дропдауны — каждый дропдаун рендерим с заголовком и списком ссылок
+    // Дропдауны — каждый дропдаун рендерим со своим заголовком и списком ссылок
     NAV_DROPDOWNS.forEach(drop => {
+      html += '<div class="an-mobile-section-label">' + drop.label + '</div>';
       drop.sections.forEach(sec => {
-        if (sec.sep) return;
-        if (sec.items && sec.items.length) {
-          if (sec.label) {
-            html += '<div class="an-mobile-section-label">' + sec.label + '</div>';
-          }
-          sec.items.forEach(item => {
-            html += '<a href="' + item.href + '" class="an-mobile-link' + (page === item.key ? ' active' : '') + '">' + item.label + '</a>';
-          });
-        }
+        if (sec.sep || !sec.items) return;
+        sec.items.forEach(item => {
+          html += '<a href="' + item.href + '" class="an-mobile-link' + (page === item.key ? ' active' : '') + '">' + item.label + '</a>';
+        });
       });
     });
 
@@ -645,7 +643,7 @@ ${buildMobileSheet()}`;
   function refreshNotifyDot() {
     const ring = document.getElementById('anAvatarRing');
     if (!ring) return;
-    const any = ['support','tickets'].some(k => {
+    const any = ['support','tickets','orders'].some(k => {
       const el = document.getElementById(`anBadge-${k}`);
       return el && el.style.display !== 'none';
     });

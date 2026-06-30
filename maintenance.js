@@ -39,40 +39,19 @@
             text-align:center;max-width:700px;width:100%;
             border:1.5px solid #dfe3e8;
           }
-          #maint-svg { width:220px;height:auto;margin-bottom:36px;display:block;margin-left:auto;margin-right:auto; }
           #maint-label { font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#1ede7b;margin-bottom:24px; }
           #maint-title { font-size:clamp(40px,7vw,80px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#191b1e;margin:0 0 20px; }
           #maint-text { font-size:clamp(15px,1.5vw,18px);color:#707a8a;font-weight:300;line-height:1.6;max-width:440px;margin:0 auto; }
-          @keyframes maint-spin1 { to { transform: rotate(360deg); } }
-          .mg1 { animation: maint-spin1 6s linear infinite; transform-origin: 260px 180px; }
           @media(max-width:600px){
             #maint-card { border-radius:32px;padding:40px 24px 52px; }
-            #maint-svg { width:160px;margin-bottom:24px; }
           }
         `;
         document.head.appendChild(style);
-
-        const svg = `<svg id="maint-svg" viewBox="0 0 520 360" xmlns="http://www.w3.org/2000/svg">
-          <g class="mg1" fill="#1ede7b">
-            <rect x="246" y="100" width="28" height="22" rx="5"/>
-            <rect x="246" y="238" width="28" height="22" rx="5"/>
-            <rect x="158" y="146" width="28" height="22" rx="5" transform="rotate(-90 172 157)"/>
-            <rect x="334" y="146" width="28" height="22" rx="5" transform="rotate(-90 348 157)"/>
-            <rect x="178" y="113" width="28" height="22" rx="5" transform="rotate(-45 192 124)"/>
-            <rect x="314" y="113" width="28" height="22" rx="5" transform="rotate(45 328 124)"/>
-            <rect x="178" y="225" width="28" height="22" rx="5" transform="rotate(45 192 236)"/>
-            <rect x="314" y="225" width="28" height="22" rx="5" transform="rotate(-45 328 236)"/>
-            <circle cx="260" cy="180" r="70"/>
-            <circle cx="260" cy="180" r="30" fill="#f2f4f7"/>
-          </g>
-          <ellipse cx="260" cy="318" rx="120" ry="9" fill="#191b1e" opacity=".08"/>
-        </svg>`;
 
         mo = document.createElement('div');
         mo.id = 'maint-overlay';
         mo.innerHTML = `
           <div id="maint-card">
-            ${svg}
             <div id="maint-label">Технические работы</div>
             <h1 id="maint-title">Скоро <em style="font-style:normal;color:#1ede7b">вернёмся</em></h1>
             <p id="maint-text">Сайт временно недоступен — мы уже работаем над улучшениями. Обычно это занимает не больше часа.</p>

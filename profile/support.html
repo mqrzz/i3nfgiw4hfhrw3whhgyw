@@ -122,9 +122,24 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 /* FORM MODAL */
 .ticket-form-overlay{position:fixed;inset:0;z-index:9600;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
 .ticket-form-overlay.show{opacity:1;pointer-events:all}
-.ticket-form-modal{background:var(--bg);border-radius:40px;padding:44px 40px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;transform:translateY(20px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.2)}
+.ticket-form-modal{background:var(--bg);border-radius:48px;width:100%;max-width:860px;max-height:92vh;overflow-y:auto;transform:translateY(20px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.2)}
 .ticket-form-overlay.show .ticket-form-modal{transform:translateY(0) scale(1)}
-.ticket-form-modal h3{font-size:1.3rem;font-weight:500;letter-spacing:-.02em;margin-bottom:28px}
+.ticket-form-inner{display:grid;grid-template-columns:1fr 1.1fr;min-height:480px}
+.ticket-form-left{background:var(--dark);border-radius:48px 0 0 48px;padding:52px 44px;display:flex;flex-direction:column}
+.ticket-form-right{padding:52px 44px;display:flex;flex-direction:column;gap:16px}
+.ticket-form-modal h3{font-size:clamp(2rem,3.5vw,3rem);font-weight:500;letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:10px}
+.ticket-form-subtitle{font-size:.9rem;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:32px;line-height:1.55}
+.ticket-form-hint{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px 20px;margin-top:auto}
+.ticket-form-hint-title{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:10px}
+.ticket-form-hint-item{display:flex;align-items:flex-start;gap:9px;font-size:.8rem;color:rgba(255,255,255,.35);margin-bottom:8px;line-height:1.5}
+.ticket-form-hint-item:last-child{margin-bottom:0}
+.ticket-form-hint-item svg{width:13px;height:13px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0;margin-top:2px}
+@media(max-width:700px){
+  .ticket-form-inner{grid-template-columns:1fr}
+  .ticket-form-left{border-radius:28px 28px 0 0;padding:32px 28px 24px}
+  .ticket-form-right{padding:24px 28px 32px}
+  .ticket-form-modal{border-radius:28px}
+}
 .ticket-form-group{margin-bottom:16px}
 .ticket-form-group label{display:block;font-size:.68rem;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
 .ticket-form-group select,.ticket-form-group input,.ticket-form-group textarea{width:100%;background:var(--bg3);border:1.5px solid var(--line-strong);border-radius:14px;padding:.8rem 1rem;color:var(--ink);font-family:var(--font);font-size:.9rem;outline:none;transition:border-color .18s}
@@ -132,19 +147,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ticket-form-group textarea{min-height:90px;resize:vertical}
 .ticket-form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
 
-/* ORDER PICKER */
-.order-pick-list{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-right:2px}
-.order-pick-item{display:flex;align-items:center;gap:14px;border:1.5px solid var(--line-strong);border-radius:16px;padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s}
-.order-pick-item:hover{border-color:var(--ink-faint)}
+/* ORDER PICKER — в левой тёмной колонке формы */
+.order-pick-list{display:flex;flex-direction:column;gap:7px;margin-bottom:auto}
+.order-pick-item{display:flex;align-items:center;gap:12px;border:1.5px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;cursor:pointer;transition:border-color .15s,background .15s}
+.order-pick-item:hover{border-color:rgba(255,255,255,.25)}
 .order-pick-item.is-selected{border-color:var(--accent);background:var(--accent-wash)}
-.order-pick-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--line-strong);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+.order-pick-radio{width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
 .order-pick-item.is-selected .order-pick-radio{border-color:var(--accent)}
-.order-pick-radio::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--accent);opacity:0;transition:opacity .15s}
+.order-pick-radio::after{content:'';width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:0;transition:opacity .15s}
 .order-pick-item.is-selected .order-pick-radio::after{opacity:1}
 .order-pick-body{flex:1;min-width:0}
-.order-pick-title{font-size:.86rem;font-weight:500;color:var(--ink)}
-.order-pick-sub{font-size:.74rem;color:var(--ink-faint);margin-top:2px}
-.no-order-option{font-size:.78rem;color:var(--ink-faint);text-align:center;padding:8px 0 2px}
+.order-pick-title{font-size:.82rem;font-weight:500;color:#fff}
+.order-pick-sub{font-size:.7rem;color:rgba(255,255,255,.35);margin-top:2px}
+.no-order-option{font-size:.76rem;color:rgba(255,255,255,.35);padding:8px 0}
 
 .ticket-form-actions{display:flex;gap:10px;margin-top:24px}
 .ticket-form-actions .btn{flex:1;justify-content:center}
@@ -259,47 +274,57 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <!-- NEW TICKET FORM -->
 <div class="ticket-form-overlay" id="ticketFormOverlay">
   <div class="ticket-form-modal">
-    <h3>Создать тикет</h3>
-
-    <div class="ticket-form-group">
-      <label>К какому заказу относится?</label>
-      <div class="order-pick-list" id="orderPickList"><!-- filled by JS --></div>
-    </div>
-
-    <div class="ticket-form-group">
-      <label>Тема вопроса</label>
-      <select id="ticketTopic">
-        <option value="Техническая проблема">Техническая проблема</option>
-        <option value="Идея / предложение">Идея / предложение</option>
-        <option value="Вопрос по оплате">Вопрос по оплате</option>
-        <option value="Правки по проекту">Правки по проекту</option>
-        <option value="Другое">Другое</option>
-      </select>
-    </div>
-    <div class="ticket-form-group">
-      <label>Приоритет</label>
-      <select id="ticketPriority">
-        <option value="low">Низкий</option>
-        <option value="medium" selected>Средний</option>
-        <option value="high">Высокий</option>
-      </select>
-    </div>
-    <div class="ticket-form-group">
-      <label>Краткое описание</label>
-      <input type="text" id="ticketSubject" placeholder="Например: не загружается сайт"/>
-    </div>
-    <div class="ticket-form-group">
-      <label>Сообщение</label>
-      <textarea id="ticketMessage" placeholder="Опишите подробнее…"></textarea>
-    </div>
-    <div class="ticket-form-group">
-      <label>Прикрепить скриншот (необязательно)</label>
-      <input type="file" id="ticketFile" accept="image/*" style="padding:6px 0;background:transparent;border:none;color:var(--ink-faint);font-size:.8rem"/>
-      <div class="file-preview" id="filePreview"></div>
-    </div>
-    <div class="ticket-form-actions">
-      <button class="btn btn-outline" id="cancelTicketBtn">Отмена</button>
-      <button class="btn btn-green" id="submitTicketBtn">Отправить</button>
+    <div class="ticket-form-inner">
+      <!-- ЛЕВАЯ КОЛОНКА — тёмная, заголовок + подсказки -->
+      <div class="ticket-form-left">
+        <h3>Создать<br>тикет</h3>
+        <div class="ticket-form-subtitle">Опишите проблему или вопрос — ответим в приоритетном порядке</div>
+        <div id="orderPickList" style="display:flex;flex-direction:column;gap:7px;margin-bottom:auto"><!-- filled by JS --></div>
+        <div class="ticket-form-hint">
+          <div class="ticket-form-hint-title">Советы</div>
+          <div class="ticket-form-hint-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Приложите скриншот — так быстрее разберёмся</div>
+          <div class="ticket-form-hint-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Укажите на какой странице сайта возникла проблема</div>
+          <div class="ticket-form-hint-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Срочные вопросы — ставьте приоритет «Высокий»</div>
+        </div>
+      </div>
+      <!-- ПРАВАЯ КОЛОНКА — поля формы -->
+      <div class="ticket-form-right">
+        <div class="ticket-form-group">
+          <label>Тема вопроса</label>
+          <select id="ticketTopic">
+            <option value="Техническая проблема">Техническая проблема</option>
+            <option value="Идея / предложение">Идея / предложение</option>
+            <option value="Вопрос по оплате">Вопрос по оплате</option>
+            <option value="Правки по проекту">Правки по проекту</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+        <div class="ticket-form-group">
+          <label>Приоритет</label>
+          <select id="ticketPriority">
+            <option value="low">Низкий</option>
+            <option value="medium" selected>Средний</option>
+            <option value="high">Высокий</option>
+          </select>
+        </div>
+        <div class="ticket-form-group">
+          <label>Краткое описание</label>
+          <input type="text" id="ticketSubject" placeholder="Например: не загружается сайт"/>
+        </div>
+        <div class="ticket-form-group">
+          <label>Сообщение</label>
+          <textarea id="ticketMessage" placeholder="Опишите подробнее…" style="min-height:110px"></textarea>
+        </div>
+        <div class="ticket-form-group">
+          <label>Скриншот (необязательно)</label>
+          <input type="file" id="ticketFile" accept="image/*" style="padding:6px 0;background:transparent;border:none;color:var(--ink-faint);font-size:.8rem"/>
+          <div class="file-preview" id="filePreview"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:auto">
+          <button class="btn btn-outline" id="cancelTicketBtn" style="flex:1;justify-content:center">Отмена</button>
+          <button class="btn btn-green" id="submitTicketBtn" style="flex:1;justify-content:center">Отправить</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -392,19 +417,20 @@ function orderLabel(o){
 
 function renderOrderPicker(){
   const el = document.getElementById('orderPickList');
+  const hdr = '<div style="font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);margin-bottom:10px">К какому заказу?</div>';
   if(!userOrders.length){
-    el.innerHTML = '<div class="no-order-option">У вас пока нет заказов — тикет будет без привязки</div>';
+    el.innerHTML = hdr + '<div class="no-order-option">Нет заказов — тикет без привязки</div>';
     selectedOrderId = null;
     return;
   }
   selectedOrderId = userOrders[0].id;
-  el.innerHTML = userOrders.map((o,i)=>`<div class="order-pick-item${i===0?' is-selected':''}" data-id="${o.id}" onclick="selectOrder('${o.id}')">
+  el.innerHTML = hdr + userOrders.map((o,i)=>`<div class="order-pick-item${i===0?' is-selected':''}" data-id="${o.id}" onclick="selectOrder('${o.id}')">
     <div class="order-pick-radio"></div>
     <div class="order-pick-body">
       <div class="order-pick-title">${esc(orderLabel(o))}</div>
       <div class="order-pick-sub">Статус: ${['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'][o.status||0]}</div>
     </div>
-  </div>`).join('') + '<div class="order-pick-item" data-id="" onclick="selectOrder(\'\')"><div class="order-pick-radio"></div><div class="order-pick-body"><div class="order-pick-title">Без привязки к заказу</div><div class="order-pick-sub">Общий вопрос</div></div></div>';
+  </div>`).join('') + '<div class="order-pick-item" data-id="" onclick="selectOrder(\'\')"><div class="order-pick-radio"></div><div class="order-pick-body"><div class="order-pick-title">Без привязки</div><div class="order-pick-sub">Общий вопрос</div></div></div>';
 }
 window.selectOrder = function(id){
   selectedOrderId = id || null;

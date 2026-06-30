@@ -2,12 +2,13 @@
  * sidebar.js — общая боковая панель личного кабинета Antviz
  * <script src="../sidebar.js" data-page="profile"></script>
  *
- * Подключается на всех 5 страницах кабинета: profile, orders, support,
- * tickets, settings. На ПК (≥981px) рисует постоянный сайдбар слева
- * с разделами и бейджами (активные заказы / непрочитанные сообщения /
- * истекающее обслуживание). На мобильных скрыт — там навигация через
- * капсулу nav.js (бургер) и обычный скролл страницы, без верхнего
- * back-bar — его каждая страница убирает сама.
+ * Подключается на всех страницах кабинета: profile, orders, sites,
+ * support, tickets, notifications, settings. На ПК (≥981px) рисует
+ * постоянный сайдбар слева с разделами и бейджами (активные заказы /
+ * непрочитанные сообщения / истекающее обслуживание / непрочитанные
+ * уведомления). На мобильных скрыт — там навигация через капсулу
+ * nav.js (бургер) и обычный скролл страницы, без верхнего back-bar —
+ * его каждая страница убирает сама.
  *
  * Подключается к уже существующему Firebase App той же логикой, что и
  * nav.js — ждёт getApps().length, не делает свой initializeApp().
@@ -72,14 +73,16 @@
   `;
 
   const NAV_ITEMS = [
-    { key:'profile',  href:b+'profile',          icon:'<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/>', label:'Обзор' },
-    { key:'orders',   href:b+'profile/orders',   icon:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label:'Мои заказы', badgeKey:'orders' },
-    { key:'support',  href:b+'profile/support',  icon:'<rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/>', label:'Чат с командой', badgeKey:'support' },
-    { key:'tickets',  href:b+'profile/tickets',  icon:'<rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/>', label:'Обслуживание', badgeKey:'tickets' },
-    { key:'order',    href:b+'order',            icon:'<path d="M12 5v14M5 12h14"/>', label:'Новый заказ' },
+    { key:'profile',       href:b+'profile',               icon:'<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/>', label:'Обзор' },
+    { key:'orders',        href:b+'profile/orders',        icon:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label:'Мои заказы', badgeKey:'orders' },
+    { key:'sites',         href:b+'profile/sites',         icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>', label:'Мои сайты' },
+    { key:'support',       href:b+'profile/support',       icon:'<rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/>', label:'Чат с командой', badgeKey:'support' },
+    { key:'tickets',       href:b+'profile/tickets',       icon:'<rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/>', label:'Обслуживание', badgeKey:'tickets' },
+    { key:'notifications', href:b+'profile/notifications', icon:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>', label:'Уведомления', badgeKey:'notif' },
+    { key:'order',         href:b+'order',                 icon:'<path d="M12 5v14M5 12h14"/>', label:'Новый заказ' },
     { sep:true },
-    { key:'settings', href:b+'profile/settings', icon:'<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/>', label:'Настройки' },
-    { key:'logout',   logout:true, icon:'<path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/>', label:'Выйти' },
+    { key:'settings',      href:b+'profile/settings',      icon:'<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/>', label:'Настройки' },
+    { key:'logout',        logout:true, icon:'<path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/>', label:'Выйти' },
   ];
 
   function buildNav() {
@@ -145,6 +148,12 @@
     onSnapshot(
       query(collection(db, 'chats', user.uid, 'messages'), where('sender', '==', 'admin'), where('readByUser', '==', false)),
       snap => setBadge('support', snap.size, 'warn'),
+      () => {}
+    );
+
+    onSnapshot(
+      query(collection(db, 'notifications', user.uid, 'items'), where('read', '==', false)),
+      snap => setBadge('notif', snap.size, 'warn'),
       () => {}
     );
 

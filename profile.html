@@ -134,19 +134,7 @@
     /* ══════════════════════════════════
        УВЕДОМЛЕНИЯ (блок на ПК)
     ══════════════════════════════════ */
-    .notif-inline-item{padding:14px 0;border-bottom:1px solid var(--border);font-size:.82rem;line-height:1.55}
-    .notif-inline-item:last-child{border-bottom:none;padding-bottom:0}
-    .notif-inline-item:first-child{padding-top:0}
-    .notif-inline-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:3px}
-    .notif-inline-title{font-weight:500;font-size:.8rem}
-    .notif-inline-time{font-size:.68rem;color:var(--muted);white-space:nowrap}
-    .notif-inline-text{color:var(--muted2);font-size:.78rem;line-height:1.5}
-    .notif-inline-item.unread .notif-inline-title{color:var(--accent)}
-    .notif-inline-unread-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
-    .notif-show-more{display:block;width:100%;text-align:center;padding:.7rem;border:none;background:var(--bg3);border-radius:10px;color:var(--muted);font-family:var(--font);font-size:.78rem;cursor:pointer;margin-top:10px;transition:background .15s}
-    .notif-show-more:hover{background:var(--border)}
-    .notif-limit-note{font-size:.7rem;color:var(--muted);text-align:center;margin-top:8px;line-height:1.5}
-    .notif-empty-inline{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
+
     .home-card{
       background:var(--bg3);border:1.5px solid var(--border);border-radius:32px;
       padding:28px 32px;margin-bottom:12px;
@@ -157,6 +145,15 @@
     .home-card-link{font-size:.76rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .15s}
     .home-card-link:hover{color:var(--text)}
     .home-card-link svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
+
+    .quick-action-btn{display:flex;align-items:center;gap:14px;padding:12px 16px;border-radius:16px;background:var(--bg);border:1.5px solid var(--border);text-decoration:none;color:inherit;transition:border-color .15s,background .15s}
+    .quick-action-btn:hover{border-color:var(--border2);background:var(--bg2)}
+    .qa-ico{width:36px;height:36px;border-radius:11px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .qa-ico svg{width:15px;height:15px}
+    .qa-body{display:flex;flex-direction:column;flex:1;min-width:0}
+    .qa-title{font-size:.88rem;font-weight:500;letter-spacing:-.01em;color:var(--text)}
+    .qa-sub{font-size:.74rem;color:var(--muted);margin-top:1px;font-weight:300}
+    .qa-arrow{font-size:1.2rem;color:var(--border2);line-height:1}
 
     .order-strip{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;text-decoration:none;color:inherit;transition:opacity .15s}
     .order-strip:last-child{border-bottom:none;padding-bottom:0}
@@ -346,6 +343,14 @@
         <span class="menu-badge" id="menuActiveCount" style="display:none">0</span>
         <span class="menu-arrow">›</span>
       </a>
+      <a href="profile/sites" class="menu-item">
+        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+        <div class="menu-text">
+          <div class="menu-title">Мои сайты</div>
+          <div class="menu-sub">Запущенные проекты</div>
+        </div>
+        <span class="menu-arrow">›</span>
+      </a>
       <a href="profile/support" class="menu-item">
         <div class="menu-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
         <div class="menu-text">
@@ -395,15 +400,6 @@
     <!-- ДВУХКОЛОНОЧНАЯ СЕТКА (ПК) -->
     <div class="home-grid">
 
-      <!-- УВЕДОМЛЕНИЯ — переехали на отдельную страницу -->
-      <div class="home-card">
-        <div class="home-card-head">
-          <div class="home-card-title">Уведомления</div>
-          <a href="profile/notifications" class="home-card-link">Все уведомления <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        </div>
-        <div id="notifInlineList"><div class="notif-empty-inline">Загрузка...</div></div>
-      </div>
-
       <!-- СТАТУС ПОДДЕРЖКИ -->
       <div class="support-card" id="supportCard">
         <div class="support-card-label">Обслуживание активно</div>
@@ -431,8 +427,38 @@
       <div class="home-card">
         <div class="home-card-head">
           <div class="home-card-title">Активность</div>
+          <a href="profile/orders" class="home-card-link">Все заказы <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
         </div>
         <div class="timeline-list" id="activityTimeline"><div class="timeline-empty">Загрузка...</div></div>
+      </div>
+
+      <!-- БЫСТРЫЕ ДЕЙСТВИЯ -->
+      <div class="home-card">
+        <div class="home-card-head">
+          <div class="home-card-title">Быстрые действия</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <a href="order" class="quick-action-btn">
+            <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></span>
+            <span class="qa-body"><span class="qa-title">Новый заказ</span><span class="qa-sub">Оформить новый сайт</span></span>
+            <span class="qa-arrow">›</span>
+          </a>
+          <a href="profile/support" class="quick-action-btn">
+            <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+            <span class="qa-body"><span class="qa-title">Написать в поддержку</span><span class="qa-sub">Вопрос или проблема</span></span>
+            <span class="qa-arrow">›</span>
+          </a>
+          <a href="profile/sites" class="quick-action-btn">
+            <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></span>
+            <span class="qa-body"><span class="qa-title">Мои сайты</span><span class="qa-sub">Запущенные проекты</span></span>
+            <span class="qa-arrow">›</span>
+          </a>
+          <a href="profile/notifications" class="quick-action-btn">
+            <span class="qa-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span>
+            <span class="qa-body"><span class="qa-title">Уведомления</span><span class="qa-sub">Последние события</span></span>
+            <span class="qa-arrow">›</span>
+          </a>
+        </div>
       </div>
 
     </div><!-- /home-grid -->
@@ -502,7 +528,7 @@ function buildTimeline(orders){
   });
   const tl=document.getElementById('activityTimeline');
   if(!tl) return;
-  const top=events.slice(0,5);
+  const top=events.slice(0,3);
   if(!top.length){tl.innerHTML='<div class="timeline-empty">Активность появится после первого заказа</div>';return;}
   tl.innerHTML=top.map(e=>`<div class="tl-item">
     <div class="tl-dot-wrap"><div class="tl-dot" style="background:${e.color}"></div></div>
@@ -574,47 +600,18 @@ window.openLightbox=function(src){document.getElementById('lightboxImg').src=src
 window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('show');document.getElementById('lightboxImg').src='';};
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();}});
 
+// Обновление мобильного бейджа колокольчика (без рендера инлайн-блока)
 let unsubNotifs=null;
-let allNotifDocs=[];
-let notifsExpanded=false;
-
-function renderNotifInline(docs){
-  const list=document.getElementById('notifInlineList');
-  if(!list) return;
-  if(!docs.length){
-    list.innerHTML='<div class="notif-empty-inline">Нет уведомлений</div>';
-    return;
-  }
-  const visible=docs.slice(0,3);
-  list.innerHTML=visible.map(d=>{
-    const n=d.data();
-    const t=n.createdAt?.toDate?n.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
-    return `<div class="notif-inline-item ${n.read?'':'unread'}">
-      <div class="notif-inline-head">
-        <span class="notif-inline-title">${!n.read?'<span class="notif-inline-unread-dot"></span> ':''} ${n.title||'Уведомление'}</span>
-        <span class="notif-inline-time">${t}</span>
-      </div>
-      <div class="notif-inline-text">${(n.text||'').replace(/\n/g,'<br>')}</div>
-    </div>`;
-  }).join('');
-}
-
 function watchNotifications(uid){
   const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
-  unsubNotifs=onSnapshot(q,async snap=>{
-    allNotifDocs=snap.docs;
+  unsubNotifs=onSnapshot(q,snap=>{
     const hasUnread=snap.docs.some(d=>!d.data().read);
-
-    // Мобильный бейдж в меню
     const menuBadge=document.getElementById('menuNotifBadge');
     if(menuBadge) menuBadge.style.display=hasUnread?'':'none';
-
-    // ПК — инлайн тизер (3 последних)
-    renderNotifInline(allNotifDocs);
+    const notifDot=document.getElementById('notifDot');
+    if(notifDot) notifDot.style.display=hasUnread?'':'none';
   },()=>{});
 }
-
-
 
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='auth';return;}
@@ -635,12 +632,6 @@ onAuthStateChanged(auth,async user=>{
   watchChatBadge(user.uid);
   watchNotifications(user.uid);
   watchSupportStatus(user.uid);
-  // На ПК помечаем уведомления прочитанными через 2 секунды (пользователь их видит)
-  if(window.innerWidth>=981){
-    setTimeout(async()=>{
-      try{const snap=await getDocs(query(collection(db,'notifications',user.uid,'items'),where('read','==',false)));for(const d of snap.docs) updateDoc(d.ref,{read:true}).catch(()=>{});}catch(e){}
-    },2000);
-  }
 });
 </script>
 

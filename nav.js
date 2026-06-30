@@ -22,44 +22,49 @@
      сайте: dark2 на dark), без белых/серых поверхностей. */
   const CSS = `
     :root {
-      --an-bg:        #191b1e;
-      --an-bg2:       #2b2f33;
-      --an-line:      rgba(255,255,255,.08);
-      --an-line-soft: rgba(255,255,255,.05);
-      --an-ink:       #ffffff;
-      --an-ink-dim:   rgba(255,255,255,.45);
-      --an-ink-faint: rgba(255,255,255,.3);
+      --an-bg:        #ffffff;
+      --an-bg2:       #f2f4f7;
+      --an-line:      #dfe3e8;
+      --an-line-soft: #eceff2;
+      --an-ink:       #191b1e;
+      --an-ink-dim:   #707a8a;
+      --an-ink-faint: #aab0ba;
       --an-green:     #1ede7b;
       --an-green-h:   #1ac16b;
       --an-green-ink: #191b1e;
-      --an-green-dim: rgba(30,222,123,.14);
+      --an-green-dim: rgba(30,222,123,.12);
       --an-warn:      #f59e0b;
-      --an-danger:    #ff6b54;
-      --an-card:      #20242a;
-      --an-card-border: rgba(255,255,255,.09);
-      --an-card-ink:  #ffffff;
-      --an-card-muted:rgba(255,255,255,.4);
+      --an-danger:    #e6503c;
+      --an-card:      #f9fafc;
+      --an-card-border: #dfe3e8;
+      --an-card-ink:  #191b1e;
+      --an-card-muted:#8b94a3;
+      --an-sh1: 0 4px 16px rgba(0,51,153,.04), 0 2px 2px rgba(0,51,153,.08);
+      --an-sh2: 0 12px 28px rgba(0,51,153,.09), 0 4px 10px rgba(0,51,153,.07);
       --an-font: 'Geologica','Inter','Arial',sans-serif;
     }
 
     .antviz-nav {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 0; left: 0; right: 0;
       z-index: 9000;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 10px 0 26px;
-      height: 64px;
-      width: calc(100% - 40px); max-width: 1100px;
+      height: 80px;
+      padding: 0 20px;
       background: var(--an-bg);
-      border: 1px solid var(--an-line);
-      border-radius: 24px;
-      transition: border-color .2s, background .2s;
+      border-bottom: 1px solid var(--an-line);
       font-family: var(--an-font);
     }
-    .antviz-nav:hover { border-color: rgba(255,255,255,.14); }
+    .an-inner {
+      width: 100%; max-width: 1328px; margin: 0 auto;
+      height: 100%; position: relative;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    @media(min-width:1024px){ .antviz-nav { padding: 0 64px; } }
+    @media(min-width:1280px){ .antviz-nav { padding: 0 96px; } }
 
     .an-logo {
       font-family: var(--an-font); font-weight: 500;
-      font-size: .95rem; letter-spacing: -.01em;
+      font-size: 1rem; letter-spacing: -.01em;
       color: var(--an-ink); text-decoration: none;
       display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
@@ -71,42 +76,45 @@
     }
     .an-link {
       color: var(--an-ink-dim);
-      font-family: var(--an-font); font-weight: 300; font-size: .88rem;
+      font-family: var(--an-font); font-weight: 300; font-size: .9rem;
       text-decoration: none; padding: .5rem .9rem;
       border-radius: 10px; transition: color .15s, background .15s;
       white-space: nowrap; position: relative;
       display: flex; align-items: center;
     }
-    .an-link:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-link:hover { color: var(--an-ink); background: var(--an-bg2); }
     .an-link.active { color: var(--an-ink); font-weight: 500; }
     .an-link.active::after {
       content: ''; position: absolute; left: .9rem; right: .9rem; bottom: 2px;
       height: 2px; border-radius: 2px; background: var(--an-green);
     }
 
-    /* Выделение для ссылки "Сделать заказ" в центре */
+    /* Ссылка "Заказать" — настоящая кнопка, как .btn.btn-green на сайте,
+       не подсвеченный текст. */
     .an-link[href*="order"] {
-      color: var(--an-green);
-      font-weight: 500;
+      background: var(--an-green); color: var(--an-green-ink);
+      font-weight: 500; padding: .6rem 1.2rem; border-radius: 12px;
     }
+    .an-link[href*="order"]:hover { background: var(--an-green-h); }
+    .an-link[href*="order"].active::after { display: none; }
 
     /* ── Кнопка с дропдауном в центре навбара ── */
     .an-nav-drop { position: relative; display: flex; align-items: center; }
     .an-nav-drop-btn {
       color: var(--an-ink-dim);
-      font-family: var(--an-font); font-weight: 300; font-size: .88rem;
+      font-family: var(--an-font); font-weight: 300; font-size: .9rem;
       background: none; border: none; cursor: pointer;
       padding: .5rem .9rem; border-radius: 10px;
       transition: color .15s, background .15s;
       white-space: nowrap; display: flex; align-items: center; gap: 5px;
     }
-    .an-nav-drop-btn:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-nav-drop-btn:hover { color: var(--an-ink); background: var(--an-bg2); }
     .an-nav-drop-btn.active { color: var(--an-ink); font-weight: 500; }
     .an-nav-drop-chevron {
-      width: 10px; height: 10px; opacity: .4; flex-shrink: 0;
+      width: 10px; height: 10px; opacity: .5; flex-shrink: 0;
       transition: transform .18s, opacity .18s;
     }
-    .an-nav-drop-btn[aria-expanded="true"] .an-nav-drop-chevron { transform: rotate(180deg); opacity: .7; }
+    .an-nav-drop-btn[aria-expanded="true"] .an-nav-drop-chevron { transform: rotate(180deg); opacity: .8; }
 
     .an-nav-menu {
       position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(-6px);
@@ -114,7 +122,7 @@
       border: 1.5px solid var(--an-card-border);
       border-radius: 20px; padding: 8px;
       min-width: 220px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+      box-shadow: var(--an-sh2);
       opacity: 0; pointer-events: none;
       transition: opacity .16s ease, transform .16s ease;
       z-index: 8990;
@@ -131,17 +139,17 @@
     .an-nav-menu-item {
       display: flex; align-items: center; gap: 10px;
       padding: 9px 10px; border-radius: 11px;
-      font-size: .84rem; color: var(--an-card-ink); font-weight: 300;
+      font-size: .85rem; color: var(--an-card-ink); font-weight: 300;
       text-decoration: none; transition: background .12s, padding-left .12s;
       white-space: nowrap;
     }
-    .an-nav-menu-item:hover { background: var(--an-green-dim); padding-left: 14px; color: #fff; }
+    .an-nav-menu-item:hover { background: var(--an-green-dim); padding-left: 14px; color: var(--an-ink); }
     .an-nav-menu-ico {
       width: 16px; height: 16px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       color: var(--an-card-muted); transition: color .12s;
     }
-    .an-nav-menu-item:hover .an-nav-menu-ico { color: var(--an-green); }
+    .an-nav-menu-item:hover .an-nav-menu-ico { color: var(--an-green-h); }
     .an-nav-menu-ico svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
     .an-nav-menu-sep { height: 1px; background: var(--an-card-border); margin: 5px 8px; }
     .an-nav-menu-label {
@@ -162,23 +170,23 @@
       text-decoration: none;
       position: relative;
     }
-    .an-user-btn:hover { border-color: var(--an-line); background: rgba(255,255,255,.04); }
+    .an-user-btn:hover { border-color: var(--an-line); background: var(--an-bg2); }
 
-    .an-user-btn.guest { padding: .55rem 1.1rem; border: 1px solid var(--an-line); border-radius: 14px; }
-    .an-user-btn.guest:hover { border-color: rgba(255,255,255,.2); }
+    .an-user-btn.guest { padding: .6rem 1.2rem; border: 1.5px solid var(--an-line); border-radius: 12px; }
+    .an-user-btn.guest:hover { border-color: var(--an-ink-faint); }
     .an-user-btn.guest .an-avatar-ring { display: none; }
     .an-user-btn.guest .an-chevron { display: none; }
 
-    /* Аватар: квадрат со скруглением в духе карточек сайта (border-radius
-       такой же логики, как .tier-badge / .rv-av), на зелёном фоне.
-       Кольцо появляется только когда есть непрочитанное. */
+    /* Аватар: квадрат со скруглением в духе .tier-badge / .rv-av сайта,
+       на зелёном фоне. Кольцо уведомления — отдельный цвет (warn),
+       а не тот же зелёный, иначе на белом фоне его не видно. */
     .an-avatar-ring {
       width: 32px; height: 32px; border-radius: 11px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       position: relative; padding: 2px;
     }
     .an-avatar-ring.notify {
-      background: var(--an-green);
+      background: var(--an-warn);
     }
     .an-avatar {
       width: 100%; height: 100%; border-radius: 9px;
@@ -191,20 +199,20 @@
     .an-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
     .an-uname { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .an-chevron { width: 11px; height: 11px; opacity: .45; flex-shrink: 0; transition: transform .2s; }
+    .an-chevron { width: 11px; height: 11px; opacity: .5; flex-shrink: 0; transition: transform .2s; }
     .an-user-btn[aria-expanded="true"] .an-chevron { transform: rotate(180deg); }
 
-    /* ── Дропдаун: остаётся в тёмной палитре капсулы, на тон светлее
-       (--an-card #20242a поверх --an-bg #191b1e) — так же, как
-       .type-card.dark (dark2 поверх dark) на главной странице.
-       Никакого белого/серого: ховеры и акценты — зелёные. */
+    /* ── Дропдаун профиля: светлая карточка, как .type-card на сайте —
+       --an-card поверх --an-bg, hairline-граница, --an-sh2 вместо
+       тяжёлой чёрной тени. Зелёный — только тонкая полоса сверху и
+       hover-подсветка. */
     .an-dd {
       position: absolute; top: calc(100% + 12px); right: 0;
       background: var(--an-card);
       border: 1.5px solid var(--an-card-border);
       border-radius: 24px; padding: 8px;
       min-width: 248px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
+      box-shadow: var(--an-sh2);
       opacity: 0; pointer-events: none;
       transform: translateY(-6px);
       transform-origin: top right;
@@ -267,13 +275,13 @@
       display: flex; align-items: center; justify-content: center;
       color: var(--an-card-muted); transition: color .12s;
     }
-    .an-dd-item:hover .an-dd-ico { color: var(--an-green); }
-    .an-dd-item:hover { color: #fff; }
+    .an-dd-item:hover .an-dd-ico { color: var(--an-green-h); }
+    .an-dd-item:hover { color: var(--an-ink); }
     .an-dd-item svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .an-dd-item.red .an-dd-ico { color: rgba(255,107,84,0.8); }
+    .an-dd-item.red .an-dd-ico { color: rgba(230,80,60,.7); }
     .an-dd-item.red:hover .an-dd-ico { color: var(--an-danger); }
-    .an-dd-item.red { color: rgba(255,140,122,0.9); }
-    .an-dd-item.red:hover { background: rgba(255,107,84,0.1); color: #ffb3a3; }
+    .an-dd-item.red { color: rgba(230,80,60,.85); }
+    .an-dd-item.red:hover { background: rgba(230,80,60,.08); color: var(--an-danger); }
 
     .an-dd-sep { height: 1px; background: var(--an-card-border); margin: 6px 10px; }
 
@@ -285,24 +293,24 @@
       display: flex; align-items: center; justify-content: center;
       padding: 0 5px; font-family: var(--an-font);
     }
-    .an-dd-badge.warn { background: var(--an-warn); color: #1a1400; }
+    .an-dd-badge.warn { background: var(--an-warn); color: #2b1c00; }
     .an-dd-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
 
     /* ══════════════════════════════════════
-       МОБИЛЬНАЯ ВЕРСИЯ — та же тёмная капсула,
-       только сверху, компактнее, с бургером
-       вместо текстовых ссылок по центру.
-       Заменяет нижний таб-бар из footer.js.
+       МОБИЛЬНАЯ ВЕРСИЯ — тот же флэш-хедер,
+       компактнее, с бургером вместо ссылок.
+       Шторка — продолжение хедера, не плавающая
+       панель, без скруглений сверху.
     ══════════════════════════════════════ */
     .an-burger {
       display: none;
       align-items: center; justify-content: center;
       width: 38px; height: 38px;
-      background: none; border: 1px solid var(--an-line);
+      background: none; border: 1.5px solid var(--an-line);
       border-radius: 12px; cursor: pointer; flex-shrink: 0;
       transition: border-color .15s, background .15s;
     }
-    .an-burger:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
+    .an-burger:hover { border-color: var(--an-ink-faint); background: var(--an-bg2); }
     .an-burger span {
       display: block; width: 16px; height: 1.6px; background: var(--an-ink);
       border-radius: 2px; position: relative; transition: transform .2s, opacity .2s;
@@ -318,52 +326,53 @@
     .an-burger.open span::after  { top: 0; transform: rotate(-45deg); }
 
     .an-mobile-sheet {
-      position: fixed; top: calc(20px + 64px + 10px); left: 50%; transform: translateX(-50%) translateY(-8px);
+      position: fixed; top: 64px; left: 0; right: 0;
       z-index: 8999;
-      width: calc(100% - 40px); max-width: 1100px;
+      width: 100%;
       background: var(--an-bg);
-      border: 1px solid var(--an-line);
-      border-radius: 24px;
-      padding: 10px;
+      border-bottom: 1px solid var(--an-line);
+      padding: 8px 20px 16px;
       display: none;
       flex-direction: column; gap: 2px;
       opacity: 0; pointer-events: none;
+      transform: translateY(-6px);
       transition: opacity .18s ease, transform .18s ease;
       font-family: var(--an-font);
-      box-shadow: 0 16px 40px rgba(0,0,0,.4);
+      box-shadow: var(--an-sh1);
+      max-height: calc(100vh - 64px); overflow-y: auto;
     }
-    .an-mobile-sheet.open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
+    .an-mobile-sheet.open { opacity: 1; pointer-events: all; transform: translateY(0); }
     .an-mobile-link {
       display: block; color: var(--an-ink-dim);
       font-weight: 300; font-size: .95rem;
-      text-decoration: none; padding: 14px 16px;
+      text-decoration: none; padding: 14px 12px;
       border-radius: 14px; transition: background .12s, color .12s;
     }
-    .an-mobile-link:hover, .an-mobile-link.active { color: var(--an-ink); background: rgba(255,255,255,.05); }
+    .an-mobile-link:hover, .an-mobile-link.active { color: var(--an-ink); background: var(--an-bg2); }
     .an-mobile-link.active { font-weight: 500; }
     .an-mobile-cta {
       display: block; text-align: center; margin-top: 4px;
       background: var(--an-green); color: var(--an-green-ink);
       font-weight: 500; font-size: .95rem;
-      text-decoration: none; padding: 14px 16px; border-radius: 14px;
+      text-decoration: none; padding: 14px 16px; border-radius: 12px;
     }
     .an-mobile-section-label {
       font-size: .68rem; font-weight: 500; color: var(--an-ink-faint);
       text-transform: uppercase; letter-spacing: .08em;
-      padding: 12px 16px 4px; font-family: var(--an-font);
+      padding: 12px 12px 4px; font-family: var(--an-font);
     }
-    .an-mobile-sep { height: 1px; background: rgba(255,255,255,.06); margin: 4px 8px; }
+    .an-mobile-sep { height: 1px; background: var(--an-line-soft); margin: 4px 8px; }
 
     @media (max-width: 768px) {
-      .antviz-nav { top: 14px; height: 58px; padding: 0 8px 0 18px; width: calc(100% - 24px); border-radius: 20px; }
-      .an-logo { font-size: .88rem; }
+      .antviz-nav { height: 64px; padding: 0 16px; }
+      .an-logo { font-size: .92rem; }
       .an-logo img { width: 24px; height: 24px; }
       .an-center { display: none; }
       .an-burger { display: flex; }
-      .an-mobile-sheet { display: flex; top: calc(14px + 58px + 8px); }
+      .an-mobile-sheet { display: flex; }
       .an-uname { display: none; }
       .an-user-btn { padding: 5px; }
-      .an-user-btn.guest { padding: .5rem .7rem; }
+      .an-user-btn.guest { padding: .5rem .8rem; }
       .an-user-btn.guest .an-uname { display: inline; max-width: 60px; }
     }
   `;
@@ -519,6 +528,7 @@
 
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
+  <div class="an-inner">
   <a class="an-logo" href="${b || '/'}">
     <img src="${b}img/favicon.png" alt="Antviz">
     Antviz
@@ -551,6 +561,7 @@
 
     ${!cfg.inApp ? `<button class="an-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span></span></button>` : ''}
   </div>
+  </div>
 </nav>
 ${buildMobileSheet()}`;
 
@@ -560,7 +571,7 @@ ${buildMobileSheet()}`;
 
   // Отступ под фиксированный навбар
   const bodyPad = document.createElement('style');
-  bodyPad.textContent = 'body { padding-top: 104px; } @media(max-width:768px){ body { padding-top: 90px; } }';
+  bodyPad.textContent = 'body { padding-top: 80px; } @media(max-width:768px){ body { padding-top: 64px; } }';
   document.head.appendChild(bodyPad);
 
   // Вставляем всю разметку NAV_HTML целиком, чтобы an-mobile-sheet попал в DOM

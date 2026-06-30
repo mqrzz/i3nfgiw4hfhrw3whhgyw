@@ -72,7 +72,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 .ti{padding:16px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative}
 .ti:hover{background:var(--bg2)}
 .ti.sel{background:rgba(30,222,123,.06);border-left:3px solid var(--green)}
-.ti-subj{font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:7px}
+.ti-subj{font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.ti-order-tag{font-size:.66rem;font-weight:500;color:var(--info,#3b82f6);background:rgba(59,130,246,.1);padding:.16rem .5rem;border-radius:6px}
+.ti-order-link{font-size:.74rem;font-weight:500;color:var(--green-d,#149955);text-decoration:none;margin-left:8px}
+.ti-order-link:hover{text-decoration:underline}
 .ti-meta{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px}
 .ti-prev{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ti-time{font-size:.68rem;color:var(--muted);margin-top:3px}
@@ -314,7 +317,7 @@ function renderList(){
   el.innerHTML=list.map(t=>{
     const unread=t.status==='open'&&!t._adminRead;
     return`<div class="ti${t.id===selectedId?' sel':''}" onclick="selectTicket('${t.id}')">
-      <div class="ti-subj">${unread?'<span class="unread"></span>':''}${esc(t.subject||'Без темы')}</div>
+      <div class="ti-subj">${unread?'<span class="unread"></span>':''}${esc(t.subject||'Без темы')}${t.orderLabel?`<span class="ti-order-tag">${esc(t.orderLabel)}</span>`:''}</div>
       <div class="ti-meta">${statusBadge(t.status)}<span>·</span><span>${esc(t.userName||'—')}</span>${t.priority?`<span>·</span>${priLabel(t.priority)}`:''}</div>
       ${t._lastMsg?`<div class="ti-prev">${esc(t._lastMsg)}</div>`:''}
       <div class="ti-time">${fmtDT(t.updatedAt||t.createdAt)}</div>
@@ -326,7 +329,7 @@ window.selectTicket=function(id){
   const ticket=allTickets.find(t=>t.id===id);if(!ticket)return;
   document.getElementById('noSelection').style.display='none';
   const cv=document.getElementById('chatView');cv.style.display='flex';cv.style.flexDirection='column';cv.style.overflow='hidden';cv.style.flex='1';
-  document.getElementById('chatSubject').textContent=`${ticket.topic||''} · ${ticket.subject||''}`.replace(/^ · /,'');
+  document.getElementById('chatSubject').innerHTML=`${esc((`${ticket.topic||''} · ${ticket.subject||''}`).replace(/^ · /,''))}${ticket.orderId?` <a href="/admin/orders?open=${ticket.orderId}" class="ti-order-link" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Заказ')} ↗</a>`:''}`;
   document.getElementById('chatMeta').innerHTML=`<span>${esc(ticket.userName||'—')}</span><span>·</span><span>${esc(ticket.userEmail||'—')}</span><span>·</span><span>${fmtDT(ticket.createdAt)}</span>${ticket.priority?`<span>·</span>${priLabel(ticket.priority)}`:''}`;
   document.getElementById('statusSelect').value=ticket.status||'open';
   updateDoc(doc(db,'tickets',id),{_adminRead:true}).catch(()=>{});

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Уведомления — Antviz</title>
+  <link rel="icon" href="../img/favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --line:#dfe3e8;--line-strong:#cbcdd6;
+  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;
+  --accent-wash:rgba(30,222,123,.12);
+  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.08);
+  --bad:#e8634f;--bad-wash:rgba(232,99,79,.08);
+  --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
+  --dark:#191b1e;--dark2:#2b2f33;
+  --font:'Geologica','Inter','Arial',sans-serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+.loading-text{color:var(--ink-faint);font-size:.75rem}
+
+.shell{width:100%;animation:fadeUp .3s ease}
+
+/* HERO */
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
+.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
+.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:14px 24px;font-size:.86rem;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
+.btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
+.btn:disabled{opacity:.4;cursor:default;transform:none}
+
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
+.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab.is-active{background:var(--dark);color:#fff}
+.mark-all{background:transparent;border:none;color:var(--accent-d);font-family:var(--font);font-size:.8rem;font-weight:500;cursor:pointer;padding:.5rem .2rem;transition:opacity .15s}
+.mark-all:hover{opacity:.7}
+.mark-all:disabled{opacity:.3;cursor:default}
+
+/* LIST */
+.notif-list{border:1.5px solid var(--line);border-radius:40px;overflow:hidden;background:var(--bg)}
+.notif-item{display:flex;align-items:flex-start;gap:16px;padding:24px 32px;border-bottom:1px solid var(--line);animation:rowIn .2s ease both;transition:background .15s;cursor:pointer}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--bg2)}
+.notif-item.unread{background:var(--accent-wash)}
+.notif-item.unread:hover{background:rgba(30,222,123,.18)}
+.notif-ico{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg2)}
+.notif-ico svg{width:18px;height:18px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
+.notif-ico.order{background:var(--dark)}
+.notif-ico.order svg{stroke:var(--accent)}
+.notif-ico.support{background:var(--info-wash)}
+.notif-ico.support svg{stroke:var(--info)}
+.notif-ico.service{background:var(--warn-wash)}
+.notif-ico.service svg{stroke:var(--warn)}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
+.notif-text{font-size:.84rem;color:var(--ink-dim);line-height:1.55;margin-bottom:6px}
+.notif-time{font-size:.72rem;color:var(--ink-faint)}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-h);flex-shrink:0;margin-top:6px}
+
+/* EMPTY */
+.empty{text-align:center;padding:96px 16px}
+.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
+.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
+.empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
+.empty p{font-size:.88rem;color:var(--ink-dim);font-weight:300;line-height:1.6}
+
+@media(max-width:900px){
+  .page-hero{border-radius:32px;padding:40px 36px}
+  .page-hero-title{font-size:2.4rem}
+}
+@media(max-width:600px){
+  .page-hero{border-radius:24px;padding:28px 24px;flex-direction:column;align-items:flex-start}
+  .page-hero-title{font-size:1.9rem}
+  .page-hero>.btn{align-self:flex-start}
+  .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
+  .tabs{overflow-x:auto;max-width:100%;width:100%}
+  .notif-item{padding:18px 20px}
+}
+#sbContent{padding-bottom:80px}
+  </style>
+</head>
+<body>
+<script src="../nav.js" data-page="notifications"></script>
+<script src="../sidebar.js" data-page="notifications"></script>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <span class="loading-text">Загружаю уведомления...</span>
+</div>
+
+<div id="sbContent" style="display:none">
+<div class="shell" id="appWrap">
+
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-eyebrow">Личный кабинет</div>
+      <div class="page-hero-title">Уведомления</div>
+      <div class="page-hero-sub">Статусы заказов, ответы поддержки и обслуживание сайта</div>
+    </div>
+    <button class="btn btn-ghost" id="markAllBtn">
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Прочитать все
+    </button>
+  </div>
+
+  <div class="toolbar">
+    <div class="tabs" id="notifTabs">
+      <button class="tab is-active" data-filter="all">Все</button>
+      <button class="tab" data-filter="unread">Непрочитанные</button>
+      <button class="tab" data-filter="order">Заказы</button>
+      <button class="tab" data-filter="support">Поддержка</button>
+      <button class="tab" data-filter="service">Обслуживание</button>
+    </div>
+  </div>
+
+  <div class="notif-list" id="notifList">
+    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
+  </div>
+
+</div>
+</div>
+
+<script type="module">
+import { auth, db } from '../firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let currentUser = null;
+let allNotifs = [];
+let activeFilter = 'all';
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function fmtTime(ts){
+  if(!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate()-1);
+  if(d >= today) return 'Сегодня · '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  if(d >= yesterday) return 'Вчера · '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('ru',{day:'numeric',month:'long'})+' · '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+}
+
+const ICONS = {
+  order: '<svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
+  support: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+  service: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>',
+};
+
+function notifItem(n){
+  const type = n.type || 'order';
+  const unread = !n.read;
+  const link = n.link || '#';
+  return `<div class="notif-item${unread?' unread':''}" data-type="${type}" data-read="${n.read?1:0}" onclick="openNotif('${n.id}','${link}')">
+    <div class="notif-ico ${type}">${ICONS[type]||ICONS.order}</div>
+    <div class="notif-body">
+      <div class="notif-title">${esc(n.title||'Уведомление')}</div>
+      ${n.text?`<div class="notif-text">${esc(n.text)}</div>`:''}
+      <div class="notif-time">${fmtTime(n.createdAt)}</div>
+    </div>
+    ${unread?'<div class="notif-dot"></div>':''}
+  </div>`;
+}
+
+function render(){
+  const el = document.getElementById('notifList');
+  let filtered = allNotifs;
+  if(activeFilter==='unread') filtered = allNotifs.filter(n=>!n.read);
+  else if(activeFilter!=='all') filtered = allNotifs.filter(n=>(n.type||'order')===activeFilter);
+
+  if(!filtered.length){
+    el.innerHTML = `<div class="empty">
+      <div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+      <h3>${activeFilter==='unread'?'Нет непрочитанных':'Здесь появятся уведомления'}</h3>
+      <p>Статусы заказов и ответы поддержки будут отображаться здесь</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML = filtered.map(notifItem).join('');
+
+  const hasUnread = allNotifs.some(n=>!n.read);
+  document.getElementById('markAllBtn').disabled = !hasUnread;
+}
+
+window.openNotif = async function(id, link){
+  const n = allNotifs.find(x=>x.id===id);
+  if(n && !n.read){
+    try{ await updateDoc(doc(db,'notifications',id),{read:true}); }catch(e){}
+  }
+  if(link && link!=='#') window.location.href = link;
+};
+
+document.getElementById('markAllBtn').addEventListener('click', async ()=>{
+  const unread = allNotifs.filter(n=>!n.read);
+  if(!unread.length) return;
+  try{
+    const batch = writeBatch(db);
+    unread.forEach(n=>batch.update(doc(db,'notifications',n.id),{read:true}));
+    await batch.commit();
+  }catch(e){}
+});
+
+document.getElementById('notifTabs').addEventListener('click', e=>{
+  const btn = e.target.closest('.tab');
+  if(!btn) return;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('is-active', b===btn));
+  activeFilter = btn.dataset.filter;
+  render();
+});
+
+function loadNotifications(uid){
+  const q = query(collection(db,'notifications'), where('uid','==',uid), orderBy('createdAt','desc'), limit(100));
+  onSnapshot(q, snap=>{
+    allNotifs = snap.docs.map(d=>({id:d.id,...d.data()}));
+    render();
+  }, err=>{
+    console.error('Notifications error:', err);
+    allNotifs = [];
+    render();
+  });
+}
+
+onAuthStateChanged(auth, user=>{
+  if(!user){ window.location.href='../auth'; return; }
+  currentUser = user;
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('sbContent').style.display='block';
+  loadNotifications(user.uid);
+});
+</script>
+
+<script src="../footer.js" data-page="notifications"></script>
+<script src="../GEOBLOCK.js"></script>
+<script type="module" src="../maintenance.js"></script>
+</body>
+</html>

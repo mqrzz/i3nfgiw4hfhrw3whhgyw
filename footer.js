@@ -54,20 +54,22 @@
             color: #f0f0f5;
             font-family: 'Unbounded', sans-serif;
             font-weight: 500;
-            font-size: 23px;
+            font-size: 25px;
             letter-spacing: -.02em;
             text-decoration: none;
             transition: color .2s;
+            display: block;
+            width: 100%;
         }
         .antviz-footer .contact-link:hover { color: #a78bfa; }
         .antviz-footer .contact-note {
             display: block;
             color: rgba(255,255,255,.25);
             font-weight: 400;
-            font-size: 17px;
+            font-size: 18px;
             letter-spacing: -.02em;
             margin-top: 6px;
-            max-width: 460px;
+            max-width: 100%;
         }
         
         .antviz-footer .socials {
@@ -114,8 +116,8 @@
             transition: color .18s;
         }
         .antviz-footer .group-items a:hover { color: #f0f0f5; }
-        .antviz-footer .group-items a.cta { color: #cbb8ff; font-weight: 500; }
-        .antviz-footer .group-items a.cta:hover { color: #ddd0ff; }
+        .antviz-footer .group-items a.cta { color: #1ede7b; font-weight: 500; }
+        .antviz-footer .group-items a.cta:hover { color: #1ac16b; }
         
         .antviz-footer .bottom {
             padding-top: 44px;
@@ -227,7 +229,7 @@
                                 </div>
                                 <div class="payment-block" style="display:flex; flex-direction:column; align-items:center;">
                                     <a href="https://www.cloudflare.com/" class="payment-logo" target="_blank" rel="noopener" aria-label="Cloudflare" style="text-decoration:none;">
-                                        <img src="https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.png" alt="Cloudflare" style="height:32px; width:auto; display:block; filter:brightness(0) saturate(100%) invert(11%) sepia(97%) saturate(7489%) hue-rotate(358deg) brightness(98%) contrast(118%);">
+                                        <span style="display:block;width:80px;height:32px;background-color:#f38020;-webkit-mask-image:url('https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.png');mask-image:url('https://logo-teka.com/wp-content/uploads/2026/04/cloudflare-vertical-logo.png');-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;-webkit-mask-position:center;mask-position:center;"></span>
                                     </a>
                                     <span class="payment-label">Под защитой</span>
                                 </div>

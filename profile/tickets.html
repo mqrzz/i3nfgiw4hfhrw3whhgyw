@@ -11,164 +11,203 @@
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
-  --green:#1ede7b;--green-h:#1ac16b;--dark:#191b1e;--dark2:#2b2f33;
-  --bad:#e8634f;--warn:#f59e0b;
+  --line:#dfe3e8;--line-strong:#cbcdd6;
+  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;--accent-wash:rgba(30,222,123,.12);
+  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.1);
+  --bad:#e8634f;--bad-wash:rgba(232,99,79,.1);
+  --dark:#191b1e;--dark2:#2b2f33;
   --font:'Geologica','Inter','Arial',sans-serif;
+  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
 }
 html{scroll-behavior:smooth;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.25;letter-spacing:-.02em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center}
-.spinner{width:24px;height:24px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .65s linear infinite}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
 
 .shell{width:100%;animation:fadeUp .3s ease}
 
 /* HERO */
-.hero{background:var(--dark);border-radius:40px;padding:44px 48px 40px;margin-bottom:16px}
-.hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:12px}
-.hero-title{font-size:clamp(2rem,4vw,3rem);font-weight:500;letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:8px}
-.hero-sub{font-size:.88rem;color:rgba(255,255,255,.3);font-weight:300;line-height:1.5}
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
+.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
+.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
-.btn:hover{transform:translateY(-1px)}
-.btn svg{width:14px;height:14px;flex-shrink:0}
-.btn-green{background:var(--green);color:var(--dark)}
-.btn-green:hover{background:var(--green-h)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,opacity .15s;white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-green{background:var(--accent);color:var(--dark)}
+.btn-green:hover{background:var(--accent-h)}
 .btn-dark{background:var(--dark);color:#fff}
 .btn-dark:hover{background:var(--dark2)}
-.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--muted)}
-.btn-outline:hover{border-color:var(--dark);color:var(--dark)}
-.btn-outline-warn{background:transparent;border:1.5px solid rgba(245,158,11,.35);color:var(--warn)}
-.btn-outline-warn:hover{background:rgba(245,158,11,.08)}
+.btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
+.btn-outline:hover{border-color:var(--accent-h);color:var(--accent-h)}
 .btn-full{width:100%;justify-content:center}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
 
-/* SWITCHER */
+/* SWITCHER (несколько сайтов) */
 .switcher{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
-.sw-btn{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:20px;padding:11px 18px;transition:border-color .15s,background .15s;font-family:var(--font)}
-.sw-btn:hover{border-color:var(--border2)}
-.sw-btn.on{border-color:var(--green);background:rgba(30,222,123,.07)}
-.sw-ico{width:30px;height:30px;border-radius:50%;background:rgba(30,222,123,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sw-ico svg{width:13px;height:13px;stroke:var(--green-h);stroke-width:2;fill:none}
-.sw-btn.warn .sw-ico{background:rgba(245,158,11,.1)}
+.sw-btn{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:11px 18px;transition:border-color .15s,background .15s;font-family:var(--font)}
+.sw-btn:hover{border-color:var(--line-strong)}
+.sw-btn.on{border-color:var(--accent);background:var(--accent-wash)}
+.sw-ico{width:30px;height:30px;border-radius:50%;background:var(--accent-wash);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sw-ico svg{width:13px;height:13px;stroke:var(--accent-h);stroke-width:2;fill:none}
+.sw-btn.warn .sw-ico{background:var(--warn-wash)}
 .sw-btn.warn .sw-ico svg{stroke:var(--warn)}
 .sw-btn.inactive .sw-ico{background:var(--bg2)}
-.sw-btn.inactive .sw-ico svg{stroke:var(--border2)}
+.sw-btn.inactive .sw-ico svg{stroke:var(--line-strong)}
 .sw-btn.inactive{opacity:.7}
-.sw-name{font-size:.88rem;font-weight:500;letter-spacing:-.01em;color:var(--text)}
-.sw-meta{font-size:.72rem;color:var(--muted);font-weight:300}
+.sw-name{font-size:.88rem;font-weight:500;letter-spacing:-.01em;color:var(--ink)}
+.sw-meta{font-size:.72rem;color:var(--ink-faint);font-weight:300}
 
-/* NO ORDERS — type-card style */
-.no-orders-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:0}
-.no-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:28px;padding:40px 36px}
+/* NO ORDERS */
+.no-orders-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.no-card{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;padding:44px}
 .no-card.dark{background:var(--dark);border-color:var(--dark);display:flex;align-items:center;justify-content:center}
-.no-card h2{font-size:clamp(20px,2.5vw,28px);font-weight:500;letter-spacing:-.03em;margin-bottom:12px;line-height:1.1}
-.no-card p{font-size:.88rem;color:var(--muted);font-weight:300;line-height:1.65;margin-bottom:24px}
+.no-card h2{font-size:clamp(20px,2.5vw,30px);font-weight:500;letter-spacing:-.03em;margin-bottom:12px;line-height:1.1}
+.no-card p{font-size:.9rem;color:var(--ink-dim);font-weight:300;line-height:1.65;margin-bottom:24px}
 .no-card-ico svg{width:64px;height:64px;stroke:rgba(255,255,255,.15);stroke-width:.8;fill:none}
 
-/* BUY — type-card style */
-.buy-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.plan-card{background:var(--dark);border-radius:28px;padding:40px 36px}
-.plan-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--green);margin-bottom:20px}
-.plan-price{font-size:clamp(32px,3.5vw,48px);font-weight:500;letter-spacing:-.05em;line-height:1;color:#fff;margin-bottom:6px}
-.plan-per{font-size:16px;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:40px}
-.plan-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:32px}
+/* BUY GRID */
+.buy-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:start}
+.plan-card{background:var(--dark);border-radius:40px;padding:48px 44px}
+.plan-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:20px}
+.plan-price{font-size:clamp(36px,4vw,52px);font-weight:500;letter-spacing:-.05em;line-height:1;color:#fff;margin-bottom:6px}
+.plan-per{font-size:16px;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:36px}
+.plan-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:30px}
 .feat{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px}
 .feat:last-child{margin-bottom:0}
-.feat-ico{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(30,222,123,.12)}
-.feat-ico svg{width:14px;height:14px;stroke:var(--green);stroke-width:1.8;fill:none}
-.feat h4{font-size:.9rem;font-weight:500;color:#fff;margin-bottom:3px;letter-spacing:-.01em}
-.feat p{font-size:.78rem;color:rgba(255,255,255,.3);font-weight:300;line-height:1.5}
-.buy-panel{background:var(--bg3);border:1.5px solid var(--border);border-radius:28px;padding:40px 36px;display:flex;flex-direction:column;gap:0}
+.feat-ico{width:34px;height:34px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--accent-wash)}
+.feat-ico svg{width:15px;height:15px;stroke:var(--accent);stroke-width:1.8;fill:none}
+.feat h4{font-size:.92rem;font-weight:500;color:#fff;margin-bottom:3px;letter-spacing:-.01em}
+.feat p{font-size:.8rem;color:rgba(255,255,255,.32);font-weight:300;line-height:1.55}
+.feat .feat-limit{display:inline-block;margin-top:4px;font-size:.7rem;font-weight:500;color:var(--accent);background:rgba(30,222,123,.12);padding:.18rem .55rem;border-radius:6px}
+
+.buy-panel{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;padding:44px}
 .buy-panel-title{font-size:clamp(18px,2vw,24px);font-weight:500;letter-spacing:-.03em;margin-bottom:8px}
-.buy-panel-sub{font-size:.88rem;color:var(--muted);font-weight:300;line-height:1.6;margin-bottom:28px}
-.order-strip{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:padding-left .15s}
+.buy-panel-sub{font-size:.9rem;color:var(--ink-dim);font-weight:300;line-height:1.6;margin-bottom:24px}
+.order-strip{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding-left .15s}
 .order-strip:last-of-type{border-bottom:none}
 .order-strip:hover{padding-left:8px}
-.order-strip-left{}
 .order-num{font-size:.95rem;font-weight:500;letter-spacing:-.01em;margin-bottom:3px;display:flex;align-items:center;gap:8px}
-.ok-pill{font-size:.62rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .6rem;border-radius:7px;background:rgba(30,222,123,.12);color:var(--green-h);border:1px solid rgba(30,222,123,.25)}
-.order-type{font-size:.8rem;color:var(--muted);font-weight:300}
-.order-arrow{width:16px;height:16px;stroke:var(--border2);stroke-width:2;fill:none;transition:stroke .15s}
-.order-strip:hover .order-arrow{stroke:var(--green-h)}
+.ok-pill{font-size:.62rem;font-weight:500;letter-spacing:.05em;text-transform:uppercase;padding:.2rem .6rem;border-radius:7px;background:var(--accent-wash);color:var(--accent-d);border:1px solid rgba(30,222,123,.25)}
+.order-type{font-size:.8rem;color:var(--ink-dim);font-weight:300}
+.order-arrow{width:16px;height:16px;stroke:var(--line-strong);stroke-width:2;fill:none;transition:stroke .15s}
+.order-strip:hover .order-arrow{stroke:var(--accent-h)}
 
-/* ACTIVE */
-.active-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;align-items:start}
-.status-card{background:var(--bg3);border:1.5px solid var(--border);border-radius:28px;padding:32px;position:sticky;top:24px}
-.status-card.active-state{border-color:rgba(30,222,123,.25)}
-.status-card.warn-state{border-color:rgba(245,158,11,.3)}
+.buy-one-card{background:var(--bg2);border:1.5px solid var(--line-strong);border-radius:20px;padding:18px 22px;margin-bottom:20px}
+
+/* TERMS — условия перед подключением */
+.terms-box{background:var(--bg);border:1.5px solid var(--line);border-radius:20px;padding:20px 22px;margin-bottom:24px}
+.terms-box-title{font-size:.78rem;font-weight:500;color:var(--ink);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.terms-box-title svg{width:14px;height:14px;stroke:var(--accent-h);stroke-width:2;fill:none}
+.terms-list{display:flex;flex-direction:column;gap:9px}
+.terms-item{display:flex;align-items:flex-start;gap:9px;font-size:.81rem;color:var(--ink-dim);line-height:1.55}
+.terms-item svg{width:13px;height:13px;stroke:var(--accent-h);stroke-width:2.2;fill:none;flex-shrink:0;margin-top:2px}
+.terms-check-row{display:flex;align-items:flex-start;gap:10px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line);cursor:pointer}
+.terms-check-row input{margin-top:3px;width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.terms-check-row span{font-size:.8rem;color:var(--ink-dim);line-height:1.5}
+
+/* ACTIVE LAYOUT */
+.active-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:20px;align-items:start}
+.status-card{background:var(--dark);border-radius:40px;padding:40px;position:sticky;top:24px}
 .status-top{display:flex;align-items:center;gap:14px;margin-bottom:32px}
-.status-ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(30,222,123,.12)}
-.status-ico svg{width:20px;height:20px;stroke:var(--green-h);stroke-width:1.7;fill:none}
-.status-card.warn-state .status-ico{background:rgba(245,158,11,.1)}
+.status-ico{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-wash)}
+.status-ico svg{width:21px;height:21px;stroke:var(--accent);stroke-width:1.7;fill:none}
+.status-card.warn-state .status-ico{background:var(--warn-wash)}
 .status-card.warn-state .status-ico svg{stroke:var(--warn)}
-.status-name{font-size:1.05rem;font-weight:500;letter-spacing:-.02em;margin-bottom:3px}
-.status-till{font-size:.8rem;color:var(--muted);font-weight:300}
-.status-site{font-size:.75rem;color:var(--muted);font-weight:300;margin-top:1px}
+.status-name{font-size:1.1rem;font-weight:500;letter-spacing:-.02em;color:#fff;margin-bottom:3px}
+.status-till{font-size:.82rem;color:rgba(255,255,255,.4);font-weight:300}
+.status-site{font-size:.76rem;color:rgba(255,255,255,.25);font-weight:300;margin-top:1px}
 .prog-wrap{margin-bottom:28px}
-.prog-labels{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-bottom:8px;font-weight:300}
-.prog-bar{height:4px;border-radius:99px;background:var(--border2);overflow:hidden}
-.prog-fill{height:100%;background:var(--green);border-radius:99px;transition:width .5s ease}
+.prog-labels{display:flex;justify-content:space-between;font-size:.72rem;color:rgba(255,255,255,.35);margin-bottom:8px;font-weight:300}
+.prog-bar{height:4px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:99px;transition:width .5s ease}
 .prog-fill.warn{background:var(--warn)}
 
+/* LIMIT WIDGET */
+.limit-wrap{margin-bottom:24px;padding:20px 0;border-top:1px solid rgba(255,255,255,.08)}
+.limit-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.limit-label{font-size:.74rem;color:rgba(255,255,255,.4);font-weight:300}
+.limit-num{font-size:.92rem;font-weight:500;color:#fff}
+.limit-num.is-full{color:var(--warn)}
+.limit-bar{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;display:flex;gap:2px}
+.limit-seg{flex:1;border-radius:99px;background:rgba(255,255,255,.1);transition:background .25s}
+.limit-seg.filled{background:var(--accent)}
+.limit-seg.filled.warn{background:var(--warn)}
+.limit-note{font-size:.72rem;color:rgba(255,255,255,.3);font-weight:300;margin-top:10px;line-height:1.5}
+.limit-reached-banner{background:var(--warn-wash);border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:14px 16px;margin-bottom:24px;font-size:.8rem;color:#fff;line-height:1.55;display:flex;gap:10px;align-items:flex-start}
+.limit-reached-banner svg{width:15px;height:15px;stroke:var(--warn);stroke-width:2;fill:none;flex-shrink:0;margin-top:1px}
+
 /* RIGHT COL */
-.right-col{display:flex;flex-direction:column;gap:16px}
-.card{background:var(--bg3);border:1.5px solid var(--border);border-radius:48px;overflow:hidden}
-.card-head{padding:32px 36px 24px;border-bottom:1px solid var(--border)}
-.card-title{font-size:1.05rem;font-weight:500;letter-spacing:-.02em;margin-bottom:5px}
-.card-sub{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.55}
-.card-body{padding:32px 36px}
-.field-g{display:flex;flex-direction:column;gap:14px}
-.field label{display:block;font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px}
-.field input,.field textarea{width:100%;background:#fff;border:1.5px solid var(--border2);border-radius:14px;padding:.82rem 1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s,box-shadow .15s}
-.field input:focus,.field textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
-.field input::placeholder,.field textarea::placeholder{color:var(--muted)}
-.field textarea{resize:vertical;min-height:88px;line-height:1.6}
-.photo-lbl{display:inline-flex;align-items:center;gap:7px;padding:.6rem 1rem;background:#fff;border:1.5px dashed var(--border2);border-radius:12px;font-size:.82rem;color:var(--muted);cursor:pointer;transition:border-color .15s;font-family:var(--font)}
-.photo-lbl:hover{border-color:var(--green);color:var(--text)}
+.right-col{display:flex;flex-direction:column;gap:20px}
+.card{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;overflow:hidden}
+.card-head{padding:36px 40px 24px;border-bottom:1px solid var(--line)}
+.card-title{font-size:1.1rem;font-weight:500;letter-spacing:-.02em;margin-bottom:5px}
+.card-sub{font-size:.84rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
+.card-body{padding:32px 40px 40px}
+.field-g{display:flex;flex-direction:column;gap:16px}
+.field label{display:block;font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:8px}
+.field input,.field textarea{width:100%;background:#fff;border:1.5px solid var(--line-strong);border-radius:14px;padding:.85rem 1.05rem;color:var(--ink);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s,box-shadow .15s}
+.field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
+.field input::placeholder,.field textarea::placeholder{color:var(--ink-faint)}
+.field textarea{resize:vertical;min-height:96px;line-height:1.6}
+.photo-lbl{display:inline-flex;align-items:center;gap:7px;padding:.6rem 1rem;background:#fff;border:1.5px dashed var(--line-strong);border-radius:12px;font-size:.82rem;color:var(--ink-dim);cursor:pointer;transition:border-color .15s;font-family:var(--font)}
+.photo-lbl:hover{border-color:var(--accent);color:var(--ink)}
 .photo-lbl svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
 .previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
-.prev-wrap{position:relative;width:68px;height:68px;border-radius:10px;overflow:hidden;border:1.5px solid var(--border)}
+.prev-wrap{position:relative;width:68px;height:68px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line)}
 .prev-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .prev-rm{position:absolute;top:3px;right:3px;width:16px;height:16px;border-radius:50%;background:rgba(25,27,30,.7);border:none;color:#fff;font-size:9px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 
 /* TICKETS LIST */
 .t-list{display:flex;flex-direction:column}
-.t-item{padding:24px 36px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:8px;overflow:hidden;word-break:break-word}
+.t-item{padding:24px 40px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;overflow:hidden;word-break:break-word;animation:rowIn .2s ease both}
 .t-item:last-child{border-bottom:none}
 .t-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
-.t-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;flex:1}
+.t-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;flex:1;color:var(--ink)}
 .t-pill{font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .6rem;border-radius:7px;white-space:nowrap}
-.t-pill.open{background:rgba(30,222,123,.12);color:var(--green-h);border:1px solid rgba(30,222,123,.25)}
-.t-pill.done{background:var(--bg2);color:var(--muted);border:1px solid var(--border2)}
-.t-desc{font-size:.82rem;color:var(--muted);font-weight:300;line-height:1.6}
-.t-reply{display:flex;align-items:flex-start;gap:9px;background:rgba(30,222,123,.07);border:1px solid rgba(30,222,123,.18);border-radius:12px;padding:12px 14px;font-size:.82rem;color:var(--green-h);line-height:1.55}
+.t-pill.open{background:var(--accent-wash);color:var(--accent-d);border:1px solid rgba(30,222,123,.25)}
+.t-pill.done{background:var(--bg2);color:var(--ink-faint);border:1px solid var(--line-strong)}
+.t-desc{font-size:.84rem;color:var(--ink-dim);font-weight:300;line-height:1.6}
+.t-reply{display:flex;align-items:flex-start;gap:9px;background:var(--accent-wash);border:1px solid rgba(30,222,123,.18);border-radius:14px;padding:14px 16px;font-size:.84rem;color:var(--accent-d);line-height:1.55}
 .t-reply svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0;margin-top:1px}
-.t-date{font-size:.7rem;color:var(--muted);font-weight:300}
-.t-empty{text-align:center;padding:36px;color:var(--muted);font-size:.85rem;font-weight:300}
+.t-date{font-size:.72rem;color:var(--ink-faint);font-weight:300}
+.t-empty{text-align:center;padding:48px;color:var(--ink-faint);font-size:.88rem;font-weight:300}
 
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.5rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;letter-spacing:-.01em}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.5rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--green);color:var(--dark)}
+.toast.success{background:var(--accent);color:var(--dark)}
 .toast.error{background:var(--bad);color:#fff}
 
-@media(max-width:860px){
-  .hero{border-radius:24px;padding:28px 28px 24px;flex-direction:column;align-items:flex-start;gap:12px}
-  .no-orders-grid,.buy-grid,.active-grid{grid-template-columns:1fr;gap:12px}
-  .no-card,.plan-card,.buy-panel,.status-card{border-radius:20px;padding:28px 22px}
-  .status-card{position:static}
-  .card{border-radius:20px}
-  .card-head,.card-body,.t-item{padding:16px 18px}
+@media(max-width:900px){
+  .page-hero{border-radius:32px;padding:40px 36px}
+  .page-hero-title{font-size:2.4rem}
 }
-@media(max-width:480px){
-  .hero{border-radius:18px;padding:22px 20px}
+@media(max-width:860px){
+  .no-orders-grid,.buy-grid,.active-grid{grid-template-columns:1fr;gap:14px}
+  .no-card,.plan-card,.buy-panel,.status-card{border-radius:24px;padding:30px 26px}
+  .status-card{position:static}
+  .card{border-radius:24px}
+  .card-head,.card-body{padding:24px 26px}
+  .t-item{padding:18px 22px}
+}
+@media(max-width:600px){
+  .page-hero{border-radius:24px;padding:28px 24px}
+  .page-hero-title{font-size:1.9rem}
   .switcher{gap:6px}
   .sw-btn{padding:9px 14px}
-  .no-card,.plan-card,.buy-panel{border-radius:16px;padding:20px 18px}
+  .no-card,.plan-card,.buy-panel{border-radius:20px;padding:22px 20px}
 }
 #sbContent{padding-bottom:80px}
   </style>
@@ -179,17 +218,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
 <div id="sbContent" style="display:none">
-<div class="shell">
+<div class="shell" id="appWrap">
 
-  <div class="hero">
-    <div class="hero-eyebrow">Обслуживание</div>
-    <div class="hero-title">Поддержка сайта</div>
-    <div class="hero-sub">Подписка на правки, доработки и приоритетный ответ</div>
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-eyebrow">Личный кабинет</div>
+      <div class="page-hero-title">Обслуживание</div>
+      <div class="page-hero-sub">Подписка на правки, доработки и приоритетный ответ</div>
+    </div>
   </div>
 
   <div id="switcher" class="switcher" style="display:none"></div>
 
-  <div id="secLoad" style="color:var(--muted);font-size:.85rem;padding:20px 0">Загрузка...</div>
+  <div id="secLoad" style="color:var(--ink-faint);font-size:.85rem;padding:20px 0">Загрузка...</div>
 
   <!-- НЕТ ГОТОВЫХ ЗАКАЗОВ -->
   <div id="secNone" style="display:none">
@@ -197,11 +238,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <div class="no-card">
         <h2>Обслуживание сайта</h2>
         <p>Подключите ежемесячную поддержку — и отправляйте заявки на правки, замену контента и доработки без новых заказов.</p>
-        <p style="color:var(--muted);font-size:.88rem;margin-bottom:28px">Для подключения сначала нужен завершённый проект.</p>
-        <a href="../order" class="btn btn-dark">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
-          Оформить сайт
-        </a>
+        <p style="color:var(--ink-dim);font-size:.88rem;margin-bottom:0">Для подключения сначала нужен завершённый проект.</p>
+        <div style="margin-top:24px">
+          <a href="../order" class="btn btn-dark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+            Оформить сайт
+          </a>
+        </div>
       </div>
       <div class="no-card dark">
         <div class="no-card-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
@@ -209,7 +252,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     </div>
   </div>
 
-  <!-- КУПИТЬ (один или все заказы) -->
+  <!-- КУПИТЬ -->
   <div id="secBuy" style="display:none">
     <div class="buy-grid">
       <div class="plan-card">
@@ -217,21 +260,50 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <div class="plan-price">500 ₽</div>
         <div class="plan-per">в месяц · без автопродления</div>
         <div class="plan-divider"></div>
-        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div><div><h4>Правки текстов</h4><p>Изменение любых текстов, заголовков, описаний</p></div></div>
-        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><div><h4>Замена изображений</h4><p>Обновление фотографий и графики</p></div></div>
-        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg></div><div><h4>Стилевые правки</h4><p>Цвета, отступы, шрифты, разметка</p></div></div>
-        <div class="feat"><div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><div><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь</p></div></div>
+        <div class="feat">
+          <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></div>
+          <div><h4>Правки и доработки</h4><p>Тексты, изображения, стили, мелкие доработки разметки</p><span class="feat-limit">до 5 заявок / месяц</span></div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+          <div><h4>Приоритетный ответ</h4><p>Заявки обрабатываются в первую очередь, обычно в течение суток</p></div>
+        </div>
+        <div class="feat">
+          <div class="feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><h4>Срок действия</h4><p>30 дней с момента оплаты, лимит заявок обнуляется при продлении</p></div>
+        </div>
       </div>
+
       <div class="buy-panel">
         <div class="buy-panel-title" id="buyTitle">Выберите проект</div>
         <div class="buy-panel-sub" id="buySub">Обслуживание подключается к конкретному готовому сайту</div>
         <div id="buyList"></div>
-        <div id="buyOneWrap" style="display:none;margin-top:24px">
-          <div style="background:var(--bg2);border:1.5px solid var(--border2);border-radius:16px;padding:16px 20px;margin-bottom:16px">
+
+        <div id="buyOneWrap" style="display:none">
+          <div class="buy-one-card">
             <div class="order-num" id="buyOneName">—</div>
             <div class="order-type" id="buyOneType"></div>
           </div>
-          <button class="btn btn-green btn-full" id="buyOneBtn" onclick="payForSupport(false)">
+
+          <div class="terms-box">
+            <div class="terms-box-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              Условия обслуживания
+            </div>
+            <div class="terms-list">
+              <div class="terms-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>До 5 заявок на правки в течение 30 дней с даты подключения</div>
+              <div class="terms-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>В заявку входят: правки текста, замена изображений, мелкие стилевые правки</div>
+              <div class="terms-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Новые разделы, смена структуры сайта и крупные доработки оцениваются отдельно</div>
+              <div class="terms-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Неиспользованные заявки не переносятся на следующий период</div>
+              <div class="terms-item"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Продление — отдельная оплата, автосписание не подключается</div>
+            </div>
+            <label class="terms-check-row">
+              <input type="checkbox" id="termsCheckbox"/>
+              <span>Я ознакомлен(а) с условиями обслуживания и лимитом заявок</span>
+            </label>
+          </div>
+
+          <button class="btn btn-green btn-full" id="buyOneBtn" onclick="payForSupport(false)" disabled>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
             Подключить за 500 ₽
           </button>
@@ -243,7 +315,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   <!-- АКТИВНО -->
   <div id="secActive" style="display:none">
     <div class="active-grid">
-      <div class="status-card active-state" id="statusCard">
+      <div class="status-card" id="statusCard">
         <div class="status-top">
           <div class="status-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
           <div>
@@ -256,6 +328,16 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           <div class="prog-labels"><span>Начало</span><span id="progLabel">—</span></div>
           <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:100%"></div></div>
         </div>
+
+        <div class="limit-wrap">
+          <div class="limit-head">
+            <span class="limit-label">Заявки в этом периоде</span>
+            <span class="limit-num" id="limitNum">0 / 5</span>
+          </div>
+          <div class="limit-bar" id="limitBar"></div>
+          <div class="limit-note">Лимит обновится при следующем продлении обслуживания</div>
+        </div>
+
         <button class="btn btn-outline btn-full" id="renewBtn" onclick="payForSupport(true)">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
           Продлить · 500 ₽
@@ -269,11 +351,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
             <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить</div>
           </div>
           <div class="card-body">
-            <div class="field-g">
+            <div id="limitReachedBanner" class="limit-reached-banner" style="display:none">
+              <svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>Лимит заявок на этот период исчерпан (5 из 5). Новые заявки станут доступны после продления обслуживания, либо напишите в поддержку для срочного вопроса.</span>
+            </div>
+            <div class="field-g" id="ticketFormFields">
               <div class="field"><label>Тема заявки</label><input id="tTitle" type="text" placeholder="Что нужно сделать?"/></div>
               <div class="field"><label>Описание</label><textarea id="tDesc" placeholder="Подробнее: что изменить, где, как должно выглядеть..."></textarea></div>
               <div class="field">
-                <label>Фото <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--muted)">(необязательно)</span></label>
+                <label>Фото <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--ink-faint)">(необязательно)</span></label>
                 <label class="photo-lbl"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>Прикрепить<input type="file" id="tPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos()"/></label>
                 <div class="previews" id="tPreviews"></div>
               </div>
@@ -306,7 +392,8 @@ import{onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/fireba
 import{collection,query,where,orderBy,getDocs,addDoc,serverTimestamp,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const PAY_URL='https://api-lac-six-78.vercel.app/api/createPayment';
-let cu=null,orders=[],done=[],active=[],sel=null,pendId=null,pendBuyId=null,inFlight=false,photos=[];
+const TICKET_LIMIT=5;
+let cu=null,orders=[],done=[],active=[],sel=null,pendId=null,pendBuyId=null,inFlight=false,photos=[],ticketsThisPeriod=0;
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200)}
@@ -364,7 +451,7 @@ function showBuyAll(){
   document.getElementById('buySub').textContent='Обслуживание подключается к конкретному готовому сайту';
   document.getElementById('buyOneWrap').style.display='none';
   document.getElementById('buyList').innerHTML=done.map(o=>`<div class="order-strip" onclick="requestSupport('${o.id}')">
-    <div class="order-strip-left"><div class="order-num">№ ${o.id.slice(0,8).toUpperCase()} <span class="ok-pill">Готов</span></div><div class="order-type">${olabel(o)}</div></div>
+    <div><div class="order-num">№ ${o.id.slice(0,8).toUpperCase()} <span class="ok-pill">Готов</span></div><div class="order-type">${olabel(o)}</div></div>
     <svg class="order-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
   </div>`).join('');
 }
@@ -378,15 +465,20 @@ function showBuyOne(o){
   document.getElementById('buyOneName').textContent=name;
   document.getElementById('buyOneType').innerHTML=olabel(o);
   document.getElementById('buyOneWrap').style.display='block';
-  const btn=document.getElementById('buyOneBtn');btn.disabled=false;
+  document.getElementById('termsCheckbox').checked=false;
+  const btn=document.getElementById('buyOneBtn');btn.disabled=true;
   btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>Подключить за 500 ₽`;
 }
+
+document.getElementById('termsCheckbox')?.addEventListener('change',function(){
+  document.getElementById('buyOneBtn').disabled=!this.checked;
+});
 
 function showActive(){
   show('secActive');
   const exp=sel.supportExpiresAt.toDate();
   const left=exp-new Date();const dl=Math.ceil(left/(864e5));const pct=Math.max(0,Math.min(100,left/(30*864e5)*100));
-  const card=document.getElementById('statusCard');card.className=`status-card ${dl<=2?'warn-state':'active-state'}`;
+  const card=document.getElementById('statusCard');card.className=`status-card ${dl<=2?'warn-state':''}`;
   const ico=card.querySelector('.status-ico svg');
   if(dl<=2){ico.outerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;}
   document.getElementById('statusName').textContent=dl<=2?'Истекает скоро':'Обслуживание активно';
@@ -401,10 +493,12 @@ function showActive(){
   photos=[];renderPreviews();loadTickets();
 }
 
-window.requestSupport=async function(id){if(inFlight)return;pendId=id;pendBuyId=id;await payForSupport(false);};
+window.requestSupport=async function(id){if(inFlight)return;pendId=id;pendBuyId=id;showBuyOne(done.find(o=>o.id===id));};
 
 window.payForSupport=async function(renew){
-  const id=renew?pendId:pendBuyId||pendId;if(!id){toast('Не найден заказ','error');return;}if(inFlight)return;inFlight=true;pendId=id;
+  const id=renew?pendId:pendBuyId||pendId;if(!id){toast('Не найден заказ','error');return;}if(inFlight)return;
+  if(!renew&&!document.getElementById('termsCheckbox').checked){toast('Подтвердите ознакомление с условиями','error');return;}
+  inFlight=true;pendId=id;
   const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;btn.textContent='Переходим к оплате...';}
   try{const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:id,amount:500,type:'support'})});const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();}
   catch(e){inFlight=false;if(btn){btn.disabled=false;btn.textContent=renew?'Продлить · 500 ₽':'Подключить за 500 ₽';}toast('Не удалось открыть оплату','error');}
@@ -413,8 +507,31 @@ window.payForSupport=async function(renew){
 async function loadTickets(){
   if(!sel)return;const oid=sel.id;
   try{const s=await getDocs(query(collection(db,'service_tickets'),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
-  const ts=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  renderTickets(ts);}catch(e){}
+  const all=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+
+  // Заявки считаем только в рамках текущего периода обслуживания
+  // (период начинается, когда было выставлено supportExpiresAt - 30 дней)
+  let periodStart=null;
+  if(sel.supportExpiresAt){
+    periodStart=new Date(sel.supportExpiresAt.toDate());
+    periodStart.setDate(periodStart.getDate()-30);
+  }
+  const inPeriod=periodStart?all.filter(t=>t.createdAt&&t.createdAt.toDate()>=periodStart):all;
+  ticketsThisPeriod=inPeriod.length;
+  renderLimit();
+  renderTickets(all);}catch(e){}
+}
+
+function renderLimit(){
+  const used=Math.min(ticketsThisPeriod,TICKET_LIMIT);
+  const isFull=ticketsThisPeriod>=TICKET_LIMIT;
+  document.getElementById('limitNum').textContent=`${ticketsThisPeriod} / ${TICKET_LIMIT}`;
+  document.getElementById('limitNum').classList.toggle('is-full',isFull);
+  const bar=document.getElementById('limitBar');
+  bar.innerHTML=Array.from({length:TICKET_LIMIT}).map((_,i)=>`<div class="limit-seg ${i<used?'filled':''} ${isFull?'warn':''}"></div>`).join('');
+  document.getElementById('limitReachedBanner').style.display=isFull?'flex':'none';
+  document.getElementById('ticketFormFields').style.display=isFull?'none':'flex';
+  document.getElementById('submitBtn').disabled=isFull;
 }
 
 function renderTickets(ts){
@@ -439,6 +556,7 @@ function renderPreviews(){const el=document.getElementById('tPreviews');if(!el)r
 window.rmPhoto=function(i){photos.splice(i,1);renderPreviews();};
 
 window.submitTicket=async function(){
+  if(ticketsThisPeriod>=TICKET_LIMIT){toast('Лимит заявок исчерпан','error');return;}
   const title=document.getElementById('tTitle').value.trim(),desc=document.getElementById('tDesc').value.trim();
   if(!title){toast('Введите тему заявки','error');return;}if(!sel){toast('Не выбран сайт','error');return;}
   const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Отправка...';

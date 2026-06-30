@@ -8,296 +8,276 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#fff;--surface:#f9fafc;--surface-2:#f2f4f7;--surface-3:#e9ecf1;
-      --line:#dfe3e8;--line-strong:#cbcdd6;
-      --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
-      --accent:#1ede7b;--accent-soft:#1ac16b;--accent-wash:rgba(30,222,123,.12);
-      --dark:#191b1e;
-      --font:'Geologica','Inter','Arial',sans-serif;
-    }
-    html{scroll-behavior:smooth}
-    body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;font-size:16px;-webkit-font-smoothing:antialiased}
-    @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-    :focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --line:#dfe3e8;--line-strong:#cbcdd6;
+  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;
+  --accent-wash:rgba(30,222,123,.12);
+  --dark:#191b1e;--dark2:#2b2f33;
+  --bad:#e8634f;--warn:#f59e0b;
+  --font:'Geologica','Inter','Arial',sans-serif;
+  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes cFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-    @keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+.loading-text{color:var(--ink-faint);font-size:.75rem}
+.confetti-wrap{position:fixed;inset:0;z-index:9800;pointer-events:none;overflow:hidden}
+.c-piece{position:absolute;top:-10px;border-radius:2px;animation:cFall linear forwards}
 
-    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-    .spinner{width:24px;height:24px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
-    .loading-text{color:var(--ink-faint);font-size:.75rem}
-    .confetti-wrap{position:fixed;inset:0;z-index:1000;pointer-events:none;overflow:hidden}
-    .c-piece{position:absolute;top:-10px;border-radius:2px;animation:cFall linear forwards}
+.shell{width:100%;animation:fadeUp .3s ease}
 
-    /* ── SHELL ── */
-    .ord-shell{width:100%;animation:fadeUp .25s ease}
+/* HERO */
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
+.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
+.page-hero-title em{font-style:normal;color:var(--accent)}
+.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
 
-    /* ── HERO ── */
-    .page-hero{background:var(--dark);border-radius:40px;padding:48px 52px 44px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-    .page-hero-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:14px}
-    .page-hero-title{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:500;letter-spacing:-.05em;line-height:1.02;color:#fff;margin-bottom:8px}
-    .page-hero-title em{color:var(--accent);font-style:normal}
-    .page-hero-sub{color:rgba(255,255,255,.3);font-size:.9rem;font-weight:300}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,opacity .15s;white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-green{background:var(--accent);color:var(--dark)}
+.btn-green:hover{background:var(--accent-h)}
+.btn-dark{background:var(--dark);color:#fff}
+.btn-dark:hover{background:var(--dark2)}
+.btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
+.btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
+.btn-outline:hover{border-color:var(--ink);color:var(--ink);background:var(--bg2)}
+.btn-sm{padding:10px 20px;font-size:.84rem;border-radius:10px}
+.btn:disabled{opacity:.5;cursor:default;transform:none}
 
-    /* ── BUTTONS ── */
-    .btn{display:inline-flex;align-items:center;gap:7px;padding:.8rem 1.5rem;border-radius:14px;font-family:var(--font);font-size:.88rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,transform .12s,opacity .15s,border-color .15s,color .15s;white-space:nowrap}
-    .btn:hover:not(:disabled){transform:translateY(-1px)}
-    .btn svg{width:15px;height:15px;flex-shrink:0;stroke-width:2;fill:none;stroke:currentColor}
-    .btn-primary{background:var(--accent);color:var(--dark)}
-    .btn-primary:hover{background:var(--accent-soft)}
-    .btn-dark{background:var(--dark);color:#fff;border:1.5px solid rgba(255,255,255,.1)}
-    .btn-dark:hover{background:#2a2d32}
-    .btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
-    .btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
-    .btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
-    .btn-outline:hover{border-color:var(--ink);color:var(--ink);background:var(--surface)}
-    .btn-sm{padding:.55rem 1.1rem;font-size:.8rem;border-radius:11px}
-    .btn-lg{padding:1rem 2rem;font-size:1rem;border-radius:16px}
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
+.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.tab:hover{color:var(--ink)}
+.tab.is-active{background:var(--dark);color:#fff}
+.count-label{color:var(--ink-faint);font-size:.76rem}
 
-    /* ── TOOLBAR ── */
-    .ord-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-    .ord-tabs{display:inline-flex;background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
-    .ord-tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
-    .ord-tab:hover{color:var(--ink)}
-    .ord-tab.is-active{background:var(--dark);color:#fff}
-    .ord-count{color:var(--ink-faint);font-size:.76rem}
+/* COLUMNS HEADER */
+.ord-cols{display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;padding:0 32px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
 
-    /* ── LIST ── */
-    .ord-cols{display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;padding:0 28px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
-    .ord-list{border:1.5px solid var(--line);border-radius:28px;overflow:hidden;background:var(--bg)}
-    .ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
-    .ord-row-wrap:last-child{border-bottom:none}
-    .ord-row-wrap.is-filtered{display:none}
+/* LIST */
+.ord-list{border:1.5px solid var(--line);border-radius:40px;overflow:hidden;background:var(--bg)}
+.ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
+.ord-row-wrap:last-child{border-bottom:none}
+.ord-row-wrap.is-filtered{display:none}
+.ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;align-items:center;width:100%;padding:24px 32px;cursor:pointer;transition:background .15s;font-family:var(--font)}
+.ord-row:hover{background:var(--bg2)}
+.ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
+.ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.ord-meta{font-size:.76rem;color:var(--ink-faint)}
 
-    .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;align-items:center;width:100%;padding:22px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
-    .ord-row:hover{background:var(--surface)}
-    .ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
-    .ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
-    .ord-meta{font-size:.76rem;color:var(--ink-faint)}
-    .ord-tags-mobile{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+/* STATUS TAGS */
+.ord-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.3rem .75rem;border-radius:8px;width:fit-content}
+.ord-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.ord-tag.s0{background:var(--bg2);color:var(--ink-dim)}
+.ord-tag.s1{background:var(--dark);color:rgba(255,255,255,.7)}
+.ord-tag.s2{background:var(--dark);color:var(--accent)}
+.ord-tag.s3{background:var(--accent-wash);color:var(--accent-h)}
+.ord-tag.s4{background:var(--dark);color:rgba(255,255,255,.7)}
+.ord-tag.s5{background:var(--accent);color:var(--dark)}
+.ord-tag.s6{background:var(--dark);color:rgba(255,255,255,.6)}
 
-    /* Status tags — только тёмный/белый/зелёный */
-    .ord-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.3rem .7rem;border-radius:8px;width:fit-content}
-    .ord-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .ord-tag.s0{background:var(--surface-3);color:var(--ink-dim)}
-    .ord-tag.s1{background:var(--dark);color:rgba(255,255,255,.7)}
-    .ord-tag.s2{background:var(--dark);color:var(--accent)}
-    .ord-tag.s3{background:var(--accent-wash);color:var(--accent-soft)}
-    .ord-tag.s4{background:var(--dark);color:rgba(255,255,255,.7)}
-    .ord-tag.s5{background:var(--accent);color:var(--dark)}
-    .ord-tag.s6{background:var(--dark);color:rgba(255,255,255,.6)}
+/* PAY STATUS */
+.ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:500}
+.ord-pay.is-paid{color:var(--accent-h)}
+.ord-pay.is-unpaid{color:var(--ink-faint)}
+.ord-pay.is-half{color:var(--ink-dim)}
+.ord-price{font-size:.92rem;font-weight:500;text-align:right;color:var(--ink)}
+.ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
 
-    /* Pay status */
-    .ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:500}
-    .ord-pay.is-paid{color:var(--accent-soft)}
-    .ord-pay.is-unpaid{color:var(--ink-faint)}
-    .ord-pay.is-half{color:var(--ink-dim)}
+/* ── REVIEW CALL-TO-ACTION (inline блок в списке заказов) ── */
+.review-cta{background:var(--dark);border-radius:24px;padding:28px 32px;margin:24px 0 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.review-cta-ico{width:48px;height:48px;border-radius:50%;background:var(--accent-wash);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.review-cta-ico svg{width:22px;height:22px;stroke:var(--accent);stroke-width:1.7;fill:none}
+.review-cta-body{flex:1;min-width:0}
+.review-cta-title{font-size:1rem;font-weight:500;color:#fff;margin-bottom:4px;letter-spacing:-.01em}
+.review-cta-sub{font-size:.84rem;color:rgba(255,255,255,.35);font-weight:300}
 
-    .ord-price{font-size:.92rem;font-weight:500;text-align:right;color:var(--ink)}
-    .ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
+/* ORDER MODAL */
+.ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.ord-modal-overlay.show{opacity:1;pointer-events:all}
+.ord-modal{background:var(--bg);border-radius:48px;width:100%;max-width:1200px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(28px) scale(.97);transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 40px 120px rgba(0,0,0,.3)}
+.ord-modal-overlay.show .ord-modal{transform:translateY(0) scale(1)}
 
-    /* ── ORDER MODAL ── */
-    .ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
-    .ord-modal-overlay.show{opacity:1;pointer-events:all}
-    .ord-modal{background:var(--bg);border-radius:36px;width:100%;max-width:1340px;max-height:94vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(28px) scale(.97);transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 40px 120px rgba(0,0,0,.3),0 0 0 1px rgba(255,255,255,.05)}
-    .ord-modal-overlay.show .ord-modal{transform:translateY(0) scale(1)}
+.ord-modal-header{background:var(--dark);padding:44px 56px 40px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-shrink:0;border-radius:48px 48px 0 0}
+.ord-modal-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
+.ord-modal-title{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:500;letter-spacing:-.04em;color:#fff;line-height:1.05;margin-bottom:14px}
+.ord-modal-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ord-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .75rem;border-radius:8px}
+.ord-chip.status{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
+.ord-chip.status.active{background:var(--accent);color:var(--dark)}
+.ord-chip.paid-yes{background:rgba(30,222,123,.15);color:var(--accent)}
+.ord-chip.paid-half{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
+.ord-chip.paid-no{background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
+.ord-chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.ord-modal-price{font-size:clamp(2rem,3.5vw,3rem);font-weight:500;letter-spacing:-.04em;color:#fff;white-space:nowrap;flex-shrink:0}
+.ord-modal-price small{font-size:.5em;font-weight:300;color:rgba(255,255,255,.3);margin-right:2px}
+.ord-modal-close{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);transition:all .15s;flex-shrink:0}
+.ord-modal-close:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
+.ord-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* Modal header — dark */
-    .ord-modal-header{background:var(--dark);padding:36px 44px 32px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-shrink:0}
-    .ord-modal-header-left{flex:1;min-width:0}
-    .ord-modal-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
-    .ord-modal-title{font-size:clamp(1.6rem,2.8vw,2.4rem);font-weight:500;letter-spacing:-.04em;color:#fff;line-height:1.1;margin-bottom:12px}
-    .ord-modal-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-    .ord-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .7rem;border-radius:8px}
-    .ord-chip.status{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
-    .ord-chip.status.active{background:var(--accent);color:var(--dark)}
-    .ord-chip.paid-yes{background:rgba(30,222,123,.15);color:var(--accent)}
-    .ord-chip.paid-half{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
-    .ord-chip.paid-no{background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
-    .ord-chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-    .ord-modal-price{font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:500;letter-spacing:-.04em;color:#fff;white-space:nowrap;flex-shrink:0}
-    .ord-modal-price small{font-size:.55em;font-weight:300;color:rgba(255,255,255,.3);margin-right:2px}
-    .ord-modal-close{width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.12);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);transition:all .15s;flex-shrink:0;margin-top:2px}
-    .ord-modal-close:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.25);color:#fff}
-    .ord-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.ord-modal-body{display:grid;grid-template-columns:1fr 360px;flex:1;overflow:hidden;min-height:0}
+.ord-modal-left{overflow-y:auto;padding:44px 56px;border-right:1px solid var(--line)}
+.ord-modal-right{overflow-y:auto;padding:36px 40px;display:flex;flex-direction:column;gap:16px;background:var(--bg3)}
 
-    /* Modal body — two columns */
-    .ord-modal-body{display:grid;grid-template-columns:1fr 380px;flex:1;overflow:hidden;min-height:0}
-    .ord-modal-left{overflow-y:auto;padding:36px 44px;border-right:1px solid var(--line)}
-    .ord-modal-right{overflow-y:auto;padding:32px 36px;display:flex;flex-direction:column;gap:16px;background:var(--surface)}
+/* TRACKER */
+.trk{margin-bottom:24px}
+.trk-row{display:flex;gap:16px;min-height:68px}
+.trk-last{min-height:0}
+.trk-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:42px}
+.trk-ball{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;border:2px solid var(--line);background:var(--bg)}
+.trk-ball svg{width:18px;height:18px}
+.trk-ball.done{background:var(--dark);border-color:var(--dark);color:#fff}
+.trk-ball.current{background:var(--accent);border-color:var(--accent);color:var(--dark);box-shadow:0 0 0 6px var(--accent-wash)}
+.trk-ball.pending{color:var(--line-strong)}
+.trk-line{flex:1;width:2px;background:var(--line);margin:4px 0;border-radius:2px;transition:background .3s}
+.trk-line.done{background:var(--dark)}
+.trk-content{padding:8px 0 24px;flex:1;min-width:0}
+.trk-last .trk-content{padding-bottom:4px}
+.trk-step-label{font-size:.92rem;font-weight:500;color:var(--line-strong);display:flex;align-items:center;gap:8px}
+.trk-step-label.done{color:var(--ink-dim)}
+.trk-step-label.current{color:var(--ink)}
+.trk-now{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;background:var(--accent);color:var(--dark);padding:.15rem .55rem;border-radius:6px}
+.trk-step-sub{font-size:.8rem;color:var(--ink-faint);font-weight:300;margin-top:3px}
+.trk-step-date{font-size:.72rem;color:var(--accent-h);font-weight:500;margin-top:4px}
+.trk-step-label.pending+.trk-step-sub{opacity:.4}
 
-    /* ── TRACKER (vertical timeline) ── */
-    .trk{margin-bottom:24px;display:flex;flex-direction:column}
-    .trk-row{display:flex;gap:16px;min-height:64px}
-    .trk-last{min-height:0}
-    .trk-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:40px}
-    .trk-ball{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;border:2px solid var(--line);background:var(--bg)}
-    .trk-ball svg{width:18px;height:18px}
-    .trk-ball.done{background:var(--dark);border-color:var(--dark);color:#fff}
-    .trk-ball.current{background:var(--accent);border-color:var(--accent);color:var(--dark);box-shadow:0 0 0 5px rgba(30,222,123,.18)}
-    .trk-ball.pending{color:var(--line-strong)}
-    .trk-line{flex:1;width:2px;background:var(--line);margin:4px 0;border-radius:2px;transition:background .3s}
-    .trk-line.done{background:var(--dark)}
-    .trk-content{padding:8px 0 20px;flex:1;min-width:0}
-    .trk-last .trk-content{padding-bottom:4px}
-    .trk-step-label{font-size:.9rem;font-weight:500;color:var(--line-strong);line-height:1.3;display:flex;align-items:center;gap:8px}
-    .trk-step-label.done{color:var(--ink-dim)}
-    .trk-step-label.current{color:var(--ink)}
-    .trk-now{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;background:var(--accent);color:var(--dark);padding:.15rem .5rem;border-radius:6px}
-    .trk-step-sub{font-size:.78rem;color:var(--ink-faint);font-weight:300;margin-top:2px}
-    .trk-step-label.done + .trk-step-sub{color:var(--ink-faint)}
-    .trk-step-label.current + .trk-step-sub{color:var(--ink-dim)}
-    .trk-step-label.pending + .trk-step-sub{opacity:.4}
-    .trk-step-date{font-size:.72rem;color:var(--accent-soft);font-weight:500;margin-top:4px;font-variant-numeric:tabular-nums}
+/* DELIVERY CARD */
+.delivery-card{background:var(--dark);border-radius:24px;padding:28px 30px;margin-bottom:0}
+.delivery-card-eyebrow{font-size:.63rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+.site-domain-big{font-size:clamp(16px,2vw,22px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:16px}
 
-    /* ── SUBSTEPS ── */
-    .sub-list{display:flex;flex-direction:column;margin:0 0 24px;border:1.5px solid var(--line);border-radius:18px;overflow:hidden}
-    .sub-item{display:grid;grid-template-columns:32px 1fr auto;gap:14px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
-    .sub-item:last-child{border-bottom:none}
-    .sub-n{font-size:.65rem;font-weight:500;color:var(--line-strong);letter-spacing:.05em}
-    .sub-item.done .sub-n{color:var(--accent-soft)}
-    .sub-lbl{font-size:.88rem;font-weight:300;color:var(--ink-faint)}
-    .sub-item.done .sub-lbl{color:var(--ink)}
-    .sub-date{font-size:.72rem;color:var(--ink-faint);white-space:nowrap}
+/* DOMAIN / STATUS BANNERS */
+.ord-comment{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;padding:16px 20px;background:var(--dark);border-radius:18px;font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.6}
+.ord-comment svg{width:15px;height:15px;stroke:var(--accent);stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none;min-width:15px}
+.ord-eta{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:14px 18px;font-size:.84rem;color:var(--ink-dim);margin-bottom:20px;font-weight:300}
+.ord-eta svg{width:15px;height:15px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;flex-shrink:0}
+.domain-banner{display:flex;align-items:flex-start;gap:12px;background:var(--bg2);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-bottom:16px}
+.domain-banner-ico{width:32px;height:32px;border-radius:9px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.domain-banner-ico svg{width:13px;height:13px;stroke:var(--accent);stroke-width:1.8;fill:none}
+.domain-banner-body{flex:1;min-width:0}
+.domain-banner-title{font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:3px}
+.domain-banner-text{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
+.domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:.76rem;font-weight:500;color:var(--accent-d);text-decoration:none}
+.domain-banner-link:hover{text-decoration:underline}
+.domain-banner-link svg{width:10px;height:10px;stroke:currentColor;stroke-width:2;fill:none}
 
-    /* ── STATUS COMMENT ── */
-    .ord-comment{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;padding:14px 18px;background:var(--dark);border-radius:16px;font-size:.84rem;color:rgba(255,255,255,.6);line-height:1.6}
-    .ord-comment svg{width:15px;height:15px;stroke:var(--accent);stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none;min-width:15px}
+/* PAY BANNERS */
+.pay-gate-banner{background:var(--dark);border-radius:20px;padding:22px 24px}
+.pay-gate-title{font-size:.92rem;font-weight:500;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.pay-gate-title svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.pay-gate-sub{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:16px;font-weight:300;line-height:1.55}
+.pay-remaining-banner{background:var(--accent-wash);border:1.5px solid rgba(30,222,123,.2);border-radius:20px;padding:22px 24px}
+.pay-remaining-title{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.pay-remaining-title svg{width:14px;height:14px;stroke:var(--accent-h);stroke-width:2;fill:none}
+.pay-remaining-sub{font-size:.8rem;color:var(--ink-dim);margin-bottom:16px;font-weight:300;line-height:1.55}
 
-    /* ── ETA ── */
-    .ord-eta{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);border-radius:14px;padding:12px 16px;font-size:.84rem;color:var(--ink-dim);margin-bottom:20px;font-weight:300}
-    .ord-eta svg{width:15px;height:15px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;flex-shrink:0}
+/* ACTIONS */
+.ord-actions-title{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:10px}
+.ord-actions-group{display:flex;flex-direction:column;gap:8px}
+.ord-action-btn{display:flex;align-items:center;gap:12px;width:100%;padding:14px 18px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.86rem;font-weight:400;cursor:pointer;transition:background .15s,border-color .15s;text-decoration:none}
+.ord-action-btn:hover{background:var(--bg2);border-color:var(--line-strong)}
+.ord-action-btn.green{background:var(--accent);border-color:var(--accent);color:var(--dark);font-weight:500}
+.ord-action-btn.green:hover{background:var(--accent-h)}
+.ord-action-btn.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.ord-action-btn.dark:hover{background:var(--dark2)}
+.ord-action-ico{width:36px;height:36px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ord-action-btn.green .ord-action-ico{background:rgba(0,0,0,.1)}
+.ord-action-btn.dark .ord-action-ico{background:rgba(255,255,255,.08)}
+.ord-action-ico svg{width:15px;height:15px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
+.ord-action-btn.green .ord-action-ico svg{stroke:var(--dark)}
+.ord-action-btn.dark .ord-action-ico svg{stroke:rgba(255,255,255,.6)}
 
-    /* ── DELIVERY CARD ── */
-    .delivery-card{background:var(--dark);border-radius:22px;padding:24px 26px;margin-bottom:0}
-    .delivery-card-eyebrow{font-size:.63rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
-    .site-domain-big{font-size:clamp(16px,2vw,22px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:14px}
-    .site-favicon{width:26px;height:26px;border-radius:7px;object-fit:contain;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);margin-bottom:10px}
-    .site-pages-list{display:flex;flex-direction:column;margin-bottom:18px;border-top:1px solid rgba(255,255,255,.08);padding-top:14px}
-    .site-page-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:.82rem;color:rgba(255,255,255,.4);font-weight:300}
-    .site-page-item:last-child{border-bottom:none}
-    .site-page-item svg{width:11px;height:11px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0}
+/* REVIEW MODAL */
+.stars-row{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
+.star{width:38px;height:38px;cursor:pointer;color:var(--line-strong);transition:color .14s,transform .12s}
+.star svg{width:100%;height:100%;fill:currentColor}
+.star.on{color:var(--accent)}
+.star:hover{transform:scale(1.15)}
+.review-textarea{width:100%;background:var(--bg2);border:1.5px solid var(--line-strong);border-radius:14px;padding:.82rem 1rem;color:var(--ink);font-family:var(--font);font-size:.9rem;outline:none;resize:vertical;min-height:96px;margin-bottom:18px;transition:border-color .18s}
+.review-textarea:focus{border-color:var(--accent)}
+.review-textarea::placeholder{color:var(--ink-faint)}
 
-    /* ── DOMAIN BANNER ── */
-    .domain-banner{display:flex;align-items:flex-start;gap:12px;background:var(--surface-2);border:1.5px solid var(--line);border-radius:16px;padding:14px 16px;margin-bottom:16px}
-    .domain-banner-ico{width:30px;height:30px;border-radius:8px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .domain-banner-ico svg{width:13px;height:13px;stroke:var(--accent);stroke-width:1.8;fill:none}
-    .domain-banner-body{flex:1;min-width:0}
-    .domain-banner-title{font-size:.8rem;font-weight:500;color:var(--ink);margin-bottom:3px}
-    .domain-banner-text{font-size:.76rem;color:var(--ink-dim);line-height:1.55}
-    .domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:5px;font-size:.76rem;font-weight:500;color:var(--accent-soft);text-decoration:none}
-    .domain-banner-link:hover{text-decoration:underline}
-    .domain-banner-link svg{width:10px;height:10px;stroke:currentColor;stroke-width:2;fill:none}
+/* DELIVERY MODAL */
+.delivery-inner{background:var(--dark);border-radius:20px;padding:22px 24px;margin-bottom:20px}
+.delivery-site-name{font-size:1.1rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:4px}
+.delivery-site-url{font-size:.8rem;color:rgba(255,255,255,.3);font-weight:300}
 
-    /* ── PAY BANNERS ── */
-    .pay-remaining-banner{background:var(--accent-wash);border:1.5px solid rgba(30,222,123,.2);border-radius:18px;padding:18px 20px}
-    .pay-remaining-title{font-size:.9rem;font-weight:500;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:7px}
-    .pay-remaining-title svg{width:14px;height:14px;stroke:var(--accent-soft);stroke-width:2;fill:none}
-    .pay-remaining-sub{font-size:.78rem;color:var(--ink-dim);margin-bottom:14px;font-weight:300;line-height:1.55}
-    .btn-pay-remaining{background:var(--dark);color:#fff;border:none;font-family:inherit;font-size:.85rem;font-weight:500;padding:.7rem 1.3rem;border-radius:12px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
-    .btn-pay-remaining:hover{background:#2a2d32;transform:translateY(-1px)}
-    .btn-pay-remaining svg{width:14px;height:14px;stroke:var(--accent);stroke-width:2;fill:none}
+/* BANNER */
+.ord-banner{position:fixed;top:86px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:400;background:var(--dark);border:1.5px solid rgba(255,255,255,.1);border-radius:20px;padding:.6rem 1rem .6rem .9rem;display:flex;align-items:center;gap:10px;font-size:.83rem;color:rgba(255,255,255,.8);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.ord-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
+.ord-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.ord-banner-close{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;padding:0;display:flex;transition:color .15s}
+.ord-banner-close:hover{color:#fff}
+.ord-banner-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 
-    .pay-gate-banner{background:var(--dark);border-radius:18px;padding:18px 20px}
-    .pay-gate-title{font-size:.9rem;font-weight:500;color:var(--accent);margin-bottom:4px;display:flex;align-items:center;gap:7px}
-    .pay-gate-title svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
-    .pay-gate-sub{font-size:.78rem;color:rgba(255,255,255,.4);margin-bottom:14px;font-weight:300;line-height:1.55}
-    .btn-pay-gate{background:var(--accent);color:var(--dark);border:none;font-family:inherit;font-size:.88rem;font-weight:500;padding:.75rem 1.4rem;border-radius:12px;cursor:pointer;transition:background .15s,transform .12s;display:flex;align-items:center;justify-content:center;gap:8px;width:100%}
-    .btn-pay-gate:hover{background:var(--accent-soft);transform:translateY(-1px)}
-    .btn-pay-gate svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--accent);color:var(--dark)}
+.toast.error{background:var(--dark);color:#fff}
+.toast.info{background:var(--dark);color:#fff}
 
-    /* ── ACTIONS (right column) ── */
-    .ord-actions-title{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:10px}
-    .ord-action-btn{display:flex;align-items:center;gap:10px;width:100%;padding:12px 16px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-family:inherit;font-size:.85rem;font-weight:400;cursor:pointer;transition:background .15s,border-color .15s;text-decoration:none}
-    .ord-action-btn:hover{background:var(--surface);border-color:var(--line-strong)}
-    .ord-action-btn.green{background:var(--accent);border-color:var(--accent);color:var(--dark);font-weight:500}
-    .ord-action-btn.green:hover{background:var(--accent-soft);border-color:var(--accent-soft)}
-    .ord-action-btn.dark{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:400}
-    .ord-action-btn.dark:hover{background:#2a2d32;border-color:#2a2d32}
-    .ord-action-ico{width:34px;height:34px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .ord-action-btn.green .ord-action-ico{background:rgba(0,0,0,.12)}
-    .ord-action-btn.dark .ord-action-ico{background:rgba(255,255,255,.07)}
-    .ord-action-ico svg{width:15px;height:15px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
-    .ord-action-btn.green .ord-action-ico svg{stroke:var(--dark)}
-    .ord-action-btn.dark .ord-action-ico svg{stroke:rgba(255,255,255,.6)}
-    .ord-actions-group{display:flex;flex-direction:column;gap:8px}
+/* MODAL shared */
+.modal-overlay{position:fixed;inset:0;z-index:9600;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--bg);border:1.5px solid var(--line);border-radius:40px;padding:44px 40px;width:100%;max-width:440px;transform:translateY(20px) scale(.97);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.2)}
+.modal-overlay.show .modal{transform:translateY(0) scale(1)}
+.modal-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;background:var(--dark)}
+.modal-icon svg{width:24px;height:24px;stroke:var(--accent);stroke-width:1.7;fill:none}
+.modal h3{font-size:1.2rem;font-weight:500;letter-spacing:-.02em;margin-bottom:8px;text-align:center}
+.modal-p{color:var(--ink-dim);font-size:.88rem;text-align:center;margin-bottom:24px;line-height:1.6}
+.modal-btns{display:flex;gap:10px}
+.modal-btns .btn{flex:1;justify-content:center}
 
-    /* ── EMPTY ── */
-    .empty{text-align:center;padding:80px 16px;color:var(--ink-faint)}
-    .empty-icon{margin-bottom:20px;display:flex;justify-content:center}
-    .empty-icon svg{width:52px;height:52px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
-    .empty h3{font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:8px}
-    .empty p{font-size:.86rem;margin-bottom:24px}
+/* EMPTY */
+.empty{text-align:center;padding:96px 16px}
+.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
+.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
+.empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
+.empty p{font-size:.88rem;color:var(--ink-dim);margin-bottom:24px;font-weight:300;line-height:1.6}
 
-    /* ── TOAST ── */
-    .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--accent);color:var(--dark)}
-    .toast.error{background:var(--dark);color:#fff}
-    .toast.info{background:var(--dark);color:#fff}
-
-    /* ── REVIEW MODAL ── */
-    .modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(15,17,20,.8);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-    .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:var(--bg);border:1.5px solid var(--line);border-radius:28px;padding:36px 32px;width:100%;max-width:420px;transform:translateY(14px) scale(.98);transition:transform .22s}
-    .modal-overlay.show .modal{transform:translateY(0) scale(1)}
-    .modal-icon-wrap{width:52px;height:52px;border-radius:50%;background:var(--dark);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
-    .modal-icon-wrap svg{width:22px;height:22px;stroke:var(--accent);stroke-width:1.7;fill:none}
-    .modal h3{font-size:1.15rem;font-weight:500;margin-bottom:8px;text-align:center;color:var(--ink)}
-    .modal-p{color:var(--ink-dim);font-size:.86rem;text-align:center;margin-bottom:22px;line-height:1.6}
-    .modal-btns{display:flex;gap:10px;margin-top:4px}
-    .modal-btns .btn{flex:1;justify-content:center}
-    .stars-row{display:flex;justify-content:center;gap:10px;margin-bottom:18px}
-    .star{width:34px;height:34px;cursor:pointer;color:var(--line-strong);transition:color .14s,transform .12s}
-    .star svg{width:100%;height:100%;fill:currentColor}
-    .star.on{color:var(--accent)}
-    .star:hover{transform:scale(1.12)}
-    .review-textarea{width:100%;background:var(--surface-2);border:1.5px solid var(--line-strong);border-radius:12px;padding:.75rem .9rem;color:var(--ink);font-family:var(--font);font-size:.88rem;outline:none;resize:vertical;min-height:88px;margin-bottom:16px;transition:border-color .18s}
-    .review-textarea:focus{border-color:var(--accent)}
-    .review-textarea::placeholder{color:var(--ink-faint)}
-
-    /* ── DELIVERY MODAL ── */
-    .delivery-modal-inner{background:var(--dark);border-radius:22px;padding:22px 24px;margin-bottom:20px}
-    .delivery-site-name{font-size:1.1rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
-    .delivery-site-url{font-size:.8rem;color:rgba(255,255,255,.35);font-weight:300}
-
-    /* ── BANNER ── */
-    .ord-banner{position:fixed;top:82px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:300;background:var(--dark);border:1.5px solid rgba(255,255,255,.1);border-radius:20px;padding:.6rem 1rem .6rem .9rem;display:flex;align-items:center;gap:10px;font-size:.83rem;font-weight:400;color:rgba(255,255,255,.8);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.2)}
-    .ord-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
-    .ord-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
-    .ord-banner-close{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;padding:0;display:flex;transition:color .15s}
-    .ord-banner-close:hover{color:#fff}
-    .ord-banner-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
-
-    /* ── MOBILE ── */
-    @media(max-width:900px){
-      .page-hero{border-radius:24px;padding:28px 24px 24px}
-      .page-hero-title{font-size:1.9rem}
-      .ord-modal-body{grid-template-columns:1fr}
-      .ord-modal-right{border-top:1px solid var(--line);border-right:none}
-      .ord-modal{max-height:95vh}
-      .ord-cols{display:none}
-      .ord-row{grid-template-columns:1fr;gap:4px;padding:18px 20px;padding-right:48px;position:relative}
-      .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
-      .ord-chevron{position:absolute;top:50%;right:18px;transform:translateY(-50%)}
-      .trk-steps{flex-wrap:wrap;gap:12px}
-      .trk-steps::before{display:none}
-    }
-    @media(max-width:480px){
-      .page-hero{border-radius:18px;padding:22px 18px}
-      .page-hero-title{font-size:1.6rem}
-      .ord-toolbar{flex-direction:column;align-items:flex-start;gap:10px}
-      .ord-tabs{overflow-x:auto;max-width:100%;width:100%}
-      .ord-modal-header{padding:22px 20px 18px}
-      .ord-modal-left{padding:20px}
-      .ord-modal-right{padding:18px 20px}
-    }
-    #sbContent{padding-bottom:80px}
+/* MOBILE */
+@media(max-width:900px){
+  .page-hero{border-radius:32px;padding:40px 36px}
+  .page-hero-title{font-size:2.4rem}
+  .ord-modal-body{grid-template-columns:1fr}
+  .ord-modal-right{border-top:1px solid var(--line);border-right:none}
+  .ord-modal{max-height:95vh}
+  .ord-cols{display:none}
+  .ord-row{grid-template-columns:1fr;gap:4px;padding:20px 24px;padding-right:52px;position:relative}
+  .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
+  .ord-chevron{position:absolute;top:50%;right:20px;transform:translateY(-50%)}
+}
+@media(max-width:600px){
+  .page-hero{border-radius:24px;padding:28px 24px}
+  .page-hero-title{font-size:1.9rem}
+  .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
+  .tabs{overflow-x:auto;max-width:100%;width:100%}
+  .ord-modal-header{padding:28px 24px 24px;border-radius:32px 32px 0 0}
+  .ord-modal-left{padding:24px}
+  .ord-modal-right{padding:20px 24px}
+  .ord-modal{border-radius:32px}
+  .review-cta{border-radius:18px;padding:20px 22px}
+}
+#sbContent{padding-bottom:80px}
   </style>
 </head>
 <body>
@@ -321,7 +301,7 @@
 <!-- REVIEW MODAL -->
 <div class="modal-overlay" id="reviewModal">
   <div class="modal">
-    <div class="modal-icon-wrap">
+    <div class="modal-icon">
       <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
     </div>
     <h3>Оставить отзыв</h3>
@@ -336,7 +316,7 @@
     <textarea class="review-textarea" id="reviewText" placeholder="Пару слов о сотрудничестве (необязательно)..."></textarea>
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeReview()">Позже</button>
-      <button class="btn btn-primary" onclick="submitReview()">Отправить</button>
+      <button class="btn btn-green" onclick="submitReview()">Отправить</button>
     </div>
   </div>
 </div>
@@ -344,7 +324,7 @@
 <!-- DELIVERY MODAL -->
 <div class="modal-overlay" id="deliveryModal">
   <div class="modal">
-    <div class="modal-icon-wrap">
+    <div class="modal-icon">
       <svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
     </div>
     <h3>Ваш сайт готов!</h3>
@@ -352,7 +332,7 @@
     <div id="deliveryModalContent"></div>
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeDelivery()">Закрыть</button>
-      <a class="btn btn-primary" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть сайт →</a>
+      <a class="btn btn-green" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть сайт →</a>
     </div>
   </div>
 </div>
@@ -361,7 +341,7 @@
 <div class="ord-modal-overlay" id="ordModalOverlay">
   <div class="ord-modal">
     <div class="ord-modal-header">
-      <div class="ord-modal-header-left">
+      <div style="flex:1;min-width:0">
         <div class="ord-modal-eyebrow">Antviz · Детали заказа</div>
         <div class="ord-modal-title" id="ordModalTitle"></div>
         <div class="ord-modal-chips" id="ordModalChips"></div>
@@ -381,10 +361,10 @@
 </div>
 
 <div id="sbContent" style="display:none">
-<div class="ord-shell" id="appWrap">
+<div class="shell" id="appWrap">
 
   <div class="page-hero">
-    <div class="page-hero-left">
+    <div>
       <div class="page-hero-eyebrow">Личный кабинет</div>
       <div class="page-hero-title">Мои <em>заказы</em></div>
       <div class="page-hero-sub">Статусы, документы и история работ</div>
@@ -395,21 +375,21 @@
     </a>
   </div>
 
-  <div class="ord-toolbar">
-    <div class="ord-tabs" id="ordTabs">
-      <button class="ord-tab is-active" data-filter="all">Все</button>
-      <button class="ord-tab" data-filter="active">Активные</button>
-      <button class="ord-tab" data-filter="done">Завершено</button>
-      <button class="ord-tab" data-filter="unpaid">Не оплачены</button>
+  <div class="toolbar">
+    <div class="tabs" id="ordTabs">
+      <button class="tab is-active" data-filter="all">Все</button>
+      <button class="tab" data-filter="active">Активные</button>
+      <button class="tab" data-filter="done">Завершено</button>
+      <button class="tab" data-filter="unpaid">Не оплачены</button>
     </div>
-    <span class="ord-count" id="ordCount"></span>
+    <span class="count-label" id="ordCount"></span>
   </div>
 
   <div class="ord-cols">
     <span>Заказ</span><span>Статус</span><span>Оплата</span><span>Сумма</span><span></span>
   </div>
   <div class="ord-list" id="ordersList">
-    <div style="padding:24px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
+    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
   </div>
 
 </div>
@@ -418,103 +398,63 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, getDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
-const STATUS_SUBS   = ['Заявка получена, скоро свяжемся','Уточняем детали проекта','Ведётся активная разработка','Отправлено на ваше согласование','Вносим правки по вашим пожеланиям','Проект завершён и сдан','Проект готов — ожидаем оплату остатка'];
 
-const STEP_ICONS = [
-  `<svg class="step-icon" viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>`,
-  `<svg class="step-icon" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
-  `<svg class="step-icon" viewBox="0 0 24 24" fill="none"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-  `<svg class="step-icon" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-  `<svg class="step-icon" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
-  `<svg class="step-icon" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-];
-const INFO_ICONS = [
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>`,
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`,
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>`,
-  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
-];
-const INFO_COLORS = ['var(--surface-3)','var(--surface-2)','var(--dark)','var(--accent-wash)','var(--surface-2)','var(--accent-wash)'];
-const INFO_STROKE = ['var(--ink-faint)','var(--ink-dim)','var(--accent)','var(--accent-soft)','var(--ink-dim)','var(--accent)'];
-const CHECK_SVG = `<svg class="check-icon" viewBox="0 0 24 24" fill="none"><polyline points="20 6 9 17 4 12"/></svg>`;
-
-let currentUser = null, unsubOrders = null, unsubChat = null;
-let lastStatuses = {}, reviewOrderId = null, reviewStars = 0, bannerTimer = null;
+let currentUser = null, unsubOrders = null;
+let allOrders = [], lastStatuses = {}, reviewOrderId = null, reviewStars = 0, bannerTimer = null;
 let isInitialLoad = true;
 
-function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function toast(msg, type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
-function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
+function fmtDate(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
+function fmtFull(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
 function getEstimate(pkg,extras=[],status=0){
-  if(status>=5) return null;
-  const urgent = (extras||[]).includes('urgent');
-  // Диапазон дней по тарифу
-  const ranges = {'Старт':[1,2],'Рост':[2,5],'Масштаб':[5,14]};
-  const [minD, maxD] = ranges[pkg] || [2,7];
-  if(urgent) {
-    const d=new Date(); d.setDate(d.getDate()+1);
-    return d.toLocaleDateString('ru',{day:'numeric',month:'long'});
-  }
-  const dMin=new Date(); dMin.setDate(dMin.getDate()+minD);
-  const dMax=new Date(); dMax.setDate(dMax.getDate()+maxD);
-  const fmt = d=>d.toLocaleDateString('ru',{day:'numeric',month:'long'});
+  if(status>=5)return null;
+  const urgent=(extras||[]).includes('urgent');
+  const ranges={'Старт':[1,2],'Рост':[2,5],'Масштаб':[5,14]};
+  const [minD,maxD]=ranges[pkg]||[2,7];
+  if(urgent){const d=new Date();d.setDate(d.getDate()+1);return d.toLocaleDateString('ru',{day:'numeric',month:'long'})}
+  const dMin=new Date();dMin.setDate(dMin.getDate()+minD);
+  const dMax=new Date();dMax.setDate(dMax.getDate()+maxD);
+  const fmt=d=>d.toLocaleDateString('ru',{day:'numeric',month:'long'});
   return fmt(dMin)+' — '+fmt(dMax);
 }
 
-function showBanner(text){clearTimeout(bannerTimer);document.getElementById('bannerText').textContent=text;document.getElementById('statusBanner').classList.add('show');bannerTimer=setTimeout(closeBanner,6500);}
+function showBanner(text){clearTimeout(bannerTimer);document.getElementById('bannerText').textContent=text;document.getElementById('statusBanner').classList.add('show');bannerTimer=setTimeout(closeBanner,6500)}
 window.closeBanner=()=>document.getElementById('statusBanner').classList.remove('show');
 
+// ══ TRACKER ══
 function buildTracker(o){
-  const s = o.status || 0;
-  // История статусов — если есть — массив {status, at}
-  const hist = o.statusHistory || [];
+  const s=o.status||0;
+  const hist=o.statusHistory||[];
   function histDate(idx){
-    // Для шага 0 всегда берём createdAt
-    if(idx===0 && o.createdAt){
-      const d = o.createdAt.toDate ? o.createdAt.toDate() : new Date(o.createdAt);
-      return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
-    }
-    const h = hist.find(x=>x.status===idx);
-    if(!h) return null;
-    const d = h.at?.toDate ? h.at.toDate() : new Date(h.at);
-    return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+    if(idx===0&&o.createdAt)return fmtFull(o.createdAt);
+    const h=hist.find(x=>x.status===idx);
+    if(!h)return null;
+    return fmtFull(h.at);
   }
-  // Filled SVG иконки — объёмные, не stroke
-  const icons = [
-    // 0 Новая заявка — ClipboardList (Lucide)
-    '<rect width="8" height="4" x="8" y="2" rx="1" ry="1" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 11h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M12 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 11h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    // 1 Обсуждение — MessageSquare (Lucide)
+  const icons=[
+    '<rect width="8" height="4" x="8" y="2" rx="1" stroke="currentColor" stroke-width="2" fill="none"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     '<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>',
-    // 2 В работе — Wrench (Lucide)
-    '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
-    // 3 На проверке — Search (Lucide)
+    '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
     '<path d="m21 21-4.34-4.34" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2" fill="none"/>',
-    // 4 Правки — Pencil (Lucide)
-    '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="m15 5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    // 5 Готово — ShieldCheck (Lucide)
-    '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
+    '<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/><path d="m15 5 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" stroke="currentColor" stroke-width="2" fill="none"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   ];
-  const labels = ['Заявка принята','Обсуждение','В работе','На проверке','Правки','Готово'];
-  const subs   = ['Заявка получена и зарегистрирована','Уточняем детали проекта','Ведётся активная разработка','Отправлено на ваше согласование','Вносим правки по пожеланиям','Проект завершён и сдан'];
-
-  const stepsHtml = icons.map((ico, i) => {
-    const state = i < s ? 'done' : i === s ? 'current' : 'pending';
-    const dateStr = (state === 'done' || state === 'current') ? histDate(i) : null;
-    const isLast = i === icons.length - 1;
-    return '<div class="trk-row '+(isLast?'trk-last':'')+'">'
+  const labels=['Заявка принята','Обсуждение','В работе','На проверке','Правки','Готово'];
+  const subs=['Заявка получена и зарегистрирована','Уточняем детали проекта','Ведётся активная разработка','Отправлено на ваше согласование','Вносим правки по пожеланиям','Проект завершён и сдан'];
+  return '<div class="trk">'+icons.map((ico,i)=>{
+    const state=i<s?'done':i===s?'current':'pending';
+    const dateStr=(state==='done'||state==='current')?histDate(i):null;
+    const isLast=i===icons.length-1;
+    return '<div class="trk-row'+(isLast?' trk-last':'')+'">'
       +'<div class="trk-left">'
-        +'<div class="trk-ball '+state+'">'
-          +'<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">'+ico+'</svg>'
-        +'</div>'
-        +(!isLast?'<div class="trk-line '+(i<s?'done':'')+'"></div>':'')
+        +'<div class="trk-ball '+state+'"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">'+ico+'</svg></div>'
+        +(!isLast?'<div class="trk-line'+(i<s?' done':'')+'"></div>':'')
       +'</div>'
       +'<div class="trk-content">'
         +'<div class="trk-step-label '+state+'">'+labels[i]+(state==='current'?' <span class="trk-now">сейчас</span>':'')+'</div>'
@@ -522,334 +462,205 @@ function buildTracker(o){
         +(dateStr?'<div class="trk-step-date">'+dateStr+'</div>':'')
       +'</div>'
       +'</div>';
-  }).join('');
-  return '<div class="trk">'+stepsHtml+'</div>';
+  }).join('')+'</div>';
 }
 
-function buildSubsteps(o){
-  const ss = o.substeps || [];
-  if (!ss.length) return '';
-  return `<div class="sub-list">${ss.map((s,i)=>`
-    <div class="sub-item ${s.done?'done':''}">
-      <div class="sub-n">${String(i+1).padStart(2,'0')}</div>
-      <span class="sub-lbl">${s.label}</span>
-      <span class="sub-date">${s.done&&s.date?s.date:''}</span>
-    </div>`).join('')}</div>`;
+function buildDomainBanner(o){
+  const extras=o.extras||[];
+  const hasReg=extras.includes('domain_reg')||(extras.includes('domain')&&o.domainOption!=='own');
+  const hasOwn=extras.includes('domain_own')||(extras.includes('domain')&&o.domainOption==='own')||o.domainOption==='own';
+  if(hasReg)return`<div class="domain-banner"><div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="domain-banner-body"><div class="domain-banner-title">Домен: покупка на рег.ру</div><div class="domain-banner-text">После оплаты на рег.ру напишите в поддержку — подключим бесплатно.</div><a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Инструкция →</a></div></div>`;
+  if(hasOwn){const dn=o.domainName?'<strong>'+esc(o.domainName)+'</strong> — ':'';return`<div class="domain-banner"><div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="domain-banner-body"><div class="domain-banner-title">Домен: подключение</div><div class="domain-banner-text">${dn}напишите в поддержку — скажем какие DNS прописать.</div><a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Инструкция →</a></div></div>`;}
+  return'';
 }
 
+// ══ ORDER CARD (строка в списке) ══
 function orderCard(o){
-  const s = o.status || 0;
-  const paid = o.paid || false;
-  const isPartialCard = o.paymentType === 'partial';
-  const paidAmtCard = o.paidAmount || 0;
-  const fullyPaidCard = paid || (isPartialCard && paidAmtCard >= (o.totalPrice||0));
-  const halfPaidCard = isPartialCard && paidAmtCard > 0 && !fullyPaidCard;
-  const payLabelCard = fullyPaidCard ? 'Оплачен' : (halfPaidCard ? '50% оплачено' : 'Не оплачен');
-  const payClassCard = fullyPaidCard ? 'is-paid' : (halfPaidCard ? 'is-half' : 'is-unpaid');
-  const estDate = getEstimate(o.package, o.extras, s);
-  const hasSite = s >= 5 && (o.siteUrl || o.siteDomain);
-  let siteBlock = '';
-  if(hasSite){
-    const siteHref = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : (o.siteDomain ? 'https://'+o.siteDomain : '#');
-    const pages = (o.sitePages||'').split('\n').filter(Boolean);
-    siteBlock = `<div class="delivery-card">
-      <div class="delivery-card-eyebrow">Ваш сайт</div>
-      ${o.siteFaviconUrl?`<img class="site-favicon" src="${o.siteFaviconUrl}" alt=""/>`:''}
-      ${o.siteDomain?`<div class="site-domain-big">${escapeHtml(o.siteDomain)}</div>`:''}
-      ${pages.length?`<div class="site-pages-list">${pages.map(p=>`<div class="site-page-item"><svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>${escapeHtml(p)}</div>`).join('')}</div>`:''}
-      <a href="${siteHref}" target="_blank" rel="noopener" class="btn btn-primary btn-sm" onclick="event.stopPropagation()" style="background:var(--accent);color:#191b1e">Открыть сайт →</a>
-    </div>`;
-  }
-
-  const statusComment = o.statusComment
-    ? `<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>${escapeHtml(o.statusComment)}</div>`
-    : '';
-
-  // Domain banner
-  const extras = o.extras || [];
-  const hasRegDomain = extras.includes('domain_reg') || (extras.includes('domain') && o.domainOption !== 'own');
-  const hasOwnDomain = extras.includes('domain_own') || (extras.includes('domain') && o.domainOption === 'own') || o.domainOption === 'own';
-  let domainBanner = '';
-  if (hasRegDomain) {
-    domainBanner = `<div class="domain-banner">
-      <div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-      <div class="domain-banner-body">
-        <div class="domain-banner-title">Домен: покупка на рег.ру</div>
-        <div class="domain-banner-text">После оплаты на рег.ру напишите нам в поддержку — подключим домен бесплатно.</div>
-        <a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Инструкция по домену →
-        </a>
-      </div>
-    </div>`;
-  } else if (hasOwnDomain) {
-    const domName = o.domainName ? `<strong>${escapeHtml(o.domainName)}</strong> — ` : '';
-    domainBanner = `<div class="domain-banner">
-      <div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
-      <div class="domain-banner-body">
-        <div class="domain-banner-title">Домен: подключение</div>
-        <div class="domain-banner-text">${domName}напишите в поддержку — скажем какие DNS-записи прописать.</div>
-        <a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-          Инструкция по домену →
-        </a>
-      </div>
-    </div>`;
-  }
-
-  return `<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaidCard?1:0}">
+  const s=o.status||0;
+  const isPartial=o.paymentType==='partial';
+  const paidAmt=o.paidAmount||0;
+  const total=o.totalPrice||0;
+  const fullyPaid=o.paid||(isPartial&&paidAmt>=total);
+  const halfPaid=isPartial&&paidAmt>0&&!fullyPaid;
+  const payLabel=fullyPaid?'Оплачен':(halfPaid?'50% оплачено':'Не оплачен');
+  const payClass=fullyPaid?'is-paid':(halfPaid?'is-half':'is-unpaid');
+  return`<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaid?1:0}" data-id="${o.id}" style="animation-delay:${allOrders.indexOf(o)*30}ms">
     <button type="button" class="ord-row" onclick="openOrderModal('${o.id}')">
       <div class="ord-cell-main">
-        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${escapeHtml(o.siteType||'Сайт')}</span>
+        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${esc(o.siteType||'Сайт')}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
       </div>
       <div class="ord-cell-status"><span class="ord-tag s${s}"><span class="ord-dot"></span>${STATUS_LABELS[s]}</span></div>
-      <div class="ord-cell-pay"><span class="ord-pay ${payClassCard}">${payLabelCard}</span></div>
-      <div class="ord-cell-price ord-price">${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</div>
+      <div class="ord-cell-pay"><span class="ord-pay ${payClass}">${payLabel}</span></div>
+      <div class="ord-cell-price ord-price">${total?total.toLocaleString('ru')+' ₽':'—'}</div>
       <svg class="ord-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
   </div>`;
 }
 
-let allOrders = [];
+function renderOrders(orders){
+  const el=document.getElementById('ordersList');
+  if(!orders.length){
+    el.innerHTML=`<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><h3>Здесь появятся ваши заказы</h3><p>Оформите первый проект — это займёт пару минут</p><a href="../order" class="btn btn-green btn-sm">Заказать сайт</a></div>`;
+    return;
+  }
+  el.innerHTML=orders.map(o=>orderCard(o)).join('');
 
-window.openOrderModal = function(id) {
-  const o = allOrders.find(x => x.id === id);
-  if (!o) return;
-  const s = o.status || 0;
-  const paid = o.paid || false;
-  const estDate = getEstimate(o.package, o.extras, s);
+  // Review CTA — показываем для завершённых заказов без отзыва
+  const needReview=orders.filter(o=>o.status===5&&o.paid&&!o.reviewed);
+  if(needReview.length){
+    const first=needReview[0];
+    const cta=document.createElement('div');
+    cta.className='review-cta';
+    cta.innerHTML=`<div class="review-cta-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="review-cta-body"><div class="review-cta-title">Как прошло сотрудничество?</div><div class="review-cta-sub">Оставьте отзыв о заказе № ${first.id.slice(0,8).toUpperCase()} — это займёт минуту</div></div><button class="btn btn-green btn-sm" onclick="openReview('${first.id}')">Оставить отзыв</button>`;
+    el.appendChild(cta);
+  }
+}
 
-  // Payment state
-  const isPartial = o.paymentType === 'partial';
-  const paidAmount = o.paidAmount || 0;
-  const totalPrice = o.totalPrice || 0;
-  const remainingAmount = o.remainingAmount > 0 ? o.remainingAmount : (isPartial && totalPrice ? Math.max(0, totalPrice - paidAmount) : 0);
-  const fullyPaid = paid || (isPartial && paidAmount >= totalPrice);
-  const halfPaid = isPartial && paidAmount > 0 && !fullyPaid;
-  const payLabel = fullyPaid ? 'Оплачен' : (halfPaid ? 'Предоплата 50%' : 'Не оплачен');
-  const payChipClass = fullyPaid ? 'paid-yes' : (halfPaid ? 'paid-half' : 'paid-no');
+// ══ ORDER MODAL ══
+window.openOrderModal=function(id){
+  const o=allOrders.find(x=>x.id===id);
+  if(!o)return;
+  const s=o.status||0;
+  const isPartial=o.paymentType==='partial';
+  const paidAmount=o.paidAmount||0;
+  const totalPrice=o.totalPrice||0;
+  const remainingAmount=o.remainingAmount>0?o.remainingAmount:(isPartial&&totalPrice?Math.max(0,totalPrice-paidAmount):0);
+  const fullyPaid=o.paid||(isPartial&&paidAmount>=totalPrice);
+  const halfPaid=isPartial&&paidAmount>0&&!fullyPaid;
+  const payLabel=fullyPaid?'Оплачен':(halfPaid?'Предоплата 50%':'Не оплачен');
+  const payChipClass=fullyPaid?'paid-yes':(halfPaid?'paid-half':'paid-no');
 
-  // Header
-  document.getElementById('ordModalTitle').textContent = (o.siteType||'Сайт') + ' · № ' + o.id.slice(0,8).toUpperCase();
-  document.getElementById('ordModalPrice').innerHTML = totalPrice ? '<small>₽</small>' + totalPrice.toLocaleString('ru') : '';
-  document.getElementById('ordModalChips').innerHTML =
+  document.getElementById('ordModalTitle').textContent=(o.siteType||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
+  document.getElementById('ordModalPrice').innerHTML=totalPrice?'<small>₽</small>'+totalPrice.toLocaleString('ru'):'';
+  document.getElementById('ordModalChips').innerHTML=
     '<span class="ord-chip status'+(s===5?' active':'')+'">'
       +'<span class="ord-chip-dot"></span>'+STATUS_LABELS[s]
     +'</span>'
-    +'<span class="ord-chip '+payChipClass+'">'+(halfPaid?'<span class="ord-chip-dot"></span>':'')+payLabel+'</span>'
+    +'<span class="ord-chip '+payChipClass+'">'+payLabel+'</span>'
     +(fmtDate(o.createdAt)?'<span style="font-size:.68rem;color:rgba(255,255,255,.25);font-weight:300">'+fmtDate(o.createdAt)+'</span>':'');
 
   // Site block
-  const hasSite = (s >= 5 || s === 6) && (o.siteUrl || o.siteDomain);
-  let siteBlock = '';
+  const hasSite=(s>=5||s===6)&&(o.siteUrl||o.siteDomain);
+  let siteBlock='';
   if(hasSite){
-    const siteHref = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : ('https://'+(o.siteDomain||''));
-    const pages = (o.sitePages||'').split('\n').filter(Boolean);
-    siteBlock = '<div class="delivery-card">'
-      +'<div class="delivery-card-eyebrow">Готовый сайт</div>'
-      +(o.siteFaviconUrl?'<img class="site-favicon" src="'+o.siteFaviconUrl+'" alt=""/>':'')
-      +(o.siteDomain?'<div class="site-domain-big">'+escapeHtml(o.siteDomain)+'</div>':'')
-      +(pages.length?'<div class="site-pages-list">'+pages.map(p=>'<div class="site-page-item"><svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>'+escapeHtml(p)+'</div>').join('')+'</div>':'')
-      +'<a href="'+siteHref+'" target="_blank" rel="noopener" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px">'
-        +'<svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>'
-        +'Открыть сайт</a>'
+    const href=o.siteUrl?(o.siteUrl.match(/^https?:\/\//)?o.siteUrl:'https://'+o.siteUrl):('https://'+(o.siteDomain||''));
+    const pages=(o.sitePages||'').split('\n').filter(Boolean);
+    siteBlock='<div class="delivery-card"><div class="delivery-card-eyebrow">Готовый сайт</div>'
+      +(o.siteDomain?'<div class="site-domain-big">'+esc(o.siteDomain)+'</div>':'')
+      +(pages.length?'<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px">'+pages.map(p=>'<div style="font-size:.82rem;color:rgba(255,255,255,.4);display:flex;gap:8px"><span style="color:var(--accent)">→</span>'+esc(p)+'</div>').join('')+'</div>':'')
+      +'<a href="'+href+'" target="_blank" rel="noopener" class="btn btn-green" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть сайт</a>'
       +'</div>';
   }
 
-  // Domain banner
-  const extras = o.extras || [];
-  const hasRegDomain = extras.includes('domain_reg') || (extras.includes('domain') && o.domainOption !== 'own');
-  const hasOwnDomain = extras.includes('domain_own') || (extras.includes('domain') && o.domainOption === 'own') || o.domainOption === 'own';
-  let domainBanner = '';
-  if (hasRegDomain) {
-    domainBanner = '<div class="domain-banner"><div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="domain-banner-body"><div class="domain-banner-title">Домен: покупка на рег.ру</div><div class="domain-banner-text">После покупки на рег.ру напишите в поддержку — подключим бесплатно.</div><a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank">Инструкция →</a></div></div>';
-  } else if (hasOwnDomain) {
-    const domName = o.domainName ? '<strong>'+escapeHtml(o.domainName)+'</strong> — ' : '';
-    domainBanner = '<div class="domain-banner"><div class="domain-banner-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div><div class="domain-banner-body"><div class="domain-banner-title">Домен: подключение</div><div class="domain-banner-text">'+domName+'Напишите в поддержку — скажем какие DNS прописать.</div><a class="domain-banner-link" href="https://blog.antviz.ru/domain/vse-o-domene-instruktsiya" target="_blank">Инструкция →</a></div></div>';
+  const statusComment=o.statusComment?'<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'+esc(o.statusComment)+'</div>':'';
+  const domainBanner=buildDomainBanner(o);
+  const estDate=getEstimate(o.package,o.extras,s);
+
+  // LEFT
+  let leftHtml=buildTracker(o);
+  if(statusComment)leftHtml+=statusComment;
+  if(domainBanner)leftHtml+=domainBanner;
+  if(estDate)leftHtml+=`<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">${estDate}</strong></div>`;
+
+  // RIGHT
+  let rightHtml='';
+  if(isPartial&&halfPaid&&(s===5||s===6)){
+    rightHtml+='<div class="pay-gate-banner"><div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div><div class="pay-gate-sub">Для получения сайта оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div><button class="btn btn-green" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center">Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить сайт</button></div>';
+  }else if(isPartial&&halfPaid){
+    rightHtml+='<div class="pay-remaining-banner"><div class="pay-remaining-title"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Предоплата получена</div><div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ — после согласования макета.</div><button class="btn btn-outline" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center;margin-top:4px">Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
   }
+  if(siteBlock)rightHtml+=siteBlock;
 
-  // Status comment
-  const statusComment = o.statusComment
-    ? '<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'+escapeHtml(o.statusComment)+'</div>'
-    : '';
-
-  // LEFT column: tracker + substeps + comment + eta
-  let leftHtml = buildTracker(o) + buildSubsteps(o);
-  if (statusComment) leftHtml += statusComment;
-  if (domainBanner) leftHtml += domainBanner;
-  if (estDate) leftHtml += '<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">'+estDate+'</strong></div>';
-
-  // RIGHT column: pay banners + site + actions
-  let rightHtml = '';
-
-  // Pay gate (done, needs payment)
-  if (isPartial && halfPaid && (s === 5 || s === 6)) {
-    rightHtml += '<div class="pay-gate-banner">'
-      +'<div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div>'
-      +'<div class="pay-gate-sub">Для получения сайта оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div>'
-      +'<button class="btn-pay-gate" onclick="payRemaining(_modalOrderId)" style="pointer-events:all">'
-        +'<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'
-        +'Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить сайт'
-      +'</button>'
-      +'</div>';
-  } else if (isPartial && halfPaid) {
-    rightHtml += '<div class="pay-remaining-banner">'
-      +'<div class="pay-remaining-title"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Предоплата получена</div>'
-      +'<div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ — после согласования макета.</div>'
-      +'<button class="btn-pay-remaining" onclick="payRemaining(_modalOrderId)" style="pointer-events:all">'
-        +'<svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>'
-        +'Доплатить '+remainingAmount.toLocaleString('ru')+' ₽ сейчас'
-      +'</button>'
-      +'</div>';
+  rightHtml+='<div class="ord-actions-title">Действия</div><div class="ord-actions-group">';
+  rightHtml+='<button class="ord-action-btn" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>Скачать квитанцию</button>';
+  if(s>=5&&fullyPaid&&!o.reviewed){
+    rightHtml+='<button class="ord-action-btn green" onclick="openReview(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Оставить отзыв</button>';
   }
-
-  if (siteBlock) rightHtml += siteBlock;
-
-  // Actions
-  rightHtml += '<div class="ord-actions-title">Действия</div><div class="ord-actions-group">';
-  rightHtml += '<button class="ord-action-btn" onclick="printReceipt(_modalOrderId)" style="pointer-events:all">'
-    +'<span class="ord-action-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>'
-    +'Скачать квитанцию'
-    +'</button>';
-  if (s >= 5 && fullyPaid && !o.reviewed) {
-    rightHtml += '<button class="ord-action-btn green" onclick="openReview(_modalOrderId)" style="pointer-events:all">'
-      +'<span class="ord-action-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>'
-      +'Оставить отзыв'
-      +'</button>';
+  if(s===3){
+    rightHtml+='<button class="ord-action-btn dark" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>Запросить правки</button>';
   }
-  if (s === 3) {
-    rightHtml += '<button class="ord-action-btn dark" onclick="requestRevision(_modalOrderId)" style="pointer-events:all">'
-      +'<span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>'
-      +'Запросить правки'
-      +'</button>';
-  }
-  rightHtml += '</div>';
+  rightHtml+='<a class="ord-action-btn" href="../profile/support" style="pointer-events:all"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>Написать в поддержку</a>';
+  rightHtml+='</div>';
 
-  window._modalOrderId = o.id;
-  document.getElementById('ordModalLeft').innerHTML = leftHtml;
-  document.getElementById('ordModalRight').innerHTML = rightHtml;
+  window._modalOrderId=o.id;
+  document.getElementById('ordModalLeft').innerHTML=leftHtml;
+  document.getElementById('ordModalRight').innerHTML=rightHtml;
   document.getElementById('ordModalOverlay').classList.add('show');
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 };
 
-window.payRemaining = async function(orderId) {
-  try {
-    const resp = await fetch('https://api-lac-six-78.vercel.app/api/createPayment', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ orderId, type: 'remaining' })
-    });
-    const data = await resp.json();
-    if (data.paymentUrl) { window.location.href = data.paymentUrl; }
-    else toast('Ошибка создания платежа','error');
-  } catch(e) { toast('Не удалось создать платёж','error'); }
+window.payRemaining=async function(orderId){
+  try{const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,type:'remaining'})});const data=await resp.json();if(data.paymentUrl){window.location.href=data.paymentUrl;}else toast('Ошибка создания платежа','error');}catch(e){toast('Не удалось создать платёж','error');}
 };
 
-window.closeOrderModal = function() {
-  document.getElementById('ordModalOverlay').classList.remove('show');
-  document.body.style.overflow = '';
-};
+window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');document.body.style.overflow='';};
+window.requestRevision=async function(id){try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
 
-window.toggleOrder = function(el){};
-window.requestRevision = async function(id){try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
-
-function renderOrders(orders){
-  const el = document.getElementById('ordersList');
-  if(!orders.length){
-    el.innerHTML = `<div class="empty">
-      <div class="empty-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
-      <h3>Здесь появятся ваши заказы</h3>
-      <p>Оформите первый проект — это займёт пару минут</p>
-      <a href="../order" class="btn btn-primary btn-sm">Заказать сайт</a>
-    </div>`;
-    return;
-  }
-  el.innerHTML = orders.map(o => orderCard(o)).join('');
-}
-
-function showDeliveryPopup(o){
-  const rawUrl = o.siteUrl||'';
-  const link = document.getElementById('deliveryLink');
-  const siteHref = rawUrl ? (rawUrl.match(/^https?:\/\//) ? rawUrl : 'https://'+rawUrl) : (o.siteDomain ? 'https://'+o.siteDomain : '');
-  link.href = siteHref||'#';
-  if(!siteHref) link.style.display='none'; else link.style.display='';
-  const pages = (o.sitePages||'').split('\n').filter(Boolean);
-  document.getElementById('deliveryModalContent').innerHTML = o.siteDomain
-    ? '<div class="delivery-modal-inner">'
-        +(o.siteFaviconUrl?'<img class="site-favicon" src="'+o.siteFaviconUrl+'" alt=""/>':'')
-        +'<div class="delivery-site-name">'+escapeHtml(o.siteDomain)+'</div>'
-        +'<div class="delivery-site-url">Готов к работе</div>'
-        +(pages.length?'<div class="site-pages-list" style="margin-top:10px;margin-bottom:0">'+pages.map(p=>'<div class="site-page-item"><svg viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>'+escapeHtml(p)+'</div>').join('')+'</div>':'')
-        +'</div>'
-    : '';
-  document.getElementById('deliveryModal').classList.add('show');
-  launchConfetti();
-}
-window.closeDelivery = function(){document.getElementById('deliveryModal').classList.remove('show');};
-
-window.openReview = function(id){
+// ══ REVIEW ══
+window.openReview=function(id){
   reviewOrderId=id;reviewStars=0;
   document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
   document.getElementById('reviewText').value='';
-  // Закрываем модалку заказа, потом открываем отзыв
   document.getElementById('ordModalOverlay').classList.remove('show');
   document.body.style.overflow='hidden';
   setTimeout(()=>document.getElementById('reviewModal').classList.add('show'),80);
 };
-window.closeReview = function(){document.getElementById('reviewModal').classList.remove('show');};
-window.setStar = function(n){reviewStars=n;document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));};
-window.submitReview = async function(){
+window.closeReview=function(){document.getElementById('reviewModal').classList.remove('show');document.body.style.overflow='';};
+window.setStar=function(n){reviewStars=n;document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));};
+window.submitReview=async function(){
   if(!reviewStars){toast('Выберите оценку','error');return;}
-  if(!currentUser||!reviewOrderId) return;
+  if(!currentUser||!reviewOrderId)return;
   try{
     await addDoc(collection(db,'reviews'),{uid:currentUser.uid,orderId:reviewOrderId,stars:reviewStars,text:document.getElementById('reviewText').value.trim(),clientName:currentUser.displayName||'',clientEmail:currentUser.email,createdAt:serverTimestamp()});
     await updateDoc(doc(db,'orders',reviewOrderId),{reviewed:true}).catch(()=>{});
-    closeReview();
-    toast('Спасибо за отзыв! ✓','success');
+    closeReview();toast('Спасибо за отзыв! ✓','success');
   }catch(e){toast('Ошибка','error');}
 };
 
-// Кэш всех заказов для безопасного доступа из printReceipt
-let _ordersCache = [];
-window.printReceipt = function(id){
-  const o = _ordersCache.find(x=>x.id===id);
-  if(!o) return;
-  const w = window.open('', '_blank', 'width=600,height=700');
-  const date = o.createdAt ? new Date(o.createdAt.seconds * 1000).toLocaleDateString('ru', {day:'numeric', month:'long', year:'numeric'}) : '—';
-  const extrasLabels = {domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
-  const extrasHtml = (o.extras||[]).length ? `<tr><td>Дополнения</td><td>${o.extras.map(e=>extrasLabels[e]||e).join(', ')}</td></tr>` : '';
-  const isPartialReceipt = o.paymentType === 'partial';
-  const paidAmt = o.paidAmount || 0;
-  const remainAmt = o.remainingAmount > 0 ? o.remainingAmount : (isPartialReceipt ? Math.max(0, (o.totalPrice||0) - paidAmt) : 0);
-  const fullyPaidReceipt = o.paid || (isPartialReceipt && paidAmt >= (o.totalPrice||0));
-  const payStatusText = fullyPaidReceipt ? 'Оплачен полностью' : (isPartialReceipt && paidAmt > 0 ? 'Предоплата 50%' : 'Не оплачен');
-  const partialRows = isPartialReceipt ? `<tr><td>Оплачено</td><td>${paidAmt.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fullyPaidReceipt ? '—' : remainAmt.toLocaleString('ru')+' ₽'}</td></tr>` : '';
-  const totalHtml = `<tr class="total"><td>Итого</td><td>${o.totalPrice ? o.totalPrice.toLocaleString('ru') + ' ₽' : '—'}</td></tr>`;
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a;font-weight:400}td:last-child{text-align:right;font-weight:500;color:#191b1e}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e;color:#191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr><tr><td>Страниц</td><td>${o.pages||'—'}</td></tr>${extrasHtml}<tr><td>Статус оплаты</td><td>${payStatusText}</td></tr>${partialRows}${totalHtml}</table><div class="footer">antviz.ru · Документ сформирован ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
-  w.document.write(html);
-  w.document.close();
+// ══ DELIVERY ══
+function showDeliveryPopup(o){
+  const rawUrl=o.siteUrl||'';
+  const href=rawUrl?(rawUrl.match(/^https?:\/\//)?rawUrl:'https://'+rawUrl):(o.siteDomain?'https://'+o.siteDomain:'');
+  const link=document.getElementById('deliveryLink');
+  link.href=href||'#';link.style.display=href?'':'none';
+  document.getElementById('deliveryModalContent').innerHTML=o.siteDomain?'<div class="delivery-inner"><div class="delivery-site-name">'+esc(o.siteDomain)+'</div><div class="delivery-site-url">Готов к работе</div></div>':'';
+  document.getElementById('deliveryModal').classList.add('show');
+  launchConfetti();
+}
+window.closeDelivery=function(){document.getElementById('deliveryModal').classList.remove('show');};
+
+// ══ RECEIPT ══
+window.printReceipt=function(id){
+  const o=allOrders.find(x=>x.id===id);if(!o)return;
+  const w=window.open('','_blank','width=600,height=700');
+  const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
+  const extLbls={domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+  const extHtml=(o.extras||[]).length?`<tr><td>Дополнения</td><td>${o.extras.map(e=>extLbls[e]||e).join(', ')}</td></tr>`:'';
+  const isP=o.paymentType==='partial';const pA=o.paidAmount||0;
+  const rA=o.remainingAmount>0?o.remainingAmount:(isP?Math.max(0,(o.totalPrice||0)-pA):0);
+  const fP=o.paid||(isP&&pA>=(o.totalPrice||0));
+  const pSt=fP?'Оплачен полностью':(isP&&pA>0?'Предоплата 50%':'Не оплачен');
+  const pRows=isP?`<tr><td>Оплачено</td><td>${pA.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fP?'—':rA.toLocaleString('ru')+' ₽'}</td></tr>`:'';
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  w.document.write(html);w.document.close();
 };
 
-function launchConfetti(){const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';const colors=['#1ede7b','#1ac16b','#191b1e','#a8f5d4','#0d3320','#fff','#dfe3e8'];for(let i=0;i<90;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}setTimeout(()=>{wrap.innerHTML='';},5000);}
-
-function watchChatBadge(uid){
-  // Уведомления о новых сообщениях поддержки — смотрим непрочитанные тикеты
-  const q = query(collection(db,'tickets'),where('uid','==',uid),where('_read','==',false));
-  unsubChat = onSnapshot(q, snap=>{
-    const badge = document.getElementById('navChatBadge');
-    if(badge) badge.style.display = snap.size?'':'none';
-  }, ()=>{});
+function launchConfetti(){
+  const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';
+  const colors=['#1ede7b','#1ac16b','#191b1e','#a8f5d4','#fff','#dfe3e8'];
+  for(let i=0;i<80;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}
+  setTimeout(()=>{wrap.innerHTML='';},5000);
 }
 
 function loadOrders(uid){
-  if(unsubOrders) unsubOrders();
-  const q = query(collection(db,'orders'),where('uid','==',uid));
-  unsubOrders = onSnapshot(q, snap=>{
-    const orders = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(o => (o.status ?? 0) !== -1)
+  if(unsubOrders)unsubOrders();
+  const q=query(collection(db,'orders'),where('uid','==',uid));
+  unsubOrders=onSnapshot(q,snap=>{
+    const orders=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o=>(o.status??0)!==-1)
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    _ordersCache = orders;
-    allOrders = orders;
+    allOrders=orders;
     renderOrders(orders);
     snap.docChanges().forEach(ch=>{
       if(ch.type==='modified'){
@@ -858,87 +669,50 @@ function loadOrders(uid){
         if(prev!==undefined&&prev!==cur){
           showBanner(STATUS_LABELS[cur]);
           if(cur===5&&!o.deliveryShown){const lsKey='antviz_delivery_seen_'+ch.doc.id;if(!localStorage.getItem(lsKey)){localStorage.setItem(lsKey,'1');setTimeout(()=>showDeliveryPopup(o),800);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});}}
-          if(cur===5&&!o.reviewed) setTimeout(()=>openReview(o.id),4500);
+          if(cur===5&&!o.reviewed)setTimeout(()=>openReview(o.id),5000);
         }
         lastStatuses[ch.doc.id]=cur;
-      } else if(ch.type==='added'){
+      }else if(ch.type==='added'){
         const o={id:ch.doc.id,...ch.doc.data()};lastStatuses[ch.doc.id]=o.status??0;
         const lsKey='antviz_delivery_seen_'+ch.doc.id;
-        if(!isInitialLoad&&o.status===5&&!o.deliveryShown&&!localStorage.getItem(lsKey)){
-          localStorage.setItem(lsKey,'1');
-          setTimeout(()=>{showDeliveryPopup(o);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});},1500);
-        }
+        if(!isInitialLoad&&o.status===5&&!o.deliveryShown&&!localStorage.getItem(lsKey)){localStorage.setItem(lsKey,'1');setTimeout(()=>{showDeliveryPopup(o);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});},1500);}
       }
     });
-    if(isInitialLoad) isInitialLoad=false;
-  }, err=>{
-    console.error('Orders error:',err);
-    renderOrders([]);
-  });
+    if(isInitialLoad)isInitialLoad=false;
+  },err=>{console.error(err);renderOrders([]);});
 }
 
-document.addEventListener('keydown', e=>{if(e.key==='Escape'){closeReview();closeDelivery();closeOrderModal();}});
-document.getElementById('ordModalOverlay').addEventListener('click', e=>{if(e.target===document.getElementById('ordModalOverlay'))closeOrderModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeReview();closeDelivery();closeOrderModal();}});
+document.getElementById('ordModalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('ordModalOverlay'))closeOrderModal();});
 
-onAuthStateChanged(auth, async user=>{
+onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='../auth';return;}
-  currentUser = user;
+  currentUser=user;
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
   loadOrders(user.uid);
-  watchChatBadge(user.uid);
 });
-
 </script>
 
 <script>
-/* Presentation-only enhancement: filter tabs + live counts.
-   Reads data-status/data-paid attributes already present on rendered rows;
-   never touches Firebase data or the module above. */
 (function(){
-  const list = document.getElementById('ordersList');
-  const tabs = document.getElementById('ordTabs');
-  const countEl = document.getElementById('ordCount');
-  let activeFilter = 'all';
-
-  function matches(row, filter){
-    const status = +row.dataset.status;
-    const paid = row.dataset.paid === '1';
-    if(filter==='all') return true;
-    if(filter==='active') return status < 5;
-    if(filter==='done') return status === 5;
-    if(filter==='unpaid') return !paid;
-    return true;
+  const list=document.getElementById('ordersList');
+  const tabs=document.getElementById('ordTabs');
+  const countEl=document.getElementById('ordCount');
+  let activeFilter='all';
+  function matches(row,filter){
+    const status=+row.dataset.status;const paid=row.dataset.paid==='1';
+    if(filter==='all')return true;if(filter==='active')return status<5;
+    if(filter==='done')return status===5;if(filter==='unpaid')return!paid;return true;
   }
-
   function apply(){
-    const rows = Array.from(list.querySelectorAll('.ord-row-wrap'));
-    let shown = 0;
-    rows.forEach(r=>{
-      const ok = matches(r, activeFilter);
-      r.classList.toggle('is-filtered', !ok);
-      if(ok) shown++;
-    });
-    countEl.textContent = rows.length ? `Показано ${shown} из ${rows.length}` : '';
+    const rows=Array.from(list.querySelectorAll('.ord-row-wrap'));
+    let shown=0;rows.forEach(r=>{const ok=matches(r,activeFilter);r.classList.toggle('is-filtered',!ok);if(ok)shown++;});
+    countEl.textContent=rows.length?`Показано ${shown} из ${rows.length}`:'';
   }
-
-  if(tabs){
-    tabs.addEventListener('click', e=>{
-      const btn = e.target.closest('.ord-tab');
-      if(!btn) return;
-      tabs.querySelectorAll('.ord-tab').forEach(b=>b.classList.toggle('is-active', b===btn));
-      activeFilter = btn.dataset.filter;
-      apply();
-    });
-  }
-
-  if(list){
-    const mo = new MutationObserver(apply);
-    mo.observe(list, { childList:true });
-    apply();
-  }
+  if(tabs)tabs.addEventListener('click',e=>{const btn=e.target.closest('.tab');if(!btn)return;tabs.querySelectorAll('.tab').forEach(b=>b.classList.toggle('is-active',b===btn));activeFilter=btn.dataset.filter;apply();});
+  if(list){const mo=new MutationObserver(apply);mo.observe(list,{childList:true});apply();}
 })();
-
 </script>
 
 <script src="../footer.js" data-page="orders"></script>

@@ -347,6 +347,12 @@
       font-weight: 500; font-size: .95rem;
       text-decoration: none; padding: 14px 16px; border-radius: 14px;
     }
+    .an-mobile-section-label {
+      font-size: .68rem; font-weight: 500; color: var(--an-ink-faint);
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 12px 16px 4px; font-family: var(--an-font);
+    }
+    .an-mobile-sep { height: 1px; background: rgba(255,255,255,.06); margin: 4px 8px; }
 
     @media (max-width: 768px) {
       .antviz-nav { top: 14px; height: 58px; padding: 0 8px 0 18px; width: calc(100% - 24px); border-radius: 20px; }
@@ -485,27 +491,32 @@
   // раскрывается по тапу на бугер, заменяет собой нижний таб-бар из footer.js.
   function buildMobileSheet() {
     if (cfg.inApp) return '';
-    const dropLinks = NAV_DROPDOWNS.flatMap(drop =>
-      drop.sections.flatMap(sec => sec.sep ? [] : (sec.items || []))
-    );
+
+    let html = '';
+
+    // Дропдауны — каждый дропдаун рендерим с заголовком и списком ссылок
+    NAV_DROPDOWNS.forEach(drop => {
+      drop.sections.forEach(sec => {
+        if (sec.sep) return;
+        if (sec.items && sec.items.length) {
+          if (sec.label) {
+            html += '<div class="an-mobile-section-label">' + sec.label + '</div>';
+          }
+          sec.items.forEach(item => {
+            html += '<a href="' + item.href + '" class="an-mobile-link' + (page === item.key ? ' active' : '') + '">' + item.label + '</a>';
+          });
+        }
+      });
+    });
+
     const plainLinks = cfg.centerLinks || [];
-    const allLinks = [...dropLinks, ...plainLinks];
+    plainLinks.forEach(l => {
+      html += '<a href="' + l.href + '" class="an-mobile-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>';
+    });
 
-    const uniqueLinks = [];
-    const seenHrefs = new Set();
-    for (const l of allLinks) {
-      if (!seenHrefs.has(l.href)) {
-        seenHrefs.add(l.href);
-        uniqueLinks.push(l);
-      }
-    }
-
-    const linksHtml = uniqueLinks.map(l =>
-      '<a href="' + l.href + '" class="an-mobile-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
-    ).join('');
     const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="an-mobile-cta">Заказать сайт</a>' : '';
-    if (!linksHtml && !ctaHtml) return '';
-    return '<div class="an-mobile-sheet" id="anMobileSheet">' + linksHtml + ctaHtml + '</div>';
+    if (!html && !ctaHtml) return '';
+    return '<div class="an-mobile-sheet" id="anMobileSheet">' + html + ctaHtml + '</div>';
   }
 
   const NAV_HTML = `

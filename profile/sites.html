@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мои сайты — Antviz</title>
+  <link rel="icon" href="../img/favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --line:#dfe3e8;--line-strong:#cbcdd6;
+  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;
+  --accent-wash:rgba(30,222,123,.12);
+  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.08);
+  --dark:#191b1e;--dark2:#2b2f33;
+  --font:'Geologica','Inter','Arial',sans-serif;
+  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+.loading-text{color:var(--ink-faint);font-size:.75rem}
+
+.shell{width:100%;animation:fadeUp .3s ease}
+
+/* HERO */
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
+.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
+.page-hero-title em{font-style:normal;color:var(--accent)}
+.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
+.btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
+.btn-green{background:var(--accent);color:var(--dark)}
+.btn-green:hover{background:var(--accent-h)}
+.btn-outline{background:transparent;border:1.5px solid rgba(255,255,255,.16);color:rgba(255,255,255,.7)}
+.btn-outline:hover{border-color:rgba(255,255,255,.4);color:#fff}
+.btn-sm{padding:11px 20px;font-size:.84rem;border-radius:10px}
+
+/* GRID */
+.sites-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:860px){.sites-grid{grid-template-columns:1fr}}
+
+/* SITE CARD */
+.site-card{background:var(--dark);border-radius:40px;padding:40px;display:flex;flex-direction:column;animation:rowIn .35s ease both;transition:transform .2s,box-shadow .2s}
+.site-card:hover{transform:translateY(-4px)}
+.site-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px}
+.site-favicon-wrap{width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
+.site-favicon-wrap img{width:28px;height:28px;object-fit:contain}
+.site-favicon-wrap svg{width:24px;height:24px;stroke:var(--accent);stroke-width:1.6;fill:none}
+.site-status-pill{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:.32rem .8rem;border-radius:8px;background:var(--accent-wash);color:var(--accent);white-space:nowrap}
+.site-status-pill.support{background:rgba(245,158,11,.12);color:var(--warn)}
+.site-domain{font-size:1.4rem;font-weight:500;letter-spacing:-.025em;color:#fff;margin-bottom:8px;word-break:break-word}
+.site-meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}
+.site-meta-chip{font-size:.78rem;color:rgba(255,255,255,.4);font-weight:300;display:flex;align-items:center;gap:6px}
+.site-meta-chip svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+.site-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:24px}
+.site-actions{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap}
+.site-actions .btn{flex:1;justify-content:center}
+
+.site-pages-list{display:flex;flex-direction:column;gap:6px;margin-bottom:24px}
+.site-page-row{font-size:.84rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:8px}
+.site-page-row svg{width:11px;height:11px;stroke:var(--accent);stroke-width:2;fill:none;flex-shrink:0}
+
+.support-banner{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:18px;padding:16px 18px;margin-bottom:24px;font-size:.82rem;color:rgba(255,255,255,.5);line-height:1.55}
+.support-banner strong{color:#fff;font-weight:500}
+
+/* EMPTY */
+.empty{text-align:center;padding:96px 16px}
+.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
+.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
+.empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
+.empty p{font-size:.88rem;color:var(--ink-dim);margin-bottom:24px;font-weight:300;line-height:1.6}
+
+@media(max-width:900px){
+  .page-hero{border-radius:32px;padding:40px 36px}
+  .page-hero-title{font-size:2.4rem}
+}
+@media(max-width:600px){
+  .page-hero{border-radius:24px;padding:28px 24px;flex-direction:column;align-items:flex-start}
+  .page-hero-title{font-size:1.9rem}
+  .site-card{border-radius:28px;padding:28px}
+  .site-actions{flex-direction:column}
+}
+#sbContent{padding-bottom:80px}
+  </style>
+</head>
+<body>
+<script src="../nav.js" data-page="sites"></script>
+<script src="../sidebar.js" data-page="sites"></script>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <span class="loading-text">Загружаю сайты...</span>
+</div>
+
+<div id="sbContent" style="display:none">
+<div class="shell" id="appWrap">
+
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-eyebrow">Личный кабинет</div>
+      <div class="page-hero-title">Мои <em>сайты</em></div>
+      <div class="page-hero-sub">Все запущенные проекты в одном месте</div>
+    </div>
+    <a href="../order" class="btn btn-ghost">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Новый заказ
+    </a>
+  </div>
+
+  <div class="sites-grid" id="sitesGrid">
+    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem;grid-column:1/-1">Загрузка...</div>
+  </div>
+
+</div>
+</div>
+
+<script type="module">
+import { auth, db } from '../firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+
+function siteCard(o){
+  const href = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : (o.siteDomain ? 'https://'+o.siteDomain : null);
+  const pagesCount = o.sitePages ? parseInt(o.sitePages,10) : null;
+
+  const hasSupport = o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > new Date();
+  const statusPill = hasSupport
+    ? `<span class="site-status-pill support">Обслуживание до ${fmtDate(o.supportExpiresAt)}</span>`
+    : `<span class="site-status-pill">Запущен</span>`;
+
+  const supportBanner = hasSupport
+    ? `<div class="support-banner">Подключено <strong>обслуживание</strong> — отправляйте заявки на правки и доработки в любой момент.</div>`
+    : `<div class="support-banner">Обслуживание не подключено — можно <strong>добавить правки и доработки</strong> по подписке.</div>`;
+
+  return `<div class="site-card">
+    <div class="site-card-top">
+      <div class="site-favicon-wrap">
+        ${o.siteFaviconUrl ? `<img src="${o.siteFaviconUrl}" alt=""/>` : `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`}
+      </div>
+      ${statusPill}
+    </div>
+    <div class="site-domain">${esc(o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase()))}</div>
+    <div class="site-meta-row">
+      <span class="site-meta-chip"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fmtDate(o.createdAt)}</span>
+      <span class="site-meta-chip"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'')}</span>
+      ${pagesCount ? `<span class="site-meta-chip"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${pagesCount} стр.</span>` : ''}
+    </div>
+    <div class="site-divider"></div>
+    ${supportBanner}
+    <div class="site-actions">
+      ${href ? `<a href="${href}" target="_blank" rel="noopener" class="btn btn-green btn-sm"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть сайт</a>` : ''}
+      <a href="support?order=${o.id}" class="btn btn-outline btn-sm">${hasSupport ? 'Заявка на правки' : 'Подключить обслуживание'}</a>
+    </div>
+  </div>`;
+}
+
+function render(orders){
+  const el = document.getElementById('sitesGrid');
+  if(!orders.length){
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+      <h3>Здесь появятся ваши сайты</h3>
+      <p>Как только проект будет завершён и сдан — он отобразится здесь со ссылкой и всеми деталями</p>
+      <a href="../order" class="btn btn-green btn-sm">Заказать сайт</a>
+    </div>`;
+    return;
+  }
+  el.innerHTML = orders.map(siteCard).join('');
+}
+
+onAuthStateChanged(auth, user=>{
+  if(!user){ window.location.href='../auth'; return; }
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('sbContent').style.display='block';
+
+  const q = query(collection(db,'orders'), where('uid','==',user.uid));
+  onSnapshot(q, snap=>{
+    const done = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o => o.status === 5 && (o.siteUrl || o.siteDomain))
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+    render(done);
+  }, err=>{
+    console.error('Sites error:', err);
+    render([]);
+  });
+});
+</script>
+
+<script src="../footer.js" data-page="sites"></script>
+<script src="../GEOBLOCK.js"></script>
+<script type="module" src="../maintenance.js"></script>
+</body>
+</html>

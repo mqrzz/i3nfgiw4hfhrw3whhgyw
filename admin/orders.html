@@ -638,8 +638,11 @@ window.printReceipt=id=>{
 window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
 
 onAuthStateChanged(auth,async user=>{
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  let isAdmin=user.email===ADMIN_EMAIL;
+  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
+  if(!isAdmin){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
   document.getElementById('appTopbar').style.display='flex';
   onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{

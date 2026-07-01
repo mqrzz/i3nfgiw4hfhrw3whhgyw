@@ -181,8 +181,11 @@ window.toggleReview=async(id,hidden)=>{await updateDoc(doc(db,'reviews',id),{hid
 window.deleteReview=async id=>{if(!confirm('Удалить отзыв?'))return;await deleteDoc(doc(db,'reviews',id));toast('Удалён','info');};
 
 onAuthStateChanged(auth,async user=>{
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  let isAdmin=user.email===ADMIN_EMAIL;
+  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!user||user.email!==ADMIN_EMAIL){window.location.href='/';return;}
+  if(!isAdmin){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
   onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')),snap=>{
     allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));renderReviews();

@@ -1,9 +1,6 @@
 // footer.js - универсальный подвал для всех страниц
 
 (function() {
-    // Страницы БЕЗ мобильного меню
-    const NO_MOBILE_NAV_PAGES = ['auth', 'profile', 'settings', 'orders', 'support', 'order'];
-    
     // Стили ТОЛЬКО для подвала — НИЧЕГО не трогают страницу
     const styles = `
         .antviz-footer {
@@ -142,8 +139,8 @@
         
         .antviz-footer .meta-note {
             grid-column: 1 / -1;
-            color: rgba(255,255,255,.14);
-            font-size: 14px;
+            color: rgba(255,255,255,.22);
+            font-size: 16px;
             line-height: 1.6;
             margin-top: 44px;
         }
@@ -195,11 +192,6 @@
             .antviz-footer .groups { grid-template-columns: 1fr; gap: 26px; }
         }
     `;
-    
-    // Определяем активную страницу из атрибута data-page
-    const script = document.currentScript;
-    const activePage = script ? (script.getAttribute('data-page') || '') : '';
-    const showMobileNav = !NO_MOBILE_NAV_PAGES.includes(activePage);
     
     // Автоматический расчёт пути для корректных ссылок
     const depth = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;

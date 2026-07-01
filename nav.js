@@ -59,7 +59,7 @@
 
     .an-logo {
       font-family: var(--an-font); font-weight: 500;
-      font-size: .95rem; letter-spacing: -.01em;
+      font-size: 15.2px; letter-spacing: -.01em;
       color: var(--an-ink); text-decoration: none;
       display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
@@ -71,8 +71,8 @@
     }
     .an-link {
       color: var(--an-ink-dim);
-      font-family: var(--an-font); font-weight: 300; font-size: .88rem;
-      text-decoration: none; padding: .5rem .9rem;
+      font-family: var(--an-font); font-weight: 300; font-size: 14.08px;
+      text-decoration: none; padding: 8px 14.4px;
       border-radius: 10px; transition: color .15s, background .15s;
       white-space: nowrap; position: relative;
       display: flex; align-items: center;
@@ -80,7 +80,7 @@
     .an-link:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
     .an-link.active { color: var(--an-ink); font-weight: 500; }
     .an-link.active::after {
-      content: ''; position: absolute; left: .9rem; right: .9rem; bottom: 2px;
+      content: ''; position: absolute; left: 14.4px; right: 14.4px; bottom: 2px;
       height: 2px; border-radius: 2px; background: var(--an-green);
     }
 
@@ -94,9 +94,9 @@
     .an-nav-drop { position: relative; display: flex; align-items: center; }
     .an-nav-drop-btn {
       color: var(--an-ink-dim);
-      font-family: var(--an-font); font-weight: 300; font-size: .88rem;
+      font-family: var(--an-font); font-weight: 300; font-size: 14.08px;
       background: none; border: none; cursor: pointer;
-      padding: .5rem .9rem; border-radius: 10px;
+      padding: 8px 14.4px; border-radius: 10px;
       transition: color .15s, background .15s;
       white-space: nowrap; display: flex; align-items: center; gap: 5px;
     }
@@ -131,7 +131,7 @@
     .an-nav-menu-item {
       display: flex; align-items: center; gap: 10px;
       padding: 9px 10px; border-radius: 11px;
-      font-size: .84rem; color: var(--an-card-ink); font-weight: 300;
+      font-size: 13.44px; color: var(--an-card-ink); font-weight: 300;
       text-decoration: none; transition: background .12s, padding-left .12s;
       white-space: nowrap;
     }
@@ -146,7 +146,7 @@
     .an-nav-menu-sep { height: 1px; background: var(--an-card-border); margin: 5px 8px; }
     .an-nav-menu-label {
       padding: 10px 10px 3px;
-      font-size: .65rem; color: var(--an-card-muted); font-weight: 500;
+      font-size: 10.4px; color: var(--an-card-muted); font-weight: 500;
       text-transform: uppercase; letter-spacing: .08em;
     }
 
@@ -158,13 +158,13 @@
       background: none; border: 1px solid transparent;
       border-radius: 14px; padding: 5px 12px 5px 5px;
       cursor: pointer; transition: border-color .15s, background .15s;
-      font-family: var(--an-font); font-weight: 300; font-size: .85rem; color: var(--an-ink);
+      font-family: var(--an-font); font-weight: 300; font-size: 13.6px; color: var(--an-ink);
       text-decoration: none;
       position: relative;
     }
     .an-user-btn:hover { border-color: var(--an-line); background: rgba(255,255,255,.04); }
 
-    .an-user-btn.guest { padding: .55rem 1.1rem; border: 1px solid var(--an-line); border-radius: 14px; }
+    .an-user-btn.guest { padding: 8.8px 17.6px; border: 1px solid var(--an-line); border-radius: 14px; }
     .an-user-btn.guest:hover { border-color: rgba(255,255,255,.2); }
     .an-user-btn.guest .an-avatar-ring { display: none; }
     .an-user-btn.guest .an-chevron { display: none; }
@@ -184,7 +184,7 @@
       width: 100%; height: 100%; border-radius: 9px;
       background: var(--an-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: .72rem; font-weight: 500; color: var(--an-green-ink);
+      font-size: 11.52px; font-weight: 500; color: var(--an-green-ink);
       overflow: hidden;
     }
     .an-avatar-ring.notify .an-avatar { border-radius: 8px; }
@@ -228,25 +228,25 @@
       width: 38px; height: 38px; border-radius: 11px;
       background: var(--an-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: .9rem; font-weight: 500; color: var(--an-green-ink);
+      font-size: 14.4px; font-weight: 500; color: var(--an-green-ink);
       flex-shrink: 0; overflow: hidden;
     }
     .an-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .an-dd-head-info { min-width: 0; flex: 1; }
     .an-dd-head-name {
-      font-family: var(--an-font); font-size: .88rem; font-weight: 500;
+      font-family: var(--an-font); font-size: 14.08px; font-weight: 500;
       color: var(--an-card-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       letter-spacing: -.01em;
     }
     .an-dd-head-email {
-      font-family: var(--an-font); font-weight: 300; font-size: .73rem;
+      font-family: var(--an-font); font-weight: 300; font-size: 11.68px;
       color: var(--an-card-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
       margin-top: 2px;
     }
 
     .an-dd-section {
       padding: 14px 11px 6px;
-      font-size: .68rem;
+      font-size: 10.88px;
       color: var(--an-card-muted); font-weight: 500;
       text-transform: uppercase; letter-spacing: .08em;
       font-family: var(--an-font);
@@ -254,7 +254,7 @@
     .an-dd-item {
       display: flex; align-items: center; gap: 11px;
       padding: 10px 10px; border-radius: 12px;
-      font-size: .85rem; color: var(--an-card-ink); font-weight: 300;
+      font-size: 13.6px; color: var(--an-card-ink); font-weight: 300;
       text-decoration: none; cursor: pointer;
       transition: background .12s, padding-left .12s;
       font-family: var(--an-font); border: none;
@@ -280,7 +280,7 @@
     .an-dd-badge {
       margin-left: auto; flex-shrink: 0;
       background: var(--an-green); color: var(--an-green-ink);
-      font-size: .66rem; font-weight: 500;
+      font-size: 10.56px; font-weight: 500;
       min-width: 18px; height: 18px; border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
       padding: 0 5px; font-family: var(--an-font);
@@ -335,7 +335,7 @@
     .an-mobile-sheet.open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
     .an-mobile-link {
       display: block; color: var(--an-ink-dim);
-      font-weight: 300; font-size: .95rem;
+      font-weight: 300; font-size: 15.2px;
       text-decoration: none; padding: 14px 16px;
       border-radius: 14px; transition: background .12s, color .12s;
     }
@@ -344,11 +344,11 @@
     .an-mobile-cta {
       display: block; text-align: center; margin-top: 4px;
       background: var(--an-green); color: var(--an-green-ink);
-      font-weight: 500; font-size: .95rem;
+      font-weight: 500; font-size: 15.2px;
       text-decoration: none; padding: 14px 16px; border-radius: 14px;
     }
     .an-mobile-section-label {
-      font-size: .68rem; font-weight: 500; color: var(--an-ink-faint);
+      font-size: 10.88px; font-weight: 500; color: var(--an-ink-faint);
       text-transform: uppercase; letter-spacing: .08em;
       padding: 12px 16px 4px; font-family: var(--an-font);
     }
@@ -356,14 +356,14 @@
 
     @media (max-width: 768px) {
       .antviz-nav { top: 14px; height: 58px; padding: 0 8px 0 18px; width: calc(100% - 24px); border-radius: 20px; }
-      .an-logo { font-size: .88rem; }
+      .an-logo { font-size: 14.08px; }
       .an-logo img { width: 24px; height: 24px; }
       .an-center { display: none; }
       .an-burger { display: flex; }
       .an-mobile-sheet { display: flex; top: calc(14px + 58px + 8px); }
       .an-uname { display: none; }
       .an-user-btn { padding: 5px; }
-      .an-user-btn.guest { padding: .5rem .7rem; }
+      .an-user-btn.guest { padding: 8px 11.2px; }
       .an-user-btn.guest .an-uname { display: inline; max-width: 60px; }
     }
   `;
@@ -417,9 +417,11 @@
     profile:  { centerLinks: PUBLIC_LINKS, showCta: true },
     auth:     { centerLinks: [], showCta: false, hideCta: true },
     orders:   { centerLinks: PUBLIC_LINKS, showCta: true },
+    sites:    { centerLinks: PUBLIC_LINKS, showCta: true },
     support:  { centerLinks: PUBLIC_LINKS, showCta: true },
     settings: { centerLinks: PUBLIC_LINKS, showCta: true },
     tickets:  { centerLinks: PUBLIC_LINKS, showCta: true },
+    notifications: { centerLinks: PUBLIC_LINKS, showCta: true },
     default:  { centerLinks: PUBLIC_LINKS, showCta: true },
   };
 
@@ -433,8 +435,10 @@
     { sep: true },
     { section: 'Кабинет' },
     { href: b+'profile/orders',  icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label: 'Мои заказы', badgeKey: 'orders' },
+    { href: b+'profile/sites',   icon: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>', label: 'Мои сайты' },
     { href: b+'profile/tickets', icon: '<rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/>', label: 'Обслуживание', badgeKey: 'tickets' },
     { href: b+'profile/support', icon: '<rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/notifications', icon: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>', label: 'Уведомления', badgeKey: 'notif' },
     { sep: true },
     { href: b+'profile/settings', icon: '<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/>', label: 'Настройки' },
     { logout: true },
@@ -645,7 +649,7 @@ ${buildMobileSheet()}`;
   function refreshNotifyDot() {
     const ring = document.getElementById('anAvatarRing');
     if (!ring) return;
-    const any = ['support','tickets'].some(k => {
+    const any = ['support','tickets','notif'].some(k => {
       const el = document.getElementById(`anBadge-${k}`);
       return el && el.style.display !== 'none';
     });
@@ -654,9 +658,11 @@ ${buildMobileSheet()}`;
 
   let unsubSupport = null;
   let unsubOrders  = null;
+  let unsubNotif   = null;
   function teardownListeners() {
     unsubSupport?.(); unsubSupport = null;
     unsubOrders?.();  unsubOrders  = null;
+    unsubNotif?.();   unsubNotif   = null;
   }
 
   function applyAuthedUI(user) {
@@ -702,7 +708,7 @@ ${buildMobileSheet()}`;
     if (avatarEl) avatarEl.innerHTML = '?';
     avatarRing?.classList.remove('notify');
     if (ddHead) ddHead.style.display = 'none';
-    ['support','orders','tickets'].forEach(k => setBadge(k, 0, null));
+    ['support','orders','tickets','notif'].forEach(k => setBadge(k, 0, null));
     refreshNotifyDot();
   }
 
@@ -730,6 +736,15 @@ ${buildMobileSheet()}`;
           o.supportExpiresAt.toDate() > new Date()
         );
         setBadge('tickets', activeSupport ? 1 : 0, 'dot');
+        refreshNotifyDot();
+      },
+      () => {}
+    );
+
+    unsubNotif = onSnapshot(
+      query(collection(db, 'notifications', user.uid, 'items'), where('read', '==', false)),
+      snap => {
+        setBadge('notif', snap.size, 'warn');
         refreshNotifyDot();
       },
       () => {}

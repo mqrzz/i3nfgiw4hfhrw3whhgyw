@@ -619,7 +619,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 </div>
 
 <div class="cookie-banner" id="cookieBanner">
-  <div class="cookie-text">Мы используем файлы cookie. <a href="faq#rules">Политика конфиденциальности</a>.</div>
+  <div class="cookie-text">Мы используем файлы cookie. <a href="privacy">Политика конфиденциальности</a>.</div>
   <button class="cookie-btn" onclick="acceptCookies()">Принять</button>
 </div>
 <div class="toast" id="ovToast"></div>
@@ -683,7 +683,7 @@ onAuthStateChanged(auth,async user=>{
   currentUser=user;
   // Чистим зависшие заказы со статусом -1 старше 10 минут
   try{
-    const staleQ=query(collection(db,'orders'),where('uid','==',user.uid),where('status','==,-1'));
+    const staleQ=query(collection(db,'orders'),where('uid','==',user.uid),where('status','==',-1));
     const staleSnap=await getDocs(staleQ);
     const cutoff=Date.now()-10*60*1000;
     for(const d of staleSnap.docs){

@@ -1,6 +1,6 @@
 (async function geoRedirect() {
   const REDIRECT_URL = 'https://geo.antviz.ru';
-  const BLOCKED_COUNTRIES = ['IR', 'AF', 'IQ', 'UA', 'NG', 'NE', 'MX', 'SA'];
+  const blockedCountries = ['IR','AF','IQ','UA','NG','NE','MX','SA','JO','PK','IN','MM','BD','NP','BT','OM','YE','QA','KW','BH','CD','CG','DZ'];
 
   function redirect() {
     window.location.replace(REDIRECT_URL);

@@ -18,13 +18,30 @@
     const auth = getAuth(app);
     let mo = null;
     let currentUser = null;
+    let authReady = false;
+    let lastOn = null;
     const ADMIN = 'wbtipoofficialcom@gmail.com';
 
-    onAuthStateChanged(auth, user => { currentUser = user; });
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+      authReady = true;
+      render();
+    });
 
     onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
-      const on = snap.exists() && snap.data().enabled === true;
-      if (currentUser?.email === ADMIN) return;
+      lastOn = snap.exists() && snap.data().enabled === true;
+      render();
+    });
+
+    function render() {
+      // Ждём, пока разрешится и авторизация, и статус техработ,
+      // чтобы админ не увидел оверлей раньше, чем определится его роль.
+      if (!authReady || lastOn === null) return;
+      const on = lastOn;
+      if (currentUser?.email === ADMIN) {
+        if (mo) { mo.remove(); mo = null; document.body.style.overflow = ''; }
+        return;
+      }
 
       if (on && !mo) {
         const style = document.createElement('style');
@@ -63,6 +80,6 @@
         mo = null;
         document.body.style.overflow = '';
       }
-    });
+    }
   } catch(e) {}
 })();

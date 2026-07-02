@@ -222,11 +222,13 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
       <div class="ts">Новых: <strong id="tNew">—</strong></div>
       <div class="ts">В работе: <strong id="tWork">—</strong></div>
       <div class="ts">Готово: <strong id="tDone">—</strong></div>
+      <div class="ts" style="color:#b45309">Возвраты: <strong id="tRefunds">—</strong></div>
     </div>
   </div>
   <div class="tab-row">
     <button class="tab active" onclick="switchTab('active',this)">Активные</button>
     <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
+    <button class="tab" onclick="switchTab('refunds',this)">Возвраты</button>
     <button class="tab" onclick="switchTab('all',this)">Все</button>
   </div>
 </div>
@@ -299,6 +301,12 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
             <button class="btn btn-blue btn-sm" onclick="sendPayLink(selOrderId,selUid)">Отправить</button>
           </div>
         </div>
+      </div>
+
+      <!-- REFUND -->
+      <div class="sec" id="refundSec" style="display:none;border-color:rgba(245,158,11,.25)">
+        <div class="sec-h" style="background:rgba(245,158,11,.05)"><span class="sec-title" style="color:#b45309">Возврат средств</span></div>
+        <div class="sec-b" id="refundBody"></div>
       </div>
 
       <!-- CLIENT -->
@@ -399,9 +407,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
         <div class="sec-h" style="background:rgba(232,99,79,.04)">
           <span class="sec-title" style="color:var(--red)">Управление</span>
         </div>
-        <div class="sec-b" style="display:flex;gap:10px">
+        <div class="sec-b" style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-danger" onclick="archiveOrder()">В архив</button>
           <button class="btn btn-outline" onclick="printReceipt(selOrderId)">Печать квитанции</button>
+          <button class="btn btn-outline" onclick="manualRefund()">Оформить возврат вручную</button>
         </div>
       </div>
 
@@ -439,14 +448,14 @@ window.switchTab=(tab,btn)=>{currentTab=tab;document.querySelectorAll('.tab').fo
 function renderList(){
   const el=document.getElementById('orderList');
   const q=(document.getElementById('searchInp')?.value||'').toLowerCase();
-  let list=currentTab==='active'?allOrders.filter(o=>o.status<5):currentTab==='done'?allOrders.filter(o=>o.status===5):allOrders;
+  let list=currentTab==='active'?allOrders.filter(o=>o.status<5):currentTab==='done'?allOrders.filter(o=>o.status===5):currentTab==='refunds'?allOrders.filter(o=>o.refundStatus==='requested'):allOrders;
   if(q)list=list.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q));
   if(!list.length){el.innerHTML='<div class="es"><span style="font-size:2rem">📋</span>Нет заказов</div>';return;}
   el.innerHTML=list.map(o=>{
     const t=o.package||o.tariff||'—';
     const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
     return`<div class="or${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
-      <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge b${o.status||0}">${S[o.status||0]}</span></div>
+      <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge b${o.status||0}">${S[o.status||0]}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:rgba(245,158,11,.15);color:#b45309">Возврат</span>':''}</div>
       <div class="or-name">${esc(o.clientName||'—')}</div>
       <div class="or-email">${esc(o.clientEmail||'')}</div>
       <div class="or-f">
@@ -461,6 +470,10 @@ function updateStats(){
   document.getElementById('tNew').textContent=allOrders.filter(o=>(o.status||0)===0).length;
   document.getElementById('tWork').textContent=allOrders.filter(o=>o.status>=1&&o.status<=4).length;
   document.getElementById('tDone').textContent=allOrders.filter(o=>o.status===5||o.status===6).length;
+  const pendingRefunds=allOrders.filter(o=>o.refundStatus==='requested').length;
+  document.getElementById('tRefunds').textContent=pendingRefunds;
+  const navBadge=document.getElementById('navBadgeOrders');
+  if(navBadge){navBadge.style.display=pendingRefunds?'':'none';navBadge.textContent=pendingRefunds;}
 }
 
 window.selectOrder=id=>{
@@ -524,6 +537,7 @@ function showDetail(o){
   const as=document.getElementById('attachSec');
   if(o.attachments?.length){as.style.display='';document.getElementById('attachGrid').innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="at" src="${a.fileData}" alt="${esc(a.fileName||'')}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')">`:` <a class="btn btn-outline btn-xs" href="${a.fileData}" download="${esc(a.fileName||'file')}">📎 ${esc(a.fileName||'Файл')}</a>`).join('');}else as.style.display='none';
   renderSupport(o);
+  renderRefund(o);
   const rev=allReviews.find(r=>r.orderId===o.id);const rs=document.getElementById('reviewSec');
   if(rev){rs.style.display='';document.getElementById('reviewContent').innerHTML=`<div style="background:var(--bg2);border-radius:18px;padding:20px 22px"><div style="color:var(--warn);margin-bottom:8px;font-size:1.2rem">${stars(rev.stars||0)}</div><div style="font-size:.9rem;color:var(--muted);line-height:1.6">${esc(rev.text||'Без текста')}</div></div>`;}else rs.style.display='none';
 }
@@ -572,7 +586,66 @@ function renderSupport(o){
   }
 }
 
-window.togglePayment=async()=>{if(!selOrderId)return;currentPaid=!currentPaid;renderPayRow();const _o=allOrders.find(x=>x.id===selOrderId);const _upd={paid:currentPaid};if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=serverTimestamp();document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===5));}await updateDoc(doc(db,'orders',selOrderId),_upd).catch(()=>{});toast(currentPaid?'Оплачен ✓':'Не оплачен','success');};
+function renderRefund(o){
+  const sec=document.getElementById('refundSec');
+  const body=document.getElementById('refundBody');
+  const st=o.refundStatus;
+  if(!st||st==='none'){sec.style.display='none';body.innerHTML='';return;}
+  sec.style.display='';
+  if(st==='requested'){
+    body.innerHTML=`<div style="font-size:.88rem;color:var(--muted);margin-bottom:14px;line-height:1.6"><strong style="color:var(--text)">Причина клиента:</strong><br>${esc(o.refundReason||'—')}</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-green btn-sm" onclick="approveRefund()">Одобрить и вернуть</button>
+        <button class="btn btn-outline btn-sm" onclick="rejectRefund()">Отклонить</button>
+      </div>`;
+  }else if(st==='approved'||st==='refunded'){
+    body.innerHTML=`<div style="font-size:.88rem;color:var(--green-d);margin-bottom:10px">✓ ${st==='refunded'?'Возврат произведён':'Возврат одобрен'}</div>
+      ${o.refundReason?`<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Причина: ${esc(o.refundReason)}</div>`:''}
+      ${st==='approved'?'<button class="btn btn-dark btn-sm" onclick="markRefunded()">Отметить «Деньги отправлены»</button>':''}`;
+  }else if(st==='rejected'){
+    body.innerHTML=`<div style="font-size:.88rem;color:var(--red);margin-bottom:6px">✕ Возврат отклонён</div>
+      ${o.refundComment?`<div style="font-size:.85rem;color:var(--muted)">Комментарий: ${esc(o.refundComment)}</div>`:''}`;
+  }
+}
+
+window.approveRefund=async()=>{
+  if(!selOrderId)return;
+  const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
+  const amt=prompt('Сумма возврата, ₽',String(o.totalPrice||''));
+  if(amt===null)return;
+  await updateDoc(doc(db,'orders',selOrderId),{
+    refundStatus:'approved',refundAmount:Number(amt)||o.totalPrice||0,refundDecidedAt:serverTimestamp()
+  }).catch(()=>{});
+  toast('Возврат одобрен ✓','success');
+};
+window.rejectRefund=async()=>{
+  if(!selOrderId)return;
+  const comment=prompt('Комментарий для клиента (почему отклонено)');
+  if(comment===null)return;
+  await updateDoc(doc(db,'orders',selOrderId),{
+    refundStatus:'rejected',refundComment:comment.trim(),refundDecidedAt:serverTimestamp()
+  }).catch(()=>{});
+  toast('Возврат отклонён','info');
+};
+window.markRefunded=async()=>{
+  if(!selOrderId)return;
+  if(!confirm('Подтвердить, что деньги фактически отправлены клиенту?'))return;
+  await updateDoc(doc(db,'orders',selOrderId),{refundStatus:'refunded',refundedAt:serverTimestamp()}).catch(()=>{});
+  toast('Возврат завершён ✓','success');
+};
+window.manualRefund=async()=>{
+  if(!selOrderId)return;
+  const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
+  if(o.refundStatus&&o.refundStatus!=='none'&&o.refundStatus!=='rejected'){toast('Возврат уже оформляется','info');return;}
+  const reason=prompt('Причина возврата (для истории)');
+  if(reason===null)return;
+  await updateDoc(doc(db,'orders',selOrderId),{
+    refundStatus:'requested',refundReason:reason.trim()||'Оформлено вручную администратором',refundRequestedAt:serverTimestamp()
+  }).catch(()=>{});
+  toast('Заявка на возврат создана ✓','success');
+};
+
+window.togglePayment=async()=>{if(!selOrderId)return;currentPaid=!currentPaid;renderPayRow();const _o=allOrders.find(x=>x.id===selOrderId);const _upd={paid:currentPaid};if(currentPaid&&!_o?.paidAt){_upd.paidAt=serverTimestamp();}if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=serverTimestamp();document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===5));}await updateDoc(doc(db,'orders',selOrderId),_upd).catch(()=>{});toast(currentPaid?'Оплачен ✓':'Не оплачен','success');};
 window.setStatus=async s=>{
   if(!selOrderId)return;
   const upd={status:s};
@@ -624,7 +697,7 @@ window.sendPayLink=async(orderId,uid)=>{
 };
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
-  await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Истекает обслуживание',text:'Свяжитесь с нами для продления.',read:false,createdAt:serverTimestamp()});
+  await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Истекает обслуживание',text:'Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
   toast('Уведомление отправлено ✓','success');
 };
 window.archiveOrder=async()=>{if(!selOrderId)return;if(!confirm('Архивировать заказ?'))return;await updateDoc(doc(db,'orders',selOrderId),{archived:true}).catch(()=>{});toast('В архиве ✓','info');};

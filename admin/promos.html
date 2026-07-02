@@ -162,7 +162,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, getCountFromServer, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allPromos=[], currentFilter='all';
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
@@ -233,6 +233,7 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   if(!isAdmin){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
+  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
   await loadPromos();renderPromos();
 });
 </script>

@@ -337,6 +337,29 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   </div>
 </div>
 
+
+<!-- REFUND MODAL -->
+<div class="modal-overlay" id="refundModal">
+  <div class="modal">
+    <div class="modal-icon">
+      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg>
+    </div>
+    <h3>Запросить возврат</h3>
+    <p class="modal-p">Возврат доступен, пока заказ не перешёл в статус «В работе». Опишите причину — заявка передаётся вручную.</p>
+    <select class="review-textarea" id="refundReasonSelect" style="margin-bottom:10px;height:auto;padding:14px 16px">
+      <option value="Ещё не начали работу">Ещё не начали работу</option>
+      <option value="Передумал(а)">Передумал(а)</option>
+      <option value="Нашёл(-ла) другой вариант">Нашёл(-ла) другой вариант</option>
+      <option value="Другое">Другое</option>
+    </select>
+    <textarea class="review-textarea" id="refundComment" placeholder="Комментарий (необязательно)..."></textarea>
+    <div class="modal-btns">
+      <button class="btn btn-outline" onclick="closeRefundModal()">Отмена</button>
+      <button class="btn btn-green" onclick="submitRefundRequest()">Отправить заявку</button>
+    </div>
+  </div>
+</div>
+
 <!-- ORDER DETAIL MODAL -->
 <div class="ord-modal-overlay" id="ordModalOverlay">
   <div class="ord-modal">
@@ -554,11 +577,20 @@ window.openOrderModal=function(id){
   }
 
   const statusComment=o.statusComment?'<div class="ord-comment"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>'+esc(o.statusComment)+'</div>':'';
+  const refundBanners={
+    requested:{bg:'rgba(245,158,11,.1)',bd:'rgba(245,158,11,.3)',c:'#b45309',t:'Заявка на возврат отправлена — рассматривается вручную'},
+    approved:{bg:'rgba(30,222,123,.1)',bd:'rgba(30,222,123,.3)',c:'var(--green-d)',t:'Возврат одобрен — средства поступят в ближайшее время'},
+    refunded:{bg:'rgba(30,222,123,.1)',bd:'rgba(30,222,123,.3)',c:'var(--green-d)',t:'Средства возвращены'},
+    rejected:{bg:'rgba(232,99,79,.1)',bd:'rgba(232,99,79,.3)',c:'var(--red)',t:'В возврате отказано'+(o.refundComment?': '+esc(o.refundComment):'')}
+  };
+  const rb=refundBanners[o.refundStatus];
+  const refundBanner=rb?'<div style="font-size:.85rem;color:'+rb.c+';background:'+rb.bg+';border:1px solid '+rb.bd+';border-radius:14px;padding:12px 16px;margin-bottom:14px;line-height:1.5">'+rb.t+'</div>':'';
   const domainBanner=buildDomainBanner(o);
   const estDate=getEstimate(o.package,o.extras,s);
 
   // LEFT
   let leftHtml=buildTracker(o);
+  if(refundBanner)leftHtml+=refundBanner;
   if(statusComment)leftHtml+=statusComment;
   if(domainBanner)leftHtml+=domainBanner;
   if(estDate)leftHtml+=`<div class="ord-eta"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Ожидаемый срок: <strong style="color:var(--ink);margin-left:4px">${estDate}</strong></div>`;
@@ -581,6 +613,9 @@ window.openOrderModal=function(id){
     rightHtml+='<button class="ord-action-btn dark" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>Запросить правки</button>';
   }
   rightHtml+='<a class="ord-action-btn" href="../profile/support" style="pointer-events:all"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>Написать в поддержку</a>';
+  if(s<2&&(!o.refundStatus||o.refundStatus==='none')){
+    rightHtml+='<button class="ord-action-btn" onclick="openRefundModal(\''+o.id+'\')" style="pointer-events:all;color:var(--red)"><span class="ord-action-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg></span>Запросить возврат</button>';
+  }
   rightHtml+='</div>';
 
   window._modalOrderId=o.id;
@@ -596,6 +631,31 @@ window.payRemaining=async function(orderId){
 
 window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');document.body.style.overflow='';};
 window.requestRevision=async function(id){try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
+
+// ══ REFUND ══
+window.openRefundModal=function(id){
+  window._refundOrderId=id;
+  document.getElementById('refundReasonSelect').value='Ещё не начали работу';
+  document.getElementById('refundComment').value='';
+  document.getElementById('refundModal').classList.add('show');
+};
+window.closeRefundModal=function(){document.getElementById('refundModal').classList.remove('show');};
+window.submitRefundRequest=async function(){
+  const id=window._refundOrderId;if(!id)return;
+  const o=allOrders.find(x=>x.id===id);
+  if(!o||(o.status||0)>=2){toast('Возврат уже недоступен для этого заказа','error');closeRefundModal();return;}
+  const reason=document.getElementById('refundReasonSelect').value;
+  const comment=document.getElementById('refundComment').value.trim();
+  try{
+    await updateDoc(doc(db,'orders',id),{
+      refundStatus:'requested',
+      refundReason:comment?reason+' — '+comment:reason,
+      refundRequestedAt:serverTimestamp()
+    });
+    toast('Заявка на возврат отправлена ✓','success');
+    closeRefundModal();closeOrderModal();
+  }catch(e){toast('Не удалось отправить заявку','error');}
+};
 
 // ══ REVIEW ══
 window.openReview=function(id){

@@ -395,12 +395,12 @@
       ]
     },
     {
-      label: 'Обо мне',
+      label: 'О сервисе',
       key: 'company',
       sections: [
         {
           items: [
-            { href: 'https://antviz.ru/about', label: 'Обо мне', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
+            { href: 'https://antviz.ru/about', label: 'О сервисе', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
             { href: b+'rules',   label: 'Правила',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
             { href: b+'privacy', label: 'Конфиденциальность',  icon: '<path d="M12 3l8 4v5c0 5-3.5 8.5-8 10C7.5 20.5 4 17 4 12V7l8-4z"/>' },
           ]
@@ -712,43 +712,61 @@ ${buildMobileSheet()}`;
     refreshNotifyDot();
   }
 
-  function watchBadges(db, fsMod, user) {
-    const { collection, query, where, onSnapshot } = fsMod;
+  const BADGE_TTL_MS = 90 * 1000; // кэш на 90 секунд — навигация по сайту не долбит Firestore на каждый переход
+
+  function readBadgeCache(uid) {
+    try {
+      const raw = sessionStorage.getItem(`antviz_badges_${uid}`);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      if (Date.now() - data.ts > BADGE_TTL_MS) return null;
+      return data;
+    } catch (e) { return null; }
+  }
+  function writeBadgeCache(uid, data) {
+    try { sessionStorage.setItem(`antviz_badges_${uid}`, JSON.stringify({ ...data, ts: Date.now() })); } catch (e) {}
+  }
+  function applyBadgeData(data) {
+    setBadge('support', data.support || 0, 'warn');
+    setBadge('orders', data.orders || 0, null);
+    setBadge('tickets', data.tickets || 0, 'dot');
+    setBadge('notif', data.notif || 0, 'warn');
+    refreshNotifyDot();
+  }
+
+  async function watchBadges(db, fsMod, user) {
+    const { collection, query, where, getDocs } = fsMod;
     teardownListeners();
 
-    unsubSupport = onSnapshot(
-      query(collection(db, 'chats', user.uid, 'messages'), where('sender', '==', 'admin'), where('readByUser', '==', false)),
-      snap => {
-        setBadge('support', snap.size, 'warn');
-        refreshNotifyDot();
-      },
-      () => {}
-    );
+    const cached = readBadgeCache(user.uid);
+    if (cached) { applyBadgeData(cached); return; }
 
-    unsubOrders = onSnapshot(
-      query(collection(db, 'orders'), where('uid', '==', user.uid)),
-      snap => {
-        const orders = snap.docs.map(d => d.data());
-        const active = orders.filter(o => (o.status || 0) >= 1 && (o.status || 0) <= 4).length;
-        setBadge('orders', active, null);
-        const activeSupport = orders.some(o =>
-          o.supportActive && o.supportExpiresAt?.toDate &&
-          o.supportExpiresAt.toDate() > new Date()
-        );
-        setBadge('tickets', activeSupport ? 1 : 0, 'dot');
-        refreshNotifyDot();
-      },
-      () => {}
-    );
+    // Разовое чтение вместо realtime-подписки: бейджам в шапке не нужно
+    // обновляться «прямо сейчас, пока страница открыта» — этого достаточно
+    // раз на заход, а следующие переходы по сайту берут значение из кэша.
+    try {
+      const [supportSnap, ordersSnap, notifSnap] = await Promise.all([
+        getDocs(query(collection(db, 'chats', user.uid, 'messages'), where('sender', '==', 'admin'), where('readByUser', '==', false))),
+        getDocs(query(collection(db, 'orders'), where('uid', '==', user.uid))),
+        getDocs(query(collection(db, 'notifications', user.uid, 'items'), where('read', '==', false))),
+      ]);
 
-    unsubNotif = onSnapshot(
-      query(collection(db, 'notifications', user.uid, 'items'), where('read', '==', false)),
-      snap => {
-        setBadge('notif', snap.size, 'warn');
-        refreshNotifyDot();
-      },
-      () => {}
-    );
+      const orders = ordersSnap.docs.map(d => d.data());
+      const active = orders.filter(o => (o.status || 0) >= 1 && (o.status || 0) <= 4).length;
+      const activeSupport = orders.some(o =>
+        o.supportActive && o.supportExpiresAt?.toDate &&
+        o.supportExpiresAt.toDate() > new Date()
+      );
+
+      const data = {
+        support: supportSnap.size,
+        orders: active,
+        tickets: activeSupport ? 1 : 0,
+        notif: notifSnap.size,
+      };
+      writeBadgeCache(user.uid, data);
+      applyBadgeData(data);
+    } catch (e) {}
   }
 
   /* ── Ждём, пока сама страница инициализирует Firebase App, и подключаемся

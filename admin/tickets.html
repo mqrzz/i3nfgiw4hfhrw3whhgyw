@@ -196,7 +196,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, getDocs, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, orderBy, getDocs, getCountFromServer, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allTickets=[], allOrders=[], currentFilter='all';
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -303,7 +303,7 @@ window.deleteTick=async id=>{
 window.notifyExpiry=async uid=>{
   if(!uid)return;
   try{
-    await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Обслуживание заканчивается',text:'До окончания обслуживания осталось менее 3 дней. Свяжитесь с нами для продления.',read:false,createdAt:serverTimestamp()});
+    await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Обслуживание заканчивается',text:'До окончания обслуживания осталось менее 3 дней. Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
     toast('Уведомление отправлено ✓','success');
   }catch(e){toast('Ошибка','error');}
 };
@@ -325,6 +325,7 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   if(!isAdmin){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
+  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
   await loadTickets();renderTickets();
   onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
     allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));

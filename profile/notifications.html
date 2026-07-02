@@ -145,7 +145,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <script type="module">
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser = null;
 let allNotifs = [];
@@ -208,7 +208,7 @@ function render(){
 window.openNotif = async function(id, link){
   const n = allNotifs.find(x=>x.id===id);
   if(n && !n.read){
-    try{ await updateDoc(doc(db,'notifications',id),{read:true}); }catch(e){}
+    try{ await updateDoc(doc(db,'notifications',currentUser.uid,'items',id),{read:true}); }catch(e){}
   }
   if(link && link!=='#') window.location.href = link;
 };
@@ -218,7 +218,7 @@ document.getElementById('markAllBtn').addEventListener('click', async ()=>{
   if(!unread.length) return;
   try{
     const batch = writeBatch(db);
-    unread.forEach(n=>batch.update(doc(db,'notifications',n.id),{read:true}));
+    unread.forEach(n=>batch.update(doc(db,'notifications',currentUser.uid,'items',n.id),{read:true}));
     await batch.commit();
   }catch(e){}
 });
@@ -232,7 +232,7 @@ document.getElementById('notifTabs').addEventListener('click', e=>{
 });
 
 function loadNotifications(uid){
-  const q = query(collection(db,'notifications'), where('uid','==',uid), orderBy('createdAt','desc'), limit(100));
+  const q = query(collection(db,'notifications',uid,'items'), orderBy('createdAt','desc'), limit(100));
   onSnapshot(q, snap=>{
     allNotifs = snap.docs.map(d=>({id:d.id,...d.data()}));
     render();

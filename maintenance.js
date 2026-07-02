@@ -1,7 +1,7 @@
 (async () => {
   try {
     const { initializeApp, getApps, getApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, doc, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
     const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
 
     const firebaseConfig = {
@@ -22,16 +22,43 @@
     let lastOn = null;
     const ADMIN = 'wbtipoofficialcom@gmail.com';
 
+    // Кэш статуса техработ в sessionStorage: пока сайт работает в обычном
+    // режиме, каждый переход между страницами не должен читать документ
+    // заново — этого не разово в несколько минут вполне достаточно.
+    const CACHE_KEY = 'antviz_maint_status';
+    const TTL_OFF_MS = 5 * 60 * 1000;  // не в техработах — кэш на 5 минут
+    const TTL_ON_MS  = 20 * 1000;      // в техработах — перечитываем чаще, чтобы быстро снять оверлей
+
+    function readCache() {
+      try {
+        const raw = sessionStorage.getItem(CACHE_KEY);
+        if (!raw) return null;
+        const data = JSON.parse(raw);
+        const ttl = data.on ? TTL_ON_MS : TTL_OFF_MS;
+        if (Date.now() - data.ts > ttl) return null;
+        return data.on;
+      } catch (e) { return null; }
+    }
+    function writeCache(on) {
+      try { sessionStorage.setItem(CACHE_KEY, JSON.stringify({ on, ts: Date.now() })); } catch (e) {}
+    }
+
     onAuthStateChanged(auth, user => {
       currentUser = user;
       authReady = true;
       render();
     });
 
-    onSnapshot(doc(db, 'settings', 'maintenance'), snap => {
-      lastOn = snap.exists() && snap.data().enabled === true;
+    (async () => {
+      const cached = readCache();
+      if (cached !== null) { lastOn = cached; render(); return; }
+      try {
+        const snap = await getDoc(doc(db, 'settings', 'maintenance'));
+        lastOn = snap.exists() && snap.data().enabled === true;
+        writeCache(lastOn);
+      } catch (e) { lastOn = false; }
       render();
-    });
+    })();
 
     function render() {
       // Ждём, пока разрешится и авторизация, и статус техработ,
@@ -71,7 +98,7 @@
           <div id="maint-card">
             <div id="maint-label">Технические работы</div>
             <h1 id="maint-title">Скоро <em style="font-style:normal;color:#1ede7b">вернёмся</em></h1>
-            <p id="maint-text">Сайт временно недоступен — мы уже работаем над улучшениями. Обычно это занимает не больше часа.</p>
+            <p id="maint-text">Сайт временно недоступен — идут технические работы. Обычно это занимает не больше часа.</p>
           </div>`;
         document.body.appendChild(mo);
         document.body.style.overflow = 'hidden';

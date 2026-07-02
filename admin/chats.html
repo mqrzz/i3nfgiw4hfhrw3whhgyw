@@ -286,7 +286,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs, getCountFromServer, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let allTickets=[], selectedId=null, currentFilter='all', unsubMsgs=null;
 
@@ -457,6 +457,7 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   if(!isAdmin){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='grid';
+  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
   const q=query(collection(db,'tickets'),orderBy('createdAt','desc'));
   onSnapshot(q,async snap=>{
     const incoming=snap.docs.map(d=>({id:d.id,...d.data()}));

@@ -249,6 +249,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
       <p>Управляйте заказами, клиентами и настройками сайта</p>
     </div>
     <div class="dash-hero-actions">
+      <button class="btn-hero-outline" id="dashRefreshBtn" onclick="loadDashboard()">Обновить</button>
       <a href="/admin/orders" class="btn-hero-outline">Все заказы →</a>
       <button class="btn-hero-green" onclick="openNotifModal()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
@@ -344,6 +345,30 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
     </div>
   </div>
 
+  <div style="margin-top:16px">
+    <div class="section">
+      <div class="section-hdr"><span class="section-title">Отчёт для бухгалтерии</span></div>
+      <div class="section-body">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div>
+            <label style="display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px">С даты (оплаты)</label>
+            <input type="date" class="si" id="repFrom"/>
+          </div>
+          <div>
+            <label style="display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px">По дату</label>
+            <input type="date" class="si" id="repTo"/>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);padding-bottom:10px">
+            <input type="checkbox" id="repOnlyPaid" checked/> только оплаченные
+          </label>
+          <button class="btn btn-dark btn-sm" onclick="generateAccountingReport()">Сформировать PDF</button>
+          <button class="btn btn-outline btn-sm" onclick="generateAccountingCsv()">Экспорт CSV</button>
+        </div>
+        <div style="font-size:.78rem;color:var(--muted);margin-top:10px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- NOTIF MODAL -->
@@ -365,7 +390,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, getDocs, addDoc, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, orderBy, onSnapshot, getDocs, getCountFromServer, addDoc, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -432,6 +457,90 @@ window.sendNotif=async()=>{
 
 window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
 
+// ══ ОТЧЁТ ДЛЯ БУХГАЛТЕРИИ ══
+function reportRows(){
+  const orders=window._dashOrders||[];
+  const fromV=document.getElementById('repFrom').value;
+  const toV=document.getElementById('repTo').value;
+  const onlyPaid=document.getElementById('repOnlyPaid').checked;
+  const from=fromV?new Date(fromV+'T00:00:00'):null;
+  const to=toV?new Date(toV+'T23:59:59'):null;
+  const extLbls={domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+  return orders.filter(o=>{
+    if(onlyPaid&&!o.paid)return false;
+    const d=(o.paidAt||o.createdAt);
+    if(!d)return!from&&!to;
+    const dd=new Date(d.seconds*1000);
+    if(from&&dd<from)return false;
+    if(to&&dd>to)return false;
+    return true;
+  }).map(o=>{
+    const d=o.paidAt||o.createdAt;
+    return{
+      id:o.id.slice(0,8).toUpperCase(),
+      date:d?new Date(d.seconds*1000).toLocaleDateString('ru'):'—',
+      client:o.clientName||'—',
+      tariff:o.package||o.tariff||'—',
+      extras:(o.extras||[]).map(e=>extLbls[e]||e).join(', ')||'—',
+      amount:o.totalPrice||0,
+      paid:!!o.paid,
+      refunded:o.refundStatus==='refunded'?(o.refundAmount||o.totalPrice||0):0
+    };
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+}
+
+window.generateAccountingReport=function(){
+  const rows=reportRows();
+  const totalIn=rows.reduce((s,r)=>s+(r.paid?r.amount:0),0);
+  const totalOut=rows.reduce((s,r)=>s+r.refunded,0);
+  const from=document.getElementById('repFrom').value||'начало';
+  const to=document.getElementById('repTo').value||'сегодня';
+  const rowsHtml=rows.map(r=>`<tr>
+    <td>№${r.id}</td><td>${r.date}</td><td>${esc(r.client)}</td><td>${esc(r.tariff)}</td>
+    <td>${esc(r.extras)}</td><td>${r.paid?'Оплачен':'Не оплачен'}</td>
+    <td style="text-align:right">${r.amount.toLocaleString('ru')} ₽</td>
+    <td style="text-align:right;color:#c0392b">${r.refunded?'−'+r.refunded.toLocaleString('ru')+' ₽':'—'}</td>
+  </tr>`).join('');
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Отчёт — Antviz</title>
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:920px;margin:40px auto;padding:0 24px;color:#191b1e;font-size:12px;line-height:1.5}
+  .header{margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #191b1e}
+  .logo{font-size:20px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}
+  .subtitle{font-size:11px;color:#707a8a;margin-top:3px}
+  table{width:100%;border-collapse:collapse;margin-top:14px}
+  th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#707a8a;padding:8px 6px;border-bottom:2px solid #191b1e}
+  td{padding:7px 6px;border-bottom:1px solid #eee;font-size:11.5px}
+  .totals{margin-top:20px;padding-top:14px;border-top:2px solid #191b1e;max-width:320px;margin-left:auto}
+  .totals div{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
+  .totals .net{font-weight:700;font-size:15px;padding-top:8px;border-top:1px solid #ccc;margin-top:4px}
+  .footer{margin-top:20px;font-size:10px;color:#aaa}
+  @media print{body{margin:20px auto}}</style></head><body>
+  <div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Отчёт для бухгалтерии · период: ${from} — ${to}</div></div>
+  <table><thead><tr><th>Заказ</th><th>Дата</th><th>Клиент</th><th>Тариф</th><th>Допы</th><th>Статус</th><th style="text-align:right">Сумма</th><th style="text-align:right">Возврат</th></tr></thead>
+  <tbody>${rowsHtml||'<tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa">Нет данных за период</td></tr>'}</tbody></table>
+  <div class="totals">
+    <div><span>Итого получено</span><strong>${totalIn.toLocaleString('ru')} ₽</strong></div>
+    <div><span>Итого возвращено</span><strong style="color:#c0392b">−${totalOut.toLocaleString('ru')} ₽</strong></div>
+    <div class="net"><span>Чистыми</span><span>${(totalIn-totalOut).toLocaleString('ru')} ₽</span></div>
+  </div>
+  <div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div>
+  <script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const w=window.open('','_blank','width=960,height=800');
+  w.document.write(html);w.document.close();
+};
+
+window.generateAccountingCsv=function(){
+  const rows=reportRows();
+  const head=['Заказ','Дата','Клиент','Тариф','Допы','Статус','Сумма','Возврат'];
+  const lines=[head.join(';')].concat(rows.map(r=>[
+    '№'+r.id,r.date,r.client,r.tariff,r.extras,r.paid?'Оплачен':'Не оплачен',r.amount,r.refunded?'-'+r.refunded:''
+  ].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(';')));
+  const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='antviz-report-'+(document.getElementById('repFrom').value||'all')+'.csv';
+  a.click();
+};
+
 onAuthStateChanged(auth,async user=>{
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
   let isAdmin=user.email===ADMIN_EMAIL;
@@ -439,9 +548,16 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   if(!isAdmin){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
+  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
 
-  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
+  window.loadDashboard=async function(){
+    const btn=document.getElementById('dashRefreshBtn');
+    if(btn){btn.disabled=true;btn.textContent='Обновление...';}
+    const snap=await getDocs(query(collection(db,'orders'),orderBy('createdAt','desc'))).catch(()=>null);
+    if(btn){btn.disabled=false;btn.textContent='Обновить';}
+    if(!snap)return;
     const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    window._dashOrders=orders;
     const done=orders.filter(o=>o.status===5);
     const rev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
     document.getElementById('sAll').textContent=orders.length;
@@ -492,7 +608,8 @@ onAuthStateChanged(auth,async user=>{
         <div style="font-size:.82rem;font-weight:500;margin-bottom:2px">${esc(o.clientName||'—')}</div>
         <div style="font-size:.72rem;color:${days<3?'var(--red)':'var(--muted)'}">Осталось ${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
       </div>`;}).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Нет активных обслуживаний</div>';
-  });
+  };
+  loadDashboard();
 });
 </script>
 <script src="../GEOBLOCK.js"></script>

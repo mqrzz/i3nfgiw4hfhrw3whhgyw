@@ -27,25 +27,28 @@
   const CSS = `
     :root{
       --sb-w: 260px;
+      --sb-gap: 16px;
     }
 
-    /* App-shell: сайдбар и контент — две колонки высотой ровно в экран.
-       Скроллится только .sb-content, сайдбар в прокрутке не участвует. */
-    html, body{ height:100%; }
-    body{ margin:0; overflow:hidden; }
+    /* Страница снова обычная — скроллится целиком, футер (подключается
+       отдельным footer.js на каждой странице) остаётся в нормальном
+       потоке документа под sb-shell. */
+    html, body{ margin:0; background:var(--bg2,#f2f4f7); }
 
+    /* App-frame: серая рамка на весь экран. Сайдбар — часть этой рамки
+       (тот же фон, без своей карточки), рабочая область — единственный
+       элемент, который визуально выделяется. */
     .sb-shell{
-      display:flex; align-items:stretch;
-      height:100vh; width:100%;
+      display:flex; align-items:flex-start;
+      min-height:100vh; width:100%;
     }
 
-    /* Сайдбар — докнут вплотную к левому краю на всю высоту окна,
-       не карточка с отступами, а полноценная панель приложения. */
+    /* Сайдбар — докнут вплотную к левому краю, прилипает при скролле
+       страницы (position:sticky), сливается с фоном-рамкой. */
     .sb-nav{
-      position:relative; flex-shrink:0;
-      width:var(--sb-w); height:100%;
-      background:var(--bg,#fff);
-      border-right:1.5px solid var(--border,#dfe3e8);
+      position:sticky; top:0; flex-shrink:0;
+      width:var(--sb-w); height:100vh;
+      background:var(--bg2,#f2f4f7);
       display:flex; flex-direction:column;
       padding:20px 14px;
       overflow-y:auto; overscroll-behavior:contain;
@@ -75,8 +78,8 @@
       transition:background .15s, color .15s;
     }
     .sb-link svg{ width:19px; height:19px; stroke:currentColor; stroke-width:1.7; flex-shrink:0; fill:none; }
-    .sb-link:hover{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); }
-    .sb-link.is-active{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); font-weight:500; }
+    .sb-link:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
+    .sb-link.is-active{ background:var(--bg,#fff); color:var(--text,#191b1e); font-weight:500; }
     .sb-link.is-active svg{ stroke:var(--green,#1ede7b); }
     .sb-badge{
       margin-left:auto; background:var(--green,#1ede7b); color:#191b1e;
@@ -89,13 +92,17 @@
     .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
     .sb-link.danger svg{ stroke:#d95a48; }
 
-    /* Контент — единственная скроллящаяся область. Сам скролл-контейнер
-       тянется на всю оставшуюся ширину, а читаемый максимум держит уже
-       внутренний .shell, чтобы текст не растягивался во всю ширину
-       экрана на сверхширoких мониторах. */
+    /* Рабочая область — плавающая панель приложения: отступы от рамки
+       сверху/справа/снизу, вплотную к сайдбару слева, скругления по
+       всем углам, собственный (не рамочный) фон. Читаемый максимум
+       держит внутренний .shell, чтобы текст не растягивался на
+       сверхширoких мониторах. */
     .sb-content{
-      flex:1; min-width:0; height:100%;
-      overflow-y:auto; -webkit-overflow-scrolling:touch;
+      flex:1; min-width:0;
+      min-height:calc(100vh - (var(--sb-gap) * 2));
+      margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) 0;
+      background:var(--bg,#fff);
+      border-radius:32px;
       padding:48px 56px 60px;
     }
     .sb-content > .shell{ max-width:1240px; margin:0 auto; }
@@ -107,12 +114,14 @@
     .antviz-nav{ display:none; }
 
     @media (max-width:980px){
-      html, body{ height:auto; }
-      body{ overflow:visible; }
       .antviz-nav{ display:flex; }
       .sb-nav{ display:none; }
-      .sb-shell{ display:block; height:auto; }
-      .sb-content{ height:auto; overflow:visible; padding:88px 1.2rem 80px; }
+      .sb-shell{ display:block; min-height:auto; }
+      .sb-content{
+        margin:0; border-radius:0; min-height:auto;
+        background:var(--bg,#fff);
+        padding:88px 1.2rem 80px;
+      }
     }
   `;
 

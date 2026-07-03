@@ -105,9 +105,9 @@
        сверхширoких мониторах. */
     .sb-content{
       flex:1; min-width:0;
-      height:calc(100vh - (var(--sb-gap) * 2));
+      height:calc(100vh - var(--sb-gap));
       overflow-y:auto; -webkit-overflow-scrolling:touch;
-      margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
+      margin:0 var(--sb-gap) var(--sb-gap) var(--sb-gap);
       background:var(--bg,#fff);
       border:1px solid var(--border,#dfe3e8);
       border-radius:32px;

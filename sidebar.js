@@ -27,38 +27,41 @@
   const CSS = `
     :root{
       --sb-w: 260px;
-      --sb-top: 96px;
-      --frame-max: 1560px;
-      --frame-pad: 24px;
     }
 
-    /* Серая канва вокруг всего кабинета — даёт эффект «обводки»: страница
-       не растянута в оба края экрана, а лежит на полотне с отступами. */
-    body{ background:var(--bg2,#f2f4f7) !important; }
+    /* App-shell: сайдбар и контент — две колонки высотой ровно в экран.
+       Скроллится только .sb-content, сайдбар в прокрутке не участвует. */
+    html, body{ height:100%; }
+    body{ margin:0; overflow:hidden; }
 
-    /* Рамка кабинета — центрируется на канве, а не тянется к левому краю. */
     .sb-shell{
-      max-width:var(--frame-max); margin:0 auto;
-      display:flex; align-items:flex-start; gap:20px;
-      padding:var(--sb-top) var(--frame-pad) var(--frame-pad);
-      width:100%;
+      display:flex; align-items:stretch;
+      height:100vh; width:100%;
     }
 
-    /* Сайдбар — полноценная карточка со своим фоном, рамкой и тенью,
-       а не прозрачная колонка ссылок поверх остального контента. */
+    /* Сайдбар — докнут вплотную к левому краю на всю высоту окна,
+       не карточка с отступами, а полноценная панель приложения. */
     .sb-nav{
-      position:sticky; top:var(--sb-top);
-      width:var(--sb-w); flex-shrink:0;
-      max-height:calc(100vh - var(--sb-top) - var(--frame-pad));
-      display:flex; flex-direction:column;
+      position:relative; flex-shrink:0;
+      width:var(--sb-w); height:100%;
       background:var(--bg,#fff);
-      border:1.5px solid var(--border,#dfe3e8);
-      border-radius:28px;
-      padding:18px;
+      border-right:1.5px solid var(--border,#dfe3e8);
+      display:flex; flex-direction:column;
+      padding:20px 14px;
       overflow-y:auto; overscroll-behavior:contain;
-      box-shadow:0 4px 16px rgba(0,51,153,.04), 0 2px 2px rgba(0,51,153,.05);
     }
     .sb-nav::-webkit-scrollbar{ width:0; }
+
+    /* Лого/выход на главную сайта — раньше эту роль играла плавающая
+       капсула nav.js, на десктопе в кабинете она теперь скрыта. */
+    .sb-brand{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px 20px; margin-bottom:8px;
+      border-bottom:1px solid var(--border,#dfe3e8);
+      text-decoration:none;
+    }
+    .sb-brand img{ width:26px; height:26px; border-radius:8px; object-fit:cover; flex-shrink:0; }
+    .sb-brand span{ font-family:'Geologica','Inter','Arial',sans-serif; font-weight:500; font-size:1rem; letter-spacing:-.01em; color:var(--text,#191b1e); }
 
     .sb-nav-main{ display:flex; flex-direction:column; gap:3px; }
     .sb-nav-bottom{ display:flex; flex-direction:column; gap:3px; margin-top:auto; padding-top:14px; }
@@ -86,19 +89,30 @@
     .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
     .sb-link.danger svg{ stroke:#d95a48; }
 
-    /* Контент — вторая карточка-зона в той же рамке, занимает всё
-       оставшееся место, но не дальше границ .sb-shell (max-width:1560px
-       centered), поэтому не «уезжает» влево с пустотой справа. */
+    /* Контент — единственная скроллящаяся область. Сам скролл-контейнер
+       тянется на всю оставшуюся ширину, а читаемый максимум держит уже
+       внутренний .shell, чтобы текст не растягивался во всю ширину
+       экрана на сверхширoких мониторах. */
     .sb-content{
-      display:block;
-      flex:1; min-width:0;
-      padding-bottom:24px;
+      flex:1; min-width:0; height:100%;
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
+      padding:48px 56px 60px;
     }
+    .sb-content > .shell{ max-width:1240px; margin:0 auto; }
+
+    /* На десктопе капсула nav.js больше не нужна — её роль (профиль,
+       уведомления, выход) уже покрывает сайдбар, а переход на главную
+       сайта теперь через .sb-brand. На мобильных сайдбар скрыт, поэтому
+       капсула возвращается как единственная навигация. */
+    .antviz-nav{ display:none; }
 
     @media (max-width:980px){
+      html, body{ height:auto; }
+      body{ overflow:visible; }
+      .antviz-nav{ display:flex; }
       .sb-nav{ display:none; }
-      .sb-shell{ display:block; padding:88px 1.2rem 80px; max-width:640px; }
-      .sb-content{ padding:0; }
+      .sb-shell{ display:block; height:auto; }
+      .sb-content{ height:auto; overflow:visible; padding:88px 1.2rem 80px; }
     }
   `;
 
@@ -143,7 +157,13 @@
 
     const shell = document.createElement('div');
     shell.className = 'sb-shell';
-    shell.innerHTML = `<nav class="sb-nav" id="sbNav">${buildNav()}</nav>`;
+    shell.innerHTML = `<nav class="sb-nav" id="sbNav">
+      <a class="sb-brand" href="${b || '/'}">
+        <img src="${b}img/favicon.png" alt=""/>
+        <span>Antviz</span>
+      </a>
+      ${buildNav()}
+    </nav>`;
 
     if (existingContent) {
       existingContent.classList.add('sb-content');

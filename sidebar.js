@@ -7,11 +7,11 @@
  * постоянный сайдбар слева с разделами и бейджами (активные заказы /
  * непрочитанные сообщения / истекающее обслуживание / непрочитанные
  * уведомления). На мобильных скрыт — там навигация через капсулу
- * nav.js (бургер) и обычный скролл страницы, без верхнего back-bar — 
+ * nav.js (бургер) и обычный скролл страницы, без верхнего back-bar —
  * его каждая страница убирает сама.
  *
  * Подключается к уже существующему Firebase App той же логикой, что и
- * nav.js — ждёт getApps().length, не делает свой initializeApp(). 
+ * nav.js — ждёт getApps().length, не делает свой initializeApp().
  *
  * Каждая страница оборачивает свой контент в <div id="sbContent">...</div>
  * — sidebar.js найдёт этот узел и обернёт его вместе с собой в общий
@@ -49,14 +49,14 @@
        справа/сверху/снизу. Прилипает при скролле страницы
        (position:sticky). */
     .sb-nav{
-      position:sticky; top:var(--sb-gap); flex-shrink:0;
-      width:var(--sb-w); height:calc(100vh - (var(--sb-gap) * 2));
+      position:sticky; top:0; flex-shrink:0;
+      width:var(--sb-w); height:calc(100vh - var(--sb-gap));
       background:var(--bg,#fff);
       border:1px solid var(--border,#dfe3e8);
       border-radius:32px;
       display:flex; flex-direction:column;
-      margin:var(--sb-gap) 0 var(--sb-gap) var(--sb-gap);
-      padding:20px 14px;
+      margin:0 0 var(--sb-gap) var(--sb-gap);
+      padding:8px 14px 20px;
       overflow-y:auto; overscroll-behavior:contain;
     }
     .sb-nav::-webkit-scrollbar{ width:0; }

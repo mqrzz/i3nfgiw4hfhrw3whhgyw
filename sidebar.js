@@ -50,12 +50,12 @@
        (position:sticky). */
     .sb-nav{
       position:sticky; top:0; flex-shrink:0;
-      width:var(--sb-w); height:calc(100vh - var(--sb-gap));
+      width:var(--sb-w); height:calc(100vh - var(--sb-gap) * 2);
       background:var(--bg,#fff);
       border:1px solid var(--border,#dfe3e8);
       border-radius:32px;
       display:flex; flex-direction:column;
-      margin:0 var(--sb-gap) var(--sb-gap) var(--sb-gap);
+      margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
       padding:8px 14px 20px;
       overflow-y:auto; overscroll-behavior:contain;
     }
@@ -105,9 +105,9 @@
        сверхширoких мониторах. */
     .sb-content{
       flex:1; min-width:0;
-      height:calc(100vh - var(--sb-gap));
+      height:calc(100vh - var(--sb-gap) * 2);
       overflow-y:auto; -webkit-overflow-scrolling:touch;
-      margin:0 var(--sb-gap) var(--sb-gap) var(--sb-gap);
+      margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
       background:var(--bg,#fff);
       border:1px solid var(--border,#dfe3e8);
       border-radius:32px;

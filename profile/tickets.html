@@ -66,40 +66,61 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
 /* EMPTY STATE — горизонтальный баннер вместо центрированной карточки */
 .empty-card{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;padding:48px 52px;display:flex;align-items:center;justify-content:space-between;gap:32px;flex-wrap:wrap}
+.empty-card-left{display:flex;align-items:center;gap:26px;flex:1;min-width:280px}
 .empty-card-text{max-width:460px}
 .empty-card h2{font-size:clamp(22px,2.5vw,30px);font-weight:500;letter-spacing:-.03em;margin-bottom:12px;line-height:1.1}
 .empty-card p{font-size:.9rem;color:var(--ink-dim);font-weight:300;line-height:1.6;margin-bottom:8px}
 .empty-card .empty-note{color:var(--ink-faint);font-size:.82rem}
 
+/* Иконки-бейджи — единый язык для заголовков карточек и пустых состояний:
+   квадрат со скруглением, приглушённый фон, тонкая обводка внутри. */
+.ico-badge{border-radius:16px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ico-badge svg{stroke:var(--ink-dim);stroke-width:1.6;fill:none}
+.ico-badge.lg{width:64px;height:64px;border-radius:19px}
+.ico-badge.lg svg{width:28px;height:28px}
+.ico-badge.md{width:42px;height:42px;border-radius:13px}
+.ico-badge.md svg{width:19px;height:19px}
+.ico-badge.sm{width:38px;height:38px;border-radius:11px}
+.ico-badge.sm svg{width:16px;height:16px}
+.ico-badge.dark{background:var(--dark)}
+.ico-badge.dark svg{stroke:var(--accent)}
+
 /* BUY CARD */
 .buy-card{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;padding:48px 44px}
-.buy-top{margin-bottom:28px}
-.buy-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);margin-bottom:14px}
+.buy-top{margin-bottom:28px;display:flex;align-items:center;gap:18px}
+.buy-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-faint);margin-bottom:10px}
 .buy-price{font-size:clamp(32px,4vw,44px);font-weight:500;letter-spacing:-.04em;color:var(--ink)}
 .buy-price span{font-size:16px;font-weight:300;color:var(--ink-faint);letter-spacing:0}
 
-/* Тайлы условий — bento-сетка вместо списка */
+/* Тайлы условий — bento-сетка вместо списка. Первые три — то, что входит
+   в подписку (акцентная иконка), нижние три — уточнения (тихий текст с
+   тире, как type-feat на главной), а не равноценный список из шести пунктов. */
 .buy-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:28px}
-.buy-tile{background:var(--bg3);padding:22px 20px;display:flex;flex-direction:column;gap:5px}
+.buy-tile{background:var(--bg3);padding:22px 20px;display:flex;flex-direction:column;gap:7px}
+.tile-ico{width:28px;height:28px;border-radius:8px;background:var(--accent-wash);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
+.tile-ico svg{width:14px;height:14px;stroke:var(--accent-d);stroke-width:1.9;fill:none}
 .buy-tile strong{font-size:.82rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
 .buy-tile span{font-size:.78rem;color:var(--ink-dim);font-weight:300;line-height:1.5}
 .buy-tile em{font-style:normal;font-size:.72rem;color:var(--accent-d);font-weight:500;margin-top:1px}
-.buy-tile.muted strong{color:var(--ink-dim)}
-.buy-tile.muted span{color:var(--ink-faint)}
+.buy-tile.muted{background:var(--bg)}
+.buy-tile.muted strong{color:var(--ink-dim);display:flex;align-items:center;gap:7px}
+.buy-tile.muted strong::before{content:'—';color:var(--ink-faint);font-weight:300}
+.buy-tile.muted span{color:var(--ink-faint);padding-left:13px}
 
 .buy-divider{height:1px;background:var(--line);margin-bottom:28px}
 .buy-sub-title{font-size:1rem;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
 .buy-sub-text{font-size:.84rem;color:var(--ink-dim);font-weight:300;margin-bottom:20px}
 
-.order-strip{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding-left .15s}
+.order-strip{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);cursor:pointer;transition:padding-left .15s}
 .order-strip:last-of-type{border-bottom:none}
 .order-strip:hover{padding-left:8px}
+.order-left{display:flex;align-items:center;gap:14px;min-width:0}
 .order-num{font-size:.95rem;font-weight:500;letter-spacing:-.01em;margin-bottom:4px}
 .order-type{display:flex;align-items:center;gap:7px;font-size:.8rem;color:var(--ink-dim);font-weight:300}
 .order-arrow{width:16px;height:16px;stroke:var(--line-strong);stroke-width:2;fill:none;transition:stroke .15s;flex-shrink:0}
 .order-strip:hover .order-arrow{stroke:var(--accent-h)}
 
-.buy-one-row{padding:16px 0;border-bottom:1px solid var(--line);margin-bottom:20px}
+.buy-one-row{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--line);margin-bottom:20px}
 .buy-one-name{font-size:.95rem;font-weight:500;letter-spacing:-.01em;margin-bottom:3px}
 .buy-one-type{font-size:.8rem;color:var(--ink-dim);font-weight:300}
 
@@ -128,14 +149,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .limit-seg.filled{background:var(--accent)}
 .limit-seg.filled.warn{background:var(--warn)}
 
-.site-line{font-size:.78rem;color:var(--ink-faint);font-weight:300;padding:0 6px;margin-bottom:24px}
+.site-line{display:flex;align-items:center;gap:7px;font-size:.78rem;color:var(--ink-faint);font-weight:300;padding:0 6px;margin-bottom:24px}
+.site-line svg{width:13px;height:13px;stroke:var(--ink-faint);stroke-width:1.8;fill:none;flex-shrink:0}
 
 .limit-reached-banner{background:var(--warn-wash);border:1px solid rgba(245,158,11,.25);border-radius:16px;padding:14px 16px;margin-bottom:24px;font-size:.8rem;color:var(--ink);line-height:1.55}
 
 /* CONTENT — форма и история в две равноценные колонки */
 .content-grid{display:grid;grid-template-columns:1fr 1.25fr;gap:20px;align-items:start}
 .card{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;overflow:hidden}
-.card-head{padding:36px 40px 24px;border-bottom:1px solid var(--line)}
+.card-head{padding:32px 40px 24px;border-bottom:1px solid var(--line);display:flex;align-items:flex-start;gap:16px}
 .card-title{font-size:1.1rem;font-weight:500;letter-spacing:-.02em;margin-bottom:5px}
 .card-sub{font-size:.84rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
 .card-body{padding:32px 40px 40px}
@@ -167,7 +189,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .t-desc{font-size:.82rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
 .t-reply{background:var(--accent-wash);border:1px solid rgba(30,222,123,.18);border-radius:12px;padding:12px 14px;font-size:.8rem;color:var(--accent-d);line-height:1.5}
 .t-reply strong{font-weight:500}
-.t-empty{text-align:center;padding:48px;color:var(--ink-faint);font-size:.88rem;font-weight:300}
+.t-empty{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:56px 24px;color:var(--ink-faint);font-size:.88rem;font-weight:300}
+.t-empty svg{width:30px;height:30px;stroke:var(--ink-faint);stroke-width:1.4;fill:none;opacity:.55}
 
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.5rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -193,10 +216,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .switcher{gap:6px}
   .sw-btn{padding:9px 14px}
   .empty-card{flex-direction:column;align-items:flex-start;border-radius:20px;padding:26px 22px}
+  .empty-card-left{gap:18px}
   .buy-card{border-radius:20px;padding:22px 20px}
   .buy-tiles{grid-template-columns:1fr}
   .status-strip{flex-direction:column;align-items:flex-start;gap:18px}
   .status-strip-limit,.limit-bar{width:100%}
+  .ico-badge.lg{width:48px;height:48px;border-radius:15px}
+  .ico-badge.lg svg{width:22px;height:22px}
+  .card-head{gap:12px}
 }
 #sbContent{padding-bottom:80px}
   </style>
@@ -224,10 +251,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   <!-- НЕТ ГОТОВЫХ ЗАКАЗОВ -->
   <div id="secNone" style="display:none">
     <div class="empty-card">
-      <div class="empty-card-text">
-        <h2>Обслуживание сайта</h2>
-        <p>Подключите ежемесячную поддержку — и отправляйте заявки на правки, замену контента и доработки без новых заказов.</p>
-        <p class="empty-note">Для подключения сначала нужен завершённый проект.</p>
+      <div class="empty-card-left">
+        <div class="ico-badge lg"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.6 5l-6 6a2 2 0 002.8 2.8l6-6a4 4 0 005-5.6l-2.8 2.8-2-2z"/></svg></div>
+        <div class="empty-card-text">
+          <h2>Обслуживание сайта</h2>
+          <p>Подключите ежемесячную поддержку — и отправляйте заявки на правки, замену контента и доработки без новых заказов.</p>
+          <p class="empty-note">Для подключения сначала нужен завершённый проект.</p>
+        </div>
       </div>
       <a href="../order" class="btn btn-primary">Оформить сайт</a>
     </div>
@@ -237,14 +267,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   <div id="secBuy" style="display:none">
     <div class="buy-card">
       <div class="buy-top">
-        <div class="buy-eyebrow">Тариф обслуживания</div>
-        <div class="buy-price">500 ₽ <span>/ 30 дней</span></div>
+        <div class="ico-badge md dark"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.6 5l-6 6a2 2 0 002.8 2.8l6-6a4 4 0 005-5.6l-2.8 2.8-2-2z"/></svg></div>
+        <div>
+          <div class="buy-eyebrow">Тариф обслуживания</div>
+          <div class="buy-price">500 ₽ <span>/ 30 дней</span></div>
+        </div>
       </div>
 
       <div class="buy-tiles">
-        <div class="buy-tile"><strong>Правки и доработки</strong><span>Тексты, изображения, стили, мелкие доработки разметки</span><em>до 5 заявок / месяц</em></div>
-        <div class="buy-tile"><strong>Приоритетный ответ</strong><span>Обрабатываются в первую очередь, обычно в течение суток</span></div>
-        <div class="buy-tile"><strong>Срок действия</strong><span>30 дней с оплаты, лимит обнуляется при продлении</span></div>
+        <div class="buy-tile">
+          <div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
+          <strong>Правки и доработки</strong><span>Тексты, изображения, стили, мелкие доработки разметки</span><em>до 5 заявок / месяц</em>
+        </div>
+        <div class="buy-tile">
+          <div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6z"/></svg></div>
+          <strong>Приоритетный ответ</strong><span>Обрабатываются в первую очередь, обычно в течение суток</span>
+        </div>
+        <div class="buy-tile">
+          <div class="tile-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 3v3M16 3v3M3.5 9.5h17"/></svg></div>
+          <strong>Срок действия</strong><span>30 дней с оплаты, лимит обнуляется при продлении</span>
+        </div>
         <div class="buy-tile muted"><strong>Крупные доработки</strong><span>Новые разделы и смена структуры — отдельная оценка</span></div>
         <div class="buy-tile muted"><strong>Без переноса</strong><span>Неиспользованные заявки не сохраняются</span></div>
         <div class="buy-tile muted"><strong>Продление</strong><span>Отдельная оплата, без автосписания</span></div>
@@ -258,8 +300,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
       <div id="buyOneWrap" style="display:none">
         <div class="buy-one-row">
-          <div class="buy-one-name" id="buyOneName">—</div>
-          <div class="buy-one-type" id="buyOneType"></div>
+          <div class="ico-badge sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+          <div>
+            <div class="buy-one-name" id="buyOneName">—</div>
+            <div class="buy-one-type" id="buyOneType"></div>
+          </div>
         </div>
 
         <label class="terms-check-row">
@@ -295,13 +340,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
       </div>
       <button class="btn btn-secondary on-dark" id="renewBtn" onclick="payForSupport(true)">Продлить · 500 ₽</button>
     </div>
-    <div class="site-line" id="statusSite"></div>
+    <div class="site-line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg><span id="statusSite"></span></div>
 
     <div class="content-grid">
       <div class="card">
         <div class="card-head">
-          <div class="card-title">Новая заявка</div>
-          <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить</div>
+          <div class="ico-badge md"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
+          <div>
+            <div class="card-title">Новая заявка</div>
+            <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить</div>
+          </div>
         </div>
         <div class="card-body">
           <div id="limitReachedBanner" class="limit-reached-banner" style="display:none">
@@ -322,10 +370,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
       <div class="card">
         <div class="card-head">
-          <div class="card-title">История заявок</div>
-          <div class="card-sub" id="listSub">Все обращения по этому сайту</div>
+          <div class="ico-badge md"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+          <div>
+            <div class="card-title">История заявок</div>
+            <div class="card-sub" id="listSub">Все обращения по этому сайту</div>
+          </div>
         </div>
-        <div class="t-list" id="tList"><div class="t-empty">Заявок пока нет</div></div>
+        <div class="t-list" id="tList"><div class="t-empty"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg>Заявок пока нет</div></div>
       </div>
     </div>
   </div>
@@ -400,7 +451,10 @@ function showBuyAll(){
   document.getElementById('buySub').textContent='Обслуживание подключается к конкретному готовому сайту';
   document.getElementById('buyOneWrap').style.display='none';
   document.getElementById('buyList').innerHTML=done.map(o=>`<div class="order-strip" onclick="requestSupport('${o.id}')">
-    <div><div class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</div><div class="order-type"><span class="dot dot-accent"></span>${olabel(o)} · готов</div></div>
+    <div class="order-left">
+      <div class="ico-badge sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+      <div><div class="order-num">№ ${o.id.slice(0,8).toUpperCase()}</div><div class="order-type"><span class="dot dot-accent"></span>${olabel(o)} · готов</div></div>
+    </div>
     <svg class="order-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
   </div>`).join('');
 }
@@ -484,7 +538,7 @@ function renderLimit(){
 
 function renderTickets(ts){
   const el=document.getElementById('tList');
-  if(!ts.length){el.innerHTML='<div class="t-empty">Заявок пока нет</div>';return;}
+  if(!ts.length){el.innerHTML='<div class="t-empty"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg>Заявок пока нет</div>';return;}
   el.innerHTML=ts.map(t=>{
     const isDone=t.status==='done';
     const date=t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';

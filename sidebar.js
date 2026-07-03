@@ -33,7 +33,7 @@
     /* Страница снова обычная — скроллится целиком, футер (подключается
        отдельным footer.js на каждой странице) остаётся в нормальном
        потоке документа под sb-shell. */
-    html, body{ margin:0; background:var(--bg2,#f2f4f7); }
+    html, body{ margin:0; background:#eceef1; }
 
     /* App-frame: серая рамка на весь экран. Сайдбар — часть этой рамки
        (тот же фон, без своей карточки), рабочая область — единственный
@@ -48,8 +48,7 @@
     .sb-nav{
       position:sticky; top:0; flex-shrink:0;
       width:var(--sb-w); height:100vh;
-      background:#e8eaee;
-      border-right:1px solid var(--border,#dfe3e8);
+      background:#eceef1;
       display:flex; flex-direction:column;
       padding:20px 14px;
       overflow-y:auto; overscroll-behavior:contain;

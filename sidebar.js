@@ -55,7 +55,7 @@
       border:1px solid var(--border,#dfe3e8);
       border-radius:32px;
       display:flex; flex-direction:column;
-      margin:0 0 var(--sb-gap) var(--sb-gap);
+      margin:0 var(--sb-gap) var(--sb-gap) var(--sb-gap);
       padding:8px 14px 20px;
       overflow-y:auto; overscroll-behavior:contain;
     }

@@ -494,7 +494,7 @@
     await user.getIdToken(true);
     const r=doc(db,'users',user.uid);
     const s=await getDoc(r);
-    if(!s.exists()) await setDoc(r,{uid:user.uid,name:name||user.displayName||'Пользователь',email:user.email,createdAt:serverTimestamp(),ordersCount:0});
+    if(!s.exists()) await setDoc(r,{uid:user.uid,name:name||user.displayName||'Пользователь',email:user.email,createdAt:serverTimestamp(),ordersCount:0,onboardingDone:false});
   }
 
   window.switchTab=function(tab){
@@ -554,7 +554,7 @@
         console.error('Firestore saveProfile error:',fsErr);
       }
       const ref=document.referrer;
-      window.location.href=(ref&&ref.includes('order'))?'order':'profile';
+      window.location.href=(ref&&ref.includes('order'))?'order':'welcome';
     }
     catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));document.getElementById('registerBtn').disabled=true;const msg=e.code==='auth/email-already-in-use'?'Этот email уже зарегистрирован':e.code==='auth/invalid-email'?'Некорректный email':'Ошибка: '+e.message;toast(msg,'error');}
   };

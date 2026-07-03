@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Добро пожаловать — Antviz</title>
+<link rel="icon" href="img/favicon.png" type="image/png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --line:#dfe3e8;--line-strong:#cbcdd6;
+  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;--accent-wash:rgba(30,222,123,.12);
+  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.1);
+  --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
+  --dark:#191b1e;--dark2:#2b2f33;
+  --font:'Geologica','Inter','Arial',sans-serif;
+}
+html{overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;height:100vh;overflow:hidden;-webkit-font-smoothing:antialiased}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes dash{to{stroke-dashoffset:0}}
+@keyframes pulseDot{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.35);opacity:.5}}
+
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
+.loading-text{color:var(--ink-faint);font-size:.75rem}
+
+/* ===== SHELL ===== */
+.wrap{height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;position:relative}
+
+.brand{position:absolute;top:32px;left:36px;display:flex;align-items:center;gap:9px}
+.brand img{width:24px;height:24px;border-radius:7px}
+.brand span{font-weight:500;font-size:.95rem;letter-spacing:-.01em}
+
+.skip{position:absolute;top:36px;right:36px;font-size:.8rem;color:var(--ink-faint);background:none;border:none;cursor:pointer;font-family:var(--font);transition:color .15s}
+.skip:hover{color:var(--ink)}
+
+/* progress dots */
+.progress{position:absolute;top:88px;left:50%;transform:translateX(-50%);display:flex;gap:7px}
+.progress i{width:26px;height:4px;border-radius:3px;background:var(--line);transition:background .25s,width .25s}
+.progress i.done{background:var(--accent-h)}
+.progress i.on{background:var(--dark);width:38px}
+
+/* ===== STAGE ===== */
+.stage{width:100%;max-width:640px;position:relative;height:min(560px,72vh)}
+.step{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+  opacity:0;transform:translateX(24px);pointer-events:none;transition:opacity .35s ease,transform .35s ease;
+}
+.step.active{opacity:1;transform:translateX(0);pointer-events:auto}
+.step.leaving{opacity:0;transform:translateX(-24px)}
+
+.step-icon{width:96px;height:96px;border-radius:28px;background:var(--dark);display:flex;align-items:center;justify-content:center;margin-bottom:32px;animation:floatY 4s ease-in-out infinite}
+.step-icon svg{width:44px;height:44px;stroke:var(--accent);stroke-width:1.5;fill:none}
+
+.step-eyebrow{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-d);margin-bottom:14px}
+.step h1{font-size:clamp(1.9rem,4vw,2.7rem);font-weight:500;letter-spacing:-.03em;line-height:1.08;margin-bottom:16px}
+.step h1 em{font-style:normal;color:var(--accent-d)}
+.step p{max-width:440px;font-size:1rem;color:var(--ink-dim);font-weight:300;line-height:1.65}
+
+/* ===== STEP 2 — интерактивный сайдбар ===== */
+.demo-sidebar{display:flex;gap:28px;align-items:flex-start;width:100%;text-align:left;margin-top:8px}
+.demo-nav{width:190px;flex-shrink:0;background:var(--bg3);border:1.5px solid var(--line);border-radius:22px;padding:12px;display:flex;flex-direction:column;gap:3px}
+.demo-item{display:flex;align-items:center;gap:10px;padding:.65rem .8rem;border-radius:11px;font-size:.82rem;color:var(--ink-dim);cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:var(--font);font-weight:300;transition:background .15s,color .15s}
+.demo-item svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none;flex-shrink:0}
+.demo-item.on{background:var(--bg);color:var(--ink);font-weight:500;box-shadow:0 2px 8px rgba(0,51,153,.06)}
+.demo-item.on svg{stroke:var(--accent-d)}
+.demo-info{flex:1;background:var(--bg3);border:1.5px solid var(--line);border-radius:22px;padding:24px;min-height:190px;display:flex;flex-direction:column;justify-content:center}
+.demo-info-title{font-size:1rem;font-weight:500;margin-bottom:8px;letter-spacing:-.01em;display:flex;align-items:center;gap:8px}
+.demo-info-title svg{width:18px;height:18px;stroke:var(--accent-d);stroke-width:1.8;fill:none}
+.demo-info-text{font-size:.85rem;color:var(--ink-dim);font-weight:300;line-height:1.6}
+
+/* ===== STEP 3 — таймлайн заказа ===== */
+.demo-timeline{display:flex;align-items:center;justify-content:center;gap:0;width:100%;margin-top:8px;padding:0 10px}
+.tl-node{display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;flex:1}
+.tl-dot{width:15px;height:15px;border-radius:50%;background:var(--line-strong);border:3px solid var(--bg);box-shadow:0 0 0 1.5px var(--line-strong);z-index:2;transition:background .3s,box-shadow .3s}
+.tl-dot.on{background:var(--accent-h);box-shadow:0 0 0 1.5px var(--accent-h)}
+.tl-label{font-size:.72rem;color:var(--ink-faint);font-weight:300;text-align:center;transition:color .3s}
+.tl-label.on{color:var(--ink);font-weight:500}
+.tl-line{position:absolute;top:6px;left:-50%;width:100%;height:2px;background:var(--line);z-index:1}
+.tl-line.on{background:var(--accent-h)}
+.tl-node:first-child .tl-line{display:none}
+
+/* ===== STEP 4 — обслуживание/поддержка ===== */
+.demo-cards{display:flex;gap:16px;width:100%;margin-top:8px}
+.demo-card{flex:1;background:var(--bg3);border:1.5px solid var(--line);border-radius:22px;padding:26px 22px;text-align:left}
+.demo-card .ico{width:42px;height:42px;border-radius:13px;background:var(--bg);border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.demo-card .ico svg{width:19px;height:19px;stroke:var(--accent-d);stroke-width:1.7;fill:none}
+.demo-card strong{display:block;font-size:.92rem;font-weight:500;margin-bottom:6px;letter-spacing:-.01em}
+.demo-card span{font-size:.8rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
+
+/* ===== nav buttons ===== */
+.nav-row{display:flex;align-items:center;gap:14px;margin-top:40px}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:13px;padding:15px 30px;font-size:.92rem;letter-spacing:-.01em;transition:background .12s,transform .12s,color .12s}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
+.btn-dark{background:var(--dark);color:#fff}
+.btn-dark:hover{background:var(--dark2)}
+.btn-green{background:var(--accent);color:var(--dark)}
+.btn-green:hover{background:var(--accent-h)}
+.btn-ghost{background:none;border:1.5px solid var(--line);color:var(--ink-dim)}
+.btn-ghost:hover{border-color:var(--line-strong);color:var(--ink)}
+
+@media(max-width:640px){
+  .brand{top:20px;left:20px}
+  .skip{top:22px;right:20px}
+  .progress{top:64px}
+  .wrap{padding:20px}
+  .stage{height:auto;min-height:520px}
+  .step-icon{width:76px;height:76px;border-radius:22px;margin-bottom:22px}
+  .step-icon svg{width:34px;height:34px}
+  .demo-sidebar{flex-direction:column}
+  .demo-nav{width:100%;flex-direction:row;overflow-x:auto;gap:6px}
+  .demo-info{min-height:140px}
+  .demo-cards{flex-direction:column}
+  .nav-row{margin-top:28px}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+  <span class="loading-text">Секунду...</span>
+</div>
+
+<div class="wrap" id="wrap" style="display:none">
+
+  <a class="brand" href="./"><img src="img/favicon.png" alt=""/><span>Antviz</span></a>
+  <button class="skip" id="skipBtn">Пропустить</button>
+  <div class="progress" id="progress"></div>
+
+  <div class="stage" id="stage">
+
+    <!-- Step 1 — приветствие -->
+    <section class="step" data-step="0">
+      <div class="step-icon"><svg viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6.3 6.3l2.8 2.8M14.9 14.9l2.8 2.8M6.3 17.7l2.8-2.8M14.9 9.1l2.8-2.8"/></svg></div>
+      <div class="step-eyebrow">Личный кабинет</div>
+      <h1>Привет, <em id="userName">друг</em>!</h1>
+      <p>Аккаунт готов. За минуту покажем, где что находится в личном кабинете — дальше будет проще ориентироваться.</p>
+    </section>
+
+    <!-- Step 2 — структура кабинета -->
+    <section class="step" data-step="1">
+      <div class="step-eyebrow">Шаг 1 из 3</div>
+      <h1>Здесь всё <em>под рукой</em></h1>
+      <p style="margin-bottom:24px">Слева — навигация по кабинету. Наведите или нажмите на пункт, чтобы узнать, что там.</p>
+      <div class="demo-sidebar">
+        <div class="demo-nav" id="demoNav"></div>
+        <div class="demo-info" id="demoInfo"></div>
+      </div>
+    </section>
+
+    <!-- Step 3 — заказы -->
+    <section class="step" data-step="2">
+      <div class="step-eyebrow">Шаг 2 из 3</div>
+      <h1>Заказ проходит <em>4 этапа</em></h1>
+      <p style="margin-bottom:8px">От оплаты до готового сайта — статус всегда виден в разделе «Мои заказы», обновления приходят в уведомления.</p>
+      <div class="demo-timeline" id="demoTimeline"></div>
+    </section>
+
+    <!-- Step 4 — обслуживание и поддержка -->
+    <section class="step" data-step="3">
+      <div class="step-eyebrow">Шаг 3 из 3</div>
+      <h1>Сайт сдан — <em>работа продолжается</em></h1>
+      <p style="margin-bottom:24px">Два способа получить помощь после запуска:</p>
+      <div class="demo-cards">
+        <div class="demo-card">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.6 5l-6 6a2 2 0 002.8 2.8l6-6a4 4 0 005-5.6l-2.8 2.8-2-2z"/></svg></div>
+          <strong>Обслуживание</strong>
+          <span>Подписка на правки и доработки сайта — заявки из карточки сайта или раздела «Обслуживание».</span>
+        </div>
+        <div class="demo-card">
+          <div class="ico"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></div>
+          <strong>Чат с командой</strong>
+          <span>Вопросы по заказу, оплате или сайту — прямой чат с ответом от команды.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Step 5 — готово -->
+    <section class="step" data-step="4">
+      <div class="step-icon" style="background:var(--accent)"><svg viewBox="0 0 24 24" stroke="var(--dark)"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="step-eyebrow">Готово</div>
+      <h1>Теперь вы знаете, <em>где что искать</em></h1>
+      <p>Личный кабинет открыт. Если что-то забудется — весь этот рассказ живёт в навигации слева.</p>
+    </section>
+
+  </div>
+
+  <div class="nav-row" id="navRow"></div>
+
+</div>
+
+<script type="module">
+import { auth, db } from './firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ---------- данные шагов навигации-демо (шаг 2) ---------- */
+const NAV_DEMO = [
+  { icon:'<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/>',
+    label:'Обзор', title:'Обзор', text:'Главная кабинета: сводка по заказам, сайтам и последним событиям в одном месте.' },
+  { icon:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>',
+    label:'Мои заказы', title:'Мои заказы', text:'Все заказы и их статус — от оплаты до сдачи готового сайта.' },
+  { icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>',
+    label:'Мои сайты', title:'Мои сайты', text:'Ссылки на готовые проекты и статус обслуживания по каждому.' },
+  { icon:'<path d="M14.7 6.3a4 4 0 00-5.6 5l-6 6a2 2 0 002.8 2.8l6-6a4 4 0 005-5.6l-2.8 2.8-2-2z"/>',
+    label:'Обслуживание', title:'Обслуживание', text:'Заявки на правки и доработки по подписке для уже готовых сайтов.' },
+  { icon:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>',
+    label:'Уведомления', title:'Уведомления', text:'Статусы заказов, ответы поддержки и напоминания об обслуживании.' },
+];
+
+function buildDemoNav(){
+  const nav = document.getElementById('demoNav');
+  const info = document.getElementById('demoInfo');
+  nav.innerHTML = NAV_DEMO.map((it,i)=>`<button class="demo-item${i===0?' on':''}" data-i="${i}"><svg viewBox="0 0 24 24">${it.icon}</svg>${it.label}</button>`).join('');
+  function show(i){
+    nav.querySelectorAll('.demo-item').forEach((el,idx)=>el.classList.toggle('on',idx===i));
+    const it = NAV_DEMO[i];
+    info.innerHTML = `<div class="demo-info-title"><svg viewBox="0 0 24 24">${it.icon}</svg>${it.title}</div><div class="demo-info-text">${it.text}</div>`;
+  }
+  show(0);
+  nav.querySelectorAll('.demo-item').forEach(btn=>{
+    btn.addEventListener('click', ()=>{ clearInterval(autoTimer); show(+btn.dataset.i); });
+  });
+  let idx = 0;
+  const autoTimer = setInterval(()=>{ idx = (idx+1) % NAV_DEMO.length; show(idx); }, 2200);
+}
+
+/* ---------- таймлайн (шаг 3) ---------- */
+const TL_STEPS = ['Оплачен','В работе','На проверке','Готов'];
+function buildTimeline(){
+  const el = document.getElementById('demoTimeline');
+  el.innerHTML = TL_STEPS.map((label,i)=>`
+    <div class="tl-node">
+      <div class="tl-line"></div>
+      <div class="tl-dot" data-i="${i}"></div>
+      <div class="tl-label" data-i="${i}">${label}</div>
+    </div>`).join('');
+  let n = 0;
+  function tick(){
+    el.querySelectorAll('.tl-dot').forEach((d,i)=>d.classList.toggle('on', i<=n));
+    el.querySelectorAll('.tl-line').forEach((d,i)=>d.classList.toggle('on', i<=n));
+    el.querySelectorAll('.tl-label').forEach((d,i)=>d.classList.toggle('on', i<=n));
+    n = (n+1) % (TL_STEPS.length+1);
+  }
+  tick();
+  timelineTimer = setInterval(tick, 1000);
+}
+let timelineTimer = null;
+
+/* ---------- степпер ---------- */
+const steps = Array.from(document.querySelectorAll('.step'));
+const progressEl = document.getElementById('progress');
+progressEl.innerHTML = steps.map((_,i)=>`<i data-i="${i}"></i>`).join('');
+let current = 0;
+
+function renderProgress(){
+  progressEl.querySelectorAll('i').forEach((el,i)=>{
+    el.classList.toggle('on', i===current);
+    el.classList.toggle('done', i<current);
+  });
+}
+
+function renderNav(){
+  const row = document.getElementById('navRow');
+  const isFirst = current===0, isLast = current===steps.length-1;
+  row.innerHTML = `
+    ${!isFirst ? `<button class="btn btn-ghost" id="backBtn">Назад</button>` : ''}
+    <button class="btn ${isLast?'btn-green':'btn-dark'}" id="nextBtn">
+      ${isLast ? 'Начать' : 'Далее'}
+      ${isLast ? '' : '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'}
+    </button>
+  `;
+  document.getElementById('backBtn')?.addEventListener('click', ()=>goTo(current-1));
+  document.getElementById('nextBtn').addEventListener('click', ()=> isLast ? finish() : goTo(current+1));
+}
+
+function goTo(i){
+  if(i<0 || i>=steps.length || i===current) return;
+  steps[current].classList.add('leaving');
+  steps[current].classList.remove('active');
+  setTimeout(()=>steps[current].classList.remove('leaving'), 360);
+  current = i;
+  steps[current].classList.add('active');
+  renderProgress();
+  renderNav();
+}
+
+async function finish(){
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.disabled = true;
+  nextBtn.style.opacity = '.6';
+  try{
+    await setDoc(doc(db,'users',currentUser.uid), { onboardingDone:true }, { merge:true });
+  }catch(e){ console.error('onboarding finish error:', e); }
+  window.location.href = './profile';
+}
+
+document.getElementById('skipBtn').addEventListener('click', finish);
+
+/* ---------- auth + firestore ---------- */
+let currentUser = null;
+
+onAuthStateChanged(auth, async user => {
+  if(!user){ window.location.href = './auth'; return; }
+  currentUser = user;
+
+  let data = {};
+  try{
+    const snap = await getDoc(doc(db,'users',user.uid));
+    if(snap.exists()) data = snap.data();
+  }catch(e){ console.error('welcome: user doc error', e); }
+
+  if(data.onboardingDone === true){
+    window.location.href = './profile';
+    return;
+  }
+
+  document.getElementById('userName').textContent = data.name || user.displayName || 'друг';
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('wrap').style.display = 'flex';
+
+  steps[0].classList.add('active');
+  renderProgress();
+  renderNav();
+  buildDemoNav();
+  buildTimeline();
+});
+</script>
+
+</body>
+</html>

@@ -26,29 +26,37 @@
 
   const CSS = `
     :root{
-      --sb-w: 220px;
-      --sb-top: 104px;
+      --sb-w: 244px;
+      --sb-top: 100px;
+      --sb-left: 28px;
+      --sb-bottom: 28px;
     }
-    .sb-shell{
-      display:flex; align-items:flex-start; gap:48px;
-      max-width:1400px; margin:0 auto;
-      padding:104px 64px 100px;
-      width:100%;
-    }
+    .sb-shell{ width:100%; }
+
+    /* Докнутая слева колонка на всю доступную высоту — не часть
+       центрированного контейнера с контентом, поэтому не "плывёт"
+       к центру на широких экранах. */
     .sb-nav{
-      width:var(--sb-w); flex-shrink:0;
-      position:sticky; top:var(--sb-top);
-      display:flex; flex-direction:column; gap:2px;
+      position:fixed; left:var(--sb-left); top:var(--sb-top); bottom:var(--sb-bottom);
+      width:var(--sb-w);
+      display:flex; flex-direction:column;
+      overflow-y:auto; overscroll-behavior:contain;
+      z-index:40;
     }
+    .sb-nav::-webkit-scrollbar{ width:0; }
+
+    .sb-nav-main{ display:flex; flex-direction:column; gap:2px; }
+    .sb-nav-bottom{ display:flex; flex-direction:column; gap:2px; margin-top:auto; padding-top:12px; }
+
     .sb-link{
       display:flex; align-items:center; gap:12px;
-      padding:.8rem 1rem; border-radius:14px;
+      padding:.75rem .9rem; border-radius:13px;
       color:var(--muted,#707a8a); text-decoration:none;
-      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:300; font-size:.9rem;
+      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:300; font-size:.88rem;
       background:none; border:none; cursor:pointer; width:100%; text-align:left;
       transition:background .15s, color .15s;
     }
-    .sb-link svg{ width:18px; height:18px; stroke:currentColor; stroke-width:1.8; flex-shrink:0; fill:none; }
+    .sb-link svg{ width:18px; height:18px; stroke:currentColor; stroke-width:1.7; flex-shrink:0; fill:none; }
     .sb-link:hover{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); }
     .sb-link.is-active{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); font-weight:500; }
     .sb-link.is-active svg{ stroke:var(--green,#1ede7b); }
@@ -58,43 +66,60 @@
       min-width:18px; text-align:center; flex-shrink:0;
     }
     .sb-badge.warn{ background:#f59e0b; color:#1a1400; }
-    .sb-sep{ height:1px; background:var(--border,#dfe3e8); margin:12px 4px; }
+    .sb-sep{ height:1px; background:var(--border,#dfe3e8); margin:12px 4px; flex-shrink:0; }
     .sb-link.danger{ color:#d95a48; }
     .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
     .sb-link.danger svg{ stroke:#d95a48; }
 
-    .sb-content{ flex:1; min-width:0; max-width:none; }
+    /* Контент сдвинут вправо от докнутой колонки и держит собственную
+       читаемую максимальную ширину, а не тянется до самого края экрана. */
+    .sb-content{
+      display:block;
+      margin-left: calc(var(--sb-left) + var(--sb-w) + 40px);
+      max-width: 1160px;
+      padding: var(--sb-top) 56px 100px 0;
+    }
+
+    @media (max-width:1480px){
+      .sb-content{ max-width:none; padding-right:48px; }
+    }
 
     @media (max-width:980px){
       .sb-nav{ display:none; }
-      .sb-shell{ display:block; padding:88px 1.2rem 80px; }
-      .sb-content{ max-width:640px; margin:0 auto; }
+      .sb-content{ margin:0 auto; max-width:640px; padding:88px 1.2rem 80px; }
     }
   `;
 
   const NAV_ITEMS = [
-    { key:'profile',       href:b+'profile',               icon:'<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/>', label:'Обзор' },
+    { key:'profile',       href:b+'profile',               icon:'<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/>', label:'Обзор' },
     { key:'orders',        href:b+'profile/orders',        icon:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label:'Мои заказы', badgeKey:'orders' },
     { key:'sites',         href:b+'profile/sites',         icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>', label:'Мои сайты' },
-    { key:'support',       href:b+'profile/support',       icon:'<rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/>', label:'Чат с командой', badgeKey:'support' },
-    { key:'tickets',       href:b+'profile/tickets',       icon:'<rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/>', label:'Обслуживание', badgeKey:'tickets' },
+    { key:'support',       href:b+'profile/support',       icon:'<path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/>', label:'Чат с командой', badgeKey:'support' },
+    { key:'tickets',       href:b+'profile/tickets',       icon:'<path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/>', label:'Обслуживание', badgeKey:'tickets' },
     { key:'notifications', href:b+'profile/notifications', icon:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>', label:'Уведомления', badgeKey:'notif' },
     { key:'order',         href:b+'order',                 icon:'<path d="M12 5v14M5 12h14"/>', label:'Новый заказ' },
     { sep:true },
-    { key:'settings',      href:b+'profile/settings',      icon:'<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/>', label:'Настройки' },
+    { key:'settings',      href:b+'profile/settings',      icon:'<circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/>', label:'Настройки' },
     { key:'logout',        logout:true, icon:'<path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/>', label:'Выйти' },
   ];
 
+  function renderItem(item) {
+    const active = item.key === page ? ' is-active' : '';
+    const badge = item.badgeKey ? `<span class="sb-badge" id="sbBadge-${item.badgeKey}" style="display:none"></span>` : '';
+    if (item.logout) {
+      return `<button class="sb-link danger" id="sbLogout"><svg viewBox="0 0 24 24">${item.icon}</svg>${item.label}</button>`;
+    }
+    return `<a href="${item.href}" class="sb-link${active}"><svg viewBox="0 0 24 24">${item.icon}</svg>${item.label}${badge}</a>`;
+  }
+
   function buildNav() {
-    return NAV_ITEMS.map(item => {
-      if (item.sep) return `<div class="sb-sep"></div>`;
-      const active = item.key === page ? ' is-active' : '';
-      const badge = item.badgeKey ? `<span class="sb-badge" id="sbBadge-${item.badgeKey}" style="display:none"></span>` : '';
-      if (item.logout) {
-        return `<button class="sb-link danger" id="sbLogout"><svg viewBox="0 0 24 24">${item.icon}</svg>${item.label}</button>`;
-      }
-      return `<a href="${item.href}" class="sb-link${active}"><svg viewBox="0 0 24 24">${item.icon}</svg>${item.label}${badge}</a>`;
-    }).join('');
+    const sepIdx = NAV_ITEMS.findIndex(i => i.sep);
+    const main   = sepIdx === -1 ? NAV_ITEMS : NAV_ITEMS.slice(0, sepIdx);
+    const bottom = sepIdx === -1 ? [] : NAV_ITEMS.slice(sepIdx + 1);
+    return `
+      <div class="sb-nav-main">${main.map(renderItem).join('')}</div>
+      <div class="sb-nav-bottom"><div class="sb-sep"></div>${bottom.map(renderItem).join('')}</div>
+    `;
   }
 
   function init() {

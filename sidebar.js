@@ -39,8 +39,8 @@
        (тот же фон, без своей карточки), рабочая область — единственный
        элемент, который визуально выделяется. */
     .sb-shell{
-      display:flex; align-items:flex-start;
-      min-height:100vh; width:100%;
+      display:flex; align-items:stretch;
+      height:100vh; width:100%;
     }
 
     /* Сайдбар — докнут вплотную к левому краю, прилипает при скролле
@@ -48,7 +48,8 @@
     .sb-nav{
       position:sticky; top:0; flex-shrink:0;
       width:var(--sb-w); height:100vh;
-      background:var(--bg2,#f2f4f7);
+      background:#e8eaee;
+      border-right:1px solid var(--border,#dfe3e8);
       display:flex; flex-direction:column;
       padding:20px 14px;
       overflow-y:auto; overscroll-behavior:contain;
@@ -99,11 +100,13 @@
        сверхширoких мониторах. */
     .sb-content{
       flex:1; min-width:0;
-      min-height:calc(100vh - (var(--sb-gap) * 2));
+      height:calc(100vh - (var(--sb-gap) * 2));
+      overflow-y:auto; -webkit-overflow-scrolling:touch;
       margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) 0;
       background:var(--bg,#fff);
+      border:1px solid var(--border,#dfe3e8);
       border-radius:32px;
-      padding:48px 56px 60px;
+      padding:32px 56px 60px;
     }
     .sb-content > .shell{ max-width:1240px; margin:0 auto; }
 
@@ -116,9 +119,10 @@
     @media (max-width:980px){
       .antviz-nav{ display:flex; }
       .sb-nav{ display:none; }
-      .sb-shell{ display:block; min-height:auto; }
+      .sb-shell{ display:block; height:auto; }
       .sb-content{
-        margin:0; border-radius:0; min-height:auto;
+        height:auto; overflow-y:visible;
+        margin:0; border:none; border-radius:0;
         background:var(--bg,#fff);
         padding:88px 1.2rem 80px;
       }

@@ -43,13 +43,19 @@
       height:100vh; width:100%;
     }
 
-    /* Сайдбар — докнут вплотную к левому краю, прилипает при скролле
-       страницы (position:sticky), сливается с фоном-рамкой. */
+    /* Сайдбар — отдельная плавающая панель, та же оформа, что и
+       рабочая область (свой фон, бордер, скругление), с таким же
+       зазором от рамки сверху/снизу/слева, что и у .sb-content
+       справа/сверху/снизу. Прилипает при скролле страницы
+       (position:sticky). */
     .sb-nav{
-      position:sticky; top:0; flex-shrink:0;
-      width:var(--sb-w); height:100vh;
-      background:#eceef1;
+      position:sticky; top:var(--sb-gap); flex-shrink:0;
+      width:var(--sb-w); height:calc(100vh - (var(--sb-gap) * 2));
+      background:var(--bg,#fff);
+      border:1px solid var(--border,#dfe3e8);
+      border-radius:32px;
       display:flex; flex-direction:column;
+      margin:var(--sb-gap) 0 var(--sb-gap) var(--sb-gap);
       padding:20px 14px;
       overflow-y:auto; overscroll-behavior:contain;
     }
@@ -101,11 +107,11 @@
       flex:1; min-width:0;
       height:calc(100vh - (var(--sb-gap) * 2));
       overflow-y:auto; -webkit-overflow-scrolling:touch;
-      margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) 0;
+      margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
       background:var(--bg,#fff);
       border:1px solid var(--border,#dfe3e8);
       border-radius:32px;
-      padding:32px 56px 60px;
+      padding:20px 56px 60px;
     }
     .sb-content > .shell{ max-width:1240px; margin:0 auto; }
 

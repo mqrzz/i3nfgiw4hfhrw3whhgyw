@@ -26,67 +26,79 @@
 
   const CSS = `
     :root{
-      --sb-w: 244px;
-      --sb-top: 100px;
-      --sb-left: 28px;
-      --sb-bottom: 28px;
+      --sb-w: 260px;
+      --sb-top: 96px;
+      --frame-max: 1560px;
+      --frame-pad: 24px;
     }
-    .sb-shell{ width:100%; }
 
-    /* Докнутая слева колонка на всю доступную высоту — не часть
-       центрированного контейнера с контентом, поэтому не "плывёт"
-       к центру на широких экранах. */
+    /* Серая канва вокруг всего кабинета — даёт эффект «обводки»: страница
+       не растянута в оба края экрана, а лежит на полотне с отступами. */
+    body{ background:var(--bg2,#f2f4f7) !important; }
+
+    /* Рамка кабинета — центрируется на канве, а не тянется к левому краю. */
+    .sb-shell{
+      max-width:var(--frame-max); margin:0 auto;
+      display:flex; align-items:flex-start; gap:20px;
+      padding:var(--sb-top) var(--frame-pad) var(--frame-pad);
+      width:100%;
+    }
+
+    /* Сайдбар — полноценная карточка со своим фоном, рамкой и тенью,
+       а не прозрачная колонка ссылок поверх остального контента. */
     .sb-nav{
-      position:fixed; left:var(--sb-left); top:var(--sb-top); bottom:var(--sb-bottom);
-      width:var(--sb-w);
+      position:sticky; top:var(--sb-top);
+      width:var(--sb-w); flex-shrink:0;
+      max-height:calc(100vh - var(--sb-top) - var(--frame-pad));
       display:flex; flex-direction:column;
+      background:var(--bg,#fff);
+      border:1.5px solid var(--border,#dfe3e8);
+      border-radius:28px;
+      padding:18px;
       overflow-y:auto; overscroll-behavior:contain;
-      z-index:40;
+      box-shadow:0 4px 16px rgba(0,51,153,.04), 0 2px 2px rgba(0,51,153,.05);
     }
     .sb-nav::-webkit-scrollbar{ width:0; }
 
-    .sb-nav-main{ display:flex; flex-direction:column; gap:2px; }
-    .sb-nav-bottom{ display:flex; flex-direction:column; gap:2px; margin-top:auto; padding-top:12px; }
+    .sb-nav-main{ display:flex; flex-direction:column; gap:3px; }
+    .sb-nav-bottom{ display:flex; flex-direction:column; gap:3px; margin-top:auto; padding-top:14px; }
 
     .sb-link{
-      display:flex; align-items:center; gap:12px;
-      padding:.75rem .9rem; border-radius:13px;
+      display:flex; align-items:center; gap:13px;
+      padding:.9rem 1rem; border-radius:14px;
       color:var(--muted,#707a8a); text-decoration:none;
-      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:300; font-size:.88rem;
+      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:300; font-size:.92rem;
       background:none; border:none; cursor:pointer; width:100%; text-align:left;
       transition:background .15s, color .15s;
     }
-    .sb-link svg{ width:18px; height:18px; stroke:currentColor; stroke-width:1.7; flex-shrink:0; fill:none; }
+    .sb-link svg{ width:19px; height:19px; stroke:currentColor; stroke-width:1.7; flex-shrink:0; fill:none; }
     .sb-link:hover{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); }
     .sb-link.is-active{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); font-weight:500; }
     .sb-link.is-active svg{ stroke:var(--green,#1ede7b); }
     .sb-badge{
       margin-left:auto; background:var(--green,#1ede7b); color:#191b1e;
-      font-size:.62rem; font-weight:500; padding:.15rem .45rem; border-radius:6px;
-      min-width:18px; text-align:center; flex-shrink:0;
+      font-size:.64rem; font-weight:500; padding:.16rem .48rem; border-radius:7px;
+      min-width:19px; text-align:center; flex-shrink:0;
     }
     .sb-badge.warn{ background:#f59e0b; color:#1a1400; }
-    .sb-sep{ height:1px; background:var(--border,#dfe3e8); margin:12px 4px; flex-shrink:0; }
+    .sb-sep{ height:1px; background:var(--border,#dfe3e8); margin:10px 6px; flex-shrink:0; }
     .sb-link.danger{ color:#d95a48; }
     .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
     .sb-link.danger svg{ stroke:#d95a48; }
 
-    /* Контент сдвинут вправо от докнутой колонки и держит собственную
-       читаемую максимальную ширину, а не тянется до самого края экрана. */
+    /* Контент — вторая карточка-зона в той же рамке, занимает всё
+       оставшееся место, но не дальше границ .sb-shell (max-width:1560px
+       centered), поэтому не «уезжает» влево с пустотой справа. */
     .sb-content{
       display:block;
-      margin-left: calc(var(--sb-left) + var(--sb-w) + 40px);
-      max-width: 1160px;
-      padding: var(--sb-top) 56px 100px 0;
-    }
-
-    @media (max-width:1480px){
-      .sb-content{ max-width:none; padding-right:48px; }
+      flex:1; min-width:0;
+      padding-bottom:24px;
     }
 
     @media (max-width:980px){
       .sb-nav{ display:none; }
-      .sb-content{ margin:0 auto; max-width:640px; padding:88px 1.2rem 80px; }
+      .sb-shell{ display:block; padding:88px 1.2rem 80px; max-width:640px; }
+      .sb-content{ padding:0; }
     }
   `;
 

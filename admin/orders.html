@@ -155,7 +155,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 /* BADGES */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:.22rem .7rem;border-radius:8px;font-size:.7rem;font-weight:500;white-space:nowrap}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-.b0{background:#f2f4f7;color:var(--muted)}.b1{background:rgba(245,158,11,.1);color:var(--warn)}.b2{background:rgba(59,130,246,.1);color:var(--info)}.b3{background:rgba(139,92,246,.1);color:#7c3aed}.b4{background:rgba(245,158,11,.1);color:var(--warn)}.b5{background:rgba(30,222,123,.12);color:var(--green-d)}
+.b0{background:#f2f4f7;color:var(--muted)}.b1{background:rgba(245,158,11,.1);color:var(--warn)}.b2{background:rgba(59,130,246,.1);color:var(--info)}.b3{background:rgba(139,92,246,.1);color:#7c3aed}.b4{background:rgba(245,158,11,.1);color:var(--warn)}.b5{background:rgba(30,222,123,.12);color:var(--green-d)}.b6{background:rgba(245,158,11,.12);color:#b45309}.b-pending{background:rgba(148,163,184,.18);color:#64748b}
 .tag{display:inline-block;padding:.22rem .7rem;border-radius:50px;font-size:.72rem;font-weight:500}
 .tag-blue{background:rgba(59,130,246,.1);color:var(--info)}.tag-green{background:rgba(30,222,123,.12);color:var(--green-d)}.tag-purple{background:rgba(139,92,246,.1);color:#7c3aed}.tag-warn{background:rgba(245,158,11,.1);color:var(--warn)}
 
@@ -230,6 +230,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
     <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
     <button class="tab" onclick="switchTab('refunds',this)">Возвраты</button>
     <button class="tab" onclick="switchTab('all',this)">Все</button>
+    <button class="tab" onclick="switchTab('archive',this)">Архив</button>
   </div>
 </div>
 
@@ -408,7 +409,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
           <span class="sec-title" style="color:var(--red)">Управление</span>
         </div>
         <div class="sec-b" style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-danger" onclick="archiveOrder()">В архив</button>
+          <button class="btn btn-danger" id="archiveBtn" onclick="archiveOrder()">В архив</button>
           <button class="btn btn-outline" onclick="printReceipt(selOrderId)">Печать квитанции</button>
           <button class="btn btn-outline" onclick="manualRefund()">Оформить возврат вручную</button>
         </div>
@@ -426,6 +427,9 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, Timestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
+// status -1 = заказ создан, но оплата ещё не подтверждена вебхуком (не путать с "Новая заявка" = 0)
+function statusLabel(st){return st===-1?'Ожидает оплаты':(S[st??0]??'—');}
+function statusBadgeClass(st){return st===-1?'b-pending':('b'+(st??0));}
 const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
 const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 let allOrders=[],allReviews=[],_cache=[];
@@ -448,14 +452,20 @@ window.switchTab=(tab,btn)=>{currentTab=tab;document.querySelectorAll('.tab').fo
 function renderList(){
   const el=document.getElementById('orderList');
   const q=(document.getElementById('searchInp')?.value||'').toLowerCase();
-  let list=currentTab==='active'?allOrders.filter(o=>o.status<5):currentTab==='done'?allOrders.filter(o=>o.status===5):currentTab==='refunds'?allOrders.filter(o=>o.refundStatus==='requested'):allOrders;
+  let list;
+  if(currentTab==='archive'){
+    list=allOrders.filter(o=>o.archived);
+  }else{
+    const notArchived=allOrders.filter(o=>!o.archived);
+    list=currentTab==='active'?notArchived.filter(o=>o.status<5):currentTab==='done'?notArchived.filter(o=>o.status===5):currentTab==='refunds'?notArchived.filter(o=>o.refundStatus==='requested'):notArchived;
+  }
   if(q)list=list.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q));
   if(!list.length){el.innerHTML='<div class="es"><span style="font-size:2rem">📋</span>Нет заказов</div>';return;}
   el.innerHTML=list.map(o=>{
     const t=o.package||o.tariff||'—';
     const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
     return`<div class="or${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
-      <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge b${o.status||0}">${S[o.status||0]}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:rgba(245,158,11,.15);color:#b45309">Возврат</span>':''}</div>
+      <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:rgba(245,158,11,.15);color:#b45309">Возврат</span>':''}</div>
       <div class="or-name">${esc(o.clientName||'—')}</div>
       <div class="or-email">${esc(o.clientEmail||'')}</div>
       <div class="or-f">
@@ -508,6 +518,7 @@ function showDetail(o){
       pInfoEl.innerHTML='<div style="font-size:.78rem;color:#b45309;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);border-radius:10px;padding:10px 14px;margin-top:10px"><strong>Предоплата 50%</strong><br>Оплачено: '+(pAmt?pAmt.toLocaleString('ru')+' ₽':'—')+' · Остаток: '+(fp?'полностью оплачен':rAmt.toLocaleString('ru')+' ₽')+'</div>';
     } else { pInfoEl.style.display='none'; pInfoEl.innerHTML=''; }
   }
+  const archBtn=document.getElementById('archiveBtn');if(archBtn)archBtn.textContent=o.archived?'Вернуть из архива':'В архив';
   currentPaid=o.paid||false;renderPayRow();
   document.getElementById('commentInp').value=o.statusComment||'';
   currentSubsteps=JSON.parse(JSON.stringify(o.substeps||[]));renderSubsteps();
@@ -599,7 +610,7 @@ function renderRefund(o){
         <button class="btn btn-outline btn-sm" onclick="rejectRefund()">Отклонить</button>
       </div>`;
   }else if(st==='approved'||st==='refunded'){
-    body.innerHTML=`<div style="font-size:.88rem;color:var(--green-d);margin-bottom:10px">✓ ${st==='refunded'?'Возврат произведён':'Возврат одобрен'}</div>
+    body.innerHTML=`<div style="font-size:.88rem;color:var(--green-d);margin-bottom:10px">✓ ${st==='refunded'?'Возврат произведён':'Возврат одобрен'}${o.refundAmount?' — '+fmtP(o.refundAmount):''}</div>
       ${o.refundReason?`<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Причина: ${esc(o.refundReason)}</div>`:''}
       ${st==='approved'?'<button class="btn btn-dark btn-sm" onclick="markRefunded()">Отметить «Деньги отправлены»</button>':''}`;
   }else if(st==='rejected'){
@@ -700,7 +711,14 @@ window.sendExpiryNotif=async uid=>{
   await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Истекает обслуживание',text:'Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
   toast('Уведомление отправлено ✓','success');
 };
-window.archiveOrder=async()=>{if(!selOrderId)return;if(!confirm('Архивировать заказ?'))return;await updateDoc(doc(db,'orders',selOrderId),{archived:true}).catch(()=>{});toast('В архиве ✓','info');};
+window.archiveOrder=async()=>{
+  if(!selOrderId)return;
+  const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
+  const goingToArchive=!o.archived;
+  if(!confirm(goingToArchive?'Архивировать заказ? Он пропадёт из обычных вкладок, но останется во вкладке «Архив».':'Вернуть заказ из архива?'))return;
+  await updateDoc(doc(db,'orders',selOrderId),{archived:goingToArchive}).catch(()=>{});
+  toast(goingToArchive?'В архиве ✓':'Возвращён из архива ✓','info');
+};
 window.printReceipt=id=>{
   const o=_cache.find(x=>x.id===id);if(!o)return;
   const w=window.open('','_blank','width=600,height=700');

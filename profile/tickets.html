@@ -187,8 +187,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .t-date{font-size:.7rem;color:var(--ink-faint);font-weight:300;white-space:nowrap}
 .t-meta{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--ink-faint);font-weight:300}
 .t-desc{font-size:.82rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
-.t-reply{background:var(--accent-wash);border:1px solid rgba(30,222,123,.18);border-radius:12px;padding:12px 14px;font-size:.8rem;color:var(--accent-d);line-height:1.5}
-.t-reply strong{font-weight:500}
+.t-reply{background:var(--bg);border:1px solid var(--line);border-left:2px solid var(--accent);border-radius:12px;padding:12px 14px;font-size:.8rem;color:var(--ink-dim);line-height:1.5}
+.t-reply strong{font-weight:500;color:var(--ink)}
 .t-empty{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:56px 24px;color:var(--ink-faint);font-size:.88rem;font-weight:300}
 .t-empty svg{width:30px;height:30px;stroke:var(--ink-faint);stroke-width:1.4;fill:none;opacity:.55}
 
@@ -224,6 +224,36 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .ico-badge.lg{width:48px;height:48px;border-radius:15px}
   .ico-badge.lg svg{width:22px;height:22px}
   .card-head{gap:12px}
+}
+
+/* MOBILE — заявка и история/чат не сжимаются в карточки внутри страницы,
+   а открываются как полноэкранные полотна (отдельный экран, а не
+   плавающий блок среди прочего контента). На десктопе не участвует. */
+.mobile-openers{display:none}
+.panel-close{display:none}
+@media(max-width:640px){
+  .mobile-openers{display:flex;flex-direction:column;gap:10px;margin-bottom:6px}
+  .opener{all:unset;cursor:pointer;display:flex;align-items:center;gap:16px;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:18px 20px;font-family:var(--font);box-sizing:border-box;width:100%}
+  .opener:active{border-color:var(--line-strong)}
+  .opener-text{flex:1;min-width:0}
+  .opener-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-bottom:2px}
+  .opener-sub{font-size:.78rem;color:var(--ink-dim);font-weight:300}
+  .opener-arrow{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;flex-shrink:0}
+
+  .content-grid .card{display:none}
+  .content-grid .card.panel-open{
+    display:flex;flex-direction:column;
+    position:fixed;inset:0;z-index:970;
+    width:100%;height:100dvh;height:100vh;
+    border-radius:0;border:none;
+    background:var(--bg);
+    animation:fadeUp .2s ease;
+  }
+  .content-grid .card.panel-open .card-head{padding:max(22px,env(safe-area-inset-top)) 22px 20px;flex-shrink:0}
+  .content-grid .card.panel-open .card-body{flex:1;overflow-y:auto;padding:22px 22px 32px}
+  .content-grid .card.panel-open .t-list{flex:1;max-height:none}
+  .panel-close{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:11px;background:var(--bg2);border:none;cursor:pointer;margin-left:auto;flex-shrink:0}
+  .panel-close svg{width:15px;height:15px;stroke:var(--ink-dim);stroke-width:2.3}
 }
 #sbContent{padding-bottom:80px}
   </style>
@@ -342,14 +372,28 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     </div>
     <div class="site-line"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg><span id="statusSite"></span></div>
 
+    <div class="mobile-openers">
+      <button class="opener" onclick="openPanel('ticketFormCard')">
+        <div class="ico-badge sm"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
+        <div class="opener-text"><div class="opener-title">Новая заявка</div><div class="opener-sub">Опишите что нужно изменить</div></div>
+        <svg class="opener-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button class="opener" onclick="openPanel('ticketHistoryCard')">
+        <div class="ico-badge sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <div class="opener-text"><div class="opener-title">История заявок</div><div class="opener-sub">Переписка с поддержкой</div></div>
+        <svg class="opener-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+
     <div class="content-grid">
-      <div class="card">
+      <div class="card" id="ticketFormCard">
         <div class="card-head">
           <div class="ico-badge md"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
           <div>
             <div class="card-title">Новая заявка</div>
             <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить</div>
           </div>
+          <button class="panel-close" onclick="closePanel('ticketFormCard')" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="card-body">
           <div id="limitReachedBanner" class="limit-reached-banner" style="display:none">
@@ -368,13 +412,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="ticketHistoryCard">
         <div class="card-head">
           <div class="ico-badge md"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
           <div>
             <div class="card-title">История заявок</div>
             <div class="card-sub" id="listSub">Все обращения по этому сайту</div>
           </div>
+          <button class="panel-close" onclick="closePanel('ticketHistoryCard')" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
         <div class="t-list" id="tList"><div class="t-empty"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg>Заявок пока нет</div></div>
       </div>
@@ -400,6 +445,15 @@ function fmt(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);r
 function olabel(o){return`${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'—')}`}
 function hide(...ids){ids.forEach(id=>document.getElementById(id).style.display='none')}
 function show(id,d='block'){document.getElementById(id).style.display=d}
+
+window.openPanel=function(id){
+  document.getElementById(id).classList.add('panel-open');
+  document.body.style.overflow='hidden';
+};
+window.closePanel=function(id){
+  document.getElementById(id).classList.remove('panel-open');
+  document.body.style.overflow='';
+};
 
 async function init(u){
   cu=u;
@@ -569,6 +623,7 @@ window.submitTicket=async function(){
   try{
     await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:photos.length?photos:null,uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',orderId:sel.id,orderSiteType:sel.siteType||'',orderTariff:sel.tariff||sel.package||'',orderDomain:sel.siteDomain||'',status:'open',createdAt:serverTimestamp()});
     document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена','success');loadTickets();
+    if(window.matchMedia('(max-width:640px)').matches){closePanel('ticketFormCard');}
   }catch(e){toast('Ошибка','error');}
   btn.disabled=false;btn.textContent='Отправить заявку';
 };

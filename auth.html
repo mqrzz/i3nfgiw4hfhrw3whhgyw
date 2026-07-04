@@ -405,7 +405,7 @@
       <div class="fg"><label class="label" for="l-email">Email</label><input class="inp" type="email" id="l-email" autocomplete="email" placeholder="your@email.com"/><div class="errmsg" id="err-l-email"></div></div>
       <div class="fg"><label class="label" for="l-pass">Пароль</label><input class="inp" type="password" id="l-pass" autocomplete="current-password" placeholder="••••••••"/><div class="errmsg" id="err-l-pass"></div></div>
       <a href="#" class="forgot" onclick="openForgot(event)">Забыли пароль?</a>
-      <div class="cf-turnstile" id="turnstile-login" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onLoginVerified" data-expired-callback="onLoginExpired" data-error-callback="onLoginExpired"></div>
+      <div class="cf-turnstile" id="turnstile-login" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onLoginVerified" data-expired-callback="onLoginExpired" data-error-callback="onLoginCaptchaError"></div>
       <button class="btn-main" id="loginBtn" onclick="doLogin()" disabled>Войти</button>
       <div class="divider">или</div>
       <button class="btn-google" onclick="openGoogleRestrictedModal(event)"> 
@@ -418,7 +418,7 @@
       <div class="fg"><label class="label" for="r-name">Ваше имя <span style="color:var(--green)">*</span></label><input class="inp" type="text" id="r-name" autocomplete="name" placeholder="Как вас зовут?"/><div class="errmsg" id="err-r-name">Введите имя</div></div>
       <div class="fg"><label class="label" for="r-email">Email <span style="color:var(--green)">*</span></label><input class="inp" type="email" id="r-email" autocomplete="email" placeholder="your@email.com"/><div class="errmsg" id="err-r-email"></div></div>
       <div class="fg"><label class="label" for="r-pass">Пароль <span style="color:var(--green)">*</span></label><input class="inp" type="password" id="r-pass" autocomplete="new-password" placeholder="Минимум 6 символов"/><div class="errmsg" id="err-r-pass"></div></div>
-      <div class="cf-turnstile" id="turnstile-register" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onRegisterVerified" data-expired-callback="onRegisterExpired" data-error-callback="onRegisterExpired"></div>
+      <div class="cf-turnstile" id="turnstile-register" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onRegisterVerified" data-expired-callback="onRegisterExpired" data-error-callback="onRegisterCaptchaError"></div>
       <button class="btn-main" id="registerBtn" onclick="doRegister()" disabled>Создать аккаунт</button>
       <div class="divider">или</div>
       <button class="btn-google" onclick="openGoogleRestrictedModal(event)">
@@ -462,12 +462,27 @@
   window.onLoginExpired = function() {
     document.getElementById('loginBtn').disabled = true;
   };
+  // виджет сломался/не смог отдать челлендж — не блокируем человека намертво
+  window.onLoginCaptchaError = function() {
+    document.getElementById('loginBtn').disabled = false;
+  };
   window.onRegisterVerified = function() {
     document.getElementById('registerBtn').disabled = false;
   };
   window.onRegisterExpired = function() {
     document.getElementById('registerBtn').disabled = true;
   };
+  window.onRegisterCaptchaError = function() {
+    document.getElementById('registerBtn').disabled = false;
+  };
+  // страховка: если Cloudflare вообще не поднялся (сеть/блокировки) и не вызвал
+  // ни callback, ни error-callback — через 8 сек всё равно пускаем к кнопке
+  setTimeout(()=>{
+    const lb = document.getElementById('loginBtn');
+    const rb = document.getElementById('registerBtn');
+    if(lb && lb.disabled) lb.disabled = false;
+    if(rb && rb.disabled) rb.disabled = false;
+  }, 8000);
 </script>
 
 <script type="module">
@@ -489,6 +504,26 @@
 
   function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
   function setLoading(id,on){const b=document.getElementById(id);if(b){b.disabled=on; b.textContent=on?'Подождите...':(id==='loginBtn'?'Войти':'Создать аккаунт');}}
+
+  // Проверяем токен капчи на своём сервере. Если сервер недоступен/не отвечает —
+  // не блокируем человека, пропускаем (fail-open). Блокируем только если сервер
+  // ответил и явно сказал, что капча невалидна.
+  async function verifyCaptcha(token){
+    try{
+      const ctrl = new AbortController();
+      const timer = setTimeout(()=>ctrl.abort(), 6000);
+      const vResp = await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token}), signal:ctrl.signal
+      });
+      clearTimeout(timer);
+      const vData = await vResp.json();
+      return { reachable:true, ok:!!vData.success };
+    }catch(e){
+      console.warn('Проверка капчи недоступна, пропускаем без блокировки:', e);
+      return { reachable:false, ok:true };
+    }
+  }
 
   async function saveProfile(user,name){
     await user.getIdToken(true);
@@ -512,13 +547,16 @@
     if(!pass){document.getElementById('l-pass').classList.add('err');document.getElementById('err-l-pass').textContent='Введите пароль';document.getElementById('err-l-pass').className='errmsg show';ok=false;}
     if(!ok)return;
     const cfToken=turnstile.getResponse(document.getElementById('turnstile-login'));
-    if(!cfToken){toast('Пройдите проверку капчи','error');return;}
     setLoading('loginBtn',true);
-    try{
-      const vResp=await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:cfToken})});
-      const vData=await vResp.json();
-      if(!vData.success){toast('Проверка капчи не пройдена','error');turnstile.reset(document.getElementById('turnstile-login'));setLoading('loginBtn',false);return;}
-    }catch(e){toast('Ошибка проверки капчи','error');turnstile.reset(document.getElementById('turnstile-login'));setLoading('loginBtn',false);return;}
+    if(cfToken){
+      const v = await verifyCaptcha(cfToken);
+      if(v.reachable && !v.ok){
+        toast('Проверка капчи не пройдена','error');
+        turnstile.reset(document.getElementById('turnstile-login'));
+        setLoading('loginBtn',false);
+        return;
+      }
+    }
     try{
       const cred=await signInWithEmailAndPassword(auth,email,pass);
       try{await saveProfile(cred.user,cred.user.displayName);}catch(fsErr){console.error('Firestore saveProfile error:',fsErr);}
@@ -537,13 +575,16 @@
     if(pass.length<6){document.getElementById('r-pass').classList.add('err');document.getElementById('err-r-pass').textContent='Минимум 6 символов';document.getElementById('err-r-pass').className='errmsg show';ok=false;}
     if(!ok)return;
     const cfToken=turnstile.getResponse(document.getElementById('turnstile-register'));
-    if(!cfToken){toast('Пройдите проверку капчи','error');return;}
     setLoading('registerBtn',true);
-    try{
-      const vResp=await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:cfToken})});
-      const vData=await vResp.json();
-      if(!vData.success){toast('Проверка капчи не пройдена','error');turnstile.reset(document.getElementById('turnstile-register'));setLoading('registerBtn',false);return;}
-    }catch(e){toast('Ошибка проверки капчи','error');turnstile.reset(document.getElementById('turnstile-register'));setLoading('registerBtn',false);return;}
+    if(cfToken){
+      const v = await verifyCaptcha(cfToken);
+      if(v.reachable && !v.ok){
+        toast('Проверка капчи не пройдена','error');
+        turnstile.reset(document.getElementById('turnstile-register'));
+        setLoading('registerBtn',false);
+        return;
+      }
+    }
     _registering=true;
     try{
       const cred=await createUserWithEmailAndPassword(auth,email,pass);

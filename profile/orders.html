@@ -19,6 +19,7 @@
   --bad:#e8634f;--bad-d:#c8412f;--bad-wash:rgba(232,99,79,.1);
   --warn:#f59e0b;--warn-d:#b45309;--warn-wash:rgba(245,158,11,.12);
   --violet:#8b7bf7;--violet-wash:rgba(139,123,247,.12);
+  --info:#3b82f6;--info-d:#2563eb;--info-wash:rgba(59,130,246,.12);
   --font:'Geologica','Inter','Arial',sans-serif;
   --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
   --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
@@ -75,26 +76,26 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ord-cols{display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;padding:0 32px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
 
 /* LIST */
-.ord-list{border:1.5px solid var(--line);border-radius:40px;overflow:hidden;background:var(--bg)}
+.ord-list{border:1.5px solid var(--line);border-radius:40px;overflow:hidden;background:var(--bg);box-shadow:var(--sh1)}
 .ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
 .ord-row-wrap:last-child{border-bottom:none}
 .ord-row-wrap.is-filtered{display:none}
 .ord-row{all:unset;display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;align-items:center;width:100%;padding:24px 32px;cursor:pointer;transition:background .15s;font-family:var(--font)}
 .ord-row:hover{background:var(--bg2)}
 .ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
-.ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
 .ord-meta{font-size:.76rem;color:var(--ink-faint)}
 
 /* STATUS TAGS */
 .ord-tag{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:500;padding:.32rem .7rem .32rem .55rem;border-radius:20px;width:fit-content;letter-spacing:-.005em}
 .ord-tag svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* Статусы сгруппированы по смыслу, а не раскрашены по одному: серый — ещё не начали,
+   синий — мы работаем, жёлтый — ждём действия от клиента, зелёный — готово. */
 .ord-tag.s0{background:var(--bg2);color:var(--ink-dim)}
-.ord-tag.s1{background:var(--violet-wash);color:#6f5fe0}
-.ord-tag.s2{background:var(--dark);color:rgba(255,255,255,.85)}
-.ord-tag.s3{background:var(--accent-wash);color:var(--accent-h)}
-.ord-tag.s4{background:var(--warn-wash);color:var(--warn-d)}
-.ord-tag.s5{background:var(--accent);color:var(--dark)}
-.ord-tag.s6{background:var(--warn-wash);color:var(--warn-d)}
+.ord-tag.s1,.ord-tag.s2{background:var(--info-wash);color:var(--info-d)}
+.ord-tag.s3,.ord-tag.s6{background:var(--warn-wash);color:var(--warn-d)}
+.ord-tag.s4{background:var(--violet-wash);color:#6f5fe0}
+.ord-tag.s5{background:var(--accent-wash);color:var(--accent-d)}
 
 /* PAY STATUS */
 .ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:500}
@@ -125,7 +126,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ord-modal-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .ord-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .75rem;border-radius:8px}
 .ord-chip.status{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
-.ord-chip.status.active{background:var(--accent);color:var(--dark)}
+.ord-chip.status.s1,.ord-chip.status.s2{background:rgba(59,130,246,.22);color:#8fb8ff}
+.ord-chip.status.s3,.ord-chip.status.s6{background:rgba(245,158,11,.2);color:#ffcb7a}
+.ord-chip.status.s4{background:rgba(139,123,247,.22);color:#c3b8ff}
+.ord-chip.status.s5{background:var(--accent);color:var(--dark)}
 .ord-chip.paid-yes{background:rgba(30,222,123,.15);color:var(--accent)}
 .ord-chip.paid-half{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
 .ord-chip.paid-no{background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
@@ -276,9 +280,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .ord-modal-right{border-top:1px solid var(--line);border-right:none}
   .ord-modal{max-height:95vh}
   .ord-cols{display:none}
-  .ord-row{grid-template-columns:1fr;gap:4px;padding:20px 24px;padding-right:52px;position:relative}
-  .ord-cell-status,.ord-cell-pay,.ord-cell-price{display:none}
-  .ord-chevron{position:absolute;top:50%;right:20px;transform:translateY(-50%)}
+  .ord-row{
+    display:flex;flex-wrap:wrap;align-items:center;
+    row-gap:10px;column-gap:12px;
+    padding:20px 52px 20px 24px;position:relative;
+  }
+  .ord-cell-main{flex:1 1 100%;order:1}
+  .ord-cell-status{order:2}
+  .ord-cell-pay{order:3}
+  .ord-cell-price{order:4;margin-left:auto;text-align:right}
+  .ord-chevron{position:absolute;top:22px;right:20px;transform:none}
 }
 @media(max-width:600px){
   .page-hero{border-radius:24px;padding:28px 24px}
@@ -578,7 +589,7 @@ window.openOrderModal=function(id){
   document.getElementById('ordModalTitle').textContent=(o.siteType||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
   document.getElementById('ordModalPrice').innerHTML=totalPrice?'<small>₽</small>'+totalPrice.toLocaleString('ru'):'';
   document.getElementById('ordModalChips').innerHTML=
-    '<span class="ord-chip status'+(s===5?' active':'')+'">'
+    '<span class="ord-chip status s'+s+'">'
       +'<svg viewBox="0 0 24 24" class="ord-chip-ico">'+STATUS_ICONS[s]+'</svg>'+STATUS_LABELS[s]
     +'</span>'
     +'<span class="ord-chip '+payChipClass+'"><svg viewBox="0 0 24 24" class="ord-chip-ico">'+PAY_ICONS[fullyPaid?'paid':(halfPaid?'half':'unpaid')]+'</svg>'+payLabel+'</span>'

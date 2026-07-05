@@ -83,6 +83,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .reset-form.visible{display:block;animation:fadeUp .18s ease}
 .reset-hint{font-size:.86rem;color:var(--ink-dim);margin-bottom:18px;line-height:1.6}
 
+/* SESSIONS */
+.sessions-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+.sessions-list{display:flex;flex-direction:column;gap:12px}
+.session-row{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#fff;border:1.5px solid var(--line);border-radius:20px;flex-wrap:wrap}
+.session-icon{width:46px;height:46px;border-radius:14px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.session-icon svg{width:22px;height:22px;stroke:var(--ink-dim);stroke-width:1.6;fill:none}
+.session-browser-badge{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:7px;background:#fff;border:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.session-browser-badge svg{width:14px;height:14px}
+.session-info{flex:1;min-width:180px}
+.session-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+.session-title{font-size:.92rem;font-weight:500;color:var(--ink)}
+.session-current-badge{font-size:.66rem;font-weight:500;padding:.22rem .6rem;border-radius:7px;background:var(--accent-wash);color:var(--accent-d);border:1px solid rgba(30,222,123,.25);text-transform:uppercase;letter-spacing:.04em}
+.session-meta{font-size:.8rem;color:var(--ink-faint)}
+.session-end-btn{background:var(--bad-wash);color:#c44432;border:1px solid rgba(232,99,79,.2);border-radius:12px;padding:.55rem 1rem;font-family:var(--font);font-size:.8rem;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background .15s}
+.session-end-btn:hover{background:rgba(232,99,79,.16)}
+.session-end-btn svg{width:14px;height:14px}
+.sessions-empty,.sessions-loading{color:var(--ink-faint);font-size:.86rem;padding:8px 4px}
+@media(max-width:560px){.session-row{padding:16px}.session-end-btn{width:100%;justify-content:center}}
+
 /* DANGER */
 .danger-card{background:var(--dark);border-radius:40px;padding:8px 44px}
 .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:28px 0;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -235,6 +254,25 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
         </div>
       </section>
 
+      <!-- УСТРОЙСТВА И СЕАНСЫ -->
+      <section class="set-card" id="sec-sessions">
+        <div class="sessions-head-row">
+          <div class="set-card-head" style="margin-bottom:0">
+            <div class="set-card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="19" height="13" rx="1.8"/><path d="M8 20.5h8M12 16.5v4" stroke-linecap="round"/></svg>
+              Устройства и сеансы
+            </div>
+            <div class="set-card-sub">Где выполнен вход в ваш аккаунт. Изменения на других устройствах применятся при их следующей загрузке страницы.</div>
+          </div>
+          <button class="btn btn-ghost" id="endAllBtn" onclick="endAllOther()" style="display:none">
+            Завершить все другие сеансы
+          </button>
+        </div>
+        <div class="sessions-list" id="sessionsList">
+          <div class="sessions-loading">Загрузка сеансов…</div>
+        </div>
+      </section>
+
       <!-- ОПАСНАЯ ЗОНА -->
       <section id="sec-danger">
         <div class="set-card-head" style="margin-bottom:18px;padding:0 4px">
@@ -265,10 +303,15 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <script type="module">
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged, signOut, updateProfile, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, doc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, doc, updateDoc, deleteDoc, getDocs, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getSessionId, endSession, endAllOtherSessions, endCurrentSession,
+  timeAgo, deviceLabel, deviceIconSVG, browserIconSVG, endSessionIconSVG
+} from './sessions.js';
 
 let currentUser = null;
 let isGoogleUser = false;
+let sessionsUnsub = null;
 
 function toast(msg, type='info'){
   const t=document.getElementById('toast');
@@ -317,6 +360,78 @@ function renderAuthMethod(user){
   }
 }
 
+function renderSessions(docs, currentSid){
+  const wrap = document.getElementById('sessionsList');
+  if(!docs.length){
+    wrap.innerHTML = '<div class="sessions-empty">Активных сеансов не найдено.</div>';
+    document.getElementById('endAllBtn').style.display = 'none';
+    return;
+  }
+  const otherCount = docs.filter(s => s.sessionId !== currentSid).length;
+  document.getElementById('endAllBtn').style.display = otherCount > 0 ? 'inline-flex' : 'none';
+
+  wrap.innerHTML = docs.map(s => {
+    const isCurrent = s.sessionId === currentSid;
+    const locationStr = [s.city, s.country].filter(Boolean).join(', ');
+    const lastActiveDate = s.lastActive && s.lastActive.toDate ? s.lastActive.toDate() : null;
+    const metaParts = [s.browser, locationStr, lastActiveDate ? ('активность ' + timeAgo(lastActiveDate)) : null].filter(Boolean);
+    return `
+      <div class="session-row">
+        <div class="session-icon">
+          ${deviceIconSVG(s.deviceType)}
+          <span class="session-browser-badge">${browserIconSVG(s.browser)}</span>
+        </div>
+        <div class="session-info">
+          <div class="session-title-row">
+            <span class="session-title">${deviceLabel(s.deviceType)}${s.osVersion ? ' · ' + s.os + ' ' + s.osVersion : (s.os ? ' · ' + s.os : '')}</span>
+            ${isCurrent ? '<span class="session-current-badge">Это устройство</span>' : ''}
+          </div>
+          <div class="session-meta">${metaParts.join(' · ') || '—'}</div>
+        </div>
+        ${isCurrent ? '' : `<button class="session-end-btn" onclick="endSessionRow('${s.sessionId}')">${endSessionIconSVG()} Завершить</button>`}
+      </div>`;
+  }).join('');
+}
+
+function startSessionsWatch(user){
+  const currentSid = getSessionId(user.uid);
+  const q = query(collection(db, 'users', user.uid, 'sessions'), where('revoked', '==', false));
+  sessionsUnsub = onSnapshot(q, snap => {
+    const docs = [];
+    snap.forEach(d => docs.push(d.data()));
+    docs.sort((a, b) => {
+      if(a.sessionId === currentSid) return -1;
+      if(b.sessionId === currentSid) return 1;
+      const at = a.lastActive && a.lastActive.toDate ? a.lastActive.toDate().getTime() : 0;
+      const bt = b.lastActive && b.lastActive.toDate ? b.lastActive.toDate().getTime() : 0;
+      return bt - at;
+    });
+    renderSessions(docs, currentSid);
+  }, err => {
+    console.error('sessions onSnapshot error:', err);
+    document.getElementById('sessionsList').innerHTML = '<div class="sessions-empty">Не удалось загрузить список сеансов.</div>';
+  });
+}
+
+window.endSessionRow=async function(sessionId){
+  if(!currentUser) return;
+  try{
+    await endSession(db, currentUser.uid, sessionId);
+    toast('Сеанс завершён','success');
+  }catch(e){ toast('Ошибка завершения сеанса','error'); }
+};
+
+window.endAllOther=async function(){
+  if(!currentUser) return;
+  const btn = document.getElementById('endAllBtn');
+  btn.disabled = true;
+  try{
+    await endAllOtherSessions(db, currentUser.uid, getSessionId(currentUser.uid));
+    toast('Остальные сеансы завершены','success');
+  }catch(e){ toast('Ошибка','error'); }
+  finally{ btn.disabled = false; }
+};
+
 window.saveSettings=async function(){
   if(!currentUser) return;
   const name=document.getElementById('settingName').value.trim();
@@ -343,6 +458,8 @@ window.sendPasswordReset=async function(){
 };
 
 window.doLogout=async function(){
+  if(sessionsUnsub) sessionsUnsub();
+  if(currentUser) await endCurrentSession(db, currentUser.uid).catch(()=>{});
   await signOut(auth);
   window.location.href='../auth';
 };
@@ -367,6 +484,8 @@ window.confirmDeleteAccount=async function(){
     const chatSnap=await gd(col(db,'chats',currentUser.uid,'messages'));
     for(const x of chatSnap.docs) await dd(x.ref).catch(()=>{});
     await dd(d(db,'chats',currentUser.uid)).catch(()=>{});
+    const sessSnap=await gd(col(db,'users',currentUser.uid,'sessions'));
+    for(const x of sessSnap.docs) await dd(x.ref).catch(()=>{});
     await dd(d(db,'users',currentUser.uid)).catch(()=>{});
     await deleteUser(currentUser);
     window.location.href='../auth';
@@ -385,6 +504,7 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('settingName').value=user.displayName||'';
   document.getElementById('settingEmail').value=user.email||'';
   renderAuthMethod(user);
+  startSessionsWatch(user);
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
 });

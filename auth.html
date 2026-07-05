@@ -492,6 +492,7 @@
     onAuthStateChanged, updateProfile, sendPasswordResetEmail
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { registerSession } from './profile/sessions.js';
 
 
   let _registering = false;
@@ -560,6 +561,7 @@
     try{
       const cred=await signInWithEmailAndPassword(auth,email,pass);
       try{await saveProfile(cred.user,cred.user.displayName);}catch(fsErr){console.error('Firestore saveProfile error:',fsErr);}
+      registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
     }
     catch(e){setLoading('loginBtn',false);turnstile.reset(document.getElementById('turnstile-login'));document.getElementById('loginBtn').disabled=true;const msg=e.code==='auth/invalid-credential'?'Неверный email или пароль':e.code==='auth/too-many-requests'?'Слишком много попыток, подождите':'Ошибка: '+e.message;toast(msg,'error');}
   };
@@ -594,6 +596,7 @@
       }catch(fsErr){
         console.error('Firestore saveProfile error:',fsErr);
       }
+      registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
       window.location.href='welcome';
     }
     catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));document.getElementById('registerBtn').disabled=true;const msg=e.code==='auth/email-already-in-use'?'Этот email уже зарегистрирован':e.code==='auth/invalid-email'?'Некорректный email':'Ошибка: '+e.message;toast(msg,'error');}

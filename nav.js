@@ -779,6 +779,7 @@ ${buildMobileSheet()}`;
       const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
       const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
       const fsMod   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const sessMod = await import(`${b}profile/sessions.js`).catch(e => { console.error('nav.js sessions.js import error:', e); return null; });
 
       let tries = 0;
       while (appMod.getApps().length === 0 && tries < 100) {
@@ -797,6 +798,8 @@ ${buildMobileSheet()}`;
       document.getElementById('anSignOut')?.addEventListener('click', async () => {
         try {
           teardownListeners();
+          const uidBefore = auth.currentUser?.uid;
+          if (sessMod && uidBefore) await sessMod.endCurrentSession(db, uidBefore).catch(() => {});
           await authMod.signOut(auth);
           window.location.href = b || '/';
         } catch(e) { console.error('nav.js signOut:', e); }
@@ -807,6 +810,7 @@ ${buildMobileSheet()}`;
         if (user) {
           applyAuthedUI(user);
           watchBadges(db, fsMod, user);
+          if (sessMod) sessMod.touchSession(db, auth, user).catch(e => console.error('touchSession:', e));
         } else {
           applyGuestUI();
         }

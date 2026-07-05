@@ -353,8 +353,11 @@
       left:50%;
       transform:translateX(-50%) translateY(20px);
       z-index:400;
-      padding:.65rem 1.4rem;
-      border-radius:12px;
+      display:flex;
+      align-items:center;
+      gap:.6rem;
+      padding:.75rem 1.5rem;
+      border-radius:16px;
       font-size:.82rem;
       font-weight:500;
       opacity:0;
@@ -362,11 +365,19 @@
       pointer-events:none;
       white-space:nowrap;
       font-family:var(--font);
+      background:var(--dark);
+      color:#fff;
+      box-shadow:0 12px 32px rgba(0,0,0,.18);
+    }
+    .toast::before{
+      content:'';
+      width:7px;height:7px;border-radius:50%;flex-shrink:0;
+      background:var(--green);
     }
     .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--green);color:var(--dark)}
-    .toast.error{background:var(--error);color:#fff}
-    .toast.info{background:var(--dark);color:#fff}
+    .toast.success::before{background:var(--green)}
+    .toast.error::before{background:var(--error)}
+    .toast.info::before{background:rgba(255,255,255,.4)}
     @media(max-width:500px){
       .toast{white-space:normal;max-width:90vw;text-align:center;}
     }
@@ -506,6 +517,22 @@
   function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
   function setLoading(id,on){const b=document.getElementById(id);if(b){b.disabled=on; b.textContent=on?'Подождите...':(id==='loginBtn'?'Войти':'Создать аккаунт');}}
 
+  // Человеко-понятные сообщения об ошибках — без кодов и текста SDK.
+  function friendlyAuthError(e, fallback){
+    const known = {
+      'auth/invalid-credential': 'Неверный email или пароль',
+      'auth/wrong-password': 'Неверный email или пароль',
+      'auth/user-not-found': 'Неверный email или пароль',
+      'auth/too-many-requests': 'Слишком много попыток, подождите немного',
+      'auth/network-request-failed': 'Не удалось подключиться. Проверьте интернет-соединение и попробуйте снова',
+      'auth/email-already-in-use': 'Этот email уже зарегистрирован',
+      'auth/invalid-email': 'Некорректный email',
+      'auth/weak-password': 'Пароль слишком простой, придумайте другой',
+      'auth/requires-recent-login': 'Нужно войти заново, чтобы выполнить это действие'
+    };
+    return known[e?.code] || fallback || 'Что-то пошло не так. Попробуйте ещё раз чуть позже';
+  }
+
   // Проверяем токен капчи на своём сервере. Если сервер недоступен/не отвечает —
   // не блокируем человека, пропускаем (fail-open). Блокируем только если сервер
   // ответил и явно сказал, что капча невалидна.
@@ -563,7 +590,7 @@
       try{await saveProfile(cred.user,cred.user.displayName);}catch(fsErr){console.error('Firestore saveProfile error:',fsErr);}
       registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
     }
-    catch(e){setLoading('loginBtn',false);turnstile.reset(document.getElementById('turnstile-login'));document.getElementById('loginBtn').disabled=true;const msg=e.code==='auth/invalid-credential'?'Неверный email или пароль':e.code==='auth/too-many-requests'?'Слишком много попыток, подождите':'Ошибка: '+e.message;toast(msg,'error');}
+    catch(e){setLoading('loginBtn',false);turnstile.reset(document.getElementById('turnstile-login'));document.getElementById('loginBtn').disabled=true;toast(friendlyAuthError(e),'error');}
   };
 
   window.doRegister=async function(){
@@ -599,7 +626,7 @@
       registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
       window.location.href='welcome';
     }
-    catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));document.getElementById('registerBtn').disabled=true;const msg=e.code==='auth/email-already-in-use'?'Этот email уже зарегистрирован':e.code==='auth/invalid-email'?'Некорректный email':'Ошибка: '+e.message;toast(msg,'error');}
+    catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));document.getElementById('registerBtn').disabled=true;toast(friendlyAuthError(e),'error');}
   };
 
   window.openGoogleRestrictedModal = function(e){if(e)e.preventDefault();document.getElementById('googleRestrictModal').classList.add('show');};
@@ -610,7 +637,7 @@
     const email=document.getElementById('forgot-email').value.trim();
     if(!email){toast('Введите email','error');return;}
     try{await sendPasswordResetEmail(auth,email);}
-    catch(e){ if(e.code!=='auth/user-not-found'){ toast('Ошибка: '+e.message,'error'); return; } }
+    catch(e){ if(e.code!=='auth/user-not-found'){ toast(friendlyAuthError(e),'error'); return; } }
     toast('Если такой аккаунт есть — письмо отправлено. Проверьте почту.','success');
     closeForgot();
   };

@@ -108,21 +108,34 @@
     .stat-num{font-family:var(--font);font-weight:500;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-.04em;line-height:1;margin-bottom:.3rem;color:#fff}
     .stat-lbl{color:rgba(255,255,255,.3);font-size:.72rem;font-weight:300}
 
-    /* MENU LIST — только мобильные */
-    .menu-list{display:flex;flex-direction:column}
-    .menu-item{display:flex;align-items:center;gap:1.1rem;padding:1.15rem 0;background:transparent;
-      border:none;border-bottom:1px solid var(--border);cursor:pointer;transition:opacity .15s;
-      text-decoration:none;color:var(--text);font-family:var(--font);width:100%;text-align:left}
-    .menu-item:first-child{border-top:1px solid var(--border)}
-    .menu-item:hover{opacity:.7}
-    .menu-ico{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(30,222,123,.1)}
-    .menu-ico svg{width:18px;height:18px;stroke:var(--accent);stroke-width:1.8;fill:none}
-    .menu-text{flex:1}
-    .menu-title{font-family:var(--font);font-size:.9rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.15rem}
-    .menu-sub{font-size:.78rem;color:var(--muted)}
-    .menu-arrow{color:var(--muted2);font-size:.85rem;flex-shrink:0}
-    .menu-badge{background:var(--accent);color:var(--accent-ink);font-size:.6rem;font-weight:500;padding:.15rem .5rem;border-radius:8px;min-width:20px;text-align:center;flex-shrink:0}
-    @media(min-width:981px){.menu-list{display:none}}
+    /* ══════════════════════════════════
+       ACTION TILES — быстрые действия,
+       видны и на мобильном, и на ПК
+    ══════════════════════════════════ */
+    .action-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+    @media(min-width:981px){.action-tiles{grid-template-columns:repeat(4,1fr)}}
+    .action-tile{display:flex;flex-direction:column;gap:16px;padding:20px 18px;background:var(--bg3);
+      border:1.5px solid var(--border);border-radius:24px;text-decoration:none;color:var(--text);
+      position:relative;transition:transform .15s,box-shadow .15s,border-color .15s;font-family:var(--font)}
+    .action-tile:hover{transform:translateY(-3px);border-color:var(--border-hi);box-shadow:var(--sh1)}
+    .action-tile:active{transform:translateY(-1px) scale(.98)}
+    .action-tile.dark{background:var(--dark);border-color:var(--dark)}
+    .action-tile.dark .tile-title{color:#fff}
+    .action-tile.dark .tile-ico{background:rgba(255,255,255,.1)}
+    .action-tile.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:16px;padding:18px 22px}
+    .action-tile.wide .tile-arrow{margin-left:auto;color:rgba(255,255,255,.35);font-size:1.2rem;flex-shrink:0}
+    .tile-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(30,222,123,.12);flex-shrink:0}
+    .tile-ico svg{width:20px;height:20px;stroke:var(--accent3);stroke-width:1.8;fill:none}
+    .action-tile.dark .tile-ico svg{stroke:var(--accent)}
+    .tile-text{min-width:0}
+    .tile-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .tile-sub{font-size:.74rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .action-tile.dark .tile-sub{color:rgba(255,255,255,.35)}
+    .tile-badge{position:absolute;top:16px;right:16px;background:var(--accent);color:var(--accent-ink);
+      font-size:.62rem;font-weight:500;padding:.18rem .5rem;border-radius:8px;min-width:20px;text-align:center;display:none}
+    .tile-badge.show{display:inline-block}
+    .tile-badge.warn{background:var(--warn);color:#1a1400}
+    @media(max-width:600px){.action-tiles{grid-template-columns:repeat(2,1fr);gap:8px}.action-tile{padding:16px 14px;border-radius:20px;gap:12px}}
 
     /* ══════════════════════════════════
        ПК — двухколоночная сетка под hero
@@ -146,15 +159,15 @@
     .home-card-link:hover{color:var(--text)}
     .home-card-link svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
 
-    .order-strip{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);cursor:pointer;text-decoration:none;color:inherit;transition:opacity .15s}
-    .order-strip:last-child{border-bottom:none;padding-bottom:0}
-    .order-strip:first-of-type{padding-top:0}
-    .order-strip:hover{opacity:.7}
-    .order-status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+    .order-strip{display:flex;align-items:center;gap:14px;padding:12px;margin:0 -12px;border-radius:16px;cursor:pointer;text-decoration:none;color:inherit;transition:background .15s}
+    .order-strip:hover{background:var(--bg2)}
+    .order-status-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .order-status-ico svg{width:16px;height:16px;stroke-width:2;fill:none}
     .order-strip-info{flex:1;min-width:0}
     .order-strip-name{font-size:.88rem;font-weight:500;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
     .order-strip-meta{font-size:.74rem;color:var(--muted);margin-top:2px}
     .order-strip-badge{font-size:.64rem;font-weight:500;padding:3px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap}
+    .home-card #recentOrdersList .order-strip:not(:last-child){margin-bottom:2px}
 
     .orders-empty{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
 
@@ -323,67 +336,61 @@
       </div>
     </div>
 
-    <!-- МОБИЛЬНОЕ МЕНЮ -->
-    <div class="menu-list">
-      <a href="profile/orders" class="menu-item">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Мои заказы</div>
-          <div class="menu-sub" id="menuOrdersSub">История всех заявок</div>
+    <!-- БЫСТРЫЕ ДЕЙСТВИЯ (плитки) -->
+    <div class="action-tiles home-grid-full">
+      <a href="profile/orders" class="action-tile">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Мои заказы</div>
+          <div class="tile-sub" id="menuOrdersSub">История всех заявок</div>
         </div>
-        <span class="menu-badge" id="menuActiveCount" style="display:none">0</span>
-        <span class="menu-arrow">›</span>
+        <span class="tile-badge" id="menuActiveCount">0</span>
       </a>
-      <a href="profile/sites" class="menu-item">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Мои сайты</div>
-          <div class="menu-sub">Запущенные проекты</div>
+      <a href="profile/sites" class="action-tile">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Мои сайты</div>
+          <div class="tile-sub">Запущенные проекты</div>
         </div>
-        <span class="menu-arrow">›</span>
       </a>
-      <a href="profile/support" class="menu-item">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Чат с командой</div>
-          <div class="menu-sub">Задайте вопрос по проекту</div>
+      <a href="profile/support" class="action-tile">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Чат с командой</div>
+          <div class="tile-sub">Вопрос по проекту</div>
         </div>
-        <span class="menu-badge" id="menuChatBadge" style="display:none">!</span>
-        <span class="menu-arrow">›</span>
+        <span class="tile-badge" id="menuChatBadge">!</span>
       </a>
-      <a href="order" class="menu-item">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Новый заказ</div>
-          <div class="menu-sub">Оформить заявку на сайт</div>
+      <a href="profile/tickets" class="action-tile" id="menuTickets">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Обслуживание</div>
+          <div class="tile-sub" id="menuTicketsSub">Заявки на доработку</div>
         </div>
-        <span class="menu-arrow">›</span>
+        <span class="tile-badge" id="menuTicketsBadge">!</span>
       </a>
-      <a href="profile/tickets" class="menu-item" id="menuTickets">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Обслуживание сайта</div>
-          <div class="menu-sub" id="menuTicketsSub">Заявки на доработку</div>
+      <a href="profile/notifications" class="action-tile">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Уведомления</div>
+          <div class="tile-sub">Последние события</div>
         </div>
-        <span class="menu-badge" id="menuTicketsBadge" style="display:none">!</span>
-        <span class="menu-arrow">›</span>
+        <span class="tile-badge" id="menuNotifBadge">!</span>
       </a>
-      <a href="profile/settings" class="menu-item">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Настройки</div>
-          <div class="menu-sub">Профиль и аккаунт</div>
+      <a href="profile/settings" class="action-tile">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Настройки</div>
+          <div class="tile-sub">Профиль и аккаунт</div>
         </div>
-        <span class="menu-arrow">›</span>
       </a>
-      <a href="profile/notifications" class="menu-item">
-        <div class="menu-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
-        <div class="menu-text">
-          <div class="menu-title">Уведомления</div>
-          <div class="menu-sub">Последние события</div>
+      <a href="order" class="action-tile dark wide">
+        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div>
+        <div class="tile-text">
+          <div class="tile-title">Новый заказ</div>
+          <div class="tile-sub">Оформить заявку на сайт</div>
         </div>
-        <span class="menu-badge" id="menuNotifBadge" style="display:none">!</span>
-        <span class="menu-arrow">›</span>
+        <span class="tile-arrow">›</span>
       </a>
     </div>
 
@@ -463,8 +470,11 @@ function renderRecentOrders(orders){
     const bg=STATUS_BG[st]||'rgba(112,122,138,.12)';
     const date=fmtDateShort(o.createdAt);
     const name=o.siteName||o.type||'Заказ';
+    const icon=st===5
+      ?'<polyline points="20 6 9 17 4 12"/>'
+      :'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>';
     return `<a href="profile/orders" class="order-strip">
-      <div class="order-status-dot" style="background:${color}"></div>
+      <div class="order-status-ico" style="background:${bg}"><svg viewBox="0 0 24 24" style="stroke:${color}">${icon}</svg></div>
       <div class="order-strip-info">
         <div class="order-strip-name">${name}</div>
         <div class="order-strip-meta">${date?'Создан '+date:''}</div>
@@ -512,7 +522,7 @@ function loadOrderStats(uid){
     document.getElementById('statActive').textContent=active;
     document.getElementById('statDone').textContent=orders.filter(o=>o.status===5).length;
     const badge=document.getElementById('menuActiveCount');
-    if(active>0){badge.textContent=active;badge.style.display='';}else badge.style.display='none';
+    if(active>0){badge.textContent=active;badge.style.display='inline-block';}else badge.style.display='none';
     document.getElementById('menuOrdersSub').textContent=active>0?`${active} активных`:'История всех заявок';
     renderRecentOrders(orders);
     buildTimeline(orders);
@@ -532,7 +542,7 @@ async function watchSupportStatus(uid){
       const daysLeft=Math.ceil((exp-new Date())/(1000*60*60*24));
       sub.textContent=daysLeft<=2?`Истекает через ${daysLeft} дн.`:`Активно · осталось ${daysLeft} дн.`;
       sub.style.color=daysLeft<=2?'var(--warn)':'';
-      if(daysLeft<=2){badge.style.display='';badge.textContent='!';}
+      if(daysLeft<=2){badge.style.display='inline-block';badge.textContent='!';}else badge.style.display='none';
       // Карточка поддержки
       if(card){
         card.classList.add('visible');
@@ -554,7 +564,7 @@ function watchChatBadge(uid){
   const q=query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false));
   unsubChat=onSnapshot(q,snap=>{
     const menuBadge=document.getElementById('menuChatBadge');
-    if(menuBadge) menuBadge.style.display=snap.size?'':'none';
+    if(menuBadge) menuBadge.style.display=snap.size?'inline-block':'none';
   },()=>{});
 }
 
@@ -569,7 +579,7 @@ function watchNotifications(uid){
   unsubNotifs=onSnapshot(q,snap=>{
     const hasUnread=snap.docs.some(d=>!d.data().read);
     const menuBadge=document.getElementById('menuNotifBadge');
-    if(menuBadge) menuBadge.style.display=hasUnread?'':'none';
+    if(menuBadge) menuBadge.style.display=hasUnread?'inline-block':'none';
     const notifDot=document.getElementById('notifDot');
     if(notifDot) notifDot.style.display=hasUnread?'':'none';
   },()=>{});

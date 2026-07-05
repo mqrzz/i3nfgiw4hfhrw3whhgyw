@@ -141,22 +141,20 @@ export async function touchSession(db, auth, user){
     const snap = await getDoc(ref);
 
     if(!snap.exists()){
-      // Документа сеанса нет (например, не успел записаться при входе) —
-      // просто создаём его сейчас. Разлогиниваем только если сеанс
-      // СУЩЕСТВУЕТ и явно помечен revoked, а не когда его просто нет.
+      // Документа сеанса нет — просто создаём его сейчас, ничего больше не делаем.
       await registerSession(db, user);
       return;
     }
 
-    if(snap.data().revoked){
-      clearSessionId(user.uid);
-      const { signOut } = await import(AUTH_URL);
-      await signOut(auth);
-      const onProfilePath = location.pathname.includes('/profile/');
-      window.location.href = onProfilePath ? '../auth' : 'auth';
-      return;
-    }
-
+    // ВАЖНО: автоматический принудительный signOut() отключён намеренно.
+    // Кнопка «Завершить» в настройках по-прежнему помечает сеанс revoked:true
+    // в Firestore и он пропадает из списка (visible-эффект для владельца
+    // аккаунта, который смотрит список), но сама сессия в браузере
+    // остальных устройств больше НЕ разлогинивается автоматически —
+    // слишком велика цена случайного ложного срабатывания.
+    // Если понадобится вернуть настоящий remote-logout, самый безопасный
+    // способ — Cloud Function + Admin SDK revokeRefreshTokens(uid), а не
+    // проверка флага из клиента.
     await updateDoc(ref, { lastActive: serverTimestamp() }).catch(() => {});
   }catch(e){
     console.error('touchSession error:', e);

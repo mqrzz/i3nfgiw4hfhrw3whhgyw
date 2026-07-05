@@ -779,7 +779,7 @@ ${buildMobileSheet()}`;
       const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
       const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
       const fsMod   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      const sessMod = await import(`${b}profile/sessions.js`).catch(e => { console.error('nav.js sessions.js import error:', e); return null; });
+      const sessMod = await import(`${b}profile/sessions.js?v=2`).catch(e => { console.error('nav.js sessions.js import error:', e); return null; });
 
       let tries = 0;
       while (appMod.getApps().length === 0 && tries < 100) {

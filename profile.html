@@ -110,10 +110,10 @@
 
     /* ══════════════════════════════════
        ACTION TILES — быстрые действия,
-       видны и на мобильном, и на ПК
+       ТОЛЬКО мобильный (на ПК те же пункты уже есть в sidebar.js)
     ══════════════════════════════════ */
     .action-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-    @media(min-width:981px){.action-tiles{grid-template-columns:repeat(4,1fr)}}
+    @media(min-width:981px){.action-tiles{display:none}}
     .action-tile{display:flex;flex-direction:column;gap:16px;padding:20px 18px;background:var(--bg3);
       border:1.5px solid var(--border);border-radius:24px;text-decoration:none;color:var(--text);
       position:relative;transition:transform .15s,box-shadow .15s,border-color .15s;font-family:var(--font)}
@@ -168,6 +168,7 @@
     .order-strip-meta{font-size:.74rem;color:var(--muted);margin-top:2px}
     .order-strip-badge{font-size:.64rem;font-weight:500;padding:3px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap}
     .home-card #recentOrdersList .order-strip:not(:last-child){margin-bottom:2px}
+
 
     .orders-empty{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
 
@@ -461,6 +462,7 @@ const STATUS_BG={0:'rgba(112,122,138,.12)',1:'rgba(30,222,123,.12)',2:'rgba(30,2
 function renderRecentOrders(orders){
   const list=document.getElementById('recentOrdersList');
   if(!list) return;
+  // ЛИМИТ: на главной всегда показываем максимум 3 последних заказа, не больше — остальное через "Все заказы"
   const recent=orders.slice(0,3);
   if(!recent.length){list.innerHTML='<div class="orders-empty">Заказов пока нет</div>';return;}
   list.innerHTML=recent.map(o=>{
@@ -500,6 +502,7 @@ function buildTimeline(orders){
   });
   const tl=document.getElementById('activityTimeline');
   if(!tl) return;
+  // ЛИМИТ: в блоке "Активность" на главной тоже максимум 3 события, не больше
   const top=events.slice(0,3);
   if(!top.length){tl.innerHTML='<div class="timeline-empty">Активность появится после первого заказа</div>';return;}
   tl.innerHTML=top.map(e=>`<div class="tl-item">

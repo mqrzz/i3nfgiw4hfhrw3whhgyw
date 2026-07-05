@@ -140,7 +140,15 @@ export async function touchSession(db, auth, user){
     const ref = doc(db, 'users', user.uid, 'sessions', sid);
     const snap = await getDoc(ref);
 
-    if(!snap.exists() || snap.data().revoked){
+    if(!snap.exists()){
+      // Документа сеанса нет (например, не успел записаться при входе) —
+      // просто создаём его сейчас. Разлогиниваем только если сеанс
+      // СУЩЕСТВУЕТ и явно помечен revoked, а не когда его просто нет.
+      await registerSession(db, user);
+      return;
+    }
+
+    if(snap.data().revoked){
       clearSessionId(user.uid);
       const { signOut } = await import(AUTH_URL);
       await signOut(auth);

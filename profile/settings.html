@@ -88,9 +88,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .sessions-list{display:flex;flex-direction:column;gap:12px}
 .session-row{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#fff;border:1.5px solid var(--line);border-radius:20px;flex-wrap:wrap}
 .session-icon{width:46px;height:46px;border-radius:14px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
-.session-icon svg{width:22px;height:22px;stroke:var(--ink-dim);stroke-width:1.6;fill:none}
+.session-icon>svg{width:22px;height:22px;stroke:var(--ink-dim);stroke-width:1.6;fill:none}
 .session-browser-badge{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:7px;background:#fff;border:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.session-browser-badge svg{width:14px;height:14px}
+.session-browser-badge svg{width:14px;height:14px;flex-shrink:0}
 .session-info{flex:1;min-width:180px}
 .session-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
 .session-title{font-size:.92rem;font-weight:500;color:var(--ink)}
@@ -307,7 +307,7 @@ import { collection, query, where, doc, updateDoc, deleteDoc, getDocs, onSnapsho
 import {
   getSessionId, endSession, endAllOtherSessions, endCurrentSession,
   timeAgo, deviceLabel, deviceIconSVG, browserIconSVG, endSessionIconSVG
-} from './sessions.js?v=2';
+} from './sessions.js?v=3';
 
 let currentUser = null;
 let isGoogleUser = false;
@@ -383,7 +383,7 @@ function renderSessions(docs, currentSid){
         </div>
         <div class="session-info">
           <div class="session-title-row">
-            <span class="session-title">${deviceLabel(s.deviceType)}${s.osVersion ? ' · ' + s.os + ' ' + s.osVersion : (s.os ? ' · ' + s.os : '')}</span>
+            <span class="session-title">${s.deviceModel || deviceLabel(s.deviceType)}${s.osVersion ? ' · ' + s.os + ' ' + s.osVersion : (s.os ? ' · ' + s.os : '')}</span>
             ${isCurrent ? '<span class="session-current-badge">Это устройство</span>' : ''}
           </div>
           <div class="session-meta">${metaParts.join(' · ') || '—'}</div>

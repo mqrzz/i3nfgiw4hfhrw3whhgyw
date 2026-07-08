@@ -77,9 +77,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .hero-stat-n{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
 .hero-stat-l{font-size:12px;color:rgba(255,255,255,.32);font-weight:300}
 
-.update-strip{display:flex;align-items:center;gap:14px;padding:16px 0;color:var(--muted);font-size:.86rem;flex-wrap:wrap}
-.update-strip b{color:var(--text);font-weight:500}
-.update-close{margin-left:auto;background:none;border:none;color:var(--muted2);cursor:pointer;padding:4px;flex-shrink:0;font-size:14px}
 
 /* ══ ГЛАВНАЯ РАСКЛАДКА — реальная 2-колоночная композиция для ПК,
    а не растянутая мобильная колонка ══ */
@@ -95,7 +92,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .sec-link:hover{color:var(--green-d)}
 .main-col>section+section{margin-top:56px}
 
-/* ══ ПРОЕКТЫ — верхний активный проект получает отдельную визуальную подачу
+/* ══ ЗАКАЗЫ — верхний активный заказ получает отдельную визуальную подачу
    (не строка списка, а акцентная карточка с прогрессом), остальные — списком ══ */
 .featured-project{border:1.5px solid var(--border);border-radius:28px;padding:28px 30px;margin-bottom:4px;position:relative;overflow:hidden}
 .fp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
@@ -174,7 +171,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   </style>
 </head>
 <body>
-<script src="nav.js" data-page="profile"></script>
+<script src="sidebar.js" data-page="profile"></script>
+
+<div id="sbContent">
 
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
@@ -209,7 +208,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <div class="hero-headline" id="heroHeadline">Здравствуйте, <em>Пользователь</em></div>
 
         <div class="hero-bar">
-          <div class="hero-stat"><div class="hero-stat-n" data-count id="statTotal">0</div><div class="hero-stat-l">Всего проектов</div></div>
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statTotal">0</div><div class="hero-stat-l">Всего заказов</div></div>
           <div class="hero-stat"><div class="hero-stat-n" data-count id="statActive">0</div><div class="hero-stat-l">В работе</div></div>
           <div class="hero-stat"><div class="hero-stat-n" data-count id="statDone">0</div><div class="hero-stat-l">Завершено</div></div>
         </div>
@@ -218,21 +217,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   </section>
 
   <div class="container">
-    <div class="update-strip" id="updateBanner">
-      <span><b>Обновление кабинета.</b> Личный кабинет переработан заново — единый стиль с сайтом, десктопная раскладка вместо растянутой мобильной.</span>
-      <button class="update-close" onclick="dismissUpdateBanner()" title="Скрыть"><i class="ph-fill ph-x"></i></button>
-    </div>
-  </div>
-
-  <div class="container">
     <div class="main-grid">
 
       <div class="main-col">
 
         <section class="reveal">
           <div class="sec-head">
-            <div><p class="eyebrow g">Ваши проекты</p><h2>Проекты</h2></div>
-            <a href="profile/projects" class="sec-link">Все проекты <i class="ph-fill ph-arrow-right"></i></a>
+            <div><p class="eyebrow g">Ваши заказы</p><h2>Заказы</h2></div>
+            <a href="profile/orders" class="sec-link">Все заказы <i class="ph-fill ph-arrow-right"></i></a>
           </div>
           <div id="featuredProjectSlot"></div>
           <div class="plain-list" id="recentProjects"><div class="list-empty">Загрузка...</div></div>
@@ -253,7 +245,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
         <div class="reveal bento-tile" style="padding:8px 6px">
           <div class="quick-links">
-            <a href="profile/projects"><i class="ph-fill ph-briefcase"></i><span>Проекты</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><i class="ph-fill ph-caret-right"></i></a>
+            <a href="profile/orders"><i class="ph-fill ph-briefcase"></i><span>Заказы</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><i class="ph-fill ph-caret-right"></i></a>
             <a href="profile/support"><i class="ph-fill ph-headset"></i><span>Поддержка</span><span class="ql-badge" id="qlHelpBadge" style="display:none">!</span><i class="ph-fill ph-caret-right"></i></a>
             <a href="profile/notifications"><i class="ph-fill ph-bell"></i><span>Уведомления</span><i class="ph-fill ph-caret-right"></i></a>
             <a href="order"><i class="ph-fill ph-plus-circle"></i><span>Новый заказ</span><i class="ph-fill ph-caret-right"></i></a>
@@ -286,15 +278,6 @@ function avatarGradient(seed){
   let h=0; for(let i=0;i<seed.length;i++) h=seed.charCodeAt(i)+((h<<5)-h);
   const hueA=Math.abs(h)%360, hueB=(hueA+42)%360;
   return `linear-gradient(135deg, hsl(${hueA} 70% 45%), hsl(${hueB} 65% 38%))`;
-}
-
-const UPDATE_VERSION='3.0.0';
-window.dismissUpdateBanner=function(){
-  localStorage.setItem('antviz_update_seen',UPDATE_VERSION);
-  document.getElementById('updateBanner')?.style.setProperty('display','none');
-};
-if(localStorage.getItem('antviz_update_seen')===UPDATE_VERSION){
-  document.getElementById('updateBanner')?.style.setProperty('display','none');
 }
 
 window.handleAvatarUpload=async function(file){
@@ -351,17 +334,17 @@ function renderFeaturedAndList(orders){
         <div class="fp-icon"><i class="ph-fill ${STATUS_ICON[featured.status]||'ph-hammer'}"></i></div>
       </div>
       <div class="fp-progress-track"><div class="fp-progress-fill" style="width:0%" data-target="${pct}"></div></div>
-      <div class="fp-meta"><span>Этап: <b>${STATUS_LABEL[featured.status]}</b></span><a href="profile/projects" style="color:var(--green-d);text-decoration:none;font-weight:500">Подробнее →</a></div>
+      <div class="fp-meta"><span>Этап: <b>${STATUS_LABEL[featured.status]}</b></span><a href="profile/orders" style="color:var(--green-d);text-decoration:none;font-weight:500">Подробнее →</a></div>
     </div>`;
     requestAnimationFrame(()=>{const f=slot.querySelector('.fp-progress-fill');setTimeout(()=>f.style.width=f.dataset.target+'%',100);});
   } else slot.innerHTML='';
 
   if(!rest.length){
-    list.innerHTML=featured?'':'<div class="list-empty">Больше проектов нет</div>';
+    list.innerHTML=featured?'':'<div class="list-empty">Больше заказов нет</div>';
   } else {
     list.innerHTML=rest.map(o=>{
       const st=o.status||0, done=st===5;
-      return `<a href="profile/projects" class="p-row">
+      return `<a href="profile/orders" class="p-row">
         <i class="ph-fill ${STATUS_ICON[st]} p-row-ico"></i>
         <div class="p-row-body"><div class="p-row-title">${o.siteName||o.siteDomain||o.siteType||'Заказ'}</div><div class="p-row-sub">${fmtDateShort(o.createdAt)?'Создан '+fmtDateShort(o.createdAt):''}</div></div>
         <span class="p-tag ${done?'done':'progress'}">${STATUS_LABEL[st]}</span>
@@ -465,7 +448,7 @@ async function loadBento(uid){
         <div class="bt-icon"><i class="ph-fill ph-star"></i></div>
         <div class="bt-label">Отзыв</div>
         <div class="bt-value" style="font-size:1rem">Как всё прошло?</div>
-        <a class="bt-cta" href="profile/projects">Оставить отзыв <i class="ph-fill ph-arrow-right"></i></a>
+        <a class="bt-cta" href="profile/orders">Оставить отзыв <i class="ph-fill ph-arrow-right"></i></a>
       </div>`;
     }
 
@@ -506,6 +489,9 @@ onAuthStateChanged(auth,async user=>{
 </script>
 
 <script src="footer.js" data-page="profile"></script>
+
+</div><!-- /sbContent -->
+
 <script src="GEOBLOCK.js"></script>
 <script type="module" src="maintenance.js"></script>
 </body>

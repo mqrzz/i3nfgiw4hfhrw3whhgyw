@@ -28,9 +28,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
 
-.container{max-width:1328px;margin:0 auto;padding:0 20px;width:100%}
-@media(min-width:1024px){.container{padding:0 64px}}
-@media(min-width:1280px){.container{padding:0 96px}}
+/* Раньше .container был скопирован из index.html (лендинга): свой
+   max-width:1328px + собственные брейкпоинты отступов 20/64/96px.
+   Но profile.html лежит внутри #sbContent, которому sidebar.js уже даёт
+   padding:20px 56px 60px — получались двойные отступы и контент был уже
+   и мельче, чем на остальных страницах кабинета (orders/sites/settings и
+   т.д.), где используется .shell{max-width:1240px} без своих отступов.
+   Приводим .container к тому же max-width и убираем дублирующие отступы —
+   масштаб теперь совпадает с остальным кабинетом. */
+.container{max-width:1240px;margin:0 auto;width:100%}
 
 .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
 .spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}

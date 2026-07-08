@@ -708,19 +708,29 @@ async function verifyCaptcha(token){
   }
 }
 
-onAuthStateChanged(auth,async user=>{
-  if(!user){window.location.href='auth';return;}
-  currentUser=user;
-  // Чистим зависшие заказы со статусом -1 старше 10 минут
+// Заказ со status:-1 — это "заявка создана, оплата ещё не подтверждена".
+// Такие заказы не должны копиться в базе, если пользователь так и не
+// заплатил (закрыл вкладку на Юкассе, передумал, ошибка платежа и т.д.).
+// Чистим их в двух точках: при каждом заходе на страницу заказа и прямо
+// перед созданием нового заказа (см. submitOrder) — так зависший "хвост"
+// не будет висеть неделями в админке, ожидая, что юзер случайно вернётся
+// на order.html.
+async function cleanupStalePending(uid, maxAgeMs=10*60*1000){
   try{
-    const staleQ=query(collection(db,'orders'),where('uid','==',user.uid),where('status','==',-1));
+    const staleQ=query(collection(db,'orders'),where('uid','==',uid),where('status','==',-1));
     const staleSnap=await getDocs(staleQ);
-    const cutoff=Date.now()-10*60*1000;
+    const cutoff=Date.now()-maxAgeMs;
     for(const d of staleSnap.docs){
       const ts=d.data().createdAt?.toMillis?.();
       if(!ts||ts<cutoff) await deleteDoc(doc(db,'orders',d.id));
     }
   }catch(_){}
+}
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){currentUser=null;window.location.href='auth';return;}
+  currentUser=user;
+  await cleanupStalePending(user.uid);
 });
 
 document.querySelectorAll('.type-card[data-format]').forEach(card=>{
@@ -983,7 +993,11 @@ document.addEventListener('click', () => document.getElementById('halfHintWrap')
 async function submitOrder(paymentType) {
   if(!agreed){document.getElementById('agreeBox').classList.add('err');document.getElementById('errAgree').classList.add('show');return;}
   if(!state.format||!state.tier){toast('Выберите формат и тариф','error');return;}
-  if(!currentUser){toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
+  // Живая проверка, а не закэшированная переменная currentUser — если сессия
+  // истекла/разлогинилась уже после загрузки страницы, submitOrder не должен
+  // полагаться на устаревшее значение и создавать заказ без владельца.
+  if(!auth.currentUser){currentUser=null;toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
+  currentUser=auth.currentUser;
   const btnFull=document.getElementById('submitBtn');
   const btnHalf=document.getElementById('submitBtnHalf');
   const isHalf = paymentType === 'partial';
@@ -1007,7 +1021,10 @@ async function submitOrder(paymentType) {
     console.warn('Капча: непредвиденная ошибка, пропускаем без блокировки:', e);
   }
 
-  // ШАГ 2: капча прошла — собираем данные и создаём заказ в Firebase
+  // ШАГ 2: капча прошла — на всякий случай подчищаем прошлые зависшие
+  // заявки этого же юзера (status:-1), чтобы при повторных попытках они
+  // не копились в базе, и создаём заказ в Firebase
+  await cleanupStalePending(currentUser.uid);
   activeBtn.textContent='Сохраняем заявку...';
   const{total,discount}=calcAmounts();const t=TIERS[state.tier];
   const payAmount = isHalf ? Math.ceil(total / 2) : total;

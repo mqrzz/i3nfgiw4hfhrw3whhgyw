@@ -6,563 +6,267 @@
   <title>Кабинет — Antviz</title>
   <link rel="icon" href="img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/> 
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css"/>
   <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#ffffff;--bg2:#f9fafc;--bg3:#f2f4f7;--card:#f9fafc;
-      --border:#dfe3e8;--border-hi:#cbcdd6;
-      --accent:#1ede7b;--accent2:#1ede7b;--accent3:#1ac16b;--accent-tint:rgba(30,222,123,.12);
-      --text:#191b1e;--muted:#707a8a;--muted2:#5a6373; 
-      --dark:#191b1e;--dark2:#2b2f33;
-      --success:#1ede7b;--error:#e8634f;--warn:#f59e0b;
-      --accent-ink:#191b1e;
-      --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
-      --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
-      --nav-h:68px;--r:16px;--r-lg:22px;
-      --font:'Geologica','Inter','Arial',sans-serif;
-    }
-    html{scroll-behavior:smooth;overflow-x:hidden}
-    body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;overflow-x:hidden}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;--green-tint:rgba(30,222,123,.12);
+  --bg:#fff;--bg3:#f9fafc;
+  --text:#191b1e;--muted:#707a8a;--muted2:#9aa2b1;
+  --border:#dfe3e8;--border2:#cbcdd6;
+  --dark:#191b1e;--dark2:#2b2f33;
+  --warn:#f59e0b;--warn-tint:rgba(245,158,11,.1);
+  --info:#3b82f6;--info-tint:rgba(59,130,246,.1);
+  --font:'Geologica','Inter','Arial',sans-serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.3;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--green-h);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
 
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.4)}}
-    @keyframes spin{to{transform:rotate(360deg)}}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.container{max-width:1328px;margin:0 auto;padding:0 20px;width:100%}
+@media(min-width:1024px){.container{padding:0 64px}}
+@media(min-width:1280px){.container{padding:0 96px}}
 
-    /* LOADING */
-    .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
-    .spinner{width:28px;height:28px;border:2px solid var(--border-hi);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
+.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+#cabinet{display:none}
 
+.eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
+.eyebrow.g{color:var(--green-d)}
 
-    /* CONTENT */
-    .page-col{width:100%}
-    @media(max-width:980px){.page-col{max-width:640px;margin:0 auto}}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:15px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark)}
+.btn-green:hover{background:var(--green-h)}
+.btn svg,.btn i{font-size:16px}
 
-    /* SECTIONS */
-    .section{display:none}
-    .section.active{display:block;animation:fadeUp .25s ease}
+/* ══ HERO ══ */
+.hero-wrap{padding:44px 0 0}
+.hero-block{background:var(--dark);border-radius:56px;padding:56px 64px;position:relative;overflow:hidden}
+@media(max-width:860px){.hero-block{padding:36px 28px;border-radius:32px}}
 
-    /* BACK BTN */
-    .back-btn{display:inline-flex;align-items:center;gap:6px;color:var(--muted);font-size:.82rem;font-weight:300;background:none;border:none;cursor:pointer;padding:0;margin-bottom:2rem;transition:color .15s;font-family:var(--font)}
-    .back-btn:hover{color:var(--text)}
-    .back-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;flex-shrink:0}
-    @media(min-width:981px){.back-btn{display:none}}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:40px}
+.hero-id{display:flex;align-items:center;gap:16px;min-width:0}
+.avatar{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:1.4rem;color:#fff;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;transition:opacity .2s}
+.avatar:hover{opacity:.85}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:16px;color:#fff}
+.avatar:hover .avatar-overlay{opacity:1}
+#avatarInput{display:none}
+.hero-id-text{min-width:0}
+.hero-greeting{color:rgba(255,255,255,.35);font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.hero-name{font-weight:500;font-size:clamp(1.5rem,2.6vw,2rem);letter-spacing:-.03em;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-    /* SECTION HEADER */
-    .sec-title{font-family:var(--font);font-weight:500;font-size:1.8rem;letter-spacing:-.02em;line-height:1.15;margin-bottom:.4rem}
-    .sec-sub{color:var(--muted);font-size:.9rem;margin-bottom:2.5rem}
+.hero-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background .18s;text-decoration:none;flex-shrink:0;font-size:18px;color:rgba(255,255,255,.65)}
+.icon-btn:hover{background:rgba(255,255,255,.14)}
+.icon-btn .dot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:#ff6b54;border:1.5px solid var(--dark);display:none}
+.icon-btn .dot.show{display:block}
 
-    /* MODALS */
-    .modal-overlay{position:fixed;inset:0;z-index:800;background:rgba(0,0,0,.7);backdrop-filter:blur(10px);
-      display:flex;align-items:flex-end;justify-content:center;padding:0;opacity:0;pointer-events:none;transition:opacity .22s}
-    .modal-overlay.show{opacity:1;pointer-events:all}
-    .modal{background:var(--bg2);border:1px solid var(--border-hi);border-radius:var(--r-lg) var(--r-lg) 0 0;
-      padding:2rem 1.5rem;width:100%;max-width:440px;transform:translateY(20px);transition:transform .22s}
-    .modal-overlay.show .modal{transform:translateY(0)}
-    .modal-icon{font-size:2.2rem;margin-bottom:.6rem;text-align:center}
-    .modal h3{font-family:var(--font);font-weight:500;font-size:1.1rem;margin-bottom:.4rem;text-align:center}
-    .modal-p{color:var(--muted);font-size:.82rem;text-align:center;margin-bottom:1.3rem;line-height:1.6}
-    .modal-btns{display:flex;gap:.6rem}
-    .modal-btns .btn{flex:1;justify-content:center}
+.hero-headline{font-weight:500;font-size:clamp(2rem,4.5vw,3.4rem);letter-spacing:-.04em;line-height:1.04;color:#fff;margin-bottom:36px;max-width:720px}
+.hero-headline em{font-style:normal;color:var(--green)}
 
-    /* ══════════════════════════════════
-       HERO — тёмный блок как на главной точно
-    ══════════════════════════════════ */
-    .profile-hero{
-      background:var(--dark);border-radius:40px;padding:40px 44px 36px;
-      margin-bottom:16px;position:relative;overflow:hidden;
-    }
-    @media(max-width:980px){.profile-hero{border-radius:28px;padding:32px 28px 28px}}
+.hero-bar{border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(3,1fr)}
+.hero-stat{padding:24px 0 0;border-right:1px solid rgba(255,255,255,.07)}
+.hero-stat:last-child{border-right:none}
+.hero-stat-n{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+.hero-stat-l{font-size:12px;color:rgba(255,255,255,.32);font-weight:300}
 
-    .hero-top-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:32px;position:relative}
-    .hero-top-actions{display:flex;gap:8px}
+.update-strip{display:flex;align-items:center;gap:14px;padding:16px 0;color:var(--muted);font-size:.86rem;flex-wrap:wrap}
+.update-strip b{color:var(--text);font-weight:500}
+.update-close{margin-left:auto;background:none;border:none;color:var(--muted2);cursor:pointer;padding:4px;flex-shrink:0;font-size:14px}
 
-    /* ══════════════════════════════════
-       ПАНЕЛЬ КАСТОМИЗАЦИИ
-    ══════════════════════════════════ */
-    .customize-panel{position:absolute;top:calc(100% + 8px);right:0;width:272px;background:var(--bg);
-      border:1.5px solid var(--border);border-radius:22px;box-shadow:var(--sh2);padding:16px;z-index:40;
-      display:none;color:var(--text);font-family:var(--font)}
-    .customize-panel.open{display:block}
-    .cp-head{display:flex;align-items:center;justify-content:space-between;font-size:.86rem;font-weight:500;margin-bottom:14px}
-    .cp-close{width:26px;height:26px;border-radius:8px;border:none;background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--muted);transition:background .15s}
-    .cp-close:hover{background:var(--border)}
-    .cp-close svg{width:13px;height:13px}
-    .cp-section{margin-bottom:14px}
-    .cp-label{font-size:.72rem;color:var(--muted);margin-bottom:8px}
-    .cp-swatches{display:flex;flex-wrap:wrap;gap:8px}
-    .cp-color{width:28px;height:28px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;position:relative;transition:transform .12s}
-    .cp-color:hover{transform:scale(1.1)}
-    .cp-color.active{border-color:var(--text)}
-    .cp-color.active::after{content:'';position:absolute;inset:0;margin:auto;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
-    .cp-icon{width:32px;height:32px;border-radius:10px;border:1.5px solid var(--border);background:var(--bg3);cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;transition:border-color .15s,transform .12s}
-    .cp-icon:hover{transform:scale(1.08)}
-    .cp-icon.active{border-color:var(--text);background:var(--border)}
-    .cp-segmented{display:flex;background:var(--bg3);border-radius:12px;padding:3px;gap:2px}
-    .cp-segmented button{flex:1;border:none;background:none;padding:.5rem 0;border-radius:9px;font-size:.76rem;font-family:var(--font);color:var(--muted);cursor:pointer;transition:background .15s,color .15s}
-    .cp-segmented button.active{background:var(--bg);color:var(--text);box-shadow:var(--sh1)}
-    .cp-reset{width:100%;border:none;background:none;color:var(--muted);font-size:.76rem;font-family:var(--font);padding:.4rem 0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-    .cp-reset:hover{color:var(--text)}
-    @media(max-width:600px){.customize-panel{position:fixed;top:auto;bottom:0;left:0;right:0;width:auto;border-radius:24px 24px 0 0}}
+/* ══ ГЛАВНАЯ РАСКЛАДКА — реальная 2-колоночная композиция для ПК,
+   а не растянутая мобильная колонка ══ */
+.main-grid{display:grid;grid-template-columns:1fr 340px;gap:56px;padding:64px 0;align-items:start}
+@media(max-width:960px){.main-grid{grid-template-columns:1fr;gap:48px;padding:48px 0}}
+.rail{position:sticky;top:24px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:960px){.rail{position:static}}
 
-    /* Плотность интерфейса — компактный режим */
-    body.density-compact .home-card{padding:20px 22px}
-    body.density-compact .action-tile{padding:14px 12px;gap:10px}
-    body.density-compact .action-tiles{gap:8px}
-    body.density-compact .tile-ico{width:36px;height:36px;border-radius:11px}
-    body.density-compact .tile-ico svg{width:16px;height:16px}
-    body.density-compact .order-strip{padding:9px}
-    body.density-compact .tl-item{padding:10px 0}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+.sec-head h2{font-size:clamp(24px,2.6vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.08}
+.sec-link{font-size:.86rem;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.sec-link i{font-size:13px}
+.sec-link:hover{color:var(--green-d)}
+.main-col>section+section{margin-top:56px}
 
-    /* ══════════════════════════════════
-       БАННЕР «ЧТО НОВОГО»
-    ══════════════════════════════════ */
-    .update-banner{display:flex;gap:16px;align-items:flex-start;background:var(--bg3);border:1.5px solid var(--border);
-      border-radius:24px;padding:20px 22px;margin-bottom:12px;position:relative}
-    .update-ico{width:44px;height:44px;border-radius:14px;background:var(--accent-tint);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .update-ico svg{width:20px;height:20px;stroke:var(--accent3)}
-    .update-body{flex:1;min-width:0}
-    .update-top{display:flex;align-items:center;gap:8px;margin-bottom:9px;flex-wrap:wrap;padding-right:26px}
-    .update-version{background:var(--accent);color:var(--accent-ink);font-size:.68rem;font-weight:600;padding:.2rem .55rem;border-radius:7px;letter-spacing:.02em}
-    .update-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em}
-    .update-list{margin:0 0 12px;padding-left:18px;font-size:.82rem;color:var(--muted);line-height:1.65}
-    .update-list li{margin-bottom:1px}
-    .update-link{display:inline-flex;align-items:center;gap:5px;font-size:.8rem;font-weight:500;color:var(--text);text-decoration:none}
-    .update-link svg{width:14px;height:14px;stroke:currentColor}
-    .update-link:hover{text-decoration:underline}
-    .update-close{position:absolute;top:16px;right:16px;width:26px;height:26px;border-radius:8px;border:none;
-      background:transparent;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s}
-    .update-close:hover{background:var(--border)}
-    .update-close svg{width:13px;height:13px;stroke:currentColor}
+/* ══ ПРОЕКТЫ — верхний активный проект получает отдельную визуальную подачу
+   (не строка списка, а акцентная карточка с прогрессом), остальные — списком ══ */
+.featured-project{border:1.5px solid var(--border);border-radius:28px;padding:28px 30px;margin-bottom:4px;position:relative;overflow:hidden}
+.fp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.fp-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--green-d);margin-bottom:6px}
+.fp-title{font-size:1.15rem;font-weight:500;letter-spacing:-.01em}
+.fp-icon{width:40px;height:40px;border-radius:12px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:18px;flex-shrink:0}
+.fp-progress-track{height:6px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:10px}
+.fp-progress-fill{height:100%;background:var(--green);border-radius:100px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.fp-meta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+.fp-meta b{color:var(--text);font-weight:500}
 
-    .avatar{width:72px;height:72px;border-radius:20px;
-      display:flex;align-items:center;justify-content:center;font-family:var(--font);font-weight:500;
-      font-size:1.8rem;color:var(--accent-ink);background:var(--accent);overflow:hidden;cursor:pointer;position:relative;transition:opacity .2s;flex-shrink:0}
-    .avatar:hover{opacity:.85}
-    .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-    .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;border-radius:20px}
-    .avatar:hover .avatar-overlay{opacity:1}
-    .avatar-overlay svg{width:20px;height:20px;stroke:#fff;stroke-width:1.8}
-    #avatarInput{display:none}
+.plain-list{display:flex;flex-direction:column}
+.p-row{display:grid;grid-template-columns:36px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;transition:padding-left .15s}
+.p-row:last-child{border-bottom:none}
+.p-row:hover{padding-left:8px}
+.p-row-ico{font-size:20px;color:var(--muted2);flex-shrink:0}
+.p-row-body{min-width:0}
+.p-row-title{font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-row-sub{font-size:.8rem;color:var(--muted)}
+.p-tag{font-size:.7rem;font-weight:500;padding:.32rem .7rem;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.p-tag.done{background:var(--green-tint);color:var(--green-d)}
+.p-tag.progress{background:var(--info-tint);color:var(--info)}
+.list-empty{padding:32px 0;text-align:center;color:var(--muted);font-size:.9rem}
 
-    .notif-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);
-      display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;position:relative;transition:background .18s}
-    .notif-btn:hover{background:rgba(255,255,255,.14)}
-    .notif-btn svg{width:20px;height:20px;stroke:rgba(255,255,255,.6);stroke-width:1.8}
-    .notif-dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--error);border:1.5px solid var(--dark);display:none}
-    .notif-dot.show{display:block}
+/* ══ АКТИВНОСТЬ — настоящая временная лента (точка + линия), а не полоса ══ */
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:1.5px;background:var(--border)}
+.tl-item{position:relative;padding-bottom:26px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-26px;top:3px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:2px solid var(--border2)}
+.tl-item.on .tl-dot{border-color:var(--green);background:var(--green)}
+.tl-title{font-size:.92rem;font-weight:500;margin-bottom:2px}
+.tl-sub{font-size:.8rem;color:var(--muted)}
+.tl-date{font-size:.72rem;color:var(--muted2);margin-top:4px}
 
-    .hero-greeting{color:rgba(255,255,255,.35);font-size:.82rem;font-weight:300;margin-bottom:6px;letter-spacing:.01em;text-transform:uppercase;letter-spacing:.08em;font-size:.72rem}
-    .hero-name{font-family:var(--font);font-weight:500;font-size:clamp(2rem,4vw,3rem);letter-spacing:-.04em;line-height:1.05;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .hero-since{color:rgba(255,255,255,.25);font-size:.76rem;margin-top:.5rem;font-weight:300}
+/* ══ BENTO-СЕТКА (правая колонка) ══ */
+.bento-tile{border:1.5px solid var(--border);border-radius:22px;padding:22px}
+.bento-tile.dark{background:var(--dark);border-color:var(--dark);color:#fff}
+.bento-tile.accent{background:var(--green);border-color:var(--green);color:var(--dark)}
+.bt-icon{width:34px;height:34px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);margin-bottom:14px}
+.bento-tile.dark .bt-icon{background:rgba(255,255,255,.1);color:var(--green)}
+.bento-tile.accent .bt-icon{background:rgba(0,0,0,.1);color:var(--dark)}
+.bt-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.bento-tile.dark .bt-label{color:rgba(255,255,255,.4)}
+.bento-tile.accent .bt-label{color:rgba(25,27,30,.6)}
+.bt-value{font-size:1.4rem;font-weight:500;letter-spacing:-.02em;margin-bottom:3px}
+.bt-sub{font-size:.78rem;color:var(--muted);line-height:1.4}
+.bento-tile.dark .bt-sub{color:rgba(255,255,255,.4)}
+.bento-tile.accent .bt-sub{color:rgba(25,27,30,.6)}
+.bt-track{height:5px;background:var(--bg3);border-radius:100px;margin-top:12px;overflow:hidden}
+.bento-tile.dark .bt-track{background:rgba(255,255,255,.12)}
+.bt-fill{height:100%;background:var(--green);border-radius:100px}
+.bt-cta{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:500;color:var(--dark);text-decoration:none;margin-top:12px}
+.bento-tile.dark .bt-cta{color:var(--green)}
+.bento-tile.accent .bt-cta{color:var(--dark)}
 
-    /* STATS внутри hero — как hero-bar на главной */
-    .hero-stats{
-      display:grid;grid-template-columns:repeat(3,1fr);
-      border-top:1px solid rgba(255,255,255,.08);
-      padding-top:24px;margin-top:0;gap:0;
-    }
-    .stat-box{padding:0;border-left:1px solid rgba(255,255,255,.08);padding-left:20px}
-    .stat-box:first-child{border-left:none;padding-left:0}
-    .stat-num{font-family:var(--font);font-weight:500;font-size:clamp(1.8rem,3.5vw,2.6rem);letter-spacing:-.04em;line-height:1;margin-bottom:.3rem;color:#fff}
-    .stat-lbl{color:rgba(255,255,255,.3);font-size:.72rem;font-weight:300}
+/* ══ БЫСТРЫЙ ДОСТУП — компактно, внизу, без сетки плиток-иконок ══ */
+.quick-links{display:flex;flex-direction:column;gap:2px}
+.quick-links a{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-radius:16px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;transition:background .15s}
+.quick-links a:hover{background:var(--bg3)}
+.quick-links a i:first-child{font-size:17px;color:var(--muted);margin-right:12px}
+.quick-links a span{flex:1}
+.quick-links a i:last-child{font-size:13px;color:var(--muted2)}
+.ql-badge{background:var(--green);color:var(--dark);font-size:.66rem;font-weight:500;padding:.16rem .5rem;border-radius:8px;margin-right:8px}
 
-    /* ══════════════════════════════════
-       ACTION TILES — быстрые действия,
-       ТОЛЬКО мобильный (на ПК те же пункты уже есть в sidebar.js)
-    ══════════════════════════════════ */
-    .action-tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
-    @media(min-width:981px){.action-tiles{display:none}}
-    .action-tile{display:flex;flex-direction:column;gap:16px;padding:20px 18px;background:var(--bg3);
-      border:1.5px solid var(--border);border-radius:24px;text-decoration:none;color:var(--text);
-      position:relative;transition:transform .15s,box-shadow .15s,border-color .15s;font-family:var(--font)}
-    .action-tile:hover{transform:translateY(-3px);border-color:var(--border-hi);box-shadow:var(--sh1)}
-    .action-tile:active{transform:translateY(-1px) scale(.98)}
-    .action-tile.dark{background:var(--dark);border-color:var(--dark)}
-    .action-tile.dark .tile-title{color:#fff}
-    .action-tile.dark .tile-ico{background:rgba(255,255,255,.1)}
-    .action-tile.wide{grid-column:1/-1;flex-direction:row;align-items:center;gap:16px;padding:18px 22px}
-    .action-tile.wide .tile-arrow{margin-left:auto;color:rgba(255,255,255,.35);font-size:1.2rem;flex-shrink:0}
-    .tile-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--accent-tint);flex-shrink:0}
-    .tile-ico svg{width:20px;height:20px;stroke:var(--accent3);stroke-width:1.8;fill:none}
-    .action-tile.dark .tile-ico svg{stroke:var(--accent)}
-    .tile-text{min-width:0}
-    .tile-title{font-size:.92rem;font-weight:500;letter-spacing:-.01em;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .tile-sub{font-size:.74rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .action-tile.dark .tile-sub{color:rgba(255,255,255,.35)}
-    .tile-badge{position:absolute;top:16px;right:16px;background:var(--accent);color:var(--accent-ink);
-      font-size:.62rem;font-weight:500;padding:.18rem .5rem;border-radius:8px;min-width:20px;text-align:center;display:none}
-    .tile-badge.show{display:inline-block}
-    .tile-badge.warn{background:var(--warn);color:#1a1400}
-    @media(max-width:600px){.action-tiles{grid-template-columns:repeat(2,1fr);gap:8px}.action-tile{padding:16px 14px;border-radius:20px;gap:12px}}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;padding:.6rem 1.3rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green);color:var(--dark)}
+.toast.error{background:#e8634f;color:#fff}
 
-    /* ══════════════════════════════════
-       ПК — двухколоночная сетка под hero
-    ══════════════════════════════════ */
-    .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .home-grid-full{grid-column:1/-1}
-    @media(max-width:980px){.home-grid{grid-template-columns:1fr}}
-
-    /* ══════════════════════════════════
-       УВЕДОМЛЕНИЯ (блок на ПК)
-    ══════════════════════════════════ */
-
-    .home-card{
-      background:var(--bg3);border:1.5px solid var(--border);border-radius:32px;
-      padding:28px 32px;margin-bottom:12px;
-      transition:box-shadow .15s;
-    }
-    .home-card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
-    .home-card-title{font-family:var(--font);font-weight:500;font-size:1rem;letter-spacing:-.02em}
-    .home-card-link{font-size:.76rem;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:4px;transition:color .15s}
-    .home-card-link:hover{color:var(--text)}
-    .home-card-link svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
-
-    .order-strip{display:flex;align-items:center;gap:14px;padding:12px;margin:0 -12px;border-radius:16px;cursor:pointer;text-decoration:none;color:inherit;transition:background .15s}
-    .order-strip:hover{background:var(--bg2)}
-    .order-status-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .order-status-ico svg{width:16px;height:16px;stroke-width:2;fill:none}
-    .order-strip-info{flex:1;min-width:0}
-    .order-strip-name{font-size:.88rem;font-weight:500;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .order-strip-meta{font-size:.74rem;color:var(--muted);margin-top:2px}
-    .order-strip-badge{font-size:.64rem;font-weight:500;padding:3px 8px;border-radius:6px;flex-shrink:0;white-space:nowrap}
-    .home-card #recentOrdersList .order-strip:not(:last-child){margin-bottom:2px}
-
-
-    .orders-empty{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
-
-    /* ══════════════════════════════════
-       SUPPORT STATUS — карточка
-    ══════════════════════════════════ */
-    .support-card{
-      background:var(--dark);border-radius:32px;
-      padding:28px 32px;margin-bottom:12px;
-      display:none;
-    }
-    .support-card.visible{display:block}
-    .support-card-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
-    .support-card-title{font-family:var(--font);font-weight:500;font-size:1.35rem;letter-spacing:-.03em;color:#fff;margin-bottom:4px}
-    .support-card-sub{font-size:.78rem;color:rgba(255,255,255,.35);margin-bottom:20px}
-    .support-progress-track{background:rgba(255,255,255,.1);border-radius:100px;height:5px;margin-bottom:8px}
-    .support-progress-fill{background:var(--accent);height:5px;border-radius:100px;transition:width .6s ease}
-    .support-progress-labels{display:flex;justify-content:space-between;font-size:.68rem;color:rgba(255,255,255,.25)}
-
-    /* ══════════════════════════════════
-       ACTIVITY TIMELINE — карточка
-    ══════════════════════════════════ */
-    .timeline-list{display:flex;flex-direction:column}
-    .tl-item{display:grid;grid-template-columns:38px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--border);align-items:start}
-    .tl-item:last-child{border-bottom:none;padding-bottom:0}
-    .tl-item:first-child{padding-top:0}
-    .tl-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-tint)}
-    .tl-ico svg{width:16px;height:16px;stroke:var(--accent3);stroke-width:2;fill:none}
-    .tl-body-title{font-size:.85rem;font-weight:500;letter-spacing:-.01em;margin-bottom:2px}
-    .tl-body-sub{font-size:.74rem;color:var(--muted)}
-    .tl-time{font-size:.7rem;color:var(--muted2);margin-top:3px}
-
-    .timeline-empty{text-align:center;padding:1.5rem 0;color:var(--muted);font-size:.82rem}
-
-    /* EMPTY */
-    .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    .empty-icon{font-size:2.2rem;margin-bottom:.7rem}
-    .empty h3{font-family:var(--font);font-weight:500;font-size:.9rem;color:var(--text);margin-bottom:.3rem}
-    .empty p{font-size:.8rem;margin-bottom:1.2rem}
-
-    /* SETTINGS */
-    .settings-section{padding-bottom:2rem;margin-bottom:2rem;border-bottom:1px solid var(--border)}
-    .settings-section:last-of-type{border-bottom:none}
-    .settings-section-title{font-family:var(--font);font-weight:500;font-size:1rem;letter-spacing:-.01em;margin-bottom:1.3rem;display:flex;align-items:center;gap:.7rem}
-    .settings-section-title svg{width:17px;height:17px;stroke:var(--accent);stroke-width:1.8;flex-shrink:0}
-
-    .form-group{margin-bottom:.9rem}
-    .form-label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:.4rem}
-    .form-input{width:100%;background:var(--bg3);border:none;border-radius:12px;padding:.85rem 1rem;color:var(--text);font-family:var(--font);font-size:.95rem;font-weight:300;outline:none;transition:box-shadow .18s}
-    .form-input:focus{box-shadow:0 0 0 2px rgba(30,222,123,.35)}
-    .form-input:disabled{opacity:.35;cursor:default}
-    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
-
-    /* DANGER */
-    .danger-section-title{font-family:var(--font);font-weight:500;font-size:1rem;color:var(--error);margin-bottom:1.3rem}
-    .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,107,84,.08);margin-bottom:1rem}
-    .danger-row:last-child{padding-bottom:0;border-bottom:none;margin-bottom:0}
-    .danger-row h4{font-family:var(--font);font-size:.88rem;font-weight:500;letter-spacing:-.01em;margin-bottom:.2rem}
-    .danger-row p{font-size:.78rem;color:var(--muted)}
-
-    /* BUTTONS */
-    .btn{display:inline-flex;align-items:center;gap:5px;padding:.75rem 1.4rem;border-radius:12px;font-family:var(--font);font-size:.88rem;font-weight:500;text-decoration:none;cursor:pointer;border:none;transition:background .15s,opacity .15s,transform .12s}
-    .btn:hover{transform:translateY(-1px)}
-    .btn-primary{background:var(--accent);color:var(--accent-ink)}
-    .btn-primary:hover{background:var(--accent3)}
-    .btn-ghost{background:var(--bg3);color:var(--text)}
-    .btn-ghost:hover{background:var(--border-hi)}
-    .btn-danger{background:rgba(255,107,84,.12);color:var(--error)}
-    .btn-danger:hover{background:rgba(255,107,84,.2)}
-    .btn-success{background:rgba(30,222,123,.12);color:var(--success)}
-    .btn-xs{padding:.32rem .8rem;font-size:.72rem;border-radius:8px}
-    .btn-sm{padding:.55rem 1.1rem;font-size:.82rem;border-radius:10px}
-
-    @media(max-width:600px){
-      .profile-hero{border-radius:32px;padding:28px 22px 24px}
-      .hero-stats{gap:0}
-      .stat-num{font-size:1.8rem}
-      .form-row{grid-template-columns:1fr}
-      .sec-title{font-size:1.4rem}
-      .home-card{border-radius:32px;padding:24px}
-      .support-card{border-radius:32px;padding:24px}
-    }
-
-    /* LIGHTBOX */
-    .lightbox{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.94);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
-    .lightbox.show{opacity:1;pointer-events:all}
-    .lightbox img{max-width:90vw;max-height:88vh;border-radius:9px;object-fit:contain}
-    .lb-close{position:fixed;top:1rem;right:1.2rem;background:rgba(255,255,255,.12);border:none;color:#fff;font-size:1.1rem;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center}
-
-    /* NOTIF MODAL */
-    .notif-modal-overlay{position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:flex-start;justify-content:flex-end;padding:74px 1rem 1rem;opacity:0;pointer-events:none;transition:opacity .22s}
-    .notif-modal-overlay.show{opacity:1;pointer-events:all}
-    .notif-modal{background:var(--bg2);border:1px solid var(--border-hi);border-radius:var(--r-lg);padding:1.2rem;width:100%;max-width:360px;max-height:70vh;overflow-y:auto;transform:translateY(-8px);transition:transform .22s}
-    .notif-modal-overlay.show .notif-modal{transform:translateY(0)}
-    .notif-modal-head{font-family:var(--font);font-weight:500;font-size:.85rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
-    .notif-modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0}
-    .notif-item{background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:.8rem .95rem;margin-bottom:.45rem;font-size:.81rem;line-height:1.55}
-    .notif-item.unread{border-color:rgba(30,222,123,.3);background:rgba(30,222,123,.06)}
-    .notif-item-head{display:flex;align-items:center;justify-content:space-between;gap:.5rem;margin-bottom:.25rem}
-    .notif-item-title{font-weight:500;font-size:.78rem}
-    .notif-item-time{font-size:.64rem;color:var(--muted);white-space:nowrap}
-    .notif-item-text{color:var(--muted2);font-size:.77rem}
-    .notif-empty{text-align:center;color:var(--muted);font-size:.8rem;padding:1.5rem 0}
-
-    /* TOAST */
-    .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;padding:.55rem 1.3rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap}
-    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-    .toast.success{background:var(--success);color:#0d1f14}
-    .toast.error{background:var(--error);color:#fff}
-    .toast.info{background:var(--accent);color:var(--accent-ink)}
-
+@media(max-width:600px){
+  .hero-wrap{padding:24px 0 0}
+  .hero-block{border-radius:28px;padding:28px 22px}
+  .main-grid{padding:40px 0}
+}
   </style>
 </head>
 <body>
 <script src="nav.js" data-page="profile"></script>
-<script src="sidebar.js" data-page="profile"></script>
 
-<div class="loading-screen" id="loadingScreen">
-  <div class="spinner"></div>
-  <p style="color:var(--muted);font-size:.76rem;margin-top:.3rem">Загружаю кабинет...</p>
-</div>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lb-close" onclick="event.stopPropagation();closeLightbox()">✕</button>
-  <img id="lightboxImg" src="" alt=""/>
-</div>
+<div id="cabinet">
 
-<div id="sbContent" style="display:none">
-<div class="page-col" id="appWrap">
-
-  <!-- HOME -->
-  <div class="section active" id="section-home">
-
-    <!-- HERO — тёмный блок, на всю ширину -->
-    <div class="profile-hero home-grid-full">
-      <div class="hero-top-row">
-        <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
-          <span id="avatarLetter">А</span>
-          <div class="avatar-overlay"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></div>
-        </div>
-        <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
-        <div class="hero-top-actions">
-          <!-- Колокольчик — только на мобильных -->
-          <a class="notif-btn" id="notifBtn" href="profile/notifications" title="Уведомления" style="display:none">
-            <svg id="notifIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-            <div class="notif-dot" id="notifDot" style="display:none"></div>
-          </a>
-          <button class="notif-btn" id="customizeBtn" title="Настроить вид" onclick="toggleCustomizePanel()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg>
-          </button>
-        </div>
-
-        <!-- ПАНЕЛЬ КАСТОМИЗАЦИИ -->
-        <div class="customize-panel" id="customizePanel">
-          <div class="cp-head">
-            <span>Настроить вид</span>
-            <button class="cp-close" onclick="toggleCustomizePanel(false)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-            </button>
-          </div>
-
-          <div class="cp-section">
-            <div class="cp-label">Цвет акцента</div>
-            <div class="cp-swatches" id="cpSwatches"></div>
-          </div>
-
-          <div class="cp-section">
-            <div class="cp-label">Иконка профиля</div>
-            <div class="cp-swatches" id="cpAvatarIcons"></div>
-          </div>
-
-          <div class="cp-section">
-            <div class="cp-label">Плотность интерфейса</div>
-            <div class="cp-segmented" id="cpDensity">
-              <button data-density="comfortable">Просторно</button>
-              <button data-density="compact">Компактно</button>
+  <section class="hero-wrap">
+    <div class="container">
+      <div class="hero-block">
+        <div class="hero-top">
+          <div class="hero-id">
+            <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
+              <span id="avatarLetter">А</span>
+              <div class="avatar-overlay"><i class="ph-fill ph-camera"></i></div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
+            <div class="hero-id-text">
+              <div class="hero-greeting">Личный кабинет</div>
+              <div class="hero-name" id="heroSince">Antviz</div>
             </div>
           </div>
-
-          <button class="cp-reset" onclick="resetCustomization()">Сбросить всё</button>
+          <div class="hero-actions">
+            <a class="icon-btn" href="profile/notifications" title="Уведомления">
+              <i class="ph-fill ph-bell"></i>
+              <span class="dot" id="notifDot"></span>
+            </a>
+            <a class="icon-btn" href="profile/settings" title="Настройки">
+              <i class="ph-fill ph-gear-six"></i>
+            </a>
+          </div>
         </div>
-      </div>
 
-      <div class="hero-greeting">Личный кабинет</div>
-      <div class="hero-name" id="heroName">...</div>
-      <div class="hero-since" id="heroSince"></div>
+        <div class="hero-headline" id="heroHeadline">Здравствуйте, <em>Пользователь</em></div>
 
-      <div class="hero-stats">
-        <div class="stat-box">
-          <div class="stat-num" id="statTotal">—</div>
-          <div class="stat-lbl">Всего заказов</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="statActive">—</div>
-          <div class="stat-lbl">В работе</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-num" id="statDone">—</div>
-          <div class="stat-lbl">Завершено</div>
+        <div class="hero-bar">
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statTotal">0</div><div class="hero-stat-l">Всего проектов</div></div>
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statActive">0</div><div class="hero-stat-l">В работе</div></div>
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statDone">0</div><div class="hero-stat-l">Завершено</div></div>
         </div>
       </div>
     </div>
+  </section>
 
-    <!-- ЧТО НОВОГО -->
-    <div class="update-banner home-grid-full" id="updateBanner">
-      <div class="update-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="9" width="18" height="4" rx="1"/>
-          <rect x="4" y="13" width="16" height="8" rx="1"/>
-          <line x1="12" y1="9" x2="12" y2="21"/>
-          <path d="M12 9C10 5.5 6 5 6 7.5S9 9 12 9z"/>
-          <path d="M12 9c2-3.5 6-4 6-1.5S15 9 12 9z"/>
-        </svg>
-      </div>
-      <div class="update-body">
-        <div class="update-top">
-          <span class="update-version">v1.4.0</span>
-          <span class="update-title">Что нового</span>
-        </div>
-        <ul class="update-list">
-          <li>Полностью переделан дизайн личного кабинета</li>
-          <li>Новое меню на ПК и на главной в мобильной версии</li>
-          <li>В настройках появился просмотр активных сеансов</li>
-        </ul>
-        <a href="https://blog.antviz.ru/updates" target="_blank" rel="noopener" class="update-link">
-          Посмотреть все
-          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-      </div>
-      <button class="update-close" onclick="dismissUpdateBanner()" title="Скрыть">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-      </button>
+  <div class="container">
+    <div class="update-strip" id="updateBanner">
+      <span><b>Обновление кабинета.</b> Личный кабинет переработан заново — единый стиль с сайтом, десктопная раскладка вместо растянутой мобильной.</span>
+      <button class="update-close" onclick="dismissUpdateBanner()" title="Скрыть"><i class="ph-fill ph-x"></i></button>
     </div>
+  </div>
 
-    <!-- БЫСТРЫЕ ДЕЙСТВИЯ (плитки) -->
-    <div class="action-tiles home-grid-full">
-      <a href="profile/orders" class="action-tile">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Мои заказы</div>
-          <div class="tile-sub" id="menuOrdersSub">История всех заявок</div>
+  <div class="container">
+    <div class="main-grid">
+
+      <div class="main-col">
+
+        <section class="reveal">
+          <div class="sec-head">
+            <div><p class="eyebrow g">Ваши проекты</p><h2>Проекты</h2></div>
+            <a href="profile/projects" class="sec-link">Все проекты <i class="ph-fill ph-arrow-right"></i></a>
+          </div>
+          <div id="featuredProjectSlot"></div>
+          <div class="plain-list" id="recentProjects"><div class="list-empty">Загрузка...</div></div>
+        </section>
+
+        <section class="reveal">
+          <div class="sec-head"><div><p class="eyebrow g">История</p><h2>Активность</h2></div></div>
+          <div class="timeline" id="activityTimeline"><div class="list-empty">Загрузка...</div></div>
+        </section>
+
+      </div>
+
+      <div class="rail">
+
+        <div class="reveal" id="bentoSupport"></div>
+        <div class="reveal" id="bentoMessages"></div>
+        <div class="reveal" id="bentoReview" style="display:none"></div>
+
+        <div class="reveal bento-tile" style="padding:8px 6px">
+          <div class="quick-links">
+            <a href="profile/projects"><i class="ph-fill ph-briefcase"></i><span>Проекты</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><i class="ph-fill ph-caret-right"></i></a>
+            <a href="profile/support"><i class="ph-fill ph-headset"></i><span>Поддержка</span><span class="ql-badge" id="qlHelpBadge" style="display:none">!</span><i class="ph-fill ph-caret-right"></i></a>
+            <a href="profile/notifications"><i class="ph-fill ph-bell"></i><span>Уведомления</span><i class="ph-fill ph-caret-right"></i></a>
+            <a href="order"><i class="ph-fill ph-plus-circle"></i><span>Новый заказ</span><i class="ph-fill ph-caret-right"></i></a>
+          </div>
         </div>
-        <span class="tile-badge" id="menuActiveCount">0</span>
-      </a>
-      <a href="profile/sites" class="action-tile">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Мои сайты</div>
-          <div class="tile-sub">Запущенные проекты</div>
-        </div>
-      </a>
-      <a href="profile/support" class="action-tile">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Чат с командой</div>
-          <div class="tile-sub">Вопрос по проекту</div>
-        </div>
-        <span class="tile-badge" id="menuChatBadge">!</span>
-      </a>
-      <a href="profile/tickets" class="action-tile" id="menuTickets">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Обслуживание</div>
-          <div class="tile-sub" id="menuTicketsSub">Заявки на доработку</div>
-        </div>
-        <span class="tile-badge" id="menuTicketsBadge">!</span>
-      </a>
-      <a href="profile/notifications" class="action-tile">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Уведомления</div>
-          <div class="tile-sub">Последние события</div>
-        </div>
-        <span class="tile-badge" id="menuNotifBadge">!</span>
-      </a>
-      <a href="profile/settings" class="action-tile">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Настройки</div>
-          <div class="tile-sub">Профиль и аккаунт</div>
-        </div>
-      </a>
-      <a href="order" class="action-tile dark wide">
-        <div class="tile-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></div>
-        <div class="tile-text">
-          <div class="tile-title">Новый заказ</div>
-          <div class="tile-sub">Оформить заявку на сайт</div>
-        </div>
-        <span class="tile-arrow">›</span>
-      </a>
+
+      </div>
+
     </div>
+  </div>
 
-    <!-- ДВУХКОЛОНОЧНАЯ СЕТКА (ПК) -->
-    <div class="home-grid">
+</div><!-- /cabinet -->
 
-      <!-- СТАТУС ПОДДЕРЖКИ -->
-      <div class="support-card" id="supportCard">
-        <div class="support-card-label">Обслуживание активно</div>
-        <div class="support-card-title" id="supportCardTitle">Тариф поддержки</div>
-        <div class="support-card-sub" id="supportCardSub">Включает доработки и приоритетный чат</div>
-        <div class="support-progress-track">
-          <div class="support-progress-fill" id="supportProgressFill" style="width:0%"></div>
-        </div>
-        <div class="support-progress-labels">
-          <span>Начало</span>
-          <span id="supportProgressLabel">0 дн. осталось</span>
-        </div>
-      </div>
-
-      <!-- ПОСЛЕДНИЕ ЗАКАЗЫ -->
-      <div class="home-card">
-        <div class="home-card-head">
-          <div class="home-card-title">Последние заказы</div>
-          <a href="profile/orders" class="home-card-link">Все заказы <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        </div>
-        <div id="recentOrdersList"><div class="orders-empty">Загрузка...</div></div>
-      </div>
-
-      <!-- ЛЕНТА АКТИВНОСТИ -->
-      <div class="home-card">
-        <div class="home-card-head">
-          <div class="home-card-title">Активность</div>
-          <a href="profile/orders" class="home-card-link">Все заказы <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
-        </div>
-        <div class="timeline-list" id="activityTimeline"><div class="timeline-empty">Загрузка...</div></div>
-      </div>
-
-
-    </div><!-- /home-grid -->
-
-  </div><!-- /section-home -->
-
-  </div><!-- /page-col -->
-
-</div><!-- /sbContent -->
 <div class="toast" id="toast"></div>
 
 <script type="module">
@@ -570,149 +274,114 @@ import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let currentUser=null, unsubOrders=null, unsubChat=null;
+let currentUser=null, unsubOrders=null;
 
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
-function fmtDate(ts){if(!ts) return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
+function fmtDateLong(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
 
-/* ══════════════════════════════════
-   КАСТОМИЗАЦИЯ ВИДА — всё хранится в localStorage браузера,
-   ничего не улетает на сервер и не видно другим устройствам
-   ══════════════════════════════════ */
-const ACCENT_PRESETS=[
-  {id:'green', accent:'#1ede7b',hover:'#1ac16b',tint:'rgba(30,222,123,.12)',ink:'#191b1e'},
-  {id:'blue',  accent:'#3b82f6',hover:'#2563eb',tint:'rgba(59,130,246,.12)', ink:'#ffffff'},
-  {id:'purple',accent:'#8b5cf6',hover:'#7c3aed',tint:'rgba(139,92,246,.12)',ink:'#ffffff'},
-  {id:'pink',  accent:'#ec4899',hover:'#db2777',tint:'rgba(236,72,153,.12)',ink:'#ffffff'},
-  {id:'orange',accent:'#f59e0b',hover:'#d97706',tint:'rgba(245,158,11,.12)',ink:'#191b1e'},
-  {id:'red',   accent:'#ef4444',hover:'#dc2626',tint:'rgba(239,68,68,.12)', ink:'#ffffff'},
-  {id:'teal',  accent:'#14b8a6',hover:'#0d9488',tint:'rgba(20,184,166,.12)',ink:'#191b1e'}
-];
-const AVATAR_ICONS=['🚀','⭐','🔥','🎨','💡','🌱','🎯','⚡'];
-
-window.applyAccent=function applyAccent(id,persist=true){
-  const p=ACCENT_PRESETS.find(x=>x.id===id)||ACCENT_PRESETS[0];
-  const r=document.documentElement.style;
-  r.setProperty('--accent',p.accent);
-  r.setProperty('--accent2',p.accent);
-  r.setProperty('--accent3',p.hover);
-  r.setProperty('--accent-tint',p.tint);
-  r.setProperty('--accent-ink',p.ink);
-  document.querySelectorAll('#cpSwatches .cp-color').forEach(b=>b.classList.toggle('active',b.dataset.id===p.id));
-  if(persist) localStorage.setItem('antviz_accent',p.id);
+/* Градиентная аватарка вместо плоской заливки — генерируется из имени/uid,
+   у каждого пользователя свой оттенок, а не одинаковый зелёный квадрат */
+function avatarGradient(seed){
+  let h=0; for(let i=0;i<seed.length;i++) h=seed.charCodeAt(i)+((h<<5)-h);
+  const hueA=Math.abs(h)%360, hueB=(hueA+42)%360;
+  return `linear-gradient(135deg, hsl(${hueA} 70% 45%), hsl(${hueB} 65% 38%))`;
 }
 
-window.applyAvatarIcon=function applyAvatarIcon(icon,persist=true){
-  const letterEl=document.getElementById('avatarLetter');
-  if(letterEl){
-    if(!letterEl.dataset.origLetter) letterEl.dataset.origLetter=letterEl.textContent;
-    letterEl.textContent=icon||letterEl.dataset.origLetter;
-  }
-  document.querySelectorAll('#cpAvatarIcons .cp-icon').forEach(b=>b.classList.toggle('active',b.dataset.icon===icon));
-  if(persist){
-    if(icon) localStorage.setItem('antviz_avatar_icon',icon); else localStorage.removeItem('antviz_avatar_icon');
-  }
-}
-
-function applyDensity(mode,persist=true){
-  document.body.classList.toggle('density-compact',mode==='compact');
-  document.querySelectorAll('#cpDensity button').forEach(b=>b.classList.toggle('active',b.dataset.density===mode));
-  if(persist) localStorage.setItem('antviz_density',mode);
-}
-
-function buildCustomizePanelUI(){
-  const sw=document.getElementById('cpSwatches');
-  if(sw) sw.innerHTML=ACCENT_PRESETS.map(p=>`<button class="cp-color" data-id="${p.id}" style="background:${p.accent}" onclick="applyAccent('${p.id}')" title="${p.id}"></button>`).join('');
-  const ic=document.getElementById('cpAvatarIcons');
-  if(ic) ic.innerHTML='<button class="cp-icon" data-icon="" onclick="applyAvatarIcon(\'\')" title="Буква имени">Аа</button>'+
-    AVATAR_ICONS.map(e=>`<button class="cp-icon" data-icon="${e}" onclick="applyAvatarIcon('${e}')">${e}</button>`).join('');
-  document.querySelectorAll('#cpDensity button').forEach(b=>b.onclick=()=>applyDensity(b.dataset.density));
-}
-
-window.toggleCustomizePanel=function(force){
-  const panel=document.getElementById('customizePanel');
-  if(!panel) return;
-  const open=typeof force==='boolean'?force:!panel.classList.contains('open');
-  panel.classList.toggle('open',open);
-};
-document.addEventListener('click',e=>{
-  const panel=document.getElementById('customizePanel');
-  const btn=document.getElementById('customizeBtn');
-  if(panel&&panel.classList.contains('open')&&!panel.contains(e.target)&&e.target!==btn&&!btn.contains(e.target)){
-    panel.classList.remove('open');
-  }
-});
-
-window.resetCustomization=function(){
-  localStorage.removeItem('antviz_accent');
-  localStorage.removeItem('antviz_avatar_icon');
-  localStorage.removeItem('antviz_density');
-  applyAccent('green',false);
-  applyAvatarIcon('',false);
-  applyDensity('comfortable',false);
-  toast('Настройки вида сброшены','info');
-};
-
-buildCustomizePanelUI();
-applyAccent(localStorage.getItem('antviz_accent')||'green',false);
-applyDensity(localStorage.getItem('antviz_density')||'comfortable',false);
-
-/* Баннер "Что нового" — версия зашита тут; при обновлении версии баннер снова покажется всем */
-const UPDATE_VERSION='1.4.0';
+const UPDATE_VERSION='3.0.0';
 window.dismissUpdateBanner=function(){
   localStorage.setItem('antviz_update_seen',UPDATE_VERSION);
-  const ub=document.getElementById('updateBanner');
-  if(ub) ub.style.display='none';
+  document.getElementById('updateBanner')?.style.setProperty('display','none');
 };
 if(localStorage.getItem('antviz_update_seen')===UPDATE_VERSION){
-  const ub=document.getElementById('updateBanner');
-  if(ub) ub.style.display='none';
+  document.getElementById('updateBanner')?.style.setProperty('display','none');
 }
 
+window.handleAvatarUpload=async function(file){
+  if(!file) return;
+  if(file.size>3*1024*1024){toast('Файл больше 3 МБ','error');return;}
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    const dataUrl=e.target.result;
+    const av=document.getElementById('heroAvatar');
+    document.getElementById('avatarLetter').style.display='none';
+    let img=av.querySelector('img');
+    if(!img){img=document.createElement('img');av.insertBefore(img,av.firstChild);}
+    img.src=dataUrl;
+    try{await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl});toast('Фото обновлено ✓','success');}catch(e){console.error(e);}
+  };
+  reader.readAsDataURL(file);
+};
 
+/* ══ Scroll reveal — тот же приём, что и на сайте ══ */
+const revealObs=new IntersectionObserver(es=>{es.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
 
-window.handleAvatarUpload=async function(file){if(!file) return;if(file.size>3*1024*1024){toast('Файл больше 3 МБ','error');return;}const reader=new FileReader();reader.onload=async function(e){const dataUrl=e.target.result;const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';let img=av.querySelector('img');if(!img){img=document.createElement('img');av.insertBefore(img,av.firstChild);}img.src=dataUrl;try{await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl});toast('Фото обновлено ✓','success');}catch(e){console.error(e);}};reader.readAsDataURL(file);};
+/* ══ Живой счётчик цифр — тот же приём, что и на сайте ══ */
+function animCount(el){
+  const target=parseInt(el.textContent)||0;
+  if(!target){return;}
+  let cur=0; const step=Math.max(1,Math.ceil(target/30));
+  const t=setInterval(()=>{cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=cur;},28);
+}
+const countObs=new IntersectionObserver(es=>{es.forEach(el=>{if(el.isIntersecting){animCount(el.target);countObs.unobserve(el.target)}})},{threshold:.5});
 
-const STATUS_LABELS={0:'Новый',1:'В работе',2:'В работе',3:'На проверке',4:'Финал',5:'Завершён',6:'Ожидает доплаты'};
-const STATUS_COLORS={0:'#707a8a',1:'#1ede7b',2:'#1ede7b',3:'#f59e0b',4:'#1ede7b',5:'#1ede7b',6:'#b45309'};
-const STATUS_BG={0:'rgba(112,122,138,.12)',1:'rgba(30,222,123,.12)',2:'rgba(30,222,123,.12)',3:'rgba(245,158,11,.12)',4:'rgba(30,222,123,.12)',5:'rgba(30,222,123,.12)',6:'rgba(180,83,9,.12)'};
+const STATUS_LABEL={0:'Новый',1:'В работе',2:'В работе',3:'На проверке',4:'Финал',5:'Завершён',6:'Ожидает доплаты'};
+const STATUS_PROGRESS={0:5,1:25,2:45,3:70,4:85,5:100,6:70};
+const STATUS_ICON={0:'ph-file-text',1:'ph-hammer',2:'ph-hammer',3:'ph-eye',4:'ph-pencil-simple',5:'ph-check-circle',6:'ph-wallet'};
 
-function renderRecentOrders(orders){
-  const list=document.getElementById('recentOrdersList');
-  if(!list) return;
-  // ЛИМИТ: на главной всегда показываем максимум 3 последних заказа, не больше — остальное через "Все заказы"
-  const recent=orders.slice(0,3);
-  if(!recent.length){list.innerHTML='<div class="orders-empty">Заказов пока нет</div>';return;}
-  list.innerHTML=recent.map(o=>{
-    const st=o.status||0;
-    const label=STATUS_LABELS[st]||'Неизвестно';
-    const color=STATUS_COLORS[st]||'#707a8a';
-    const bg=STATUS_BG[st]||'rgba(112,122,138,.12)';
-    const date=fmtDateShort(o.createdAt);
-    const name=o.siteName||o.type||'Заказ';
-    const icon=st===5
-      ?'<polyline points="20 6 9 17 4 12"/>'
-      :'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>';
-    return `<a href="profile/orders" class="order-strip">
-      <div class="order-status-ico" style="background:${bg}"><svg viewBox="0 0 24 24" style="stroke:${color}">${icon}</svg></div>
-      <div class="order-strip-info">
-        <div class="order-strip-name">${name}</div>
-        <div class="order-strip-meta">${date?'Создан '+date:''}</div>
+function renderFeaturedAndList(orders){
+  const slot=document.getElementById('featuredProjectSlot');
+  const list=document.getElementById('recentProjects');
+  if(!orders.length){
+    slot.innerHTML='';
+    list.innerHTML='<div class="list-empty">Заказов пока нет — <a href="order" style="color:var(--green-d);text-decoration:none;font-weight:500">оформите первый</a></div>';
+    document.getElementById('qlProjectsBadge').style.display='none';
+    return;
+  }
+  const active=orders.filter(o=>(o.status||0)>=1&&(o.status||0)<=4);
+  const featured=active[0];
+  const rest=orders.filter(o=>o.id!==featured?.id).slice(0,4);
+
+  if(featured){
+    const pct=STATUS_PROGRESS[featured.status]||10;
+    slot.innerHTML=`<div class="featured-project">
+      <div class="fp-top">
+        <div><div class="fp-eyebrow">Сейчас в работе</div><div class="fp-title">${featured.siteName||featured.siteDomain||featured.siteType||'Проект'}</div></div>
+        <div class="fp-icon"><i class="ph-fill ${STATUS_ICON[featured.status]||'ph-hammer'}"></i></div>
       </div>
-      <div class="order-strip-badge" style="color:${color};background:${bg}">${label}</div>
-    </a>`;
-  }).join('');
+      <div class="fp-progress-track"><div class="fp-progress-fill" style="width:0%" data-target="${pct}"></div></div>
+      <div class="fp-meta"><span>Этап: <b>${STATUS_LABEL[featured.status]}</b></span><a href="profile/projects" style="color:var(--green-d);text-decoration:none;font-weight:500">Подробнее →</a></div>
+    </div>`;
+    requestAnimationFrame(()=>{const f=slot.querySelector('.fp-progress-fill');setTimeout(()=>f.style.width=f.dataset.target+'%',100);});
+  } else slot.innerHTML='';
+
+  if(!rest.length){
+    list.innerHTML=featured?'':'<div class="list-empty">Больше проектов нет</div>';
+  } else {
+    list.innerHTML=rest.map(o=>{
+      const st=o.status||0, done=st===5;
+      return `<a href="profile/projects" class="p-row">
+        <i class="ph-fill ${STATUS_ICON[st]} p-row-ico"></i>
+        <div class="p-row-body"><div class="p-row-title">${o.siteName||o.siteDomain||o.siteType||'Заказ'}</div><div class="p-row-sub">${fmtDateShort(o.createdAt)?'Создан '+fmtDateShort(o.createdAt):''}</div></div>
+        <span class="p-tag ${done?'done':'progress'}">${STATUS_LABEL[st]}</span>
+      </a>`;
+    }).join('');
+  }
+
+  const activeCount=active.length;
+  const badge=document.getElementById('qlProjectsBadge');
+  if(activeCount>0){badge.textContent=activeCount;badge.style.display='inline-block';}else badge.style.display='none';
 }
 
 function buildTimeline(orders){
   const events=[];
   orders.forEach(o=>{
-    const name=o.siteName||o.type||'Заказ';
-    if(o.createdAt) events.push({ts:o.createdAt,title:'Создан заказ',sub:name,icon:'<path d="M12 5v14M5 12h14"/>'});
-    if(o.status===5&&o.updatedAt) events.push({ts:o.updatedAt,title:'Заказ завершён',sub:name,icon:'<polyline points="20 6 9 17 4 12"/>'});
-    if(o.status>=1&&o.status<=4&&o.updatedAt) events.push({ts:o.updatedAt,title:'Статус обновлён',sub:`${name} — ${STATUS_LABELS[o.status]}`,icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>'});
-    if(o.supportActive&&o.supportExpiresAt) events.push({ts:o.supportExpiresAt,title:'Поддержка активна',sub:name,icon:'<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z"/>'});
+    const name=o.siteName||o.siteDomain||o.siteType||'Заказ';
+    if(o.createdAt) events.push({ts:o.createdAt,title:'Создан заказ',sub:name,on:false});
+    if(o.status===5&&o.updatedAt) events.push({ts:o.updatedAt,title:'Заказ завершён',sub:name,on:true});
+    else if(o.status>=1&&o.status<=4&&o.updatedAt) events.push({ts:o.updatedAt,title:'Статус обновлён',sub:`${name} — ${STATUS_LABEL[o.status]}`,on:false});
+    if(o.supportActive&&o.supportExpiresAt) events.push({ts:o.supportExpiresAt,title:'Поддержка активна',sub:name,on:true});
   });
   events.sort((a,b)=>{
     const ta=a.ts?.toDate?a.ts.toDate():new Date(a.ts);
@@ -720,17 +389,13 @@ function buildTimeline(orders){
     return tb-ta;
   });
   const tl=document.getElementById('activityTimeline');
-  if(!tl) return;
-  // ЛИМИТ: в блоке "Активность" на главной тоже максимум 3 события, не больше
-  const top=events.slice(0,3);
-  if(!top.length){tl.innerHTML='<div class="timeline-empty">Активность появится после первого заказа</div>';return;}
-  tl.innerHTML=top.map(e=>`<div class="tl-item">
-    <div class="tl-ico"><svg viewBox="0 0 24 24">${e.icon}</svg></div>
-    <div>
-      <div class="tl-body-title">${e.title}</div>
-      <div class="tl-body-sub">${e.sub}</div>
-      <div class="tl-time">${fmtDateShort(e.ts)}</div>
-    </div>
+  const top=events.slice(0,5);
+  if(!top.length){tl.innerHTML='<div class="list-empty">Активность появится после первого заказа</div>';return;}
+  tl.innerHTML=top.map(e=>`<div class="tl-item${e.on?' on':''}">
+    <div class="tl-dot"></div>
+    <div class="tl-title">${e.title}</div>
+    <div class="tl-sub">${e.sub}</div>
+    <div class="tl-date">${fmtDateShort(e.ts)}</div>
   </div>`).join('');
 }
 
@@ -743,90 +408,100 @@ function loadOrderStats(uid){
     document.getElementById('statTotal').textContent=orders.length;
     document.getElementById('statActive').textContent=active;
     document.getElementById('statDone').textContent=orders.filter(o=>o.status===5).length;
-    const badge=document.getElementById('menuActiveCount');
-    if(active>0){badge.textContent=active;badge.style.display='inline-block';}else badge.style.display='none';
-    document.getElementById('menuOrdersSub').textContent=active>0?`${active} активных`:'История всех заявок';
-    renderRecentOrders(orders);
+    document.querySelectorAll('.hero-stat-n[data-count]').forEach(el=>countObs.observe(el));
+    renderFeaturedAndList(orders);
     buildTimeline(orders);
   },err=>console.error('Orders:',err));
 }
 
-async function watchSupportStatus(uid){
+async function loadBento(uid){
   try{
-    const snap=await getDocs(query(collection(db,'orders'),where('uid','==',uid)));
-    const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    const [ordersSnap, chatSnap] = await Promise.all([
+      getDocs(query(collection(db,'orders'),where('uid','==',uid))),
+      getDocs(query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false))),
+    ]);
+    const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
+
     const activeSupport=orders.find(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
-    const sub=document.getElementById('menuTicketsSub');
-    const badge=document.getElementById('menuTicketsBadge');
-    const card=document.getElementById('supportCard');
+    const supportSlot=document.getElementById('bentoSupport');
     if(activeSupport){
-      const exp=activeSupport.supportExpiresAt.toDate();
-      const daysLeft=Math.ceil((exp-new Date())/(1000*60*60*24));
-      sub.textContent=daysLeft<=2?`Истекает через ${daysLeft} дн.`:`Активно · осталось ${daysLeft} дн.`;
-      sub.style.color=daysLeft<=2?'var(--warn)':'';
-      if(daysLeft<=2){badge.style.display='inline-block';badge.textContent='!';}else badge.style.display='none';
-      // Карточка поддержки
-      if(card){
-        card.classList.add('visible');
-        const totalDays=30;
-        const pct=Math.max(0,Math.min(100,Math.round(daysLeft/totalDays*100)));
-        document.getElementById('supportCardTitle').textContent=activeSupport.siteName||'Обслуживание сайта';
-        document.getElementById('supportCardSub').textContent=`Включает доработки и приоритетный чат`;
-        document.getElementById('supportProgressFill').style.width=pct+'%';
-        document.getElementById('supportProgressLabel').textContent=daysLeft+' дн. осталось';
-      }
+      const days=Math.ceil((activeSupport.supportExpiresAt.toDate()-new Date())/86400000);
+      const pct=Math.max(4,Math.min(100,Math.round(days/30*100)));
+      supportSlot.innerHTML=`<div class="bento-tile dark">
+        <div class="bt-icon"><i class="ph-fill ph-shield-check"></i></div>
+        <div class="bt-label">Обслуживание</div>
+        <div class="bt-value">${days} дн.</div>
+        <div class="bt-sub">${activeSupport.siteName||activeSupport.siteDomain||'осталось по подписке'}</div>
+        <div class="bt-track"><div class="bt-fill" style="width:${pct}%"></div></div>
+      </div>`;
     } else {
-      sub.textContent='Заявки на доработку';
-      if(card) card.classList.remove('visible');
+      supportSlot.innerHTML=`<div class="bento-tile">
+        <div class="bt-icon"><i class="ph-fill ph-shield-check"></i></div>
+        <div class="bt-label">Обслуживание</div>
+        <div class="bt-value" style="font-size:1rem">Не подключено</div>
+        <a class="bt-cta" href="profile/support">Подключить <i class="ph-fill ph-arrow-right"></i></a>
+      </div>`;
     }
-  }catch(e){}
+
+    const msgSlot=document.getElementById('bentoMessages');
+    const unread=chatSnap.size;
+    msgSlot.innerHTML=unread>0?`<div class="bento-tile accent">
+        <div class="bt-icon"><i class="ph-fill ph-chat-circle-dots"></i></div>
+        <div class="bt-label">Сообщения</div>
+        <div class="bt-value">${unread} новых</div>
+        <a class="bt-cta" href="profile/support">Открыть <i class="ph-fill ph-arrow-right"></i></a>
+      </div>`:`<div class="bento-tile">
+        <div class="bt-icon"><i class="ph-fill ph-chat-circle-dots"></i></div>
+        <div class="bt-label">Сообщения</div>
+        <div class="bt-value" style="font-size:1rem">Всё прочитано</div>
+        <div class="bt-sub">Команда на связи в поддержке</div>
+      </div>`;
+
+    const doneUnreviewed=orders.find(o=>o.status===5&&!o.reviewed);
+    const reviewSlot=document.getElementById('bentoReview');
+    if(doneUnreviewed){
+      reviewSlot.style.display='block';
+      reviewSlot.innerHTML=`<div class="bento-tile">
+        <div class="bt-icon"><i class="ph-fill ph-star"></i></div>
+        <div class="bt-label">Отзыв</div>
+        <div class="bt-value" style="font-size:1rem">Как всё прошло?</div>
+        <a class="bt-cta" href="profile/projects">Оставить отзыв <i class="ph-fill ph-arrow-right"></i></a>
+      </div>`;
+    }
+
+    document.getElementById('qlHelpBadge').style.display=unread>0?'inline-block':'none';
+    document.querySelectorAll('.rail .reveal').forEach(el=>revealObs.observe(el));
+  }catch(e){console.error(e);}
 }
 
-function watchChatBadge(uid){
-  const q=query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false));
-  unsubChat=onSnapshot(q,snap=>{
-    const menuBadge=document.getElementById('menuChatBadge');
-    if(menuBadge) menuBadge.style.display=snap.size?'inline-block':'none';
-  },()=>{});
-}
-
-window.openLightbox=function(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('show');};
-window.closeLightbox=function(){document.getElementById('lightbox').classList.remove('show');document.getElementById('lightboxImg').src='';};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLightbox();}});
-
-// Обновление мобильного бейджа колокольчика (без рендера инлайн-блока)
-let unsubNotifs=null;
-function watchNotifications(uid){
+function watchNotifDot(uid){
   const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
-  unsubNotifs=onSnapshot(q,snap=>{
+  onSnapshot(q,snap=>{
     const hasUnread=snap.docs.some(d=>!d.data().read);
-    const menuBadge=document.getElementById('menuNotifBadge');
-    if(menuBadge) menuBadge.style.display=hasUnread?'inline-block':'none';
-    const notifDot=document.getElementById('notifDot');
-    if(notifDot) notifDot.style.display=hasUnread?'':'none';
+    document.getElementById('notifDot').classList.toggle('show',hasUnread);
   },()=>{});
 }
 
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='auth';return;}
-
   currentUser=user;
   const name=user.displayName||'Пользователь';
-  document.getElementById('heroName').textContent=name;
+  document.getElementById('heroHeadline').innerHTML='Здравствуйте, <em>'+name+'</em>';
   document.getElementById('avatarLetter').textContent=name[0].toUpperCase();
-  applyAvatarIcon(localStorage.getItem('antviz_avatar_icon')||'',false);
+  document.getElementById('heroAvatar').style.background=avatarGradient(user.uid||name);
   document.getElementById('loadingScreen').style.display='none';
-  document.getElementById('sbContent').style.display='block';
+  document.getElementById('cabinet').style.display='block';
+
   getDoc(doc(db,'users',user.uid)).then(snap=>{
     if(snap.exists()){const d=snap.data();
-      if(d.createdAt) document.getElementById('heroSince').textContent='в Antviz с '+fmtDate(d.createdAt);
+      if(d.createdAt) document.getElementById('heroSince').textContent='В Antviz с '+fmtDateLong(d.createdAt);
       if(d.avatarDataUrl){const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';const img=document.createElement('img');img.src=d.avatarDataUrl;av.insertBefore(img,av.firstChild);}
     }
   }).catch(e=>console.warn('users doc:',e));
+
   loadOrderStats(user.uid);
-  watchChatBadge(user.uid);
-  watchNotifications(user.uid);
-  watchSupportStatus(user.uid);
+  loadBento(user.uid);
+  watchNotifDot(user.uid);
 });
 </script>
 

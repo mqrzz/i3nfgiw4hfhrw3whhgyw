@@ -402,6 +402,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
             <div class="sf-row"><div class="sf-lbl">URL сайта</div><input class="si" id="siteUrl" type="text" placeholder="https://..."/></div>
             <div class="sf-row"><div class="sf-lbl">URL favicon</div><input class="si" id="siteFavicon" type="text" placeholder="https://.../favicon.png"/></div>
             <div class="sf-row"><div class="sf-lbl">Количество страниц</div><input class="si" id="sitePages" type="text" placeholder="5"/></div>
+            <div class="sf-row"><div class="sf-lbl">Репозиторий</div><input class="si" id="siteRepo" type="text" placeholder="https://github.com/owner/repo"/></div>
           </div>
         </div>
       </div>
@@ -571,6 +572,7 @@ function showDetail(o){
   document.getElementById('siteUrl').value=o.siteUrl||'';
   document.getElementById('siteFavicon').value=o.siteFaviconUrl||'';
   document.getElementById('sitePages').value=o.sitePages||'';
+  document.getElementById('siteRepo').value=o.siteRepo||'';
   document.getElementById('clientInfo').innerHTML=`
     <div class="ic"><div class="ic-l">Имя</div><div class="ic-v">${esc(o.clientName||'—')}</div></div>
     <div class="ic"><div class="ic-l">Email</div><div class="ic-v">${esc(o.clientEmail||'—')}</div></div>`;
@@ -787,7 +789,8 @@ window.saveSite=async()=>{
   const url=document.getElementById('siteUrl').value.trim();
   const fav=document.getElementById('siteFavicon').value.trim();
   const pages=document.getElementById('sitePages').value.trim();
-  const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,status:5,doneAt:serverTimestamp()});
+  const repo=document.getElementById('siteRepo').value.trim();
+  const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,siteRepo:repo,status:5,doneAt:serverTimestamp()});
   if(!ok)return;
   if(selUid&&domain)await addDoc(collection(db,'notifications',selUid,'items'),{title:'🎉 Ваш сайт готов!',text:`Сайт готов: ${domain}${url?' — '+url:''}`,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось отправить уведомление клиенту:',err));
   toast('Сохранено и клиент уведомлён ✓','success');

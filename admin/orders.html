@@ -328,6 +328,21 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
         <div class="sec-b"><div style="display:flex;gap:8px;flex-wrap:wrap" id="extrasList"></div></div>
       </div>
 
+      <!-- BRIEF -->
+      <div class="sec" id="briefSec" style="display:none">
+        <div class="sec-h"><span class="sec-title">Бриф клиента</span></div>
+        <div class="sec-b">
+          <div class="ig" id="briefGrid" style="margin-bottom:16px"></div>
+          <div id="refsBox" style="font-size:.9rem;line-height:1.7;color:var(--muted);display:none"></div>
+        </div>
+      </div>
+
+      <!-- SHOP DETAILS -->
+      <div class="sec" id="shopSec" style="display:none">
+        <div class="sec-h"><span class="sec-title">Интернет-магазин</span></div>
+        <div class="sec-b"><div class="ig" id="shopGrid"></div></div>
+      </div>
+
       <!-- DESCRIPTION -->
       <div class="sec" id="descSec" style="display:none">
         <div class="sec-h"><span class="sec-title">Описание от клиента</span></div>
@@ -432,11 +447,39 @@ function statusLabel(st){return st===-1?'Ожидает оплаты':(S[st??0]?
 function statusBadgeClass(st){return st===-1?'b-pending':('b'+(st??0));}
 const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
 const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
+const GOALS={leads:'Заявки и звонки',sales:'Продажи онлайн',brand:'Имидж / представительство',info:'Информирование'};
+const READINESS={ready:'Всё готово',partial:'Частично готово',none:'Ничего нет — с нуля'};
+const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Наличными при получении'};
+const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 let allOrders=[],allReviews=[],_cache=[];
 let selOrderId=null,selUid=null;
 let currentTab='active',currentPaid=false,currentSubsteps=[];
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+
+// Раньше почти каждая запись в Firestore в этом файле выглядела так:
+// `await updateDoc(...).catch(()=>{}); toast('Сохранено ✓','success');`
+// — то есть тост «сохранено» показывался БЕЗУСЛОВНО, даже если запись
+// реально упала (нет прав, невалидные данные, сеть и т.д.). Визуально
+// галочка/дата применялись на секунду (оптимистичное обновление в
+// currentSubsteps/UI), а потом просто пропадали при следующем onSnapshot —
+// без единого сообщения об ошибке. Из-за этого выглядело как "не работает",
+// хотя реальная причина (скорее всего правила безопасности Firestore,
+// не пускающие поля substeps/startedAt/doneAt) оставалась невидимой.
+// safeUpdate() показывает тост только когда запись правда прошла, и
+// показывает настоящую ошибку (err.code), когда нет — так в следующий раз,
+// когда это случится, будет видно, что именно упало.
+async function safeUpdate(orderId,data,successMsg){
+  try{
+    await updateDoc(doc(db,'orders',orderId),data);
+    if(successMsg)toast(successMsg,'success');
+    return true;
+  }catch(err){
+    console.error('Firestore updateDoc failed:',err);
+    toast('Не сохранилось ('+(err.code||err.message||'ошибка')+')','error');
+    return false;
+  }
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtD(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDT(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
@@ -544,6 +587,35 @@ function showDetail(o){
   const ea=o.extras||[];const es=document.getElementById('extrasSec');
   if(ea.length){es.style.display='';document.getElementById('extrasList').innerHTML=ea.map(e=>{const l=EX[e]||e;const ec=e==='domain_reg'?'tag-blue':e==='domain_own'?'tag-green':e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':'tag-warn';return`<span class="tag ${ec}">${esc(l)}</span>`;}).join('');}else es.style.display='none';
   const ds=document.getElementById('descSec');if(o.description){ds.style.display='';document.getElementById('descBox').textContent=o.description;}else ds.style.display='none';
+  const bs=document.getElementById('briefSec');
+  const hasGoals=Array.isArray(o.goals)&&o.goals.length;
+  const hasReadiness=!!o.contentReadiness;
+  const hasLaunch=!!o.launchDate;
+  const hasRefs=!!o.references;
+  if(hasGoals||hasReadiness||hasLaunch||hasRefs){
+    bs.style.display='';
+    const cells=[];
+    if(hasGoals)cells.push(`<div class="ic"><div class="ic-l">Цель сайта</div><div class="ic-v">${o.goals.map(g=>esc(GOALS[g]||g)).join(', ')}</div></div>`);
+    if(hasReadiness)cells.push(`<div class="ic"><div class="ic-l">Готовность материалов</div><div class="ic-v">${esc(READINESS[o.contentReadiness]||o.contentReadiness)}</div></div>`);
+    if(hasLaunch)cells.push(`<div class="ic"><div class="ic-l">Желаемый запуск</div><div class="ic-v">${esc(new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}))}</div></div>`);
+    document.getElementById('briefGrid').innerHTML=cells.join('');
+    const refsBox=document.getElementById('refsBox');
+    if(hasRefs){refsBox.style.display='block';refsBox.innerHTML=`<div class="ic-l" style="margin-bottom:6px">Референсы</div>${esc(o.references)}`;}
+    else{refsBox.style.display='none';refsBox.innerHTML='';}
+  }else{bs.style.display='none';}
+  const shs=document.getElementById('shopSec');
+  if(o.shopDetails){
+    const sd=o.shopDetails;
+    const hasAny=(sd.payment?.length)||(sd.delivery?.length)||sd.quantity;
+    if(hasAny){
+      shs.style.display='';
+      const cells=[];
+      if(sd.payment?.length)cells.push(`<div class="ic"><div class="ic-l">Способы оплаты</div><div class="ic-v">${sd.payment.map(p=>esc(SHOPPAY[p]||p)).join(', ')}</div></div>`);
+      if(sd.delivery?.length)cells.push(`<div class="ic"><div class="ic-l">Доставка</div><div class="ic-v">${sd.delivery.map(d=>esc(SHOPDELIVERY[d]||d)).join(', ')}</div></div>`);
+      if(sd.quantity)cells.push(`<div class="ic"><div class="ic-l">Число товаров</div><div class="ic-v">${esc(sd.quantity)}</div></div>`);
+      document.getElementById('shopGrid').innerHTML=cells.join('');
+    }else shs.style.display='none';
+  }else shs.style.display='none';
   const fs=document.getElementById('favSec');if(o.favicon){fs.style.display='';document.getElementById('favGrid').innerHTML=`<img class="at" src="${esc(o.favicon)}" alt="favicon" onclick="openLightbox('${o.favicon.replace(/'/g,"\\'")}')">`;} else fs.style.display='none';
   const as=document.getElementById('attachSec');
   if(o.attachments?.length){as.style.display='';document.getElementById('attachGrid').innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="at" src="${a.fileData}" alt="${esc(a.fileName||'')}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')">`:` <a class="btn btn-outline btn-xs" href="${a.fileData}" download="${esc(a.fileName||'file')}">📎 ${esc(a.fileName||'Файл')}</a>`).join('');}else as.style.display='none';
@@ -624,25 +696,22 @@ window.approveRefund=async()=>{
   const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
   const amt=prompt('Сумма возврата, ₽',String(o.totalPrice||''));
   if(amt===null)return;
-  await updateDoc(doc(db,'orders',selOrderId),{
+  await safeUpdate(selOrderId,{
     refundStatus:'approved',refundAmount:Number(amt)||o.totalPrice||0,refundDecidedAt:serverTimestamp()
-  }).catch(()=>{});
-  toast('Возврат одобрен ✓','success');
+  },'Возврат одобрен ✓');
 };
 window.rejectRefund=async()=>{
   if(!selOrderId)return;
   const comment=prompt('Комментарий для клиента (почему отклонено)');
   if(comment===null)return;
-  await updateDoc(doc(db,'orders',selOrderId),{
+  await safeUpdate(selOrderId,{
     refundStatus:'rejected',refundComment:comment.trim(),refundDecidedAt:serverTimestamp()
-  }).catch(()=>{});
-  toast('Возврат отклонён','info');
+  },'Возврат отклонён');
 };
 window.markRefunded=async()=>{
   if(!selOrderId)return;
   if(!confirm('Подтвердить, что деньги фактически отправлены клиенту?'))return;
-  await updateDoc(doc(db,'orders',selOrderId),{refundStatus:'refunded',refundedAt:serverTimestamp()}).catch(()=>{});
-  toast('Возврат завершён ✓','success');
+  await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:serverTimestamp()},'Возврат завершён ✓');
 };
 window.manualRefund=async()=>{
   if(!selOrderId)return;
@@ -650,74 +719,112 @@ window.manualRefund=async()=>{
   if(o.refundStatus&&o.refundStatus!=='none'&&o.refundStatus!=='rejected'){toast('Возврат уже оформляется','info');return;}
   const reason=prompt('Причина возврата (для истории)');
   if(reason===null)return;
-  await updateDoc(doc(db,'orders',selOrderId),{
+  await safeUpdate(selOrderId,{
     refundStatus:'requested',refundReason:reason.trim()||'Оформлено вручную администратором',refundRequestedAt:serverTimestamp()
-  }).catch(()=>{});
-  toast('Заявка на возврат создана ✓','success');
+  },'Заявка на возврат создана ✓');
 };
 
-window.togglePayment=async()=>{if(!selOrderId)return;currentPaid=!currentPaid;renderPayRow();const _o=allOrders.find(x=>x.id===selOrderId);const _upd={paid:currentPaid};if(currentPaid&&!_o?.paidAt){_upd.paidAt=serverTimestamp();}if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=serverTimestamp();document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===5));}await updateDoc(doc(db,'orders',selOrderId),_upd).catch(()=>{});toast(currentPaid?'Оплачен ✓':'Не оплачен','success');};
+window.togglePayment=async()=>{
+  if(!selOrderId)return;
+  const prevPaid=currentPaid;
+  currentPaid=!currentPaid;renderPayRow();
+  const _o=allOrders.find(x=>x.id===selOrderId);
+  const _upd={paid:currentPaid};
+  if(currentPaid&&!_o?.paidAt){_upd.paidAt=serverTimestamp();}
+  if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=serverTimestamp();document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===5));}
+  const ok=await safeUpdate(selOrderId,_upd,currentPaid?'Оплачен ✓':'Не оплачен');
+  if(!ok){currentPaid=prevPaid;renderPayRow();}
+};
 window.setStatus=async s=>{
   if(!selOrderId)return;
   const upd={status:s};
   const o=allOrders.find(x=>x.id===selOrderId);
   if(s>=2&&!o?.startedAt)upd.startedAt=serverTimestamp();
+  let msg;
   if(s===5){
     // If partial payment and not fully paid, auto-switch to "Ожидает доплаты"
     const isPartial = o?.paymentType==='partial';
     const paidAmt = o?.paidAmount||0;
     const totalPrice = o?.totalPrice||0;
     const fullyPaid = o?.paid || (isPartial && paidAmt>=totalPrice);
-    if(isPartial && !fullyPaid){ upd.status=6; toast('Предоплата — статус → Ожидает доплаты ✓','success'); }
-    else { upd.doneAt=serverTimestamp(); toast('Статус → '+S[s]+' ✓','success'); }
-  } else { toast('Статус → '+S[s]+' ✓','success'); }
-  await updateDoc(doc(db,'orders',selOrderId),upd).catch(()=>{});
+    if(isPartial && !fullyPaid){ upd.status=6; msg='Предоплата — статус → Ожидает доплаты ✓'; }
+    else { upd.doneAt=serverTimestamp(); msg='Статус → '+S[s]+' ✓'; }
+  } else { msg='Статус → '+S[s]+' ✓'; }
+  await safeUpdate(selOrderId,upd,msg);
 };
-window.saveComment=async()=>{if(!selOrderId)return;await updateDoc(doc(db,'orders',selOrderId),{statusComment:document.getElementById('commentInp').value.trim()}).catch(()=>{});toast('Сохранено ✓','success');};
-window.toggleSS=async(i,done)=>{currentSubsteps[i].done=done;if(done)currentSubsteps[i].date=new Date().toLocaleDateString('ru',{day:'numeric',month:'short'});else delete currentSubsteps[i].date;renderSubsteps();if(selOrderId)await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});};
-window.addSubstep=async()=>{const inp=document.getElementById('substepInp');const label=inp.value.trim();if(!label)return;currentSubsteps.push({label,done:false});inp.value='';renderSubsteps();if(selOrderId)await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});};
-window.deleteSS=async i=>{currentSubsteps.splice(i,1);renderSubsteps();if(selOrderId)await updateDoc(doc(db,'orders',selOrderId),{substeps:currentSubsteps}).catch(()=>{});};
-window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await updateDoc(doc(db,'orders',selOrderId),{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))}).catch(()=>{});toast('Дата сохранена ✓','success');};
+window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
+window.toggleSS=async(i,done)=>{
+  const prevDone=currentSubsteps[i].done,prevDate=currentSubsteps[i].date;
+  currentSubsteps[i].done=done;
+  if(done)currentSubsteps[i].date=new Date().toLocaleDateString('ru',{day:'numeric',month:'short'});
+  else delete currentSubsteps[i].date;
+  renderSubsteps();
+  if(selOrderId){
+    const ok=await safeUpdate(selOrderId,{substeps:currentSubsteps});
+    if(!ok){currentSubsteps[i].done=prevDone;if(prevDate)currentSubsteps[i].date=prevDate;else delete currentSubsteps[i].date;renderSubsteps();}
+  }
+};
+window.addSubstep=async()=>{
+  const inp=document.getElementById('substepInp');const label=inp.value.trim();if(!label)return;
+  currentSubsteps.push({label,done:false});inp.value='';renderSubsteps();
+  if(selOrderId){
+    const ok=await safeUpdate(selOrderId,{substeps:currentSubsteps});
+    if(!ok){currentSubsteps.pop();renderSubsteps();}
+  }
+};
+window.deleteSS=async i=>{
+  const removed=currentSubsteps[i];
+  currentSubsteps.splice(i,1);renderSubsteps();
+  if(selOrderId){
+    const ok=await safeUpdate(selOrderId,{substeps:currentSubsteps});
+    if(!ok){currentSubsteps.splice(i,0,removed);renderSubsteps();}
+  }
+};
+window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))},'Дата сохранена ✓');};
 window.saveSite=async()=>{
   if(!selOrderId)return;
   const domain=document.getElementById('siteDomain').value.trim();
   const url=document.getElementById('siteUrl').value.trim();
   const fav=document.getElementById('siteFavicon').value.trim();
   const pages=document.getElementById('sitePages').value.trim();
-  await updateDoc(doc(db,'orders',selOrderId),{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,status:5,doneAt:serverTimestamp()}).catch(()=>{});
-  if(selUid&&domain)await addDoc(collection(db,'notifications',selUid,'items'),{title:'🎉 Ваш сайт готов!',text:`Сайт готов: ${domain}${url?' — '+url:''}`,read:false,createdAt:serverTimestamp()}).catch(()=>{});
+  const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,status:5,doneAt:serverTimestamp()});
+  if(!ok)return;
+  if(selUid&&domain)await addDoc(collection(db,'notifications',selUid,'items'),{title:'🎉 Ваш сайт готов!',text:`Сайт готов: ${domain}${url?' — '+url:''}`,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось отправить уведомление клиенту:',err));
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{
   const exp=new Date(Date.now()+30*864e5);
-  await updateDoc(doc(db,'orders',orderId),{supportActive:true,supportStartedAt:serverTimestamp(),supportExpiresAt:Timestamp.fromDate(exp),supportRequested:false});
-  if(uid)await addDoc(collection(db,'notifications',uid,'items'),{title:'✅ Обслуживание активировано',text:'Обслуживание подключено на 30 дней.',read:false,createdAt:serverTimestamp()});
+  const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:serverTimestamp(),supportExpiresAt:Timestamp.fromDate(exp),supportRequested:false});
+  if(!ok)return;
+  if(uid)await addDoc(collection(db,'notifications',uid,'items'),{title:'✅ Обслуживание активировано',text:'Обслуживание подключено на 30 дней.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
   toast('Активировано ✓','success');
 };
 window.renewSupport=async orderId=>{
   const exp=new Date(Date.now()+30*864e5);
-  await updateDoc(doc(db,'orders',orderId),{supportExpiresAt:Timestamp.fromDate(exp)});
-  toast('Продлено на 30 дней ✓','success');
+  await safeUpdate(orderId,{supportExpiresAt:Timestamp.fromDate(exp)},'Продлено на 30 дней ✓');
 };
 window.sendPayLink=async(orderId,uid)=>{
   const inp=document.getElementById('payLink_'+orderId)||document.getElementById('payLinkInp');
   const link=inp?.value.trim();if(!link){toast('Введите ссылку','error');return;}
   if(!uid){toast('UID не найден','error');return;}
-  await addDoc(collection(db,'notifications',uid,'items'),{title:'💳 Ссылка на оплату',text:`Ссылка: ${link}`,read:false,createdAt:serverTimestamp()});
-  toast('Ссылка отправлена ✓','success');if(inp)inp.value='';
+  try{
+    await addDoc(collection(db,'notifications',uid,'items'),{title:'💳 Ссылка на оплату',text:`Ссылка: ${link}`,read:false,createdAt:serverTimestamp()});
+    toast('Ссылка отправлена ✓','success');if(inp)inp.value='';
+  }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
-  await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Истекает обслуживание',text:'Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
-  toast('Уведомление отправлено ✓','success');
+  try{
+    await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Истекает обслуживание',text:'Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
+    toast('Уведомление отправлено ✓','success');
+  }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };
 window.archiveOrder=async()=>{
   if(!selOrderId)return;
   const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
   const goingToArchive=!o.archived;
   if(!confirm(goingToArchive?'Архивировать заказ? Он пропадёт из обычных вкладок, но останется во вкладке «Архив».':'Вернуть заказ из архива?'))return;
-  await updateDoc(doc(db,'orders',selOrderId),{archived:goingToArchive}).catch(()=>{});
-  toast(goingToArchive?'В архиве ✓':'Возвращён из архива ✓','info');
+  await safeUpdate(selOrderId,{archived:goingToArchive},goingToArchive?'В архиве ✓':'Возвращён из архива ✓');
 };
 window.printReceipt=id=>{
   const o=_cache.find(x=>x.id===id);if(!o)return;

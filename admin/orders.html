@@ -127,15 +127,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 .ic-l{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:500}
 .ic-v{font-size:.95rem;color:var(--text);font-weight:300}
 
-/* SUBSTEPS */
-.ss-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
-.ss-row:last-child{border-bottom:none}
-.ss-chk{width:16px;height:16px;cursor:pointer;accent-color:var(--green-d);flex-shrink:0}
-.ss-txt{font-size:.9rem;flex:1;line-height:1.4}
-.ss-date{font-size:.75rem;color:var(--muted);white-space:nowrap}
-.ss-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:.9rem;padding:0;line-height:1;transition:color .12s}
-.ss-del:hover{color:var(--red)}
-
 /* SITE FIELDS */
 .sf{display:flex;flex-direction:column;gap:14px}
 .sf-row{display:flex;flex-direction:column;gap:6px}
@@ -361,18 +352,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
         <div class="sec-b"><div class="ag" id="attachGrid"></div></div>
       </div>
 
-      <!-- SUBSTEPS -->
-      <div class="sec">
-        <div class="sec-h"><span class="sec-title">Этапы работы</span></div>
-        <div class="sec-b">
-          <div id="substepList" style="margin-bottom:16px"></div>
-          <div style="display:flex;gap:10px">
-            <input class="inp" id="substepInp" type="text" placeholder="Новый этап..."/>
-            <button class="btn btn-dark btn-sm" onclick="addSubstep()">Добавить</button>
-          </div>
-        </div>
-      </div>
-
       <!-- DATES -->
       <div class="sec">
         <div class="sec-h"><span class="sec-title">Даты</span></div>
@@ -454,7 +433,7 @@ const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Налич�
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 let allOrders=[],allReviews=[],_cache=[];
 let selOrderId=null,selUid=null;
-let currentTab='active',currentPaid=false,currentSubsteps=[];
+let currentTab='active',currentPaid=false;
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 
@@ -462,11 +441,11 @@ function toast(m,t='info'){const el=document.getElementById('toast');el.textCont
 // `await updateDoc(...).catch(()=>{}); toast('Сохранено ✓','success');`
 // — то есть тост «сохранено» показывался БЕЗУСЛОВНО, даже если запись
 // реально упала (нет прав, невалидные данные, сеть и т.д.). Визуально
-// галочка/дата применялись на секунду (оптимистичное обновление в
-// currentSubsteps/UI), а потом просто пропадали при следующем onSnapshot —
-// без единого сообщения об ошибке. Из-за этого выглядело как "не работает",
-// хотя реальная причина (скорее всего правила безопасности Firestore,
-// не пускающие поля substeps/startedAt/doneAt) оставалась невидимой.
+// галочка/дата применялись на секунду (оптимистичное обновление UI), а
+// потом просто пропадали при следующем onSnapshot — без единого сообщения
+// об ошибке. Из-за этого выглядело как "не работает", хотя реальная причина
+// (скорее всего правила безопасности Firestore, не пускающие поля
+// startedAt/doneAt) оставалась невидимой.
 // safeUpdate() показывает тост только когда запись правда прошла, и
 // показывает настоящую ошибку (err.code), когда нет — так в следующий раз,
 // когда это случится, будет видно, что именно упало.
@@ -565,7 +544,6 @@ function showDetail(o){
   const archBtn=document.getElementById('archiveBtn');if(archBtn)archBtn.textContent=o.archived?'Вернуть из архива':'В архив';
   currentPaid=o.paid||false;renderPayRow();
   document.getElementById('commentInp').value=o.statusComment||'';
-  currentSubsteps=JSON.parse(JSON.stringify(o.substeps||[]));renderSubsteps();
   document.getElementById('dateStarted').value=tsToInput(o.startedAt);
   document.getElementById('dateDone').value=tsToInput(o.doneAt);
   document.getElementById('siteDomain').value=o.siteDomain||'';
@@ -631,17 +609,6 @@ function renderPayRow(){
   const row=document.getElementById('payRow');row.classList.toggle('paid',currentPaid);
   document.getElementById('payLabel').textContent=currentPaid?'Оплачен — нажмите чтобы изменить':'Не оплачен — нажмите чтобы изменить';
   const pill=document.getElementById('payPill');pill.className=currentPaid?'pay-pill pay-yes':'pay-pill pay-no';pill.textContent=currentPaid?'✓ ОПЛАЧЕН':'✕ НЕ ОПЛАЧЕН';
-}
-
-function renderSubsteps(){
-  const el=document.getElementById('substepList');
-  if(!currentSubsteps.length){el.innerHTML='<div style="font-size:.88rem;color:var(--muted);padding:8px 0">Нет этапов</div>';return;}
-  el.innerHTML=currentSubsteps.map((ss,i)=>`<div class="ss-row">
-    <input type="checkbox" class="ss-chk" ${ss.done?'checked':''} onchange="toggleSS(${i},this.checked)"/>
-    <span class="ss-txt" style="${ss.done?'text-decoration:line-through;opacity:.45':''}">${esc(ss.label)}</span>
-    ${ss.date?`<span class="ss-date">${ss.date}</span>`:''}
-    <button class="ss-del" onclick="deleteSS(${i})">✕</button>
-  </div>`).join('');
 }
 
 function renderSupport(o){
@@ -755,33 +722,6 @@ window.setStatus=async s=>{
   await safeUpdate(selOrderId,upd,msg);
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
-window.toggleSS=async(i,done)=>{
-  const prevDone=currentSubsteps[i].done,prevDate=currentSubsteps[i].date;
-  currentSubsteps[i].done=done;
-  if(done)currentSubsteps[i].date=new Date().toLocaleDateString('ru',{day:'numeric',month:'short'});
-  else delete currentSubsteps[i].date;
-  renderSubsteps();
-  if(selOrderId){
-    const ok=await safeUpdate(selOrderId,{substeps:currentSubsteps});
-    if(!ok){currentSubsteps[i].done=prevDone;if(prevDate)currentSubsteps[i].date=prevDate;else delete currentSubsteps[i].date;renderSubsteps();}
-  }
-};
-window.addSubstep=async()=>{
-  const inp=document.getElementById('substepInp');const label=inp.value.trim();if(!label)return;
-  currentSubsteps.push({label,done:false});inp.value='';renderSubsteps();
-  if(selOrderId){
-    const ok=await safeUpdate(selOrderId,{substeps:currentSubsteps});
-    if(!ok){currentSubsteps.pop();renderSubsteps();}
-  }
-};
-window.deleteSS=async i=>{
-  const removed=currentSubsteps[i];
-  currentSubsteps.splice(i,1);renderSubsteps();
-  if(selOrderId){
-    const ok=await safeUpdate(selOrderId,{substeps:currentSubsteps});
-    if(!ok){currentSubsteps.splice(i,0,removed);renderSubsteps();}
-  }
-};
 window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))},'Дата сохранена ✓');};
 window.saveSite=async()=>{
   if(!selOrderId)return;

@@ -10,7 +10,7 @@
     const res = await fetch('https://api.country.is/', { signal: AbortSignal.timeout(4000) });
     if (res.ok) {
       const data = await res.json();
-      if (data.country && BLOCKED_COUNTRIES.includes(data.country)) {
+      if (data.country && blockedCountries.includes(data.country)) {
         redirect();
         return;
       }
@@ -21,7 +21,7 @@
     const res = await fetch('https://ipwho.is/?fields=country_code', { signal: AbortSignal.timeout(4000) });
     if (res.ok) {
       const data = await res.json();
-      if (data.country_code && BLOCKED_COUNTRIES.includes(data.country_code)) {
+      if (data.country_code && blockedCountries.includes(data.country_code)) {
         redirect();
         return;
       }

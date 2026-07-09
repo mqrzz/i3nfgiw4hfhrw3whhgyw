@@ -70,6 +70,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .site-meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}
 .site-meta-chip{font-size:.78rem;color:rgba(255,255,255,.4);font-weight:300;display:flex;align-items:center;gap:6px}
 .site-meta-chip svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+a.site-meta-chip{transition:color .12s}
+a.site-meta-chip:hover{color:var(--accent)}
 .site-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:24px}
 .site-actions{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap}
 .site-actions .btn{flex:1;justify-content:center}
@@ -143,6 +145,7 @@ function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(t
 function siteCard(o){
   const href = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl) : (o.siteDomain ? 'https://'+o.siteDomain : null);
   const pagesCount = o.sitePages ? parseInt(o.sitePages,10) : null;
+  const repoHref = o.siteRepo ? (o.siteRepo.match(/^https?:\/\//) ? o.siteRepo : 'https://github.com/'+o.siteRepo.replace(/^\/+/,'')) : null;
 
   const hasSupport = o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > new Date();
   const statusPill = hasSupport
@@ -165,6 +168,7 @@ function siteCard(o){
       <span class="site-meta-chip"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fmtDate(o.createdAt)}</span>
       <span class="site-meta-chip"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'')}</span>
       ${pagesCount ? `<span class="site-meta-chip"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${pagesCount} стр.</span>` : ''}
+      ${repoHref ? `<a href="${repoHref}" target="_blank" rel="noopener" class="site-meta-chip" style="text-decoration:none;cursor:pointer"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Код на GitHub</a>` : ''}
     </div>
     <div class="site-divider"></div>
     ${supportBanner}

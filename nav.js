@@ -53,25 +53,27 @@
 
     .antviz-nav, .antviz-nav * { box-sizing: border-box; }
 
-    /* ── Капсула ── */
+    /* ── Капсула ──
+       Было: полупрозрачный blur поверх белого сайта — от этого капсула
+       читалась серой, а не чёрной. Теперь — плотный непрозрачный
+       --nv-bg (тот же тон, что .hero-block/.calc-block на сайте),
+       плюс тёплое зелёное свечение снизу для уверенности бренда. */
     .antviz-nav {
       position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
       display: flex; align-items: center; justify-content: space-between;
       gap: 8px;
       padding: 6px 8px 6px 22px;
-      height: 60px;
+      height: 62px;
       width: calc(100% - 32px); max-width: 1080px;
-      background: var(--nv-bg-soft);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      backdrop-filter: blur(18px) saturate(140%);
-      border: 1px solid var(--nv-line);
+      background: var(--nv-bg);
+      border: 1px solid rgba(255,255,255,.09);
       border-radius: 22px;
-      box-shadow: var(--nv-sh);
+      box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 0 0 1px rgba(30,222,123,.04), 0 12px 34px -6px rgba(30,222,123,.18);
       font-family: var(--nv-font);
       transition: border-color .2s var(--nv-ease), box-shadow .2s var(--nv-ease);
     }
-    .antviz-nav:hover { border-color: rgba(255,255,255,.16); }
+    .antviz-nav:hover { border-color: rgba(30,222,123,.25); box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 0 0 1px rgba(30,222,123,.08), 0 14px 38px -4px rgba(30,222,123,.26); }
 
     .nv-logo {
       font-family: var(--nv-font); font-weight: 500;
@@ -95,11 +97,8 @@
       display: flex; align-items: center;
     }
     .nv-link:hover { color: var(--nv-ink); background: rgba(255,255,255,.06); }
-    .nv-link.active { color: var(--nv-ink); font-weight: 500; }
-    .nv-link.active::after {
-      content: ''; position: absolute; left: 14px; right: 14px; bottom: 3px;
-      height: 2px; border-radius: 2px; background: var(--nv-green);
-    }
+    .nv-link.active { color: var(--nv-green-ink); font-weight: 500; background: var(--nv-green); }
+    .nv-link.active:hover { background: var(--nv-green-h); }
     .nv-link.accent { color: var(--nv-green); font-weight: 500; }
     .nv-link.accent:hover { background: var(--nv-green-dim); }
 
@@ -307,23 +306,21 @@
     .nv-burger.open .nv-burger-box span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
 
     .nv-sheet {
-      position: fixed; top: calc(18px + 60px + 10px); left: 50%;
+      position: fixed; top: calc(18px + 62px + 10px); left: 50%;
       transform: translateX(-50%) translateY(-8px) scale(.98);
       z-index: 8999;
       width: calc(100% - 32px); max-width: 1080px;
-      max-height: calc(100vh - 18px - 60px - 34px);
+      max-height: calc(100vh - 18px - 62px - 34px);
       overflow-y: auto;
-      background: var(--nv-bg-soft);
-      -webkit-backdrop-filter: blur(18px) saturate(140%);
-      backdrop-filter: blur(18px) saturate(140%);
-      border: 1px solid var(--nv-line);
+      background: var(--nv-bg);
+      border: 1px solid rgba(255,255,255,.09);
       border-radius: 22px;
       padding: 8px;
       display: none; flex-direction: column; gap: 2px;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity .2s var(--nv-ease), transform .2s var(--nv-ease), visibility 0s linear .2s;
       font-family: var(--nv-font);
-      box-shadow: var(--nv-sh);
+      box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 12px 34px -6px rgba(30,222,123,.18);
     }
     .nv-sheet.open {
       opacity: 1; visibility: visible; pointer-events: all;

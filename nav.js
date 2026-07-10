@@ -1,11 +1,25 @@
 /**
- * nav.js — Antviz (дизайн под главную страницу)
+ * nav.js — Antviz
  * <script src="nav.js" data-page="home"></script>
  *
+ * ПОЛНАЯ ПЕРЕСБОРКА (v2):
+ * — визуальный язык взят напрямую с главной страницы (тени с синим
+ *   подтоном --sh2, радиусы из той же лестницы 28/32/40, зелёный —
+ *   только как акцент состояния, никакой декоративной "зелёной полоски");
+ * — один-единственный триггер открытия/закрытия (клик), никакого
+ *   гибрида hover+aria — это и было источником "дёрганых" анимаций;
+ * — новый набор иконок: единая толщина линии, единая геометрия
+ *   (circle/rounded-square контейнер + простой глиф), никакого
+ *   разнобоя фигур, как раньше;
+ * — лёгкий glassmorphism на капсуле (blur), в духе текущего тренда
+ *   тёмных SaaS-шапок, но сдержанно — сайт не про эффекты, он про код;
+ * — уважение reduced-motion и видимый focus-visible.
+ *
  * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
- * инициализирует САМА СТРАНИЦА (как она и делает сейчас), и просто
- * подключается к уже существующему приложению через getApps()/getAuth().
- * Это убирает любые проблемы с относительными путями к конфигу.
+ * инициализирует САМА СТРАНИЦА, и подключается к уже существующему
+ * приложению через getApps()/getAuth(). Логика авторизации, бейджей
+ * и сессий не менялась — менялся только визуальный слой и разметка
+ * вокруг него (id остались прежними, чтобы ничего не сломать).
  */
 (function () {
 
@@ -14,365 +28,366 @@
   const depth  = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
   const b      = depth > 0 ? '../' : '';
 
-  /* ─────────────── CSS ───────────────
-     Палитра и формы взяты напрямую с главной страницы Antviz:
-     тёмная капсула (var(--dark)), зелёный акцент (var(--green)),
-     шрифт Geologica, скругления-«квадраты» (не pill). Дропдаун —
-     тоже тёмный, на тон светлее капсулы (как .type-card.dark на
-     сайте: dark2 на dark), без белых/серых поверхностей. */
+  /* ─────────────── CSS ─────────────── */
   const CSS = `
     :root {
-      --an-bg:        #191b1e;
-      --an-bg2:       #2b2f33;
-      --an-line:      rgba(255,255,255,.08);
-      --an-line-soft: rgba(255,255,255,.05);
-      --an-ink:       #ffffff;
-      --an-ink-dim:   rgba(255,255,255,.45);
-      --an-ink-faint: rgba(255,255,255,.3);
-      --an-green:     #1ede7b;
-      --an-green-h:   #1ac16b;
-      --an-green-ink: #191b1e;
-      --an-green-dim: rgba(30,222,123,.14);
-      --an-warn:      #f59e0b;
-      --an-danger:    #ff6b54;
-      --an-card:      #20242a;
-      --an-card-border: rgba(255,255,255,.09);
-      --an-card-ink:  #ffffff;
-      --an-card-muted:rgba(255,255,255,.4);
-      --an-font: 'Geologica','Inter','Arial',sans-serif;
+      --nv-bg:        #191b1e;
+      --nv-bg-soft:   rgba(25,27,30,.82);
+      --nv-surface:   #232629;
+      --nv-surface2:  #2b2f33;
+      --nv-line:      rgba(255,255,255,.09);
+      --nv-line-soft: rgba(255,255,255,.05);
+      --nv-ink:       #ffffff;
+      --nv-ink-dim:   rgba(255,255,255,.5);
+      --nv-ink-faint: rgba(255,255,255,.3);
+      --nv-green:     #1ede7b;
+      --nv-green-h:   #1ac16b;
+      --nv-green-ink: #0e1512;
+      --nv-green-dim: rgba(30,222,123,.12);
+      --nv-warn:      #f5a623;
+      --nv-danger:    #ff6b54;
+      --nv-sh:        0 20px 44px rgba(4,10,26,.38), 0 4px 14px rgba(4,10,26,.22);
+      --nv-font:      'Geologica','Inter','Arial',sans-serif;
+      --nv-ease:      cubic-bezier(.16,1,.3,1);
     }
 
+    .antviz-nav, .antviz-nav * { box-sizing: border-box; }
+
+    /* ── Капсула ── */
     .antviz-nav {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 10px 0 26px;
-      height: 64px;
-      width: calc(100% - 40px); max-width: 1100px;
-      background: var(--an-bg);
-      border: 1px solid var(--an-line);
-      border-radius: 24px;
-      transition: border-color .2s, background .2s;
-      font-family: var(--an-font);
+      gap: 8px;
+      padding: 6px 8px 6px 22px;
+      height: 60px;
+      width: calc(100% - 32px); max-width: 1080px;
+      background: var(--nv-bg-soft);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--nv-line);
+      border-radius: 22px;
+      box-shadow: var(--nv-sh);
+      font-family: var(--nv-font);
+      transition: border-color .2s var(--nv-ease), box-shadow .2s var(--nv-ease);
     }
-    .antviz-nav:hover { border-color: rgba(255,255,255,.14); }
+    .antviz-nav:hover { border-color: rgba(255,255,255,.16); }
 
-    .an-logo {
-      font-family: var(--an-font); font-weight: 500;
-      font-size: 15.2px; letter-spacing: -.01em;
-      color: var(--an-ink); text-decoration: none;
-      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+    .nv-logo {
+      font-family: var(--nv-font); font-weight: 500;
+      font-size: 15px; letter-spacing: -.01em;
+      color: var(--nv-ink); text-decoration: none;
+      display: flex; align-items: center; gap: 9px; flex-shrink: 0;
     }
-    .an-logo img { width: 28px; height: 28px; border-radius: 8px; object-fit: cover; }
+    .nv-logo img { width: 26px; height: 26px; border-radius: 8px; object-fit: cover; }
 
-    .an-center {
+    /* ── Центр: ссылки + дропдауны ── */
+    .nv-center {
       position: absolute; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; gap: 2px;
     }
-    .an-link {
-      color: var(--an-ink-dim);
-      font-family: var(--an-font); font-weight: 300; font-size: 14.08px;
-      text-decoration: none; padding: 8px 14.4px;
-      border-radius: 10px; transition: color .15s, background .15s;
+    .nv-link {
+      color: var(--nv-ink-dim);
+      font-family: var(--nv-font); font-weight: 300; font-size: 14px;
+      text-decoration: none; padding: 9px 14px;
+      border-radius: 11px; transition: color .15s var(--nv-ease), background .15s var(--nv-ease);
       white-space: nowrap; position: relative;
       display: flex; align-items: center;
     }
-    .an-link:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
-    .an-link.active { color: var(--an-ink); font-weight: 500; }
-    .an-link.active::after {
-      content: ''; position: absolute; left: 14.4px; right: 14.4px; bottom: 2px;
-      height: 2px; border-radius: 2px; background: var(--an-green);
+    .nv-link:hover { color: var(--nv-ink); background: rgba(255,255,255,.06); }
+    .nv-link.active { color: var(--nv-ink); font-weight: 500; }
+    .nv-link.active::after {
+      content: ''; position: absolute; left: 14px; right: 14px; bottom: 3px;
+      height: 2px; border-radius: 2px; background: var(--nv-green);
     }
+    .nv-link.accent { color: var(--nv-green); font-weight: 500; }
+    .nv-link.accent:hover { background: var(--nv-green-dim); }
 
-    /* Выделение для ссылки "Сделать заказ" в центре */
-    .an-link[href*="order"] {
-      color: var(--an-green);
-      font-weight: 500;
-    }
-
-    /* ── Кнопка с дропдауном в центре навбара ── */
-    .an-nav-drop { position: relative; display: flex; align-items: center; }
-    .an-nav-drop-btn {
-      color: var(--an-ink-dim);
-      font-family: var(--an-font); font-weight: 300; font-size: 14.08px;
+    .nv-drop { position: relative; display: flex; align-items: center; }
+    .nv-drop-btn {
+      color: var(--nv-ink-dim);
+      font-family: var(--nv-font); font-weight: 300; font-size: 14px;
       background: none; border: none; cursor: pointer;
-      padding: 8px 14.4px; border-radius: 10px;
-      transition: color .15s, background .15s;
-      white-space: nowrap; display: flex; align-items: center; gap: 5px;
+      padding: 9px 12px 9px 14px; border-radius: 11px;
+      transition: color .15s var(--nv-ease), background .15s var(--nv-ease);
+      white-space: nowrap; display: flex; align-items: center; gap: 6px;
     }
-    .an-nav-drop-btn:hover { color: var(--an-ink); background: rgba(255,255,255,.05); }
-    .an-nav-drop-btn.active { color: var(--an-ink); font-weight: 500; }
-    .an-nav-drop-chevron {
-      width: 10px; height: 10px; opacity: .4; flex-shrink: 0;
-      transition: transform .18s, opacity .18s;
+    .nv-drop-btn:hover { color: var(--nv-ink); background: rgba(255,255,255,.06); }
+    .nv-drop-btn.is-active { color: var(--nv-ink); font-weight: 500; }
+    .nv-chev {
+      width: 9px; height: 9px; opacity: .45; flex-shrink: 0;
+      transition: transform .22s var(--nv-ease), opacity .15s;
     }
-    .an-nav-drop-btn[aria-expanded="true"] .an-nav-drop-chevron { transform: rotate(180deg); opacity: .7; }
+    .nv-drop.open .nv-chev { transform: rotate(180deg); opacity: .8; }
 
-    .an-nav-menu {
-      position: absolute; top: calc(100% + 14px); left: 50%; transform: translateX(-50%) translateY(-6px);
-      background: var(--an-card);
-      border: 1.5px solid var(--an-card-border);
+    .nv-menu {
+      position: absolute; top: calc(100% + 12px); left: 50%;
+      background: var(--nv-surface);
+      border: 1px solid var(--nv-line);
       border-radius: 20px; padding: 8px;
-      min-width: 220px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
-      opacity: 0; pointer-events: none;
-      transition: opacity .16s ease, transform .16s ease;
+      min-width: 232px;
+      box-shadow: var(--nv-sh);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translate(-50%, -6px) scale(.98);
+      transform-origin: top center;
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s linear .18s;
       z-index: 8990;
-      font-family: var(--an-font);
+      font-family: var(--nv-font);
     }
-    .an-nav-menu::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-      background: var(--an-green); border-radius: 20px 20px 0 0;
+    .nv-drop.open .nv-menu {
+      opacity: 1; visibility: visible; pointer-events: all;
+      transform: translate(-50%, 0) scale(1);
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s;
     }
-    .an-nav-drop:hover .an-nav-menu,
-    .an-nav-menu:hover { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
-    .an-nav-drop-btn[aria-expanded="true"] ~ .an-nav-menu { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
 
-    .an-nav-menu-item {
-      display: flex; align-items: center; gap: 10px;
-      padding: 9px 10px; border-radius: 11px;
-      font-size: 13.44px; color: var(--an-card-ink); font-weight: 300;
-      text-decoration: none; transition: background .12s, padding-left .12s;
-      white-space: nowrap;
-    }
-    .an-nav-menu-item:hover { background: var(--an-green-dim); padding-left: 14px; color: #fff; }
-    .an-nav-menu-ico {
-      width: 16px; height: 16px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--an-card-muted); transition: color .12s;
-    }
-    .an-nav-menu-item:hover .an-nav-menu-ico { color: var(--an-green); }
-    .an-nav-menu-ico svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .an-nav-menu-sep { height: 1px; background: var(--an-card-border); margin: 5px 8px; }
-    .an-nav-menu-label {
-      padding: 10px 10px 3px;
-      font-size: 10.4px; color: var(--an-card-muted); font-weight: 500;
+    .nv-menu-label {
+      padding: 9px 10px 4px;
+      font-size: 10.5px; color: var(--nv-ink-faint); font-weight: 500;
       text-transform: uppercase; letter-spacing: .08em;
     }
+    .nv-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 12px;
+      font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
+      text-decoration: none; transition: background .12s, color .12s;
+      white-space: nowrap;
+    }
+    .nv-menu-item:hover { background: var(--nv-green-dim); color: #fff; }
+    .nv-menu-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); }
+    .nv-menu-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 8px; }
 
-    .an-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+    /* ── Иконки: единая геометрия — скруглённый квадрат-контейнер
+       + простой глиф; никакого разнобоя форм ── */
+    .nv-ico {
+      width: 26px; height: 26px; flex-shrink: 0; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--nv-ink-faint);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      transition: color .12s, border-color .12s;
+    }
+    .nv-ico svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-    .an-user { position: relative; display: flex; }
-    .an-user-btn {
+    .nv-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+    /* ── Пользователь ── */
+    .nv-user { position: relative; display: flex; }
+    .nv-user-btn {
       display: flex; align-items: center; gap: 9px;
       background: none; border: 1px solid transparent;
-      border-radius: 14px; padding: 5px 12px 5px 5px;
+      border-radius: 14px; padding: 4px 12px 4px 4px;
       cursor: pointer; transition: border-color .15s, background .15s;
-      font-family: var(--an-font); font-weight: 300; font-size: 13.6px; color: var(--an-ink);
-      text-decoration: none;
-      position: relative;
+      font-family: var(--nv-font); font-weight: 300; font-size: 13.5px; color: var(--nv-ink);
+      text-decoration: none; position: relative;
     }
-    .an-user-btn:hover { border-color: var(--an-line); background: rgba(255,255,255,.04); }
+    .nv-user-btn:hover { border-color: var(--nv-line); background: rgba(255,255,255,.05); }
+    .nv-user-btn.guest {
+      padding: 9px 18px; border: 1px solid var(--nv-line); border-radius: 14px;
+      background: rgba(255,255,255,.03);
+    }
+    .nv-user-btn.guest:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+    .nv-user-btn.guest .nv-avatar-ring,
+    .nv-user-btn.guest .nv-chev-user { display: none; }
 
-    .an-user-btn.guest { padding: 8.8px 17.6px; border: 1px solid var(--an-line); border-radius: 14px; }
-    .an-user-btn.guest:hover { border-color: rgba(255,255,255,.2); }
-    .an-user-btn.guest .an-avatar-ring { display: none; }
-    .an-user-btn.guest .an-chevron { display: none; }
-
-    /* Аватар: квадрат со скруглением в духе карточек сайта (border-radius
-       такой же логики, как .tier-badge / .rv-av), на зелёном фоне.
-       Кольцо появляется только когда есть непрочитанное. */
-    .an-avatar-ring {
+    .nv-avatar-ring {
       width: 32px; height: 32px; border-radius: 11px; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
       position: relative; padding: 2px;
     }
-    .an-avatar-ring.notify {
-      background: conic-gradient(from -45deg, var(--an-warn), var(--an-green) 60%);
+    .nv-avatar-ring.notify {
+      background: conic-gradient(from -45deg, var(--nv-warn), var(--nv-green) 65%);
     }
-    .an-avatar {
+    .nv-avatar {
       width: 100%; height: 100%; border-radius: 9px;
-      background: var(--an-green);
+      background: var(--nv-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: 11.52px; font-weight: 500; color: var(--an-green-ink);
+      font-size: 11.5px; font-weight: 500; color: var(--nv-green-ink);
       overflow: hidden;
     }
-    .an-avatar-ring.notify .an-avatar { border-radius: 8px; }
-    .an-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .nv-avatar-ring.notify .nv-avatar { border-radius: 8px; }
+    .nv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .nv-uname { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nv-chev-user { width: 10px; height: 10px; opacity: .4; flex-shrink: 0; transition: transform .2s var(--nv-ease); }
+    .nv-user-btn[aria-expanded="true"] .nv-chev-user { transform: rotate(180deg); }
 
-    .an-uname { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .an-chevron { width: 11px; height: 11px; opacity: .45; flex-shrink: 0; transition: transform .2s; }
-    .an-user-btn[aria-expanded="true"] .an-chevron { transform: rotate(180deg); }
-
-    /* ── Дропдаун: остаётся в тёмной палитре капсулы, на тон светлее
-       (--an-card #20242a поверх --an-bg #191b1e) — так же, как
-       .type-card.dark (dark2 поверх dark) на главной странице.
-       Никакого белого/серого: ховеры и акценты — зелёные. */
-    .an-dd {
+    .nv-dd {
       position: absolute; top: calc(100% + 12px); right: 0;
-      background: var(--an-card);
-      border: 1.5px solid var(--an-card-border);
-      border-radius: 24px; padding: 8px;
-      min-width: 248px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.45), 0 4px 12px rgba(0,0,0,.3);
-      opacity: 0; pointer-events: none;
-      transform: translateY(-6px);
+      background: var(--nv-surface);
+      border: 1px solid var(--nv-line);
+      border-radius: 22px; padding: 8px;
+      min-width: 256px;
+      box-shadow: var(--nv-sh);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translateY(-6px) scale(.98);
       transform-origin: top right;
-      transition: opacity .16s ease, transform .16s ease;
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s linear .18s;
       z-index: 9999;
-      overflow: hidden;
-      font-family: var(--an-font);
+      font-family: var(--nv-font);
     }
-    .an-dd::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
-      background: var(--an-green);
+    .nv-dd.open {
+      opacity: 1; visibility: visible; pointer-events: all;
+      transform: translateY(0) scale(1);
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s;
     }
-    .an-dd.open { opacity: 1; pointer-events: all; transform: translateY(0); }
 
-    .an-dd-head {
+    .nv-dd-head {
       display: flex; align-items: center; gap: 11px;
-      padding: 14px 10px 14px; margin-bottom: 2px;
-      border-bottom: 1px solid var(--an-card-border);
+      padding: 12px 10px 14px; margin-bottom: 4px;
+      border-bottom: 1px solid var(--nv-line-soft);
     }
-    .an-dd-head-avatar {
-      width: 38px; height: 38px; border-radius: 11px;
-      background: var(--an-green);
+    .nv-dd-head-avatar {
+      width: 38px; height: 38px; border-radius: 12px;
+      background: var(--nv-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: 14.4px; font-weight: 500; color: var(--an-green-ink);
+      font-size: 14px; font-weight: 500; color: var(--nv-green-ink);
       flex-shrink: 0; overflow: hidden;
     }
-    .an-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .an-dd-head-info { min-width: 0; flex: 1; }
-    .an-dd-head-name {
-      font-family: var(--an-font); font-size: 14.08px; font-weight: 500;
-      color: var(--an-card-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      letter-spacing: -.01em;
+    .nv-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .nv-dd-head-info { min-width: 0; flex: 1; }
+    .nv-dd-head-name {
+      font-size: 14px; font-weight: 500; color: #fff;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.01em;
     }
-    .an-dd-head-email {
-      font-family: var(--an-font); font-weight: 300; font-size: 11.68px;
-      color: var(--an-card-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      margin-top: 2px;
+    .nv-dd-head-email {
+      font-weight: 300; font-size: 11.5px; color: var(--nv-ink-faint);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px;
     }
 
-    .an-dd-section {
-      padding: 14px 11px 6px;
-      font-size: 10.88px;
-      color: var(--an-card-muted); font-weight: 500;
+    .nv-dd-section {
+      padding: 12px 11px 5px;
+      font-size: 10.5px; color: var(--nv-ink-faint); font-weight: 500;
       text-transform: uppercase; letter-spacing: .08em;
-      font-family: var(--an-font);
     }
-    .an-dd-item {
+    .nv-dd-item {
       display: flex; align-items: center; gap: 11px;
-      padding: 10px 10px; border-radius: 12px;
-      font-size: 13.6px; color: var(--an-card-ink); font-weight: 300;
+      padding: 8px 10px; border-radius: 13px;
+      font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
       text-decoration: none; cursor: pointer;
-      transition: background .12s, padding-left .12s;
-      font-family: var(--an-font); border: none;
-      background: none; width: 100%; text-align: left;
-      position: relative;
+      transition: background .12s, color .12s;
+      border: none; background: none; width: 100%; text-align: left;
+      position: relative; font-family: var(--nv-font);
     }
-    .an-dd-item:hover { background: var(--an-green-dim); padding-left: 13px; }
-    .an-dd-ico {
-      width: 18px; height: 18px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      color: var(--an-card-muted); transition: color .12s;
-    }
-    .an-dd-item:hover .an-dd-ico { color: var(--an-green); }
-    .an-dd-item:hover { color: #fff; }
-    .an-dd-item svg { width: 18px; height: 18px; flex-shrink: 0; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-    .an-dd-item.red .an-dd-ico { color: rgba(255,107,84,0.8); }
-    .an-dd-item.red:hover .an-dd-ico { color: var(--an-danger); }
-    .an-dd-item.red { color: rgba(255,140,122,0.9); }
-    .an-dd-item.red:hover { background: rgba(255,107,84,0.1); color: #ffb3a3; }
+    .nv-dd-item:hover { background: var(--nv-green-dim); color: #fff; }
+    .nv-dd-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); }
+    .nv-dd-item.danger .nv-ico { color: rgba(255,107,84,.75); }
+    .nv-dd-item.danger:hover { background: rgba(255,107,84,.1); color: #ffb3a3; }
+    .nv-dd-item.danger:hover .nv-ico { color: var(--nv-danger); border-color: rgba(255,107,84,.3); }
+    .nv-dd-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 10px; }
 
-    .an-dd-sep { height: 1px; background: var(--an-card-border); margin: 6px 10px; }
-
-    .an-dd-badge {
+    .nv-badge {
       margin-left: auto; flex-shrink: 0;
-      background: var(--an-green); color: var(--an-green-ink);
-      font-size: 10.56px; font-weight: 500;
+      background: var(--nv-green); color: var(--nv-green-ink);
+      font-size: 10.5px; font-weight: 500;
       min-width: 18px; height: 18px; border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      padding: 0 5px; font-family: var(--an-font);
+      padding: 0 5px;
     }
-    .an-dd-badge.warn { background: var(--an-warn); color: #1a1400; }
-    .an-dd-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--an-danger); }
+    .nv-badge.warn { background: var(--nv-warn); color: #1a1400; }
+    .nv-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--nv-danger); }
 
-    /* ══════════════════════════════════════
-       МОБИЛЬНАЯ ВЕРСИЯ — та же тёмная капсула,
-       только сверху, компактнее, с бургером
-       вместо текстовых ссылок по центру.
-       Заменяет нижний таб-бар из footer.js.
-    ══════════════════════════════════════ */
-    .an-burger {
-      display: none;
-      align-items: center; justify-content: center;
-      width: 38px; height: 38px;
-      background: none; border: 1px solid var(--an-line);
-      border-radius: 12px; cursor: pointer; flex-shrink: 0;
+    /* ── Бургер / мобильное меню ── */
+    .nv-burger {
+      display: none; align-items: center; justify-content: center;
+      width: 40px; height: 40px;
+      background: none; border: 1px solid var(--nv-line);
+      border-radius: 13px; cursor: pointer; flex-shrink: 0;
       transition: border-color .15s, background .15s;
     }
-    .an-burger:hover { border-color: rgba(255,255,255,.2); background: rgba(255,255,255,.04); }
-    .an-burger span {
-      display: block; width: 16px; height: 1.6px; background: var(--an-ink);
-      border-radius: 2px; position: relative; transition: transform .2s, opacity .2s;
+    .nv-burger:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.05); }
+    .nv-burger-box { position: relative; width: 16px; height: 12px; }
+    .nv-burger-box span {
+      position: absolute; left: 0; width: 16px; height: 1.6px; background: var(--nv-ink);
+      border-radius: 2px; transition: transform .22s var(--nv-ease), top .22s var(--nv-ease), opacity .15s;
     }
-    .an-burger span::before, .an-burger span::after {
-      content: ''; position: absolute; left: 0; width: 16px; height: 1.6px;
-      background: var(--an-ink); border-radius: 2px; transition: transform .2s, top .2s, opacity .2s;
-    }
-    .an-burger span::before { top: -5px; }
-    .an-burger span::after  { top: 5px; }
-    .an-burger.open span { background: transparent; }
-    .an-burger.open span::before { top: 0; transform: rotate(45deg); }
-    .an-burger.open span::after  { top: 0; transform: rotate(-45deg); }
+    .nv-burger-box span:nth-child(1) { top: 0; }
+    .nv-burger-box span:nth-child(2) { top: 5px; }
+    .nv-burger-box span:nth-child(3) { top: 10px; }
+    .nv-burger.open .nv-burger-box span:nth-child(1) { top: 5px; transform: rotate(45deg); }
+    .nv-burger.open .nv-burger-box span:nth-child(2) { opacity: 0; }
+    .nv-burger.open .nv-burger-box span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
 
-    .an-mobile-sheet {
-      position: fixed; top: calc(20px + 64px + 10px); left: 50%; transform: translateX(-50%) translateY(-8px);
+    .nv-sheet {
+      position: fixed; top: calc(18px + 60px + 10px); left: 50%;
+      transform: translateX(-50%) translateY(-8px) scale(.98);
       z-index: 8999;
-      width: calc(100% - 40px); max-width: 1100px;
-      background: var(--an-bg);
-      border: 1px solid var(--an-line);
-      border-radius: 24px;
-      padding: 10px;
-      display: none;
-      flex-direction: column; gap: 2px;
-      opacity: 0; pointer-events: none;
-      transition: opacity .18s ease, transform .18s ease;
-      font-family: var(--an-font);
-      box-shadow: 0 16px 40px rgba(0,0,0,.4);
+      width: calc(100% - 32px); max-width: 1080px;
+      max-height: calc(100vh - 18px - 60px - 34px);
+      overflow-y: auto;
+      background: var(--nv-bg-soft);
+      -webkit-backdrop-filter: blur(18px) saturate(140%);
+      backdrop-filter: blur(18px) saturate(140%);
+      border: 1px solid var(--nv-line);
+      border-radius: 22px;
+      padding: 8px;
+      display: none; flex-direction: column; gap: 2px;
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transition: opacity .2s var(--nv-ease), transform .2s var(--nv-ease), visibility 0s linear .2s;
+      font-family: var(--nv-font);
+      box-shadow: var(--nv-sh);
     }
-    .an-mobile-sheet.open { opacity: 1; pointer-events: all; transform: translateX(-50%) translateY(0); }
-    .an-mobile-link {
-      display: block; color: var(--an-ink-dim);
-      font-weight: 300; font-size: 15.2px;
-      text-decoration: none; padding: 14px 16px;
+    .nv-sheet.open {
+      opacity: 1; visibility: visible; pointer-events: all;
+      transform: translateX(-50%) translateY(0) scale(1);
+      transition: opacity .2s var(--nv-ease), transform .2s var(--nv-ease), visibility 0s;
+    }
+    .nv-mlink {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--nv-ink-dim); font-weight: 300; font-size: 15px;
+      text-decoration: none; padding: 13px 14px;
       border-radius: 14px; transition: background .12s, color .12s;
     }
-    .an-mobile-link:hover, .an-mobile-link.active { color: var(--an-ink); background: rgba(255,255,255,.05); }
-    .an-mobile-link.active { font-weight: 500; }
-    .an-mobile-cta {
+    .nv-mlink:hover, .nv-mlink.active { color: #fff; background: rgba(255,255,255,.06); }
+    .nv-mlink.active { font-weight: 500; }
+    .nv-mcta {
       display: block; text-align: center; margin-top: 4px;
-      background: var(--an-green); color: var(--an-green-ink);
-      font-weight: 500; font-size: 15.2px;
+      background: var(--nv-green); color: var(--nv-green-ink);
+      font-weight: 500; font-size: 15px;
       text-decoration: none; padding: 14px 16px; border-radius: 14px;
     }
-    .an-mobile-section-label {
-      font-size: 10.88px; font-weight: 500; color: var(--an-ink-faint);
+    .nv-msection {
+      font-size: 10.5px; font-weight: 500; color: var(--nv-ink-faint);
       text-transform: uppercase; letter-spacing: .08em;
-      padding: 12px 16px 4px; font-family: var(--an-font);
+      padding: 12px 14px 4px;
     }
-    .an-mobile-sep { height: 1px; background: rgba(255,255,255,.06); margin: 4px 8px; }
+    .nv-msep { height: 1px; background: var(--nv-line-soft); margin: 4px 8px; }
+
+    .mobile-cart-badge {
+      position: absolute; top: 1px; right: 3px; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--nv-green); color: var(--nv-green-ink);
+      font-size: 9px; font-weight: 700; display: none; align-items: center; justify-content: center;
+    }
+    .mobile-cart-badge.show { display: flex; }
+
+    /* focus-visible — доступность, требуется по гайдлайну */
+    .antviz-nav a:focus-visible,
+    .antviz-nav button:focus-visible {
+      outline: 2px solid var(--nv-green); outline-offset: 2px; border-radius: 8px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nv-menu, .nv-dd, .nv-sheet, .nv-chev, .nv-chev-user, .nv-burger-box span { transition: none !important; }
+    }
 
     @media (max-width: 768px) {
-      .antviz-nav { top: 14px; height: 58px; padding: 0 8px 0 18px; width: calc(100% - 24px); border-radius: 20px; }
-      .an-logo { font-size: 14.08px; }
-      .an-logo img { width: 24px; height: 24px; }
-      .an-center { display: none; }
-      .an-burger { display: flex; }
-      .an-mobile-sheet { display: flex; top: calc(14px + 58px + 8px); }
-      .an-uname { display: none; }
-      .an-user-btn { padding: 5px; }
-      .an-user-btn.guest { padding: 8px 11.2px; }
-      .an-user-btn.guest .an-uname { display: inline; max-width: 60px; }
+      .antviz-nav { top: 12px; height: 56px; padding: 5px 6px 5px 16px; width: calc(100% - 20px); border-radius: 19px; }
+      .nv-logo { font-size: 14px; }
+      .nv-logo img { width: 23px; height: 23px; }
+      .nv-center { display: none; }
+      .nv-burger { display: flex; }
+      .nv-sheet { display: flex; top: calc(12px + 56px + 8px); }
+      .nv-uname { display: none; }
+      .nv-user-btn { padding: 4px; }
+      .nv-user-btn.guest { padding: 8px 12px; }
+      .nv-user-btn.guest .nv-uname { display: inline; max-width: 60px; }
     }
   `;
 
   const PUBLIC_LINKS = [
-    { href: b+'order',  label: 'Сделать заказ', key: 'order' },
+    { href: b+'order', label: 'Сделать заказ', key: 'order', accent: true },
   ];
 
-  // Дропдауны центрального навбара
+  // Единая иконка-контейнер: <rect/> квадрат-скругление + один простой
+  // глиф внутри, толщина линии всегда 1.7 — см. .nv-ico
   const NAV_DROPDOWNS = [
     {
       label: 'Услуги',
@@ -381,15 +396,15 @@
         {
           label: 'Примеры работ',
           items: [
-            { href: b+'project1', label: 'Лендинг',            icon: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M3 8h18M8 3v5"/>' },
-            { href: b+'project2', label: 'Визитная карточка',   icon: '<rect x="3" y="5" width="18" height="14" rx="4"/><path d="M7 10h6M7 13h4"/>' },
-            { href: b+'project3', label: 'Портфолио',           icon: '<rect x="3" y="3" width="8" height="8" rx="3"/><rect x="13" y="3" width="8" height="8" rx="3"/><rect x="3" y="13" width="8" height="8" rx="3"/><rect x="13" y="13" width="8" height="8" rx="3"/>' },
+            { href: b+'project1', label: 'Лендинг',           icon: '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
+            { href: b+'project2', label: 'Визитная карточка',  icon: '<rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="8.2" cy="12" r="1.5"/><path d="M13 10.3h6M13 13.7h6"/>' },
+            { href: b+'project3', label: 'Портфолио',          icon: '<rect x="3" y="4" width="18" height="14" rx="3"/><path d="M3 15l4.2-4.2a2 2 0 012.8 0L14 14.8M12.5 13.3l1.6-1.6a2 2 0 012.8 0L21 15" /><circle cx="7.8" cy="8.2" r="1.3"/>' },
           ]
         },
         { sep: true },
         {
           items: [
-            { href: b+'order', label: 'Все тарифы \u2192', icon: '<path d="M5 12h14M12 5l7 7-7 7"/>' },
+            { href: b+'order', label: 'Все тарифы', icon: '<path d="M5 12h14M13 6l6 6-6 6"/>' },
           ]
         }
       ]
@@ -400,9 +415,9 @@
       sections: [
         {
           items: [
-            { href: 'https://antviz.ru/about', label: 'О сервисе', icon: '<circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/>' },
-            { href: b+'rules',   label: 'Правила',     icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9h8M8 12h6M8 15h4"/>' },
-            { href: b+'privacy', label: 'Конфиденциальность',  icon: '<path d="M12 3l8 4v5c0 5-3.5 8.5-8 10C7.5 20.5 4 17 4 12V7l8-4z"/>' },
+            { href: 'https://antviz.ru/about', label: 'О сервисе',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8h.01M11 11.5h1.4v5"/>' },
+            { href: b+'rules',                  label: 'Правила',          icon: '<path d="M12 3l7 3.2v4.8c0 4.8-3 8-7 9.5-4-1.5-7-4.7-7-9.5V6.2L12 3z"/><path d="M9.2 12l1.9 1.9L15.2 10"/>' },
+            { href: b+'privacy',                 label: 'Конфиденциальность', icon: '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/><circle cx="12" cy="14.7" r="1.3"/>' },
           ]
         }
       ]
@@ -427,41 +442,38 @@
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
-  // Набор иконок: единая толщина линии (1.6), форма «квадрат со скруглением»
-  // перекликается с антвиз-карточками (tier, type-card) — не дефолтный
-  // набор, а угловатые геометричные формы под общий стиль сайта.
   const DD_ITEMS = [
-    { href: b+'profile',         icon: '<rect x="3.5" y="3.5" width="17" height="17" rx="6"/><path d="M7.5 8.5h9M7.5 12h6M7.5 15.5h4"/>', label: 'Обзор кабинета' },
+    { href: b+'profile',               icon: '<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M4 10.2h16M9.8 10.2V20"/>', label: 'Обзор кабинета' },
     { sep: true },
     { section: 'Кабинет' },
-    { href: b+'profile/orders',  icon: '<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label: 'Мои заказы', badgeKey: 'orders' },
-    { href: b+'profile/sites',   icon: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>', label: 'Мои сайты' },
-    { href: b+'profile/tickets', icon: '<rect x="4" y="6" width="16" height="12" rx="3.5"/><path d="M4 10.5h16" stroke-dasharray="0.1 3.4"/><circle cx="8.2" cy="14" r="1"/>', label: 'Обслуживание', badgeKey: 'tickets' },
-    { href: b+'profile/support', icon: '<rect x="4" y="5" width="16" height="11" rx="4"/><path d="M9 19.5l1.6-3.5h2.8l1.6 3.5"/><circle cx="9.2" cy="10.3" r="1.1"/><circle cx="14.8" cy="10.3" r="1.1"/>', label: 'Поддержка', badgeKey: 'support' },
-    { href: b+'profile/notifications', icon: '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>', label: 'Уведомления', badgeKey: 'notif' },
+    { href: b+'profile/orders',        icon: '<path d="M7 5h6l4 4v10a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M13 5v4h4"/><path d="M9 13h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
+    { href: b+'profile/sites',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.8 2.8 2.8 14.2 0 17M12 3.5c-2.8 2.8-2.8 14.2 0 17"/>', label: 'Мои сайты' },
+    { href: b+'profile/tickets',       icon: '<path d="M4 8a4 4 0 018 0M12 8a4 4 0 018 0"/><rect x="3" y="8" width="4.4" height="7" rx="1.6"/><rect x="16.6" y="8" width="4.4" height="7" rx="1.6"/><path d="M16.6 15v1.2a3 3 0 01-3 3h-2.1"/>', label: 'Обслуживание', badgeKey: 'tickets' },
+    { href: b+'profile/support',       icon: '<circle cx="9" cy="10" r="1.15"/><circle cx="15" cy="10" r="1.15"/><path d="M5 12.5V11a7 7 0 0114 0v1.5M8.6 18l1.3-2.8h4.2l1.3 2.8"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/notifications', icon: '<path d="M6.5 9.2a5.5 5.5 0 0111 0c0 6 2 7.3 2 7.3H4.5s2-1.3 2-7.3z"/><path d="M10.2 20.5a2 2 0 003.6 0"/>', label: 'Уведомления', badgeKey: 'notif' },
     { sep: true },
-    { href: b+'profile/settings', icon: '<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M9 9l6 6M15 9l-6 6"/>', label: 'Настройки' },
+    { href: b+'profile/settings',      icon: '<circle cx="12" cy="12" r="2.6"/><path d="M12 3v2.6M12 18.4V21M4.9 4.9l1.85 1.85M17.25 17.25l1.85 1.85M3 12h2.6M18.4 12H21M4.9 19.1l1.85-1.85M17.25 6.75l1.85-1.85"/>', label: 'Настройки' },
     { logout: true },
   ];
 
+  function iconHtml(svg) { return `<span class="nv-ico"><svg viewBox="0 0 24 24">${svg}</svg></span>`; }
+
   function buildDD() {
     return DD_ITEMS.map(item => {
-      if (item.section) return `<div class="an-dd-section">${item.section}</div>`;
-      if (item.sep)     return `<div class="an-dd-sep"></div>`;
-      if (item.logout)  return `<button class="an-dd-item red" id="anSignOut"><span class="an-dd-ico"><svg viewBox="0 0 24 24"><path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/></svg></span>Выйти</button>`;
-      const badgeSlot = item.badgeKey ? `<span class="an-dd-badge" id="anBadge-${item.badgeKey}" style="display:none"></span>` : '';
-      return `<a href="${item.href}" class="an-dd-item"><span class="an-dd-ico"><svg viewBox="0 0 24 24">${item.icon}</svg></span>${item.label}${badgeSlot}</a>`;
+      if (item.section) return `<div class="nv-dd-section">${item.section}</div>`;
+      if (item.sep)     return `<div class="nv-dd-sep"></div>`;
+      if (item.logout)  return `<button class="nv-dd-item danger" id="anSignOut">${iconHtml('<path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/>')}Выйти</button>`;
+      const badgeSlot = item.badgeKey ? `<span class="nv-badge" id="anBadge-${item.badgeKey}" style="display:none"></span>` : '';
+      return `<a href="${item.href}" class="nv-dd-item">${iconHtml(item.icon)}${item.label}${badgeSlot}</a>`;
     }).join('');
   }
 
   function buildNavMenu(sections) {
     return sections.map(sec => {
-      if (sec.sep) return '<div class="an-nav-menu-sep"></div>';
-      let html = sec.label ? '<div class="an-nav-menu-label">' + sec.label + '</div>' : '';
+      if (sec.sep) return '<div class="nv-menu-sep"></div>';
+      let html = sec.label ? '<div class="nv-menu-label">' + sec.label + '</div>' : '';
       html += sec.items.map(item =>
-        '<a href="' + item.href + '" class="an-nav-menu-item">' +
-        '<span class="an-nav-menu-ico"><svg viewBox="0 0 24 24">' + item.icon + '</svg></span>' +
-        item.label + '</a>'
+        '<a href="' + item.href + '" class="nv-menu-item">' + iconHtml(item.icon) + item.label + '</a>'
       ).join('');
       return html;
     }).join('');
@@ -470,92 +482,87 @@
   function buildCenter() {
     if (cfg.inApp) return '';
     const links = cfg.centerLinks || [];
-    const chevronSvg = '<svg class="an-nav-drop-chevron" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+    const chevronSvg = '<svg class="nv-chev" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
 
     const dropdowns = NAV_DROPDOWNS.map(drop => {
       const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
-      return '<div class="an-nav-drop">' +
-        '<button class="an-nav-drop-btn' + (isActive ? ' active' : '') + '" aria-expanded="false" data-drop="' + drop.key + '">' +
+      return '<div class="nv-drop" data-drop="' + drop.key + '">' +
+        '<button class="nv-drop-btn' + (isActive ? ' is-active' : '') + '" aria-expanded="false">' +
         drop.label + chevronSvg +
         '</button>' +
-        '<div class="an-nav-menu" id="anDrop-' + drop.key + '">' +
+        '<div class="nv-menu" id="anDrop-' + drop.key + '">' +
         buildNavMenu(drop.sections) +
         '</div></div>';
     }).join('');
 
     const plainLinks = links.map(l =>
-      '<a href="' + l.href + '" class="an-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+      '<a href="' + l.href + '" class="nv-link' + (page === l.key ? ' active' : '') + (l.accent ? ' accent' : '') + '">' + l.label + '</a>'
     ).join('');
 
     if (!dropdowns && !plainLinks) return '';
-    return '<div class="an-center" id="anCenter">' + dropdowns + plainLinks + '</div>';
+    return '<div class="nv-center" id="anCenter">' + dropdowns + plainLinks + '</div>';
   }
 
-  // Мобильная панель: те же ссылки, что и в центре десктопной капсулы,
-  // раскрывается по тапу на бугер, заменяет собой нижний таб-бар из footer.js.
   function buildMobileSheet() {
     if (cfg.inApp) return '';
-
     let html = '';
 
-    // Дропдауны — каждый дропдаун рендерим с заголовком и списком ссылок
     NAV_DROPDOWNS.forEach(drop => {
+      html += '<div class="nv-msection">' + drop.label + '</div>';
       drop.sections.forEach(sec => {
         if (sec.sep) return;
         if (sec.items && sec.items.length) {
-          if (sec.label) {
-            html += '<div class="an-mobile-section-label">' + sec.label + '</div>';
-          }
           sec.items.forEach(item => {
-            html += '<a href="' + item.href + '" class="an-mobile-link' + (page === item.key ? ' active' : '') + '">' + item.label + '</a>';
+            html += '<a href="' + item.href + '" class="nv-mlink">' + iconHtml(item.icon) + item.label + '</a>';
           });
         }
       });
+      html += '<div class="nv-msep"></div>';
     });
 
     const plainLinks = cfg.centerLinks || [];
     plainLinks.forEach(l => {
-      html += '<a href="' + l.href + '" class="an-mobile-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>';
+      html += '<a href="' + l.href + '" class="nv-mlink' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>';
     });
 
-    const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="an-mobile-cta">Заказать сайт</a>' : '';
+    const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="nv-mcta">Заказать сайт</a>' : '';
     if (!html && !ctaHtml) return '';
-    return '<div class="an-mobile-sheet" id="anMobileSheet">' + html + ctaHtml + '</div>';
+    return '<div class="nv-sheet" id="anMobileSheet">' + html + ctaHtml + '</div>';
   }
 
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
-  <a class="an-logo" href="${b || '/'}">
+  <a class="nv-logo" href="${b || '/'}">
     <img src="${b}img/favicon.png" alt="Antviz">
     Antviz
   </a>
 
   ${buildCenter()}
 
-  <div class="an-right">
-    <div class="an-user" id="anUser">
-      <a href="${b}auth" class="an-user-btn guest" id="anUserBtn" aria-expanded="false">
-        <div class="an-avatar-ring" id="anAvatarRing">
-          <div class="an-avatar" id="anAvatar">?</div>
+  <div class="nv-right">
+    <div class="nv-user" id="anUser">
+      <a href="${b}auth" class="nv-user-btn guest" id="anUserBtn" aria-expanded="false">
+        <div class="nv-avatar-ring" id="anAvatarRing">
+          <div class="nv-avatar" id="anAvatar">?</div>
         </div>
-        <span class="an-uname" id="anUname">Войти</span>
-        <svg class="an-chevron" viewBox="0 0 12 12" fill="none">
-          <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        <span class="nv-uname" id="anUname">Войти</span>
+        <svg class="nv-chev-user" viewBox="0 0 12 12" fill="none">
+          <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
         </svg>
       </a>
-      <div class="an-dd" id="anDd">
-        <div class="an-dd-head" id="anDdHead" style="display:none">
-          <div class="an-dd-head-avatar" id="anDdHeadAvatar">?</div>
-          <div class="an-dd-head-info">
-            <div class="an-dd-head-name" id="anDdHeadName">—</div>
-            <div class="an-dd-head-email" id="anDdHeadEmail">—</div>
+      <div class="nv-dd" id="anDd">
+        <div class="nv-dd-head" id="anDdHead" style="display:none">
+          <div class="nv-dd-head-avatar" id="anDdHeadAvatar">?</div>
+          <div class="nv-dd-head-info">
+            <div class="nv-dd-head-name" id="anDdHeadName">—</div>
+            <div class="nv-dd-head-email" id="anDdHeadEmail">—</div>
           </div>
         </div>
         ${buildDD()}
       </div>
     </div>
 
-    ${!cfg.inApp ? `<button class="an-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span></span></button>` : ''}
+    ${!cfg.inApp ? `<button class="nv-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span class="nv-burger-box"><span></span><span></span><span></span></span></button>` : ''}
   </div>
 </nav>
 ${buildMobileSheet()}`;
@@ -564,77 +571,79 @@ ${buildMobileSheet()}`;
   style.textContent = CSS;
   document.head.appendChild(style);
 
-  // Отступ под фиксированный навбар
   const bodyPad = document.createElement('style');
-  bodyPad.textContent = 'body { padding-top: 104px; } @media(max-width:768px){ body { padding-top: 90px; } }';
+  bodyPad.textContent = 'body { padding-top: 96px; } @media(max-width:768px){ body { padding-top: 88px; } }';
   document.head.appendChild(bodyPad);
 
-  // Вставляем всю разметку NAV_HTML целиком, чтобы an-mobile-sheet попал в DOM
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
 
   let userBtn = document.getElementById('anUserBtn');
   const dd    = document.getElementById('anDd');
   let isAuthed = false;
 
-  function onUserBtnClick(e) {
-    if (!isAuthed) return;
-    e.preventDefault();
-    const open = dd.classList.toggle('open');
-    userBtn.setAttribute('aria-expanded', String(open));
-  }
-  userBtn?.addEventListener('click', onUserBtnClick);
-
-  // Дропдауны центрального навбара — открытие по клику
-  document.querySelectorAll('.an-nav-drop-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const key = btn.dataset.drop;
-      const menu = document.getElementById('anDrop-' + key);
-      const isOpen = btn.getAttribute('aria-expanded') === 'true';
-      // Закрываем все остальные
-      document.querySelectorAll('.an-nav-drop-btn').forEach(b => {
-        b.setAttribute('aria-expanded', 'false');
-      });
-      if (!isOpen) {
-        btn.setAttribute('aria-expanded', 'true');
-      }
+  /* ── Единый механизм открытия/закрытия: только клик, только
+     класс .open — никакого CSS :hover-триггера и никакой второй
+     логики на aria-expanded одновременно. Один источник истины. ── */
+  function closeAllDrops(except) {
+    document.querySelectorAll('.nv-drop.open').forEach(d => {
+      if (d === except) return;
+      d.classList.remove('open');
+      d.querySelector('.nv-drop-btn')?.setAttribute('aria-expanded', 'false');
     });
-  });
-
-  // Бургер мобильной капсулы — открывает/закрывает an-mobile-sheet
-  const burger = document.getElementById('anBurger');
-  const sheet  = document.getElementById('anMobileSheet');
-  burger?.addEventListener('click', () => {
-    const open = burger.classList.toggle('open');
-    burger.setAttribute('aria-expanded', String(open));
-    sheet?.classList.toggle('open', open);
-  });
+  }
+  function closeUserDd() {
+    dd?.classList.remove('open');
+    userBtn?.setAttribute('aria-expanded', 'false');
+  }
   function closeMobileSheet() {
     burger?.classList.remove('open');
     burger?.setAttribute('aria-expanded', 'false');
     sheet?.classList.remove('open');
   }
 
+  function onUserBtnClick(e) {
+    if (!isAuthed) return;
+    e.preventDefault();
+    closeAllDrops();
+    const open = !dd.classList.contains('open');
+    dd.classList.toggle('open', open);
+    userBtn.setAttribute('aria-expanded', String(open));
+  }
+  userBtn?.addEventListener('click', onUserBtnClick);
+
+  document.querySelectorAll('.nv-drop').forEach(drop => {
+    const btn = drop.querySelector('.nv-drop-btn');
+    btn?.addEventListener('click', e => {
+      e.stopPropagation();
+      closeUserDd();
+      const willOpen = !drop.classList.contains('open');
+      closeAllDrops(willOpen ? drop : null);
+      drop.classList.toggle('open', willOpen);
+      btn.setAttribute('aria-expanded', String(willOpen));
+    });
+  });
+
+  const burger = document.getElementById('anBurger');
+  const sheet  = document.getElementById('anMobileSheet');
+  burger?.addEventListener('click', () => {
+    closeAllDrops();
+    closeUserDd();
+    const open = !burger.classList.contains('open');
+    burger.classList.toggle('open', open);
+    burger.setAttribute('aria-expanded', String(open));
+    sheet?.classList.toggle('open', open);
+  });
+
   document.addEventListener('click', e => {
-    if (!userBtn || !dd) return;
-    if (!userBtn.contains(e.target) && !dd.contains(e.target)) {
-      dd.classList.remove('open');
-      userBtn.setAttribute('aria-expanded', 'false');
-    }
-    if (burger && sheet && !burger.contains(e.target) && !sheet.contains(e.target)) {
-      closeMobileSheet();
-    }
-    // Закрыть дропдауны центра при клике вне
-    const inAnyDrop = e.target.closest('.an-nav-drop');
-    if (!inAnyDrop) {
-      document.querySelectorAll('.an-nav-drop-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
-    }
+    if (userBtn && dd && !userBtn.contains(e.target) && !dd.contains(e.target)) closeUserDd();
+    if (burger && sheet && !burger.contains(e.target) && !sheet.contains(e.target)) closeMobileSheet();
+    if (!e.target.closest('.nv-drop')) closeAllDrops();
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      dd?.classList.remove('open');
+      closeAllDrops();
+      closeUserDd();
       closeMobileSheet();
-      document.querySelectorAll('.an-nav-drop-btn').forEach(b => b.setAttribute('aria-expanded', 'false'));
     }
   });
 
@@ -642,7 +651,7 @@ ${buildMobileSheet()}`;
     const el = document.getElementById(`anBadge-${key}`);
     if (!el) return;
     if (!value) { el.style.display = 'none'; return; }
-    el.className = 'an-dd-badge' + (variant ? ' ' + variant : '');
+    el.className = 'nv-badge' + (variant ? ' ' + variant : '');
     el.textContent = (variant === 'dot') ? '' : String(value);
     el.style.display = 'flex';
   }
@@ -770,10 +779,7 @@ ${buildMobileSheet()}`;
   }
 
   /* ── Ждём, пока сама страница инициализирует Firebase App, и подключаемся
-     к УЖЕ СУЩЕСТВУЮЩЕМУ приложению — без своего импорта firebase-config.js.
-     Каждая страница (profile, support, order и т.д.) уже сама делает
-     initializeApp() в своём скрипте — нам достаточно дождаться этого
-     момента через getApps().length, чтобы не зависеть от путей вообще. */
+     к УЖЕ СУЩЕСТВУЮЩЕМУ приложению — без своего импорта firebase-config.js. */
   (async () => {
     try {
       const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');

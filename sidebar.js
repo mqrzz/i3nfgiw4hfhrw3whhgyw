@@ -74,16 +74,19 @@
     .sb-brand-row{ display:flex; align-items:center; gap:6px; padding:4px 4px 20px; margin-bottom:8px; border-bottom:1px solid var(--border,#dfe3e8); }
     .sb-brand-row .sb-brand{ padding:4px 6px; margin:0; border:none; flex:1; min-width:0; }
 
-    /* Кнопка сворачивания текста — иконка-переключатель рядом с лого. */
+    /* Кнопка сворачивания текста — иконка-переключатель рядом с лого.
+       Специально крупнее остальных элементов сайдбара — это главный
+       переключатель режима, должен бросаться в глаза и легко ловиться
+       курсором/пальцем. */
     .sb-collapse-btn{
       display:flex; align-items:center; justify-content:center;
-      width:36px; height:36px; flex-shrink:0;
-      border-radius:10px; border:none; background:none; cursor:pointer;
+      width:48px; height:48px; flex-shrink:0;
+      border-radius:13px; border:none; background:none; cursor:pointer;
       color:var(--muted,#707a8a);
       transition:background .15s, color .15s;
     }
     .sb-collapse-btn:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
-    .sb-collapse-btn svg{ width:19px; height:19px; stroke:currentColor; stroke-width:1.7; fill:none; }
+    .sb-collapse-btn svg{ width:24px; height:24px; stroke:currentColor; stroke-width:1.7; fill:none; }
     .sb-collapse-btn .sb-ico-expand{ display:none; }
 
     .sb-nav-main{ display:flex; flex-direction:column; gap:3px; }
@@ -116,7 +119,7 @@
 
     /* Свёрнутое состояние — только иконки. Переключается кнопкой у
        лого, состояние держится в localStorage (см. JS ниже). */
-    .sb-nav.is-collapsed{ width:76px; padding-left:10px; padding-right:10px; }
+    .sb-nav.is-collapsed{ width:84px; padding-left:10px; padding-right:10px; }
     .sb-nav.is-collapsed .sb-brand-row{ justify-content:center; padding-left:0; padding-right:0; }
     .sb-nav.is-collapsed .sb-brand{ display:none; }
     .sb-nav.is-collapsed .sb-link{ justify-content:center; gap:0; padding-left:0; padding-right:0; }
@@ -128,7 +131,7 @@
     /* Бейдж в свёрнутом виде — превращается в маленькую точку поверх
        иконки вместо цифры (иначе некуда её помещать). */
     .sb-nav.is-collapsed .sb-badge{
-      position:absolute; top:8px; right:16px;
+      position:absolute; top:8px; right:20px;
       width:9px; height:9px; min-width:0; padding:0; border-radius:50%;
       font-size:0; line-height:0; overflow:hidden;
     }

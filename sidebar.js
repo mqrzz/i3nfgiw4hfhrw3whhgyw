@@ -70,7 +70,21 @@
       text-decoration:none;
     }
     .sb-brand img{ width:26px; height:26px; border-radius:8px; object-fit:cover; flex-shrink:0; }
-    .sb-brand span{ font-family:'Geologica','Inter','Arial',sans-serif; font-weight:500; font-size:1rem; letter-spacing:-.01em; color:var(--text,#191b1e); }
+    .sb-brand span{ font-family:'Geologica','Inter','Arial',sans-serif; font-weight:500; font-size:1rem; letter-spacing:-.01em; color:var(--text,#191b1e); white-space:nowrap; overflow:hidden; }
+    .sb-brand-row{ display:flex; align-items:center; gap:6px; padding:4px 4px 20px; margin-bottom:8px; border-bottom:1px solid var(--border,#dfe3e8); }
+    .sb-brand-row .sb-brand{ padding:4px 6px; margin:0; border:none; flex:1; min-width:0; }
+
+    /* Кнопка сворачивания текста — иконка-переключатель рядом с лого. */
+    .sb-collapse-btn{
+      display:flex; align-items:center; justify-content:center;
+      width:30px; height:30px; flex-shrink:0;
+      border-radius:9px; border:none; background:none; cursor:pointer;
+      color:var(--muted,#707a8a);
+      transition:background .15s, color .15s;
+    }
+    .sb-collapse-btn:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
+    .sb-collapse-btn svg{ width:17px; height:17px; stroke:currentColor; stroke-width:1.7; fill:none; }
+    .sb-collapse-btn .sb-ico-expand{ display:none; }
 
     .sb-nav-main{ display:flex; flex-direction:column; gap:3px; }
     .sb-nav-bottom{ display:flex; flex-direction:column; gap:3px; margin-top:auto; padding-top:14px; }
@@ -87,6 +101,7 @@
     .sb-link:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
     .sb-link.is-active{ background:var(--bg,#fff); color:var(--text,#191b1e); font-weight:500; }
     .sb-link.is-active svg{ stroke:var(--green,#1ede7b); }
+    .sb-link-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sb-badge{
       margin-left:auto; background:var(--green,#1ede7b); color:#191b1e;
       font-size:.64rem; font-weight:500; padding:.16rem .48rem; border-radius:7px;
@@ -97,6 +112,18 @@
     .sb-link.danger{ color:#d95a48; }
     .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
     .sb-link.danger svg{ stroke:#d95a48; }
+
+    /* Свёрнутое состояние — только иконки. Переключается кнопкой у
+       лого, состояние держится в localStorage (см. JS ниже). */
+    .sb-nav.is-collapsed{ width:76px; padding-left:10px; padding-right:10px; }
+    .sb-nav.is-collapsed .sb-brand-row{ justify-content:center; padding-left:0; padding-right:0; }
+    .sb-nav.is-collapsed .sb-brand{ display:none; }
+    .sb-nav.is-collapsed .sb-link{ justify-content:center; gap:0; padding-left:0; padding-right:0; }
+    .sb-nav.is-collapsed .sb-link-label{ display:none; }
+    .sb-nav.is-collapsed .sb-badge{ display:none; }
+    .sb-nav.is-collapsed .sb-collapse-btn .sb-ico-collapse{ display:none; }
+    .sb-nav.is-collapsed .sb-collapse-btn .sb-ico-expand{ display:flex; }
+    .sb-nav{ transition:width .18s ease; }
 
     /* Рабочая область — плавающая панель приложения: отступы от рамки
        сверху/справа/снизу, вплотную к сайдбару слева, скругления по
@@ -158,10 +185,11 @@
   function renderItem(item) {
     const active = item.key === page ? ' is-active' : '';
     const badge = item.badgeKey ? `<span class="sb-badge" id="sbBadge-${item.badgeKey}" style="display:none"></span>` : '';
+    const label = `<span class="sb-link-label">${item.label}</span>`;
     if (item.logout) {
-      return `<button class="sb-link danger" id="sbLogout"><svg viewBox="0 0 24 24">${item.icon}</svg>${item.label}</button>`;
+      return `<button class="sb-link danger" id="sbLogout" title="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}</button>`;
     }
-    return `<a href="${item.href}" class="sb-link${active}"><svg viewBox="0 0 24 24">${item.icon}</svg>${item.label}${badge}</a>`;
+    return `<a href="${item.href}" class="sb-link${active}" title="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}${badge}</a>`;
   }
 
   function buildNav() {
@@ -181,13 +209,21 @@
 
     const existingContent = document.getElementById('sbContent');
 
+    const collapsed = localStorage.getItem('sb-collapsed') === '1';
+
     const shell = document.createElement('div');
     shell.className = 'sb-shell';
-    shell.innerHTML = `<nav class="sb-nav" id="sbNav">
-      <a class="sb-brand" href="${b || '/'}">
-        <img src="${b}img/favicon.png" alt=""/>
-        <span>Antviz</span>
-      </a>
+    shell.innerHTML = `<nav class="sb-nav${collapsed ? ' is-collapsed' : ''}" id="sbNav">
+      <div class="sb-brand-row">
+        <a class="sb-brand" href="${b || '/'}">
+          <img src="${b}img/favicon.png" alt=""/>
+          <span>Antviz</span>
+        </a>
+        <button class="sb-collapse-btn" id="sbCollapseBtn" type="button" title="Свернуть/развернуть меню">
+          <svg class="sb-ico-collapse" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><path d="M9.5 4.5v15"/><path d="M14 10l-2 2 2 2"/></svg>
+          <svg class="sb-ico-expand" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><path d="M9.5 4.5v15"/><path d="M12.5 10l2 2-2 2"/></svg>
+        </button>
+      </div>
       ${buildNav()}
     </nav>`;
 
@@ -200,6 +236,12 @@
       // элементом в body, страница сама отвечает за свою раскладку.
       document.body.insertBefore(shell, document.body.firstChild);
     }
+
+    document.getElementById('sbCollapseBtn')?.addEventListener('click', () => {
+      const nav = document.getElementById('sbNav');
+      const nowCollapsed = nav.classList.toggle('is-collapsed');
+      localStorage.setItem('sb-collapsed', nowCollapsed ? '1' : '0');
+    });
 
     document.getElementById('sbLogout')?.addEventListener('click', async () => {
       try {

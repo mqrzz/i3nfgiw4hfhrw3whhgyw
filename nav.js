@@ -57,61 +57,85 @@
        Было: полупрозрачный blur поверх белого сайта — от этого капсула
        читалась серой, а не чёрной. Теперь — плотный непрозрачный
        --nv-bg (тот же тон, что .hero-block/.calc-block на сайте),
-       плюс тёплое зелёное свечение снизу для уверенности бренда. */
+       плюс тёплое зелёное свечение снизу для уверенности бренда.
+       Форма — почти полная пилюля (радиус ~ половина высоты), ссылки —
+       просто текст без фоновых "таблеток" при ховере, один явный
+       контрастный CTA справа (см. референс Darkweb X, который прислал
+       заказчик). */
     .antviz-nav {
-      position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
       display: flex; align-items: center; justify-content: space-between;
-      gap: 8px;
-      padding: 6px 8px 6px 22px;
-      height: 62px;
-      width: calc(100% - 32px); max-width: 1080px;
+      gap: 12px;
+      padding: 8px 8px 8px 24px;
+      height: 72px;
+      width: calc(100% - 32px); max-width: 1120px;
       background: var(--nv-bg);
-      border: 1px solid rgba(255,255,255,.09);
-      border-radius: 22px;
-      box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 0 0 1px rgba(30,222,123,.04), 0 12px 34px -6px rgba(30,222,123,.18);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 36px;
+      box-shadow: 0 24px 50px rgba(0,0,0,.44), 0 0 0 1px rgba(30,222,123,.04), 0 14px 36px -6px rgba(30,222,123,.16);
       font-family: var(--nv-font);
       transition: border-color .2s var(--nv-ease), box-shadow .2s var(--nv-ease);
     }
-    .antviz-nav:hover { border-color: rgba(30,222,123,.25); box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 0 0 1px rgba(30,222,123,.08), 0 14px 38px -4px rgba(30,222,123,.26); }
+    .antviz-nav:hover { border-color: rgba(30,222,123,.2); }
 
     .nv-logo {
       font-family: var(--nv-font); font-weight: 500;
-      font-size: 15px; letter-spacing: -.01em;
+      font-size: 16px; letter-spacing: -.01em;
       color: var(--nv-ink); text-decoration: none;
-      display: flex; align-items: center; gap: 9px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 11px; flex-shrink: 0;
     }
-    .nv-logo img { width: 26px; height: 26px; border-radius: 8px; object-fit: cover; }
+    .nv-logo-badge {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: var(--nv-green-dim);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .nv-logo-badge img { width: 22px; height: 22px; border-radius: 6px; object-fit: cover; }
 
-    /* ── Центр: ссылки + дропдауны ── */
+    /* ── Центр: просто текстовые ссылки, без плашек при ховере ── */
     .nv-center {
       position: absolute; left: 50%; transform: translateX(-50%);
-      display: flex; align-items: center; gap: 2px;
+      display: flex; align-items: center; gap: 30px;
     }
     .nv-link {
       color: var(--nv-ink-dim);
-      font-family: var(--nv-font); font-weight: 300; font-size: 14px;
-      text-decoration: none; padding: 9px 14px;
-      border-radius: 11px; transition: color .15s var(--nv-ease), background .15s var(--nv-ease);
+      font-family: var(--nv-font); font-weight: 300; font-size: 15px;
+      text-decoration: none;
       white-space: nowrap; position: relative;
       display: flex; align-items: center;
+      transition: color .15s var(--nv-ease);
     }
-    .nv-link:hover { color: var(--nv-ink); background: rgba(255,255,255,.06); }
-    .nv-link.active { color: var(--nv-green-ink); font-weight: 500; background: var(--nv-green); }
-    .nv-link.active:hover { background: var(--nv-green-h); }
-    .nv-link.accent { color: var(--nv-green); font-weight: 500; }
-    .nv-link.accent:hover { background: var(--nv-green-dim); }
+    .nv-link:hover { color: var(--nv-ink); }
+    .nv-link.active { color: var(--nv-ink); font-weight: 500; }
+    .nv-link.active::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -15px;
+      height: 3px; border-radius: 2px; background: var(--nv-green);
+    }
+
+    /* Основной CTA — единственный контрастный элемент капсулы,
+       ровно как белая "Get started" в референсе, только в нашем
+       зелёном. Рендерится отдельно от плоских ссылок, справа. */
+    .nv-cta {
+      display: flex; align-items: center; flex-shrink: 0;
+      background: var(--nv-green); color: var(--nv-green-ink);
+      font-family: var(--nv-font); font-weight: 500; font-size: 14.5px;
+      text-decoration: none; white-space: nowrap;
+      padding: 13px 22px; border-radius: 28px;
+      transition: background .15s var(--nv-ease), transform .12s var(--nv-ease);
+    }
+    .nv-cta:hover { background: var(--nv-green-h); transform: translateY(-1px); }
 
     .nv-drop { position: relative; display: flex; align-items: center; }
     .nv-drop-btn {
       color: var(--nv-ink-dim);
-      font-family: var(--nv-font); font-weight: 300; font-size: 14px;
+      font-family: var(--nv-font); font-weight: 300; font-size: 15px;
       background: none; border: none; cursor: pointer;
-      padding: 9px 12px 9px 14px; border-radius: 11px;
-      transition: color .15s var(--nv-ease), background .15s var(--nv-ease);
-      white-space: nowrap; display: flex; align-items: center; gap: 6px;
+      padding: 0; display: flex; align-items: center; gap: 6px;
+      white-space: nowrap;
+      transition: color .15s var(--nv-ease);
     }
-    .nv-drop-btn:hover { color: var(--nv-ink); background: rgba(255,255,255,.06); }
+    .nv-drop-btn:hover { color: var(--nv-ink); }
     .nv-drop-btn.is-active { color: var(--nv-ink); font-weight: 500; }
     .nv-chev {
       width: 9px; height: 9px; opacity: .45; flex-shrink: 0;
@@ -167,7 +191,7 @@
     }
     .nv-ico svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-    .nv-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .nv-right { display: flex; align-items: center; gap: 20px; margin-left: auto; }
 
     /* ── Пользователь ── */
     .nv-user { position: relative; display: flex; }
@@ -181,10 +205,10 @@
     }
     .nv-user-btn:hover { border-color: var(--nv-line); background: rgba(255,255,255,.05); }
     .nv-user-btn.guest {
-      padding: 9px 18px; border: 1px solid var(--nv-line); border-radius: 14px;
-      background: rgba(255,255,255,.03);
+      padding: 0; border: none; background: none;
+      font-weight: 300; font-size: 15px; color: var(--nv-ink-dim);
     }
-    .nv-user-btn.guest:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.06); }
+    .nv-user-btn.guest:hover { border-color: transparent; background: none; color: var(--nv-ink); }
     .nv-user-btn.guest .nv-avatar-ring,
     .nv-user-btn.guest .nv-chev-user { display: none; }
 
@@ -306,11 +330,11 @@
     .nv-burger.open .nv-burger-box span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
 
     .nv-sheet {
-      position: fixed; top: calc(18px + 62px + 10px); left: 50%;
+      position: fixed; top: calc(20px + 72px + 10px); left: 50%;
       transform: translateX(-50%) translateY(-8px) scale(.98);
       z-index: 8999;
       width: calc(100% - 32px); max-width: 1080px;
-      max-height: calc(100vh - 18px - 62px - 34px);
+      max-height: calc(100vh - 20px - 72px - 34px);
       overflow-y: auto;
       background: var(--nv-bg);
       border: 1px solid rgba(255,255,255,.09);
@@ -366,15 +390,17 @@
     }
 
     @media (max-width: 768px) {
-      .antviz-nav { top: 12px; height: 56px; padding: 5px 6px 5px 16px; width: calc(100% - 20px); border-radius: 19px; }
-      .nv-logo { font-size: 14px; }
-      .nv-logo img { width: 23px; height: 23px; }
+      .antviz-nav { top: 14px; height: 60px; padding: 6px 6px 6px 18px; width: calc(100% - 24px); border-radius: 30px; }
+      .nv-logo { font-size: 14px; gap: 8px; }
+      .nv-logo-badge { width: 32px; height: 32px; }
+      .nv-logo-badge img { width: 18px; height: 18px; }
       .nv-center { display: none; }
+      .nv-cta { display: none; }
       .nv-burger { display: flex; }
-      .nv-sheet { display: flex; top: calc(12px + 56px + 8px); }
+      .nv-sheet { display: flex; top: calc(14px + 60px + 8px); }
       .nv-uname { display: none; }
       .nv-user-btn { padding: 4px; }
-      .nv-user-btn.guest { padding: 8px 12px; }
+      .nv-user-btn.guest { padding: 0; font-size: 14px; }
       .nv-user-btn.guest .nv-uname { display: inline; max-width: 60px; }
     }
   `;
@@ -478,7 +504,7 @@
 
   function buildCenter() {
     if (cfg.inApp) return '';
-    const links = cfg.centerLinks || [];
+    const links = (cfg.centerLinks || []).filter(l => !l.accent);
     const chevronSvg = '<svg class="nv-chev" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
 
     const dropdowns = NAV_DROPDOWNS.map(drop => {
@@ -493,11 +519,21 @@
     }).join('');
 
     const plainLinks = links.map(l =>
-      '<a href="' + l.href + '" class="nv-link' + (page === l.key ? ' active' : '') + (l.accent ? ' accent' : '') + '">' + l.label + '</a>'
+      '<a href="' + l.href + '" class="nv-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
     ).join('');
 
     if (!dropdowns && !plainLinks) return '';
     return '<div class="nv-center" id="anCenter">' + dropdowns + plainLinks + '</div>';
+  }
+
+  // Единственный контрастный элемент капсулы — по образцу референса
+  // (сплошная светлая пилюля справа на тёмной панели). Рендерится
+  // отдельно от плоских ссылок центра и садится в nv-right.
+  function buildCta() {
+    if (cfg.inApp || cfg.hideCta) return '';
+    const link = (cfg.centerLinks || []).find(l => l.accent);
+    if (!link) return '';
+    return '<a href="' + link.href + '" class="nv-cta">' + link.label + '</a>';
   }
 
   function buildMobileSheet() {
@@ -517,7 +553,7 @@
       html += '<div class="nv-msep"></div>';
     });
 
-    const plainLinks = cfg.centerLinks || [];
+    const plainLinks = (cfg.centerLinks || []).filter(l => !l.accent);
     plainLinks.forEach(l => {
       html += '<a href="' + l.href + '" class="nv-mlink' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>';
     });
@@ -530,7 +566,7 @@
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
   <a class="nv-logo" href="${b || '/'}">
-    <img src="${b}img/favicon.png" alt="Antviz">
+    <span class="nv-logo-badge"><img src="${b}img/favicon.png" alt="Antviz"></span>
     Antviz
   </a>
 
@@ -559,6 +595,8 @@
       </div>
     </div>
 
+    ${buildCta()}
+
     ${!cfg.inApp ? `<button class="nv-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span class="nv-burger-box"><span></span><span></span><span></span></span></button>` : ''}
   </div>
 </nav>
@@ -569,7 +607,7 @@ ${buildMobileSheet()}`;
   document.head.appendChild(style);
 
   const bodyPad = document.createElement('style');
-  bodyPad.textContent = 'body { padding-top: 96px; } @media(max-width:768px){ body { padding-top: 88px; } }';
+  bodyPad.textContent = 'body { padding-top: 110px; } @media(max-width:768px){ body { padding-top: 94px; } }';
   document.head.appendChild(bodyPad);
 
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);

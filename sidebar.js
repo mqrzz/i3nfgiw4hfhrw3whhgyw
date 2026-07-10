@@ -77,19 +77,20 @@
     /* Кнопка сворачивания текста — иконка-переключатель рядом с лого. */
     .sb-collapse-btn{
       display:flex; align-items:center; justify-content:center;
-      width:30px; height:30px; flex-shrink:0;
-      border-radius:9px; border:none; background:none; cursor:pointer;
+      width:36px; height:36px; flex-shrink:0;
+      border-radius:10px; border:none; background:none; cursor:pointer;
       color:var(--muted,#707a8a);
       transition:background .15s, color .15s;
     }
     .sb-collapse-btn:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
-    .sb-collapse-btn svg{ width:17px; height:17px; stroke:currentColor; stroke-width:1.7; fill:none; }
+    .sb-collapse-btn svg{ width:19px; height:19px; stroke:currentColor; stroke-width:1.7; fill:none; }
     .sb-collapse-btn .sb-ico-expand{ display:none; }
 
     .sb-nav-main{ display:flex; flex-direction:column; gap:3px; }
     .sb-nav-bottom{ display:flex; flex-direction:column; gap:3px; margin-top:auto; padding-top:14px; }
 
     .sb-link{
+      position:relative;
       display:flex; align-items:center; gap:13px;
       padding:.9rem 1rem; border-radius:14px;
       color:var(--muted,#707a8a); text-decoration:none;
@@ -120,10 +121,58 @@
     .sb-nav.is-collapsed .sb-brand{ display:none; }
     .sb-nav.is-collapsed .sb-link{ justify-content:center; gap:0; padding-left:0; padding-right:0; }
     .sb-nav.is-collapsed .sb-link-label{ display:none; }
-    .sb-nav.is-collapsed .sb-badge{ display:none; }
     .sb-nav.is-collapsed .sb-collapse-btn .sb-ico-collapse{ display:none; }
     .sb-nav.is-collapsed .sb-collapse-btn .sb-ico-expand{ display:flex; }
     .sb-nav{ transition:width .18s ease; }
+
+    /* Бейдж в свёрнутом виде — превращается в маленькую точку поверх
+       иконки вместо цифры (иначе некуда её помещать). */
+    .sb-nav.is-collapsed .sb-badge{
+      position:absolute; top:8px; right:16px;
+      width:9px; height:9px; min-width:0; padding:0; border-radius:50%;
+      font-size:0; line-height:0; overflow:hidden;
+    }
+
+    /* Кастомная подсказка при наведении на иконку в свёрнутом виде —
+       рисуется одним общим элементом, позиционируется через JS
+       (position:fixed), чтобы не обрезаться overflow сайдбара. */
+    .sb-tooltip{
+      position:fixed; top:0; left:0; z-index:60;
+      background:var(--text,#191b1e); color:#fff;
+      font-family:'Geologica','Inter','Arial',sans-serif; font-size:.8rem; font-weight:400;
+      padding:.42rem .7rem; border-radius:9px; white-space:nowrap;
+      pointer-events:none; opacity:0; transform:translateY(-50%);
+      transition:opacity .12s ease;
+    }
+    .sb-tooltip.is-visible{ opacity:1; }
+
+    /* Приветственная плашка при первом заходе — объясняет назначение
+       кнопки. Показывается один раз (флаг в localStorage), закрывается
+       крестиком или сама через 20 секунд. */
+    .sb-brand-row{ position:relative; }
+    .sb-collapse-hint{
+      position:absolute; top:100%; right:0; margin-top:10px; width:216px;
+      background:var(--bg,#fff); border:1px solid var(--border,#dfe3e8);
+      border-radius:14px; padding:.75rem 1.6rem .75rem .9rem;
+      box-shadow:0 10px 28px rgba(25,27,30,.12);
+      font-family:'Geologica','Inter','Arial',sans-serif; font-size:.78rem; line-height:1.4;
+      color:var(--text,#191b1e); z-index:40;
+      opacity:0; transform:translateY(-6px); pointer-events:none;
+      transition:opacity .18s ease, transform .18s ease;
+    }
+    .sb-collapse-hint.is-visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
+    .sb-collapse-hint::before{
+      content:''; position:absolute; top:-6px; right:15px; width:11px; height:11px;
+      background:var(--bg,#fff); border-left:1px solid var(--border,#dfe3e8);
+      border-top:1px solid var(--border,#dfe3e8); transform:rotate(45deg);
+    }
+    .sb-collapse-hint-close{
+      position:absolute; top:6px; right:6px; width:20px; height:20px;
+      display:flex; align-items:center; justify-content:center;
+      border:none; background:none; cursor:pointer; border-radius:50%;
+      color:var(--muted,#707a8a); font-size:1rem; line-height:1; padding:0;
+    }
+    .sb-collapse-hint-close:hover{ background:#eceef1; color:var(--text,#191b1e); }
 
     /* Рабочая область — плавающая панель приложения: отступы от рамки
        сверху/справа/снизу, вплотную к сайдбару слева, скругления по
@@ -187,9 +236,9 @@
     const badge = item.badgeKey ? `<span class="sb-badge" id="sbBadge-${item.badgeKey}" style="display:none"></span>` : '';
     const label = `<span class="sb-link-label">${item.label}</span>`;
     if (item.logout) {
-      return `<button class="sb-link danger" id="sbLogout" title="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}</button>`;
+      return `<button class="sb-link danger" id="sbLogout" aria-label="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}</button>`;
     }
-    return `<a href="${item.href}" class="sb-link${active}" title="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}${badge}</a>`;
+    return `<a href="${item.href}" class="sb-link${active}" aria-label="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}${badge}</a>`;
   }
 
   function buildNav() {
@@ -210,6 +259,7 @@
     const existingContent = document.getElementById('sbContent');
 
     const collapsed = localStorage.getItem('sb-collapsed') === '1';
+    const hintSeen  = localStorage.getItem('sb-collapse-hint-seen') === '1';
 
     const shell = document.createElement('div');
     shell.className = 'sb-shell';
@@ -219,10 +269,15 @@
           <img src="${b}img/favicon.png" alt=""/>
           <span>Antviz</span>
         </a>
-        <button class="sb-collapse-btn" id="sbCollapseBtn" type="button" title="Свернуть/развернуть меню">
-          <svg class="sb-ico-collapse" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><path d="M9.5 4.5v15"/><path d="M14 10l-2 2 2 2"/></svg>
-          <svg class="sb-ico-expand" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><path d="M9.5 4.5v15"/><path d="M12.5 10l2 2-2 2"/></svg>
+        <button class="sb-collapse-btn" id="sbCollapseBtn" type="button" aria-label="Свернуть/развернуть меню">
+          <svg class="sb-ico-collapse" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><path d="M9.5 4.5v15"/><path d="M15 9.5l-2.2 2.5 2.2 2.5"/></svg>
+          <svg class="sb-ico-expand" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="4"/><path d="M9.5 4.5v15"/><path d="M13.3 9.5l2.2 2.5-2.2 2.5"/></svg>
         </button>
+        ${!collapsed && !hintSeen ? `
+        <div class="sb-collapse-hint" id="sbCollapseHint">
+          <button class="sb-collapse-hint-close" id="sbCollapseHintClose" type="button" aria-label="Закрыть подсказку">×</button>
+          Эта кнопка сворачивает меню — останутся только иконки
+        </div>` : ''}
       </div>
       ${buildNav()}
     </nav>`;
@@ -237,10 +292,68 @@
       document.body.insertBefore(shell, document.body.firstChild);
     }
 
-    document.getElementById('sbCollapseBtn')?.addEventListener('click', () => {
-      const nav = document.getElementById('sbNav');
-      const nowCollapsed = nav.classList.toggle('is-collapsed');
+    const navEl = document.getElementById('sbNav');
+
+    function toggleCollapse() {
+      const nowCollapsed = navEl.classList.toggle('is-collapsed');
       localStorage.setItem('sb-collapsed', nowCollapsed ? '1' : '0');
+      dismissHint();
+      return nowCollapsed;
+    }
+
+    // --- Приветственная подсказка при первом заходе ---
+    let hintTimer = null;
+    function dismissHint() {
+      const hint = document.getElementById('sbCollapseHint');
+      if (!hint) return;
+      hint.classList.remove('is-visible');
+      localStorage.setItem('sb-collapse-hint-seen', '1');
+      if (hintTimer) { clearTimeout(hintTimer); hintTimer = null; }
+    }
+    const hintEl = document.getElementById('sbCollapseHint');
+    if (hintEl) {
+      requestAnimationFrame(() => setTimeout(() => hintEl.classList.add('is-visible'), 300));
+      hintTimer = setTimeout(dismissHint, 20000);
+      document.getElementById('sbCollapseHintClose')?.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dismissHint();
+      });
+    }
+
+    // --- Кнопка сворачивания + двойной клик по лого ---
+    document.getElementById('sbCollapseBtn')?.addEventListener('click', toggleCollapse);
+    document.querySelector('.sb-brand')?.addEventListener('dblclick', (e) => {
+      e.preventDefault();
+      toggleCollapse();
+    });
+
+    // --- Клавиатурный шорткат Ctrl/Cmd+B ---
+    document.addEventListener('keydown', (e) => {
+      const tag = (e.target && e.target.tagName) || '';
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'b') {
+        e.preventDefault();
+        toggleCollapse();
+      }
+    });
+
+    // --- Кастомные подсказки при наведении на иконки в свёрнутом виде ---
+    const tooltip = document.createElement('div');
+    tooltip.className = 'sb-tooltip';
+    document.body.appendChild(tooltip);
+    shell.querySelectorAll('.sb-link').forEach(link => {
+      link.addEventListener('mouseenter', () => {
+        if (!navEl.classList.contains('is-collapsed')) return;
+        const label = link.getAttribute('aria-label');
+        if (!label) return;
+        const rect = link.getBoundingClientRect();
+        tooltip.textContent = label;
+        tooltip.style.left = (rect.right + 10) + 'px';
+        tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+        tooltip.classList.add('is-visible');
+      });
+      link.addEventListener('mouseleave', () => tooltip.classList.remove('is-visible'));
+      link.addEventListener('click', () => tooltip.classList.remove('is-visible'));
     });
 
     document.getElementById('sbLogout')?.addEventListener('click', async () => {

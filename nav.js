@@ -828,7 +828,7 @@ ${buildMobileSheet()}`;
         tries++;
       }
       if (appMod.getApps().length === 0) {
-        console.error('nav.js: Firebase App не инициализирован страницей за 5 секунд — профиль не может загрузиться.');
+        console.error('nav.js: Произошла ошибка — профиль не может загрузиться.');
         return;
       }
 

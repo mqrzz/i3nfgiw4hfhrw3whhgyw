@@ -2,18 +2,24 @@
  * nav.js — Antviz
  * <script src="nav.js" data-page="home"></script>
  *
- * v3 — полноширинный липкий бар (как у большинства сайтов), без плавающей
- * капсулы и скруглений:
- * — position: sticky, во весь экран, тонкая граница снизу вместо тени/парения;
- * — внутренний ряд контента выровнен по тому же max-width, что и .container
- *   на странице — края меню совпадают с краями остальных секций;
- * — логотип — просто иконка+текст на фоне бара, без круглой подложки и свечения;
- * — на десктопе выпадающие меню открываются по НАВЕДЕНИЮ (клик не обязателен),
- *   клик оставлен как запасной способ для тач-планшетов и клавиатуры;
- * — оба выпадающих меню (сервисы/блог/о нас и профиль) — плоский список
- *   текста, без иконок и без цветной подсветки при наведении;
- * — добавлен пункт «Блог» (Новости / Что нового) и отдельная ссылка «Цены»;
- * — бизнес-логика авторизации/бейджей/сессий не менялась.
+ * ПОЛНАЯ ПЕРЕСБОРКА (v2):
+ * — визуальный язык взят напрямую с главной страницы (тени с синим
+ *   подтоном --sh2, радиусы из той же лестницы 28/32/40, зелёный —
+ *   только как акцент состояния, никакой декоративной "зелёной полоски");
+ * — один-единственный триггер открытия/закрытия (клик), никакого
+ *   гибрида hover+aria — это и было источником "дёрганых" анимаций;
+ * — новый набор иконок: единая толщина линии, единая геометрия
+ *   (circle/rounded-square контейнер + простой глиф), никакого
+ *   разнобоя фигур, как раньше;
+ * — лёгкий glassmorphism на капсуле (blur), в духе текущего тренда
+ *   тёмных SaaS-шапок, но сдержанно — сайт не про эффекты, он про код;
+ * — уважение reduced-motion и видимый focus-visible.
+ *
+ * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
+ * инициализирует САМА СТРАНИЦА, и подключается к уже существующему
+ * приложению через getApps()/getAuth(). Логика авторизации, бейджей
+ * и сессий не менялась — менялся только визуальный слой и разметка
+ * вокруг него (id остались прежними, чтобы ничего не сломать).
  */
 (function () {
 
@@ -21,132 +27,188 @@
   const page   = script ? (script.getAttribute('data-page') || 'home') : 'home';
   const depth  = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
   const b      = depth > 0 ? '../' : '';
-  const NAV_H  = 72; // высота бара — константа, используется и в CSS, и для позиционирования мобильной шторки
 
   /* ─────────────── CSS ─────────────── */
   const CSS = `
     :root {
       --nv-bg:        #191b1e;
+      --nv-bg-soft:   rgba(25,27,30,.82);
       --nv-surface:   #232629;
+      --nv-surface2:  #2b2f33;
       --nv-line:      rgba(255,255,255,.09);
-      --nv-line-soft: rgba(255,255,255,.06);
+      --nv-line-soft: rgba(255,255,255,.05);
       --nv-ink:       #ffffff;
-      --nv-ink-dim:   rgba(255,255,255,.52);
-      --nv-ink-faint: rgba(255,255,255,.32);
+      --nv-ink-dim:   rgba(255,255,255,.5);
+      --nv-ink-faint: rgba(255,255,255,.3);
       --nv-green:     #1ede7b;
       --nv-green-h:   #1ac16b;
       --nv-green-ink: #0e1512;
+      --nv-green-dim: rgba(30,222,123,.12);
       --nv-warn:      #f5a623;
       --nv-danger:    #ff6b54;
+      --nv-sh:        0 20px 44px rgba(4,10,26,.38), 0 4px 14px rgba(4,10,26,.22);
       --nv-font:      'Geologica','Inter','Arial',sans-serif;
       --nv-ease:      cubic-bezier(.16,1,.3,1);
     }
 
     .antviz-nav, .antviz-nav * { box-sizing: border-box; }
 
-    /* ── Бар: во всю ширину, без скруглений, приклеен сверху ── */
+    /* ── Капсула ──
+       Было: полупрозрачный blur поверх белого сайта — от этого капсула
+       читалась серой, а не чёрной. Теперь — плотный непрозрачный
+       --nv-bg (тот же тон, что .hero-block/.calc-block на сайте),
+       плюс тёплое зелёное свечение снизу для уверенности бренда.
+       Форма — почти полная пилюля (радиус ~ половина высоты), ссылки —
+       просто текст без фоновых "таблеток" при ховере, один явный
+       контрастный CTA справа (см. референс Darkweb X, который прислал
+       заказчик). */
     .antviz-nav {
-      position: sticky; top: 0; left: 0; width: 100%;
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding: 8px 8px 8px 24px;
+      height: 72px;
+      width: calc(100% - 32px); max-width: 1120px;
       background: var(--nv-bg);
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.07);
+      border-radius: 36px;
+      box-shadow: 0 24px 50px rgba(0,0,0,.44), 0 0 0 1px rgba(30,222,123,.04), 0 14px 36px -6px rgba(30,222,123,.16);
       font-family: var(--nv-font);
+      transition: border-color .2s var(--nv-ease), box-shadow .2s var(--nv-ease);
     }
-    .nv-inner {
-      max-width: 1328px; margin: 0 auto; padding: 0 20px;
-      height: ${NAV_H}px;
-      display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    }
-    @media (min-width: 1024px) { .nv-inner { padding: 0 64px; } }
-    @media (min-width: 1280px) { .nv-inner { padding: 0 96px; } }
+    .antviz-nav:hover { border-color: rgba(30,222,123,.2); }
 
-    /* ── Логотип: просто на фоне бара, без подложки/свечения ── */
     .nv-logo {
       font-family: var(--nv-font); font-weight: 500;
       font-size: 16px; letter-spacing: -.01em;
       color: var(--nv-ink); text-decoration: none;
-      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 11px; flex-shrink: 0;
     }
-    .nv-logo img { width: 27px; height: 27px; border-radius: 7px; object-fit: cover; display: block; }
+    .nv-logo-badge {
+      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
+      background: var(--nv-green-dim);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .nv-logo-badge img { width: 22px; height: 22px; border-radius: 6px; object-fit: cover; }
 
-    /* ── Центр: просто текстовые ссылки/дропдауны ── */
-    .nv-center { display: flex; align-items: center; gap: 30px; height: 100%; }
+    /* ── Центр: просто текстовые ссылки, без плашек при ховере ── */
+    .nv-center {
+      position: absolute; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 30px;
+    }
     .nv-link {
       color: var(--nv-ink-dim);
       font-family: var(--nv-font); font-weight: 300; font-size: 15px;
-      text-decoration: none; white-space: nowrap;
+      text-decoration: none;
+      white-space: nowrap; position: relative;
+      display: flex; align-items: center;
       transition: color .15s var(--nv-ease);
     }
     .nv-link:hover { color: var(--nv-ink); }
+    .nv-link.active { color: var(--nv-ink); font-weight: 500; }
+    .nv-link.active::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -15px;
+      height: 3px; border-radius: 2px; background: var(--nv-green);
+    }
 
-    .nv-drop { position: relative; display: flex; align-items: center; height: 100%; }
-    .nv-drop-btn {
-      color: var(--nv-ink-dim);
-      font-family: var(--nv-font); font-weight: 300; font-size: 15px;
-      background: none; border: none; cursor: pointer; padding: 0;
-      display: flex; align-items: center; gap: 6px; white-space: nowrap;
-      transition: color .15s var(--nv-ease);
-    }
-    .nv-drop:hover .nv-drop-btn, .nv-drop-btn:hover { color: var(--nv-ink); }
-    .nv-chev { width: 9px; height: 9px; opacity: .45; flex-shrink: 0; transition: transform .2s var(--nv-ease), opacity .15s; }
-    .nv-drop:hover .nv-chev, .nv-drop.open .nv-chev { transform: rotate(180deg); opacity: .8; }
-
-    /* Выпадающее меню: по наведению на десктопе (без обязательного клика),
-       .open — запасной способ через клик/тач/клавиатуру.
-       padding-top на обёртке = невидимый "мостик", чтобы наведение
-       не прерывалось в зазоре между кнопкой и карточкой меню. */
-    .nv-menu {
-      position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
-      padding-top: 12px;
-      opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity .15s var(--nv-ease), visibility 0s linear .15s;
-      z-index: 8990;
-    }
-    @media (hover: hover) and (pointer: fine) {
-      .nv-drop:hover .nv-menu { opacity: 1; visibility: visible; pointer-events: all; transition: opacity .15s var(--nv-ease); }
-    }
-    .nv-drop.open .nv-menu { opacity: 1; visibility: visible; pointer-events: all; transition: opacity .15s var(--nv-ease); }
-
-    .nv-menu-card {
-      background: var(--nv-surface);
-      border: 1px solid var(--nv-line);
-      border-radius: 14px; padding: 6px;
-      min-width: 216px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.4);
-      font-family: var(--nv-font);
-    }
-    .nv-menu-item {
-      display: block; padding: 10px 12px; border-radius: 9px;
-      font-size: 14px; color: rgba(255,255,255,.8); font-weight: 300;
-      text-decoration: none; white-space: nowrap;
-      transition: background .12s, color .12s;
-    }
-    .nv-menu-item:hover { background: rgba(255,255,255,.07); color: #fff; }
-    .nv-menu-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 8px; }
-
-    /* Единственный контрастный элемент бара — CTA-пилюля */
+    /* Основной CTA — единственный контрастный элемент капсулы,
+       ровно как белая "Get started" в референсе, только в нашем
+       зелёном. Рендерится отдельно от плоских ссылок, справа. */
     .nv-cta {
       display: flex; align-items: center; flex-shrink: 0;
       background: var(--nv-green); color: var(--nv-green-ink);
       font-family: var(--nv-font); font-weight: 500; font-size: 14.5px;
       text-decoration: none; white-space: nowrap;
-      padding: 11px 20px; border-radius: 12px;
-      transition: background .15s var(--nv-ease);
+      padding: 13px 22px; border-radius: 28px;
+      transition: background .15s var(--nv-ease), transform .12s var(--nv-ease);
     }
-    .nv-cta:hover { background: var(--nv-green-h); }
+    .nv-cta:hover { background: var(--nv-green-h); transform: translateY(-1px); }
 
-    .nv-right { display: flex; align-items: center; gap: 22px; margin-left: auto; }
+    .nv-drop { position: relative; display: flex; align-items: center; }
+    .nv-drop-btn {
+      color: var(--nv-ink-dim);
+      font-family: var(--nv-font); font-weight: 300; font-size: 15px;
+      background: none; border: none; cursor: pointer;
+      padding: 0; display: flex; align-items: center; gap: 6px;
+      white-space: nowrap;
+      transition: color .15s var(--nv-ease);
+    }
+    .nv-drop-btn:hover { color: var(--nv-ink); }
+    .nv-drop-btn.is-active { color: var(--nv-ink); font-weight: 500; }
+    .nv-chev {
+      width: 9px; height: 9px; opacity: .45; flex-shrink: 0;
+      transition: transform .22s var(--nv-ease), opacity .15s;
+    }
+    .nv-drop.open .nv-chev { transform: rotate(180deg); opacity: .8; }
+
+    .nv-menu {
+      position: absolute; top: calc(100% + 12px); left: 50%;
+      background: var(--nv-surface);
+      border: 1px solid var(--nv-line);
+      border-radius: 20px; padding: 8px;
+      min-width: 232px;
+      box-shadow: var(--nv-sh);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translate(-50%, -6px) scale(.98);
+      transform-origin: top center;
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s linear .18s;
+      z-index: 8990;
+      font-family: var(--nv-font);
+    }
+    .nv-drop.open .nv-menu {
+      opacity: 1; visibility: visible; pointer-events: all;
+      transform: translate(-50%, 0) scale(1);
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s;
+    }
+
+    .nv-menu-label {
+      padding: 9px 10px 4px;
+      font-size: 10.5px; color: var(--nv-ink-faint); font-weight: 500;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
+    .nv-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 12px;
+      font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
+      text-decoration: none; transition: background .12s, color .12s;
+      white-space: nowrap;
+    }
+    .nv-menu-item:hover { background: var(--nv-green-dim); color: #fff; }
+    .nv-menu-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); }
+    .nv-menu-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 8px; }
+
+    /* ── Иконки: единая геометрия — скруглённый квадрат-контейнер
+       + простой глиф; никакого разнобоя форм ── */
+    .nv-ico {
+      width: 26px; height: 26px; flex-shrink: 0; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--nv-ink-faint);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      transition: color .12s, border-color .12s;
+    }
+    .nv-ico svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+    .nv-right { display: flex; align-items: center; gap: 20px; margin-left: auto; }
 
     /* ── Пользователь ── */
     .nv-user { position: relative; display: flex; }
     .nv-user-btn {
       display: flex; align-items: center; gap: 9px;
-      background: none; border: none; cursor: pointer;
-      font-family: var(--nv-font); font-weight: 300; font-size: 14px; color: var(--nv-ink);
-      text-decoration: none; position: relative; padding: 0;
+      background: none; border: 1px solid transparent;
+      border-radius: 14px; padding: 4px 12px 4px 4px;
+      cursor: pointer; transition: border-color .15s, background .15s;
+      font-family: var(--nv-font); font-weight: 300; font-size: 13.5px; color: var(--nv-ink);
+      text-decoration: none; position: relative;
     }
-    .nv-user-btn.guest { font-weight: 300; font-size: 15px; color: var(--nv-ink-dim); }
-    .nv-user-btn.guest:hover { color: var(--nv-ink); }
+    .nv-user-btn:hover { border-color: var(--nv-line); background: rgba(255,255,255,.05); }
+    .nv-user-btn.guest {
+      padding: 0; border: none; background: none;
+      font-weight: 300; font-size: 15px; color: var(--nv-ink-dim);
+    }
+    .nv-user-btn.guest:hover { border-color: transparent; background: none; color: var(--nv-ink); }
     .nv-user-btn.guest .nv-avatar-ring,
     .nv-user-btn.guest .nv-chev-user { display: none; }
 
@@ -155,7 +217,9 @@
       display: flex; align-items: center; justify-content: center;
       position: relative; padding: 2px;
     }
-    .nv-avatar-ring.notify { background: conic-gradient(from -45deg, var(--nv-warn), var(--nv-green) 65%); }
+    .nv-avatar-ring.notify {
+      background: conic-gradient(from -45deg, var(--nv-warn), var(--nv-green) 65%);
+    }
     .nv-avatar {
       width: 100%; height: 100%; border-radius: 9px;
       background: var(--nv-green);
@@ -170,22 +234,23 @@
     .nv-user-btn[aria-expanded="true"] .nv-chev-user { transform: rotate(180deg); }
 
     .nv-dd {
-      position: absolute; top: calc(100% + 16px); right: 0;
+      position: absolute; top: calc(100% + 12px); right: 0;
       background: var(--nv-surface);
       border: 1px solid var(--nv-line);
-      border-radius: 16px; padding: 6px;
-      min-width: 244px;
-      box-shadow: 0 18px 40px rgba(0,0,0,.4);
+      border-radius: 22px; padding: 8px;
+      min-width: 256px;
+      box-shadow: var(--nv-sh);
       opacity: 0; visibility: hidden; pointer-events: none;
-      transform: translateY(-6px);
-      transition: opacity .16s var(--nv-ease), transform .16s var(--nv-ease), visibility 0s linear .16s;
+      transform: translateY(-6px) scale(.98);
+      transform-origin: top right;
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s linear .18s;
       z-index: 9999;
       font-family: var(--nv-font);
     }
     .nv-dd.open {
       opacity: 1; visibility: visible; pointer-events: all;
-      transform: translateY(0);
-      transition: opacity .16s var(--nv-ease), transform .16s var(--nv-ease), visibility 0s;
+      transform: translateY(0) scale(1);
+      transition: opacity .18s var(--nv-ease), transform .18s var(--nv-ease), visibility 0s;
     }
 
     .nv-dd-head {
@@ -202,22 +267,34 @@
     }
     .nv-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .nv-dd-head-info { min-width: 0; flex: 1; }
-    .nv-dd-head-name { font-size: 14px; font-weight: 500; color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.01em; }
-    .nv-dd-head-email { font-weight: 300; font-size: 11.5px; color: var(--nv-ink-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+    .nv-dd-head-name {
+      font-size: 14px; font-weight: 500; color: #fff;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.01em;
+    }
+    .nv-dd-head-email {
+      font-weight: 300; font-size: 11.5px; color: var(--nv-ink-faint);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px;
+    }
 
-    .nv-dd-section { padding: 12px 11px 5px; font-size: 10.5px; color: var(--nv-ink-faint); font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
+    .nv-dd-section {
+      padding: 12px 11px 5px;
+      font-size: 10.5px; color: var(--nv-ink-faint); font-weight: 500;
+      text-transform: uppercase; letter-spacing: .08em;
+    }
     .nv-dd-item {
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px 11px; border-radius: 9px;
-      font-size: 14px; color: rgba(255,255,255,.8); font-weight: 300;
+      display: flex; align-items: center; gap: 11px;
+      padding: 8px 10px; border-radius: 13px;
+      font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
       text-decoration: none; cursor: pointer;
       transition: background .12s, color .12s;
       border: none; background: none; width: 100%; text-align: left;
-      font-family: var(--nv-font);
+      position: relative; font-family: var(--nv-font);
     }
-    .nv-dd-item:hover { background: rgba(255,255,255,.07); color: #fff; }
-    .nv-dd-item.danger { color: rgba(255,107,84,.8); }
-    .nv-dd-item.danger:hover { background: rgba(255,107,84,.09); color: #ff9686; }
+    .nv-dd-item:hover { background: var(--nv-green-dim); color: #fff; }
+    .nv-dd-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); }
+    .nv-dd-item.danger .nv-ico { color: rgba(255,107,84,.75); }
+    .nv-dd-item.danger:hover { background: rgba(255,107,84,.1); color: #ffb3a3; }
+    .nv-dd-item.danger:hover .nv-ico { color: var(--nv-danger); border-color: rgba(255,107,84,.3); }
     .nv-dd-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 10px; }
 
     .nv-badge {
@@ -231,12 +308,12 @@
     .nv-badge.warn { background: var(--nv-warn); color: #1a1400; }
     .nv-badge.dot { width: 7px; height: 7px; min-width: 0; padding: 0; border-radius: 50%; background: var(--nv-danger); }
 
-    /* ── Бургер / мобильная шторка ── */
+    /* ── Бургер / мобильное меню ── */
     .nv-burger {
       display: none; align-items: center; justify-content: center;
-      width: 38px; height: 38px;
+      width: 40px; height: 40px;
       background: none; border: 1px solid var(--nv-line);
-      border-radius: 10px; cursor: pointer; flex-shrink: 0;
+      border-radius: 13px; cursor: pointer; flex-shrink: 0;
       transition: border-color .15s, background .15s;
     }
     .nv-burger:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.05); }
@@ -253,168 +330,234 @@
     .nv-burger.open .nv-burger-box span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
 
     .nv-sheet {
-      position: fixed; top: ${NAV_H}px; left: 0; right: 0;
+      position: fixed; top: calc(20px + 72px + 10px); left: 50%;
+      transform: translateX(-50%) translateY(-8px) scale(.98);
       z-index: 8999;
-      max-height: calc(100vh - ${NAV_H}px);
+      width: calc(100% - 32px); max-width: 1080px;
+      max-height: calc(100vh - 20px - 72px - 34px);
       overflow-y: auto;
       background: var(--nv-bg);
-      border-top: 1px solid rgba(255,255,255,.08);
-      padding: 10px 20px 22px;
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 22px;
+      padding: 8px;
       display: none; flex-direction: column; gap: 2px;
       opacity: 0; visibility: hidden; pointer-events: none;
-      transition: opacity .18s var(--nv-ease), visibility 0s linear .18s;
+      transition: opacity .2s var(--nv-ease), transform .2s var(--nv-ease), visibility 0s linear .2s;
       font-family: var(--nv-font);
+      box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 12px 34px -6px rgba(30,222,123,.18);
     }
-    .nv-sheet.open { opacity: 1; visibility: visible; pointer-events: all; transition: opacity .18s var(--nv-ease), visibility 0s; }
+    .nv-sheet.open {
+      opacity: 1; visibility: visible; pointer-events: all;
+      transform: translateX(-50%) translateY(0) scale(1);
+      transition: opacity .2s var(--nv-ease), transform .2s var(--nv-ease), visibility 0s;
+    }
     .nv-mlink {
       display: flex; align-items: center; gap: 12px;
       color: var(--nv-ink-dim); font-weight: 300; font-size: 15px;
-      text-decoration: none; padding: 13px 4px;
-      border-radius: 10px; transition: background .12s, color .12s;
+      text-decoration: none; padding: 13px 14px;
+      border-radius: 14px; transition: background .12s, color .12s;
     }
-    .nv-mlink:hover { color: #fff; background: rgba(255,255,255,.05); }
+    .nv-mlink:hover, .nv-mlink.active { color: #fff; background: rgba(255,255,255,.06); }
+    .nv-mlink.active { font-weight: 500; }
     .nv-mcta {
-      display: block; text-align: center; margin-top: 10px;
+      display: block; text-align: center; margin-top: 4px;
       background: var(--nv-green); color: var(--nv-green-ink);
       font-weight: 500; font-size: 15px;
-      text-decoration: none; padding: 14px 16px; border-radius: 12px;
+      text-decoration: none; padding: 14px 16px; border-radius: 14px;
     }
-    .nv-msection { font-size: 10.5px; font-weight: 500; color: var(--nv-ink-faint); text-transform: uppercase; letter-spacing: .08em; padding: 14px 4px 2px; }
-    .nv-msep { height: 1px; background: var(--nv-line-soft); margin: 8px 0; }
+    .nv-msection {
+      font-size: 10.5px; font-weight: 500; color: var(--nv-ink-faint);
+      text-transform: uppercase; letter-spacing: .08em;
+      padding: 12px 14px 4px;
+    }
+    .nv-msep { height: 1px; background: var(--nv-line-soft); margin: 4px 8px; }
 
+    .mobile-cart-badge {
+      position: absolute; top: 1px; right: 3px; width: 14px; height: 14px;
+      border-radius: 50%; background: var(--nv-green); color: var(--nv-green-ink);
+      font-size: 9px; font-weight: 700; display: none; align-items: center; justify-content: center;
+    }
+    .mobile-cart-badge.show { display: flex; }
+
+    /* focus-visible — доступность, требуется по гайдлайну */
     .antviz-nav a:focus-visible,
-    .antviz-nav button:focus-visible { outline: 2px solid var(--nv-green); outline-offset: 2px; border-radius: 6px; }
+    .antviz-nav button:focus-visible {
+      outline: 2px solid var(--nv-green); outline-offset: 2px; border-radius: 8px;
+    }
 
     @media (prefers-reduced-motion: reduce) {
       .nv-menu, .nv-dd, .nv-sheet, .nv-chev, .nv-chev-user, .nv-burger-box span { transition: none !important; }
     }
 
-    @media (max-width: 860px) {
-      .nv-center, .nv-cta { display: none; }
+    @media (max-width: 768px) {
+      .antviz-nav { top: 14px; height: 60px; padding: 6px 6px 6px 18px; width: calc(100% - 24px); border-radius: 30px; }
+      .nv-logo { font-size: 14px; gap: 8px; }
+      .nv-logo-badge { width: 32px; height: 32px; }
+      .nv-logo-badge img { width: 18px; height: 18px; }
+      .nv-center { display: none; }
+      .nv-cta { display: none; }
       .nv-burger { display: flex; }
-      .nv-sheet { display: flex; }
-      .nv-right { gap: 14px; }
-    }
-    @media (max-width: 480px) {
+      .nv-sheet { display: flex; top: calc(14px + 60px + 8px); }
       .nv-uname { display: none; }
+      .nv-user-btn { padding: 4px; }
+      .nv-user-btn.guest { padding: 0; font-size: 14px; }
+      .nv-user-btn.guest .nv-uname { display: inline; max-width: 60px; }
     }
   `;
 
-  /* ─────────────── Данные меню ─────────────── */
+  const PUBLIC_LINKS = [
+    { href: b+'order', label: 'Сделать заказ', key: 'order', accent: true },
+  ];
 
-  // Единственный контрастный элемент — управляется per-page через NAV_CONFIG
-  const CTA_LINK = { href: b + 'order', label: 'Сделать заказ' };
-
-  const NAV_ITEMS = [
+  // Единая иконка-контейнер: <rect/> квадрат-скругление + один простой
+  // глиф внутри, толщина линии всегда 1.7 — см. .nv-ico
+  const NAV_DROPDOWNS = [
     {
-      type: 'dropdown', label: 'Услуги', key: 'services',
-      items: [
-        { href: b + 'project1', label: 'Лендинг' },
-        { href: b + 'project2', label: 'Визитная карточка' },
-        { href: b + 'project3', label: 'Портфолио' },
+      label: 'Услуги',
+      key: 'services',
+      sections: [
+        {
+          label: 'Примеры работ',
+          items: [
+            { href: b+'project1', label: 'Лендинг',           icon: '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h8M8 12h8M8 16h5"/>' },
+            { href: b+'project2', label: 'Визитная карточка',  icon: '<rect x="3" y="6" width="18" height="12" rx="3"/><circle cx="8.2" cy="12" r="1.5"/><path d="M13 10.3h6M13 13.7h6"/>' },
+            { href: b+'project3', label: 'Портфолио',          icon: '<rect x="3" y="4" width="18" height="14" rx="3"/><path d="M3 15l4.2-4.2a2 2 0 012.8 0L14 14.8M12.5 13.3l1.6-1.6a2 2 0 012.8 0L21 15" /><circle cx="7.8" cy="8.2" r="1.3"/>' },
+          ]
+        },
         { sep: true },
-        { href: 'https://antviz.ru/price', label: 'Цены' },
-      ]
-    },
-    { type: 'link', href: 'https://antviz.ru/price', label: 'Цены' },
-    {
-      type: 'dropdown', label: 'Блог', key: 'blog',
-      items: [
-        { href: 'https://blog.antviz.ru/news', label: 'Главная (новости)' },
-        { href: 'https://blog.antviz.ru/updates', label: 'Что нового' },
+        {
+          items: [
+            { href: b+'order', label: 'Все тарифы', icon: '<path d="M5 12h14M13 6l6 6-6 6"/>' },
+          ]
+        }
       ]
     },
     {
-      type: 'dropdown', label: 'О сервисе', key: 'company',
-      items: [
-        { href: 'https://antviz.ru/about', label: 'О сервисе' },
-        { href: b + 'rules', label: 'Правила' },
-        { href: b + 'privacy', label: 'Конфиденциальность' },
+      label: 'О сервисе',
+      key: 'company',
+      sections: [
+        {
+          items: [
+            { href: 'https://antviz.ru/about', label: 'О сервисе',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8h.01M11 11.5h1.4v5"/>' },
+            { href: b+'rules',                  label: 'Правила',          icon: '<path d="M12 3l7 3.2v4.8c0 4.8-3 8-7 9.5-4-1.5-7-4.7-7-9.5V6.2L12 3z"/><path d="M9.2 12l1.9 1.9L15.2 10"/>' },
+            { href: b+'privacy',                 label: 'Конфиденциальность', icon: '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/><circle cx="12" cy="14.7" r="1.3"/>' },
+          ]
+        }
       ]
     },
   ];
 
   const NAV_CONFIG = {
-    home:     { showCta: true },
-    faq:      { showCta: true },
-    about:    { showCta: true },
-    order:    { showCta: false, hideCta: true },
-    profile:  { showCta: true },
-    auth:     { showCta: false, hideCta: true },
-    orders:   { showCta: true },
-    sites:    { showCta: true },
-    support:  { showCta: true },
-    settings: { showCta: true },
-    tickets:  { showCta: true },
-    notifications: { showCta: true },
-    default:  { showCta: true },
+    home:     { centerLinks: PUBLIC_LINKS, showCta: true },
+    faq:      { centerLinks: PUBLIC_LINKS, showCta: true },
+    about:    { centerLinks: PUBLIC_LINKS, showCta: true },
+    order:    { centerLinks: PUBLIC_LINKS, showCta: false, hideCta: true },
+    profile:  { centerLinks: PUBLIC_LINKS, showCta: true },
+    auth:     { centerLinks: [], showCta: false, hideCta: true },
+    orders:   { centerLinks: PUBLIC_LINKS, showCta: true },
+    sites:    { centerLinks: PUBLIC_LINKS, showCta: true },
+    support:  { centerLinks: PUBLIC_LINKS, showCta: true },
+    settings: { centerLinks: PUBLIC_LINKS, showCta: true },
+    tickets:  { centerLinks: PUBLIC_LINKS, showCta: true },
+    notifications: { centerLinks: PUBLIC_LINKS, showCta: true },
+    default:  { centerLinks: PUBLIC_LINKS, showCta: true },
   };
 
   const cfg = NAV_CONFIG[page] || NAV_CONFIG.default;
 
   const DD_ITEMS = [
-    { href: b+'profile',               label: 'Обзор кабинета' },
+    { href: b+'profile',               icon: '<rect x="4" y="4" width="16" height="16" rx="5"/><path d="M4 10.2h16M9.8 10.2V20"/>', label: 'Обзор кабинета' },
     { sep: true },
     { section: 'Кабинет' },
-    { href: b+'profile/orders',        label: 'Мои заказы', badgeKey: 'orders' },
-    { href: b+'profile/sites',         label: 'Мои сайты' },
-    { href: b+'profile/tickets',       label: 'Обслуживание', badgeKey: 'tickets' },
-    { href: b+'profile/support',       label: 'Поддержка', badgeKey: 'support' },
-    { href: b+'profile/notifications', label: 'Уведомления', badgeKey: 'notif' },
+    { href: b+'profile/orders',        icon: '<path d="M7 5h6l4 4v10a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M13 5v4h4"/><path d="M9 13h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
+    { href: b+'profile/sites',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.8 2.8 2.8 14.2 0 17M12 3.5c-2.8 2.8-2.8 14.2 0 17"/>', label: 'Мои сайты' },
+    { href: b+'profile/tickets',       icon: '<path d="M4 8a4 4 0 018 0M12 8a4 4 0 018 0"/><rect x="3" y="8" width="4.4" height="7" rx="1.6"/><rect x="16.6" y="8" width="4.4" height="7" rx="1.6"/><path d="M16.6 15v1.2a3 3 0 01-3 3h-2.1"/>', label: 'Обслуживание', badgeKey: 'tickets' },
+    { href: b+'profile/support',       icon: '<circle cx="9" cy="10" r="1.15"/><circle cx="15" cy="10" r="1.15"/><path d="M5 12.5V11a7 7 0 0114 0v1.5M8.6 18l1.3-2.8h4.2l1.3 2.8"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/notifications', icon: '<path d="M6.5 9.2a5.5 5.5 0 0111 0c0 6 2 7.3 2 7.3H4.5s2-1.3 2-7.3z"/><path d="M10.2 20.5a2 2 0 003.6 0"/>', label: 'Уведомления', badgeKey: 'notif' },
     { sep: true },
-    { href: b+'profile/settings',      label: 'Настройки' },
+    { href: b+'profile/settings',      icon: '<circle cx="12" cy="12" r="2.6"/><path d="M12 3v2.6M12 18.4V21M4.9 4.9l1.85 1.85M17.25 17.25l1.85 1.85M3 12h2.6M18.4 12H21M4.9 19.1l1.85-1.85M17.25 6.75l1.85-1.85"/>', label: 'Настройки' },
     { logout: true },
   ];
+
+  function iconHtml(svg) { return `<span class="nv-ico"><svg viewBox="0 0 24 24">${svg}</svg></span>`; }
 
   function buildDD() {
     return DD_ITEMS.map(item => {
       if (item.section) return `<div class="nv-dd-section">${item.section}</div>`;
       if (item.sep)     return `<div class="nv-dd-sep"></div>`;
-      if (item.logout)  return `<button class="nv-dd-item danger" id="anSignOut">Выйти</button>`;
+      if (item.logout)  return `<button class="nv-dd-item danger" id="anSignOut">${iconHtml('<path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/>')}Выйти</button>`;
       const badgeSlot = item.badgeKey ? `<span class="nv-badge" id="anBadge-${item.badgeKey}" style="display:none"></span>` : '';
-      return `<a href="${item.href}" class="nv-dd-item">${item.label}${badgeSlot}</a>`;
+      return `<a href="${item.href}" class="nv-dd-item">${iconHtml(item.icon)}${item.label}${badgeSlot}</a>`;
+    }).join('');
+  }
+
+  function buildNavMenu(sections) {
+    return sections.map(sec => {
+      if (sec.sep) return '<div class="nv-menu-sep"></div>';
+      let html = sec.label ? '<div class="nv-menu-label">' + sec.label + '</div>' : '';
+      html += sec.items.map(item =>
+        '<a href="' + item.href + '" class="nv-menu-item">' + iconHtml(item.icon) + item.label + '</a>'
+      ).join('');
+      return html;
     }).join('');
   }
 
   function buildCenter() {
     if (cfg.inApp) return '';
+    const links = (cfg.centerLinks || []).filter(l => !l.accent);
     const chevronSvg = '<svg class="nv-chev" viewBox="0 0 12 12" fill="none"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>';
 
-    const html = NAV_ITEMS.map(item => {
-      if (item.type === 'link') {
-        return '<a href="' + item.href + '" class="nv-link">' + item.label + '</a>';
-      }
-      const menuHtml = item.items.map(it =>
-        it.sep ? '<div class="nv-menu-sep"></div>' : '<a href="' + it.href + '" class="nv-menu-item">' + it.label + '</a>'
-      ).join('');
-      return '<div class="nv-drop" data-drop="' + item.key + '">' +
-        '<button class="nv-drop-btn" type="button">' + item.label + chevronSvg + '</button>' +
-        '<div class="nv-menu"><div class="nv-menu-card">' + menuHtml + '</div></div>' +
-        '</div>';
+    const dropdowns = NAV_DROPDOWNS.map(drop => {
+      const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
+      return '<div class="nv-drop" data-drop="' + drop.key + '">' +
+        '<button class="nv-drop-btn' + (isActive ? ' is-active' : '') + '" aria-expanded="false">' +
+        drop.label + chevronSvg +
+        '</button>' +
+        '<div class="nv-menu" id="anDrop-' + drop.key + '">' +
+        buildNavMenu(drop.sections) +
+        '</div></div>';
     }).join('');
 
-    return '<div class="nv-center" id="anCenter">' + html + '</div>';
+    const plainLinks = links.map(l =>
+      '<a href="' + l.href + '" class="nv-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+    ).join('');
+
+    if (!dropdowns && !plainLinks) return '';
+    return '<div class="nv-center" id="anCenter">' + dropdowns + plainLinks + '</div>';
   }
 
+  // Единственный контрастный элемент капсулы — по образцу референса
+  // (сплошная светлая пилюля справа на тёмной панели). Рендерится
+  // отдельно от плоских ссылок центра и садится в nv-right.
   function buildCta() {
     if (cfg.inApp || cfg.hideCta) return '';
-    return '<a href="' + CTA_LINK.href + '" class="nv-cta">' + CTA_LINK.label + '</a>';
+    const link = (cfg.centerLinks || []).find(l => l.accent);
+    if (!link) return '';
+    return '<a href="' + link.href + '" class="nv-cta">' + link.label + '</a>';
   }
 
   function buildMobileSheet() {
     if (cfg.inApp) return '';
     let html = '';
-    NAV_ITEMS.forEach(item => {
-      if (item.type === 'link') {
-        html += '<a href="' + item.href + '" class="nv-mlink">' + item.label + '</a>';
-        return;
-      }
-      html += '<div class="nv-msection">' + item.label + '</div>';
-      item.items.forEach(it => {
-        if (it.sep) return;
-        html += '<a href="' + it.href + '" class="nv-mlink">' + it.label + '</a>';
+
+    NAV_DROPDOWNS.forEach(drop => {
+      html += '<div class="nv-msection">' + drop.label + '</div>';
+      drop.sections.forEach(sec => {
+        if (sec.sep) return;
+        if (sec.items && sec.items.length) {
+          sec.items.forEach(item => {
+            html += '<a href="' + item.href + '" class="nv-mlink">' + iconHtml(item.icon) + item.label + '</a>';
+          });
+        }
       });
+      html += '<div class="nv-msep"></div>';
     });
+
+    const plainLinks = (cfg.centerLinks || []).filter(l => !l.accent);
+    plainLinks.forEach(l => {
+      html += '<a href="' + l.href + '" class="nv-mlink' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>';
+    });
+
     const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="nv-mcta">Заказать сайт</a>' : '';
     if (!html && !ctaHtml) return '';
     return '<div class="nv-sheet" id="anMobileSheet">' + html + ctaHtml + '</div>';
@@ -422,41 +565,39 @@
 
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
-  <div class="nv-inner">
-    <a class="nv-logo" href="${b || '/'}">
-      <img src="${b}img/favicon.png" alt="Antviz">
-      Antviz
-    </a>
+  <a class="nv-logo" href="${b || '/'}">
+    <span class="nv-logo-badge"><img src="${b}img/favicon.png" alt="Antviz"></span>
+    Antviz
+  </a>
 
-    ${buildCenter()}
+  ${buildCenter()}
 
-    <div class="nv-right">
-      ${buildCta()}
-
-      <div class="nv-user" id="anUser">
-        <a href="${b}auth" class="nv-user-btn guest" id="anUserBtn" aria-expanded="false">
-          <div class="nv-avatar-ring" id="anAvatarRing">
-            <div class="nv-avatar" id="anAvatar">?</div>
-          </div>
-          <span class="nv-uname" id="anUname">Войти</span>
-          <svg class="nv-chev-user" viewBox="0 0 12 12" fill="none">
-            <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
-          </svg>
-        </a>
-        <div class="nv-dd" id="anDd">
-          <div class="nv-dd-head" id="anDdHead" style="display:none">
-            <div class="nv-dd-head-avatar" id="anDdHeadAvatar">?</div>
-            <div class="nv-dd-head-info">
-              <div class="nv-dd-head-name" id="anDdHeadName">—</div>
-              <div class="nv-dd-head-email" id="anDdHeadEmail">—</div>
-            </div>
-          </div>
-          ${buildDD()}
+  <div class="nv-right">
+    <div class="nv-user" id="anUser">
+      <a href="${b}auth" class="nv-user-btn guest" id="anUserBtn" aria-expanded="false">
+        <div class="nv-avatar-ring" id="anAvatarRing">
+          <div class="nv-avatar" id="anAvatar">?</div>
         </div>
+        <span class="nv-uname" id="anUname">Войти</span>
+        <svg class="nv-chev-user" viewBox="0 0 12 12" fill="none">
+          <path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </a>
+      <div class="nv-dd" id="anDd">
+        <div class="nv-dd-head" id="anDdHead" style="display:none">
+          <div class="nv-dd-head-avatar" id="anDdHeadAvatar">?</div>
+          <div class="nv-dd-head-info">
+            <div class="nv-dd-head-name" id="anDdHeadName">—</div>
+            <div class="nv-dd-head-email" id="anDdHeadEmail">—</div>
+          </div>
+        </div>
+        ${buildDD()}
       </div>
-
-      ${!cfg.inApp ? `<button class="nv-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span class="nv-burger-box"><span></span><span></span><span></span></span></button>` : ''}
     </div>
+
+    ${buildCta()}
+
+    ${!cfg.inApp ? `<button class="nv-burger" id="anBurger" aria-label="Меню" aria-expanded="false"><span class="nv-burger-box"><span></span><span></span><span></span></span></button>` : ''}
   </div>
 </nav>
 ${buildMobileSheet()}`;
@@ -465,17 +606,25 @@ ${buildMobileSheet()}`;
   style.textContent = CSS;
   document.head.appendChild(style);
 
-  // Sticky-бар занимает место в обычном потоке документа сам по себе —
-  // искусственный padding-top на body больше не нужен (в отличие от
-  // прежней плавающей капсулы с position:fixed).
+  const bodyPad = document.createElement('style');
+  bodyPad.textContent = 'body { padding-top: 110px; } @media(max-width:768px){ body { padding-top: 94px; } }';
+  document.head.appendChild(bodyPad);
+
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
 
   let userBtn = document.getElementById('anUserBtn');
   const dd    = document.getElementById('anDd');
   let isAuthed = false;
 
-  function closeAllNavDrops() {
-    document.querySelectorAll('.nv-drop.open').forEach(d => d.classList.remove('open'));
+  /* ── Единый механизм открытия/закрытия: только клик, только
+     класс .open — никакого CSS :hover-триггера и никакой второй
+     логики на aria-expanded одновременно. Один источник истины. ── */
+  function closeAllDrops(except) {
+    document.querySelectorAll('.nv-drop.open').forEach(d => {
+      if (d === except) return;
+      d.classList.remove('open');
+      d.querySelector('.nv-drop-btn')?.setAttribute('aria-expanded', 'false');
+    });
   }
   function closeUserDd() {
     dd?.classList.remove('open');
@@ -490,32 +639,29 @@ ${buildMobileSheet()}`;
   function onUserBtnClick(e) {
     if (!isAuthed) return;
     e.preventDefault();
-    closeAllNavDrops();
+    closeAllDrops();
     const open = !dd.classList.contains('open');
     dd.classList.toggle('open', open);
     userBtn.setAttribute('aria-expanded', String(open));
   }
   userBtn?.addEventListener('click', onUserBtnClick);
 
-  // Дропдауны в центре: на десктопе открываются по наведению (см. CSS,
-  // :hover). Клик — запасной способ для тач-планшетов/клавиатуры, не
-  // обязательный на мышке.
   document.querySelectorAll('.nv-drop').forEach(drop => {
     const btn = drop.querySelector('.nv-drop-btn');
     btn?.addEventListener('click', e => {
       e.stopPropagation();
       closeUserDd();
       const willOpen = !drop.classList.contains('open');
-      closeAllNavDrops();
+      closeAllDrops(willOpen ? drop : null);
       drop.classList.toggle('open', willOpen);
+      btn.setAttribute('aria-expanded', String(willOpen));
     });
-    drop.addEventListener('mouseleave', () => drop.classList.remove('open'));
   });
 
   const burger = document.getElementById('anBurger');
   const sheet  = document.getElementById('anMobileSheet');
   burger?.addEventListener('click', () => {
-    closeAllNavDrops();
+    closeAllDrops();
     closeUserDd();
     const open = !burger.classList.contains('open');
     burger.classList.toggle('open', open);
@@ -526,11 +672,11 @@ ${buildMobileSheet()}`;
   document.addEventListener('click', e => {
     if (userBtn && dd && !userBtn.contains(e.target) && !dd.contains(e.target)) closeUserDd();
     if (burger && sheet && !burger.contains(e.target) && !sheet.contains(e.target)) closeMobileSheet();
-    if (!e.target.closest('.nv-drop')) closeAllNavDrops();
+    if (!e.target.closest('.nv-drop')) closeAllDrops();
   });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      closeAllNavDrops();
+      closeAllDrops();
       closeUserDd();
       closeMobileSheet();
     }
@@ -682,7 +828,7 @@ ${buildMobileSheet()}`;
         tries++;
       }
       if (appMod.getApps().length === 0) {
-        console.error('nav.js: Firebase App не инициализирован страницей за 5 секунд — профиль не может загрузиться.');
+        console.error('nav.js: Произошла ошибка — профиль не может загрузиться.');
         return;
       }
 

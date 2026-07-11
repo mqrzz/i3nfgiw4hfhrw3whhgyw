@@ -8,6 +8,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <!-- Раньше тут подключался внешний шрифт-иконки Phosphor с CDN — единственное
+       место на сайте, где иконки не инлайновый SVG прямо в коде, как везде
+       (settings.html, quick-links и т.д.). Из-за внешней зависимости страница
+       либо ждала загрузку шрифта чтобы вообще отрисоваться, либо (после первой
+       попытки ускорить через async-загрузку) иконки грузились не во всех
+       браузерах. Убрали шрифт целиком, все иконки теперь инлайн-SVG. -->
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -61,7 +67,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .avatar{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:1.4rem;color:#fff;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;transition:opacity .2s}
 .avatar:hover{opacity:.85}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block}
-.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;font-size:16px;color:#fff}
+.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff}
+.avatar-overlay svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none}
 .avatar:hover .avatar-overlay{opacity:1}
 #avatarInput{display:none}
 .hero-id-text{min-width:0}
@@ -69,7 +76,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .hero-name{font-weight:500;font-size:clamp(1.5rem,2.6vw,2rem);letter-spacing:-.03em;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .hero-actions{display:flex;gap:8px;flex-shrink:0}
-.icon-btn{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background .18s;text-decoration:none;flex-shrink:0;font-size:18px;color:rgba(255,255,255,.65)}
+.icon-btn{width:44px;height:44px;border-radius:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background .18s;text-decoration:none;flex-shrink:0;color:rgba(255,255,255,.65)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none}
 .icon-btn:hover{background:rgba(255,255,255,.14)}
 .icon-btn .dot{position:absolute;top:9px;right:9px;width:7px;height:7px;border-radius:50%;background:#ff6b54;border:1.5px solid var(--dark);display:none}
 .icon-btn .dot.show{display:block}
@@ -94,7 +102,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:28px}
 .sec-head h2{font-size:clamp(24px,2.6vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.08}
 .sec-link{font-size:.86rem;font-weight:500;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:6px;flex-shrink:0}
-.sec-link i{font-size:13px}
+.sec-link svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
 .sec-link:hover{color:var(--green-d)}
 .main-col>section+section{margin-top:56px}
 
@@ -104,7 +112,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .fp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
 .fp-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--green-d);margin-bottom:6px}
 .fp-title{font-size:1.15rem;font-weight:500;letter-spacing:-.01em}
-.fp-icon{width:40px;height:40px;border-radius:12px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--green);font-size:18px;flex-shrink:0}
+.fp-icon{width:40px;height:40px;border-radius:12px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--green);flex-shrink:0}
+.fp-icon svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.7;fill:none}
 .fp-progress-track{height:6px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:10px}
 .fp-progress-fill{height:100%;background:var(--green);border-radius:100px;transition:width .8s cubic-bezier(.22,1,.36,1)}
 .fp-meta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
@@ -114,7 +123,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .p-row{display:grid;grid-template-columns:36px 1fr auto;gap:16px;align-items:center;padding:16px 0;border-bottom:1px solid var(--border);text-decoration:none;color:inherit;transition:padding-left .15s}
 .p-row:last-child{border-bottom:none}
 .p-row:hover{padding-left:8px}
-.p-row-ico{font-size:20px;color:var(--muted2);flex-shrink:0}
+.p-row-ico{flex-shrink:0;color:var(--muted2);display:flex;align-items:center}
+.p-row-ico svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none}
 .p-row-body{min-width:0}
 .p-row-title{font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .p-row-sub{font-size:.8rem;color:var(--muted)}
@@ -138,7 +148,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .bento-tile{border:1.5px solid var(--border);border-radius:22px;padding:22px}
 .bento-tile.dark{background:var(--dark);border-color:var(--dark);color:#fff}
 .bento-tile.accent{background:var(--green);border-color:var(--green);color:var(--dark)}
-.bt-icon{width:34px;height:34px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--muted);margin-bottom:14px}
+.bt-icon{width:34px;height:34px;border-radius:10px;background:var(--bg3);display:flex;align-items:center;justify-content:center;color:var(--muted);margin-bottom:14px}
+.bt-icon svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none}
 .bento-tile.dark .bt-icon{background:rgba(255,255,255,.1);color:var(--green)}
 .bento-tile.accent .bt-icon{background:rgba(0,0,0,.1);color:var(--dark)}
 .bt-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
@@ -152,6 +163,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .bento-tile.dark .bt-track{background:rgba(255,255,255,.12)}
 .bt-fill{height:100%;background:var(--green);border-radius:100px}
 .bt-cta{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;font-weight:500;color:var(--dark);text-decoration:none;margin-top:12px}
+.bt-cta svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.9;fill:none;flex-shrink:0}
 .bento-tile.dark .bt-cta{color:var(--green)}
 .bento-tile.accent .bt-cta{color:var(--dark)}
 
@@ -159,9 +171,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .quick-links{display:flex;flex-direction:column;gap:2px}
 .quick-links a{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-radius:16px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;transition:background .15s}
 .quick-links a:hover{background:var(--bg3)}
-.quick-links a i:first-child{font-size:17px;color:var(--muted);margin-right:12px}
 .quick-links a span{flex:1}
-.quick-links a i:last-child{font-size:13px;color:var(--muted2)}
+.quick-links a svg:last-child{width:13px;height:13px;stroke-width:2;margin-right:0;color:var(--muted2)}
 .ql-badge{background:var(--green);color:var(--dark);font-size:.66rem;font-weight:500;padding:.16rem .5rem;border-radius:8px;margin-right:8px}
 
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;padding:.6rem 1.3rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap}
@@ -201,7 +212,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           <div class="hero-id">
             <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
               <span id="avatarLetter">А</span>
-              <div class="avatar-overlay"><i class="ph-fill ph-camera"></i></div>
+              <div class="avatar-overlay"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
             </div>
             <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
             <div class="hero-id-text">
@@ -211,11 +222,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           </div>
           <div class="hero-actions">
             <a class="icon-btn" href="profile/notifications" title="Уведомления">
-              <i class="ph-fill ph-bell"></i>
+              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
               <span class="dot" id="notifDot"></span>
             </a>
             <a class="icon-btn" href="profile/settings" title="Настройки">
-              <i class="ph-fill ph-gear-six"></i>
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg>
             </a>
           </div>
         </div>
@@ -239,7 +250,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <section class="reveal">
           <div class="sec-head">
             <div><p class="eyebrow g">Ваши заказы</p><h2>Заказы</h2></div>
-            <a href="profile/orders" class="sec-link">Все заказы <i class="ph-fill ph-arrow-right"></i></a>
+            <a href="profile/orders" class="sec-link">Все заказы <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
           </div>
           <div id="featuredProjectSlot"></div>
           <div class="plain-list" id="recentProjects"><div class="list-empty">Загрузка...</div></div>
@@ -260,13 +271,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
         <div class="reveal bento-tile quick-links-tile" style="padding:8px 6px">
           <div class="quick-links">
-            <a href="profile/orders"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg><span>Мои заказы</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><i class="ph-fill ph-caret-right"></i></a>
-            <a href="profile/sites"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg><span>Мои сайты</span><i class="ph-fill ph-caret-right"></i></a>
-            <a href="profile/support"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg><span>Чат с командой</span><span class="ql-badge" id="qlHelpBadge" style="display:none">!</span><i class="ph-fill ph-caret-right"></i></a>
-            <a href="profile/tickets"><svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg><span>Обслуживание</span><i class="ph-fill ph-caret-right"></i></a>
-            <a href="profile/notifications"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>Уведомления</span><i class="ph-fill ph-caret-right"></i></a>
-            <a href="order"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Новый заказ</span><i class="ph-fill ph-caret-right"></i></a>
-            <a href="profile/settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg><span>Настройки</span><i class="ph-fill ph-caret-right"></i></a>
+            <a href="profile/orders"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg><span>Мои заказы</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/sites"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg><span>Мои сайты</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/support"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg><span>Чат с командой</span><span class="ql-badge" id="qlHelpBadge" style="display:none">!</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/tickets"><svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg><span>Обслуживание</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/notifications"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span>Уведомления</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="order"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Новый заказ</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg><span>Настройки</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
           </div>
         </div>
 
@@ -338,7 +349,13 @@ function observeCountOnce(el){
 
 const STATUS_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 const STATUS_PROGRESS={0:5,1:25,2:45,3:70,4:85,5:100,6:70};
-const STATUS_ICON={0:'ph-file-text',1:'ph-hammer',2:'ph-hammer',3:'ph-eye',4:'ph-pencil-simple',5:'ph-check-circle',6:'ph-wallet'};
+const ICON_FILE_TEXT='<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 13h6M9 16.5h6M9 9.5h2"/></svg>';
+const ICON_HAMMER='<svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 0 0-4.9 4.66l-5.6 5.6a1.9 1.9 0 0 0 2.7 2.7l5.6-5.6a3.6 3.6 0 0 0 4.66-4.9l-2.53 2.53-2-2z"/></svg>';
+const ICON_EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_PENCIL='<svg viewBox="0 0 24 24"><path d="M16.5 3.5l4 4L8 20l-5 1 1-5 12.5-12.5z"/></svg>';
+const ICON_CHECK_CIRCLE='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
+const ICON_WALLET='<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M16 12.5h2.5"/></svg>';
+const STATUS_ICON={0:ICON_FILE_TEXT,1:ICON_HAMMER,2:ICON_HAMMER,3:ICON_EYE,4:ICON_PENCIL,5:ICON_CHECK_CIRCLE,6:ICON_WALLET};
 
 function renderFeaturedAndList(orders){
   const slot=document.getElementById('featuredProjectSlot');
@@ -358,7 +375,7 @@ function renderFeaturedAndList(orders){
     slot.innerHTML=`<div class="featured-project">
       <div class="fp-top">
         <div><div class="fp-eyebrow">Сейчас в работе</div><div class="fp-title">${featured.siteName||featured.siteDomain||featured.siteType||'Проект'}</div></div>
-        <div class="fp-icon"><i class="ph-fill ${STATUS_ICON[featured.status]||'ph-hammer'}"></i></div>
+        <div class="fp-icon">${STATUS_ICON[featured.status]||ICON_HAMMER}</div>
       </div>
       <div class="fp-progress-track"><div class="fp-progress-fill" style="width:0%" data-target="${pct}"></div></div>
       <div class="fp-meta"><span>Этап: <b>${STATUS_LABEL[featured.status]}</b></span><a href="profile/orders" style="color:var(--green-d);text-decoration:none;font-weight:500">Подробнее →</a></div>
@@ -372,7 +389,7 @@ function renderFeaturedAndList(orders){
     list.innerHTML=rest.map(o=>{
       const st=o.status||0, done=st===5;
       return `<a href="profile/orders" class="p-row">
-        <i class="ph-fill ${STATUS_ICON[st]} p-row-ico"></i>
+        <span class="p-row-ico">${STATUS_ICON[st]}</span>
         <div class="p-row-body"><div class="p-row-title">${o.siteName||o.siteDomain||o.siteType||'Заказ'}</div><div class="p-row-sub">${fmtDateShort(o.createdAt)?'Создан '+fmtDateShort(o.createdAt):''}</div></div>
         <span class="p-tag ${done?'done':'progress'}">${STATUS_LABEL[st]}</span>
       </a>`;
@@ -443,7 +460,7 @@ async function loadBento(uid){
       const days=Math.ceil((activeSupport.supportExpiresAt.toDate()-new Date())/86400000);
       const pct=Math.max(4,Math.min(100,Math.round(days/30*100)));
       supportSlot.innerHTML=`<div class="bento-tile dark">
-        <div class="bt-icon"><i class="ph-fill ph-shield-check"></i></div>
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
         <div class="bt-label">Обслуживание</div>
         <div class="bt-value">${days} дн.</div>
         <div class="bt-sub">${activeSupport.siteName||activeSupport.siteDomain||'осталось по подписке'}</div>
@@ -451,22 +468,22 @@ async function loadBento(uid){
       </div>`;
     } else {
       supportSlot.innerHTML=`<div class="bento-tile">
-        <div class="bt-icon"><i class="ph-fill ph-shield-check"></i></div>
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
         <div class="bt-label">Обслуживание</div>
         <div class="bt-value" style="font-size:1rem">Не подключено</div>
-        <a class="bt-cta" href="profile/support">Подключить <i class="ph-fill ph-arrow-right"></i></a>
+        <a class="bt-cta" href="profile/support">Подключить <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>`;
     }
 
     const msgSlot=document.getElementById('bentoMessages');
     const unread=chatSnap.size;
     msgSlot.innerHTML=unread>0?`<div class="bento-tile accent">
-        <div class="bt-icon"><i class="ph-fill ph-chat-circle-dots"></i></div>
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.5 0 1115.48-4.6z"/><circle cx="9" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r=".65" fill="currentColor" stroke="none"/></svg></div>
         <div class="bt-label">Сообщения</div>
         <div class="bt-value">${unread} новых</div>
-        <a class="bt-cta" href="profile/support">Открыть <i class="ph-fill ph-arrow-right"></i></a>
+        <a class="bt-cta" href="profile/support">Открыть <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>`:`<div class="bento-tile">
-        <div class="bt-icon"><i class="ph-fill ph-chat-circle-dots"></i></div>
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.5 0 1115.48-4.6z"/><circle cx="9" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r=".65" fill="currentColor" stroke="none"/></svg></div>
         <div class="bt-label">Сообщения</div>
         <div class="bt-value" style="font-size:1rem">Всё прочитано</div>
         <div class="bt-sub">Команда на связи в поддержке</div>
@@ -477,10 +494,10 @@ async function loadBento(uid){
     if(doneUnreviewed){
       reviewSlot.style.display='block';
       reviewSlot.innerHTML=`<div class="bento-tile">
-        <div class="bt-icon"><i class="ph-fill ph-star"></i></div>
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.7-4.3 4.1 1.1 5.9L12 16.8 6.7 19.6l1.1-5.9-4.3-4.1 5.9-.7L12 3.5z"/></svg></div>
         <div class="bt-label">Отзыв</div>
         <div class="bt-value" style="font-size:1rem">Как всё прошло?</div>
-        <a class="bt-cta" href="profile/orders">Оставить отзыв <i class="ph-fill ph-arrow-right"></i></a>
+        <a class="bt-cta" href="profile/orders">Оставить отзыв <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
       </div>`;
     }
 

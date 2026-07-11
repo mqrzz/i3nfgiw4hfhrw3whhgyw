@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <title>Добро пожаловать — Antviz</title>
 <link rel="icon" href="img/favicon.png" type="image/png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -20,7 +20,7 @@
   --font:'Geologica','Inter','Arial',sans-serif;
 }
 html{overflow-x:hidden}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;height:100vh;height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;height:100vh;height:100dvh;overflow:hidden;-webkit-font-smoothing:antialiased;overscroll-behavior:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 :focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
 
@@ -42,14 +42,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .loading-text{color:var(--ink-faint);font-size:.75rem}
 
 /* ===== экран с именем (до онбординга) и прощальный экран ===== */
-.name-screen{position:fixed;inset:0;z-index:600;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:30px;text-align:center;padding:32px;opacity:1;transform:translateY(0);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+.name-screen{position:fixed;inset:0;z-index:600;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:30px;text-align:center;padding:32px;overflow-y:auto;opacity:1;transform:translateY(0);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
 .name-screen.show{display:flex}
 .name-screen.leaving{opacity:0;transform:translateY(-70px)}
 .name-screen-icon{width:100px;height:100px;border-radius:30px;background:var(--dark);display:flex;align-items:center;justify-content:center}
 .name-screen-icon svg{width:46px;height:46px;fill:none}
 .name-screen-icon svg path,.name-screen-icon svg circle{stroke:var(--accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .name-screen-eyebrow{font-size:.78rem;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-faint)}
-.name-screen-text{font-size:clamp(2.4rem,8vw,5.2rem);font-weight:500;letter-spacing:-.03em;line-height:1.05;color:var(--ink);animation:popIn .6s cubic-bezier(.16,1,.3,1) both}
+.name-screen-text{font-size:clamp(2.4rem,8vw,5.2rem);font-weight:500;letter-spacing:-.03em;line-height:1.05;color:var(--ink);animation:popIn .6s cubic-bezier(.16,1,.3,1) both;overflow-wrap:break-word;word-break:break-word;max-width:100%}
 .name-screen-text em{font-style:normal;color:var(--accent-d)}
 @media(min-width:1100px){
   .name-screen-icon{width:130px;height:130px;border-radius:38px}
@@ -96,12 +96,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .step-icon-done svg path,.step-icon-done svg circle,.step-icon-done svg polyline{stroke:var(--dark);stroke-width:2}
 
 .step-eyebrow{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--accent-d);margin-bottom:14px}
-.step h1{font-size:clamp(1.9rem,4vw,2.7rem);font-weight:500;letter-spacing:-.03em;line-height:1.08;margin-bottom:16px}
+.step h1{font-size:clamp(1.9rem,4vw,2.7rem);font-weight:500;letter-spacing:-.03em;line-height:1.08;margin-bottom:16px;overflow-wrap:break-word;word-break:break-word;max-width:100%}
 .step h1 em{font-style:normal;color:var(--accent-d)}
 .step p{max-width:440px;font-size:1rem;color:var(--ink-dim);font-weight:300;line-height:1.65}
 
 /* hero name letters */
-.hero-name{position:relative;display:inline-flex}
+.hero-name{position:relative;display:inline-flex;flex-wrap:wrap;justify-content:center;max-width:100%}
 .letter{display:inline-block;opacity:0;transform:translateY(34px) scale(.7);animation:letterUp .65s cubic-bezier(.16,1,.3,1) forwards}
 .sparkle{position:absolute;opacity:0;pointer-events:none}
 .sparkle svg{width:100%;height:100%;stroke:var(--accent-d);stroke-width:1.6;fill:none}
@@ -237,23 +237,28 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 }
 
 @media(max-width:640px){
-  .brand{top:20px;left:20px}
-  .skip{top:22px;right:20px}
-  .progress-wrap{top:20px}
-  .progress-track{width:130px}
-  .wrap{padding:20px}
-  .stage{height:auto;min-height:540px;max-height:76vh;max-height:76dvh;margin-top:46px}
+  body{height:auto;min-height:100vh;min-height:100dvh;overflow-y:auto;overflow-x:hidden}
+  .wrap{height:auto;min-height:100vh;min-height:100dvh;padding:20px;padding-top:calc(20px + env(safe-area-inset-top));padding-bottom:calc(20px + env(safe-area-inset-bottom))}
+  .brand{top:calc(16px + env(safe-area-inset-top));left:16px}
+  .skip{top:calc(16px + env(safe-area-inset-top));right:16px}
+  .progress-wrap{position:fixed;top:0;left:0;transform:none;width:100%;padding-top:env(safe-area-inset-top)}
+  .progress-track{width:100%;height:3px;border-radius:0}
+  .stage{height:auto;min-height:500px;margin-top:52px}
   .step{overflow-y:auto;overflow-x:hidden;padding:10px 6px;justify-content:flex-start}
   .step-icon{width:76px;height:76px;border-radius:22px;margin-bottom:22px}
   .step-icon svg{width:34px;height:34px}
   .demo-sidebar{flex-direction:column}
-  .demo-nav{width:100%;flex-direction:row;overflow-x:auto;gap:6px;-webkit-overflow-scrolling:touch}
+  .demo-nav{width:100%;flex-direction:row;overflow-x:auto;gap:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
+  .demo-nav::-webkit-scrollbar{display:none}
   .demo-item{width:auto;flex-shrink:0;white-space:nowrap}
   .demo-info{min-height:140px}
   .demo-timeline{flex-direction:column;align-items:stretch;gap:0}
   .tl-node{flex-direction:row;align-items:flex-start;text-align:left;gap:14px;min-height:66px}
-  .tl-rail{flex-direction:column;width:auto;height:auto;align-self:stretch;justify-content:flex-start}
-  .tl-line{position:static;width:2px;flex:1;left:auto;top:auto;transform:none;min-height:20px;margin:2px 0}
+  .tl-rail{flex-direction:column;width:auto;height:auto;align-self:stretch;align-items:center;justify-content:flex-start}
+  .tl-dot{order:1;flex-shrink:0}
+  .tl-line{position:static;order:2;width:2px;flex:1;left:auto;top:auto;transform:none;min-height:20px;margin:4px 0 0}
+  .tl-node:first-child .tl-line{display:block}
+  .tl-node:last-child .tl-line{display:none}
   .tl-title,.tl-text{text-align:left;max-width:none}
   .tl-title{justify-content:flex-start}
   .site-mock{max-width:100%}

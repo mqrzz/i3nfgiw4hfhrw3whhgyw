@@ -39,10 +39,12 @@
       color: var(--text);
       font-family: var(--font);
       font-weight: 300;
-      min-height: 100vh;
-      display:flex;
-      flex-direction:column;
       overflow-x:hidden;
+    }
+    
+    .page-wrap{
+      min-height:100vh;
+      display:flex;
     }
     
     .content-wrapper{
@@ -51,8 +53,124 @@
       align-items:center;
       justify-content:center;
       width:100%;
-      padding:0 1.5rem;
-      margin-bottom:2.5rem;
+      padding:2.5rem 1.5rem;
+    }
+    
+    /* ===== Left brand panel (desktop only) ===== */
+    .side-panel{
+      display:none;
+      position:relative;
+      flex:1;
+      max-width:700px;
+      background:
+        radial-gradient(600px circle at 15% 15%, rgba(30,222,123,.16), transparent 60%),
+        radial-gradient(500px circle at 85% 85%, rgba(30,222,123,.10), transparent 55%),
+        var(--dark);
+      color:#fff;
+      overflow:hidden;
+      flex-direction:column;
+      justify-content:center;
+      padding: 4rem 3.6rem;
+    }
+    .side-panel::before{
+      content:'';
+      position:absolute;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size:44px 44px;
+      -webkit-mask-image: radial-gradient(circle at 30% 30%, #000 0%, transparent 70%);
+      mask-image: radial-gradient(circle at 30% 30%, #000 0%, transparent 70%);
+    }
+    .side-panel-inner{position:relative;z-index:1}
+    .side-logo{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      font-weight:600;
+      font-size:1rem;
+      letter-spacing:.02em;
+      margin-bottom:3.2rem;
+      color:#fff;
+      text-decoration:none;
+    }
+    .side-logo img{
+      width:34px;
+      height:34px;
+      border-radius:9px;
+      object-fit:cover;
+    }
+    
+
+    .side-title{
+      font-size:2.5rem;
+      font-weight:600;
+      letter-spacing:-0.03em;
+      line-height:1.15;
+      margin-bottom:.6rem;
+      max-width:420px;
+    }
+    
+    .side-rotator{
+      position:relative;
+      height:3.6rem;
+      overflow:hidden;
+      margin-bottom:1.6rem;
+      padding-top:.35rem;
+    }
+    .side-rotator span{
+      position:absolute;
+      left:0; top:.35rem;
+      font-size:2.5rem;
+      line-height:1.15;
+      font-weight:600;
+      letter-spacing:-0.03em;
+      background:linear-gradient(90deg,var(--green),#8ef7c0);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      opacity:0;
+      transform:translateY(18px);
+      transition:opacity .5s ease, transform .5s ease;
+      white-space:nowrap;
+    }
+    .side-rotator span.active{
+      opacity:1;
+      transform:translateY(0);
+    }
+    .side-rotator span.out{
+      opacity:0;
+      transform:translateY(-18px);
+    }
+    
+    .side-sub{
+      color:rgba(255,255,255,.6);
+      font-size:1rem;
+      line-height:1.6;
+      max-width:400px;
+      margin-bottom:2.4rem;
+    }
+    
+    .side-stats{
+      display:flex;
+      gap:2.2rem;
+    }
+    .side-stat b{
+      display:block;
+      font-size:1.5rem;
+      font-weight:600;
+      letter-spacing:-0.02em;
+    }
+    .side-stat span{
+      display:block;
+      color:rgba(255,255,255,.5);
+      font-size:.78rem;
+      margin-top:.15rem;
+    }
+    
+    @media(min-width:961px){
+      .side-panel{display:flex}
     }
     
 
@@ -391,7 +509,28 @@
 
 <script src="/GEOBLOCK.js"></script>
 
-<div class="content-wrapper">
+<div class="page-wrap">
+
+  <div class="side-panel">
+    <div class="side-panel-inner">
+      <a href="/" class="side-logo">
+        <img src="img/favicon.png" alt="Antviz">
+        Antviz
+      </a>
+
+      <div class="side-title">Мы занимаемся</div>
+      <div class="side-rotator" id="sideRotator"></div>
+
+      <p class="side-sub">Разрабатываем, запускаем и сопровождаем сайты под ключ — от идеи до стабильной работы после релиза.</p>
+
+      <div class="side-stats">
+        <div class="side-stat"><b>2 дня</b><span>средняя разработка лендинга</span></div>
+        <div class="side-stat"><b>24/7</b><span>техподдержка</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-wrapper">
   <div class="card">
     <a href="/" class="logo-block">
       <img src="img/favicon.png" alt="Antviz">
@@ -432,6 +571,8 @@
     </div>
     <a href="/" class="back">← Вернуться на главную</a>
   </div>
+</div>
+
 </div>
 
 <div class="modal-bg" id="googleRestrictModal">
@@ -493,6 +634,33 @@
     if(lb && lb.disabled) lb.disabled = false;
     if(rb && rb.disabled) rb.disabled = false;
   }, 8000);
+
+  // Анимированная смена фраз в левой панели
+  (function(){
+    const el = document.getElementById('sideRotator');
+    if(!el) return;
+    const phrases = ['созданием сайтов','обслуживанием сайтов','продвижением в топ','дизайном и вёрсткой','SEO-оптимизацией'];
+    let i = 0;
+    const make = (text, cls) => {
+      const s = document.createElement('span');
+      s.textContent = text;
+      if(cls) s.className = cls;
+      return s;
+    };
+    let current = make(phrases[0], 'active');
+    el.appendChild(current);
+    setInterval(()=>{
+      i = (i + 1) % phrases.length;
+      const next = make(phrases[i]);
+      el.appendChild(next);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>next.classList.add('active')));
+      current.classList.remove('active');
+      current.classList.add('out');
+      const old = current;
+      setTimeout(()=>old.remove(), 550);
+      current = next;
+    }, 2400);
+  })();
 </script>
 
 <script type="module">

@@ -5,318 +5,290 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Мои заказы — Antviz</title>
   <link rel="icon" href="../img/favicon.png" type="image/png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --line:#dfe3e8;--line-strong:#cbcdd6;
-  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
-  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;
-  --accent-wash:rgba(30,222,123,.12);
-  --dark:#191b1e;--dark2:#2b2f33;
-  --bad:#e8634f;--bad-d:#c8412f;--bad-wash:rgba(232,99,79,.1);
-  --warn:#f59e0b;--warn-d:#b45309;--warn-wash:rgba(245,158,11,.12);
-  --violet:#8b7bf7;--violet-wash:rgba(139,123,247,.12);
-  --info:#3b82f6;--info-d:#2563eb;--info-wash:rgba(59,130,246,.12);
-  --font:'Geologica','Inter','Arial',sans-serif;
-  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
-  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
+  --bg:#fff;--bg2:#fafafa;--bg3:#f5f5f5;
+  --line:#eaeaea;--line-strong:#e0e0e0;
+  --ink:#000;--ink-dim:#666;--ink-faint:#8f8f8f;
+  --black:#000;--black2:#1a1a1a;
+  --danger:#e5484d;--danger-d:#c53030;--danger-wash:#fff1f0;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --radius-sm:6px;--radius-md:8px;--radius-lg:12px;
 }
 html{scroll-behavior:smooth;overflow-x:hidden}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:400;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;font-size:14px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0}to{opacity:1}}
 @keyframes cFall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
-.loading-text{color:var(--ink-faint);font-size:.75rem}
+.spinner{width:20px;height:20px;border:2px solid var(--line-strong);border-top-color:var(--ink);border-radius:50%;animation:spin .65s linear infinite}
+.loading-text{color:var(--ink-faint);font-size:13px}
 .confetti-wrap{position:fixed;inset:0;z-index:9800;pointer-events:none;overflow:hidden}
-.c-piece{position:absolute;top:-10px;border-radius:2px;animation:cFall linear forwards}
+.c-piece{position:absolute;top:-10px;border-radius:1px;animation:cFall linear forwards}
 
-.shell{width:100%;animation:fadeUp .3s ease}
+.page-wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+.shell{width:100%;animation:fadeUp .25s ease}
 
-/* HERO */
-.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
-.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
-.page-hero-title em{font-style:normal;color:var(--accent)}
-.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+/* TOP HEADER — как breadcrumb-бар Vercel */
+.topbar{display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:1px solid var(--line);gap:16px;flex-wrap:wrap}
+.topbar-crumb{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:var(--ink)}
+.topbar-crumb .crumb-dim{color:var(--ink-faint);font-weight:400}
+.topbar-crumb svg{width:14px;height:14px;stroke:var(--ink-faint);stroke-width:2;fill:none;flex-shrink:0}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,opacity .15s;white-space:nowrap}
-.btn:hover:not(:disabled){transform:translateY(-1px)}
-.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
-.btn-green{background:var(--accent);color:var(--dark)}
-.btn-green:hover{background:var(--accent-h)}
-.btn-dark{background:var(--dark);color:#fff}
-.btn-dark:hover{background:var(--dark2)}
-.btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
-.btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
-.btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
-.btn-outline:hover{border-color:var(--ink);color:var(--ink);background:var(--bg2)}
-.btn-sm{padding:10px 20px;font-size:.84rem;border-radius:10px}
-.btn:disabled{opacity:.5;cursor:default;transform:none}
+/* PAGE TITLE ROW */
+.page-title-row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px 0 20px}
+.page-title{font-size:20px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+.page-sub{font-size:13px;color:var(--ink-faint);margin-top:4px}
 
-/* TOOLBAR */
-.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
-.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
-.tab:hover{color:var(--ink)}
-.tab.is-active{background:var(--dark);color:#fff}
-.count-label{color:var(--ink-faint);font-size:.76rem}
+/* BUTTONS — компактные, как в Vercel (32px высота) */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border-radius:var(--radius-sm);padding:0 14px;height:32px;font-size:13px;letter-spacing:0;transition:background .1s,border-color .1s,color .1s,opacity .15s;white-space:nowrap;border:1px solid transparent}
+.btn svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-primary{background:var(--black);color:#fff;border-color:var(--black)}
+.btn-primary:hover:not(:disabled){background:var(--black2)}
+.btn-secondary{background:#fff;color:var(--ink);border-color:var(--line-strong)}
+.btn-secondary:hover:not(:disabled){border-color:var(--ink);background:var(--bg2)}
+.btn-ghost{background:transparent;color:var(--ink-dim);border-color:transparent}
+.btn-ghost:hover:not(:disabled){background:var(--bg2);color:var(--ink)}
+.btn-danger{background:#fff;color:var(--danger);border-color:var(--line-strong)}
+.btn-danger:hover:not(:disabled){border-color:var(--danger);background:var(--danger-wash)}
+.btn-lg{height:36px;padding:0 18px;font-size:13.5px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn-block{width:100%}
 
-/* COLUMNS HEADER */
-.ord-cols{display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;padding:0 32px 12px;font-size:.64rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+/* SUBNAV — underline tabs как разделы проекта в Vercel */
+.subnav{display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);overflow-x:auto}
+.subnav-tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:14px;font-weight:500;padding:10px 12px;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .12s,border-color .12s}
+.subnav-tab:hover{color:var(--ink)}
+.subnav-tab.is-active{color:var(--ink);border-bottom-color:var(--ink)}
 
-/* LIST */
-.ord-list{display:flex;flex-direction:column;gap:12px}
-.ord-row-wrap{position:relative;border:1.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--bg);box-shadow:var(--sh1);animation:rowIn .2s ease both;transition:box-shadow .15s,border-color .15s,transform .15s}
-.ord-row-wrap:hover{border-color:var(--line-strong);box-shadow:var(--sh2);transform:translateY(-1px)}
-.ord-row-wrap::before{content:'';position:absolute;left:14px;top:16px;bottom:16px;width:3px;border-radius:3px;background:var(--line-strong);opacity:.4}
-.ord-row-wrap[data-status="1"]::before,.ord-row-wrap[data-status="2"]::before{background:var(--info);opacity:1}
-.ord-row-wrap[data-status="3"]::before,.ord-row-wrap[data-status="6"]::before{background:var(--warn);opacity:1}
-.ord-row-wrap[data-status="4"]::before{background:var(--violet);opacity:1}
-.ord-row-wrap[data-status="5"]::before{background:var(--accent);opacity:1}
+.toolbar{display:flex;align-items:center;justify-content:flex-end;padding:14px 0}
+.count-label{color:var(--ink-faint);font-size:12.5px}
+
+/* TABLE */
+.table-wrap{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden;background:var(--bg)}
+.ord-cols{display:grid;grid-template-columns:1fr 170px 150px 110px;gap:16px;padding:0 20px;height:38px;align-items:center;font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);background:var(--bg2);border-bottom:1px solid var(--line)}
+
+.ord-list{display:flex;flex-direction:column}
+.ord-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .15s ease both}
+.ord-row-wrap:last-child{border-bottom:none}
 .ord-row-wrap.is-filtered{display:none}
-.ord-row{all:unset;box-sizing:border-box;display:grid;grid-template-columns:1fr 160px 140px 110px 20px;gap:16px;align-items:center;width:100%;padding:24px 32px 24px 40px;cursor:pointer;transition:background .15s;font-family:var(--font)}
+.ord-row{all:unset;box-sizing:border-box;display:grid;grid-template-columns:1fr 170px 150px 110px;gap:16px;align-items:center;width:100%;padding:14px 20px;cursor:pointer;transition:background .1s;font-family:var(--font)}
 .ord-row:hover{background:var(--bg2)}
-.ord-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
-.ord-num{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.ord-meta{font-size:.76rem;color:var(--ink-faint)}
+.ord-cell-main{display:flex;flex-direction:column;gap:3px;min-width:0}
+.ord-num{font-size:13.5px;font-weight:500;color:var(--ink);letter-spacing:-.005em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ord-meta{font-size:12px;color:var(--ink-faint)}
+.ord-price{font-size:13.5px;font-weight:500;text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
 
-/* STATUS TAGS */
-.ord-tag{display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:500;padding:.32rem .7rem .32rem .55rem;border-radius:20px;width:fit-content;letter-spacing:-.005em}
-.ord-tag svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-/* Статусы сгруппированы по смыслу, а не раскрашены по одному: серый — ещё не начали,
-   синий — мы работаем, жёлтый — ждём действия от клиента, зелёный — готово. */
-.ord-tag.s0{background:var(--bg2);color:var(--ink-dim)}
-.ord-tag.s1,.ord-tag.s2{background:var(--info-wash);color:var(--info-d)}
-.ord-tag.s3,.ord-tag.s6{background:var(--warn-wash);color:var(--warn-d)}
-.ord-tag.s4{background:var(--violet-wash);color:#6f5fe0}
-.ord-tag.s5{background:var(--accent-wash);color:var(--accent-d)}
+/* STATUS / PAY — монохромные плашки: точка + текст, без цвета */
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;padding:3px 9px 3px 7px;border-radius:20px;width:fit-content;border:1px solid var(--line-strong);color:var(--ink-dim);background:var(--bg)}
+.tag .dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
+.tag.is-final{background:var(--black);border-color:var(--black);color:#fff}
+.tag.is-final .dot{background:#fff}
+.tag.is-progress .dot{background:var(--ink)}
+.tag.is-progress{color:var(--ink);border-color:var(--line-strong)}
 
-/* PAY STATUS */
-.ord-pay{display:inline-flex;align-items:center;gap:5px;font-size:.75rem;font-weight:500}
-.ord-pay svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.ord-pay.is-paid{color:var(--accent-h)}
-.ord-pay.is-unpaid{color:var(--ink-faint)}
-.ord-pay.is-half{color:var(--warn-d)}
-.ord-price{font-size:.92rem;font-weight:500;text-align:right;color:var(--ink)}
-.ord-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
+.pay-plain{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-faint)}
+.pay-plain .dot{width:6px;height:6px;border-radius:50%;background:var(--line-strong);flex-shrink:0}
+.pay-plain.is-paid{color:var(--ink);font-weight:500}
+.pay-plain.is-paid .dot{background:var(--black)}
+.pay-plain.is-half .dot{background:var(--ink-dim)}
 
-/* ── REVIEW CALL-TO-ACTION (inline блок в списке заказов) ── */
-.review-cta{background:var(--dark);border-radius:24px;padding:28px 32px;margin:24px 0 0;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
-.review-cta-ico{width:48px;height:48px;border-radius:50%;background:var(--accent-wash);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.review-cta-ico svg{width:22px;height:22px;stroke:var(--accent);stroke-width:1.7;fill:none}
+/* REVIEW CTA — нейтральная плашка-подсказка */
+.review-cta{border:1px solid var(--line);border-radius:var(--radius-md);padding:16px 20px;margin-top:16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:var(--bg2)}
+.review-cta-ico{width:32px;height:32px;border-radius:50%;background:var(--bg);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.review-cta-ico svg{width:15px;height:15px;stroke:var(--ink);stroke-width:1.7;fill:none}
 .review-cta-body{flex:1;min-width:0}
-.review-cta-title{font-size:1rem;font-weight:500;color:#fff;margin-bottom:4px;letter-spacing:-.01em}
-.review-cta-sub{font-size:.84rem;color:rgba(255,255,255,.35);font-weight:300}
+.review-cta-title{font-size:13.5px;font-weight:500;color:var(--ink);margin-bottom:2px}
+.review-cta-sub{font-size:12.5px;color:var(--ink-faint)}
 
-/* ORDER MODAL */
-.ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+/* ORDER MODAL — светлый диалог, как настройки в Vercel */
+.ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .18s}
 .ord-modal-overlay.show{opacity:1;pointer-events:all}
-.ord-modal{background:var(--bg);border-radius:48px;width:100%;max-width:1200px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(28px) scale(.97);transition:transform .32s cubic-bezier(.22,1,.36,1);box-shadow:0 40px 120px rgba(0,0,0,.3)}
+.ord-modal{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-lg);width:100%;max-width:960px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(10px) scale(.99);transition:transform .2s cubic-bezier(.22,1,.36,1);box-shadow:0 20px 60px rgba(0,0,0,.18)}
 .ord-modal-overlay.show .ord-modal{transform:translateY(0) scale(1)}
 
-.ord-modal-header{background:var(--dark);padding:40px 56px 36px;flex-shrink:0;border-radius:48px 48px 0 0;position:relative}
-.ord-modal-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:12px}
-.ord-modal-title{font-size:clamp(1.8rem,3vw,2.8rem);font-weight:500;letter-spacing:-.04em;color:#fff;line-height:1.05;margin-bottom:14px;padding-right:56px}
+.ord-modal-header{padding:20px 24px;flex-shrink:0;border-bottom:1px solid var(--line);position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.ord-modal-headtext{min-width:0}
+.ord-modal-eyebrow{font-size:11.5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);margin-bottom:6px}
+.ord-modal-title{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--ink);line-height:1.3;margin-bottom:10px}
 .ord-modal-chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.ord-chip{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.28rem .75rem;border-radius:8px}
-.ord-chip.status{background:rgba(255,255,255,.08);color:rgba(255,255,255,.6)}
-.ord-chip.status.s1,.ord-chip.status.s2{background:rgba(59,130,246,.22);color:#8fb8ff}
-.ord-chip.status.s3,.ord-chip.status.s6{background:rgba(245,158,11,.2);color:#ffcb7a}
-.ord-chip.status.s4{background:rgba(139,123,247,.22);color:#c3b8ff}
-.ord-chip.status.s5{background:var(--accent);color:var(--dark)}
-.ord-chip.paid-yes{background:rgba(30,222,123,.15);color:var(--accent)}
-.ord-chip.paid-half{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5)}
-.ord-chip.paid-no{background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
-.ord-chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-.ord-chip-ico{width:12px;height:12px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0}
-.ord-modal-price{font-size:clamp(2.2rem,4vw,3.2rem);font-weight:500;letter-spacing:-.04em;color:#fff;margin-top:18px}
-.ord-modal-price small{font-size:.42em;font-weight:300;color:rgba(255,255,255,.3);margin-right:6px}
-.ord-modal-close{position:absolute;top:32px;right:32px;width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);transition:all .15s;flex-shrink:0}
-.ord-modal-close:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
-.ord-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.ord-chip{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:3px 9px 3px 7px;border-radius:20px;border:1px solid var(--line-strong);color:var(--ink-dim);background:var(--bg)}
+.ord-chip.is-final{background:var(--black);border-color:var(--black);color:#fff}
+.ord-chip.is-final .ord-chip-dot{background:#fff}
+.ord-chip.paid-yes{background:var(--black);border-color:var(--black);color:#fff}
+.ord-chip.paid-yes .ord-chip-dot{background:#fff}
+.ord-chip.paid-half{color:var(--ink)}
+.ord-chip.paid-no{color:var(--ink-faint)}
+.ord-chip-dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);flex-shrink:0}
+.ord-modal-price{font-size:22px;font-weight:600;letter-spacing:-.01em;color:var(--ink);flex-shrink:0;white-space:nowrap}
+.ord-modal-price small{font-size:.6em;font-weight:400;color:var(--ink-faint);margin-right:3px}
+.ord-modal-close{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--line-strong);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);transition:all .12s;flex-shrink:0}
+.ord-modal-close:hover{background:var(--bg2);color:var(--ink)}
+.ord-modal-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
 
-.ord-modal-body{display:grid;grid-template-columns:1fr 1fr;gap:20px;padding:28px;flex:1;overflow-y:auto;min-height:0;background:var(--bg3)}
-.ord-modal-left,.ord-modal-right{display:flex;flex-direction:column;gap:16px;min-width:0}
+.ord-modal-body{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:20px 24px;flex:1;overflow-y:auto;min-height:0;background:var(--bg2)}
+.ord-modal-left,.ord-modal-right{display:flex;flex-direction:column;gap:14px;min-width:0}
 
-/* TRACKER — компактный горизонтальный степпер вместо вертикальной простыни на пол-экрана */
-.trk-card{background:var(--bg);border:1px solid var(--line);border-radius:28px;padding:26px 26px 22px}
-.trk-stepper{display:flex;align-items:center;margin-bottom:22px}
-.trk-dot{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid var(--line);background:var(--bg);color:var(--line-strong);transition:all .2s}
-.trk-dot svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
-.trk-dot.done{background:var(--dark);border-color:var(--dark);color:#fff}
-.trk-dot.current{background:var(--accent);border-color:var(--accent);color:var(--dark);box-shadow:0 0 0 5px var(--accent-wash)}
-.trk-seg{flex:1;height:2px;background:var(--line);margin:0 2px;transition:background .3s}
-.trk-seg.done{background:var(--dark)}
-.trk-current{background:var(--bg2);border-radius:18px;padding:18px 20px}
-.trk-current-label{font-size:1rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.trk-now{font-size:.66rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--accent-d);background:var(--accent-wash);padding:.2rem .55rem;border-radius:8px}
-.trk-current-sub{font-size:.85rem;color:var(--ink-dim);line-height:1.5}
-.trk-current-date{font-size:.74rem;color:var(--ink-faint);margin-top:8px}
-.trk-toggle{background:none;border:none;color:var(--ink-faint);font-size:.78rem;font-family:var(--font);cursor:pointer;padding:14px 0 0;display:flex;align-items:center;gap:5px;width:100%}
+/* CARD — базовая единица (везде такие) */
+.card{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-md);padding:18px 20px}
+.card-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);margin-bottom:12px}
+
+/* TRACKER — компактный монохромный степпер */
+.trk-stepper{display:flex;align-items:center;margin-bottom:16px}
+.trk-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1.5px solid var(--line-strong);background:var(--bg);color:var(--ink-faint);transition:all .15s}
+.trk-dot svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none}
+.trk-dot.done{background:var(--ink);border-color:var(--ink);color:#fff}
+.trk-dot.current{background:var(--bg);border-color:var(--ink);color:var(--ink);box-shadow:0 0 0 3px var(--bg3)}
+.trk-seg{flex:1;height:1px;background:var(--line-strong);margin:0 2px;transition:background .2s}
+.trk-seg.done{background:var(--ink)}
+.trk-current{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:14px 16px}
+.trk-current-label{font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.trk-now{font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);background:var(--bg3);border:1px solid var(--line-strong);padding:2px 7px;border-radius:20px}
+.trk-current-sub{font-size:13px;color:var(--ink-dim);line-height:1.5}
+.trk-current-date{font-size:12px;color:var(--ink-faint);margin-top:8px}
+.trk-toggle{background:none;border:none;color:var(--ink-faint);font-size:12.5px;font-family:var(--font);cursor:pointer;padding:12px 0 0;display:flex;align-items:center;gap:5px;width:100%}
 .trk-toggle:hover{color:var(--ink-dim)}
-.trk-toggle svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none;transition:transform .2s}
+.trk-toggle svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none;transition:transform .15s}
 .trk-toggle.open svg{transform:rotate(180deg)}
-.trk-history{display:none;flex-direction:column;gap:14px;margin-top:12px;padding-top:14px;border-top:1px solid var(--line)}
+.trk-history{display:none;flex-direction:column;gap:12px;margin-top:10px;padding-top:12px;border-top:1px solid var(--line)}
 .trk-history.show{display:flex}
 .trk-hist-row{display:flex;gap:10px;align-items:flex-start}
-.trk-hist-dot{width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.trk-hist-dot svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
-.trk-hist-dot.done{background:var(--dark);color:#fff}
-.trk-hist-dot.current{background:var(--accent);color:var(--dark)}
-.trk-hist-body{flex:1;min-width:0;padding-top:2px}
-.trk-hist-label{font-size:.85rem;font-weight:500;color:var(--ink)}
-.trk-hist-sub{font-size:.76rem;color:var(--ink-faint);margin-top:2px}
+.trk-hist-dot{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:var(--ink);color:#fff}
+.trk-hist-dot svg{width:10px;height:10px;stroke:currentColor;stroke-width:2;fill:none}
+.trk-hist-body{flex:1;min-width:0;padding-top:1px}
+.trk-hist-label{font-size:13px;font-weight:500;color:var(--ink)}
+.trk-hist-sub{font-size:11.5px;color:var(--ink-faint);margin-top:2px}
 
 /* DELIVERY CARD */
-.delivery-card{background:var(--dark);border-radius:24px;padding:28px 30px;margin-bottom:0}
-.delivery-card-eyebrow{font-size:.63rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
-.site-domain-big{font-size:clamp(16px,2vw,22px);font-weight:500;letter-spacing:-.03em;color:#fff;margin-bottom:16px}
+.delivery-card-eyebrow{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);margin-bottom:8px}
+.site-domain-big{font-size:16px;font-weight:600;letter-spacing:-.01em;color:var(--ink);margin-bottom:12px;word-break:break-all}
 
-/* DOMAIN / STATUS BANNERS */
-.refund-banner{display:flex;align-items:flex-start;gap:12px;border-radius:18px;padding:16px 18px}
-.refund-banner-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.refund-banner-ico svg{width:15px;height:15px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
-.refund-banner-body{flex:1;min-width:0}
-.refund-banner-title{font-size:.82rem;font-weight:500;margin-bottom:2px}
-.refund-banner-text{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
+/* BANNERS — плоские, с рамкой, без заливки цветом */
+.refund-banner,.domain-banner{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:14px 16px}
+.refund-banner-ico,.domain-banner-ico{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink)}
+.refund-banner-ico svg,.domain-banner-ico svg{width:14px;height:14px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.refund-banner-body,.domain-banner-body{flex:1;min-width:0}
+.refund-banner-title,.domain-banner-title{font-size:13px;font-weight:600;margin-bottom:2px;color:var(--ink)}
+.refund-banner-text,.domain-banner-text{font-size:12.5px;color:var(--ink-dim);line-height:1.5}
+.refund-banner.is-danger{border-color:var(--danger);background:var(--danger-wash)}
+.refund-banner.is-danger .refund-banner-title{color:var(--danger-d)}
+.refund-banner.is-danger .refund-banner-ico{border-color:var(--danger);color:var(--danger-d)}
 
-.ord-comment{display:flex;align-items:flex-start;gap:10px;padding:16px 20px;background:var(--dark);border-radius:18px;font-size:.85rem;color:rgba(255,255,255,.6);line-height:1.6}
-.ord-comment svg{width:15px;height:15px;stroke:var(--accent);stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none;min-width:15px}
-.ord-eta{display:flex;align-items:center;gap:14px;background:var(--bg3);border:1px solid var(--line);border-radius:18px;padding:14px 18px;font-size:.83rem;color:var(--ink-dim);font-weight:300}
-.ord-eta-ico{width:34px;height:34px;border-radius:10px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ord-eta-ico svg{width:15px;height:15px;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.ord-comment{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);font-size:13px;color:var(--ink-dim);line-height:1.55}
+.ord-comment svg{width:14px;height:14px;stroke:var(--ink-faint);stroke-width:1.8;flex-shrink:0;margin-top:2px;fill:none;min-width:14px}
+.ord-eta{display:flex;align-items:center;gap:12px;background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 16px;font-size:13px;color:var(--ink-dim)}
+.ord-eta-ico{width:28px;height:28px;border-radius:var(--radius-sm);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ord-eta-ico svg{width:13px;height:13px;stroke:var(--ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .ord-eta-body{display:flex;flex-direction:column;gap:1px}
-.ord-eta-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-faint)}
-.domain-banner{display:flex;align-items:flex-start;gap:12px;background:var(--bg2);border:1.5px solid var(--line);border-radius:18px;padding:16px 18px}
-.domain-banner-ico{width:32px;height:32px;border-radius:9px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.domain-banner-ico svg{width:13px;height:13px;stroke:var(--accent);stroke-width:1.8;fill:none}
-.domain-banner-body{flex:1;min-width:0}
-.domain-banner-title{font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:3px}
-.domain-banner-text{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
-.domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:.76rem;font-weight:500;color:var(--accent-d);text-decoration:none}
-.domain-banner-link:hover{text-decoration:underline}
+.ord-eta-label{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint)}
+.domain-banner-link{display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:12.5px;font-weight:500;color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line-strong)}
+.domain-banner-link:hover{border-color:var(--ink)}
 .domain-banner-link svg{width:10px;height:10px;stroke:currentColor;stroke-width:2;fill:none}
 
 /* PAY BANNERS */
-.pay-gate-banner{background:var(--dark);border-radius:20px;padding:22px 24px}
-.pay-gate-title{font-size:.92rem;font-weight:500;color:var(--accent);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.pay-gate-banner{border:1px solid var(--ink);border-radius:var(--radius-md);padding:16px 18px}
+.pay-gate-title{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:7px}
 .pay-gate-title svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
-.pay-gate-sub{font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:16px;font-weight:300;line-height:1.55}
-.pay-remaining-banner{background:var(--accent-wash);border:1.5px solid rgba(30,222,123,.2);border-radius:20px;padding:22px 24px}
-.pay-remaining-title{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:7px}
-.pay-remaining-title svg{width:14px;height:14px;stroke:var(--accent-h);stroke-width:2;fill:none}
-.pay-remaining-sub{font-size:.8rem;color:var(--ink-dim);margin-bottom:16px;font-weight:300;line-height:1.55}
+.pay-gate-sub{font-size:12.5px;color:var(--ink-dim);margin-bottom:14px;line-height:1.5}
+.pay-remaining-banner{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-md);padding:16px 18px}
+.pay-remaining-title{font-size:13.5px;font-weight:600;color:var(--ink);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.pay-remaining-title svg{width:14px;height:14px;stroke:var(--ink);stroke-width:2;fill:none}
+.pay-remaining-sub{font-size:12.5px;color:var(--ink-dim);margin-bottom:14px;line-height:1.5}
 
-/* ACTIONS — карточка с сеткой плиток вместо списка кнопок, висящих отдельно */
-.ord-actions-card{background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:22px}
-.ord-actions-title{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:14px}
-.ord-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ord-action-tile{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:16px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:500;color:var(--ink);text-decoration:none;transition:background .15s,border-color .15s,transform .12s;line-height:1.3}
-.ord-action-tile:hover{border-color:var(--line-strong);background:var(--bg2);transform:translateY(-1px)}
-.ord-action-tile.wide{grid-column:1/-1;flex-direction:row;align-items:center}
-.ord-action-tile.green{background:var(--accent);border-color:var(--accent);color:var(--dark)}
-.ord-action-tile.green:hover{background:var(--accent-h)}
-.ord-action-tile.dark{background:var(--dark);border-color:var(--dark);color:#fff}
-.ord-action-tile.dark:hover{background:var(--dark2)}
-.ord-action-tile-ico{width:34px;height:34px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.ord-action-tile.green .ord-action-tile-ico{background:rgba(0,0,0,.1)}
-.ord-action-tile.dark .ord-action-tile-ico{background:rgba(255,255,255,.08)}
-.ord-action-tile-ico svg{width:15px;height:15px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
-.ord-action-tile.green .ord-action-tile-ico svg{stroke:var(--dark)}
-.ord-action-tile.dark .ord-action-tile-ico svg{stroke:rgba(255,255,255,.6)}
+/* ACTIONS — вертикальный список строк, как в настройках Vercel */
+.ord-actions-card{border:1px solid var(--line);border-radius:var(--radius-md);overflow:hidden}
+.ord-actions-title{font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);padding:12px 16px;background:var(--bg2);border-bottom:1px solid var(--line)}
+.ord-action-row{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink);width:100%;transition:background .1s}
+.ord-action-row:last-child{border-bottom:none}
+.ord-action-row:hover{background:var(--bg2)}
+.ord-action-row.is-danger{color:var(--danger-d)}
+.ord-action-row-ico{width:26px;height:26px;border-radius:var(--radius-sm);border:1px solid var(--line-strong);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ord-action-row-ico svg{width:13px;height:13px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
+.ord-action-row.is-danger .ord-action-row-ico svg{stroke:var(--danger-d)}
+.ord-action-row.is-primary .ord-action-row-ico{background:var(--ink);border-color:var(--ink)}
+.ord-action-row.is-primary .ord-action-row-ico svg{stroke:#fff}
+.ord-action-row-chevron{margin-left:auto;width:14px;height:14px;stroke:var(--ink-faint);stroke-width:2;fill:none;flex-shrink:0}
 
 /* REVIEW MODAL */
-.stars-row{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
-.star{width:38px;height:38px;cursor:pointer;color:var(--line-strong);transition:color .14s,transform .12s}
+.stars-row{display:flex;justify-content:center;gap:10px;margin-bottom:20px}
+.star{width:30px;height:30px;cursor:pointer;color:var(--line-strong);transition:color .12s,transform .1s}
 .star svg{width:100%;height:100%;fill:currentColor}
-.star.on{color:var(--accent)}
-.star:hover{transform:scale(1.15)}
-.review-textarea{width:100%;background:var(--bg2);border:1.5px solid var(--line-strong);border-radius:14px;padding:.82rem 1rem;color:var(--ink);font-family:var(--font);font-size:.9rem;outline:none;resize:vertical;min-height:96px;margin-bottom:18px;transition:border-color .18s}
-.review-textarea:focus{border-color:var(--accent)}
+.star.on{color:var(--ink)}
+.star:hover{transform:scale(1.1)}
+.review-textarea{width:100%;background:var(--bg);border:1px solid var(--line-strong);border-radius:var(--radius-sm);padding:.7rem .85rem;color:var(--ink);font-family:var(--font);font-size:13.5px;outline:none;resize:vertical;min-height:88px;margin-bottom:16px;transition:border-color .15s}
+.review-textarea:focus{border-color:var(--ink)}
 .review-textarea::placeholder{color:var(--ink-faint)}
 
 /* DELIVERY MODAL */
-.delivery-inner{background:var(--dark);border-radius:20px;padding:22px 24px;margin-bottom:20px}
-.delivery-site-name{font-size:1.1rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:4px}
-.delivery-site-url{font-size:.8rem;color:rgba(255,255,255,.3);font-weight:300}
+.delivery-inner{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-sm);padding:16px 18px;margin-bottom:18px}
+.delivery-site-name{font-size:16px;font-weight:600;color:var(--ink);letter-spacing:-.01em;margin-bottom:4px}
+.delivery-site-url{font-size:12.5px;color:var(--ink-faint)}
 
-/* BANNER */
-.ord-banner{position:fixed;top:86px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:400;background:var(--dark);border:1.5px solid rgba(255,255,255,.1);border-radius:20px;padding:.6rem 1rem .6rem .9rem;display:flex;align-items:center;gap:10px;font-size:.83rem;color:rgba(255,255,255,.8);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+/* BANNER (уведомление об изменении статуса) */
+.ord-banner{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:400;background:var(--black);border:1px solid var(--black);border-radius:var(--radius-md);padding:.55rem .8rem .55rem .8rem;display:flex;align-items:center;gap:10px;font-size:13px;color:#fff;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25)}
 .ord-banner.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:all}
-.ord-banner-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0}
-.ord-banner-close{background:none;border:none;color:rgba(255,255,255,.35);cursor:pointer;padding:0;display:flex;transition:color .15s}
+.ord-banner-dot{width:6px;height:6px;border-radius:50%;background:#fff;flex-shrink:0}
+.ord-banner-close{background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;padding:0;display:flex;transition:color .15s}
 .ord-banner-close:hover{color:#fff}
-.ord-banner-close svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+.ord-banner-close svg{width:12px;height:12px;stroke:currentColor;stroke-width:2;fill:none}
 
 /* TOAST */
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.6rem 1.1rem;border-radius:var(--radius-sm);font-size:13px;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;max-width:90vw;border:1px solid var(--black)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--accent);color:var(--dark)}
-.toast.error{background:var(--dark);color:#fff}
-.toast.info{background:var(--dark);color:#fff}
+.toast.success{background:var(--black);color:#fff}
+.toast.error{background:#fff;color:var(--danger-d);border-color:var(--danger)}
+.toast.info{background:var(--black);color:#fff}
 
 /* MODAL shared */
-.modal-overlay{position:fixed;inset:0;z-index:9600;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay{position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .18s}
 .modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border:1.5px solid var(--line);border-radius:40px;padding:44px 40px;width:100%;max-width:440px;transform:translateY(20px) scale(.97);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.2)}
+.modal{background:var(--bg);border:1px solid var(--line);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:400px;transform:translateY(10px) scale(.99);transition:transform .2s cubic-bezier(.22,1,.36,1);box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .modal-overlay.show .modal{transform:translateY(0) scale(1)}
-.modal-icon{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;background:var(--dark)}
-.modal-icon svg{width:24px;height:24px;stroke:var(--accent);stroke-width:1.7;fill:none}
-.modal h3{font-size:1.2rem;font-weight:500;letter-spacing:-.02em;margin-bottom:8px;text-align:center}
-.modal-p{color:var(--ink-dim);font-size:.88rem;text-align:center;margin-bottom:24px;line-height:1.6}
-.modal-btns{display:flex;gap:10px}
-.modal-btns .btn{flex:1;justify-content:center}
+.modal-icon{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;border:1px solid var(--line-strong)}
+.modal-icon svg{width:20px;height:20px;stroke:var(--ink);stroke-width:1.7;fill:none}
+.modal h3{font-size:16px;font-weight:600;letter-spacing:-.01em;margin-bottom:6px;text-align:center}
+.modal-p{color:var(--ink-dim);font-size:13px;text-align:center;margin-bottom:20px;line-height:1.55}
+.modal-btns{display:flex;gap:8px}
+.modal-btns .btn{flex:1}
 
 /* EMPTY */
-.empty{text-align:center;padding:96px 16px}
-.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
-.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
-.empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
-.empty p{font-size:.88rem;color:var(--ink-dim);margin-bottom:24px;font-weight:300;line-height:1.6}
+.empty{text-align:center;padding:80px 16px}
+.empty-ico{margin-bottom:20px;display:flex;justify-content:center}
+.empty-ico svg{width:44px;height:44px;stroke:var(--ink-faint);stroke-width:1;fill:none}
+.empty h3{font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px;letter-spacing:-.005em}
+.empty p{font-size:13px;color:var(--ink-dim);margin-bottom:20px;line-height:1.55}
 
 /* MOBILE */
 @media(max-width:900px){
-  .page-hero{border-radius:32px;padding:40px 36px}
-  .page-hero-title{font-size:2.4rem}
-  .ord-modal-body{grid-template-columns:1fr;padding:20px 24px}
+  .ord-modal-body{grid-template-columns:1fr;padding:16px}
   .ord-modal{max-height:95vh}
   .ord-cols{display:none}
   .ord-row{
     display:flex;flex-wrap:wrap;align-items:center;
-    row-gap:12px;column-gap:10px;
-    padding:22px 44px 22px 40px;position:relative;
+    row-gap:10px;column-gap:10px;
+    padding:16px 20px;position:relative;
   }
   .ord-cell-main{flex:0 0 100%;order:1}
-  .ord-row::before{content:'';order:2;flex:0 0 100%;height:1px;background:var(--line);margin:0 0 2px}
-  .ord-cell-status{order:3}
-  .ord-cell-pay{order:4}
-  .ord-cell-price{order:5;margin-left:auto;text-align:right;font-size:1.05rem;font-weight:600}
-  .ord-chevron{position:absolute;top:24px;right:20px;transform:none}
+  .ord-cell-status{order:2}
+  .ord-cell-pay{order:3}
+  .ord-cell-price{order:4;margin-left:auto;text-align:right}
 }
 @media(max-width:600px){
+  .page-wrap{padding:0 16px 60px}
   .ord-modal-overlay{padding:0}
   .ord-modal{border-radius:0;max-height:100dvh;height:100dvh}
-  .ord-modal-header{border-radius:0}
-  .page-hero{border-radius:24px;padding:28px 24px}
-  .page-hero-title{font-size:1.9rem}
-  .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
-  .tabs{overflow-x:auto;max-width:100%;width:100%}
-  .ord-modal-header{padding:28px 24px 24px}
-  .ord-modal-body{padding:20px 16px;grid-template-columns:1fr;gap:14px}
-  .review-cta{border-radius:18px;padding:20px 22px}
+  .page-title-row{padding:20px 0 16px}
+  .toolbar{flex-direction:column;align-items:flex-start;gap:8px}
+  .ord-modal-header{padding:16px}
+  .ord-modal-body{padding:14px;grid-template-columns:1fr;gap:12px}
+  .review-cta{padding:14px 16px}
 }
-#sbContent{padding-bottom:80px}
+#sbContent{padding-bottom:40px}
   </style>
 </head>
 <body>
@@ -354,8 +326,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     </div>
     <textarea class="review-textarea" id="reviewText" placeholder="Пару слов о сотрудничестве (необязательно)..."></textarea>
     <div class="modal-btns">
-      <button class="btn btn-outline" onclick="closeReview()">Позже</button>
-      <button class="btn btn-green" onclick="submitReview()">Отправить</button>
+      <button class="btn btn-secondary" onclick="closeReview()">Позже</button>
+      <button class="btn btn-primary" onclick="submitReview()">Отправить</button>
     </div>
   </div>
 </div>
@@ -370,8 +342,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     <p class="modal-p">Работа завершена — можно посмотреть результат</p>
     <div id="deliveryModalContent"></div>
     <div class="modal-btns">
-      <button class="btn btn-outline" onclick="closeDelivery()">Закрыть</button>
-      <a class="btn btn-green" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть сайт →</a>
+      <button class="btn btn-secondary" onclick="closeDelivery()">Закрыть</button>
+      <a class="btn btn-primary" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть сайт →</a>
     </div>
   </div>
 </div>
@@ -385,7 +357,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     </div>
     <h3>Запросить возврат</h3>
     <p class="modal-p">Возврат доступен, пока заказ не перешёл в статус «В работе». Опишите причину — заявка передаётся вручную.</p>
-    <select class="review-textarea" id="refundReasonSelect" style="margin-bottom:10px;height:auto;padding:14px 16px">
+    <select class="review-textarea" id="refundReasonSelect" style="margin-bottom:10px;height:auto;padding:12px 14px">
       <option value="Ещё не начали работу">Ещё не начали работу</option>
       <option value="Передумал(а)">Передумал(а)</option>
       <option value="Нашёл(-ла) другой вариант">Нашёл(-ла) другой вариант</option>
@@ -393,8 +365,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     </select>
     <textarea class="review-textarea" id="refundComment" placeholder="Комментарий (необязательно)..."></textarea>
     <div class="modal-btns">
-      <button class="btn btn-outline" onclick="closeRefundModal()">Отмена</button>
-      <button class="btn btn-green" onclick="submitRefundRequest()">Отправить заявку</button>
+      <button class="btn btn-secondary" onclick="closeRefundModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="submitRefundRequest()">Отправить заявку</button>
     </div>
   </div>
 </div>
@@ -403,13 +375,17 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <div class="ord-modal-overlay" id="ordModalOverlay">
   <div class="ord-modal">
     <div class="ord-modal-header">
-      <button class="ord-modal-close" onclick="closeOrderModal()" aria-label="Закрыть">
-        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
-      </button>
-      <div class="ord-modal-eyebrow">Antviz · Детали заказа</div>
-      <div class="ord-modal-title" id="ordModalTitle"></div>
-      <div class="ord-modal-chips" id="ordModalChips"></div>
-      <div class="ord-modal-price" id="ordModalPrice"></div>
+      <div class="ord-modal-headtext">
+        <div class="ord-modal-eyebrow">Antviz · Детали заказа</div>
+        <div class="ord-modal-title" id="ordModalTitle"></div>
+        <div class="ord-modal-chips" id="ordModalChips"></div>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:14px;flex-shrink:0">
+        <div class="ord-modal-price" id="ordModalPrice"></div>
+        <button class="ord-modal-close" onclick="closeOrderModal()" aria-label="Закрыть">
+          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
+        </button>
+      </div>
     </div>
     <div class="ord-modal-body">
       <div class="ord-modal-left" id="ordModalLeft"></div>
@@ -419,37 +395,49 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 </div>
 
 <div id="sbContent" style="display:none">
+<div class="page-wrap">
 <div class="shell" id="appWrap">
 
-  <div class="page-hero">
-    <div>
-      <div class="page-hero-eyebrow">Личный кабинет</div>
-      <div class="page-hero-title">Мои <em>заказы</em></div>
-      <div class="page-hero-sub">Статусы, документы и история работ</div>
+  <div class="topbar">
+    <div class="topbar-crumb">
+      <span class="crumb-dim">Antviz</span>
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      <span>Заказы</span>
     </div>
-    <a href="../order" class="btn btn-ghost">
+    <a href="../order" class="btn btn-primary">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
       Новый заказ
     </a>
   </div>
 
-  <div class="toolbar">
-    <div class="tabs" id="ordTabs">
-      <button class="tab is-active" data-filter="all">Все</button>
-      <button class="tab" data-filter="active">Активные</button>
-      <button class="tab" data-filter="done">Завершено</button>
-      <button class="tab" data-filter="unpaid">Не оплачены</button>
+  <div class="page-title-row">
+    <div>
+      <div class="page-title">Мои заказы</div>
+      <div class="page-sub">Статусы, документы и история работ</div>
     </div>
+  </div>
+
+  <div class="subnav" id="ordTabs">
+    <button class="subnav-tab is-active" data-filter="all">Все</button>
+    <button class="subnav-tab" data-filter="active">Активные</button>
+    <button class="subnav-tab" data-filter="done">Завершено</button>
+    <button class="subnav-tab" data-filter="unpaid">Не оплачены</button>
+  </div>
+
+  <div class="toolbar">
     <span class="count-label" id="ordCount"></span>
   </div>
 
-  <div class="ord-cols">
-    <span>Заказ</span><span>Статус</span><span>Оплата</span><span>Сумма</span><span></span>
-  </div>
-  <div class="ord-list" id="ordersList">
-    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
+  <div class="table-wrap">
+    <div class="ord-cols">
+      <span>Заказ</span><span>Статус</span><span>Оплата</span><span style="text-align:right">Сумма</span>
+    </div>
+    <div class="ord-list" id="ordersList">
+      <div style="padding:24px 20px;color:var(--ink-faint);font-size:13px">Загрузка...</div>
+    </div>
   </div>
 
+</div>
 </div>
 </div>
 
@@ -475,6 +463,8 @@ const PAY_ICONS = {
   half:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
   unpaid:'<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>'
 };
+// Финальный (позитивный) статус — единственное место, где мы допускаем "чёрную" плашку вместо нейтральной.
+const FINAL_STATUS = 5;
 
 let currentUser = null, unsubOrders = null;
 let allOrders = [], lastStatuses = {}, reviewOrderId = null, reviewStars = 0, bannerTimer = null;
@@ -529,14 +519,14 @@ function buildTracker(o){
   const doneSteps=icons.map((ico,i)=>i).filter(i=>i<s);
   const history=doneSteps.map(i=>{
     const d=histDate(i);
-    return '<div class="trk-hist-row"><div class="trk-hist-dot done"><svg viewBox="0 0 24 24">'+icons[i]+'</svg></div>'
+    return '<div class="trk-hist-row"><div class="trk-hist-dot"><svg viewBox="0 0 24 24">'+icons[i]+'</svg></div>'
       +'<div class="trk-hist-body"><div class="trk-hist-label">'+labels[i]+'</div>'
       +(d?'<div class="trk-hist-sub">'+d+'</div>':'')+'</div></div>';
   }).join('');
 
   const toggle=doneSteps.length?('<button class="trk-toggle" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'show\')">Показать историю статусов ('+doneSteps.length+') <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button><div class="trk-history">'+history+'</div>'):'';
 
-  return '<div class="trk-card"><div class="trk-stepper">'+stepper+'</div>'+currentBlock+toggle+'</div>';
+  return '<div class="card"><div class="trk-stepper">'+stepper+'</div>'+currentBlock+toggle+'</div>';
 }
 
 function buildDomainBanner(o){
@@ -548,7 +538,7 @@ function buildDomainBanner(o){
   return'';
 }
 
-// ══ ORDER CARD (строка в списке) ══
+// ══ ORDER ROW (строка таблицы) ══
 function orderCard(o){
   const s=o.status||0;
   const isPartial=o.paymentType==='partial';
@@ -557,17 +547,18 @@ function orderCard(o){
   const fullyPaid=o.paid||(isPartial&&paidAmt>=total);
   const halfPaid=isPartial&&paidAmt>0&&!fullyPaid;
   const payLabel=fullyPaid?'Оплачен':(halfPaid?'50% оплачено':'Не оплачен');
-  const payClass=fullyPaid?'is-paid':(halfPaid?'is-half':'is-unpaid');
-  return`<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaid?1:0}" data-id="${o.id}" style="animation-delay:${allOrders.indexOf(o)*30}ms">
+  const payClass=fullyPaid?'is-paid':(halfPaid?'is-half':'');
+  const isFinal=s===FINAL_STATUS;
+  const tagClass=isFinal?'is-final':(s>0?'is-progress':'');
+  return`<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaid?1:0}" data-id="${o.id}">
     <button type="button" class="ord-row" onclick="openOrderModal('${o.id}')">
       <div class="ord-cell-main">
         <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${esc(o.siteType||'Сайт')}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
       </div>
-      <div class="ord-cell-status"><span class="ord-tag s${s}"><svg viewBox="0 0 24 24">${STATUS_ICONS[s]}</svg>${STATUS_LABELS[s]}</span></div>
-      <div class="ord-cell-pay"><span class="ord-pay ${payClass}"><svg viewBox="0 0 24 24">${PAY_ICONS[fullyPaid?'paid':(halfPaid?'half':'unpaid')]}</svg>${payLabel}</span></div>
+      <div class="ord-cell-status"><span class="tag ${tagClass}"><span class="dot"></span>${STATUS_LABELS[s]}</span></div>
+      <div class="ord-cell-pay"><span class="pay-plain ${payClass}"><span class="dot"></span>${payLabel}</span></div>
       <div class="ord-cell-price ord-price">${total?total.toLocaleString('ru')+' ₽':'—'}</div>
-      <svg class="ord-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
     </button>
   </div>`;
 }
@@ -575,7 +566,7 @@ function orderCard(o){
 function renderOrders(orders){
   const el=document.getElementById('ordersList');
   if(!orders.length){
-    el.innerHTML=`<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><h3>Здесь появятся ваши заказы</h3><p>Оформите первый проект — это займёт пару минут</p><a href="../order" class="btn btn-green btn-sm">Заказать сайт</a></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><h3>Здесь появятся ваши заказы</h3><p>Оформите первый проект — это займёт пару минут</p><a href="../order" class="btn btn-primary">Заказать сайт</a></div>`;
     return;
   }
   el.innerHTML=orders.map(o=>orderCard(o)).join('');
@@ -586,8 +577,8 @@ function renderOrders(orders){
     const first=needReview[0];
     const cta=document.createElement('div');
     cta.className='review-cta';
-    cta.innerHTML=`<div class="review-cta-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="review-cta-body"><div class="review-cta-title">Как прошло сотрудничество?</div><div class="review-cta-sub">Оставьте отзыв о заказе № ${first.id.slice(0,8).toUpperCase()} — это займёт минуту</div></div><button class="btn btn-green btn-sm" onclick="openReview('${first.id}')">Оставить отзыв</button>`;
-    el.appendChild(cta);
+    cta.innerHTML=`<div class="review-cta-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="review-cta-body"><div class="review-cta-title">Как прошло сотрудничество?</div><div class="review-cta-sub">Оставьте отзыв о заказе № ${first.id.slice(0,8).toUpperCase()} — это займёт минуту</div></div><button class="btn btn-primary" onclick="openReview('${first.id}')">Оставить отзыв</button>`;
+    document.querySelector('.page-wrap .shell').appendChild(cta);
   }
 }
 
@@ -604,15 +595,16 @@ window.openOrderModal=function(id){
   const halfPaid=isPartial&&paidAmount>0&&!fullyPaid;
   const payLabel=fullyPaid?'Оплачен':(halfPaid?'Предоплата 50%':'Не оплачен');
   const payChipClass=fullyPaid?'paid-yes':(halfPaid?'paid-half':'paid-no');
+  const isFinal=s===FINAL_STATUS;
 
   document.getElementById('ordModalTitle').textContent=(o.siteType||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
   document.getElementById('ordModalPrice').innerHTML=totalPrice?'<small>₽</small>'+totalPrice.toLocaleString('ru'):'';
   document.getElementById('ordModalChips').innerHTML=
-    '<span class="ord-chip status s'+s+'">'
-      +'<svg viewBox="0 0 24 24" class="ord-chip-ico">'+STATUS_ICONS[s]+'</svg>'+STATUS_LABELS[s]
+    '<span class="ord-chip '+(isFinal?'is-final':'')+'">'
+      +'<span class="ord-chip-dot"></span>'+STATUS_LABELS[s]
     +'</span>'
-    +'<span class="ord-chip '+payChipClass+'"><svg viewBox="0 0 24 24" class="ord-chip-ico">'+PAY_ICONS[fullyPaid?'paid':(halfPaid?'half':'unpaid')]+'</svg>'+payLabel+'</span>'
-    +(fmtDate(o.createdAt)?'<span style="font-size:.68rem;color:rgba(255,255,255,.25);font-weight:300">'+fmtDate(o.createdAt)+'</span>':'');
+    +'<span class="ord-chip '+payChipClass+'"><span class="ord-chip-dot"></span>'+payLabel+'</span>'
+    +(fmtDate(o.createdAt)?'<span style="font-size:11.5px;color:var(--ink-faint)">'+fmtDate(o.createdAt)+'</span>':'');
 
   // Site block
   const hasSite=(s>=5||s===6)&&(o.siteUrl||o.siteDomain);
@@ -620,10 +612,10 @@ window.openOrderModal=function(id){
   if(hasSite){
     const href=o.siteUrl?(o.siteUrl.match(/^https?:\/\//)?o.siteUrl:'https://'+o.siteUrl):('https://'+(o.siteDomain||''));
     const pages=(o.sitePages||'').split('\n').filter(Boolean);
-    siteBlock='<div class="delivery-card"><div class="delivery-card-eyebrow">Готовый сайт</div>'
+    siteBlock='<div class="card"><div class="delivery-card-eyebrow">Готовый сайт</div>'
       +(o.siteDomain?'<div class="site-domain-big">'+esc(o.siteDomain)+'</div>':'')
-      +(pages.length?'<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px">'+pages.map(p=>'<div style="font-size:.82rem;color:rgba(255,255,255,.4);display:flex;gap:8px"><span style="color:var(--accent)">→</span>'+esc(p)+'</div>').join('')+'</div>':'')
-      +'<a href="'+href+'" target="_blank" rel="noopener" class="btn btn-green" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть сайт</a>'
+      +(pages.length?'<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:14px">'+pages.map(p=>'<div style="font-size:12.5px;color:var(--ink-dim);display:flex;gap:8px"><span style="color:var(--ink-faint)">→</span>'+esc(p)+'</div>').join('')+'</div>':'')
+      +'<a href="'+href+'" target="_blank" rel="noopener" class="btn btn-primary btn-block"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть сайт</a>'
       +'</div>';
   }
 
@@ -632,13 +624,13 @@ window.openOrderModal=function(id){
   const checkIco='<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>';
   const xIco='<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>';
   const refundBanners={
-    requested:{wash:'var(--warn-wash)',c:'var(--warn-d)',ico:clockIco,title:'Заявка на возврат отправлена',text:'Рассматривается вручную — обычно это занимает не больше суток.'},
-    approved:{wash:'var(--accent-wash)',c:'var(--accent-d)',ico:checkIco,title:'Возврат одобрен',text:'Средства поступят на счёт в ближайшее время.'},
-    refunded:{wash:'var(--accent-wash)',c:'var(--accent-d)',ico:checkIco,title:'Средства возвращены',text:'Возврат по этому заказу завершён.'},
-    rejected:{wash:'var(--bad-wash)',c:'var(--bad-d)',ico:xIco,title:'В возврате отказано',text:o.refundComment?esc(o.refundComment):'Заказ уже перешёл в работу.'}
+    requested:{ico:clockIco,title:'Заявка на возврат отправлена',text:'Рассматривается вручную — обычно это занимает не больше суток.'},
+    approved:{ico:checkIco,title:'Возврат одобрен',text:'Средства поступят на счёт в ближайшее время.'},
+    refunded:{ico:checkIco,title:'Средства возвращены',text:'Возврат по этому заказу завершён.'},
+    rejected:{ico:xIco,title:'В возврате отказано',text:o.refundComment?esc(o.refundComment):'Заказ уже перешёл в работу.',danger:true}
   };
   const rb=refundBanners[o.refundStatus];
-  const refundBanner=rb?'<div class="refund-banner" style="background:'+rb.wash+'"><div class="refund-banner-ico" style="background:'+rb.wash+';color:'+rb.c+'"><svg viewBox="0 0 24 24">'+rb.ico+'</svg></div><div class="refund-banner-body"><div class="refund-banner-title" style="color:'+rb.c+'">'+rb.title+'</div><div class="refund-banner-text">'+rb.text+'</div></div></div>':'';
+  const refundBanner=rb?'<div class="refund-banner'+(rb.danger?' is-danger':'')+'"><div class="refund-banner-ico"><svg viewBox="0 0 24 24">'+rb.ico+'</svg></div><div class="refund-banner-body"><div class="refund-banner-title">'+rb.title+'</div><div class="refund-banner-text">'+rb.text+'</div></div></div>':'';
   const domainBanner=buildDomainBanner(o);
   const estDate=getEstimate(o.package,o.extras,s);
 
@@ -647,29 +639,29 @@ window.openOrderModal=function(id){
   if(refundBanner)leftHtml+=refundBanner;
   if(statusComment)leftHtml+=statusComment;
   if(domainBanner)leftHtml+=domainBanner;
-  if(estDate)leftHtml+=`<div class="ord-eta"><div class="ord-eta-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="ord-eta-body"><span class="ord-eta-label">Ожидаемый срок</span><strong style="color:var(--ink);font-weight:500;font-size:.92rem">${estDate}</strong></div></div>`;
+  if(estDate)leftHtml+=`<div class="ord-eta"><div class="ord-eta-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="ord-eta-body"><span class="ord-eta-label">Ожидаемый срок</span><strong style="color:var(--ink);font-weight:600;font-size:13.5px">${estDate}</strong></div></div>`;
 
   // RIGHT
   let rightHtml='';
   if(isPartial&&halfPaid&&(s===5||s===6)){
-    rightHtml+='<div class="pay-gate-banner"><div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div><div class="pay-gate-sub">Для получения сайта оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div><button class="btn btn-green" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center">Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить сайт</button></div>';
+    rightHtml+='<div class="pay-gate-banner"><div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div><div class="pay-gate-sub">Для получения сайта оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div><button class="btn btn-primary btn-block" onclick="payRemaining(\''+o.id+'\')">Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить сайт</button></div>';
   }else if(isPartial&&halfPaid){
-    rightHtml+='<div class="pay-remaining-banner"><div class="pay-remaining-title"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Предоплата получена</div><div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ — после согласования макета.</div><button class="btn btn-outline" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center;margin-top:4px">Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
+    rightHtml+='<div class="pay-remaining-banner"><div class="pay-remaining-title"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Предоплата получена</div><div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ — после согласования макета.</div><button class="btn btn-secondary btn-block" onclick="payRemaining(\''+o.id+'\')" style="margin-top:2px">Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
   }
   if(siteBlock)rightHtml+=siteBlock;
 
-  let tiles='<button class="ord-action-tile" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>Скачать квитанцию</button>';
+  let tiles='<button class="ord-action-row" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-row-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>Скачать квитанцию<svg class="ord-action-row-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>';
   if(s>=5&&fullyPaid&&!o.reviewed){
-    tiles+='<button class="ord-action-tile green" onclick="openReview(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Оставить отзыв</button>';
+    tiles+='<button class="ord-action-row is-primary" onclick="openReview(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-row-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Оставить отзыв<svg class="ord-action-row-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>';
   }
   if(s===3){
-    tiles+='<button class="ord-action-tile dark" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>Запросить правки</button>';
+    tiles+='<button class="ord-action-row" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-row-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>Запросить правки<svg class="ord-action-row-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>';
   }
-  tiles+='<a class="ord-action-tile" href="../profile/support" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>Написать в поддержку</a>';
+  tiles+='<a class="ord-action-row" href="../profile/support" style="pointer-events:all"><span class="ord-action-row-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>Написать в поддержку<svg class="ord-action-row-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></a>';
   if(s<2&&(!o.refundStatus||o.refundStatus==='none')){
-    tiles+='<button class="ord-action-tile" onclick="openRefundModal(\''+o.id+'\')" style="pointer-events:all;color:var(--bad-d)"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg></span>Запросить возврат</button>';
+    tiles+='<button class="ord-action-row is-danger" onclick="openRefundModal(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-row-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg></span>Запросить возврат<svg class="ord-action-row-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>';
   }
-  rightHtml+='<div class="ord-actions-card"><div class="ord-actions-title">Действия</div><div class="ord-actions-grid">'+tiles+'</div></div>';
+  rightHtml+='<div class="ord-actions-card"><div class="ord-actions-title">Действия</div>'+tiles+'</div>';
 
   window._modalOrderId=o.id;
   document.getElementById('ordModalLeft').innerHTML=leftHtml;
@@ -755,14 +747,14 @@ window.printReceipt=function(id){
   const fP=o.paid||(isP&&pA>=(o.totalPrice||0));
   const pSt=fP?'Оплачен полностью':(isP&&pA>0?'Предоплата 50%':'Не оплачен');
   const pRows=isP?`<tr><td>Оплачено</td><td>${pA.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fP?'—':rA.toLocaleString('ru')+' ₽'}</td></tr>`:'';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#000;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #000}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#000}.subtitle{font-size:11px;color:#8f8f8f;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #eee;font-size:13px}td:first-child{color:#8f8f8f}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #000}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Antviz</div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип сайта</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.tariff||o.package||'—'}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
   w.document.write(html);w.document.close();
 };
 
 function launchConfetti(){
   const wrap=document.getElementById('confettiWrap');wrap.innerHTML='';
-  const colors=['#1ede7b','#1ac16b','#191b1e','#a8f5d4','#fff','#dfe3e8'];
-  for(let i=0;i<80;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${6+Math.random()*6}px;height:${6+Math.random()*6}px;border-radius:${Math.random()>.5?'50%':'2px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1`;wrap.appendChild(p);}
+  const colors=['#000','#404040','#8f8f8f','#eaeaea','#fff'];
+  for(let i=0;i<70;i++){const p=document.createElement('div');p.className='c-piece';p.style.cssText=`left:${Math.random()*100}%;background:${colors[Math.floor(Math.random()*colors.length)]};width:${5+Math.random()*5}px;height:${5+Math.random()*5}px;border-radius:${Math.random()>.5?'50%':'1px'};animation-duration:${2.5+Math.random()*2}s;animation-delay:${Math.random()}s;opacity:1;border:1px solid rgba(0,0,0,.08)`;wrap.appendChild(p);}
   setTimeout(()=>{wrap.innerHTML='';},5000);
 }
 
@@ -823,7 +815,7 @@ onAuthStateChanged(auth,async user=>{
     let shown=0;rows.forEach(r=>{const ok=matches(r,activeFilter);r.classList.toggle('is-filtered',!ok);if(ok)shown++;});
     countEl.textContent=rows.length?`Показано ${shown} из ${rows.length}`:'';
   }
-  if(tabs)tabs.addEventListener('click',e=>{const btn=e.target.closest('.tab');if(!btn)return;tabs.querySelectorAll('.tab').forEach(b=>b.classList.toggle('is-active',b===btn));activeFilter=btn.dataset.filter;apply();});
+  if(tabs)tabs.addEventListener('click',e=>{const btn=e.target.closest('.subnav-tab');if(!btn)return;tabs.querySelectorAll('.subnav-tab').forEach(b=>b.classList.toggle('is-active',b===btn));activeFilter=btn.dataset.filter;apply();});
   if(list){const mo=new MutationObserver(apply);mo.observe(list,{childList:true});apply();}
 })();
 </script>

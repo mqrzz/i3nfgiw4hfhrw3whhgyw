@@ -9,10 +9,13 @@
  * — один-единственный триггер открытия/закрытия (клик), никакого
  *   гибрида hover+aria — это и было источником "дёрганых" анимаций;
  * — новый набор иконок: единая толщина линии, единая геометрия
- *   (circle/rounded-square контейнер + простой глиф), никакого
- *   разнобоя фигур, как раньше;
- * — лёгкий glassmorphism на капсуле (blur), в духе текущего тренда
- *   тёмных SaaS-шапок, но сдержанно — сайт не про эффекты, он про код;
+ *   (rounded-square контейнер + простой глиф), никакого разнобоя фигур;
+ * — капсула полностью непрозрачная (--nv-bg), без blur/glassmorphism —
+ *   такого эффекта в интерфейсе Antviz принципиально нет;
+ * — логотип — сам файл фавикона крупным планом, без декоративной
+ *   круглой подложки; никаких градиентов нигде в навигации (в т.ч.
+ *   в индикаторе непрочитанного — это точка, а не conic-gradient);
+ * — все радиусы и letter-spacing выровнены под системную лестницу сайта;
  * — уважение reduced-motion и видимый focus-visible.
  *
  * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
@@ -72,7 +75,7 @@
       width: calc(100% - 32px); max-width: 1120px;
       background: var(--nv-bg);
       border: 1px solid rgba(255,255,255,.07);
-      border-radius: 36px;
+      border-radius: 40px;
       box-shadow: 0 24px 50px rgba(0,0,0,.44), 0 0 0 1px rgba(30,222,123,.04), 0 14px 36px -6px rgba(30,222,123,.16);
       font-family: var(--nv-font);
       transition: border-color .2s var(--nv-ease), box-shadow .2s var(--nv-ease);
@@ -81,17 +84,14 @@
 
     .nv-logo {
       font-family: var(--nv-font); font-weight: 500;
-      font-size: 16px; letter-spacing: -.01em;
+      font-size: 17px; letter-spacing: -.03em;
       color: var(--nv-ink); text-decoration: none;
-      display: flex; align-items: center; gap: 11px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
-    .nv-logo-badge {
-      width: 38px; height: 38px; border-radius: 50%; flex-shrink: 0;
-      background: var(--nv-green-dim);
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
-    }
-    .nv-logo-badge img { width: 22px; height: 22px; border-radius: 6px; object-fit: cover; }
+    /* Раньше здесь была круглая подложка вокруг фавикона — просто
+       декоративный контейнер, который ничего не нёс кроме шума.
+       Убрали: сам логотип крупнее и стоит без рамки. */
+    .nv-logo-mark { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; object-fit: cover; }
 
     /* ── Центр: просто текстовые ссылки, без плашек при ховере ── */
     .nv-center {
@@ -209,26 +209,31 @@
       font-weight: 300; font-size: 15px; color: var(--nv-ink-dim);
     }
     .nv-user-btn.guest:hover { border-color: transparent; background: none; color: var(--nv-ink); }
-    .nv-user-btn.guest .nv-avatar-ring,
+    .nv-user-btn.guest .nv-avatar-wrap,
     .nv-user-btn.guest .nv-chev-user { display: none; }
 
-    .nv-avatar-ring {
-      width: 32px; height: 32px; border-radius: 11px; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      position: relative; padding: 2px;
-    }
-    .nv-avatar-ring.notify {
-      background: conic-gradient(from -45deg, var(--nv-warn), var(--nv-green) 65%);
-    }
+    /* Раньше тут было конус-градиентное "кольцо" вокруг аватара для
+       индикации непрочитанных — прямое нарушение правила "никаких
+       градиентов в UI". Заменили на обычную точку-бейдж в углу,
+       тот же паттерн, что уже используется в .nv-badge.dot внутри
+       выпадающего меню — единообразно со всем остальным интерфейсом. */
+    .nv-avatar-wrap { position: relative; width: 32px; height: 32px; flex-shrink: 0; }
     .nv-avatar {
-      width: 100%; height: 100%; border-radius: 9px;
+      width: 100%; height: 100%; border-radius: 12px;
       background: var(--nv-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: 11.5px; font-weight: 500; color: var(--nv-green-ink);
+      font-size: 12px; font-weight: 500; color: var(--nv-green-ink);
       overflow: hidden;
     }
-    .nv-avatar-ring.notify .nv-avatar { border-radius: 8px; }
     .nv-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .nv-avatar-dot {
+      position: absolute; top: -2px; right: -2px;
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--nv-warn);
+      border: 2px solid var(--nv-bg);
+      display: none;
+    }
+    .nv-avatar-dot.show { display: block; }
     .nv-uname { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .nv-chev-user { width: 10px; height: 10px; opacity: .4; flex-shrink: 0; transition: transform .2s var(--nv-ease); }
     .nv-user-btn[aria-expanded="true"] .nv-chev-user { transform: rotate(180deg); }
@@ -237,7 +242,7 @@
       position: absolute; top: calc(100% + 12px); right: 0;
       background: var(--nv-surface);
       border: 1px solid var(--nv-line);
-      border-radius: 22px; padding: 8px;
+      border-radius: 20px; padding: 8px;
       min-width: 256px;
       box-shadow: var(--nv-sh);
       opacity: 0; visibility: hidden; pointer-events: none;
@@ -269,7 +274,7 @@
     .nv-dd-head-info { min-width: 0; flex: 1; }
     .nv-dd-head-name {
       font-size: 14px; font-weight: 500; color: #fff;
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.01em;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.03em;
     }
     .nv-dd-head-email {
       font-weight: 300; font-size: 11.5px; color: var(--nv-ink-faint);
@@ -283,7 +288,7 @@
     }
     .nv-dd-item {
       display: flex; align-items: center; gap: 11px;
-      padding: 8px 10px; border-radius: 13px;
+      padding: 8px 10px; border-radius: 12px;
       font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
       text-decoration: none; cursor: pointer;
       transition: background .12s, color .12s;
@@ -313,7 +318,7 @@
       display: none; align-items: center; justify-content: center;
       width: 40px; height: 40px;
       background: none; border: 1px solid var(--nv-line);
-      border-radius: 13px; cursor: pointer; flex-shrink: 0;
+      border-radius: 12px; cursor: pointer; flex-shrink: 0;
       transition: border-color .15s, background .15s;
     }
     .nv-burger:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.05); }
@@ -338,7 +343,7 @@
       overflow-y: auto;
       background: var(--nv-bg);
       border: 1px solid rgba(255,255,255,.09);
-      border-radius: 22px;
+      border-radius: 24px;
       padding: 8px;
       display: none; flex-direction: column; gap: 2px;
       opacity: 0; visibility: hidden; pointer-events: none;
@@ -390,10 +395,9 @@
     }
 
     @media (max-width: 768px) {
-      .antviz-nav { top: 14px; height: 60px; padding: 6px 6px 6px 18px; width: calc(100% - 24px); border-radius: 30px; }
-      .nv-logo { font-size: 14px; gap: 8px; }
-      .nv-logo-badge { width: 32px; height: 32px; }
-      .nv-logo-badge img { width: 18px; height: 18px; }
+      .antviz-nav { top: 14px; height: 60px; padding: 6px 6px 6px 18px; width: calc(100% - 24px); border-radius: 24px; }
+      .nv-logo { font-size: 15px; gap: 8px; }
+      .nv-logo-mark { width: 34px; height: 34px; }
       .nv-center { display: none; }
       .nv-cta { display: none; }
       .nv-burger { display: flex; }
@@ -566,7 +570,7 @@
   const NAV_HTML = `
 <nav class="antviz-nav" id="antvizNav">
   <a class="nv-logo" href="${b || '/'}">
-    <span class="nv-logo-badge"><img src="${b}img/favicon.png" alt="Antviz"></span>
+    <img class="nv-logo-mark" src="${b}img/favicon.png" alt="Antviz">
     Antviz
   </a>
 
@@ -575,8 +579,9 @@
   <div class="nv-right">
     <div class="nv-user" id="anUser">
       <a href="${b}auth" class="nv-user-btn guest" id="anUserBtn" aria-expanded="false">
-        <div class="nv-avatar-ring" id="anAvatarRing">
+        <div class="nv-avatar-wrap">
           <div class="nv-avatar" id="anAvatar">?</div>
+          <span class="nv-avatar-dot" id="anAvatarDot"></span>
         </div>
         <span class="nv-uname" id="anUname">Войти</span>
         <svg class="nv-chev-user" viewBox="0 0 12 12" fill="none">
@@ -691,13 +696,13 @@ ${buildMobileSheet()}`;
     el.style.display = 'flex';
   }
   function refreshNotifyDot() {
-    const ring = document.getElementById('anAvatarRing');
-    if (!ring) return;
+    const dot = document.getElementById('anAvatarDot');
+    if (!dot) return;
     const any = ['support','tickets','notif'].some(k => {
       const el = document.getElementById(`anBadge-${k}`);
       return el && el.style.display !== 'none';
     });
-    ring.classList.toggle('notify', any);
+    dot.classList.toggle('show', any);
   }
 
   let unsubSupport = null;
@@ -742,7 +747,7 @@ ${buildMobileSheet()}`;
   function applyGuestUI() {
     const unameEl  = document.getElementById('anUname');
     const avatarEl = document.getElementById('anAvatar');
-    const avatarRing = document.getElementById('anAvatarRing');
+    const avatarDot = document.getElementById('anAvatarDot');
     const ddHead   = document.getElementById('anDdHead');
 
     isAuthed = false;
@@ -750,7 +755,7 @@ ${buildMobileSheet()}`;
     userBtn.setAttribute('href', `${b}auth`);
     if (unameEl) unameEl.textContent = 'Войти';
     if (avatarEl) avatarEl.innerHTML = '?';
-    avatarRing?.classList.remove('notify');
+    avatarDot?.classList.remove('show');
     if (ddHead) ddHead.style.display = 'none';
     ['support','orders','tickets','notif'].forEach(k => setBadge(k, 0, null));
     refreshNotifyDot();
@@ -820,7 +825,7 @@ ${buildMobileSheet()}`;
       const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
       const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
       const fsMod   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      const sessMod = await import(`${b}profile/sessions.js?v=2`).catch(e => { console.error('nav.js sessions.js import error:', e); return null; });
+      const sessMod = await import(`${b}profile/sessions.js?v=4`).catch(e => { console.error('nav.js sessions.js import error:', e); return null; });
 
       let tries = 0;
       while (appMod.getApps().length === 0 && tries < 100) {
@@ -846,12 +851,28 @@ ${buildMobileSheet()}`;
         } catch(e) { console.error('nav.js signOut:', e); }
       });
 
+      let unwatchRevoke = null;
+
       authMod.onAuthStateChanged(auth, user => {
         teardownListeners();
+        unwatchRevoke?.(); unwatchRevoke = null;
+
         if (user) {
           applyAuthedUI(user);
           watchBadges(db, fsMod, user);
-          if (sessMod) sessMod.touchSession(db, auth, user).catch(e => console.error('touchSession:', e));
+          if (sessMod) {
+            // lastActive пишем не чаще раза в 5 минут — как и было.
+            sessMod.touchSession(db, auth, user).catch(e => console.error('touchSession:', e));
+            // А вот отзыв конкретно ЭТОГО сеанса ловим сразу же через
+            // realtime-подписку — без ожидания следующего touch и без
+            // Cloud Function/revokeRefreshTokens (токены не тратим).
+            unwatchRevoke = sessMod.watchSessionRevocation(db, user.uid, async () => {
+              unwatchRevoke?.(); unwatchRevoke = null;
+              teardownListeners();
+              try { await authMod.signOut(auth); } catch(e) {}
+              window.location.href = `${b}auth`;
+            });
+          }
         } else {
           applyGuestUI();
         }

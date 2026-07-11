@@ -17,7 +17,7 @@
 const FS_URL   = "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const AUTH_URL = "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const TOUCH_INTERVAL_MS = 5 * 60 * 1000; // не чаще раза в 5 минут
+const TOUCH_INTERVAL_MS = 5 * 60 * 1000; // не чаще раза в 5 мин.
 
 /* ───────────────────── sessionId (привязан к браузеру + аккаунту) ───────────────────── */
 

@@ -13,10 +13,11 @@
        (~1500 иконок) с внешнего CDN ради 14 используемых иконок — браузер не
        начинал отрисовку страницы (даже спиннер loadingScreen) пока файл не
        скачается, отсюда и долгая загрузка именно на этой странице. Грузим
-       асинхронно: preload не блокирует рендер, onload переключает его в
-       stylesheet, когда файл готов. -->
+       асинхронно через переключение media (а не rel=preload — у него до сих
+       пор неровная поддержка в разных браузерах, из-за чего иконки грузились
+       не везде). Приём с media="print" → "all" работает предсказуемо везде. -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin/>
-  <link rel="preload" as="style" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css" onload="this.onload=null;this.rel='stylesheet'"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css" media="print" onload="this.media='all'"/>
   <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.2/src/fill/style.css"/></noscript>
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}

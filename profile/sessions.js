@@ -17,7 +17,7 @@
 const FS_URL   = "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 const AUTH_URL = "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-const TOUCH_INTERVAL_MS = 5 * 60 * 1000; // не чаще раза в 5 мин.
+const TOUCH_INTERVAL_MS = 5 * 60 * 1000; // не чаще раза в 5 минут
 
 /* ───────────────────── sessionId (привязан к браузеру + аккаунту) ───────────────────── */
 
@@ -215,6 +215,40 @@ export async function touchSession(db, auth, user){
   }catch(e){
     console.error('touchSession error:', e);
   }
+}
+
+/* ───────────────────── Мгновенный выборочный разлогин (nav.js) ─────────────────────
+ * touchSession() выше обновляет lastActive не чаще раза в 5 минут — это
+ * ограничение специально для ЗАПИСИ (не долбить Firestore лишний раз) и
+ * трогать его не нужно, оно так и задумано.
+ *
+ * А вот отслеживание revoked — это ЧТЕНИЕ, и незачем ждать эти 5 минут:
+ * вешаем лёгкий onSnapshot ровно на один документ (свой sessionId), он
+ * никогда не переспрашивает Firestore сам — сервер сам присылает апдейт,
+ * когда флаг меняется. Как только revoked стал true — сразу вызываем
+ * колбэк (обычно signOut + редирект), без polling и без Cloud Function.
+ *
+ * Работает только для устройства, на котором открыта вкладка — если
+ * вкладка закрыта, разлогин произойдёт при следующей загрузке страницы
+ * (это ограничение подхода без Admin SDK, но оно устраивает: токены
+ * revokeRefreshTokens() не тратим, действие целиком на клиенте и бесплатно).
+ */
+export function watchSessionRevocation(db, uid, onRevoked){
+  const sid = localStorage.getItem(sidKey(uid));
+  if(!sid) return () => {};
+
+  let unsub = () => {};
+  let cancelled = false;
+
+  import(FS_URL).then(({ doc, onSnapshot }) => {
+    if(cancelled) return;
+    const ref = doc(db, 'users', uid, 'sessions', sid);
+    unsub = onSnapshot(ref, snap => {
+      if(snap.exists() && snap.data().revoked === true) onRevoked();
+    }, () => {});
+  }).catch(() => {});
+
+  return () => { cancelled = true; unsub(); };
 }
 
 /* ───────────────────── Завершение сеансов (settings.html) ───────────────────── */

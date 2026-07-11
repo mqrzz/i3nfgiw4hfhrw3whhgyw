@@ -89,8 +89,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .session-row{display:flex;align-items:center;gap:16px;padding:18px 20px;background:#fff;border:1.5px solid var(--line);border-radius:20px;flex-wrap:wrap}
 .session-icon{width:46px;height:46px;border-radius:14px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
 .session-icon>svg{width:22px;height:22px;stroke:var(--ink-dim);stroke-width:1.6;fill:none}
-.session-browser-badge{position:absolute;bottom:-4px;right:-4px;width:20px;height:20px;border-radius:7px;background:#fff;border:1.5px solid var(--bg3);display:flex;align-items:center;justify-content:center;overflow:hidden}
-.session-browser-badge svg{width:14px;height:14px;flex-shrink:0}
 .session-info{flex:1;min-width:180px}
 .session-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
 .session-title{font-size:.92rem;font-weight:500;color:var(--ink)}
@@ -306,7 +304,7 @@ import { onAuthStateChanged, signOut, updateProfile, deleteUser, sendPasswordRes
 import { collection, query, where, doc, updateDoc, deleteDoc, getDocs, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getSessionId, endSession, endAllOtherSessions, endCurrentSession,
-  timeAgo, deviceLabel, deviceIconSVG, browserIconSVG, endSessionIconSVG
+  timeAgo, deviceLabel, deviceIconSVG, endSessionIconSVG
 } from './sessions.js?v=3';
 
 let currentUser = null;
@@ -379,7 +377,6 @@ function renderSessions(docs, currentSid){
       <div class="session-row">
         <div class="session-icon">
           ${deviceIconSVG(s.deviceType)}
-          <span class="session-browser-badge">${browserIconSVG(s.browser)}</span>
         </div>
         <div class="session-info">
           <div class="session-title-row">
@@ -438,8 +435,7 @@ window.saveSettings=async function(){
   if(!name){toast('Введите имя','error');return;}
   try{
     await updateProfile(currentUser,{displayName:name});
-    const {doc:firestoreDoc, updateDoc:firestoreUpdate} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    await updateDoc(firestoreDoc(db,'users',currentUser.uid),{name}).catch(()=>{});
+    await updateDoc(doc(db,'users',currentUser.uid),{name}).catch(()=>{});
     toast('Сохранено ✓','success');
   }catch(e){toast('Ошибка сохранения','error');}
 };
@@ -478,15 +474,14 @@ window.confirmDeleteAccount=async function(){
   const btn=document.getElementById('deleteConfirmBtn');
   btn.textContent='Удаляю...';btn.disabled=true;
   try{
-    const {collection:col,query:q,where:wh,getDocs:gd,deleteDoc:dd,updateDoc:ud,doc:d} = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
-    const ordSnap=await gd(q(col(db,'orders'),wh('uid','==',currentUser.uid)));
-    for(const x of ordSnap.docs) await ud(x.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
-    const chatSnap=await gd(col(db,'chats',currentUser.uid,'messages'));
-    for(const x of chatSnap.docs) await dd(x.ref).catch(()=>{});
-    await dd(d(db,'chats',currentUser.uid)).catch(()=>{});
-    const sessSnap=await gd(col(db,'users',currentUser.uid,'sessions'));
-    for(const x of sessSnap.docs) await dd(x.ref).catch(()=>{});
-    await dd(d(db,'users',currentUser.uid)).catch(()=>{});
+    const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
+    for(const x of ordSnap.docs) await updateDoc(x.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
+    const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
+    for(const x of chatSnap.docs) await deleteDoc(x.ref).catch(()=>{});
+    await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
+    const sessSnap=await getDocs(collection(db,'users',currentUser.uid,'sessions'));
+    for(const x of sessSnap.docs) await deleteDoc(x.ref).catch(()=>{});
+    await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
     await deleteUser(currentUser);
     window.location.href='../auth';
   }catch(e){

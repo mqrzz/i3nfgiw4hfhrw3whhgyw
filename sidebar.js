@@ -95,16 +95,23 @@
     .sb-link{
       position:relative;
       display:flex; align-items:center; gap:13px;
-      padding:.9rem 1rem; border-radius:14px;
+      padding:.6rem 1rem .6rem .6rem; border-radius:14px;
       color:var(--muted,#707a8a); text-decoration:none;
-      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:300; font-size:.92rem;
+      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:400; font-size:.92rem;
       background:none; border:none; cursor:pointer; width:100%; text-align:left;
       transition:background .15s, color .15s;
     }
-    .sb-link svg{ width:19px; height:19px; stroke:currentColor; stroke-width:1.7; flex-shrink:0; fill:none; }
-    .sb-link:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
-    .sb-link.is-active{ background:var(--bg,#fff); color:var(--text,#191b1e); font-weight:500; }
-    .sb-link.is-active svg{ stroke:var(--green,#1ede7b); }
+    .sb-link-ico{
+      width:36px; height:36px; flex-shrink:0; border-radius:11px;
+      display:flex; align-items:center; justify-content:center;
+      background:var(--bg2,#f2f4f7);
+      transition:background .15s, color .15s, box-shadow .15s;
+    }
+    .sb-link-ico svg{ width:18px; height:18px; stroke:currentColor; stroke-width:1.8; flex-shrink:0; fill:none; }
+    .sb-link:hover{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); }
+    .sb-link:hover .sb-link-ico{ background:var(--bg,#fff); box-shadow:0 6px 14px -8px rgba(25,27,30,.2); }
+    .sb-link.is-active{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); font-weight:500; }
+    .sb-link.is-active .sb-link-ico{ background:var(--text,#191b1e); color:var(--green,#1ede7b); box-shadow:0 8px 18px -8px rgba(25,27,30,.4); }
     .sb-link-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .sb-badge{
       margin-left:auto; background:var(--green,#1ede7b); color:#191b1e;
@@ -114,8 +121,9 @@
     .sb-badge.warn{ background:#f59e0b; color:#1a1400; }
     .sb-sep{ height:1px; background:var(--border,#dfe3e8); margin:10px 6px; flex-shrink:0; }
     .sb-link.danger{ color:#d95a48; }
-    .sb-link.danger:hover{ background:rgba(232,99,79,.08); color:#c44432; }
-    .sb-link.danger svg{ stroke:#d95a48; }
+    .sb-link.danger:hover{ background:none; color:#c44432; }
+    .sb-link.danger .sb-link-ico{ color:#d95a48; }
+    .sb-link.danger:hover .sb-link-ico{ background:rgba(232,99,79,.1); }
 
     /* Свёрнутое состояние — только иконки. Переключается кнопкой у
        лого, состояние держится в localStorage (см. JS ниже). */
@@ -131,7 +139,7 @@
     /* Бейдж в свёрнутом виде — превращается в маленькую точку поверх
        иконки вместо цифры (иначе некуда её помещать). */
     .sb-nav.is-collapsed .sb-badge{
-      position:absolute; top:8px; right:20px;
+      position:absolute; top:4px; right:15px;
       width:9px; height:9px; min-width:0; padding:0; border-radius:50%;
       font-size:0; line-height:0; overflow:hidden;
     }
@@ -238,10 +246,11 @@
     const active = item.key === page ? ' is-active' : '';
     const badge = item.badgeKey ? `<span class="sb-badge" id="sbBadge-${item.badgeKey}" style="display:none"></span>` : '';
     const label = `<span class="sb-link-label">${item.label}</span>`;
+    const icon = `<span class="sb-link-ico"><svg viewBox="0 0 24 24">${item.icon}</svg></span>`;
     if (item.logout) {
-      return `<button class="sb-link danger" id="sbLogout" aria-label="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}</button>`;
+      return `<button class="sb-link danger" id="sbLogout" aria-label="${item.label}">${icon}${label}</button>`;
     }
-    return `<a href="${item.href}" class="sb-link${active}" aria-label="${item.label}"><svg viewBox="0 0 24 24">${item.icon}</svg>${label}${badge}</a>`;
+    return `<a href="${item.href}" class="sb-link${active}" aria-label="${item.label}">${icon}${label}${badge}</a>`;
   }
 
   function buildNav() {

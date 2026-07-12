@@ -49,7 +49,7 @@
       --nv-green-dim: rgba(30,222,123,.12);
       --nv-warn:      #f5a623;
       --nv-danger:    #ff6b54;
-      --nv-sh:        0 20px 44px rgba(4,10,26,.38), 0 4px 14px rgba(4,10,26,.22);
+      --nv-sh:        0 26px 54px rgba(4,10,26,.42), 0 6px 18px rgba(4,10,26,.26), 0 16px 36px -10px rgba(30,222,123,.14);
       --nv-font:      'Geologica','Inter','Arial',sans-serif;
       --nv-ease:      cubic-bezier(.16,1,.3,1);
     }
@@ -91,7 +91,7 @@
     /* Раньше здесь была круглая подложка вокруг фавикона — просто
        декоративный контейнер, который ничего не нёс кроме шума.
        Убрали: сам логотип крупнее и стоит без рамки. */
-    .nv-logo-mark { width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0; object-fit: cover; }
+    .nv-logo-mark { width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0; object-fit: cover; }
 
     /* ── Центр: просто текстовые ссылки, без плашек при ховере ── */
     .nv-center {
@@ -143,12 +143,30 @@
     }
     .nv-drop.open .nv-chev { transform: rotate(180deg); opacity: .8; }
 
+    /* Наведение вместо клика — только для этого конкретного дропдауна
+       (Блог) и только на устройствах с настоящим курсором, чтобы не
+       ловить залипший hover на тачскринах. Невидимый ::before мостиком
+       перекрывает зазор до меню — иначе курсор "теряет" элемент на
+       полпути и меню дёргано закрывается. */
+    .nv-drop-hover::before {
+      content: ''; position: absolute; top: 100%; left: 50%;
+      transform: translateX(-50%); width: 100%; height: 12px;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .nv-drop-hover:hover .nv-menu {
+        opacity: 1; visibility: visible; pointer-events: all;
+        transform: translate(-50%, 0) scale(1);
+        transition: opacity .15s var(--nv-ease), transform .15s var(--nv-ease), visibility 0s;
+      }
+      .nv-drop-hover:hover .nv-chev { transform: rotate(180deg); opacity: .8; }
+    }
+
     .nv-menu {
       position: absolute; top: calc(100% + 12px); left: 50%;
       background: var(--nv-surface);
       border: 1px solid var(--nv-line);
-      border-radius: 20px; padding: 8px;
-      min-width: 232px;
+      border-radius: 24px; padding: 10px;
+      min-width: 244px;
       box-shadow: var(--nv-sh);
       opacity: 0; visibility: hidden; pointer-events: none;
       transform: translate(-50%, -6px) scale(.98);
@@ -242,8 +260,8 @@
       position: absolute; top: calc(100% + 12px); right: 0;
       background: var(--nv-surface);
       border: 1px solid var(--nv-line);
-      border-radius: 20px; padding: 8px;
-      min-width: 256px;
+      border-radius: 24px; padding: 10px;
+      min-width: 264px;
       box-shadow: var(--nv-sh);
       opacity: 0; visibility: hidden; pointer-events: none;
       transform: translateY(-6px) scale(.98);
@@ -259,26 +277,27 @@
     }
 
     .nv-dd-head {
-      display: flex; align-items: center; gap: 11px;
-      padding: 12px 10px 14px; margin-bottom: 4px;
+      display: flex; align-items: center; gap: 13px;
+      padding: 12px 10px 16px; margin-bottom: 6px;
       border-bottom: 1px solid var(--nv-line-soft);
     }
     .nv-dd-head-avatar {
-      width: 38px; height: 38px; border-radius: 12px;
+      width: 46px; height: 46px; border-radius: 14px;
       background: var(--nv-green);
       display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 500; color: var(--nv-green-ink);
+      font-size: 16px; font-weight: 500; color: var(--nv-green-ink);
       flex-shrink: 0; overflow: hidden;
+      box-shadow: 0 10px 22px -10px rgba(30,222,123,.5);
     }
     .nv-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .nv-dd-head-info { min-width: 0; flex: 1; }
     .nv-dd-head-name {
-      font-size: 14px; font-weight: 500; color: #fff;
+      font-size: 15px; font-weight: 500; color: #fff;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.03em;
     }
     .nv-dd-head-email {
       font-weight: 300; font-size: 11.5px; color: var(--nv-ink-faint);
-      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px;
     }
 
     .nv-dd-section {
@@ -397,7 +416,7 @@
     @media (max-width: 768px) {
       .antviz-nav { top: 14px; height: 60px; padding: 6px 6px 6px 18px; width: calc(100% - 24px); border-radius: 24px; }
       .nv-logo { font-size: 15px; gap: 8px; }
-      .nv-logo-mark { width: 34px; height: 34px; }
+      .nv-logo-mark { width: 29px; height: 29px; }
       .nv-center { display: none; }
       .nv-cta { display: none; }
       .nv-burger { display: flex; }
@@ -443,8 +462,22 @@
         {
           items: [
             { href: 'https://antviz.ru/about', label: 'О сервисе',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8h.01M11 11.5h1.4v5"/>' },
+            { href: 'https://antviz.ru/price',  label: 'Цены',             icon: '<path d="M12.5 3.5H19a1 1 0 011 1v6.5a1 1 0 01-.3.7l-8 8a1 1 0 01-1.4 0l-7.2-7.2a1 1 0 010-1.4l8-8a1 1 0 01.4-.3z"/><circle cx="15.6" cy="7.9" r="1.4"/>' },
             { href: b+'rules',                  label: 'Правила',          icon: '<path d="M12 3l7 3.2v4.8c0 4.8-3 8-7 9.5-4-1.5-7-4.7-7-9.5V6.2L12 3z"/><path d="M9.2 12l1.9 1.9L15.2 10"/>' },
             { href: b+'privacy',                 label: 'Конфиденциальность', icon: '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/><circle cx="12" cy="14.7" r="1.3"/>' },
+          ]
+        }
+      ]
+    },
+    {
+      label: 'Блог',
+      key: 'blog',
+      hover: true,
+      sections: [
+        {
+          items: [
+            { href: 'https://blog.antviz.ru/',         label: 'Блог',        icon: '<path d="M4 5.5A2.5 2.5 0 016.5 3H18a1 1 0 011 1v15a1 1 0 01-1 1H6.5A2.5 2.5 0 014 17.5v-12z"/><path d="M8 8h8M8 11.5h8M8 15h5"/>' },
+            { href: 'https://blog.antviz.ru/updates',  label: 'Что нового', icon: '<path d="M3 10v4a1 1 0 001 1h2l4 4V5L6 9H4a1 1 0 00-1 1z"/><path d="M15 8a4 4 0 010 8M17.8 5.2a8 8 0 010 13.6"/>' },
           ]
         }
       ]
@@ -475,11 +508,11 @@
     { section: 'Кабинет' },
     { href: b+'profile/orders',        icon: '<path d="M7 5h6l4 4v10a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M13 5v4h4"/><path d="M9 13h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
     { href: b+'profile/sites',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.8 2.8 2.8 14.2 0 17M12 3.5c-2.8 2.8-2.8 14.2 0 17"/>', label: 'Мои сайты' },
-    { href: b+'profile/tickets',       icon: '<path d="M4 8a4 4 0 018 0M12 8a4 4 0 018 0"/><rect x="3" y="8" width="4.4" height="7" rx="1.6"/><rect x="16.6" y="8" width="4.4" height="7" rx="1.6"/><path d="M16.6 15v1.2a3 3 0 01-3 3h-2.1"/>', label: 'Обслуживание', badgeKey: 'tickets' },
-    { href: b+'profile/support',       icon: '<circle cx="9" cy="10" r="1.15"/><circle cx="15" cy="10" r="1.15"/><path d="M5 12.5V11a7 7 0 0114 0v1.5M8.6 18l1.3-2.8h4.2l1.3 2.8"/>', label: 'Поддержка', badgeKey: 'support' },
+    { href: b+'profile/tickets',       icon: '<path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/>', label: 'Обслуживание', badgeKey: 'tickets' },
+    { href: b+'profile/support',       icon: '<path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/>', label: 'Поддержка', badgeKey: 'support' },
     { href: b+'profile/notifications', icon: '<path d="M6.5 9.2a5.5 5.5 0 0111 0c0 6 2 7.3 2 7.3H4.5s2-1.3 2-7.3z"/><path d="M10.2 20.5a2 2 0 003.6 0"/>', label: 'Уведомления', badgeKey: 'notif' },
     { sep: true },
-    { href: b+'profile/settings',      icon: '<circle cx="12" cy="12" r="2.6"/><path d="M12 3v2.6M12 18.4V21M4.9 4.9l1.85 1.85M17.25 17.25l1.85 1.85M3 12h2.6M18.4 12H21M4.9 19.1l1.85-1.85M17.25 6.75l1.85-1.85"/>', label: 'Настройки' },
+    { href: b+'profile/settings',      icon: '<circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/>', label: 'Настройки' },
     { logout: true },
   ];
 
@@ -513,7 +546,7 @@
 
     const dropdowns = NAV_DROPDOWNS.map(drop => {
       const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
-      return '<div class="nv-drop" data-drop="' + drop.key + '">' +
+      return '<div class="nv-drop' + (drop.hover ? ' nv-drop-hover' : '') + '" data-drop="' + drop.key + '">' +
         '<button class="nv-drop-btn' + (isActive ? ' is-active' : '') + '" aria-expanded="false">' +
         drop.label + chevronSvg +
         '</button>' +

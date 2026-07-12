@@ -76,14 +76,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
    квадрат со скруглением, приглушённый фон, тонкая обводка внутри. */
 .ico-badge{border-radius:16px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ico-badge svg{stroke:var(--ink-dim);stroke-width:1.6;fill:none}
+.ico-badge.xl{width:76px;height:76px;border-radius:22px}
+.ico-badge.xl svg{width:34px;height:34px}
 .ico-badge.lg{width:64px;height:64px;border-radius:19px}
 .ico-badge.lg svg{width:28px;height:28px}
 .ico-badge.md{width:42px;height:42px;border-radius:13px}
 .ico-badge.md svg{width:19px;height:19px}
 .ico-badge.sm{width:38px;height:38px;border-radius:11px}
 .ico-badge.sm svg{width:16px;height:16px}
-.ico-badge.dark{background:var(--dark)}
-.ico-badge.dark svg{stroke:var(--accent)}
+.ico-badge.dark{background:var(--dark);box-shadow:0 10px 24px -10px rgba(25,27,30,.4)}
+.ico-badge.dark svg{stroke:var(--accent);stroke-width:1.7}
 
 /* BUY CARD */
 .buy-card{background:var(--bg3);border:1.5px solid var(--line);border-radius:40px;padding:48px 44px}
@@ -168,7 +170,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
 .field input::placeholder,.field textarea::placeholder{color:var(--ink-faint)}
 .field textarea{resize:vertical;min-height:96px;line-height:1.6}
-.photo-lbl{display:inline-flex;align-items:center;padding:.55rem 1rem;background:#fff;border:1.5px solid var(--line-strong);border-radius:10px;font-size:.8rem;color:var(--ink-dim);cursor:pointer;transition:border-color .15s,color .15s;font-family:var(--font)}
+.photo-lbl{display:inline-flex;align-items:center;gap:8px;padding:.55rem 1rem;background:#fff;border:1.5px solid var(--line-strong);border-radius:10px;font-size:.8rem;color:var(--ink-dim);cursor:pointer;transition:border-color .15s,color .15s;font-family:var(--font)}
+.photo-lbl svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
 .photo-lbl:hover{border-color:var(--ink);color:var(--ink)}
 .previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .prev-wrap{position:relative;width:68px;height:68px;border-radius:10px;overflow:hidden;border:1.5px solid var(--line)}
@@ -189,8 +192,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .t-desc{font-size:.82rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
 .t-reply{background:var(--bg);border:1px solid var(--line);border-left:2px solid var(--accent);border-radius:12px;padding:12px 14px;font-size:.8rem;color:var(--ink-dim);line-height:1.5}
 .t-reply strong{font-weight:500;color:var(--ink)}
-.t-empty{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;padding:56px 24px;color:var(--ink-faint);font-size:.88rem;font-weight:300}
-.t-empty svg{width:30px;height:30px;stroke:var(--ink-faint);stroke-width:1.4;fill:none;opacity:.55}
+.t-empty{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:64px 24px;color:var(--ink-dim);font-size:.88rem;font-weight:300}
+.t-empty svg{width:28px;height:28px;stroke:var(--accent);stroke-width:1.7;fill:none}
+
+.t-gate{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:56px 40px 60px}
+.t-gate-text strong{display:block;font-size:.98rem;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-bottom:6px}
+.t-gate-text span{display:block;font-size:.84rem;color:var(--ink-dim);font-weight:300;line-height:1.55;max-width:340px}
+.t-gate .btn{margin-top:4px}
 
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.5rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -223,7 +231,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .status-strip-limit,.limit-bar{width:100%}
   .ico-badge.lg{width:48px;height:48px;border-radius:15px}
   .ico-badge.lg svg{width:22px;height:22px}
+  .ico-badge.xl{width:60px;height:60px;border-radius:18px}
+  .ico-badge.xl svg{width:26px;height:26px}
   .card-head{gap:12px}
+  .t-gate{padding:44px 24px 48px}
 }
 
 /* MOBILE — заявка и история/чат не сжимаются в карточки внутри страницы,
@@ -374,12 +385,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
     <div class="mobile-openers">
       <button class="opener" onclick="openPanel('ticketFormCard')">
-        <div class="ico-badge sm"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
+        <div class="ico-badge md dark"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
         <div class="opener-text"><div class="opener-title">Новая заявка</div><div class="opener-sub">Опишите что нужно изменить</div></div>
         <svg class="opener-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
       <button class="opener" onclick="openPanel('ticketHistoryCard')">
-        <div class="ico-badge sm"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+        <div class="ico-badge md dark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
         <div class="opener-text"><div class="opener-title">История заявок</div><div class="opener-sub">Переписка с поддержкой</div></div>
         <svg class="opener-arrow" viewBox="0 0 24 24" fill="none"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
@@ -388,7 +399,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     <div class="content-grid">
       <div class="card" id="ticketFormCard">
         <div class="card-head">
-          <div class="ico-badge md"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
+          <div class="ico-badge lg dark"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
           <div>
             <div class="card-title">Новая заявка</div>
             <div class="card-sub" id="formSub">Опишите что нужно изменить или добавить</div>
@@ -404,7 +415,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
             <div class="field"><label>Описание</label><textarea id="tDesc" placeholder="Подробнее: что изменить, где, как должно выглядеть..."></textarea></div>
             <div class="field">
               <label>Фото <span class="label-optional">(необязательно)</span></label>
-              <label class="photo-lbl">Прикрепить<input type="file" id="tPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos()"/></label>
+              <label class="photo-lbl"><svg viewBox="0 0 24 24"><path d="M17 7l-6.5 6.5a2.5 2.5 0 003.54 3.54L20 11a5 5 0 00-7.07-7.07L6 10.86"/></svg>Прикрепить<input type="file" id="tPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos()"/></label>
               <div class="previews" id="tPreviews"></div>
             </div>
             <button class="btn btn-primary" id="submitBtn" onclick="submitTicket()">Отправить заявку</button>
@@ -414,14 +425,22 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
       <div class="card" id="ticketHistoryCard">
         <div class="card-head">
-          <div class="ico-badge md"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
+          <div class="ico-badge lg dark"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
           <div>
             <div class="card-title">История заявок</div>
             <div class="card-sub" id="listSub">Все обращения по этому сайту</div>
           </div>
           <button class="panel-close" onclick="closePanel('ticketHistoryCard')" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
-        <div class="t-list" id="tList"><div class="t-empty"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg>Заявок пока нет</div></div>
+        <div class="t-gate" id="tGate">
+          <div class="ico-badge xl dark"><svg viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h10"/></svg></div>
+          <div class="t-gate-text">
+            <strong>История ещё не загружена</strong>
+            <span>Заявки подгружаются по запросу — так мы не расходуем лишние обращения к базе</span>
+          </div>
+          <button class="btn btn-primary" id="tGateBtn" onclick="showTicketsList()">Показать все заявки</button>
+        </div>
+        <div class="t-list" id="tList" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -433,7 +452,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <script type="module">
 import{auth,db}from'../firebase-config.js';
 import{onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{collection,query,where,orderBy,getDocs,addDoc,serverTimestamp,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{collection,query,where,orderBy,getDocs,getCountFromServer,addDoc,serverTimestamp,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const PAY_URL='https://api-lac-six-78.vercel.app/api/createPayment';
 const TICKET_LIMIT=5;
@@ -546,7 +565,7 @@ function showActive(){
   document.getElementById('formSub').textContent=`Заявка для: ${name}`;
   document.getElementById('listSub').textContent=`Обращения: ${name}`;
   document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';
-  photos=[];renderPreviews();loadTickets();
+  photos=[];renderPreviews();resetTicketsGate();loadTicketCount();
 }
 
 window.requestSupport=async function(id){if(inFlight)return;pendId=id;pendBuyId=id;showBuyOne(done.find(o=>o.id===id));};
@@ -560,6 +579,40 @@ window.payForSupport=async function(renew){
   catch(e){inFlight=false;if(btn){btn.disabled=false;btn.textContent=renew?'Продлить · 500 ₽':'Подключить за 500 ₽';}toast('Не удалось открыть оплату','error');}
 };
 
+function periodStartFor(o){
+  if(!o.supportExpiresAt)return null;
+  const d=new Date(o.supportExpiresAt.toDate());d.setDate(d.getDate()-30);return d;
+}
+
+async function loadTicketCount(){
+  if(!sel)return;const oid=sel.id;
+  const periodStart=periodStartFor(sel);
+  try{
+    const q=periodStart
+      ?query(collection(db,'service_tickets'),where('orderId','==',oid),where('createdAt','>=',periodStart))
+      :query(collection(db,'service_tickets'),where('orderId','==',oid));
+    const snap=await getCountFromServer(q);
+    if(!sel||sel.id!==oid)return;
+    ticketsThisPeriod=snap.data().count;
+  }catch(e){ticketsThisPeriod=0;}
+  renderLimit();
+}
+
+function resetTicketsGate(){
+  const gate=document.getElementById('tGate'),list=document.getElementById('tList'),btn=document.getElementById('tGateBtn');
+  gate.style.display='flex';list.style.display='none';list.innerHTML='';
+  btn.disabled=false;btn.textContent='Показать все заявки';
+}
+
+window.showTicketsList=async function(){
+  const btn=document.getElementById('tGateBtn');
+  btn.disabled=true;btn.textContent='Загрузка...';
+  await loadTickets();
+  if(!sel)return;
+  document.getElementById('tGate').style.display='none';
+  document.getElementById('tList').style.display='flex';
+};
+
 async function loadTickets(){
   if(!sel)return;const oid=sel.id;
   try{const s=await getDocs(query(collection(db,'service_tickets'),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
@@ -567,15 +620,15 @@ async function loadTickets(){
 
   // Заявки считаем только в рамках текущего периода обслуживания
   // (период начинается, когда было выставлено supportExpiresAt - 30 дней)
-  let periodStart=null;
-  if(sel.supportExpiresAt){
-    periodStart=new Date(sel.supportExpiresAt.toDate());
-    periodStart.setDate(periodStart.getDate()-30);
-  }
+  const periodStart=periodStartFor(sel);
   const inPeriod=periodStart?all.filter(t=>t.createdAt&&t.createdAt.toDate()>=periodStart):all;
   ticketsThisPeriod=inPeriod.length;
   renderLimit();
-  renderTickets(all);}catch(e){}
+  renderTickets(all);}catch(e){
+    const btn=document.getElementById('tGateBtn');
+    if(btn){btn.disabled=false;btn.textContent='Показать все заявки';}
+    toast('Не удалось загрузить заявки','error');
+  }
 }
 
 function renderLimit(){
@@ -592,7 +645,7 @@ function renderLimit(){
 
 function renderTickets(ts){
   const el=document.getElementById('tList');
-  if(!ts.length){el.innerHTML='<div class="t-empty"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg>Заявок пока нет</div>';return;}
+  if(!ts.length){el.innerHTML='<div class="t-empty"><div class="ico-badge lg dark"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg></div>Заявок пока нет</div>';return;}
   el.innerHTML=ts.map(t=>{
     const isDone=t.status==='done';
     const date=t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
@@ -622,7 +675,8 @@ window.submitTicket=async function(){
   const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Отправка...';
   try{
     await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:photos.length?photos:null,uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',orderId:sel.id,orderSiteType:sel.siteType||'',orderTariff:sel.tariff||sel.package||'',orderDomain:sel.siteDomain||'',status:'open',createdAt:serverTimestamp()});
-    document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена','success');loadTickets();
+    document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена','success');
+    if(document.getElementById('tList').style.display==='none'){loadTicketCount();}else{loadTickets();}
     if(window.matchMedia('(max-width:640px)').matches){closePanel('ticketFormCard');}
   }catch(e){toast('Ошибка','error');}
   btn.disabled=false;btn.textContent='Отправить заявку';

@@ -176,20 +176,20 @@
       white-space: nowrap;
     }
     .nv-menu-item:hover { background: var(--nv-green-dim); color: #fff; }
-    .nv-menu-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); }
+    .nv-menu-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); background: var(--nv-green-dim); box-shadow: 0 6px 14px -8px rgba(30,222,123,.4); }
     .nv-menu-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 8px; }
 
     /* ── Иконки: единая геометрия — скруглённый квадрат-контейнер
        + простой глиф; никакого разнобоя форм ── */
     .nv-ico {
-      width: 26px; height: 26px; flex-shrink: 0; border-radius: 9px;
+      width: 34px; height: 34px; flex-shrink: 0; border-radius: 11px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--nv-ink-faint);
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.06);
-      transition: color .12s, border-color .12s;
+      color: var(--nv-ink-dim);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      transition: color .15s, border-color .15s, background .15s, box-shadow .15s;
     }
-    .nv-ico svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .nv-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
     .nv-right { display: flex; align-items: center; gap: 20px; margin-left: auto; }
 
@@ -296,10 +296,10 @@
       position: relative; font-family: var(--nv-font);
     }
     .nv-dd-item:hover { background: var(--nv-green-dim); color: #fff; }
-    .nv-dd-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); }
+    .nv-dd-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); background: var(--nv-green-dim); box-shadow: 0 6px 14px -8px rgba(30,222,123,.4); }
     .nv-dd-item.danger .nv-ico { color: rgba(255,107,84,.75); }
     .nv-dd-item.danger:hover { background: rgba(255,107,84,.1); color: #ffb3a3; }
-    .nv-dd-item.danger:hover .nv-ico { color: var(--nv-danger); border-color: rgba(255,107,84,.3); }
+    .nv-dd-item.danger:hover .nv-ico { color: var(--nv-danger); border-color: rgba(255,107,84,.3); background: rgba(255,107,84,.12); box-shadow: 0 6px 14px -8px rgba(255,107,84,.35); }
     .nv-dd-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 10px; }
 
     .nv-badge {

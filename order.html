@@ -17,14 +17,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 :root{
   --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
   --green-light:#d2f8e5;--green-lighter:#e8fcf2;
-  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --text:#191b1e;--muted:#707a8a;
-  --border:#dfe3e8;--border2:#cbcdd6;
+  --bg:#fff;--bg2:#f1f2fd;--bg3:#faf9ff;
+  --text:#191b1e;--muted:#5f5f8a;
+  --border:#e3e1f7;--border2:#c7c4ec;
   --dark:#191b1e;--dark2:#2b2f33;
   --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
   --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
   --font:'Geologica','Inter','Arial',sans-serif;
   --sp-l:100px;
+  /* colorful accent system for icons */
+  --blue:#2f6bff;--blue-l:#5b8cff;--blue-bg:#eaf0ff;
+  --purple:#8b3ffb;--purple-l:#a970ff;--purple-bg:#f4ecff;
+  --orange:#ff8a1f;--orange-l:#ffab4d;--orange-bg:#fff2e2;
+  --pink:#ff3f8f;--pink-l:#ff6fac;--pink-bg:#ffe9f2;
+  --red:#ff4d4d;--red-l:#ff7a7a;--red-bg:#ffe9e9;
+  --teal:#0fc7c0;--teal-l:#3fe0d8;--teal-bg:#e2fbf9;
+  --yellow:#ffc324;--yellow-l:#ffd75c;--yellow-bg:#fff8e0;
 }
 @media(max-width:768px){:root{--sp-l:60px}}
 @media(max-width:480px){:root{--sp-l:48px}}
@@ -66,7 +74,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
 /* HERO */
 .hero-wrap{padding:var(--sp-l) 0 0;background:var(--bg)}
-.hero-block{background:var(--dark);border-radius:64px;padding:80px 100px;text-align:center;overflow:hidden}
+.hero-block{background:var(--dark);border-radius:64px;padding:80px 100px;text-align:center;overflow:hidden;position:relative}
+.hero-block::before{content:'';position:absolute;top:-40%;left:-10%;width:60%;height:140%;background:radial-gradient(circle,rgba(47,107,255,.35),transparent 65%);pointer-events:none}
+.hero-block::after{content:'';position:absolute;bottom:-40%;right:-10%;width:60%;height:140%;background:radial-gradient(circle,rgba(30,222,123,.28),transparent 65%);pointer-events:none}
+.hero-block>*{position:relative;z-index:1}
 @media(max-width:860px){.hero-block{padding:48px 32px;border-radius:32px}}
 .hero-eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:24px}
 .hero-block h1{font-size:clamp(52px,8vw,100px);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:24px}
@@ -129,7 +140,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
 /* EXTRAS / CALC */
 .calc-wrap{padding:var(--sp-l) 0;background:var(--bg2)}
-.calc-block{background:var(--dark);border-radius:64px;padding:64px 80px}
+.calc-block{background:var(--dark);border-radius:64px;padding:64px 80px;position:relative;overflow:hidden}
+.calc-block::before{content:'';position:absolute;top:-30%;right:-15%;width:55%;height:130%;background:radial-gradient(circle,rgba(139,63,251,.3),transparent 65%);pointer-events:none}
+.calc-block>*{position:relative;z-index:1}
 @media(max-width:860px){.calc-block{padding:48px 32px;border-radius:32px}}
 .calc-grid{display:grid;grid-template-columns:1fr 300px;gap:64px;align-items:start;margin-top:48px}
 @media(max-width:960px){.calc-grid{grid-template-columns:1fr;gap:40px}}
@@ -258,33 +271,43 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .domain-error{margin-top:6px;font-size:12px;color:#ff6b54;font-weight:300;display:none}
 .domain-error.show{display:block}
 
-/* CARD ICONS */
-.card-ico{width:40px;height:40px;border-radius:14px;background:var(--bg2);display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0;transition:background .15s,color .15s}
-.card-ico svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.type-card.sel .card-ico{background:var(--green);color:var(--dark)}
+/* CARD ICONS — big & colorful */
+.card-ico{width:64px;height:64px;border-radius:20px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:transform .2s cubic-bezier(.22,1,.36,1),box-shadow .2s}
+.card-ico svg{width:32px;height:32px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.type-card:hover .card-ico{transform:scale(1.06) rotate(-2deg)}
+.type-card.sel .card-ico{transform:scale(1.08);box-shadow:0 14px 28px -8px rgba(20,20,20,.35)}
 .type-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 
-.stype-ico{width:30px;height:30px;border-radius:10px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:var(--text)}
-.stype-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.stype-card.sel .stype-ico{background:var(--green);border-color:var(--green);color:var(--dark)}
+.stype-ico{width:48px;height:48px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;color:#fff;transition:transform .2s}
+.stype-ico svg{width:24px;height:24px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.stype-card.sel .stype-ico{transform:scale(1.08)}
 
-.extra-ico{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.55);flex-shrink:0;transition:background .15s,color .15s}
-.extra-ico svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.calc-extra.on .extra-ico{background:var(--green);color:var(--dark)}
-.calc-extra-l{display:flex;align-items:center;gap:12px}
+.extra-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0;transition:transform .2s,box-shadow .2s;box-shadow:0 6px 16px -6px rgba(0,0,0,.5)}
+.extra-ico svg{width:22px;height:22px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.calc-extra.on .extra-ico{transform:scale(1.08)}
+.calc-extra-l{display:flex;align-items:center;gap:14px}
 
-.pick-ico{width:30px;height:30px;border-radius:9px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:var(--text)}
-.pick-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.pick-card.sel .pick-ico{background:var(--green);border-color:var(--green);color:var(--dark)}
+.pick-ico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;color:#fff;transition:transform .2s}
+.pick-ico svg{width:20px;height:20px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pick-card.sel .pick-ico{transform:scale(1.08)}
 
-.tier-ico{width:34px;height:34px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:var(--text)}
-.tier-ico svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.tier.dark .tier-ico{background:rgba(255,255,255,.08);color:#fff}
-.tier.sel .tier-ico{background:var(--green);color:var(--dark)}
+.tier-ico{width:54px;height:54px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin-bottom:18px;color:#fff;transition:transform .2s;box-shadow:0 8px 18px -6px rgba(0,0,0,.3)}
+.tier-ico svg{width:27px;height:27px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tier.sel .tier-ico{transform:scale(1.08)}
 
-.filezone-ico{width:36px;height:36px;border-radius:12px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;color:var(--muted);transition:background .15s,border-color .15s,color .15s}
-.filezone-ico svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.filezone:hover .filezone-ico,.filezone.dragover .filezone-ico{background:var(--green);border-color:var(--green);color:var(--dark)}
+.filezone-ico{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;color:#fff;transition:transform .2s,box-shadow .2s;box-shadow:0 8px 18px -6px rgba(0,0,0,.25)}
+.filezone-ico svg{width:26px;height:26px;stroke:#fff;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.filezone:hover .filezone-ico,.filezone.dragover .filezone-ico{transform:scale(1.08)}
+
+/* colorful gradient badges */
+.c-blue{background:linear-gradient(135deg,var(--blue-l),var(--blue))}
+.c-purple{background:linear-gradient(135deg,var(--purple-l),var(--purple))}
+.c-orange{background:linear-gradient(135deg,var(--orange-l),var(--orange))}
+.c-pink{background:linear-gradient(135deg,var(--pink-l),var(--pink))}
+.c-red{background:linear-gradient(135deg,var(--red-l),var(--red))}
+.c-teal{background:linear-gradient(135deg,var(--teal-l),var(--teal))}
+.c-green{background:linear-gradient(135deg,#4eea94,var(--green-d))}
+.c-yellow{background:linear-gradient(135deg,var(--yellow-l),var(--yellow))}
 
 /* PICK CARDS (goal / readiness / shop options) */
 .pick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:4px}
@@ -378,7 +401,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     <div class="types-grid">
       <div class="type-card reveal" data-format="landing">
         <div class="type-card-top">
-          <div class="card-ico"><svg viewBox="0 0 24 24"><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/></svg></div>
+          <div class="card-ico c-blue"><svg viewBox="0 0 24 24"><rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/></svg></div>
           <div class="type-n" style="margin-bottom:0">01</div>
         </div>
         <h3>Лендинг-визитка</h3>
@@ -391,7 +414,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </div>
       <div class="type-card reveal" data-format="multipage">
         <div class="type-card-top">
-          <div class="card-ico"><svg viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg></div>
+          <div class="card-ico c-purple"><svg viewBox="0 0 24 24"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/></svg></div>
           <div class="type-n" style="margin-bottom:0">02</div>
         </div>
         <h3>Многостраничный сайт</h3>
@@ -404,7 +427,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </div>
       <div class="type-card reveal" data-format="shop">
         <div class="type-card-top">
-          <div class="card-ico"><svg viewBox="0 0 24 24"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></svg></div>
+          <div class="card-ico c-orange"><svg viewBox="0 0 24 24"><path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/></svg></div>
           <div class="type-n" style="margin-bottom:0">03</div>
         </div>
         <h3>Интернет-магазин</h3>
@@ -417,7 +440,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </div>
       <div class="type-card reveal" data-format="custom">
         <div class="type-card-top">
-          <div class="card-ico"><svg viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg></div>
+          <div class="card-ico c-pink"><svg viewBox="0 0 24 24"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/></svg></div>
           <div class="type-n" style="margin-bottom:0">04</div>
         </div>
         <h3>Особый случай</h3>
@@ -434,12 +457,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <p class="field-label" style="margin-bottom:16px">Какой сайт нужен?</p>
       <div class="stype-grid">
         <div class="stype-card" data-stype="static">
-          <div class="stype-ico"><svg viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
+          <div class="stype-ico c-teal"><svg viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg></div>
           <div class="stype-title">Статический</div>
           <div class="stype-desc">Страницы не меняются сами, контент редактируем вручную. Быстрый, дешевле в обслуживании.</div>
         </div>
         <div class="stype-card" data-stype="dynamic">
-          <div class="stype-ico"><svg viewBox="0 0 24 24"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg></div>
+          <div class="stype-ico c-blue"><svg viewBox="0 0 24 24"><rect width="20" height="8" x="2" y="2" rx="2" ry="2"/><rect width="20" height="8" x="2" y="14" rx="2" ry="2"/><line x1="6" x2="6.01" y1="6" y2="6"/><line x1="6" x2="6.01" y1="18" y2="18"/></svg></div>
           <div class="stype-title">Сайт с серверной частью / динамический</div>
           <div class="stype-desc">Блог, каталог, новости — контент добавляется через панель без программиста. Для магазинов и порталов.</div>
         </div>
@@ -466,7 +489,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     <h2 class="section-h2 reveal">Какой масштаб нужен?</h2>
     <div class="tiers-grid">
       <div class="tier reveal" data-tier="start">
-        <div class="tier-ico"><svg viewBox="0 0 24 24"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></svg></div>
+        <div class="tier-ico c-blue"><svg viewBox="0 0 24 24"><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09"/><path d="M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05"/></svg></div>
         <div class="tier-price">2 900 <sup>₽</sup></div>
         <div class="tier-name">Старт</div>
         <div class="tier-meta">1 страница · 1—2 дня</div>
@@ -476,7 +499,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </div>
       <div class="tier dark reveal" data-tier="growth">
         <div class="tier-badge">Чаще выбирают</div>
-        <div class="tier-ico"><svg viewBox="0 0 24 24"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/></svg></div>
+        <div class="tier-ico c-green"><svg viewBox="0 0 24 24"><path d="M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"/></svg></div>
         <div class="tier-price">5 900 <sup>₽</sup></div>
         <div class="tier-name">Рост</div>
         <div class="tier-meta">до 5 страниц · 2—5 дней</div>
@@ -485,7 +508,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         </ul>
       </div>
       <div class="tier reveal" data-tier="scale">
-        <div class="tier-ico"><svg viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></div>
+        <div class="tier-ico c-purple"><svg viewBox="0 0 24 24"><path d="M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z"/><path d="M5 21h14"/></svg></div>
         <div class="tier-price">11 900 <sup>₽</sup></div>
         <div class="tier-name">Масштаб</div>
         <div class="tier-meta">до 10 страниц · 5—14 дней</div>
@@ -515,7 +538,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           <div class="calc-extras">
             <div class="calc-extra" id="xDomain">
               <div class="calc-extra-row">
-                <div class="calc-extra-l"><div class="extra-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div><span class="calc-extra-name">Домен</span></div>
+                <div class="calc-extra-l"><div class="extra-ico c-blue"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg></div><span class="calc-extra-name">Домен</span></div>
                 <div class="calc-extra-r"><span class="calc-extra-price" id="xDomainPrice">нужен</span><div class="sw"></div></div>
               </div>
               <div class="domain-sub" id="domainSub" hidden>
@@ -543,19 +566,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
             </div>
             <div class="calc-extra" id="xContent">
               <div class="calc-extra-row">
-                <div class="calc-extra-l"><div class="extra-ico"><svg viewBox="0 0 24 24"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg></div><span class="calc-extra-name">Наполнение контентом</span></div>
+                <div class="calc-extra-l"><div class="extra-ico c-pink"><svg viewBox="0 0 24 24"><path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/></svg></div><span class="calc-extra-name">Наполнение контентом</span></div>
                 <div class="calc-extra-r"><span class="calc-extra-price">+2 000 ₽</span><div class="sw"></div></div>
               </div>
             </div>
             <div class="calc-extra" id="xShop">
               <div class="calc-extra-row">
-                <div class="calc-extra-l"><div class="extra-ico"><svg viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></div><span class="calc-extra-name">Каталог и корзина</span></div>
+                <div class="calc-extra-l"><div class="extra-ico c-orange"><svg viewBox="0 0 24 24"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg></div><span class="calc-extra-name">Каталог и корзина</span></div>
                 <div class="calc-extra-r"><span class="calc-extra-price">+4 900 ₽</span><div class="sw"></div></div>
               </div>
             </div>
             <div class="calc-extra" id="xUrgent">
               <div class="calc-extra-row">
-                <div class="calc-extra-l"><div class="extra-ico"><svg viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div><span class="calc-extra-name">Срочный запуск (2—4 рабочих дня)</span></div>
+                <div class="calc-extra-l"><div class="extra-ico c-red"><svg viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div><span class="calc-extra-name">Срочный запуск (2—4 рабочих дня)</span></div>
                 <div class="calc-extra-r"><span class="calc-extra-price">+30%</span><div class="sw"></div></div>
               </div>
             </div>
@@ -591,22 +614,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <label class="field-label">Цель сайта <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">(можно выбрать несколько)</span></label>
         <div class="pick-grid" id="goalGrid">
           <div class="pick-card" data-goal="leads">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M13 2a9 9 0 0 1 9 9"/><path d="M13 6a5 5 0 0 1 5 5"/><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg></div>
+            <div class="pick-ico c-blue"><svg viewBox="0 0 24 24"><path d="M13 2a9 9 0 0 1 9 9"/><path d="M13 6a5 5 0 0 1 5 5"/><path d="M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"/></svg></div>
             <div class="pick-card-title">Заявки и звонки</div>
             <div class="pick-card-desc">Форма/телефон — собрать обращения клиентов</div>
           </div>
           <div class="pick-card" data-goal="sales">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></div>
+            <div class="pick-ico c-green"><svg viewBox="0 0 24 24"><path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/></svg></div>
             <div class="pick-card-title">Продажи онлайн</div>
             <div class="pick-card-desc">Каталог, корзина, оплата на сайте</div>
           </div>
           <div class="pick-card" data-goal="brand">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></div>
+            <div class="pick-ico c-purple"><svg viewBox="0 0 24 24"><path d="M10 12h4"/><path d="M10 8h4"/><path d="M14 21v-3a2 2 0 0 0-4 0v3"/><path d="M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"/><path d="M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"/></svg></div>
             <div class="pick-card-title">Имидж / представительство</div>
             <div class="pick-card-desc">Показать компанию, вызвать доверие</div>
           </div>
           <div class="pick-card" data-goal="info">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
+            <div class="pick-ico c-teal"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></div>
             <div class="pick-card-title">Информирование</div>
             <div class="pick-card-desc">Новости, расписание, справочные материалы</div>
           </div>
@@ -617,17 +640,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <label class="field-label">Готовность материалов</label>
         <div class="pick-grid cols3" id="readinessGrid">
           <div class="pick-card" data-readiness="ready">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div class="pick-ico c-green"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
             <div class="pick-card-title">Всё готово</div>
             <div class="pick-card-desc">Тексты и фото есть</div>
           </div>
           <div class="pick-card" data-readiness="partial">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+            <div class="pick-ico c-orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
             <div class="pick-card-title">Частично</div>
             <div class="pick-card-desc">Что-то есть, что-то нужно дописать</div>
           </div>
           <div class="pick-card" data-readiness="none">
-            <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m14.5 12.5-5 5"/><path d="m9.5 12.5 5 5"/></svg></div>
+            <div class="pick-ico c-red"><svg viewBox="0 0 24 24"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="m14.5 12.5-5 5"/><path d="m9.5 12.5 5 5"/></svg></div>
             <div class="pick-card-title">Ничего нет</div>
             <div class="pick-card-desc">Нужно сделать с нуля</div>
           </div>
@@ -650,15 +673,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           <label class="field-label">Способы оплаты <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">(можно выбрать несколько)</span></label>
           <div class="pick-grid cols3" id="shopPayGrid">
             <div class="pick-card" data-shoppay="online">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div>
+              <div class="pick-ico c-blue"><svg viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg></div>
               <div class="pick-card-title">Картой онлайн</div>
             </div>
             <div class="pick-card" data-shoppay="sbp">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></div>
+              <div class="pick-ico c-purple"><svg viewBox="0 0 24 24"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></div>
               <div class="pick-card-title">СБП</div>
             </div>
             <div class="pick-card" data-shoppay="cash">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div>
+              <div class="pick-ico c-green"><svg viewBox="0 0 24 24"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg></div>
               <div class="pick-card-title">Наличными при получении</div>
             </div>
           </div>
@@ -667,19 +690,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
           <label class="field-label">Доставка <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">(можно выбрать несколько)</span></label>
           <div class="pick-grid" id="shopDeliveryGrid">
             <div class="pick-card" data-shopdelivery="courier">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></div>
+              <div class="pick-ico c-blue"><svg viewBox="0 0 24 24"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></svg></div>
               <div class="pick-card-title">Курьером</div>
             </div>
             <div class="pick-card" data-shopdelivery="pickup">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></div>
+              <div class="pick-ico c-teal"><svg viewBox="0 0 24 24"><path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></svg></div>
               <div class="pick-card-title">Самовывоз</div>
             </div>
             <div class="pick-card" data-shopdelivery="post">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></div>
+              <div class="pick-ico c-purple"><svg viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></div>
               <div class="pick-card-title">Почта / транспортная компания</div>
             </div>
             <div class="pick-card" data-shopdelivery="none">
-              <div class="pick-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></div>
+              <div class="pick-ico c-red"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg></div>
               <div class="pick-card-title">Доставка не нужна</div>
             </div>
           </div>
@@ -695,7 +718,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <div class="field-info"><strong>Фавикон</strong> — маленькая иконка во вкладке браузера. Обычно логотип 32×32 px. PNG, ICO или SVG.</div>
         <div class="filezone" id="favZone">
           <input type="file" id="fFav" accept="image/png,image/x-icon,image/svg+xml,.ico" style="display:none"/>
-          <div class="filezone-ico"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
+          <div class="filezone-ico c-blue"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg></div>
           <div class="filezone-text"><strong>Нажмите или перетащите</strong> файл сюда</div>
         </div>
         <div class="fav-preview" id="favPreview"></div>
@@ -705,7 +728,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <label class="field-label">Материалы <span style="text-transform:none;letter-spacing:0;font-weight:300;color:var(--border2)">фото, PDF, брендбук</span></label>
         <div class="filezone" id="filesZone">
           <input type="file" id="fFiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none"/>
-          <div class="filezone-ico"><svg viewBox="0 0 24 24"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg></div>
+          <div class="filezone-ico c-purple"><svg viewBox="0 0 24 24"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg></div>
           <div class="filezone-text"><strong>Нажмите или перетащите</strong> файлы · до 10 МБ каждый</div>
         </div>
         <div class="chips" id="fileChips"></div>

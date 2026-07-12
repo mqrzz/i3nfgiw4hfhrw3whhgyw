@@ -308,6 +308,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
     content:":";
     margin-left:4px;
   }
+  /* thead скрыт на мобилке — возвращаем подписи Antviz / Tilda-Wix у каждого значения */
+  .ctable td.us::before,
+  .ctable td.them::before{
+    content:attr(data-label);
+    font-size:10px;
+    font-weight:500;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:rgba(255,255,255,.25);
+  }
+  .ctable td.us::before{color:var(--green)}
 }
 
 /* ══════════════════════════════════
@@ -364,6 +375,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .pay-b{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:14px;font-weight:300;color:var(--text);transition:border-color .15s,box-shadow .15s}
 .pay-b:hover{border-color:var(--border2);box-shadow:var(--sh1)}
 .pay-b img{height:20px;object-fit:contain}
+.pay-flex{display:grid;grid-template-columns:1fr auto;gap:56px;align-items:center}
+.pay-photo{justify-self:end;max-width:220px;width:100%}
+.pay-photo img{width:100%;height:auto;max-height:420px;object-fit:contain;display:block}
+@media(max-width:760px){
+  .pay-flex{grid-template-columns:1fr;gap:32px;text-align:center}
+  .pay-photo{justify-self:center;max-width:190px;order:-1}
+  .pay-row{justify-content:center}
+}
 
 /* ══════════════════════════════════
    14 CTA — как final-block в order.html
@@ -817,13 +836,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       <table class="ctable">
         <thead><tr><th></th><th class="us">Antviz</th><th class="them">Tilda / Wix</th></tr></thead>
         <tbody>
-          <tr><td>Хостинг</td><td class="us"><span class="cg">Бесплатно навсегда</span></td><td class="them">от 300 ₽/мес</td></tr>
-          <tr><td>Дизайн</td><td class="us"><span class="cg">Уникальный, с нуля</span></td><td class="them">Шаблоны</td></tr>
-          <tr><td>Скорость загрузки</td><td class="us"><span class="cg">Максимальная, CDN</span></td><td class="them">Медленнее</td></tr>
-          <tr><td>Владение кодом</td><td class="us"><span class="cg">Полностью ваш</span></td><td class="them">Принадлежит платформе</td></tr>
-          <tr><td>SSL (HTTPS)</td><td class="us"><span class="cg">Бесплатно, авто</span></td><td class="them">Только в платных тарифах</td></tr>
-          <tr><td>Серверная логика</td><td class="us"><span class="cg">Да</span></td><td class="them">Нет</td></tr>
-          <tr><td>Абонентская плата</td><td class="us"><span class="cg">Нет</span></td><td class="them">Обязательна</td></tr>
+          <tr><td>Хостинг</td><td class="us" data-label="Antviz"><span class="cg">Бесплатно навсегда</span></td><td class="them" data-label="Tilda / Wix">от 300 ₽/мес</td></tr>
+          <tr><td>Дизайн</td><td class="us" data-label="Antviz"><span class="cg">Уникальный, с нуля</span></td><td class="them" data-label="Tilda / Wix">Шаблоны</td></tr>
+          <tr><td>Скорость загрузки</td><td class="us" data-label="Antviz"><span class="cg">Максимальная, CDN</span></td><td class="them" data-label="Tilda / Wix">Медленнее</td></tr>
+          <tr><td>Владение кодом</td><td class="us" data-label="Antviz"><span class="cg">Полностью ваш</span></td><td class="them" data-label="Tilda / Wix">Принадлежит платформе</td></tr>
+          <tr><td>SSL (HTTPS)</td><td class="us" data-label="Antviz"><span class="cg">Бесплатно, авто</span></td><td class="them" data-label="Tilda / Wix">Только в платных тарифах</td></tr>
+          <tr><td>Серверная логика</td><td class="us" data-label="Antviz"><span class="cg">Да</span></td><td class="them" data-label="Tilda / Wix">Нет</td></tr>
+          <tr><td>Абонентская плата</td><td class="us" data-label="Antviz"><span class="cg">Нет</span></td><td class="them" data-label="Tilda / Wix">Обязательна</td></tr>
         </tbody>
       </table>
     </div>
@@ -886,14 +905,21 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <!-- ══ 13 PAYMENT ══ -->
 <section class="pay-wrap">
   <div class="container">
-    <p class="eyebrow reveal">Оплата</p>
-    <h2 class="reveal" style="font-size:clamp(28px,3.5vw,48px);font-weight:500;letter-spacing:-.03em">Удобные способы оплаты</h2>
-    <p class="reveal" style="font-size:16px;color:var(--muted);font-weight:300;margin-top:12px">Через ЮKassa. Чек сразу после оплаты.</p>
-    <div class="pay-row reveal">
-      <div class="pay-b"><img src="img/sbp-logo.png" alt="СБП"/><span>СБП</span></div>
-      <div class="pay-b"><img src="img/cards-logo.png" alt="Карты"/><span>Банковские карты</span></div>
-      <div class="pay-b"><img src="img/tpay-logo.png" alt="T-Pay"/><span>T‑Pay</span></div>
-      <div class="pay-b"><img src="img/sberpay-logo.png" alt="SberPay"/><span>SberPay</span></div>
+    <div class="pay-flex">
+      <div>
+        <p class="eyebrow reveal">Оплата</p>
+        <h2 class="reveal" style="font-size:clamp(28px,3.5vw,48px);font-weight:500;letter-spacing:-.03em">Удобные способы оплаты</h2>
+        <p class="reveal" style="font-size:16px;color:var(--muted);font-weight:300;margin-top:12px">Через ЮKassa. Чек сразу после оплаты.</p>
+        <div class="pay-row reveal">
+          <div class="pay-b"><img src="img/sbp-logo.png" alt="СБП"/><span>СБП</span></div>
+          <div class="pay-b"><img src="img/cards-logo.png" alt="Карты"/><span>Банковские карты</span></div>
+          <div class="pay-b"><img src="img/tpay-logo.png" alt="T-Pay"/><span>T‑Pay</span></div>
+          <div class="pay-b"><img src="img/sberpay-logo.png" alt="SberPay"/><span>SberPay</span></div>
+        </div>
+      </div>
+      <div class="pay-photo reveal">
+        <img src="img/iphone-demo1.png" alt="Оплата с телефона" />
+      </div>
     </div>
   </div>
 </section>

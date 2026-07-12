@@ -21,7 +21,7 @@
  * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
  * инициализирует САМА СТРАНИЦА, и подключается к уже существующему
  * приложению через getApps()/getAuth(). Логика авторизации, бейджей
- * и сессий не менялась — менялся только визуальный слой и разметка              
+ * и сессий не менялась — менялся только визуальный слой и разметка
  * вокруг него (id остались прежними, чтобы ничего не сломать).
  */
 (function () {
@@ -869,6 +869,15 @@ ${buildMobileSheet()}`;
             unwatchRevoke = sessMod.watchSessionRevocation(db, user.uid, async () => {
               unwatchRevoke?.(); unwatchRevoke = null;
               teardownListeners();
+              // КРИТИЧНО: очищаем sessionId до signOut. Без этого при
+              // следующем входе registerSession() переиспользует тот же
+              // sid, а его документ в Firestore всё ещё revoked:true —
+              // из-за гонки с асинхронной геолокацией/Client Hints внутри
+              // registerSession() новый onSnapshot-листенер может поймать
+              // старое значение раньше, чем оно успеет обновиться, и тут
+              // же выкинет пользователя обратно. Именно это и была причина
+              // случайных разлогинов сразу после повторного входа.
+              sessMod.clearSessionId(user.uid);
               try { await authMod.signOut(auth); } catch(e) {}
               window.location.href = `${b}auth`;
             });

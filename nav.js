@@ -148,17 +148,17 @@
        ловить залипший hover на тачскринах. Невидимый ::before мостиком
        перекрывает зазор до меню — иначе курсор "теряет" элемент на
        полпути и меню дёргано закрывается. */
-    .nv-drop-hover::before {
+    .nv-drop::before {
       content: ''; position: absolute; top: 100%; left: 50%;
       transform: translateX(-50%); width: 100%; height: 12px;
     }
     @media (hover: hover) and (pointer: fine) {
-      .nv-drop-hover:hover .nv-menu {
+      .nv-drop:hover .nv-menu {
         opacity: 1; visibility: visible; pointer-events: all;
         transform: translate(-50%, 0) scale(1);
         transition: opacity .15s var(--nv-ease), transform .15s var(--nv-ease), visibility 0s;
       }
-      .nv-drop-hover:hover .nv-chev { transform: rotate(180deg); opacity: .8; }
+      .nv-drop:hover .nv-chev { transform: rotate(180deg); opacity: .8; }
     }
 
     .nv-menu {
@@ -194,7 +194,7 @@
       white-space: nowrap;
     }
     .nv-menu-item:hover { background: var(--nv-green-dim); color: #fff; }
-    .nv-menu-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); background: var(--nv-green-dim); box-shadow: 0 6px 14px -8px rgba(30,222,123,.4); }
+    .nv-menu-item:hover .nv-ico { color: var(--nv-green-ink); border-color: transparent; background: var(--nv-green); box-shadow: 0 8px 18px -8px rgba(30,222,123,.5); }
     .nv-menu-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 8px; }
 
     /* ── Иконки: единая геометрия — скруглённый квадрат-контейнер
@@ -202,9 +202,9 @@
     .nv-ico {
       width: 34px; height: 34px; flex-shrink: 0; border-radius: 11px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--nv-ink-dim);
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.08);
+      color: var(--nv-green);
+      background: var(--nv-green-dim);
+      border: 1px solid rgba(30,222,123,.16);
       transition: color .15s, border-color .15s, background .15s, box-shadow .15s;
     }
     .nv-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -315,10 +315,10 @@
       position: relative; font-family: var(--nv-font);
     }
     .nv-dd-item:hover { background: var(--nv-green-dim); color: #fff; }
-    .nv-dd-item:hover .nv-ico { color: var(--nv-green); border-color: rgba(30,222,123,.3); background: var(--nv-green-dim); box-shadow: 0 6px 14px -8px rgba(30,222,123,.4); }
-    .nv-dd-item.danger .nv-ico { color: rgba(255,107,84,.75); }
+    .nv-dd-item:hover .nv-ico { color: var(--nv-green-ink); border-color: transparent; background: var(--nv-green); box-shadow: 0 8px 18px -8px rgba(30,222,123,.5); }
+    .nv-dd-item.danger .nv-ico { color: var(--nv-danger); background: rgba(255,107,84,.12); border-color: rgba(255,107,84,.2); }
     .nv-dd-item.danger:hover { background: rgba(255,107,84,.1); color: #ffb3a3; }
-    .nv-dd-item.danger:hover .nv-ico { color: var(--nv-danger); border-color: rgba(255,107,84,.3); background: rgba(255,107,84,.12); box-shadow: 0 6px 14px -8px rgba(255,107,84,.35); }
+    .nv-dd-item.danger:hover .nv-ico { color: #fff; border-color: transparent; background: var(--nv-danger); box-shadow: 0 8px 18px -8px rgba(255,107,84,.5); }
     .nv-dd-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 10px; }
 
     .nv-badge {
@@ -472,12 +472,11 @@
     {
       label: 'Блог',
       key: 'blog',
-      hover: true,
       sections: [
         {
           items: [
             { href: 'https://blog.antviz.ru/',         label: 'Блог',        icon: '<path d="M4 5.5A2.5 2.5 0 016.5 3H18a1 1 0 011 1v15a1 1 0 01-1 1H6.5A2.5 2.5 0 014 17.5v-12z"/><path d="M8 8h8M8 11.5h8M8 15h5"/>' },
-            { href: 'https://blog.antviz.ru/updates',  label: 'Что нового', icon: '<path d="M3 10v4a1 1 0 001 1h2l4 4V5L6 9H4a1 1 0 00-1 1z"/><path d="M15 8a4 4 0 010 8M17.8 5.2a8 8 0 010 13.6"/>' },
+            { href: 'https://blog.antviz.ru/updates',  label: 'Что нового', icon: '<path d="M12 3.2l1.7 4.6 4.6 1.7-4.6 1.7L12 15.8l-1.7-4.6-4.6-1.7 4.6-1.7L12 3.2z"/><path d="M18.5 15.5l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7z"/>' },
           ]
         }
       ]
@@ -546,7 +545,7 @@
 
     const dropdowns = NAV_DROPDOWNS.map(drop => {
       const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
-      return '<div class="nv-drop' + (drop.hover ? ' nv-drop-hover' : '') + '" data-drop="' + drop.key + '">' +
+      return '<div class="nv-drop" data-drop="' + drop.key + '">' +
         '<button class="nv-drop-btn' + (isActive ? ' is-active' : '') + '" aria-expanded="false">' +
         drop.label + chevronSvg +
         '</button>' +

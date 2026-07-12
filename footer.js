@@ -258,6 +258,7 @@
                         <span class="group-title">Навигация</span>
                         <ul class="group-items">
                             <li><a href="${base}">Главная</a></li>
+                            <li><a href="${base}price">Цены</a></li>
                             <li><a href="${base}order" class="cta">Заказать сайт</a></li>
                             <li><a href="${base}rules">Правила</a></li>
                             <li><a href="${base}profile/support">Поддержка</a></li>

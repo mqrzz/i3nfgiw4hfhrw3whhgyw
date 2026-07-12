@@ -35,11 +35,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .shell{width:100%;animation:fadeUp .3s ease}
 
 /* HERO */
-.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
 .page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
 .page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:16px}
 .page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
 .unread-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-size:.6rem;font-weight:500;width:26px;height:26px;border-radius:50%;vertical-align:middle;flex-shrink:0}
+.page-hero-visual{width:216px;flex-shrink:0;display:flex;align-items:center;justify-content:center;align-self:center}
+.page-hero-visual svg{width:100%;height:auto;overflow:visible;display:block}
+.page-hero-visual .bob{animation:heroBob 4.5s ease-in-out infinite}
+@keyframes heroBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@media(max-width:900px){.page-hero-visual{display:none}}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
@@ -78,6 +83,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ticket-row:hover{background:var(--bg3)}
 .ticket-cell-main{display:flex;flex-direction:column;gap:5px;min-width:0}
 .ticket-subject{font-size:.92rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ticket-topic-ico{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ticket-topic-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
 .ticket-subject.has-unread{color:var(--accent-d)}
 .ticket-order-tag{font-size:.7rem;font-weight:500;color:var(--info);background:var(--info-wash);padding:.18rem .55rem;border-radius:6px}
 .ticket-preview{font-size:.78rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
@@ -175,10 +182,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .file-preview{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--ink-faint);margin-top:6px}
 .file-preview .remove-file{cursor:pointer;color:var(--bad)}
 
-.empty{text-align:center;padding:88px 16px}
-.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
-.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
-.empty h3{font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:8px}
+.empty{text-align:center;padding:72px 16px 64px}
+.empty-ico{margin-bottom:12px;display:flex;justify-content:center}
+.empty-ico svg{width:172px;height:auto;overflow:visible}
+.empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px}
 .empty p{font-size:.88rem;color:var(--ink-dim);margin-bottom:24px;font-weight:300}
 
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
@@ -251,6 +258,24 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
       </div>
       <div class="page-hero-sub">Вопросы, идеи, сообщения об ошибках — поддержка на связи</div>
     </div>
+
+    <div class="page-hero-visual" aria-hidden="true">
+      <svg class="bob" viewBox="0 0 220 190" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="112" cy="168" rx="72" ry="11" fill="rgba(0,0,0,.35)"/>
+        <circle cx="150" cy="55" r="78" fill="var(--accent)" opacity=".09"/>
+        <circle cx="24" cy="24" r="5" fill="rgba(255,255,255,.28)"/>
+        <circle cx="202" cy="120" r="4" fill="var(--accent)" opacity=".5"/>
+        <!-- back bubble: agent typing -->
+        <path d="M14 36 H140 a17 17 0 0 1 17 17 v46 a17 17 0 0 1-17 17 H70 L46 138 v-22 H14 a17 17 0 0 1-17-17 V53 a17 17 0 0 1 17-17 z" fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.18)" stroke-width="1.5"/>
+        <circle cx="42" cy="79" r="5.5" fill="rgba(255,255,255,.5)"/>
+        <circle cx="66" cy="79" r="5.5" fill="rgba(255,255,255,.5)"/>
+        <circle cx="90" cy="79" r="5.5" fill="rgba(255,255,255,.5)"/>
+        <!-- front bubble: resolved -->
+        <path d="M92 66 H196 a15 15 0 0 1 15 15 v42 a15 15 0 0 1-15 15 H132 l-22 20 v-20 H92 a15 15 0 0 1-15-15 V81 a15 15 0 0 1 15-15 z" fill="var(--accent)"/>
+        <path d="M118 104 l13 13 27-29" fill="none" stroke="var(--dark)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
     <button class="btn btn-ghost" id="newTicketBtn">
       <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
       Новый тикет

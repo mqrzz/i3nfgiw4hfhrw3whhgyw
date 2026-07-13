@@ -1,1157 +1,330 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"/>
   <title>Поддержка — Antviz</title>
-  <link rel="icon" href="../img/favicon.png" type="image/png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" href="../img/favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
   <style>
-    /* ----- RESET & BASE ----- */
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-    :root {
-      --bg: #ffffff;
-      --bg-secondary: #f5f5f7;
-      --bg-tertiary: #fafafc;
-      --border: #d2d2d7;
-      --border-strong: #b0b0b8;
-      --text-primary: #1d1d1f;
-      --text-secondary: #6e6e73;
-      --text-faint: #a1a1a6;
-      --accent: #007aff;
-      --accent-hover: #005bbf;
-      --accent-wash: rgba(0, 122, 255, 0.10);
-      --badge-red: #ff3b30;
-      --radius-card: 12px;
-      --radius-modal: 16px;
-      --font: 'Geologica', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
-    body {
-      background: var(--bg);
-      color: var(--text-primary);
-      font-family: var(--font);
-      font-weight: 300;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      min-height: 100vh;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      * {
-        animation-duration: 0.01ms !important;
-        transition-duration: 0.01ms !important;
-      }
-    }
-    :focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --line:#dfe3e8;--line-strong:#cbcdd6;
+  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
+  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;--accent-wash:rgba(30,222,123,.16);
+  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.16);
+  --bad:#e8634f;--bad-wash:rgba(232,99,79,.16);
+  --info:#3b82f6;--info-wash:rgba(59,130,246,.16);
+  --dark:#191b1e;--dark2:#2b2f33;
+  --font:'Geologica','Inter','Arial',sans-serif;
+  /* цветная система для иконок тем/типов заказов */
+  --blue:#2f6bff;--blue-l:#5b8cff;
+  --purple:#8b3ffb;--purple-l:#a970ff;
+  --orange:#ff8a1f;--orange-l:#ffab4d;
+  --pink:#ff3f8f;--pink-l:#ff6fac;
+  --teal:#0fc7c0;--teal-l:#3fe0d8;
+  --yellow:#ffc324;--yellow-l:#ffd75c;
+  --red:#ff4d4d;--red-l:#ff7a7a;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 
-    /* ----- LOADING ----- */
-    .loading-screen {
-      position: fixed;
-      inset: 0;
-      z-index: 999;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .spinner {
-      width: 28px;
-      height: 28px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
 
-    /* ----- SHELL & FADE IN ----- */
-    .shell {
-      width: 100%;
-      animation: fadeIn 0.25s ease;
-    }
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
+.shell{width:100%;animation:fadeUp .3s ease}
 
-    /* ----- HERO ----- */
-    .page-hero {
-      background: var(--bg-secondary);
-      border-radius: var(--radius-card);
-      padding: 40px 48px;
-      margin-bottom: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .page-hero-eyebrow {
-      font-size: 0.7rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-secondary);
-    }
-    .page-hero-title {
-      font-size: clamp(2rem, 3.6vw, 3rem);
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      color: var(--text-primary);
-      margin: 2px 0 4px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .page-hero-sub {
-      color: var(--text-secondary);
-      font-size: 0.95rem;
-      font-weight: 300;
-    }
-    .unread-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--badge-red);
-      color: #fff;
-      font-size: 0.6rem;
-      font-weight: 500;
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+/* HERO */
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.page-hero::before{content:'';position:absolute;top:-45%;left:-8%;width:55%;height:140%;background:radial-gradient(circle,rgba(47,107,255,.32),transparent 65%);pointer-events:none}
+.page-hero::after{content:'';position:absolute;bottom:-45%;right:-8%;width:55%;height:140%;background:radial-gradient(circle,rgba(30,222,123,.26),transparent 65%);pointer-events:none}
+.page-hero>*{position:relative;z-index:1}
+.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
+.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px;display:flex;align-items:center;gap:16px}
+.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+.unread-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--bad);color:#fff;font-size:.6rem;font-weight:500;width:26px;height:26px;border-radius:50%;vertical-align:middle;flex-shrink:0}
 
-    /* ----- BUTTONS ----- */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: var(--font);
-      font-weight: 500;
-      font-size: 0.9rem;
-      padding: 10px 24px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.15s, color 0.15s, border-color 0.15s;
-      text-decoration: none;
-      background: transparent;
-      color: var(--text-primary);
-    }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
-    }
-    .btn-primary:hover {
-      background: var(--accent-hover);
-    }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--text-secondary);
-    }
-    .btn-ghost:hover {
-      background: var(--bg-secondary);
-      border-color: var(--border-strong);
-      color: var(--text-primary);
-    }
-    .btn-sm {
-      font-size: 0.8rem;
-      padding: 6px 14px;
-      border-radius: 6px;
-    }
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-green{background:var(--accent);color:var(--dark)}
+.btn-green:hover{background:var(--accent-h)}
+.btn-ghost{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
+.btn-ghost:hover{background:rgba(255,255,255,.14);color:#fff}
+.btn-outline{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink-dim)}
+.btn-outline:hover{border-color:var(--accent-h);color:var(--accent-h)}
+.btn-xs{padding:.45rem .9rem;font-size:.76rem;border-radius:10px}
 
-    /* ----- TOOLBAR (фильтры) ----- */
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 20px;
-    }
-    .filters {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-    .tabs {
-      display: flex;
-      gap: 4px;
-      border-bottom: 1px solid var(--border);
-    }
-    .tab {
-      background: transparent;
-      border: none;
-      padding: 8px 14px;
-      font-family: var(--font);
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: var(--text-secondary);
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      transition: border-color 0.2s, color 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .tab:hover {
-      color: var(--text-primary);
-    }
-    .tab.is-active {
-      color: var(--text-primary);
-      border-bottom-color: var(--accent);
-      font-weight: 500;
-    }
-    .tab-count {
-      font-size: 0.7rem;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-      padding: 0 6px;
-      border-radius: 4px;
-      min-width: 16px;
-      text-align: center;
-    }
-    .topic-select select {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 32px 6px 12px;
-      font-family: var(--font);
-      font-size: 0.85rem;
-      color: var(--text-primary);
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      cursor: pointer;
-      outline: none;
-    }
-    .topic-select select:focus {
-      border-color: var(--accent);
-    }
-    .search-box {
-      position: relative;
-    }
-    .search-box input {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 6px 12px 6px 32px;
-      font-family: var(--font);
-      font-size: 0.85rem;
-      color: var(--text-primary);
-      width: 180px;
-      outline: none;
-      transition: border-color 0.2s, width 0.2s;
-    }
-    .search-box input:focus {
-      border-color: var(--accent);
-      width: 220px;
-    }
-    .search-box input::placeholder {
-      color: var(--text-faint);
-    }
-    .search-box svg {
-      position: absolute;
-      left: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
-      stroke: var(--text-faint);
-      fill: none;
-      stroke-width: 2;
-    }
-    .count-label {
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      font-weight: 300;
-    }
+/* TOOLBAR */
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
+.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.tab:hover{color:var(--ink)}
+.tab.is-active{background:var(--dark);color:#fff}
+.tab-count{font-size:.66rem;font-weight:500;background:var(--bg2);color:var(--ink-faint);padding:.06rem .4rem;border-radius:8px;min-width:16px;text-align:center}
+.tab[data-filter="open"] .tab-count{background:var(--info-wash);color:var(--info)}
+.tab[data-filter="in-progress"] .tab-count{background:var(--warn-wash);color:var(--warn)}
+.tab[data-filter="resolved"] .tab-count{background:var(--accent-wash);color:var(--accent-d)}
+.search-box{position:relative}
+.search-box input{background:var(--bg3);border:1.5px solid var(--line-strong);border-radius:14px;padding:.62rem 1rem .62rem 2.4rem;color:var(--ink);font-family:var(--font);font-size:.84rem;outline:none;width:200px;transition:border-color .18s,width .2s}
+.search-box input:focus{border-color:var(--accent);width:240px}
+.search-box input::placeholder{color:var(--ink-faint)}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;stroke:var(--ink-faint);stroke-width:2;fill:none}
+.count-label{color:var(--ink-faint);font-size:.78rem}
+.topic-select select{background:var(--bg3);border:1.5px solid var(--line-strong);border-radius:14px;padding:.62rem 2rem .62rem 1rem;color:var(--ink);font-family:var(--font);font-size:.8rem;outline:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer;min-width:170px}
+.topic-select select:focus{border-color:var(--accent)}
 
-    /* ----- TICKET LIST (колонки) ----- */
-    .ticket-cols {
-      display: grid;
-      grid-template-columns: 1fr 140px 120px 100px 20px;
-      gap: 16px;
-      padding: 0 4px 8px 4px;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-faint);
-      font-weight: 500;
-      border-bottom: 1px solid var(--border);
-    }
-    .ticket-list {
-      display: flex;
-      flex-direction: column;
-    }
-    .ticket-row-wrap {
-      border-bottom: 1px solid var(--border);
-      background: var(--bg);
-      transition: background 0.15s;
-    }
-    .ticket-row-wrap:hover {
-      background: var(--bg-secondary);
-    }
-    .ticket-row {
-      all: unset;
-      display: grid;
-      grid-template-columns: 1fr 140px 120px 100px 20px;
-      gap: 16px;
-      align-items: center;
-      width: 100%;
-      padding: 16px 4px;
-      cursor: pointer;
-      font-family: var(--font);
-    }
-    .ticket-row.has-unread .ticket-subject {
-      font-weight: 500;
-      color: var(--text-primary);
-    }
-    .ticket-cell-main {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      min-width: 0;
-    }
-    .ticket-topic-ico {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-    }
-    .ticket-topic-ico svg {
-      width: 18px;
-      height: 18px;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      fill: none;
-    }
-    .ticket-cell-text {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-      flex: 1;
-    }
-    .ticket-subject {
-      font-size: 0.95rem;
-      font-weight: 400;
-      color: var(--text-primary);
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .ticket-order-tag {
-      font-size: 0.7rem;
-      font-weight: 400;
-      color: var(--text-secondary);
-      background: var(--bg-secondary);
-      padding: 0 8px;
-      border-radius: 4px;
-    }
-    .ticket-preview {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
-    }
-    .ticket-meta {
-      font-size: 0.75rem;
-      color: var(--text-faint);
-    }
-    .ticket-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.7rem;
-      font-weight: 400;
-      padding: 2px 10px;
-      border-radius: 4px;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-    }
-    .ticket-tag.open {
-      background: var(--accent-wash);
-      color: var(--accent);
-    }
-    .ticket-tag.in-progress {
-      background: rgba(255, 149, 0, 0.12);
-      color: #b25900;
-    }
-    .ticket-tag.resolved {
-      background: rgba(52, 199, 89, 0.12);
-      color: #1a8a3a;
-    }
-    .ticket-tag.closed {
-      background: var(--bg-secondary);
-      color: var(--text-faint);
-    }
-    .ticket-chevron {
-      width: 16px;
-      height: 16px;
-      stroke: var(--text-faint);
-      stroke-width: 2;
-      fill: none;
-      justify-self: end;
-    }
-    .unread-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--badge-red);
-      display: inline-block;
-      flex-shrink: 0;
-    }
-    .ticket-mobile-tags {
-      display: none;
-    }
+/* LIST */
+.ticket-cols{display:grid;grid-template-columns:1fr 150px 130px 120px 22px;gap:16px;padding:0 28px 12px;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
+.ticket-list{display:flex;flex-direction:column;gap:12px}
+.ticket-row-wrap{border:1.5px solid var(--line);border-radius:24px;overflow:hidden;animation:rowIn .2s ease both;background:var(--bg);transition:border-color .15s,box-shadow .15s,transform .15s}
+.ticket-row-wrap:hover{border-color:var(--line-strong);box-shadow:0 16px 32px -18px rgba(25,27,30,.3);transform:translateY(-2px)}
+.ticket-row{all:unset;display:grid;grid-template-columns:1fr 150px 130px 120px 22px;gap:16px;align-items:center;width:100%;padding:24px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
+.ticket-row:hover{background:var(--bg3)}
+.ticket-row.has-unread{box-shadow:inset 3px 0 0 0 var(--bad)}
+.ticket-row:hover .ticket-chevron{transform:translateX(3px)}
+.ticket-cell-main{display:flex;align-items:flex-start;gap:14px;min-width:0}
+.ticket-cell-text{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}
+.ticket-topic-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;margin-top:1px;box-shadow:0 6px 14px -6px rgba(0,0,0,.35)}
+.ticket-topic-ico svg{width:19px;height:19px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ticket-subject{font-size:.92rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ticket-subject.has-unread{color:var(--accent-d)}
+.ticket-order-tag{font-size:.7rem;font-weight:500;color:var(--info);background:var(--info-wash);padding:.18rem .55rem;border-radius:6px}
+.ticket-preview{font-size:.78rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ticket-desktop-only{}
+.ticket-meta{font-size:.72rem;color:var(--ink-faint)}
+.ticket-tag{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:500;padding:.3rem .7rem;border-radius:8px;width:fit-content}
+.ticket-tag.open{background:var(--info-wash);color:var(--info)}
+.ticket-tag.in-progress{background:var(--warn-wash);color:var(--warn)}
+.ticket-tag.resolved{background:var(--accent-wash);color:var(--accent-d)}
+.ticket-tag.closed{background:rgba(139,63,251,.12);color:#8b3ffb}
+.ticket-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
+.unread-dot{width:8px;height:8px;border-radius:50%;background:var(--bad);display:inline-block;flex-shrink:0;animation:pulse 1.5s infinite}
+.ticket-mobile-tags{display:none}
 
-    /* ----- EMPTY STATE ----- */
-    .empty {
-      text-align: center;
-      padding: 64px 16px;
-    }
-    .empty h3 {
-      font-size: 1.2rem;
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-    .empty p {
-      color: var(--text-secondary);
-      margin-bottom: 20px;
-    }
+/* TICKET FULLSCREEN MODAL */
+.ticket-modal-overlay{position:fixed;inset:0;z-index:9600;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s}
+.ticket-modal-overlay.show{opacity:1;pointer-events:all}
+.ticket-modal{background:var(--bg);border-radius:40px;width:100%;max-width:720px;height:82vh;min-height:420px;display:flex;flex-direction:column;position:relative;transform:translateY(24px) scale(.97);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 100px rgba(0,0,0,.25)}
+.ticket-modal-overlay.show .ticket-modal{transform:translateY(0) scale(1)}
+.ticket-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:32px 32px 0;flex-shrink:0}
+.ticket-modal-headline{display:flex;gap:14px;align-items:flex-start;flex:1;min-width:0}
+.ticket-modal-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 8px 18px -6px rgba(0,0,0,.3)}
+.ticket-modal-ico svg{width:22px;height:22px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.ticket-modal-info{flex:1;min-width:0}
+.ticket-modal-title{font-size:1.1rem;font-weight:500;color:var(--ink);letter-spacing:-.02em}
+.ticket-modal-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.ticket-modal-close{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--line-strong);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-faint);transition:all .15s;flex-shrink:0}
+.ticket-modal-close:hover{background:var(--bg2);border-color:var(--ink-faint);color:var(--ink)}
+.ticket-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+.ticket-modal-chat{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:18px 32px 0}
+.ticket-modal-input{padding:16px 32px 24px;flex-shrink:0;border-top:1px solid var(--line)}
 
-    /* ----- MODAL (чат) ----- */
-    .ticket-modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9600;
-      background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s;
-    }
-    .ticket-modal-overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .ticket-modal {
-      background: var(--bg);
-      border-radius: var(--radius-modal);
-      width: 100%;
-      max-width: 720px;
-      height: 80vh;
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-      transform: translateY(12px) scale(0.98);
-      transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
-      overflow: hidden;
-    }
-    .ticket-modal-overlay.show .ticket-modal {
-      transform: translateY(0) scale(1);
-    }
-    .ticket-modal-head {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      padding: 24px 28px 0;
-      flex-shrink: 0;
-    }
-    .ticket-modal-headline {
-      display: flex;
-      gap: 14px;
-      align-items: flex-start;
-      flex: 1;
-      min-width: 0;
-    }
-    .ticket-modal-ico {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-    }
-    .ticket-modal-ico svg {
-      width: 20px;
-      height: 20px;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      fill: none;
-    }
-    .ticket-modal-info {
-      flex: 1;
-      min-width: 0;
-    }
-    .ticket-modal-title {
-      font-size: 1.1rem;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-    }
-    .ticket-modal-tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-top: 6px;
-      align-items: center;
-    }
-    .ticket-modal-close {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 1px solid var(--border);
-      background: transparent;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-      transition: all 0.15s;
-      flex-shrink: 0;
-    }
-    .ticket-modal-close:hover {
-      background: var(--bg-secondary);
-      border-color: var(--border-strong);
-      color: var(--text-primary);
-    }
-    .ticket-modal-close svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-    }
-    .ticket-modal-chat {
-      flex: 1;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      padding: 18px 28px 0;
-    }
-    .ticket-modal-input {
-      padding: 16px 28px 24px;
-      flex-shrink: 0;
-      border-top: 1px solid var(--border);
-    }
+/* CHAT */
+.chat-box{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;flex:1;overflow-y:auto;padding-right:6px;scroll-behavior:smooth}
+.chat-row{display:flex;align-items:flex-end;gap:9px;max-width:86%;animation:fadeUp .15s ease}
+.chat-row.user{align-self:flex-end;flex-direction:row-reverse}
+.chat-row.support{align-self:flex-start}
+.chat-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.chat-avatar svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.9;fill:none}
+.chat-avatar.user{background:linear-gradient(135deg,#4eea94,var(--accent-d));color:#fff}
+.chat-avatar.support{background:linear-gradient(135deg,#3a4046,var(--dark));color:var(--accent)}
+.chat-msg{padding:12px 16px;border-radius:18px;font-size:.86rem;font-weight:400;line-height:1.55;min-width:0}
+.chat-msg.user{background:linear-gradient(135deg,#4eea94,var(--accent-d));color:#fff;border-bottom-right-radius:4px}
+.chat-msg.support{background:var(--bg3);color:var(--ink);border-bottom-left-radius:4px;border:1.5px solid var(--line)}
+.chat-msg .msg-date{font-size:.62rem;color:var(--ink-faint);font-weight:300;display:block;margin-top:5px}
+.chat-msg.user .msg-date{color:rgba(255,255,255,.75)}
+.chat-msg .msg-img{max-width:160px;border-radius:10px;margin-top:6px;border:1px solid var(--line)}
+.msg-divider{font-size:.68rem;color:var(--ink-faint);text-align:center;padding:8px 0 4px;font-weight:500}
+.chat-input-wrap{display:flex;gap:8px;margin-top:6px}
+.chat-input-wrap input{flex:1;background:var(--bg3);border:1.5px solid var(--line-strong);border-radius:14px;padding:.7rem 1rem;color:var(--ink);font-family:var(--font);font-size:.86rem;outline:none;transition:border-color .18s}
+.chat-input-wrap input:focus{border-color:var(--accent)}
 
-    /* ----- CHAT ----- */
-    .chat-box {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 14px;
-      flex: 1;
-      overflow-y: auto;
-      padding-right: 4px;
-      scroll-behavior: smooth;
-    }
-    .chat-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      max-width: 85%;
-    }
-    .chat-row.user {
-      align-self: flex-end;
-      flex-direction: row-reverse;
-    }
-    .chat-row.support {
-      align-self: flex-start;
-    }
-    .chat-avatar {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      background: var(--bg-secondary);
-      color: var(--text-secondary);
-    }
-    .chat-avatar.user {
-      background: var(--accent);
-      color: #fff;
-    }
-    .chat-avatar svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      stroke-width: 2;
-      fill: none;
-    }
-    .chat-msg {
-      padding: 10px 14px;
-      border-radius: 14px;
-      font-size: 0.9rem;
-      font-weight: 300;
-      line-height: 1.5;
-      min-width: 0;
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      border-bottom-left-radius: 2px;
-    }
-    .chat-msg.user {
-      background: var(--accent);
-      color: #fff;
-      border-bottom-right-radius: 2px;
-      border-bottom-left-radius: 14px;
-    }
-    .chat-msg.support {
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-    }
-    .chat-msg .msg-date {
-      font-size: 0.6rem;
-      color: var(--text-faint);
-      display: block;
-      margin-top: 4px;
-      font-weight: 300;
-    }
-    .chat-msg.user .msg-date {
-      color: rgba(255, 255, 255, 0.7);
-    }
-    .chat-msg .msg-img {
-      max-width: 160px;
-      border-radius: 8px;
-      margin-top: 4px;
-      border: 1px solid var(--border);
-    }
-    .msg-divider {
-      font-size: 0.7rem;
-      color: var(--text-faint);
-      text-align: center;
-      padding: 8px 0 4px;
-      font-weight: 400;
-    }
-    .chat-input-wrap {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-    .chat-input-wrap input {
-      flex: 1;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 14px;
-      font-family: var(--font);
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .chat-input-wrap input:focus {
-      border-color: var(--accent);
-    }
+/* FORM MODAL */
+.ticket-form-overlay{position:fixed;inset:0;z-index:9600;background:rgba(15,17,20,.75);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.ticket-form-overlay.show{opacity:1;pointer-events:all}
+.ticket-form-modal{background:var(--bg);border-radius:48px;width:100%;max-width:860px;max-height:92vh;overflow-y:auto;transform:translateY(20px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 80px rgba(0,0,0,.2)}
+.ticket-form-overlay.show .ticket-form-modal{transform:translateY(0) scale(1)}
+.ticket-form-inner{display:grid;grid-template-columns:1fr 1.1fr;min-height:480px}
+.ticket-form-left{background:var(--dark);border-radius:48px 0 0 48px;padding:52px 44px;display:flex;flex-direction:column}
+.ticket-form-right{padding:52px 44px;display:flex;flex-direction:column;gap:16px}
+.ticket-form-modal h3{font-size:clamp(2rem,3.5vw,3rem);font-weight:500;letter-spacing:-.04em;line-height:1.05;color:#fff;margin-bottom:10px}
+.ticket-form-subtitle{font-size:.9rem;color:rgba(255,255,255,.3);font-weight:300;margin-bottom:32px;line-height:1.55}
+.ticket-form-hint{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:18px 20px;margin-top:auto;flex-shrink:0}
+.ticket-form-hint-title{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:10px}
+.ticket-form-hint-item{display:flex;align-items:center;gap:11px;font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:10px;line-height:1.5}
+.ticket-form-hint-item:last-child{margin-bottom:0}
+.ticket-form-hint-ico{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.ticket-form-hint-ico svg{width:13px;height:13px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:700px){
+  .ticket-form-inner{grid-template-columns:1fr}
+  .ticket-form-left{border-radius:28px 28px 0 0;padding:32px 28px 24px}
+  .ticket-form-right{padding:24px 28px 32px}
+  .ticket-form-modal{border-radius:28px}
+}
+@media(max-width:640px){
+  .ticket-form-overlay{padding:0}
+  .ticket-form-modal{
+    width:100%;max-width:none;
+    height:100vh;height:100dvh;max-height:none;
+    border-radius:0;box-shadow:none;
+  }
+  .ticket-form-left{border-radius:0;padding:max(24px,env(safe-area-inset-top)) 22px 24px}
+  .ticket-form-right{padding:24px 22px max(24px,env(safe-area-inset-bottom))}
+}
+.ticket-form-group{margin-bottom:16px}
+.ticket-form-group label:not(.file-dropzone){display:block;font-size:.68rem;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.ticket-form-group select,.ticket-form-group input,.ticket-form-group textarea{width:100%;background:var(--bg3);border:1.5px solid var(--line-strong);border-radius:14px;padding:.8rem 1rem;color:var(--ink);font-family:var(--font);font-size:.9rem;outline:none;transition:border-color .18s}
+.ticket-form-group select:focus,.ticket-form-group input:focus,.ticket-form-group textarea:focus{border-color:var(--accent)}
+.ticket-form-group textarea{min-height:90px;resize:vertical}
+.ticket-form-group select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(25,27,30,.45)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
 
-    /* ----- FORM (создание тикета) ----- */
-    .ticket-form-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 9600;
-      background: rgba(0, 0, 0, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.2s;
-    }
-    .ticket-form-overlay.show {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .ticket-form-modal {
-      background: var(--bg);
-      border-radius: var(--radius-modal);
-      width: 100%;
-      max-width: 780px;
-      max-height: 90vh;
-      overflow-y: auto;
-      transform: translateY(12px) scale(0.98);
-      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.15);
-      padding: 32px 40px;
-    }
-    .ticket-form-overlay.show .ticket-form-modal {
-      transform: translateY(0) scale(1);
-    }
-    .ticket-form-modal h3 {
-      font-size: 1.8rem;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      margin-bottom: 6px;
-    }
-    .ticket-form-subtitle {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      margin-bottom: 24px;
-    }
-    .ticket-form-group {
-      margin-bottom: 18px;
-    }
-    .ticket-form-group label:not(.file-dropzone) {
-      display: block;
-      font-size: 0.7rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      margin-bottom: 4px;
-    }
-    .ticket-form-group select,
-    .ticket-form-group input,
-    .ticket-form-group textarea {
-      width: 100%;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-family: var(--font);
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .ticket-form-group select:focus,
-    .ticket-form-group input:focus,
-    .ticket-form-group textarea:focus {
-      border-color: var(--accent);
-    }
-    .ticket-form-group textarea {
-      min-height: 90px;
-      resize: vertical;
-    }
-    .ticket-form-group select {
-      appearance: none;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236e6e73' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      padding-right: 36px;
-    }
-    .file-dropzone {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border: 1px dashed var(--border);
-      border-radius: 8px;
-      padding: 12px 16px;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      background: var(--bg-secondary);
-    }
-    .file-dropzone:hover {
-      border-color: var(--accent);
-      background: var(--accent-wash);
-    }
-    .file-dropzone-ico {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      background: var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-secondary);
-    }
-    .file-dropzone-ico svg {
-      width: 16px;
-      height: 16px;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      fill: none;
-    }
-    .file-dropzone-text {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-    }
-    .file-dropzone-text strong {
-      color: var(--text-primary);
-      font-weight: 500;
-    }
-    .file-preview {
-      font-size: 0.8rem;
-      color: var(--text-secondary);
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .file-preview .remove-file {
-      cursor: pointer;
-      color: var(--badge-red);
-    }
-    .ticket-form-actions {
-      display: flex;
-      gap: 12px;
-      margin-top: 20px;
-    }
-    .ticket-form-actions .btn {
-      flex: 1;
-      justify-content: center;
-    }
+/* ORDER PICKER — в левой тёмной колонке формы */
+.order-pick-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:280px;margin-bottom:20px;padding-right:6px}
+.order-pick-list::-webkit-scrollbar{width:5px}
+.order-pick-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:10px}
+.order-pick-item{display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:11px 14px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s,box-shadow .15s;flex-shrink:0}
+.order-pick-item:hover{border-color:rgba(255,255,255,.28);transform:translateY(-1px);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}
+.order-pick-item.is-selected{border-color:var(--accent);background:linear-gradient(180deg,rgba(30,222,123,.14),rgba(30,222,123,.04));box-shadow:0 0 0 1px rgba(30,222,123,.15),0 8px 20px -8px rgba(30,222,123,.35)}
+.order-pick-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 6px 14px -6px rgba(0,0,0,.5);transition:transform .15s}
+.order-pick-item.is-selected .order-pick-ico{transform:scale(1.06)}
+.order-pick-ico svg{width:19px;height:19px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.order-pick-check{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;color:transparent}
+.order-pick-check svg{width:11px;height:11px;stroke:currentColor;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.order-pick-item.is-selected .order-pick-check{border-color:var(--accent);background:var(--accent);color:var(--dark)}
+.order-pick-body{flex:1;min-width:0}
+.order-pick-title{font-size:.82rem;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.order-pick-status{display:inline-flex;align-items:center;font-size:.65rem;font-weight:500;margin-top:5px;padding:.17rem .5rem;border-radius:7px}
+.no-order-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:28px 16px;border:1.5px dashed rgba(255,255,255,.14);border-radius:18px}
+.no-order-empty-ico{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue-l),var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -6px rgba(0,0,0,.5)}
+.no-order-empty-ico svg{width:22px;height:22px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.no-order-empty-title{font-size:.82rem;font-weight:500;color:#fff}
+.no-order-empty-sub{font-size:.74rem;color:rgba(255,255,255,.4);line-height:1.5;max-width:220px}
+.no-order-empty-cta{font-size:.74rem;font-weight:500;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.order-pick-item.no-link{border-style:dashed}
+.order-pick-item.no-link .order-pick-ico{background:rgba(255,255,255,.08);box-shadow:none}
+.opc-blue{background:linear-gradient(135deg,var(--blue-l),var(--blue))}
+.opc-purple{background:linear-gradient(135deg,var(--purple-l),var(--purple))}
+.opc-orange{background:linear-gradient(135deg,var(--orange-l),var(--orange))}
+.opc-pink{background:linear-gradient(135deg,var(--pink-l),var(--pink))}
+.opc-yellow{background:linear-gradient(135deg,var(--yellow-l),var(--yellow))}
+.opc-teal{background:linear-gradient(135deg,var(--teal-l),var(--teal))}
 
-    /* ----- ORDER PICKER (в форме) ----- */
-    .order-pick-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 18px;
-    }
-    .order-pick-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 8px 14px 8px 12px;
-      cursor: pointer;
-      transition: border-color 0.15s, background 0.15s;
-      flex: 0 1 auto;
-    }
-    .order-pick-item:hover {
-      border-color: var(--border-strong);
-    }
-    .order-pick-item.is-selected {
-      border-color: var(--accent);
-      background: var(--accent-wash);
-    }
-    .order-pick-ico {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: var(--bg);
-      color: var(--text-secondary);
-      flex-shrink: 0;
-    }
-    .order-pick-ico svg {
-      width: 14px;
-      height: 14px;
-      stroke: currentColor;
-      stroke-width: 1.8;
-      fill: none;
-    }
-    .order-pick-body {
-      min-width: 0;
-    }
-    .order-pick-title {
-      font-size: 0.85rem;
-      font-weight: 400;
-      color: var(--text-primary);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .order-pick-status {
-      font-size: 0.65rem;
-      font-weight: 400;
-      color: var(--text-secondary);
-      background: var(--bg);
-      padding: 0 6px;
-      border-radius: 4px;
-    }
-    .order-pick-check {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 1.5px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      color: transparent;
-    }
-    .order-pick-item.is-selected .order-pick-check {
-      border-color: var(--accent);
-      background: var(--accent);
-      color: #fff;
-    }
-    .order-pick-check svg {
-      width: 10px;
-      height: 10px;
-      stroke: currentColor;
-      stroke-width: 3;
-      fill: none;
-    }
+.ticket-form-actions{display:flex;gap:10px;margin-top:24px}
+.ticket-form-actions .btn{flex:1;justify-content:center}
+.file-preview{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--ink-faint);margin-top:6px}
+.file-preview .remove-file{cursor:pointer;color:var(--bad)}
+.file-dropzone{display:flex;align-items:center;gap:12px;border:1.5px dashed var(--line-strong);border-radius:16px;padding:13px 16px;cursor:pointer;transition:border-color .15s,background .15s}
+.file-dropzone:hover{border-color:var(--accent-d);background:var(--accent-wash)}
+.file-dropzone-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+.file-dropzone-ico svg{width:17px;height:17px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.file-dropzone-text{font-size:.82rem;color:var(--ink-dim);font-weight:300}
+.file-dropzone-text strong{color:var(--ink);font-weight:500}
 
-    /* ----- TOAST ----- */
-    .toast {
-      position: fixed;
-      bottom: 32px;
-      left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      z-index: 9700;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 400;
-      opacity: 0;
-      transition: opacity 0.2s, transform 0.2s;
-      pointer-events: none;
-      max-width: 90vw;
-      background: var(--text-primary);
-      color: #fff;
-    }
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .toast.success {
-      background: #34c759;
-      color: #fff;
-    }
-    .toast.error {
-      background: #ff3b30;
-      color: #fff;
-    }
+.empty{text-align:center;padding:88px 16px}
+.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
+.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
+.empty h3{font-size:1.1rem;font-weight:500;color:var(--ink);margin-bottom:8px}
+.empty p{font-size:.88rem;color:var(--ink-dim);margin-bottom:24px;font-weight:300}
 
-    /* ----- RESPONSIVE ----- */
-    @media (max-width: 840px) {
-      .ticket-cols {
-        display: none;
-      }
-      .ticket-row {
-        grid-template-columns: 1fr;
-        gap: 4px;
-        padding: 14px 0;
-        position: relative;
-      }
-      .ticket-cell-status,
-      .ticket-cell-date {
-        display: none;
-      }
-      .ticket-desktop-only {
-        display: none !important;
-      }
-      .ticket-chevron {
-        position: absolute;
-        top: 50%;
-        right: 4px;
-        transform: translateY(-50%);
-      }
-      .ticket-mobile-tags {
-        display: flex;
-        gap: 6px;
-        margin-top: 6px;
-        flex-wrap: wrap;
-        align-items: center;
-      }
-      .ticket-preview {
-        white-space: normal;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .chat-box {
-        max-height: 55vh;
-        min-height: 180px;
-      }
-    }
-    @media (max-width: 640px) {
-      .page-hero {
-        padding: 24px 20px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
-      }
-      .page-hero-title {
-        font-size: 1.8rem;
-      }
-      .toolbar {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-      }
-      .filters {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-      .tabs {
-        overflow-x: auto;
-        flex-wrap: nowrap;
-      }
-      .search-box input {
-        width: 100%;
-      }
-      .search-box input:focus {
-        width: 100%;
-      }
-      .ticket-modal-overlay {
-        padding: 0;
-      }
-      .ticket-modal {
-        width: 100%;
-        max-width: none;
-        height: 100vh;
-        height: 100dvh;
-        min-height: 0;
-        border-radius: 0;
-        box-shadow: none;
-      }
-      .ticket-modal-head {
-        padding: max(20px, env(safe-area-inset-top)) 20px 0;
-      }
-      .ticket-modal-chat {
-        padding: 14px 20px 0;
-      }
-      .ticket-modal-input {
-        padding: 12px 20px max(20px, env(safe-area-inset-bottom));
-      }
-      .ticket-form-overlay {
-        padding: 0;
-      }
-      .ticket-form-modal {
-        width: 100%;
-        max-width: none;
-        max-height: none;
-        height: 100vh;
-        height: 100dvh;
-        border-radius: 0;
-        box-shadow: none;
-        padding: max(24px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
-        overflow-y: auto;
-      }
-      .order-pick-list {
-        flex-wrap: wrap;
-      }
-      .order-pick-item {
-        flex: 1 0 auto;
-      }
-    }
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--accent);color:var(--dark)}
+.toast.error{background:var(--dark);color:#fff}
+.toast.info{background:var(--dark);color:#fff}
+
+@media(max-width:900px){
+  .page-hero{border-radius:32px;padding:40px 36px}
+  .page-hero-title{font-size:2.2rem}
+}
+@media(max-width:840px){
+  .ticket-cols{display:none}
+  .ticket-row-wrap{border-radius:20px}
+  .ticket-row{grid-template-columns:1fr;gap:4px;padding:20px 48px 20px 24px;position:relative}
+  .ticket-cell-status,.ticket-cell-date{display:none}
+  .ticket-desktop-only{display:none!important}
+  .ticket-chevron{position:absolute;top:50%;right:20px;transform:translateY(-50%)}
+  .ticket-mobile-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center}
+  .ticket-preview{white-space:normal;-webkit-line-clamp:2;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}
+  .chat-box{max-height:55vh;min-height:200px}
+}
+@media(max-width:600px){
+  .page-hero{border-radius:24px;padding:28px 24px;flex-direction:column;align-items:flex-start;gap:16px}
+  .page-hero-title{font-size:1.8rem}
+  .page-hero>.btn{width:100%;justify-content:center}
+  .toolbar{flex-direction:column;align-items:stretch;gap:8px}
+  .search-box{min-width:0}
+  .search-box input{width:100%;max-width:100%}
+  .search-box input:focus{width:100%}
+  .filters{flex-direction:column;align-items:stretch;gap:8px;min-width:0}
+  .tabs{display:flex;width:100%;max-width:100%;overflow-x:auto;min-width:0}
+  .topic-select{min-width:0}
+  .topic-select select{width:100%;max-width:100%;min-width:0}
+}
+#sbContent{padding-bottom:80px}
+
+/* MOBILE — чат открывается на весь экран, как полноэкранное полотно */
+@media(max-width:640px){
+  .ticket-modal-overlay{padding:0}
+  .ticket-modal{
+    width:100%;max-width:none;
+    height:100vh;height:100dvh;min-height:0;
+    border-radius:0;box-shadow:none;
+  }
+  .ticket-modal-head{padding:max(22px,env(safe-area-inset-top)) 22px 0}
+  .ticket-modal-chat{padding:16px 22px 0}
+  .ticket-modal-input{padding:14px 22px max(20px,env(safe-area-inset-bottom))}
+  .chat-box{max-height:none;min-height:0}
+}
   </style>
 </head>
 <body>
+<script src="../nav.js" data-page="support"></script>
+<script src="../sidebar.js" data-page="support"></script>
 
-  <!-- Лоадер -->
-  <div class="loading-screen" id="loadingScreen">
-    <div class="spinner"></div>
-  </div>
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+</div>
 
-  <!-- Навигация и сайдбар -->
-  <script src="../nav.js" data-page="support"></script>
-  <script src="../sidebar.js" data-page="support"></script>
+<div id="sbContent" style="display:none">
+<div class="shell" id="appWrap">
 
-  <div id="sbContent" style="display:none">
-    <div class="shell" id="appWrap">
-
-      <!-- HERO -->
-      <div class="page-hero">
-        <div>
-          <div class="page-hero-eyebrow">Личный кабинет</div>
-          <h1 class="page-hero-title">
-            Поддержка
-            <span class="unread-badge" id="headerUnread" style="display:none">0</span>
-          </h1>
-          <p class="page-hero-sub">Вопросы, идеи, сообщения об ошибках — мы на связи</p>
-        </div>
-        <button class="btn btn-primary" id="newTicketBtn">Новый тикет</button>
+  <div class="page-hero">
+    <div>
+      <div class="page-hero-eyebrow">Личный кабинет</div>
+      <div class="page-hero-title">
+        Поддержка
+        <span class="unread-badge" id="headerUnread" style="display:none">0</span>
       </div>
-
-      <!-- TOOLBAR -->
-      <div class="toolbar">
-        <div class="filters">
-          <div class="tabs" id="ticketTabs">
-            <button class="tab is-active" data-filter="all">Все <span class="tab-count" id="tabCount-all">0</span></button>
-            <button class="tab" data-filter="open">Открытые <span class="tab-count" id="tabCount-open">0</span></button>
-            <button class="tab" data-filter="in-progress">В обработке <span class="tab-count" id="tabCount-in-progress">0</span></button>
-            <button class="tab" data-filter="resolved">Решённые <span class="tab-count" id="tabCount-resolved">0</span></button>
-          </div>
-          <div class="topic-select">
-            <select id="topicFilter">
-              <option value="all">Все темы</option>
-              <option value="Техническая проблема">Техническая проблема</option>
-              <option value="Идея / предложение">Идея / предложение</option>
-              <option value="Вопрос по оплате">Вопрос по оплате</option>
-              <option value="Правки по проекту">Правки по проекту</option>
-              <option value="Другое">Другое</option>
-            </select>
-          </div>
-          <div class="search-box">
-            <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="searchInput" placeholder="Поиск..." />
-          </div>
-        </div>
-        <span class="count-label" id="ticketCount"></span>
-      </div>
-
-      <!-- COLUMN HEADERS -->
-      <div class="ticket-cols">
-        <span>Тема</span><span>Статус</span><span>Обновлён</span><span>Сообщений</span><span></span>
-      </div>
-
-      <!-- TICKET LIST -->
-      <div class="ticket-list" id="ticketsList">
-        <div style="padding:32px;color:var(--text-faint);text-align:center;">Загрузка...</div>
-      </div>
+      <div class="page-hero-sub">Вопросы, идеи, сообщения об ошибках — поддержка на связи</div>
     </div>
+    <button class="btn btn-ghost" id="newTicketBtn">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Новый тикет
+    </button>
   </div>
 
-  <!-- FORM (создание тикета) -->
-  <div class="ticket-form-overlay" id="ticketFormOverlay">
-    <div class="ticket-form-modal">
-      <h3>Создать тикет</h3>
-      <p class="ticket-form-subtitle">Опишите проблему или вопрос — мы ответим в ближайшее время</p>
-
-      <!-- Выбор заказа -->
-      <div class="ticket-form-group">
-        <label>К какому заказу относится вопрос?</label>
-        <div id="orderPickList" class="order-pick-list"></div>
+  <div class="toolbar">
+    <div class="filters">
+      <div class="tabs" id="ticketTabs">
+        <button class="tab is-active" data-filter="all">Все <span class="tab-count" id="tabCount-all">0</span></button>
+        <button class="tab" data-filter="open">Открытые <span class="tab-count" id="tabCount-open">0</span></button>
+        <button class="tab" data-filter="in-progress">В обработке <span class="tab-count" id="tabCount-in-progress">0</span></button>
+        <button class="tab" data-filter="resolved">Решённые <span class="tab-count" id="tabCount-resolved">0</span></button>
       </div>
-
-      <!-- Поля -->
-      <div class="ticket-form-group">
-        <label>Тема вопроса</label>
-        <select id="ticketTopic">
+      <div class="topic-select">
+        <select id="topicFilter">
+          <option value="all">Все темы</option>
           <option value="Техническая проблема">Техническая проблема</option>
           <option value="Идея / предложение">Идея / предложение</option>
           <option value="Вопрос по оплате">Вопрос по оплате</option>
@@ -1159,658 +332,548 @@
           <option value="Другое">Другое</option>
         </select>
       </div>
-      <div class="ticket-form-group">
-        <label>Приоритет</label>
-        <select id="ticketPriority">
-          <option value="low">Низкий</option>
-          <option value="medium" selected>Средний</option>
-          <option value="high">Высокий</option>
-        </select>
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Поиск..."/>
       </div>
-      <div class="ticket-form-group">
-        <label>Краткое описание</label>
-        <input type="text" id="ticketSubject" placeholder="Например: не загружается сайт" />
-      </div>
-      <div class="ticket-form-group">
-        <label>Сообщение</label>
-        <textarea id="ticketMessage" placeholder="Опишите подробнее…" style="min-height:100px;"></textarea>
-      </div>
-      <div class="ticket-form-group">
-        <label>Скриншот (необязательно)</label>
-        <label class="file-dropzone" for="ticketFile">
-          <span class="file-dropzone-ico"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span>
-          <span class="file-dropzone-text"><strong>Нажмите</strong> или перетащите файл</span>
-        </label>
-        <input type="file" id="ticketFile" accept="image/*" style="display:none" />
-        <div class="file-preview" id="filePreview"></div>
-      </div>
+    </div>
+    <span class="count-label" id="ticketCount"></span>
+  </div>
 
-      <div class="ticket-form-actions">
-        <button class="btn btn-ghost" id="cancelTicketBtn">Отмена</button>
-        <button class="btn btn-primary" id="submitTicketBtn">Отправить</button>
+  <div class="ticket-cols">
+    <span>Тема</span><span>Статус</span><span>Обновлён</span><span>Сообщений</span><span></span>
+  </div>
+
+  <div class="ticket-list" id="ticketsList">
+    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem;text-align:center">Загрузка...</div>
+  </div>
+
+</div>
+</div>
+
+<!-- NEW TICKET FORM -->
+<div class="ticket-form-overlay" id="ticketFormOverlay">
+  <div class="ticket-form-modal">
+    <div class="ticket-form-inner">
+      <!-- ЛЕВАЯ КОЛОНКА — тёмная, заголовок + подсказки -->
+      <div class="ticket-form-left">
+        <h3>Создать<br>тикет</h3>
+        <div class="ticket-form-subtitle">Опишите проблему или вопрос — ответим в приоритетном порядке</div>
+        <div id="orderPickList" class="order-pick-list"><!-- filled by JS --></div>
+        <div class="ticket-form-hint">
+          <div class="ticket-form-hint-title">Советы</div>
+          <div class="ticket-form-hint-item"><span class="ticket-form-hint-ico opc-blue"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span>Приложите скриншот — так быстрее разберёмся</div>
+          <div class="ticket-form-hint-item"><span class="ticket-form-hint-ico opc-purple"><svg viewBox="0 0 24 24"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51z"/></svg></span>Укажите на какой странице сайта возникла проблема</div>
+          <div class="ticket-form-hint-item"><span class="ticket-form-hint-ico opc-orange"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg></span>Срочные вопросы — ставьте приоритет «Высокий»</div>
+        </div>
+      </div>
+      <!-- ПРАВАЯ КОЛОНКА — поля формы -->
+      <div class="ticket-form-right">
+        <div class="ticket-form-group">
+          <label>Тема вопроса</label>
+          <select id="ticketTopic">
+            <option value="Техническая проблема">Техническая проблема</option>
+            <option value="Идея / предложение">Идея / предложение</option>
+            <option value="Вопрос по оплате">Вопрос по оплате</option>
+            <option value="Правки по проекту">Правки по проекту</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+        <div class="ticket-form-group">
+          <label>Приоритет</label>
+          <select id="ticketPriority">
+            <option value="low">Низкий</option>
+            <option value="medium" selected>Средний</option>
+            <option value="high">Высокий</option>
+          </select>
+        </div>
+        <div class="ticket-form-group">
+          <label>Краткое описание</label>
+          <input type="text" id="ticketSubject" placeholder="Например: не загружается сайт"/>
+        </div>
+        <div class="ticket-form-group">
+          <label>Сообщение</label>
+          <textarea id="ticketMessage" placeholder="Опишите подробнее…" style="min-height:110px"></textarea>
+        </div>
+        <div class="ticket-form-group">
+          <label>Скриншот (необязательно)</label>
+          <label class="file-dropzone" for="ticketFile">
+            <span class="file-dropzone-ico opc-teal"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span>
+            <span class="file-dropzone-text"><strong>Нажмите</strong>, чтобы прикрепить скриншот</span>
+          </label>
+          <input type="file" id="ticketFile" accept="image/*" style="display:none"/>
+          <div class="file-preview" id="filePreview"></div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:auto">
+          <button class="btn btn-outline" id="cancelTicketBtn" style="flex:1;justify-content:center">Отмена</button>
+          <button class="btn btn-green" id="submitTicketBtn" style="flex:1;justify-content:center">Отправить</button>
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+<div class="toast" id="toast"></div>
 
-  <!-- MODAL CHAT -->
-  <div class="ticket-modal-overlay" id="ticketModalOverlay">
-    <div class="ticket-modal">
-      <div class="ticket-modal-head">
-        <div class="ticket-modal-headline">
-          <div class="ticket-modal-ico" id="ticketModalIco"></div>
-          <div class="ticket-modal-info">
-            <div class="ticket-modal-title" id="ticketModalTitle"></div>
-            <div class="ticket-modal-tags" id="ticketModalTags"></div>
-          </div>
+<!-- TICKET CHAT MODAL -->
+<div class="ticket-modal-overlay" id="ticketModalOverlay">
+  <div class="ticket-modal">
+    <div class="ticket-modal-head">
+      <div class="ticket-modal-headline">
+        <div class="ticket-modal-ico" id="ticketModalIco"></div>
+        <div class="ticket-modal-info">
+          <div class="ticket-modal-title" id="ticketModalTitle"></div>
+          <div class="ticket-modal-tags" id="ticketModalTags"></div>
         </div>
-        <button class="ticket-modal-close" onclick="closeTicketModal()" aria-label="Закрыть">
-          <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <button class="ticket-modal-close" onclick="closeTicketModal()" aria-label="Закрыть">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="ticket-modal-chat">
+      <div class="chat-box" id="ticketModalChatBox"></div>
+    </div>
+    <div class="ticket-modal-input">
+      <div class="chat-input-wrap">
+        <input id="ticketModalInput" type="text" placeholder="Написать сообщение…" onkeydown="if(event.key==='Enter')sendChatModal()"/>
+        <label class="btn btn-outline btn-xs" style="cursor:pointer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:14px;height:14px"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <input type="file" accept="image/*" style="display:none" onchange="attachImgModal(this)"/>
+        </label>
+        <button class="btn btn-green btn-xs" onclick="sendChatModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
         </button>
       </div>
-      <div class="ticket-modal-chat">
-        <div class="chat-box" id="ticketModalChatBox"></div>
-      </div>
-      <div class="ticket-modal-input">
-        <div class="chat-input-wrap">
-          <input id="ticketModalInput" type="text" placeholder="Написать сообщение…" onkeydown="if(event.key==='Enter')sendChatModal()" />
-          <label class="btn btn-ghost btn-sm" style="cursor:pointer;padding:6px 10px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <input type="file" accept="image/*" style="display:none" onchange="attachImgModal(this)" />
-          </label>
-          <button class="btn btn-primary btn-sm" onclick="sendChatModal()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </button>
-        </div>
-      </div>
     </div>
   </div>
+</div>
 
-  <!-- Закрытие модалки по клику на оверлей и ESC -->
-  <script>
-    document.getElementById('ticketModalOverlay').addEventListener('click', e => {
-      if (e.target === document.getElementById('ticketModalOverlay')) closeTicketModal();
-    });
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeTicketModal();
-    });
-  </script>
+<script>
+document.getElementById('ticketModalOverlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('ticketModalOverlay')) closeTicketModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeTicketModal();
+});
+</script>
 
-  <!-- ОСНОВНОЙ JS (Firebase + вся логика) -->
-  <script type="module">
-    import { auth, db } from '../firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import {
-      collection, query, where, orderBy, onSnapshot,
-      addDoc, serverTimestamp, doc, updateDoc, getDocs
-    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+<script type="module">
+import { auth, db } from '../firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  collection, query, where, orderBy, onSnapshot,
+  addDoc, serverTimestamp, doc, updateDoc, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ----- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (скопированы из исходного файла) -----
-    function toast(msg, type = 'info') {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.className = `toast ${type} show`;
-      clearTimeout(t._h);
-      t._h = setTimeout(() => t.className = 'toast', 3200);
+let currentUser = null;
+let allTickets = [];
+let userOrders = [];
+let unsubTickets = null;
+let unsubMessages = {};
+let selectedOrderId = null;
+
+function toast(msg, type = 'info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = `toast ${type} show`;
+  clearTimeout(t._h); t._h = setTimeout(() => t.className = 'toast', 3200);
+}
+function esc(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today); yesterday.setDate(yesterday.getDate() - 1);
+  if (d >= today) return 'Сегодня ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+  if (d >= yesterday) return 'Вчера ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+  return d.toLocaleDateString('ru', {day:'numeric',month:'short'}) + ' ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+}
+function statusLabel(s) { return {open:'Открыт','in-progress':'В обработке',resolved:'Решён',closed:'Закрыт'}[s] || s; }
+function statusClass(s) { return {open:'open','in-progress':'in-progress',resolved:'resolved',closed:'closed'}[s] || 'open'; }
+const TOPIC_META = {
+  'Техническая проблема': { cls:'opc-blue',   wash:'rgba(47,107,255,.12)',  color:'#2f6bff', icon:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>' },
+  'Идея / предложение':   { cls:'opc-yellow', wash:'rgba(255,195,36,.18)',  color:'#a66b00', icon:'<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.5 5.5 0 1 0 5.5 12c0 1.5.5 2.5 1.5 3.5.6.5 1 1 1.2 2z"/>' },
+  'Вопрос по оплате':     { cls:'opc-teal',   wash:'rgba(15,199,192,.16)',  color:'#0a8f89', icon:'<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>' },
+  'Правки по проекту':    { cls:'opc-purple', wash:'rgba(139,63,251,.12)',  color:'#8b3ffb', icon:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>' },
+  'Другое':                { cls:'opc-pink',   wash:'rgba(255,63,143,.12)',  color:'#ff3f8f', icon:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>' }
+};
+function topicMeta(topic){ return TOPIC_META[topic] || TOPIC_META['Другое']; }
+function hasUnread(ticket) {
+  const msgs = ticket._messages || [];
+  if (!msgs.length) return false;
+  const last = msgs[msgs.length - 1];
+  return last.sender === 'support' && !ticket._read;
+}
+function orderLabel(o){
+  return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (o.siteType||'Сайт');
+}
+
+const ORDER_TYPE_ICONS = {
+  landing: '<rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/>',
+  multipage: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/>',
+  shop: '<path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/>',
+  custom: '<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'
+};
+function orderTypeMeta(o){
+  const t = (o.siteType || '').toLowerCase();
+  if (t.includes('магазин')) return { icon: ORDER_TYPE_ICONS.shop, cls: 'opc-orange' };
+  if (t.includes('лендинг')) return { icon: ORDER_TYPE_ICONS.landing, cls: 'opc-blue' };
+  if (t.includes('многостран')) return { icon: ORDER_TYPE_ICONS.multipage, cls: 'opc-purple' };
+  return { icon: ORDER_TYPE_ICONS.custom, cls: 'opc-pink' };
+}
+const ORDER_STATUS_META = [
+  { label:'Новая заявка',     bg:'var(--info-wash)',           color:'var(--info)' },
+  { label:'Обсуждение',       bg:'rgba(139,63,251,.15)',       color:'#8b3ffb' },
+  { label:'В работе',         bg:'var(--warn-wash)',           color:'var(--warn)' },
+  { label:'На проверке',      bg:'rgba(255,63,143,.15)',       color:'#ff3f8f' },
+  { label:'Правки',           bg:'rgba(15,199,192,.15)',       color:'#0fc7c0' },
+  { label:'Готово',           bg:'var(--accent-wash)',         color:'var(--accent-d)' },
+  { label:'Ожидает доплаты',  bg:'var(--bad-wash)',            color:'var(--bad)' }
+];
+const CHECK_ICON = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function renderOrderPicker(){
+  const el = document.getElementById('orderPickList');
+  const hdr = '<div style="font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);margin-bottom:10px">К какому заказу?</div>';
+  if(!userOrders.length){
+    el.innerHTML = hdr + `<div class="no-order-empty">
+      <div class="no-order-empty-ico"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h.01M9 15h.01M15 9h6M15 15h6M15 12h6"/></svg></div>
+      <div class="no-order-empty-title">Заказов пока нет</div>
+      <div class="no-order-empty-sub">Тикет создастся без привязки к заказу — это тоже нормально, просто опишите вопрос ниже</div>
+    </div>`;
+    selectedOrderId = null;
+    return;
+  }
+  selectedOrderId = userOrders[0].id;
+  el.innerHTML = hdr + userOrders.map((o,i)=>{
+    const type = orderTypeMeta(o);
+    const status = ORDER_STATUS_META[o.status||0] || ORDER_STATUS_META[0];
+    return `<div class="order-pick-item${i===0?' is-selected':''}" data-id="${o.id}" onclick="selectOrder('${o.id}')">
+    <div class="order-pick-ico ${type.cls}"><svg viewBox="0 0 24 24">${type.icon}</svg></div>
+    <div class="order-pick-body">
+      <div class="order-pick-title">${esc(orderLabel(o))}</div>
+      <span class="order-pick-status" style="background:${status.bg};color:${status.color}">${status.label}</span>
+    </div>
+    <div class="order-pick-check">${CHECK_ICON}</div>
+  </div>`;
+  }).join('') + `<div class="order-pick-item no-link" data-id="" onclick="selectOrder('')">
+    <div class="order-pick-ico"><svg viewBox="0 0 24 24" stroke="rgba(255,255,255,.5)"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></div>
+    <div class="order-pick-body">
+      <div class="order-pick-title">Без привязки</div>
+      <span class="order-pick-status" style="background:rgba(255,255,255,.08);color:rgba(255,255,255,.4)">Общий вопрос</span>
+    </div>
+    <div class="order-pick-check">${CHECK_ICON}</div>
+  </div>`;
+}
+window.selectOrder = function(id){
+  selectedOrderId = id || null;
+  document.querySelectorAll('.order-pick-item').forEach(el=>{
+    el.classList.toggle('is-selected', el.dataset.id === (id||''));
+  });
+};
+
+function renderTickets() {
+  const el = document.getElementById('ticketsList');
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const topicFilter = document.getElementById('topicFilter')?.value || 'all';
+  const statusFilter = document.querySelector('.tab.is-active')?.dataset.filter || 'all';
+  let filtered = allTickets.filter(t => {
+    if (statusFilter !== 'all' && t.status !== statusFilter) return false;
+    if (topicFilter !== 'all' && t.topic !== topicFilter) return false;
+    if (search) {
+      const inSubject = (t.subject || '').toLowerCase().includes(search);
+      const inTopic = (t.topic || '').toLowerCase().includes(search);
+      const inMsgs = (t._messages || []).some(m => (m.text || '').toLowerCase().includes(search));
+      return inSubject || inTopic || inMsgs;
     }
-
-    function esc(s) {
-      return String(s ?? '').replace(/[&<>"']/g, c =>
-        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
-      );
-    }
-
-    function formatDate(ts) {
-      if (!ts) return '—';
-      const d = ts.toDate ? ts.toDate() : new Date(ts);
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
-      if (d >= today) return 'Сегодня ' + d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-      if (d >= yesterday) return 'Вчера ' + d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-      return d.toLocaleDateString('ru', { day: 'numeric', month: 'short' }) + ' ' +
-        d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-    }
-
-    function statusLabel(s) {
-      return { open: 'Открыт', 'in-progress': 'В обработке', resolved: 'Решён', closed: 'Закрыт' }[s] || s;
-    }
-
-    function statusClass(s) {
-      return { open: 'open', 'in-progress': 'in-progress', resolved: 'resolved', closed: 'closed' }[s] || 'open';
-    }
-
-    const TOPIC_META = {
-      'Техническая проблема': {
-        cls: 'opc-blue',
-        wash: 'rgba(47,107,255,.12)',
-        color: '#2f6bff',
-        icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>'
-      },
-      'Идея / предложение': {
-        cls: 'opc-yellow',
-        wash: 'rgba(255,195,36,.18)',
-        color: '#a66b00',
-        icon: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.5 5.5 0 1 0 5.5 12c0 1.5.5 2.5 1.5 3.5.6.5 1 1 1.2 2z"/>'
-      },
-      'Вопрос по оплате': {
-        cls: 'opc-teal',
-        wash: 'rgba(15,199,192,.16)',
-        color: '#0a8f89',
-        icon: '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>'
-      },
-      'Правки по проекту': {
-        cls: 'opc-purple',
-        wash: 'rgba(139,63,251,.12)',
-        color: '#8b3ffb',
-        icon: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>'
-      },
-      'Другое': {
-        cls: 'opc-pink',
-        wash: 'rgba(255,63,143,.12)',
-        color: '#ff3f8f',
-        icon: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>'
-      }
-    };
-
-    function topicMeta(topic) {
-      return TOPIC_META[topic] || TOPIC_META['Другое'];
-    }
-
-    function hasUnread(ticket) {
-      const msgs = ticket._messages || [];
-      if (!msgs.length) return false;
-      const last = msgs[msgs.length - 1];
-      return last.sender === 'support' && !ticket._read;
-    }
-
-    function orderLabel(o) {
-      return (o.siteDomain || ('№ ' + o.id.slice(0, 8).toUpperCase())) + ' · ' + (o.siteType || 'Сайт');
-    }
-
-    const ORDER_TYPE_ICONS = {
-      landing: '<rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/>',
-      multipage: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/>',
-      shop: '<path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/>',
-      custom: '<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'
-    };
-
-    function orderTypeMeta(o) {
-      const t = (o.siteType || '').toLowerCase();
-      if (t.includes('магазин')) return { icon: ORDER_TYPE_ICONS.shop, cls: 'opc-orange' };
-      if (t.includes('лендинг')) return { icon: ORDER_TYPE_ICONS.landing, cls: 'opc-blue' };
-      if (t.includes('многостран')) return { icon: ORDER_TYPE_ICONS.multipage, cls: 'opc-purple' };
-      return { icon: ORDER_TYPE_ICONS.custom, cls: 'opc-pink' };
-    }
-
-    const ORDER_STATUS_META = [
-      { label: 'Новая заявка', bg: 'var(--info-wash)', color: 'var(--info)' },
-      { label: 'Обсуждение', bg: 'rgba(139,63,251,.15)', color: '#8b3ffb' },
-      { label: 'В работе', bg: 'var(--warn-wash)', color: 'var(--warn)' },
-      { label: 'На проверке', bg: 'rgba(255,63,143,.15)', color: '#ff3f8f' },
-      { label: 'Правки', bg: 'rgba(15,199,192,.15)', color: '#0fc7c0' },
-      { label: 'Готово', bg: 'var(--accent-wash)', color: 'var(--accent-d)' },
-      { label: 'Ожидает доплаты', bg: 'var(--bad-wash)', color: 'var(--bad)' }
-    ];
-
-    const CHECK_ICON = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
-
-    // ----- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ -----
-    let currentUser = null;
-    let allTickets = [];
-    let userOrders = [];
-    let unsubTickets = null;
-    let unsubMessages = {};
-    let selectedOrderId = null;
-    let _activeTicketId = null;
-
-    // ----- РЕНДЕРЕР СПИСКА ЗАКАЗОВ (ОБНОВЛЁН) -----
-    function renderOrderPicker() {
-      const el = document.getElementById('orderPickList');
-      if (!userOrders.length) {
-        el.innerHTML = `<span style="color:var(--text-secondary);font-size:0.85rem;">Заказов пока нет, тикет будет создан без привязки</span>`;
-        selectedOrderId = null;
-        return;
-      }
-      selectedOrderId = userOrders[0].id;
-      el.innerHTML = userOrders.map((o, i) => {
-        const type = orderTypeMeta(o);
-        const status = ORDER_STATUS_META[o.status || 0] || ORDER_STATUS_META[0];
-        return `<div class="order-pick-item${i === 0 ? ' is-selected' : ''}" data-id="${o.id}" onclick="selectOrder('${o.id}')">
-          <div class="order-pick-ico"><svg viewBox="0 0 24 24">${type.icon}</svg></div>
-          <div class="order-pick-body">
-            <div class="order-pick-title">${esc(orderLabel(o))}</div>
-            <span class="order-pick-status">${status.label}</span>
-          </div>
-          <div class="order-pick-check">${CHECK_ICON}</div>
-        </div>`;
-      }).join('') + `<div class="order-pick-item no-link" data-id="" onclick="selectOrder('')">
-        <div class="order-pick-ico"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></div>
-        <div class="order-pick-body">
-          <div class="order-pick-title">Без привязки</div>
-          <span class="order-pick-status">Общий вопрос</span>
-        </div>
-        <div class="order-pick-check">${CHECK_ICON}</div>
-      </div>`;
-    }
-
-    // ----- РЕНДЕРЕР ТИКЕТОВ (ОБНОВЛЁН) -----
-    function renderTickets() {
-      const el = document.getElementById('ticketsList');
-      const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
-      const topicFilter = document.getElementById('topicFilter')?.value || 'all';
-      const statusFilter = document.querySelector('.tab.is-active')?.dataset.filter || 'all';
-
-      let filtered = allTickets.filter(t => {
-        if (statusFilter !== 'all' && t.status !== statusFilter) return false;
-        if (topicFilter !== 'all' && t.topic !== topicFilter) return false;
-        if (search) {
-          const inSubject = (t.subject || '').toLowerCase().includes(search);
-          const inTopic = (t.topic || '').toLowerCase().includes(search);
-          const inMsgs = (t._messages || []).some(m => (m.text || '').toLowerCase().includes(search));
-          return inSubject || inTopic || inMsgs;
-        }
-        return true;
-      });
-
-      filtered.sort((a, b) => {
-        const au = hasUnread(a) ? 1 : 0,
-          bu = hasUnread(b) ? 1 : 0;
-        if (au !== bu) return bu - au;
-        const at = a.updatedAt?.seconds || a.createdAt?.seconds || 0;
-        const bt = b.updatedAt?.seconds || b.createdAt?.seconds || 0;
-        return bt - at;
-      });
-
-      const unreadCount = allTickets.filter(t => hasUnread(t)).length;
-      const badge = document.getElementById('headerUnread');
-      if (badge) {
-        badge.textContent = unreadCount;
-        badge.style.display = unreadCount ? 'inline-flex' : 'none';
-      }
-
-      const countEl = document.getElementById('ticketCount');
-      if (countEl) countEl.textContent = filtered.length ? `${filtered.length} тикет${filtered.length === 1 ? '' : 'ов'}` : '';
-
-      const tabCounts = { all: allTickets.length, open: 0, 'in-progress': 0, resolved: 0 };
-      allTickets.forEach(t => {
-        if (tabCounts[t.status] !== undefined) tabCounts[t.status]++;
-      });
-      Object.keys(tabCounts).forEach(k => {
-        const el2 = document.getElementById(`tabCount-${k}`);
-        if (el2) el2.textContent = tabCounts[k];
-      });
-
-      if (!filtered.length) {
-        el.innerHTML =
-          `<div class="empty"><h3>Тикетов нет</h3><p>Напишите — поможем с любым вопросом</p><button class="btn btn-primary" onclick="document.getElementById('newTicketBtn').click()">Создать тикет</button></div>`;
-        return;
-      }
-
-      el.innerHTML = filtered.map((t, i) => {
-        const unread = hasUnread(t);
-        const sc = statusClass(t.status);
-        const msgCount = t._messages?.length || 0;
-        const lastMsg = t._messages?.[t._messages.length - 1];
-        const preview = lastMsg ? esc(lastMsg.text || '').slice(0, 60) : '';
-        const linkedOrder = t.orderId ? userOrders.find(o => o.id === t.orderId) : null;
-        const tm = topicMeta(t.topic);
-        return `<div class="ticket-row-wrap">
-          <button class="ticket-row${unread ? ' has-unread' : ''}" onclick="openTicketModal('${t.id}')">
-            <div class="ticket-cell-main">
-              <div class="ticket-topic-ico"><svg viewBox="0 0 24 24">${tm.icon}</svg></div>
-              <div class="ticket-cell-text">
-                <div class="ticket-subject${unread ? ' has-unread' : ''}">
-                  ${unread ? '<span class="unread-dot"></span>' : ''}
-                  ${esc(t.subject || t.topic || 'Тикет')}
-                  ${linkedOrder ? `<span class="ticket-order-tag">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : ''}
-                </div>
-                <div class="ticket-preview">${preview || esc(t.topic || '')}</div>
-                <div class="ticket-mobile-tags">
-                  <span class="ticket-tag ${sc}">${statusLabel(t.status)}</span>
-                  <span class="ticket-tag">${msgCount} сообщ.</span>
-                </div>
-              </div>
+    return true;
+  });
+  filtered.sort((a, b) => {
+    const au = hasUnread(a) ? 1 : 0, bu = hasUnread(b) ? 1 : 0;
+    if (au !== bu) return bu - au;
+    const at = a.updatedAt?.seconds || a.createdAt?.seconds || 0;
+    const bt = b.updatedAt?.seconds || b.createdAt?.seconds || 0;
+    return bt - at;
+  });
+  const unreadCount = allTickets.filter(t => hasUnread(t)).length;
+  const badge = document.getElementById('headerUnread');
+  if (badge) { badge.textContent = unreadCount; badge.style.display = unreadCount ? 'inline-flex' : 'none'; }
+  const countEl = document.getElementById('ticketCount');
+  if (countEl) countEl.textContent = filtered.length ? `${filtered.length} тикет${filtered.length===1?'':'ов'}` : '';
+  const tabCounts = { all: allTickets.length, open: 0, 'in-progress': 0, resolved: 0 };
+  allTickets.forEach(t => { if (tabCounts[t.status] !== undefined) tabCounts[t.status]++; });
+  Object.keys(tabCounts).forEach(k => {
+    const el2 = document.getElementById(`tabCount-${k}`);
+    if (el2) el2.textContent = tabCounts[k];
+  });
+  if (!filtered.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><h3>Тикетов нет</h3><p>Напишите — поможем с любым вопросом</p><button class="btn btn-green" onclick="document.getElementById('newTicketBtn').click()">Создать тикет</button></div>`;
+    return;
+  }
+  el.innerHTML = filtered.map((t, i) => {
+    const unread = hasUnread(t);
+    const sc = statusClass(t.status);
+    const msgCount = t._messages?.length || 0;
+    const lastMsg = t._messages?.[t._messages.length - 1];
+    const preview = lastMsg ? esc(lastMsg.text || '').slice(0, 60) : '';
+    const linkedOrder = t.orderId ? userOrders.find(o=>o.id===t.orderId) : null;
+    const tm = topicMeta(t.topic);
+    return `<div class="ticket-row-wrap" style="animation-delay:${i*30}ms">
+      <button class="ticket-row${unread?' has-unread':''}" onclick="openTicketModal('${t.id}')">
+        <div class="ticket-cell-main">
+          <div class="ticket-topic-ico ${tm.cls}"><svg viewBox="0 0 24 24">${tm.icon}</svg></div>
+          <div class="ticket-cell-text">
+            <div class="ticket-subject${unread?' has-unread':''}">
+              ${unread ? '<span class="unread-dot"></span>' : ''}
+              ${esc(t.subject || t.topic || 'Тикет')}
+              ${linkedOrder ? `<span class="ticket-order-tag">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : ''}
             </div>
-            <span class="ticket-tag ${sc} ticket-desktop-only">${statusLabel(t.status)}</span>
-            <span class="ticket-meta ticket-desktop-only">${formatDate(t.updatedAt || t.createdAt)}</span>
-            <span class="ticket-meta ticket-desktop-only">${msgCount}</span>
-            <svg class="ticket-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
-          </button>
-        </div>`;
-      }).join('');
-    }
-
-    // ----- ОТКРЫТИЕ/ЗАКРЫТИЕ МОДАЛКИ ЧАТА -----
-    window.openTicketModal = async function(id) {
-      const ticket = allTickets.find(t => t.id === id);
-      if (!ticket) return;
-      _activeTicketId = id;
-
-      // Пометить как прочитанное
-      if (ticket._read === false) {
-        ticket._read = true;
-        updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
-        renderTickets();
-      }
-
-      const sc = statusClass(ticket.status);
-      const linkedOrder = ticket.orderId ? userOrders.find(o => o.id === ticket.orderId) : null;
-      const tm = topicMeta(ticket.topic);
-
-      const modalIcoEl = document.getElementById('ticketModalIco');
-      modalIcoEl.className = 'ticket-modal-ico';
-      modalIcoEl.innerHTML = `<svg viewBox="0 0 24 24">${tm.icon}</svg>`;
-
-      document.getElementById('ticketModalTitle').textContent = ticket.subject || ticket.topic || 'Тикет';
-      document.getElementById('ticketModalTags').innerHTML =
-        `<span class="ticket-tag ${sc}">${statusLabel(ticket.status)}</span>` +
-        (linkedOrder ? `<span class="ticket-order-tag">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : '') +
-        `<span class="ticket-meta" style="font-size:.75rem;color:var(--text-faint)">${formatDate(ticket.updatedAt || ticket.createdAt)}</span>`;
-
-      const chatBox = document.getElementById('ticketModalChatBox');
-      chatBox.innerHTML = buildChat(ticket._messages || []);
-      document.getElementById('ticketModalInput').value = '';
-      document.getElementById('ticketModalOverlay').classList.add('show');
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 80);
-    };
-
-    window.closeTicketModal = function() {
-      document.getElementById('ticketModalOverlay').classList.remove('show');
-      document.body.style.overflow = '';
-      _activeTicketId = null;
-    };
-
-    // ----- ПОСТРОЕНИЕ ЧАТА -----
-    const ICON_SUPPORT = '<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
-    const ICON_USER = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.6 3.3-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></svg>';
-
-    function buildChat(msgs) {
-      if (!msgs.length) {
-        return `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 16px;color:var(--text-faint)">
-          <div class="chat-avatar support" style="width:44px;height:44px;background:var(--bg-secondary);color:var(--text-secondary);">
-            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+            <div class="ticket-preview">${preview || esc(t.topic || '')}</div>
+            <div class="ticket-mobile-tags">
+              <span class="ticket-tag ${sc}">${statusLabel(t.status)}</span>
+              <span class="ticket-tag" style="background:${tm.wash};color:${tm.color}">${msgCount} сообщ.</span>
+            </div>
           </div>
-          <span style="font-size:.82rem;font-weight:300">Начните диалог — напишите первым</span>
-        </div>`;
-      }
-      let html = '';
-      let lastDate = '';
-      msgs.forEach(m => {
-        const d = m.createdAt?.toDate ? m.createdAt.toDate() : new Date();
-        const dateStr = d.toLocaleDateString('ru', { day: 'numeric', month: 'long' });
-        if (dateStr !== lastDate) {
-          html += `<div class="msg-divider">${dateStr}</div>`;
-          lastDate = dateStr;
-        }
-        const time = d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
-        const cls = m.sender === 'user' ? 'user' : 'support';
-        html += `<div class="chat-row ${cls}">
-          <div class="chat-avatar ${cls}">${cls === 'user' ? ICON_USER : ICON_SUPPORT}</div>
-          <div class="chat-msg ${cls}">
-            ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение"/>` : ''}
-            ${m.text && m.text !== 'Вложение' ? esc(m.text).replace(/\n/g, '<br>') : ''}
-            <span class="msg-date">${time}</span>
-          </div>
-        </div>`;
+        </div>
+        <span class="ticket-tag ${sc} ticket-desktop-only">${statusLabel(t.status)}</span>
+        <span class="ticket-meta ticket-desktop-only">${formatDate(t.updatedAt || t.createdAt)}</span>
+        <span class="ticket-meta ticket-desktop-only">${msgCount}</span>
+        <svg class="ticket-chevron" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+const ICON_SUPPORT = '<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
+const ICON_USER = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.6 3.3-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></svg>';
+
+function buildChat(msgs) {
+  if (!msgs.length) return '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 16px;color:var(--ink-faint)"><div class="chat-avatar support" style="width:44px;height:44px"><svg viewBox="0 0 24 24" style="width:20px;height:20px">' + '<path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>' + '</svg></div><span style="font-size:.82rem;font-weight:300">Начните диалог — напишите первым</span></div>';
+  let html = '';
+  let lastDate = '';
+  msgs.forEach(m => {
+    const d = m.createdAt?.toDate ? m.createdAt.toDate() : new Date();
+    const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long'});
+    if (dateStr !== lastDate) { html += `<div class="msg-divider">${dateStr}</div>`; lastDate = dateStr; }
+    const time = d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
+    const cls = m.sender === 'user' ? 'user' : 'support';
+    html += `<div class="chat-row ${cls}">
+      <div class="chat-avatar ${cls}">${cls === 'user' ? ICON_USER : ICON_SUPPORT}</div>
+      <div class="chat-msg ${cls}">
+        ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение"/>` : ''}
+        ${m.text && m.text !== 'Вложение' ? esc(m.text).replace(/\n/g,'<br>') : ''}
+        <span class="msg-date">${time}</span>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+
+let _activeTicketId = null;
+
+window.openTicketModal = async function(id) {
+  const ticket = allTickets.find(t => t.id === id);
+  if (!ticket) return;
+  _activeTicketId = id;
+
+  if (ticket._read === false) {
+    ticket._read = true;
+    updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
+    renderTickets();
+  }
+
+  const sc = statusClass(ticket.status);
+  const linkedOrder = ticket.orderId ? userOrders.find(o=>o.id===ticket.orderId) : null;
+  const tm = topicMeta(ticket.topic);
+  const modalIcoEl = document.getElementById('ticketModalIco');
+  modalIcoEl.className = 'ticket-modal-ico ' + tm.cls;
+  modalIcoEl.innerHTML = `<svg viewBox="0 0 24 24">${tm.icon}</svg>`;
+  document.getElementById('ticketModalTitle').textContent = ticket.subject || ticket.topic || 'Тикет';
+  document.getElementById('ticketModalTags').innerHTML =
+    '<span class="ticket-tag ' + sc + '">' + statusLabel(ticket.status) + '</span>' +
+    (linkedOrder ? '<span class="ticket-order-tag">' + esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase())) + '</span>' : '') +
+    '<span class="ticket-meta" style="font-size:.75rem;color:var(--ink-faint)">' + formatDate(ticket.updatedAt || ticket.createdAt) + '</span>';
+
+  const chatBox = document.getElementById('ticketModalChatBox');
+  chatBox.innerHTML = buildChat(ticket._messages || []);
+
+  document.getElementById('ticketModalInput').value = '';
+  document.getElementById('ticketModalOverlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 80);
+};
+
+window.closeTicketModal = function() {
+  document.getElementById('ticketModalOverlay').classList.remove('show');
+  document.body.style.overflow = '';
+  _activeTicketId = null;
+};
+
+window.sendChatModal = async function() {
+  if (!_activeTicketId) return;
+  const inp = document.getElementById('ticketModalInput');
+  const text = inp?.value.trim();
+  if (!text) return toast('Напишите сообщение', 'error');
+  inp.value = '';
+  try {
+    await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), { sender: 'user', text, imageUrl: null, createdAt: serverTimestamp() });
+    await updateDoc(doc(db, 'tickets', _activeTicketId), { updatedAt: serverTimestamp(), _read: true, status: 'open' });
+    setTimeout(() => { const b = document.getElementById('ticketModalChatBox'); if(b) b.scrollTop = b.scrollHeight; }, 100);
+  } catch(e) { toast('Ошибка отправки', 'error'); }
+};
+
+window.attachImgModal = async function(fileInput) {
+  if (!_activeTicketId) return;
+  const file = fileInput.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), { sender: 'user', text: 'Вложение', imageUrl: e.target.result, createdAt: serverTimestamp() });
+      await updateDoc(doc(db, 'tickets', _activeTicketId), { updatedAt: serverTimestamp(), _read: true });
+      toast('Изображение отправлено ✓', 'success');
+      setTimeout(() => { const b = document.getElementById('ticketModalChatBox'); if(b) b.scrollTop = b.scrollHeight; }, 100);
+    } catch(err) { toast('Ошибка', 'error'); }
+  };
+  reader.readAsDataURL(file);
+  fileInput.value = '';
+};
+
+function openModal() {
+  document.getElementById('ticketFormOverlay').classList.add('show');
+  document.getElementById('ticketSubject').value = '';
+  document.getElementById('ticketMessage').value = '';
+  document.getElementById('ticketFile').value = '';
+  document.getElementById('filePreview').innerHTML = '';
+  window._pendingFile = null;
+  renderOrderPicker();
+}
+
+document.getElementById('newTicketBtn').addEventListener('click', openModal);
+document.getElementById('cancelTicketBtn').addEventListener('click', () => document.getElementById('ticketFormOverlay').classList.remove('show'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('ticketFormOverlay').classList.remove('show'); });
+
+document.getElementById('ticketFile').addEventListener('change', function() {
+  const file = this.files[0];
+  const preview = document.getElementById('filePreview');
+  if (file) {
+    window._pendingFile = file;
+    preview.innerHTML = `<span>${esc(file.name)}</span> <span class="remove-file" onclick="document.getElementById('ticketFile').value='';document.getElementById('filePreview').innerHTML='';window._pendingFile=null;">✕</span>`;
+  } else { preview.innerHTML = ''; window._pendingFile = null; }
+});
+
+document.getElementById('submitTicketBtn').addEventListener('click', async function() {
+  const topic = document.getElementById('ticketTopic').value;
+  const priority = document.getElementById('ticketPriority').value;
+  const subject = document.getElementById('ticketSubject').value.trim();
+  const message = document.getElementById('ticketMessage').value.trim();
+  if (!subject) return toast('Введите краткое описание', 'error');
+  if (!message) return toast('Напишите сообщение', 'error');
+  this.disabled = true; this.textContent = 'Отправка...';
+  const linkedOrder = selectedOrderId ? userOrders.find(o=>o.id===selectedOrderId) : null;
+  const doCreate = async (imageUrl) => {
+    try {
+      const ticketRef = await addDoc(collection(db, 'tickets'), {
+        uid: currentUser.uid, userName: currentUser.displayName || 'Пользователь',
+        userEmail: currentUser.email || '', topic, priority, subject,
+        orderId: selectedOrderId || null,
+        orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
+        status: 'open', _read: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
       });
-      return html;
-    }
+      await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), { sender: 'user', text: message, imageUrl: imageUrl || null, createdAt: serverTimestamp() });
+      document.getElementById('ticketFormOverlay').classList.remove('show');
+      toast('Тикет создан ✓', 'success');
+    } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
+    this.disabled = false; this.textContent = 'Отправить';
+  };
+  const file = window._pendingFile;
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => doCreate(e.target.result);
+    reader.readAsDataURL(file);
+  } else { await doCreate(null); }
+});
 
-    // ----- ОТПРАВКА СООБЩЕНИЙ В ЧАТЕ -----
-    window.sendChatModal = async function() {
-      if (!_activeTicketId) return;
-      const inp = document.getElementById('ticketModalInput');
-      const text = inp?.value.trim();
-      if (!text) return toast('Напишите сообщение', 'error');
-      inp.value = '';
-      try {
-        await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), {
-          sender: 'user',
-          text,
-          imageUrl: null,
-          createdAt: serverTimestamp()
-        });
-        await updateDoc(doc(db, 'tickets', _activeTicketId), {
-          updatedAt: serverTimestamp(),
-          _read: true,
-          status: 'open'
-        });
-        setTimeout(() => {
-          const b = document.getElementById('ticketModalChatBox');
-          if (b) b.scrollTop = b.scrollHeight;
-        }, 100);
-      } catch (e) {
-        toast('Ошибка отправки', 'error');
-      }
-    };
+document.getElementById('ticketTabs').addEventListener('click', e => {
+  const btn = e.target.closest('.tab');
+  if (!btn) return;
+  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('is-active', b === btn));
+  renderTickets();
+});
 
-    window.attachImgModal = async function(fileInput) {
-      if (!_activeTicketId) return;
-      const file = fileInput.files[0];
-      if (!file) return;
-      if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
-      const reader = new FileReader();
-      reader.onload = async e => {
-        try {
-          await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), {
-            sender: 'user',
-            text: 'Вложение',
-            imageUrl: e.target.result,
-            createdAt: serverTimestamp()
-          });
-          await updateDoc(doc(db, 'tickets', _activeTicketId), {
-            updatedAt: serverTimestamp(),
-            _read: true
-          });
-          toast('Изображение отправлено ✓', 'success');
-          setTimeout(() => {
-            const b = document.getElementById('ticketModalChatBox');
-            if (b) b.scrollTop = b.scrollHeight;
-          }, 100);
-        } catch (err) {
-          toast('Ошибка', 'error');
-        }
-      };
-      reader.readAsDataURL(file);
-      fileInput.value = '';
-    };
+let searchTimeout;
+document.getElementById('searchInput').addEventListener('input', () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(renderTickets, 250); });
+document.getElementById('topicFilter').addEventListener('change', renderTickets);
 
-    // ----- ПОДПИСКА НА СООБЩЕНИЯ ТИКЕТА -----
-    function subscribeMessages(ticketId) {
-      if (unsubMessages[ticketId]) return;
-      const q = query(collection(db, 'tickets', ticketId, 'messages'), orderBy('createdAt', 'asc'));
-      unsubMessages[ticketId] = onSnapshot(q, snap => {
-        const ticket = allTickets.find(t => t.id === ticketId);
-        if (!ticket) return;
-        ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        if (_activeTicketId === ticketId) {
-          const box = document.getElementById('ticketModalChatBox');
-          if (box) {
-            const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
-            box.innerHTML = buildChat(ticket._messages);
-            if (wasAtBottom) setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
-          }
-        }
-        renderTickets();
-      });
-    }
-
-    async function loadMessages(ticket) {
-      const snap = await getDocs(query(collection(db, 'tickets', ticket.id, 'messages'), orderBy('createdAt', 'asc')));
-      ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    }
-
-    async function loadUserOrders(uid) {
-      try {
-        const snap = await getDocs(query(collection(db, 'orders'), where('uid', '==', uid)));
-        userOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
-          .filter(o => (o.status ?? 0) !== -1)
-          .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-      } catch (e) {
-        userOrders = [];
-        console.warn('Не удалось загрузить заказы:', e);
+function subscribeMessages(ticketId) {
+  if (unsubMessages[ticketId]) return;
+  const q = query(collection(db, 'tickets', ticketId, 'messages'), orderBy('createdAt', 'asc'));
+  unsubMessages[ticketId] = onSnapshot(q, snap => {
+    const ticket = allTickets.find(t => t.id === ticketId);
+    if (!ticket) return;
+    ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (_activeTicketId === ticketId) {
+      const box = document.getElementById('ticketModalChatBox');
+      if (box) {
+        const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+        box.innerHTML = buildChat(ticket._messages);
+        if (wasAtBottom) setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
       }
     }
+    renderTickets();
+  });
+}
 
-    // ----- ОБРАБОТЧИКИ ФОРМЫ -----
-    function openModal() {
-      document.getElementById('ticketFormOverlay').classList.add('show');
-      document.getElementById('ticketSubject').value = '';
-      document.getElementById('ticketMessage').value = '';
-      document.getElementById('ticketFile').value = '';
-      document.getElementById('filePreview').innerHTML = '';
-      window._pendingFile = null;
-      renderOrderPicker();
+async function loadMessages(ticket) {
+  const snap = await getDocs(query(collection(db, 'tickets', ticket.id, 'messages'), orderBy('createdAt', 'asc')));
+  ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+async function loadUserOrders(uid){
+  try{
+    const snap = await getDocs(query(collection(db,'orders'), where('uid','==',uid)));
+    userOrders = snap.docs.map(d=>({id:d.id,...d.data()}))
+      .filter(o=>(o.status??0) !== -1)
+      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  }catch(e){ userOrders = []; }
+}
+
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href = '../auth'; return; }
+  currentUser = user;
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('sbContent').style.display = 'block';
+  await loadUserOrders(user.uid);
+  const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
+  unsubTickets = onSnapshot(q, async snap => {
+    const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    for (const t of incoming) {
+      const existing = allTickets.find(x => x.id === t.id);
+      t._messages = existing?._messages || [];
+      t._read = existing?._read ?? t._read ?? true;
+      if (!t._messages.length) await loadMessages(t);
+      subscribeMessages(t.id);
     }
+    allTickets = incoming;
+    renderTickets();
+  });
 
-    document.getElementById('newTicketBtn').addEventListener('click', openModal);
-    document.getElementById('cancelTicketBtn').addEventListener('click', () =>
-      document.getElementById('ticketFormOverlay').classList.remove('show')
-    );
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') document.getElementById('ticketFormOverlay').classList.remove('show');
-    });
+  // Если пришли по ссылке с конкретным заказом (например, со страницы "Мои сайты") —
+  // сразу открываем форму создания тикета с этим заказом предвыбранным
+  const params = new URLSearchParams(window.location.search);
+  const preOrderId = params.get('order');
+  if (preOrderId && userOrders.some(o => o.id === preOrderId)) {
+    openModal();
+    setTimeout(() => window.selectOrder(preOrderId), 50);
+  }
+});
+</script>
 
-    document.getElementById('ticketFile').addEventListener('change', function() {
-      const file = this.files[0];
-      const preview = document.getElementById('filePreview');
-      if (file) {
-        window._pendingFile = file;
-        preview.innerHTML =
-          `<span>${esc(file.name)}</span> <span class="remove-file" onclick="document.getElementById('ticketFile').value='';document.getElementById('filePreview').innerHTML='';window._pendingFile=null;">✕</span>`;
-      } else {
-        preview.innerHTML = '';
-        window._pendingFile = null;
-      }
-    });
-
-    document.getElementById('submitTicketBtn').addEventListener('click', async function() {
-      const topic = document.getElementById('ticketTopic').value;
-      const priority = document.getElementById('ticketPriority').value;
-      const subject = document.getElementById('ticketSubject').value.trim();
-      const message = document.getElementById('ticketMessage').value.trim();
-      if (!subject) return toast('Введите краткое описание', 'error');
-      if (!message) return toast('Напишите сообщение', 'error');
-      this.disabled = true;
-      this.textContent = 'Отправка...';
-      const linkedOrder = selectedOrderId ? userOrders.find(o => o.id === selectedOrderId) : null;
-
-      const doCreate = async (imageUrl) => {
-        try {
-          const ticketRef = await addDoc(collection(db, 'tickets'), {
-            uid: currentUser.uid,
-            userName: currentUser.displayName || 'Пользователь',
-            userEmail: currentUser.email || '',
-            topic,
-            priority,
-            subject,
-            orderId: selectedOrderId || null,
-            orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
-            status: 'open',
-            _read: true,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
-          });
-          await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
-            sender: 'user',
-            text: message,
-            imageUrl: imageUrl || null,
-            createdAt: serverTimestamp()
-          });
-          document.getElementById('ticketFormOverlay').classList.remove('show');
-          toast('Тикет создан ✓', 'success');
-        } catch (e) {
-          toast('Ошибка: ' + e.message, 'error');
-        }
-        this.disabled = false;
-        this.textContent = 'Отправить';
-      };
-
-      const file = window._pendingFile;
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = e => doCreate(e.target.result);
-        reader.readAsDataURL(file);
-      } else {
-        await doCreate(null);
-      }
-    });
-
-    // ----- ОБРАБОТЧИКИ ТАБОВ И ФИЛЬТРОВ -----
-    document.getElementById('ticketTabs').addEventListener('click', e => {
-      const btn = e.target.closest('.tab');
-      if (!btn) return;
-      document.querySelectorAll('.tab').forEach(b => b.classList.toggle('is-active', b === btn));
-      renderTickets();
-    });
-
-    let searchTimeout;
-    document.getElementById('searchInput').addEventListener('input', () => {
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(renderTickets, 250);
-    });
-    document.getElementById('topicFilter').addEventListener('change', renderTickets);
-
-    // Глобальная функция для выбора заказа в форме
-    window.selectOrder = function(id) {
-      selectedOrderId = id || null;
-      document.querySelectorAll('.order-pick-item').forEach(el => {
-        el.classList.toggle('is-selected', el.dataset.id === (id || ''));
-      });
-    };
-
-    // ----- АВТОРИЗАЦИЯ И ЗАГРУЗКА ДАННЫХ -----
-    onAuthStateChanged(auth, async user => {
-      if (!user) {
-        // Если пользователь не авторизован, редирект на страницу входа
-        window.location.href = '../auth';
-        return;
-      }
-      currentUser = user;
-
-      // Скрываем лоадер и показываем контент
-      document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('sbContent').style.display = 'block';
-
-      // Загружаем заказы
-      await loadUserOrders(user.uid);
-
-      // Подписываемся на тикеты
-      const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
-      unsubTickets = onSnapshot(q, async snap => {
-        const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        for (const t of incoming) {
-          const existing = allTickets.find(x => x.id === t.id);
-          t._messages = existing?._messages || [];
-          t._read = existing?._read ?? t._read ?? true;
-          if (!t._messages.length) await loadMessages(t);
-          subscribeMessages(t.id);
-        }
-        allTickets = incoming;
-        renderTickets();
-      });
-
-      // Если пришли с параметром order — открываем форму с предвыбранным заказом
-      const params = new URLSearchParams(window.location.search);
-      const preOrderId = params.get('order');
-      if (preOrderId && userOrders.some(o => o.id === preOrderId)) {
-        openModal();
-        setTimeout(() => window.selectOrder(preOrderId), 50);
-      }
-    });
-
-    // Добавим небольшую диагностику (вы можете убрать после отладки)
-    console.log('✅ Скрипт загружен, ожидаем авторизацию...');
-  </script>
-
-  <!-- Футер и дополнительные скрипты -->
-  <script src="../footer.js" data-page="profile"></script>
-  <script src="../GEOBLOCK.js"></script>
-  <script type="module" src="../maintenance.js"></script>
+<script src="../footer.js" data-page="profile"></script>
+<script src="../GEOBLOCK.js"></script>
+<script type="module" src="../maintenance.js"></script>
 </body>
 </html>

@@ -575,7 +575,7 @@ window.payForSupport=async function(renew){
   if(!renew&&!document.getElementById('termsCheckbox').checked){toast('Подтвердите ознакомление с условиями','error');return;}
   inFlight=true;pendId=id;
   const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;btn.textContent='Переходим к оплате...';}
-  try{const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:id,amount:500,type:'support'})});const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();}
+  try{const idToken=await auth.currentUser.getIdToken();const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId:id,amount:500,type:'support'})});const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();}
   catch(e){inFlight=false;if(btn){btn.disabled=false;btn.textContent=renew?'Продлить · 500 ₽':'Подключить за 500 ₽';}toast('Не удалось открыть оплату','error');}
 };
 

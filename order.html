@@ -1298,7 +1298,8 @@ async function submitOrder(paymentType) {
   // ШАГ 3: заказ создан — редиректим на оплату
   activeBtn.textContent='Переходим к оплате...';
   try{
-    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:docRef.id,type:paymentType==='partial'?'partial':'order'})});
+    const idToken=await currentUser.getIdToken();
+    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId:docRef.id,type:paymentType==='partial'?'partial':'order'})});
     const data=await resp.json();
     if(data.paymentUrl){window.location.href=data.paymentUrl;}
     else throw new Error();

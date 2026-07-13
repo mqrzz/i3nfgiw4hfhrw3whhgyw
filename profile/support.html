@@ -1071,12 +1071,13 @@
   </style>
 </head>
 <body>
+
   <!-- Лоадер -->
   <div class="loading-screen" id="loadingScreen">
     <div class="spinner"></div>
   </div>
 
-  <!-- Навигация и сайдбар подключаются через внешние скрипты -->
+  <!-- Навигация и сайдбар -->
   <script src="../nav.js" data-page="support"></script>
   <script src="../sidebar.js" data-page="support"></script>
 
@@ -1237,7 +1238,7 @@
     });
   </script>
 
-  <!-- Основной JS (Firebase, логика) - практически без изменений, только адаптирован под новую разметку -->
+  <!-- ОСНОВНОЙ JS (Firebase + вся логика) -->
   <script type="module">
     import { auth, db } from '../firebase-config.js';
     import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -1246,22 +1247,127 @@
       addDoc, serverTimestamp, doc, updateDoc, getDocs
     } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+    // ----- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (скопированы из исходного файла) -----
+    function toast(msg, type = 'info') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      clearTimeout(t._h);
+      t._h = setTimeout(() => t.className = 'toast', 3200);
+    }
+
+    function esc(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])
+      );
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '—';
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      if (d >= today) return 'Сегодня ' + d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+      if (d >= yesterday) return 'Вчера ' + d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+      return d.toLocaleDateString('ru', { day: 'numeric', month: 'short' }) + ' ' +
+        d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function statusLabel(s) {
+      return { open: 'Открыт', 'in-progress': 'В обработке', resolved: 'Решён', closed: 'Закрыт' }[s] || s;
+    }
+
+    function statusClass(s) {
+      return { open: 'open', 'in-progress': 'in-progress', resolved: 'resolved', closed: 'closed' }[s] || 'open';
+    }
+
+    const TOPIC_META = {
+      'Техническая проблема': {
+        cls: 'opc-blue',
+        wash: 'rgba(47,107,255,.12)',
+        color: '#2f6bff',
+        icon: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>'
+      },
+      'Идея / предложение': {
+        cls: 'opc-yellow',
+        wash: 'rgba(255,195,36,.18)',
+        color: '#a66b00',
+        icon: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.5 5.5 0 1 0 5.5 12c0 1.5.5 2.5 1.5 3.5.6.5 1 1 1.2 2z"/>'
+      },
+      'Вопрос по оплате': {
+        cls: 'opc-teal',
+        wash: 'rgba(15,199,192,.16)',
+        color: '#0a8f89',
+        icon: '<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>'
+      },
+      'Правки по проекту': {
+        cls: 'opc-purple',
+        wash: 'rgba(139,63,251,.12)',
+        color: '#8b3ffb',
+        icon: '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>'
+      },
+      'Другое': {
+        cls: 'opc-pink',
+        wash: 'rgba(255,63,143,.12)',
+        color: '#ff3f8f',
+        icon: '<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>'
+      }
+    };
+
+    function topicMeta(topic) {
+      return TOPIC_META[topic] || TOPIC_META['Другое'];
+    }
+
+    function hasUnread(ticket) {
+      const msgs = ticket._messages || [];
+      if (!msgs.length) return false;
+      const last = msgs[msgs.length - 1];
+      return last.sender === 'support' && !ticket._read;
+    }
+
+    function orderLabel(o) {
+      return (o.siteDomain || ('№ ' + o.id.slice(0, 8).toUpperCase())) + ' · ' + (o.siteType || 'Сайт');
+    }
+
+    const ORDER_TYPE_ICONS = {
+      landing: '<rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/>',
+      multipage: '<path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"/><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"/>',
+      shop: '<path d="M16 10a4 4 0 0 1-8 0"/><path d="M3.103 6.034h17.794"/><path d="M3.4 5.467a2 2 0 0 0-.4 1.2V20a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6.667a2 2 0 0 0-.4-1.2l-2-2.667A2 2 0 0 0 17 2H7a2 2 0 0 0-1.6.8z"/>',
+      custom: '<path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"/><path d="M20 2v4"/><path d="M22 4h-4"/><circle cx="4" cy="20" r="2"/>'
+    };
+
+    function orderTypeMeta(o) {
+      const t = (o.siteType || '').toLowerCase();
+      if (t.includes('магазин')) return { icon: ORDER_TYPE_ICONS.shop, cls: 'opc-orange' };
+      if (t.includes('лендинг')) return { icon: ORDER_TYPE_ICONS.landing, cls: 'opc-blue' };
+      if (t.includes('многостран')) return { icon: ORDER_TYPE_ICONS.multipage, cls: 'opc-purple' };
+      return { icon: ORDER_TYPE_ICONS.custom, cls: 'opc-pink' };
+    }
+
+    const ORDER_STATUS_META = [
+      { label: 'Новая заявка', bg: 'var(--info-wash)', color: 'var(--info)' },
+      { label: 'Обсуждение', bg: 'rgba(139,63,251,.15)', color: '#8b3ffb' },
+      { label: 'В работе', bg: 'var(--warn-wash)', color: 'var(--warn)' },
+      { label: 'На проверке', bg: 'rgba(255,63,143,.15)', color: '#ff3f8f' },
+      { label: 'Правки', bg: 'rgba(15,199,192,.15)', color: '#0fc7c0' },
+      { label: 'Готово', bg: 'var(--accent-wash)', color: 'var(--accent-d)' },
+      { label: 'Ожидает доплаты', bg: 'var(--bad-wash)', color: 'var(--bad)' }
+    ];
+
+    const CHECK_ICON = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+
+    // ----- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ -----
     let currentUser = null;
     let allTickets = [];
     let userOrders = [];
     let unsubTickets = null;
     let unsubMessages = {};
     let selectedOrderId = null;
+    let _activeTicketId = null;
 
-    // Вспомогательные функции (toast, esc, formatDate, statusLabel, statusClass, topicMeta, orderLabel, orderTypeMeta, ORDER_STATUS_META, CHECK_ICON) остаются те же, что и в исходном коде, поэтому я их не дублирую для краткости.
-    // Они полностью идентичны, единственное — в renderOrderPicker и renderTickets используются обновлённые классы и структура.
-    // В целях экономии места я приведу только изменённые части рендереров.
-
-    // ... (здесь идут все те же функции, что были в исходнике, но с адаптированными классами)
-    // Для полной работоспособности скопируйте их из исходного файла.
-
-    // Ниже приведены только обновлённые функции renderOrderPicker и renderTickets, использующие новый стиль.
-
+    // ----- РЕНДЕРЕР СПИСКА ЗАКАЗОВ (ОБНОВЛЁН) -----
     function renderOrderPicker() {
       const el = document.getElementById('orderPickList');
       if (!userOrders.length) {
@@ -1273,7 +1379,7 @@
       el.innerHTML = userOrders.map((o, i) => {
         const type = orderTypeMeta(o);
         const status = ORDER_STATUS_META[o.status || 0] || ORDER_STATUS_META[0];
-        return `<div class="order-pick-item${i===0?' is-selected':''}" data-id="${o.id}" onclick="selectOrder('${o.id}')">
+        return `<div class="order-pick-item${i === 0 ? ' is-selected' : ''}" data-id="${o.id}" onclick="selectOrder('${o.id}')">
           <div class="order-pick-ico"><svg viewBox="0 0 24 24">${type.icon}</svg></div>
           <div class="order-pick-body">
             <div class="order-pick-title">${esc(orderLabel(o))}</div>
@@ -1291,11 +1397,13 @@
       </div>`;
     }
 
+    // ----- РЕНДЕРЕР ТИКЕТОВ (ОБНОВЛЁН) -----
     function renderTickets() {
       const el = document.getElementById('ticketsList');
       const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
       const topicFilter = document.getElementById('topicFilter')?.value || 'all';
       const statusFilter = document.querySelector('.tab.is-active')?.dataset.filter || 'all';
+
       let filtered = allTickets.filter(t => {
         if (statusFilter !== 'all' && t.status !== statusFilter) return false;
         if (topicFilter !== 'all' && t.topic !== topicFilter) return false;
@@ -1307,42 +1415,55 @@
         }
         return true;
       });
+
       filtered.sort((a, b) => {
-        const au = hasUnread(a) ? 1 : 0, bu = hasUnread(b) ? 1 : 0;
+        const au = hasUnread(a) ? 1 : 0,
+          bu = hasUnread(b) ? 1 : 0;
         if (au !== bu) return bu - au;
         const at = a.updatedAt?.seconds || a.createdAt?.seconds || 0;
         const bt = b.updatedAt?.seconds || b.createdAt?.seconds || 0;
         return bt - at;
       });
+
       const unreadCount = allTickets.filter(t => hasUnread(t)).length;
       const badge = document.getElementById('headerUnread');
-      if (badge) { badge.textContent = unreadCount; badge.style.display = unreadCount ? 'inline-flex' : 'none'; }
+      if (badge) {
+        badge.textContent = unreadCount;
+        badge.style.display = unreadCount ? 'inline-flex' : 'none';
+      }
+
       const countEl = document.getElementById('ticketCount');
-      if (countEl) countEl.textContent = filtered.length ? `${filtered.length} тикет${filtered.length===1?'':'ов'}` : '';
+      if (countEl) countEl.textContent = filtered.length ? `${filtered.length} тикет${filtered.length === 1 ? '' : 'ов'}` : '';
+
       const tabCounts = { all: allTickets.length, open: 0, 'in-progress': 0, resolved: 0 };
-      allTickets.forEach(t => { if (tabCounts[t.status] !== undefined) tabCounts[t.status]++; });
+      allTickets.forEach(t => {
+        if (tabCounts[t.status] !== undefined) tabCounts[t.status]++;
+      });
       Object.keys(tabCounts).forEach(k => {
         const el2 = document.getElementById(`tabCount-${k}`);
         if (el2) el2.textContent = tabCounts[k];
       });
+
       if (!filtered.length) {
-        el.innerHTML = `<div class="empty"><h3>Тикетов нет</h3><p>Напишите — поможем с любым вопросом</p><button class="btn btn-primary" onclick="document.getElementById('newTicketBtn').click()">Создать тикет</button></div>`;
+        el.innerHTML =
+          `<div class="empty"><h3>Тикетов нет</h3><p>Напишите — поможем с любым вопросом</p><button class="btn btn-primary" onclick="document.getElementById('newTicketBtn').click()">Создать тикет</button></div>`;
         return;
       }
+
       el.innerHTML = filtered.map((t, i) => {
         const unread = hasUnread(t);
         const sc = statusClass(t.status);
         const msgCount = t._messages?.length || 0;
         const lastMsg = t._messages?.[t._messages.length - 1];
         const preview = lastMsg ? esc(lastMsg.text || '').slice(0, 60) : '';
-        const linkedOrder = t.orderId ? userOrders.find(o=>o.id===t.orderId) : null;
+        const linkedOrder = t.orderId ? userOrders.find(o => o.id === t.orderId) : null;
         const tm = topicMeta(t.topic);
         return `<div class="ticket-row-wrap">
-          <button class="ticket-row${unread?' has-unread':''}" onclick="openTicketModal('${t.id}')">
+          <button class="ticket-row${unread ? ' has-unread' : ''}" onclick="openTicketModal('${t.id}')">
             <div class="ticket-cell-main">
               <div class="ticket-topic-ico"><svg viewBox="0 0 24 24">${tm.icon}</svg></div>
               <div class="ticket-cell-text">
-                <div class="ticket-subject${unread?' has-unread':''}">
+                <div class="ticket-subject${unread ? ' has-unread' : ''}">
                   ${unread ? '<span class="unread-dot"></span>' : ''}
                   ${esc(t.subject || t.topic || 'Тикет')}
                   ${linkedOrder ? `<span class="ticket-order-tag">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : ''}
@@ -1363,11 +1484,331 @@
       }).join('');
     }
 
-    // Остальные функции (открытие/закрытие модалки, отправка сообщений, подписки, авторизация) остаются без изменений.
-    // ... (скопировать их из исходного файла)
+    // ----- ОТКРЫТИЕ/ЗАКРЫТИЕ МОДАЛКИ ЧАТА -----
+    window.openTicketModal = async function(id) {
+      const ticket = allTickets.find(t => t.id === id);
+      if (!ticket) return;
+      _activeTicketId = id;
+
+      // Пометить как прочитанное
+      if (ticket._read === false) {
+        ticket._read = true;
+        updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
+        renderTickets();
+      }
+
+      const sc = statusClass(ticket.status);
+      const linkedOrder = ticket.orderId ? userOrders.find(o => o.id === ticket.orderId) : null;
+      const tm = topicMeta(ticket.topic);
+
+      const modalIcoEl = document.getElementById('ticketModalIco');
+      modalIcoEl.className = 'ticket-modal-ico';
+      modalIcoEl.innerHTML = `<svg viewBox="0 0 24 24">${tm.icon}</svg>`;
+
+      document.getElementById('ticketModalTitle').textContent = ticket.subject || ticket.topic || 'Тикет';
+      document.getElementById('ticketModalTags').innerHTML =
+        `<span class="ticket-tag ${sc}">${statusLabel(ticket.status)}</span>` +
+        (linkedOrder ? `<span class="ticket-order-tag">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : '') +
+        `<span class="ticket-meta" style="font-size:.75rem;color:var(--text-faint)">${formatDate(ticket.updatedAt || ticket.createdAt)}</span>`;
+
+      const chatBox = document.getElementById('ticketModalChatBox');
+      chatBox.innerHTML = buildChat(ticket._messages || []);
+      document.getElementById('ticketModalInput').value = '';
+      document.getElementById('ticketModalOverlay').classList.add('show');
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 80);
+    };
+
+    window.closeTicketModal = function() {
+      document.getElementById('ticketModalOverlay').classList.remove('show');
+      document.body.style.overflow = '';
+      _activeTicketId = null;
+    };
+
+    // ----- ПОСТРОЕНИЕ ЧАТА -----
+    const ICON_SUPPORT = '<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
+    const ICON_USER = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.6 3.3-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></svg>';
+
+    function buildChat(msgs) {
+      if (!msgs.length) {
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 16px;color:var(--text-faint)">
+          <div class="chat-avatar support" style="width:44px;height:44px;background:var(--bg-secondary);color:var(--text-secondary);">
+            <svg viewBox="0 0 24 24" style="width:20px;height:20px"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+          </div>
+          <span style="font-size:.82rem;font-weight:300">Начните диалог — напишите первым</span>
+        </div>`;
+      }
+      let html = '';
+      let lastDate = '';
+      msgs.forEach(m => {
+        const d = m.createdAt?.toDate ? m.createdAt.toDate() : new Date();
+        const dateStr = d.toLocaleDateString('ru', { day: 'numeric', month: 'long' });
+        if (dateStr !== lastDate) {
+          html += `<div class="msg-divider">${dateStr}</div>`;
+          lastDate = dateStr;
+        }
+        const time = d.toLocaleTimeString('ru', { hour: '2-digit', minute: '2-digit' });
+        const cls = m.sender === 'user' ? 'user' : 'support';
+        html += `<div class="chat-row ${cls}">
+          <div class="chat-avatar ${cls}">${cls === 'user' ? ICON_USER : ICON_SUPPORT}</div>
+          <div class="chat-msg ${cls}">
+            ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение"/>` : ''}
+            ${m.text && m.text !== 'Вложение' ? esc(m.text).replace(/\n/g, '<br>') : ''}
+            <span class="msg-date">${time}</span>
+          </div>
+        </div>`;
+      });
+      return html;
+    }
+
+    // ----- ОТПРАВКА СООБЩЕНИЙ В ЧАТЕ -----
+    window.sendChatModal = async function() {
+      if (!_activeTicketId) return;
+      const inp = document.getElementById('ticketModalInput');
+      const text = inp?.value.trim();
+      if (!text) return toast('Напишите сообщение', 'error');
+      inp.value = '';
+      try {
+        await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), {
+          sender: 'user',
+          text,
+          imageUrl: null,
+          createdAt: serverTimestamp()
+        });
+        await updateDoc(doc(db, 'tickets', _activeTicketId), {
+          updatedAt: serverTimestamp(),
+          _read: true,
+          status: 'open'
+        });
+        setTimeout(() => {
+          const b = document.getElementById('ticketModalChatBox');
+          if (b) b.scrollTop = b.scrollHeight;
+        }, 100);
+      } catch (e) {
+        toast('Ошибка отправки', 'error');
+      }
+    };
+
+    window.attachImgModal = async function(fileInput) {
+      if (!_activeTicketId) return;
+      const file = fileInput.files[0];
+      if (!file) return;
+      if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
+      const reader = new FileReader();
+      reader.onload = async e => {
+        try {
+          await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), {
+            sender: 'user',
+            text: 'Вложение',
+            imageUrl: e.target.result,
+            createdAt: serverTimestamp()
+          });
+          await updateDoc(doc(db, 'tickets', _activeTicketId), {
+            updatedAt: serverTimestamp(),
+            _read: true
+          });
+          toast('Изображение отправлено ✓', 'success');
+          setTimeout(() => {
+            const b = document.getElementById('ticketModalChatBox');
+            if (b) b.scrollTop = b.scrollHeight;
+          }, 100);
+        } catch (err) {
+          toast('Ошибка', 'error');
+        }
+      };
+      reader.readAsDataURL(file);
+      fileInput.value = '';
+    };
+
+    // ----- ПОДПИСКА НА СООБЩЕНИЯ ТИКЕТА -----
+    function subscribeMessages(ticketId) {
+      if (unsubMessages[ticketId]) return;
+      const q = query(collection(db, 'tickets', ticketId, 'messages'), orderBy('createdAt', 'asc'));
+      unsubMessages[ticketId] = onSnapshot(q, snap => {
+        const ticket = allTickets.find(t => t.id === ticketId);
+        if (!ticket) return;
+        ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        if (_activeTicketId === ticketId) {
+          const box = document.getElementById('ticketModalChatBox');
+          if (box) {
+            const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
+            box.innerHTML = buildChat(ticket._messages);
+            if (wasAtBottom) setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+          }
+        }
+        renderTickets();
+      });
+    }
+
+    async function loadMessages(ticket) {
+      const snap = await getDocs(query(collection(db, 'tickets', ticket.id, 'messages'), orderBy('createdAt', 'asc')));
+      ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    async function loadUserOrders(uid) {
+      try {
+        const snap = await getDocs(query(collection(db, 'orders'), where('uid', '==', uid)));
+        userOrders = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+          .filter(o => (o.status ?? 0) !== -1)
+          .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      } catch (e) {
+        userOrders = [];
+        console.warn('Не удалось загрузить заказы:', e);
+      }
+    }
+
+    // ----- ОБРАБОТЧИКИ ФОРМЫ -----
+    function openModal() {
+      document.getElementById('ticketFormOverlay').classList.add('show');
+      document.getElementById('ticketSubject').value = '';
+      document.getElementById('ticketMessage').value = '';
+      document.getElementById('ticketFile').value = '';
+      document.getElementById('filePreview').innerHTML = '';
+      window._pendingFile = null;
+      renderOrderPicker();
+    }
+
+    document.getElementById('newTicketBtn').addEventListener('click', openModal);
+    document.getElementById('cancelTicketBtn').addEventListener('click', () =>
+      document.getElementById('ticketFormOverlay').classList.remove('show')
+    );
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.getElementById('ticketFormOverlay').classList.remove('show');
+    });
+
+    document.getElementById('ticketFile').addEventListener('change', function() {
+      const file = this.files[0];
+      const preview = document.getElementById('filePreview');
+      if (file) {
+        window._pendingFile = file;
+        preview.innerHTML =
+          `<span>${esc(file.name)}</span> <span class="remove-file" onclick="document.getElementById('ticketFile').value='';document.getElementById('filePreview').innerHTML='';window._pendingFile=null;">✕</span>`;
+      } else {
+        preview.innerHTML = '';
+        window._pendingFile = null;
+      }
+    });
+
+    document.getElementById('submitTicketBtn').addEventListener('click', async function() {
+      const topic = document.getElementById('ticketTopic').value;
+      const priority = document.getElementById('ticketPriority').value;
+      const subject = document.getElementById('ticketSubject').value.trim();
+      const message = document.getElementById('ticketMessage').value.trim();
+      if (!subject) return toast('Введите краткое описание', 'error');
+      if (!message) return toast('Напишите сообщение', 'error');
+      this.disabled = true;
+      this.textContent = 'Отправка...';
+      const linkedOrder = selectedOrderId ? userOrders.find(o => o.id === selectedOrderId) : null;
+
+      const doCreate = async (imageUrl) => {
+        try {
+          const ticketRef = await addDoc(collection(db, 'tickets'), {
+            uid: currentUser.uid,
+            userName: currentUser.displayName || 'Пользователь',
+            userEmail: currentUser.email || '',
+            topic,
+            priority,
+            subject,
+            orderId: selectedOrderId || null,
+            orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
+            status: 'open',
+            _read: true,
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+          });
+          await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
+            sender: 'user',
+            text: message,
+            imageUrl: imageUrl || null,
+            createdAt: serverTimestamp()
+          });
+          document.getElementById('ticketFormOverlay').classList.remove('show');
+          toast('Тикет создан ✓', 'success');
+        } catch (e) {
+          toast('Ошибка: ' + e.message, 'error');
+        }
+        this.disabled = false;
+        this.textContent = 'Отправить';
+      };
+
+      const file = window._pendingFile;
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = e => doCreate(e.target.result);
+        reader.readAsDataURL(file);
+      } else {
+        await doCreate(null);
+      }
+    });
+
+    // ----- ОБРАБОТЧИКИ ТАБОВ И ФИЛЬТРОВ -----
+    document.getElementById('ticketTabs').addEventListener('click', e => {
+      const btn = e.target.closest('.tab');
+      if (!btn) return;
+      document.querySelectorAll('.tab').forEach(b => b.classList.toggle('is-active', b === btn));
+      renderTickets();
+    });
+
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', () => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(renderTickets, 250);
+    });
+    document.getElementById('topicFilter').addEventListener('change', renderTickets);
+
+    // Глобальная функция для выбора заказа в форме
+    window.selectOrder = function(id) {
+      selectedOrderId = id || null;
+      document.querySelectorAll('.order-pick-item').forEach(el => {
+        el.classList.toggle('is-selected', el.dataset.id === (id || ''));
+      });
+    };
+
+    // ----- АВТОРИЗАЦИЯ И ЗАГРУЗКА ДАННЫХ -----
+    onAuthStateChanged(auth, async user => {
+      if (!user) {
+        // Если пользователь не авторизован, редирект на страницу входа
+        window.location.href = '../auth';
+        return;
+      }
+      currentUser = user;
+
+      // Скрываем лоадер и показываем контент
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('sbContent').style.display = 'block';
+
+      // Загружаем заказы
+      await loadUserOrders(user.uid);
+
+      // Подписываемся на тикеты
+      const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
+      unsubTickets = onSnapshot(q, async snap => {
+        const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        for (const t of incoming) {
+          const existing = allTickets.find(x => x.id === t.id);
+          t._messages = existing?._messages || [];
+          t._read = existing?._read ?? t._read ?? true;
+          if (!t._messages.length) await loadMessages(t);
+          subscribeMessages(t.id);
+        }
+        allTickets = incoming;
+        renderTickets();
+      });
+
+      // Если пришли с параметром order — открываем форму с предвыбранным заказом
+      const params = new URLSearchParams(window.location.search);
+      const preOrderId = params.get('order');
+      if (preOrderId && userOrders.some(o => o.id === preOrderId)) {
+        openModal();
+        setTimeout(() => window.selectOrder(preOrderId), 50);
+      }
+    });
+
+    // Добавим небольшую диагностику (вы можете убрать после отладки)
+    console.log('✅ Скрипт загружен, ожидаем авторизацию...');
   </script>
 
-  <!-- Подключение футера и прочих скриптов -->
+  <!-- Футер и дополнительные скрипты -->
   <script src="../footer.js" data-page="profile"></script>
   <script src="../GEOBLOCK.js"></script>
   <script type="module" src="../maintenance.js"></script>

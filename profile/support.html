@@ -179,10 +179,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .order-pick-list{display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:280px;margin-bottom:20px;padding-right:6px}
 .order-pick-list::-webkit-scrollbar{width:5px}
 .order-pick-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,.18);border-radius:10px}
-.order-pick-item{display:flex;align-items:center;gap:12px;border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:11px 14px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s;flex-shrink:0}
-.order-pick-item:hover{border-color:rgba(255,255,255,.28);transform:translateY(-1px)}
-.order-pick-item.is-selected{border-color:var(--accent);background:rgba(30,222,123,.08)}
-.order-pick-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 6px 14px -6px rgba(0,0,0,.5)}
+.order-pick-item{display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1.5px solid rgba(255,255,255,.1);border-radius:16px;padding:11px 14px;cursor:pointer;transition:border-color .15s,background .15s,transform .15s,box-shadow .15s;flex-shrink:0}
+.order-pick-item:hover{border-color:rgba(255,255,255,.28);transform:translateY(-1px);background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03))}
+.order-pick-item.is-selected{border-color:var(--accent);background:linear-gradient(180deg,rgba(30,222,123,.14),rgba(30,222,123,.04));box-shadow:0 0 0 1px rgba(30,222,123,.15),0 8px 20px -8px rgba(30,222,123,.35)}
+.order-pick-ico{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 6px 14px -6px rgba(0,0,0,.5);transition:transform .15s}
+.order-pick-item.is-selected .order-pick-ico{transform:scale(1.06)}
 .order-pick-ico svg{width:19px;height:19px;stroke:#fff;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .order-pick-check{width:20px;height:20px;border-radius:50%;border:1.5px solid rgba(255,255,255,.25);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;color:transparent}
 .order-pick-check svg{width:11px;height:11px;stroke:currentColor;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round}
@@ -190,7 +191,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .order-pick-body{flex:1;min-width:0}
 .order-pick-title{font-size:.82rem;font-weight:500;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .order-pick-status{display:inline-flex;align-items:center;font-size:.65rem;font-weight:500;margin-top:5px;padding:.17rem .5rem;border-radius:7px}
-.no-order-option{font-size:.76rem;color:rgba(255,255,255,.35);padding:8px 0}
+.no-order-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:28px 16px;border:1.5px dashed rgba(255,255,255,.14);border-radius:18px}
+.no-order-empty-ico{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,var(--blue-l),var(--blue));display:flex;align-items:center;justify-content:center;box-shadow:0 8px 18px -6px rgba(0,0,0,.5)}
+.no-order-empty-ico svg{width:22px;height:22px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.no-order-empty-title{font-size:.82rem;font-weight:500;color:#fff}
+.no-order-empty-sub{font-size:.74rem;color:rgba(255,255,255,.4);line-height:1.5;max-width:220px}
+.no-order-empty-cta{font-size:.74rem;font-weight:500;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}
 .order-pick-item.no-link{border-style:dashed}
 .order-pick-item.no-link .order-pick-ico{background:rgba(255,255,255,.08);box-shadow:none}
 .opc-blue{background:linear-gradient(135deg,var(--blue-l),var(--blue))}
@@ -514,7 +520,11 @@ function renderOrderPicker(){
   const el = document.getElementById('orderPickList');
   const hdr = '<div style="font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);margin-bottom:10px">К какому заказу?</div>';
   if(!userOrders.length){
-    el.innerHTML = hdr + '<div class="no-order-option">Нет заказов — тикет без привязки</div>';
+    el.innerHTML = hdr + `<div class="no-order-empty">
+      <div class="no-order-empty-ico"><svg viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M9 9h.01M9 15h.01M15 9h6M15 15h6M15 12h6"/></svg></div>
+      <div class="no-order-empty-title">Заказов пока нет</div>
+      <div class="no-order-empty-sub">Тикет создастся без привязки к заказу — это тоже нормально, просто опишите вопрос ниже</div>
+    </div>`;
     selectedOrderId = null;
     return;
   }

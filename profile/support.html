@@ -107,7 +107,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ticket-tag.open{background:var(--info-wash);color:var(--info)}
 .ticket-tag.in-progress{background:var(--warn-wash);color:var(--warn)}
 .ticket-tag.resolved{background:var(--accent-wash);color:var(--accent-d)}
-.ticket-tag.closed{background:var(--bg2);color:var(--ink-faint)}
+.ticket-tag.closed{background:rgba(139,63,251,.12);color:#8b3ffb}
 .ticket-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;transition:transform .2s;justify-self:end}
 .unread-dot{width:8px;height:8px;border-radius:50%;background:var(--bad);display:inline-block;flex-shrink:0;animation:pulse 1.5s infinite}
 .ticket-mobile-tags{display:none}
@@ -171,6 +171,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .ticket-form-left{border-radius:28px 28px 0 0;padding:32px 28px 24px}
   .ticket-form-right{padding:24px 28px 32px}
   .ticket-form-modal{border-radius:28px}
+}
+@media(max-width:640px){
+  .ticket-form-overlay{padding:0}
+  .ticket-form-modal{
+    width:100%;max-width:none;
+    height:100vh;height:100dvh;max-height:none;
+    border-radius:0;box-shadow:none;
+  }
+  .ticket-form-left{border-radius:0;padding:max(24px,env(safe-area-inset-top)) 22px 24px}
+  .ticket-form-right{padding:24px 22px max(24px,env(safe-area-inset-bottom))}
 }
 .ticket-form-group{margin-bottom:16px}
 .ticket-form-group label:not(.file-dropzone){display:block;font-size:.68rem;font-weight:500;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
@@ -256,7 +266,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .search-box{min-width:0}
   .search-box input{width:100%;max-width:100%}
   .search-box input:focus{width:100%}
-  .ticket-form-modal{padding:28px 22px;border-radius:28px}
   .filters{flex-direction:column;align-items:stretch;gap:8px;min-width:0}
   .tabs{display:flex;width:100%;max-width:100%;overflow-x:auto;min-width:0}
   .topic-select{min-width:0}
@@ -484,11 +493,11 @@ function formatDate(ts) {
 function statusLabel(s) { return {open:'Открыт','in-progress':'В обработке',resolved:'Решён',closed:'Закрыт'}[s] || s; }
 function statusClass(s) { return {open:'open','in-progress':'in-progress',resolved:'resolved',closed:'closed'}[s] || 'open'; }
 const TOPIC_META = {
-  'Техническая проблема': { cls:'opc-blue',   icon:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>' },
-  'Идея / предложение':   { cls:'opc-yellow', icon:'<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.5 5.5 0 1 0 5.5 12c0 1.5.5 2.5 1.5 3.5.6.5 1 1 1.2 2z"/>' },
-  'Вопрос по оплате':     { cls:'opc-teal',   icon:'<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>' },
-  'Правки по проекту':    { cls:'opc-purple', icon:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>' },
-  'Другое':                { cls:'opc-pink',   icon:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>' }
+  'Техническая проблема': { cls:'opc-blue',   wash:'rgba(47,107,255,.12)',  color:'#2f6bff', icon:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/>' },
+  'Идея / предложение':   { cls:'opc-yellow', wash:'rgba(255,195,36,.18)',  color:'#a66b00', icon:'<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15 14c.2-1 .7-1.7 1.5-2.5A5.5 5.5 0 1 0 5.5 12c0 1.5.5 2.5 1.5 3.5.6.5 1 1 1.2 2z"/>' },
+  'Вопрос по оплате':     { cls:'opc-teal',   wash:'rgba(15,199,192,.16)',  color:'#0a8f89', icon:'<rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/>' },
+  'Правки по проекту':    { cls:'opc-purple', wash:'rgba(139,63,251,.12)',  color:'#8b3ffb', icon:'<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/><path d="m15 5 4 4"/>' },
+  'Другое':                { cls:'opc-pink',   wash:'rgba(255,63,143,.12)',  color:'#ff3f8f', icon:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/>' }
 };
 function topicMeta(topic){ return TOPIC_META[topic] || TOPIC_META['Другое']; }
 function hasUnread(ticket) {
@@ -624,7 +633,7 @@ function renderTickets() {
             <div class="ticket-preview">${preview || esc(t.topic || '')}</div>
             <div class="ticket-mobile-tags">
               <span class="ticket-tag ${sc}">${statusLabel(t.status)}</span>
-              <span class="ticket-tag" style="background:var(--bg3);color:var(--ink-faint)">${msgCount} сообщ.</span>
+              <span class="ticket-tag" style="background:${tm.wash};color:${tm.color}">${msgCount} сообщ.</span>
             </div>
           </div>
         </div>

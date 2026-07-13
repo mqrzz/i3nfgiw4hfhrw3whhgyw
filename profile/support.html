@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"/>
   <title>Поддержка — Antviz</title>
   <link rel="icon" href="../img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -86,9 +86,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
 /* LIST */
 .ticket-cols{display:grid;grid-template-columns:1fr 150px 130px 120px 22px;gap:16px;padding:0 28px 12px;font-size:.65rem;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-faint);font-weight:500}
-.ticket-list{border:1.5px solid var(--line);border-radius:40px;overflow:hidden}
-.ticket-row-wrap{border-bottom:1px solid var(--line);animation:rowIn .2s ease both}
-.ticket-row-wrap:last-child{border-bottom:none}
+.ticket-list{display:flex;flex-direction:column;gap:12px}
+.ticket-row-wrap{border:1.5px solid var(--line);border-radius:24px;overflow:hidden;animation:rowIn .2s ease both;background:var(--bg);transition:border-color .15s,box-shadow .15s,transform .15s}
+.ticket-row-wrap:hover{border-color:var(--line-strong);box-shadow:0 16px 32px -18px rgba(25,27,30,.3);transform:translateY(-2px)}
 .ticket-row{all:unset;display:grid;grid-template-columns:1fr 150px 130px 120px 22px;gap:16px;align-items:center;width:100%;padding:24px 28px;cursor:pointer;transition:background .15s;font-family:var(--font)}
 .ticket-row:hover{background:var(--bg3)}
 .ticket-row.has-unread{box-shadow:inset 3px 0 0 0 var(--bad)}
@@ -118,6 +118,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ticket-modal{background:var(--bg);border-radius:40px;width:100%;max-width:720px;height:82vh;min-height:420px;display:flex;flex-direction:column;position:relative;transform:translateY(24px) scale(.97);transition:transform .3s cubic-bezier(.22,1,.36,1);box-shadow:0 32px 100px rgba(0,0,0,.25)}
 .ticket-modal-overlay.show .ticket-modal{transform:translateY(0) scale(1)}
 .ticket-modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:32px 32px 0;flex-shrink:0}
+.ticket-modal-headline{display:flex;gap:14px;align-items:flex-start;flex:1;min-width:0}
+.ticket-modal-ico{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 8px 18px -6px rgba(0,0,0,.3)}
+.ticket-modal-ico svg{width:22px;height:22px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .ticket-modal-info{flex:1;min-width:0}
 .ticket-modal-title{font-size:1.1rem;font-weight:500;color:var(--ink);letter-spacing:-.02em}
 .ticket-modal-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
@@ -134,12 +137,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .chat-row.support{align-self:flex-start}
 .chat-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .chat-avatar svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.9;fill:none}
-.chat-avatar.user{background:var(--accent-wash);color:var(--accent-d)}
-.chat-avatar.support{background:var(--dark);color:var(--accent)}
+.chat-avatar.user{background:linear-gradient(135deg,#4eea94,var(--accent-d));color:#fff}
+.chat-avatar.support{background:linear-gradient(135deg,#3a4046,var(--dark));color:var(--accent)}
 .chat-msg{padding:12px 16px;border-radius:18px;font-size:.86rem;font-weight:400;line-height:1.55;min-width:0}
-.chat-msg.user{background:var(--accent-wash);color:var(--ink);border-bottom-right-radius:4px}
+.chat-msg.user{background:linear-gradient(135deg,#4eea94,var(--accent-d));color:#fff;border-bottom-right-radius:4px}
 .chat-msg.support{background:var(--bg3);color:var(--ink);border-bottom-left-radius:4px;border:1.5px solid var(--line)}
 .chat-msg .msg-date{font-size:.62rem;color:var(--ink-faint);font-weight:300;display:block;margin-top:5px}
+.chat-msg.user .msg-date{color:rgba(255,255,255,.75)}
 .chat-msg .msg-img{max-width:160px;border-radius:10px;margin-top:6px;border:1px solid var(--line)}
 .msg-divider{font-size:.68rem;color:var(--ink-faint);text-align:center;padding:8px 0 4px;font-weight:500}
 .chat-input-wrap{display:flex;gap:8px;margin-top:6px}
@@ -235,7 +239,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 }
 @media(max-width:840px){
   .ticket-cols{display:none}
-  .ticket-list{border-radius:24px}
+  .ticket-row-wrap{border-radius:20px}
   .ticket-row{grid-template-columns:1fr;gap:4px;padding:20px 48px 20px 24px;position:relative}
   .ticket-cell-status,.ticket-cell-date{display:none}
   .ticket-desktop-only{display:none!important}
@@ -263,7 +267,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .ticket-modal-overlay{padding:0}
   .ticket-modal{
     width:100%;max-width:none;
-    height:100dvh;height:100vh;min-height:0;
+    height:100vh;height:100dvh;min-height:0;
     border-radius:0;box-shadow:none;
   }
   .ticket-modal-head{padding:max(22px,env(safe-area-inset-top)) 22px 0}
@@ -404,9 +408,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <div class="ticket-modal-overlay" id="ticketModalOverlay">
   <div class="ticket-modal">
     <div class="ticket-modal-head">
-      <div class="ticket-modal-info">
-        <div class="ticket-modal-title" id="ticketModalTitle"></div>
-        <div class="ticket-modal-tags" id="ticketModalTags"></div>
+      <div class="ticket-modal-headline">
+        <div class="ticket-modal-ico" id="ticketModalIco"></div>
+        <div class="ticket-modal-info">
+          <div class="ticket-modal-title" id="ticketModalTitle"></div>
+          <div class="ticket-modal-tags" id="ticketModalTags"></div>
+        </div>
       </div>
       <button class="ticket-modal-close" onclick="closeTicketModal()" aria-label="Закрыть">
         <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
@@ -668,6 +675,10 @@ window.openTicketModal = async function(id) {
 
   const sc = statusClass(ticket.status);
   const linkedOrder = ticket.orderId ? userOrders.find(o=>o.id===ticket.orderId) : null;
+  const tm = topicMeta(ticket.topic);
+  const modalIcoEl = document.getElementById('ticketModalIco');
+  modalIcoEl.className = 'ticket-modal-ico ' + tm.cls;
+  modalIcoEl.innerHTML = `<svg viewBox="0 0 24 24">${tm.icon}</svg>`;
   document.getElementById('ticketModalTitle').textContent = ticket.subject || ticket.topic || 'Тикет';
   document.getElementById('ticketModalTags').innerHTML =
     '<span class="ticket-tag ' + sc + '">' + statusLabel(ticket.status) + '</span>' +

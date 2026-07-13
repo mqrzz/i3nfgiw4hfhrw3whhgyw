@@ -679,7 +679,7 @@ window.openOrderModal=function(id){
 };
 
 window.payRemaining=async function(orderId){
-  try{const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId,type:'remaining'})});const data=await resp.json();if(data.paymentUrl){window.location.href=data.paymentUrl;}else toast('Ошибка создания платежа','error');}catch(e){toast('Не удалось создать платёж','error');}
+  try{const idToken=await auth.currentUser.getIdToken();const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId,type:'remaining'})});const data=await resp.json();if(data.paymentUrl){window.location.href=data.paymentUrl;}else toast('Ошибка создания платежа','error');}catch(e){toast('Не удалось создать платёж','error');}
 };
 
 window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');document.body.style.overflow='';};

@@ -221,20 +221,32 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 /* ACTIONS — карточка с сеткой плиток вместо списка кнопок, висящих отдельно */
 .ord-actions-card{background:var(--bg);border:1px solid var(--line);border-radius:24px;padding:22px}
 .ord-actions-title{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);margin-bottom:14px}
-.ord-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ord-action-tile{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:16px;border-radius:16px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:500;color:var(--ink);text-decoration:none;transition:background .15s,border-color .15s,transform .12s;line-height:1.3}
+.ord-actions-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ord-action-tile{display:flex;flex-direction:row;align-items:center;gap:10px;padding:11px 13px;border-radius:14px;border:1.5px solid var(--line);background:var(--bg);cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:500;color:var(--ink);text-decoration:none;transition:background .15s,border-color .15s,transform .12s;line-height:1.25}
 .ord-action-tile:hover{border-color:var(--line-strong);background:var(--bg2);transform:translateY(-1px)}
 .ord-action-tile.wide{grid-column:1/-1;flex-direction:row;align-items:center}
 .ord-action-tile.green{background:var(--accent);border-color:var(--accent);color:var(--dark)}
 .ord-action-tile.green:hover{background:var(--accent-h)}
 .ord-action-tile.dark{background:var(--dark);border-color:var(--dark);color:#fff}
 .ord-action-tile.dark:hover{background:var(--dark2)}
-.ord-action-tile-ico{width:34px;height:34px;border-radius:10px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ord-action-tile.blue{background:var(--info-wash);border-color:rgba(59,130,246,.25);color:var(--info-d)}
+.ord-action-tile.blue:hover{background:rgba(59,130,246,.2);border-color:rgba(59,130,246,.4)}
+.ord-action-tile.violet{background:var(--violet-wash);border-color:rgba(139,123,247,.28);color:#6f5fe0}
+.ord-action-tile.violet:hover{background:rgba(139,123,247,.2);border-color:rgba(139,123,247,.45)}
+.ord-action-tile.red{background:var(--bad-wash);border-color:rgba(232,99,79,.28);color:var(--bad-d)}
+.ord-action-tile.red:hover{background:rgba(232,99,79,.2);border-color:rgba(232,99,79,.45)}
+.ord-action-tile-ico{width:28px;height:28px;border-radius:9px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .ord-action-tile.green .ord-action-tile-ico{background:rgba(0,0,0,.1)}
 .ord-action-tile.dark .ord-action-tile-ico{background:rgba(255,255,255,.08)}
-.ord-action-tile-ico svg{width:15px;height:15px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
+.ord-action-tile.blue .ord-action-tile-ico{background:rgba(59,130,246,.15)}
+.ord-action-tile.violet .ord-action-tile-ico{background:rgba(139,123,247,.16)}
+.ord-action-tile.red .ord-action-tile-ico{background:rgba(232,99,79,.16)}
+.ord-action-tile-ico svg{width:13px;height:13px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
 .ord-action-tile.green .ord-action-tile-ico svg{stroke:var(--dark)}
 .ord-action-tile.dark .ord-action-tile-ico svg{stroke:rgba(255,255,255,.6)}
+.ord-action-tile.blue .ord-action-tile-ico svg{stroke:var(--info-d)}
+.ord-action-tile.violet .ord-action-tile-ico svg{stroke:#6f5fe0}
+.ord-action-tile.red .ord-action-tile-ico svg{stroke:var(--bad-d)}
 
 /* REVIEW MODAL */
 .stars-row{display:flex;justify-content:center;gap:12px;margin-bottom:20px}
@@ -658,16 +670,16 @@ window.openOrderModal=function(id){
   }
   if(siteBlock)rightHtml+=siteBlock;
 
-  let tiles='<button class="ord-action-tile" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>Скачать квитанцию</button>';
+  let tiles='<button class="ord-action-tile blue" onclick="printReceipt(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg></span>Скачать квитанцию</button>';
   if(s>=5&&fullyPaid&&!o.reviewed){
     tiles+='<button class="ord-action-tile green" onclick="openReview(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></span>Оставить отзыв</button>';
   }
   if(s===3){
     tiles+='<button class="ord-action-tile dark" onclick="requestRevision(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></span>Запросить правки</button>';
   }
-  tiles+='<a class="ord-action-tile" href="../profile/support" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>Написать в поддержку</a>';
+  tiles+='<a class="ord-action-tile violet" href="../profile/support" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>Написать в поддержку</a>';
   if(s<2&&(!o.refundStatus||o.refundStatus==='none')){
-    tiles+='<button class="ord-action-tile" onclick="openRefundModal(\''+o.id+'\')" style="pointer-events:all;color:var(--bad-d)"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg></span>Запросить возврат</button>';
+    tiles+='<button class="ord-action-tile red" onclick="openRefundModal(\''+o.id+'\')" style="pointer-events:all"><span class="ord-action-tile-ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/></svg></span>Запросить возврат</button>';
   }
   rightHtml+='<div class="ord-actions-card"><div class="ord-actions-title">Действия</div><div class="ord-actions-grid">'+tiles+'</div></div>';
 

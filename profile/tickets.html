@@ -228,7 +228,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .buy-card{border-radius:20px;padding:22px 20px}
   .buy-tiles{grid-template-columns:1fr}
   .status-strip{flex-direction:column;align-items:flex-start;gap:18px}
-  .status-strip-limit,.limit-bar{width:100%}
+  .status-strip-prog,.status-strip-limit,.limit-bar{width:100%}
   .ico-badge.lg{width:48px;height:48px;border-radius:15px}
   .ico-badge.lg svg{width:22px;height:22px}
   .ico-badge.xl{width:60px;height:60px;border-radius:18px}
@@ -608,9 +608,6 @@ window.showTicketsList=async function(){
   const btn=document.getElementById('tGateBtn');
   btn.disabled=true;btn.textContent='Загрузка...';
   await loadTickets();
-  if(!sel)return;
-  document.getElementById('tGate').style.display='none';
-  document.getElementById('tList').style.display='flex';
 };
 
 async function loadTickets(){
@@ -624,7 +621,10 @@ async function loadTickets(){
   const inPeriod=periodStart?all.filter(t=>t.createdAt&&t.createdAt.toDate()>=periodStart):all;
   ticketsThisPeriod=inPeriod.length;
   renderLimit();
-  renderTickets(all);}catch(e){
+  renderTickets(all);
+  document.getElementById('tGate').style.display='none';
+  document.getElementById('tList').style.display='flex';
+  }catch(e){
     const btn=document.getElementById('tGateBtn');
     if(btn){btn.disabled=false;btn.textContent='Показать все заявки';}
     toast('Не удалось загрузить заявки','error');

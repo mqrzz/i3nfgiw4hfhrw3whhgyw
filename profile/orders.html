@@ -186,7 +186,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 /* DOMAIN / STATUS BANNERS */
 .refund-banner{display:flex;align-items:flex-start;gap:12px;border-radius:18px;padding:16px 18px}
 .refund-banner-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.refund-banner-ico svg{width:15px;height:15px;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.refund-banner-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .refund-banner-body{flex:1;min-width:0}
 .refund-banner-title{font-size:.82rem;font-weight:500;margin-bottom:2px}
 .refund-banner-text{font-size:.78rem;color:var(--ink-dim);line-height:1.55}
@@ -496,16 +496,35 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
 function fmtDate(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
 function fmtFull(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
-function getEstimate(pkg,extras=[],status=0){
+function getEstimate(o){
+  const status=o.status||0;
   if(status>=5)return null;
-  const urgent=(extras||[]).includes('urgent');
+  // Если студия уже сама вручную проставила дату готовности в админке —
+  // это и есть обязательство по срокам, никакая прикидка поверх не нужна
+  // и тем более не должна её тихо перезатирать общей формулой по тарифу.
+  if(o.doneAt){
+    const d=o.doneAt.toDate?o.doneAt.toDate():new Date(o.doneAt);
+    return{text:d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}),committed:true};
+  }
+  const extras=o.extras||[];
+  const urgent=extras.includes('urgent');
   const ranges={'Старт':[1,2],'Рост':[2,5],'Масштаб':[5,14]};
-  const [minD,maxD]=ranges[pkg]||[2,7];
-  if(urgent){const d=new Date();d.setDate(d.getDate()+1);return d.toLocaleDateString('ru',{day:'numeric',month:'long'})}
+  let[minD,maxD]=ranges[o.package]||[2,7];
+  const type=o.siteType||'';
+  // Серверная часть (бэкенд, интеграции, БД) всегда добавляет времени
+  // независимо от тарифа и формата.
+  if(o.siteKind==='dynamic'){minD+=2;maxD+=5;}
+  // Формат сайта: лендинг — база (без надбавки), дальше сложнее.
+  if(/Интернет-магазин/.test(type)){minD+=3;maxD+=7;}
+  else if(/Многостраничный/.test(type)){minD+=1;maxD+=3;}
+  else if(/Особый случай/.test(type)){minD+=2;maxD+=6;}
+  if(extras.includes('shop')){minD+=2;maxD+=4;}
+  if(extras.includes('content')){minD+=1;maxD+=2;}
+  if(urgent){const d=new Date();d.setDate(d.getDate()+1);return{text:d.toLocaleDateString('ru',{day:'numeric',month:'long'}),committed:false};}
   const dMin=new Date();dMin.setDate(dMin.getDate()+minD);
   const dMax=new Date();dMax.setDate(dMax.getDate()+maxD);
   const fmt=d=>d.toLocaleDateString('ru',{day:'numeric',month:'long'});
-  return fmt(dMin)+' — '+fmt(dMax);
+  return{text:fmt(dMin)+' — '+fmt(dMax),committed:false};
 }
 
 function showBanner(text){clearTimeout(bannerTimer);document.getElementById('bannerText').textContent=text;document.getElementById('statusBanner').classList.add('show');bannerTimer=setTimeout(closeBanner,6500)}
@@ -652,14 +671,17 @@ window.openOrderModal=function(id){
   const rb=refundBanners[o.refundStatus];
   const refundBanner=rb?'<div class="refund-banner" style="background:'+rb.wash+'"><div class="refund-banner-ico" style="background:'+rb.wash+';color:'+rb.c+'"><svg viewBox="0 0 24 24">'+rb.ico+'</svg></div><div class="refund-banner-body"><div class="refund-banner-title" style="color:'+rb.c+'">'+rb.title+'</div><div class="refund-banner-text">'+rb.text+'</div></div></div>':'';
   const domainBanner=buildDomainBanner(o);
-  const estDate=getEstimate(o.package,o.extras,s);
+  const estDate=getEstimate(o);
 
   // LEFT
   let leftHtml=buildTracker(o);
   if(refundBanner)leftHtml+=refundBanner;
   if(statusComment)leftHtml+=statusComment;
   if(domainBanner)leftHtml+=domainBanner;
-  if(estDate)leftHtml+=`<div class="ord-eta"><div class="ord-eta-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="ord-eta-body"><span class="ord-eta-label">Ожидаемый срок</span><strong style="color:var(--ink);font-weight:500;font-size:.92rem">${estDate}</strong></div></div>`;
+  if(estDate){
+    const wishDate=(!estDate.committed&&o.launchDate)?new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):null;
+    leftHtml+=`<div class="ord-eta"><div class="ord-eta-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="4"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div class="ord-eta-body"><span class="ord-eta-label">${estDate.committed?'Дата готовности':'Ожидаемый срок'}</span><strong style="color:var(--ink);font-weight:500;font-size:.92rem">${estDate.text}</strong>${wishDate?'<span style="font-size:.72rem;color:var(--ink-faint);font-weight:300">Ваше пожелание при заказе: '+wishDate+'</span>':''}</div></div>`;
+  }
 
   // RIGHT
   let rightHtml='';

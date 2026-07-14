@@ -20,6 +20,8 @@
   --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
   --dark:#191b1e;--dark2:#2b2f33;
   --font:'Geologica','Inter','Arial',sans-serif;
+  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
 }
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -41,43 +43,51 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
 .page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
 
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:14px 24px;font-size:.86rem;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,opacity .15s;white-space:nowrap}
 .btn:hover:not(:disabled){transform:translateY(-1px)}
-.btn svg{width:14px;height:14px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
 .btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
 .btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
 
 /* TOOLBAR */
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px}
-.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px;overflow-x:auto;max-width:100%}
+.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
 .tab:hover{color:var(--ink)}
 .tab.is-active{background:var(--dark);color:#fff}
-.mark-all{background:transparent;border:none;color:var(--accent-d);font-family:var(--font);font-size:.8rem;font-weight:500;cursor:pointer;padding:.5rem .2rem;transition:opacity .15s}
-.mark-all:hover{opacity:.7}
-.mark-all:disabled{opacity:.3;cursor:default}
+.tab-badge{background:rgba(0,0,0,.08);color:inherit;font-size:.68rem;font-weight:500;padding:.05rem .4rem;border-radius:10px;line-height:1.5}
+.tab.is-active .tab-badge{background:rgba(255,255,255,.18)}
+.count-label{color:var(--ink-faint);font-size:.76rem;white-space:nowrap}
 
 /* LIST */
-.notif-list{border:1.5px solid var(--line);border-radius:40px;overflow:hidden;background:var(--bg)}
-.notif-item{display:flex;align-items:flex-start;gap:16px;padding:24px 32px;border-bottom:1px solid var(--line);animation:rowIn .2s ease both;transition:background .15s;cursor:pointer}
-.notif-item:last-child{border-bottom:none}
+.notif-list{display:flex;flex-direction:column;gap:12px}
+.notif-row-wrap{position:relative;border:1.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--bg);box-shadow:var(--sh1);animation:rowIn .2s ease both;transition:box-shadow .15s,border-color .15s,transform .15s}
+.notif-row-wrap:hover{border-color:var(--line-strong);box-shadow:var(--sh2);transform:translateY(-1px)}
+.notif-row-wrap::before{content:'';position:absolute;left:14px;top:16px;bottom:16px;width:3px;border-radius:3px;background:var(--line-strong);opacity:.4}
+.notif-row-wrap[data-type="order"]::before{background:var(--accent-d);opacity:1}
+.notif-row-wrap[data-type="support"]::before{background:var(--info);opacity:1}
+.notif-row-wrap[data-type="service"]::before{background:var(--warn);opacity:1}
+.notif-row-wrap.is-filtered{display:none}
+.notif-item{all:unset;box-sizing:border-box;display:flex;align-items:flex-start;gap:16px;width:100%;padding:24px 32px 24px 40px;cursor:pointer;transition:background .15s;font-family:var(--font)}
 .notif-item:hover{background:var(--bg2)}
-.notif-item.unread{background:var(--accent-wash)}
-.notif-item.unread:hover{background:rgba(30,222,123,.18)}
-.notif-ico{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg2)}
-.notif-ico svg{width:18px;height:18px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
+.notif-row-wrap.unread .notif-item{background:var(--accent-wash)}
+.notif-row-wrap.unread .notif-item:hover{background:rgba(30,222,123,.18)}
+.notif-ico{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg2)}
+.notif-ico svg{width:19px;height:19px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
 .notif-ico.order{background:var(--dark)}
 .notif-ico.order svg{stroke:var(--accent)}
 .notif-ico.support{background:var(--info-wash)}
 .notif-ico.support svg{stroke:var(--info)}
 .notif-ico.service{background:var(--warn-wash)}
 .notif-ico.service svg{stroke:var(--warn)}
-.notif-body{flex:1;min-width:0}
-.notif-title{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:4px;letter-spacing:-.01em}
-.notif-text{font-size:.84rem;color:var(--ink-dim);line-height:1.55;margin-bottom:6px}
+.notif-body{flex:1;min-width:0;padding-top:2px}
+.notif-title-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.notif-title{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-h);flex-shrink:0}
+.notif-text{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:8px}
 .notif-time{font-size:.72rem;color:var(--ink-faint)}
-.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-h);flex-shrink:0;margin-top:6px}
+.notif-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;flex-shrink:0;margin-top:14px}
 
 /* EMPTY */
 .empty{text-align:center;padding:96px 16px}
@@ -85,6 +95,13 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
 .empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
 .empty p{font-size:.88rem;color:var(--ink-dim);font-weight:300;line-height:1.6}
+
+/* TOAST */
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--accent);color:var(--dark)}
+.toast.error{background:var(--dark);color:#fff}
+.toast.info{background:var(--dark);color:#fff}
 
 @media(max-width:900px){
   .page-hero{border-radius:32px;padding:40px 36px}
@@ -95,8 +112,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .page-hero-title{font-size:1.9rem}
   .page-hero>.btn{align-self:flex-start}
   .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
-  .tabs{overflow-x:auto;max-width:100%;width:100%}
-  .notif-item{padding:18px 20px}
+  .tabs{width:100%}
+  .notif-item{padding:18px 20px 18px 26px}
+  .notif-chevron{display:none}
 }
 #sbContent{padding-bottom:80px}
   </style>
@@ -128,11 +146,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   <div class="toolbar">
     <div class="tabs" id="notifTabs">
       <button class="tab is-active" data-filter="all">Все</button>
-      <button class="tab" data-filter="unread">Непрочитанные</button>
+      <button class="tab" data-filter="unread">Непрочитанные <span class="tab-badge" id="unreadBadge" style="display:none">0</span></button>
       <button class="tab" data-filter="order">Заказы</button>
       <button class="tab" data-filter="support">Поддержка</button>
       <button class="tab" data-filter="service">Обслуживание</button>
     </div>
+    <span class="count-label" id="notifCount"></span>
   </div>
 
   <div class="notif-list" id="notifList">
@@ -141,6 +160,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
 </div>
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script type="module">
 import { auth, db } from '../firebase-config.js';
@@ -152,6 +173,7 @@ let allNotifs = [];
 let activeFilter = 'all';
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
 
 function fmtTime(ts){
   if(!ts) return '';
@@ -170,18 +192,23 @@ const ICONS = {
   service: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>',
 };
 
-function notifItem(n){
+function notifItem(n, idx){
   const type = n.type || 'order';
   const unread = !n.read;
-  const link = n.link || '#';
-  return `<div class="notif-item${unread?' unread':''}" data-type="${type}" data-read="${n.read?1:0}" onclick="openNotif('${n.id}','${link}')">
-    <div class="notif-ico ${type}">${ICONS[type]||ICONS.order}</div>
-    <div class="notif-body">
-      <div class="notif-title">${esc(n.title||'Уведомление')}</div>
-      ${n.text?`<div class="notif-text">${esc(n.text)}</div>`:''}
-      <div class="notif-time">${fmtTime(n.createdAt)}</div>
-    </div>
-    ${unread?'<div class="notif-dot"></div>':''}
+  const link = n.link || '';
+  return `<div class="notif-row-wrap${unread?' unread':''}" data-type="${esc(type)}" data-id="${esc(n.id)}" style="animation-delay:${idx*30}ms">
+    <button type="button" class="notif-item" data-id="${esc(n.id)}" data-link="${esc(link)}">
+      <div class="notif-ico ${esc(type)}">${ICONS[type]||ICONS.order}</div>
+      <div class="notif-body">
+        <div class="notif-title-row">
+          <div class="notif-title">${esc(n.title||'Уведомление')}</div>
+          ${unread?'<div class="notif-dot"></div>':''}
+        </div>
+        ${n.text?`<div class="notif-text">${esc(n.text)}</div>`:''}
+        <div class="notif-time">${fmtTime(n.createdAt)}</div>
+      </div>
+      ${link?'<svg class="notif-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>':''}
+    </button>
   </div>`;
 }
 
@@ -197,30 +224,45 @@ function render(){
       <h3>${activeFilter==='unread'?'Нет непрочитанных':'Здесь появятся уведомления'}</h3>
       <p>Статусы заказов и ответы поддержки будут отображаться здесь</p>
     </div>`;
-    return;
+  }else{
+    el.innerHTML = filtered.map(notifItem).join('');
   }
-  el.innerHTML = filtered.map(notifItem).join('');
 
-  const hasUnread = allNotifs.some(n=>!n.read);
-  document.getElementById('markAllBtn').disabled = !hasUnread;
+  const unreadCount = allNotifs.filter(n=>!n.read).length;
+  document.getElementById('markAllBtn').disabled = !unreadCount;
+  const badge = document.getElementById('unreadBadge');
+  badge.style.display = unreadCount ? '' : 'none';
+  badge.textContent = unreadCount;
+  document.getElementById('notifCount').textContent = allNotifs.length ? `Показано ${filtered.length} из ${allNotifs.length}` : '';
 }
 
 window.openNotif = async function(id, link){
   const n = allNotifs.find(x=>x.id===id);
   if(n && !n.read){
-    try{ await updateDoc(doc(db,'notifications',currentUser.uid,'items',id),{read:true}); }catch(e){}
+    try{ await updateDoc(doc(db,'notifications',currentUser.uid,'items',id),{read:true}); }catch(e){ toast('Не удалось отметить как прочитанное','error'); }
   }
-  if(link && link!=='#') window.location.href = link;
+  if(link) window.location.href = link;
 };
 
-document.getElementById('markAllBtn').addEventListener('click', async ()=>{
+document.getElementById('notifList').addEventListener('click', e=>{
+  const btn = e.target.closest('.notif-item');
+  if(!btn) return;
+  window.openNotif(btn.dataset.id, btn.dataset.link);
+});
+
+document.getElementById('markAllBtn').addEventListener('click', async function(){
   const unread = allNotifs.filter(n=>!n.read);
   if(!unread.length) return;
+  this.disabled = true;
   try{
     const batch = writeBatch(db);
     unread.forEach(n=>batch.update(doc(db,'notifications',currentUser.uid,'items',n.id),{read:true}));
     await batch.commit();
-  }catch(e){}
+    toast('Все уведомления прочитаны ✓','success');
+  }catch(e){
+    toast('Не удалось обновить уведомления','error');
+    this.disabled = !allNotifs.some(n=>!n.read);
+  }
 });
 
 document.getElementById('notifTabs').addEventListener('click', e=>{

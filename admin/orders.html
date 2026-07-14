@@ -176,12 +176,40 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 .toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
 .toast.show{opacity:1;transform:none}
 .toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--warn);color:#fff}
+
+/* PROMPT MODAL — заменяет браузерные prompt()/confirm() для возвратов */
+.pm-ov{position:fixed;inset:0;z-index:2000;background:rgba(25,27,30,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:20px}
+.pm-ov.show{opacity:1;pointer-events:all}
+.pm-card{background:var(--bg);border-radius:28px;padding:28px 28px 24px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.25);transform:translateY(8px) scale(.98);transition:transform .15s}
+.pm-ov.show .pm-card{transform:none}
+.pm-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.pm-icon svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pm-title{font-weight:500;font-size:1.02rem;letter-spacing:-.02em;color:var(--text);margin-bottom:6px}
+.pm-sub{font-size:.83rem;color:var(--muted);font-weight:300;line-height:1.5;margin-bottom:18px}
+.pm-field{margin-bottom:20px}
+.pm-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;display:block;margin-bottom:8px}
+.pm-input{background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%;resize:vertical}
+.pm-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.pm-actions{display:flex;gap:10px}
+.pm-actions .btn{flex:1;justify-content:center}
 </style>
 </head>
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
 <div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lb-x" onclick="event.stopPropagation();closeLightbox()">✕</button><img id="lightboxImg" src="" alt=""/></div>
+<div class="pm-ov" id="pmOv" onclick="if(event.target===this)closePromptModal()">
+  <div class="pm-card" id="pmCard">
+    <div class="pm-icon" id="pmIcon"></div>
+    <div class="pm-title" id="pmTitle"></div>
+    <div class="pm-sub" id="pmSub"></div>
+    <div class="pm-field" id="pmFieldWrap"><span class="pm-lbl" id="pmLbl"></span><input class="pm-input" id="pmInput"/></div>
+    <div class="pm-actions">
+      <button class="btn btn-outline" onclick="closePromptModal()">Отмена</button>
+      <button class="btn" id="pmConfirmBtn">Подтвердить</button>
+    </div>
+  </div>
+</div>
 
 <!-- SIDEBAR -->
 <div class="sb">
@@ -419,7 +447,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <script type="module">
 import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, Timestamp, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, Timestamp, where, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 // status -1 = заказ создан, но оплата ещё не подтверждена вебхуком (не путать с "Новая заявка" = 0)
@@ -660,37 +688,93 @@ function renderRefund(o){
   }
 }
 
+function openPromptModal({icon,iconBg,iconColor,title,sub,field,confirmLabel,confirmClass,onConfirm}){
+  document.getElementById('pmIcon').style.background=iconBg;
+  document.getElementById('pmIcon').style.color=iconColor;
+  document.getElementById('pmIcon').innerHTML='<svg viewBox="0 0 24 24">'+icon+'</svg>';
+  document.getElementById('pmTitle').textContent=title;
+  document.getElementById('pmSub').textContent=sub||'';
+  const fw=document.getElementById('pmFieldWrap'),inp=document.getElementById('pmInput');
+  if(field){
+    fw.style.display='';
+    document.getElementById('pmLbl').textContent=field.label;
+    inp.type=field.type||'text';
+    inp.placeholder=field.placeholder||'';
+    inp.value=field.defaultValue||'';
+  }else fw.style.display='none';
+  const btn=document.getElementById('pmConfirmBtn');
+  btn.className='btn '+(confirmClass||'btn-dark');
+  btn.textContent=confirmLabel||'Подтвердить';
+  btn.onclick=()=>{
+    const val=field?inp.value.trim():true;
+    if(field?.required&&!val){inp.focus();inp.style.borderColor='var(--red)';return;}
+    closePromptModal();
+    onConfirm(val);
+  };
+  document.getElementById('pmOv').classList.add('show');
+  if(field)setTimeout(()=>inp.focus(),50);
+}
+window.closePromptModal=()=>document.getElementById('pmOv').classList.remove('show');
+
+const ICO_CHECK='<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>';
+const ICO_X='<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/>';
+const ICO_SEND='<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>';
+const ICO_REFRESH='<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>';
+
 window.approveRefund=async()=>{
   if(!selOrderId)return;
   const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
-  const amt=prompt('Сумма возврата, ₽',String(o.totalPrice||''));
-  if(amt===null)return;
-  await safeUpdate(selOrderId,{
-    refundStatus:'approved',refundAmount:Number(amt)||o.totalPrice||0,refundDecidedAt:serverTimestamp()
-  },'Возврат одобрен ✓');
+  openPromptModal({
+    icon:ICO_CHECK,iconBg:'rgba(30,222,123,.12)',iconColor:'var(--green-d)',
+    title:'Одобрить возврат',sub:'Клиент получит уведомление, что возврат одобрен.',
+    field:{label:'Сумма возврата, ₽',type:'number',defaultValue:String(o.totalPrice||''),required:true},
+    confirmLabel:'Одобрить',confirmClass:'btn-green',
+    onConfirm:async(val)=>{
+      const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:serverTimestamp()},'Возврат одобрен ✓');
+      if(ok&&o.uid)await addDoc(collection(db,'notifications',o.uid,'items'),{title:'✅ Возврат одобрен',text:'Средства поступят на счёт в ближайшее время.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+    }
+  });
 };
 window.rejectRefund=async()=>{
   if(!selOrderId)return;
-  const comment=prompt('Комментарий для клиента (почему отклонено)');
-  if(comment===null)return;
-  await safeUpdate(selOrderId,{
-    refundStatus:'rejected',refundComment:comment.trim(),refundDecidedAt:serverTimestamp()
-  },'Возврат отклонён');
+  const o=allOrders.find(x=>x.id===selOrderId);
+  openPromptModal({
+    icon:ICO_X,iconBg:'rgba(232,99,79,.12)',iconColor:'var(--red)',
+    title:'Отклонить возврат',sub:'Комментарий увидит клиент — объясните причину.',
+    field:{label:'Комментарий для клиента',type:'text',required:true},
+    confirmLabel:'Отклонить',confirmClass:'btn-danger',
+    onConfirm:async(val)=>{
+      const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:serverTimestamp()},'Возврат отклонён');
+      if(ok&&o?.uid)await addDoc(collection(db,'notifications',o.uid,'items'),{title:'❌ Возврат отклонён',text:val||'Свяжитесь с поддержкой для уточнения.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+    }
+  });
 };
 window.markRefunded=async()=>{
   if(!selOrderId)return;
-  if(!confirm('Подтвердить, что деньги фактически отправлены клиенту?'))return;
-  await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:serverTimestamp()},'Возврат завершён ✓');
+  const o=allOrders.find(x=>x.id===selOrderId);
+  openPromptModal({
+    icon:ICO_SEND,iconBg:'rgba(25,27,30,.08)',iconColor:'var(--dark)',
+    title:'Деньги отправлены?',sub:'Подтвердите, что средства фактически переведены клиенту — это закроет возврат и отправит клиенту уведомление.',
+    confirmLabel:'Подтвердить',confirmClass:'btn-dark',
+    onConfirm:async()=>{
+      const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:serverTimestamp()},'Возврат завершён ✓');
+      if(ok&&o?.uid)await addDoc(collection(db,'notifications',o.uid,'items'),{title:'💸 Средства возвращены',text:'Возврат по заказу завершён.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+    }
+  });
 };
 window.manualRefund=async()=>{
   if(!selOrderId)return;
   const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
   if(o.refundStatus&&o.refundStatus!=='none'&&o.refundStatus!=='rejected'){toast('Возврат уже оформляется','info');return;}
-  const reason=prompt('Причина возврата (для истории)');
-  if(reason===null)return;
-  await safeUpdate(selOrderId,{
-    refundStatus:'requested',refundReason:reason.trim()||'Оформлено вручную администратором',refundRequestedAt:serverTimestamp()
-  },'Заявка на возврат создана ✓');
+  openPromptModal({
+    icon:ICO_REFRESH,iconBg:'rgba(245,158,11,.12)',iconColor:'var(--warn)',
+    title:'Оформить возврат вручную',sub:'Для случаев, когда клиент попросил возврат не через форму (например, в чате).',
+    field:{label:'Причина возврата (для истории)',type:'text'},
+    confirmLabel:'Оформить',confirmClass:'btn-dark',
+    onConfirm:async(val)=>{
+      await safeUpdate(selOrderId,{refundStatus:'requested',refundReason:val||'Оформлено вручную администратором',refundRequestedAt:serverTimestamp()},'Заявка на возврат создана ✓');
+    }
+  });
 };
 
 window.togglePayment=async()=>{
@@ -700,25 +784,33 @@ window.togglePayment=async()=>{
   const _o=allOrders.find(x=>x.id===selOrderId);
   const _upd={paid:currentPaid};
   if(currentPaid&&!_o?.paidAt){_upd.paidAt=serverTimestamp();}
-  if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=serverTimestamp();document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===5));}
+  if(currentPaid&&_o&&_o.status===6){const _now=Timestamp.now();_upd.status=5;_upd.doneAt=_now;_upd.statusHistory=arrayUnion({status:5,at:_now});document.querySelectorAll('.sbtn').forEach((b,i)=>b.classList.toggle('cur',i===5));}
   const ok=await safeUpdate(selOrderId,_upd,currentPaid?'Оплачен ✓':'Не оплачен');
   if(!ok){currentPaid=prevPaid;renderPayRow();}
 };
 window.setStatus=async s=>{
   if(!selOrderId)return;
+  // Единый клиентский timestamp: arrayUnion() не поддерживает serverTimestamp()
+  // внутри элементов массива (Firestore резолвит его в null), поэтому для
+  // statusHistory берём Timestamp.now() и используем ЕГО ЖЕ значение
+  // для startedAt/doneAt, чтобы даты в статус-панели админки и в истории
+  // трекера у клиента совпадали, а не жили каждая своей жизнью.
+  const now=Timestamp.now();
   const upd={status:s};
   const o=allOrders.find(x=>x.id===selOrderId);
-  if(s>=2&&!o?.startedAt)upd.startedAt=serverTimestamp();
+  if(s>=2&&!o?.startedAt)upd.startedAt=now;
   let msg;
+  let histStatus=s;
   if(s===5){
     // If partial payment and not fully paid, auto-switch to "Ожидает доплаты"
     const isPartial = o?.paymentType==='partial';
     const paidAmt = o?.paidAmount||0;
     const totalPrice = o?.totalPrice||0;
     const fullyPaid = o?.paid || (isPartial && paidAmt>=totalPrice);
-    if(isPartial && !fullyPaid){ upd.status=6; msg='Предоплата — статус → Ожидает доплаты ✓'; }
-    else { upd.doneAt=serverTimestamp(); msg='Статус → '+S[s]+' ✓'; }
+    if(isPartial && !fullyPaid){ upd.status=6; histStatus=6; msg='Предоплата — статус → Ожидает доплаты ✓'; }
+    else { upd.doneAt=now; msg='Статус → '+S[s]+' ✓'; }
   } else { msg='Статус → '+S[s]+' ✓'; }
+  upd.statusHistory=arrayUnion({status:histStatus,at:now});
   await safeUpdate(selOrderId,upd,msg);
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};

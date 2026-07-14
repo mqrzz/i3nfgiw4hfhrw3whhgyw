@@ -61,17 +61,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .site-card{background:var(--dark);border-radius:40px;padding:40px;display:flex;flex-direction:column;animation:rowIn .35s ease both;transition:transform .2s,box-shadow .2s}
 .site-card:hover{transform:translateY(-4px)}
 .site-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px}
-.site-favicon-wrap{width:52px;height:52px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden}
-.site-favicon-wrap img{width:28px;height:28px;object-fit:contain}
-.site-favicon-wrap svg{width:24px;height:24px;stroke:var(--accent);stroke-width:1.6;fill:none}
+.site-favicon-wrap{width:60px;height:60px;border-radius:18px;background:linear-gradient(135deg,#4eea94,#149955);border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 8px 18px -8px rgba(20,153,85,.5)}
+.site-favicon-wrap img{width:34px;height:34px;object-fit:contain}
+.site-favicon-wrap svg{width:30px;height:30px;stroke:#fff;stroke-width:1.6;fill:none}
 .site-status-pill{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;padding:.32rem .8rem;border-radius:8px;background:var(--accent-wash);color:var(--accent);white-space:nowrap}
 .site-status-pill.support{background:rgba(245,158,11,.12);color:var(--warn)}
 .site-domain{font-size:1.4rem;font-weight:500;letter-spacing:-.025em;color:#fff;margin-bottom:8px;word-break:break-word}
-.site-meta-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:28px}
-.site-meta-chip{font-size:.78rem;color:rgba(255,255,255,.4);font-weight:300;display:flex;align-items:center;gap:6px}
-.site-meta-chip svg{width:13px;height:13px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+.site-meta-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.site-meta-chip{font-size:.78rem;color:rgba(255,255,255,.55);font-weight:300;display:flex;align-items:center;gap:10px;text-decoration:none}
+.site-meta-ico{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .15s,box-shadow .15s}
+.site-meta-ico svg{width:16px;height:16px;stroke:#fff;stroke-width:1.9;fill:none;flex-shrink:0}
+.mic-blue{background:linear-gradient(135deg,#5b8cff,#2f6bff)}
+.mic-teal{background:linear-gradient(135deg,#3fe0d8,#0fc7c0)}
+.mic-purple{background:linear-gradient(135deg,#a970ff,#8b3ffb)}
+.mic-indigo{background:linear-gradient(135deg,#8b93ff,#5b63f0)}
 a.site-meta-chip{transition:color .12s}
-a.site-meta-chip:hover{color:var(--accent)}
+a.site-meta-chip:hover{color:#fff}
+a.site-meta-chip:hover .site-meta-ico{transform:scale(1.08);box-shadow:0 8px 16px -6px rgba(0,0,0,.5)}
 .site-divider{height:1px;background:rgba(255,255,255,.08);margin-bottom:24px}
 .site-actions{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap}
 .site-actions .btn{flex:1;justify-content:center}
@@ -86,7 +92,8 @@ a.site-meta-chip:hover{color:var(--accent)}
 /* EMPTY */
 .empty{text-align:center;padding:96px 16px}
 .empty-ico{margin-bottom:24px;display:flex;justify-content:center}
-.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
+.empty-ico-wrap{width:88px;height:88px;border-radius:24px;background:linear-gradient(135deg,#4eea94,#149955);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 24px -10px rgba(20,153,85,.4)}
+.empty-ico-wrap svg{width:44px;height:44px;stroke:#fff;stroke-width:1.3;fill:none}
 .empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
 .empty p{font-size:.88rem;color:var(--ink-dim);margin-bottom:24px;font-weight:300;line-height:1.6}
 
@@ -99,6 +106,10 @@ a.site-meta-chip:hover{color:var(--accent)}
   .page-hero-title{font-size:1.9rem}
   .site-card{border-radius:28px;padding:28px}
   .site-actions{flex-direction:column}
+  .site-meta-row{gap:14px}
+  .site-favicon-wrap{width:52px;height:52px;border-radius:16px}
+  .site-favicon-wrap svg{width:26px;height:26px}
+  .site-favicon-wrap img{width:30px;height:30px}
 }
 #sbContent{padding-bottom:80px}
   </style>
@@ -165,10 +176,10 @@ function siteCard(o){
     </div>
     <div class="site-domain">${esc(o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase()))}</div>
     <div class="site-meta-row">
-      <span class="site-meta-chip"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fmtDate(o.createdAt)}</span>
-      <span class="site-meta-chip"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'')}</span>
-      ${pagesCount ? `<span class="site-meta-chip"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${pagesCount} стр.</span>` : ''}
-      ${repoHref ? `<a href="${repoHref}" target="_blank" rel="noopener" class="site-meta-chip" style="text-decoration:none;cursor:pointer"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Код на GitHub</a>` : ''}
+      <span class="site-meta-chip"><span class="site-meta-ico mic-blue"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>${fmtDate(o.createdAt)}</span>
+      <span class="site-meta-chip"><span class="site-meta-ico mic-teal"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span>${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'')}</span>
+      ${pagesCount ? `<span class="site-meta-chip"><span class="site-meta-ico mic-purple"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>${pagesCount} стр.</span>` : ''}
+      ${repoHref ? `<a href="${repoHref}" target="_blank" rel="noopener" class="site-meta-chip"><span class="site-meta-ico mic-indigo"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span>Код на GitHub</a>` : ''}
     </div>
     <div class="site-divider"></div>
     ${supportBanner}
@@ -183,7 +194,7 @@ function render(orders){
   const el = document.getElementById('sitesGrid');
   if(!orders.length){
     el.innerHTML = `<div class="empty" style="grid-column:1/-1">
-      <div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+      <div class="empty-ico"><div class="empty-ico-wrap"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div></div>
       <h3>Здесь появятся ваши сайты</h3>
       <p>Как только проект будет завершён и сдан — он отобразится здесь со ссылкой и всеми деталями</p>
       <a href="../order" class="btn btn-green btn-sm">Заказать сайт</a>

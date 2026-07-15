@@ -168,7 +168,14 @@
     function renderBan() {
       const banned = isBanActive(banData);
       if (banned && !bo) {
-        if (!signedOutForBan) { signedOutForBan = true; signOut(auth).catch(() => {}); }
+        if (!signedOutForBan) {
+          signedOutForBan = true;
+          // Сигнал для других onAuthStateChanged-слушателей на странице (напр. на главной),
+          // которые при user=null делают редирект — чтобы они его не делали именно в этом случае
+          // и не сносили только что показанный экран бана.
+          window.__antvizBanSignOut = true;
+          signOut(auth).catch(() => {});
+        }
 
         const style = document.createElement('style');
         style.textContent = `
@@ -216,6 +223,7 @@
       if (!bo) return;
       bo.remove(); bo = null;
       signedOutForBan = false;
+      window.__antvizBanSignOut = false;
       if (!mo) document.body.style.overflow = '';
     }
   } catch(e) {}

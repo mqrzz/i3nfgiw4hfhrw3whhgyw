@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Баны — Antviz Admin</title>
+<link rel="icon" href="../img/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f2f4f7;overflow:hidden}
+:root{
+  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
+  --dark:#191b1e;--dark2:#2b2f33;
+  --red:#e8634f;--warn:#f59e0b;--info:#3b82f6;
+  --font:'Geologica','Inter',sans-serif;
+  --sw:256px;--th:68px;
+}
+body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoothing:antialiased}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+/* LOADING */
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.35)}
+
+/* SIDEBAR */
+.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:200}
+.sb-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07)}
+.lm{width:34px;height:34px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lm svg{width:18px;height:18px;fill:var(--dark)}
+.ln{font-weight:500;font-size:.95rem;color:#fff;letter-spacing:-.02em}
+.lb{margin-left:auto;font-size:.58rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;background:rgba(232,99,79,.15);color:var(--red);border:1px solid rgba(232,99,79,.25);padding:.15rem .5rem;border-radius:7px}
+.sb-nav{flex:1;padding:14px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.ns{font-size:.6rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.25);padding:14px 10px 5px;margin-top:6px}
+.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;text-decoration:none;color:rgba(255,255,255,.45);font-size:.85rem;font-weight:300;transition:background .12s,color .12s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
+.ni:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
+.ni.active{background:rgba(30,222,123,.12);color:var(--green)}
+.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nb{position:absolute;right:10px;background:var(--red);color:#fff;font-size:.58rem;font-weight:500;min-width:17px;height:17px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
+
+/* TOPBAR */
+.tb{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100}
+.tb-l{display:flex;align-items:center;gap:16px}
+.tb-title{font-weight:500;font-size:1rem;letter-spacing:-.02em}
+.tb-stats{display:flex;gap:6px}
+.ts{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.3rem .85rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
+.ts strong{font-weight:500;color:var(--text)}
+.tab-row{display:flex;gap:5px}
+.tab{background:none;border:1.5px solid var(--border);border-radius:10px;padding:.35rem .9rem;font-family:var(--font);font-size:.8rem;font-weight:300;color:var(--muted);cursor:pointer;transition:all .12s}
+.tab:hover{border-color:var(--border2);color:var(--text)}
+.tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
+
+/* WORKSPACE: list + detail only */
+.ws{display:flex;position:fixed;top:var(--th);left:var(--sw);right:0;bottom:0}
+
+/* COL LIST */
+.cl{width:300px;flex-shrink:0;border-right:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;overflow:hidden}
+.cl-head{padding:16px 14px 12px;border-bottom:1px solid var(--border)}
+.sb-box{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:.55rem .9rem;transition:border-color .15s}
+.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.sb-box svg{width:14px;height:14px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.84rem;font-weight:300;color:var(--text);width:100%}
+.ol{flex:1;overflow-y:auto;padding:10px}
+.or{padding:14px 16px;border-radius:18px;cursor:pointer;transition:background .1s;border:1.5px solid transparent;margin-bottom:6px;animation:fadeIn .15s ease}
+.or:hover{background:var(--bg2)}
+.or.sel{background:rgba(30,222,123,.06);border-color:rgba(30,222,123,.3)}
+.or-h{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.or-id{font-size:.73rem;font-weight:500;color:var(--green-d);letter-spacing:.02em}
+.or-name{font-size:.88rem;font-weight:400;color:var(--text);margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.or-email{font-size:.76rem;color:var(--muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.or-f{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.es{padding:48px 20px;text-align:center;color:var(--muted);font-size:.84rem;display:flex;flex-direction:column;gap:10px;align-items:center}
+
+/* COL DETAIL */
+.cd{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg3)}
+.de{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:var(--muted)}
+.de-icon{font-size:3rem}
+.dw{flex:1;overflow-y:auto;padding:32px 36px}
+
+/* HERO */
+.hero{background:var(--dark);border-radius:32px;padding:36px 40px;margin-bottom:24px}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px}
+.hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--green);margin-bottom:8px}
+.hero-num{font-size:2rem;font-weight:500;letter-spacing:-.04em;color:#fff}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hc{background:rgba(255,255,255,.07);border-radius:18px;padding:18px 22px}
+.hc-l{font-size:.65rem;text-transform:uppercase;letter-spacing:.09em;color:rgba(255,255,255,.3);margin-bottom:6px;font-weight:500}
+.hc-v{font-size:1rem;color:rgba(255,255,255,.85);font-weight:300}
+.hc-v.green{color:var(--green);font-weight:500;font-size:1.15rem}
+
+/* SECTION CARDS */
+.sec{background:var(--bg);border:1.5px solid var(--border);border-radius:28px;margin-bottom:16px;overflow:visible}
+.sec-h{padding:22px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sec-title{font-weight:500;font-size:1rem;letter-spacing:-.02em;color:var(--text)}
+.sec-b{padding:24px 28px}
+
+/* STATUS */
+.srow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.sbtn{background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:.5rem 1rem;font-family:var(--font);font-size:.82rem;font-weight:300;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap}
+.sbtn:hover{border-color:var(--border2);color:var(--text)}
+.sbtn.cur{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
+.sbtn.s0.cur{background:var(--muted);border-color:var(--muted)}
+.sbtn.s1.cur{background:var(--warn);border-color:var(--warn);color:#000}
+.sbtn.s2.cur{background:var(--info);border-color:var(--info)}
+.sbtn.s3.cur{background:#7c3aed;border-color:#7c3aed}
+.sbtn.s4.cur{background:var(--red);border-color:var(--red)}
+.sbtn.s5.cur{background:var(--green-d);border-color:var(--green-d)}
+
+/* PAY */
+.pay-row{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:18px;background:var(--bg2);cursor:pointer;transition:background .12s;border:1.5px solid var(--border);margin-bottom:16px}
+.pay-row:hover{background:var(--border)}
+.pay-row.paid{background:rgba(30,222,123,.07);border-color:rgba(30,222,123,.3)}
+.pay-pill{font-size:.75rem;font-weight:500;padding:.3rem .9rem;border-radius:10px}
+.pay-yes{background:rgba(30,222,123,.15);color:var(--green-d)}
+.pay-no{background:rgba(232,99,79,.1);color:var(--red)}
+.pay-lbl{font-size:.86rem;color:var(--muted)}
+
+/* INFO GRID */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ic{background:var(--bg2);border-radius:18px;padding:18px 20px}
+.ic-l{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:500}
+.ic-v{font-size:.95rem;color:var(--text);font-weight:300}
+
+/* SITE FIELDS */
+.sf{display:flex;flex-direction:column;gap:14px}
+.sf-row{display:flex;flex-direction:column;gap:6px}
+.sf-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.si{background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.si:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+
+/* SUPPORT */
+.sup{background:rgba(30,222,123,.06);border:1.5px solid rgba(30,222,123,.2);border-radius:20px;padding:22px 24px}
+.sup-t{font-weight:500;font-size:.95rem;color:var(--green-d);margin-bottom:10px}
+
+/* ATTACH */
+.ag{display:flex;flex-wrap:wrap;gap:10px}
+.at{width:80px;height:80px;object-fit:cover;border-radius:14px;cursor:pointer;transition:opacity .15s;border:1.5px solid var(--border)}
+.at:hover{opacity:.75}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:.22rem .7rem;border-radius:8px;font-size:.7rem;font-weight:500;white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.b0{background:#f2f4f7;color:var(--muted)}.b1{background:rgba(245,158,11,.1);color:var(--warn)}.b2{background:rgba(59,130,246,.1);color:var(--info)}.b3{background:rgba(139,92,246,.1);color:#7c3aed}.b4{background:rgba(245,158,11,.1);color:var(--warn)}.b5{background:rgba(30,222,123,.12);color:var(--green-d)}.b6{background:rgba(245,158,11,.12);color:#b45309}.b-pending{background:rgba(148,163,184,.18);color:#64748b}
+.tag{display:inline-block;padding:.22rem .7rem;border-radius:50px;font-size:.72rem;font-weight:500}
+.tag-blue{background:rgba(59,130,246,.1);color:var(--info)}.tag-green{background:rgba(30,222,123,.12);color:var(--green-d)}.tag-purple{background:rgba(139,92,246,.1);color:#7c3aed}.tag-warn{background:rgba(245,158,11,.1);color:var(--warn)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-weight:500;font-size:.84rem;border:none;border-radius:12px;padding:.55rem 1.1rem;cursor:pointer;transition:background .1s,transform .1s;text-decoration:none;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:var(--dark2)}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--muted)}.btn-outline:hover{border-color:var(--text);color:var(--text)}
+.btn-danger{background:rgba(232,99,79,.08);color:var(--red);border:1px solid rgba(232,99,79,.2)}.btn-danger:hover{background:rgba(232,99,79,.15)}
+.btn-blue{background:rgba(59,130,246,.1);color:var(--info);border:1px solid rgba(59,130,246,.2)}.btn-blue:hover{background:rgba(59,130,246,.18)}
+.btn-sm{padding:.4rem .9rem;font-size:.8rem;border-radius:10px}
+.btn-xs{padding:.25rem .65rem;font-size:.72rem;border-radius:8px}
+
+/* INPUTS */
+.inp,.sel,.textarea{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s}
+.inp:focus,.sel:focus,.textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.textarea{resize:vertical;min-height:80px;line-height:1.5}
+
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.lightbox.show{opacity:1;pointer-events:all}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:16px;object-fit:contain}
+.lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast.show{opacity:1;transform:none}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--warn);color:#fff}
+
+/* PROMPT MODAL — заменяет браузерные prompt()/confirm() для возвратов */
+.pm-ov{position:fixed;inset:0;z-index:2000;background:rgba(25,27,30,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:20px}
+.pm-ov.show{opacity:1;pointer-events:all}
+.pm-card{background:var(--bg);border-radius:28px;padding:28px 28px 24px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.25);transform:translateY(8px) scale(.98);transition:transform .15s}
+.pm-ov.show .pm-card{transform:none}
+.pm-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.pm-icon svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.pm-title{font-weight:500;font-size:1.02rem;letter-spacing:-.02em;color:var(--text);margin-bottom:6px}
+.pm-sub{font-size:.83rem;color:var(--muted);font-weight:300;line-height:1.5;margin-bottom:18px}
+.pm-field{margin-bottom:20px}
+.pm-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;display:block;margin-bottom:8px}
+.pm-input{background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%;resize:vertical}
+.pm-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.pm-actions{display:flex;gap:10px}
+.pm-actions .btn{flex:1;justify-content:center}
+
+/* SWITCH — тумблер показа кнопки на экране бана */
+.sw{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw-track{position:absolute;inset:0;background:var(--border2);border-radius:999px;cursor:pointer;transition:background .15s}
+.sw-track::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+.sw-track{background:var(--green)}
+.sw input:checked+.sw-track::before{transform:translateX(18px)}
+</style>
+</head>
+<body>
+
+<div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
+<div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lb-x" onclick="event.stopPropagation();closeLightbox()">✕</button><img id="lightboxImg" src="" alt=""/></div>
+<div class="pm-ov" id="pmOv" onclick="if(event.target===this)closePromptModal()">
+  <div class="pm-card" id="pmCard">
+    <div class="pm-icon" id="pmIcon"></div>
+    <div class="pm-title" id="pmTitle"></div>
+    <div class="pm-sub" id="pmSub"></div>
+    <div class="pm-field" id="pmFieldWrap"><span class="pm-lbl" id="pmLbl"></span><input class="pm-input" id="pmInput"/></div>
+    <div class="pm-actions">
+      <button class="btn btn-outline" onclick="closePromptModal()">Отмена</button>
+      <button class="btn" id="pmConfirmBtn">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sb">
+  <a href="/admin" class="sb-logo">
+    <div class="lm"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
+    <span class="ln">Antviz</span><span class="lb">Admin</span>
+  </a>
+  <nav class="sb-nav">
+    <span class="ns">Основное</span>
+    <a href="/admin" class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Дашборд</a>
+    <a href="/admin/orders" class="ni"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nb" id="navBadgeOrders" style="display:none"></span></a>
+    <span class="ns">Клиенты</span>
+    <a href="/admin/tickets" class="ni"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nb" id="navBadgeTickets" style="display:none"></span></a>
+    <a href="/admin/chats" class="ni"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чаты<span class="nb" id="navBadgeChats" style="display:none"></span></a>
+    <a href="/admin/bans" class="ni active"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>Баны</a>
+    <a href="/admin/promos" class="ni"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
+    <span class="ns">Система</span>
+    <a href="/admin/reviews" class="ni"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
+  </nav>
+  <div class="sb-foot">
+    <button class="ni" onclick="doLogout()" style="color:rgba(232,99,79,.8)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="tb" id="appTopbar" style="display:none">
+  <div class="tb-l">
+    <span class="tb-title">Баны</span>
+    <div class="tb-stats">
+      <div class="ts">Забанено сейчас: <strong id="tActive">—</strong></div>
+      <div class="ts">Навсегда: <strong id="tPerm">—</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- WORKSPACE -->
+<div class="ws" id="appWrap" style="display:none">
+
+  <!-- LIST -->
+  <div class="cl">
+    <div class="cl-head">
+      <div class="sb-box">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input id="searchInp" type="text" placeholder="Поиск по email или имени..." oninput="renderList()"/>
+      </div>
+    </div>
+    <div class="ol" id="orderList">
+      <div class="es"><span style="font-size:2rem">🚫</span>Загрузка...</div>
+    </div>
+  </div>
+
+  <!-- DETAIL -->
+  <div class="cd">
+    <div class="de" id="detailEmpty">
+      <div class="de-icon">👆</div>
+      <div style="font-size:.9rem">Найдите пользователя слева или выберите из списка забаненных</div>
+    </div>
+    <div class="dw" id="detailWrap" style="display:none">
+
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-top">
+          <div>
+            <div class="hero-eyebrow">Пользователь</div>
+            <div class="hero-num" id="dId">—</div>
+          </div>
+          <div id="dBadge"></div>
+        </div>
+        <div class="hero-grid" id="dHeroInfo"></div>
+      </div>
+
+      <!-- CURRENT BAN -->
+      <div class="sec" id="curBanSec" style="display:none;border-color:rgba(232,99,79,.2)">
+        <div class="sec-h" style="background:rgba(232,99,79,.04)"><span class="sec-title" style="color:var(--red)">Активный бан</span></div>
+        <div class="sec-b">
+          <div class="sf" id="curBanInfo"></div>
+          <div style="margin-top:16px"><button class="btn btn-green" onclick="unbanUser()">Разбанить</button></div>
+        </div>
+      </div>
+
+      <!-- BAN FORM -->
+      <div class="sec" id="banFormSec">
+        <div class="sec-h"><span class="sec-title" id="banFormTitle">Забанить пользователя</span></div>
+        <div class="sec-b">
+          <div class="sf">
+            <div class="sf-row"><div class="sf-lbl">Причина</div><input class="si" id="banReason" type="text" placeholder="Например: спам в чате поддержки"/></div>
+            <div class="sf-row">
+              <div class="sf-lbl">Срок</div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-outline btn-sm" onclick="setBanDuration(1)">1 день</button>
+                <button class="btn btn-outline btn-sm" onclick="setBanDuration(3)">3 дня</button>
+                <button class="btn btn-outline btn-sm" onclick="setBanDuration(7)">7 дней</button>
+                <button class="btn btn-outline btn-sm" onclick="setBanDuration(30)">30 дней</button>
+                <button class="btn btn-outline btn-sm" id="banPermBtn" onclick="setBanDuration(null)">Навсегда</button>
+              </div>
+            </div>
+            <div class="sf-row"><div class="sf-lbl">Забанен до</div><input class="si" id="banUntil" type="date"/><span style="font-size:.72rem;color:var(--muted);font-weight:300;margin-top:6px;display:block" id="banUntilHint">Пусто = навсегда</span></div>
+            <div class="sf-row" style="align-items:center;flex-direction:row;justify-content:space-between">
+              <div class="sf-lbl" style="margin:0">Показывать кнопку на экране бана</div>
+              <label class="sw"><input type="checkbox" id="banShowBtn" checked onchange="toggleBanBtnUrl()"/><span class="sw-track"></span></label>
+            </div>
+            <div class="sf-row" id="banBtnUrlRow"><div class="sf-lbl">Текст и ссылка кнопки</div>
+              <input class="si" id="banBtnLabel" type="text" placeholder="Написать в поддержку" style="margin-bottom:8px"/>
+              <input class="si" id="banBtnUrl" type="text" placeholder="https://t.me/antviz_support"/>
+            </div>
+          </div>
+          <div style="margin-top:18px"><button class="btn btn-danger" onclick="submitBan()">Забанить</button></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp, Timestamp, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+
+function openPromptModal({icon,iconBg,iconColor,title,sub,confirmLabel,confirmClass,onConfirm}){
+  document.getElementById('pmIcon').style.background=iconBg;
+  document.getElementById('pmIcon').style.color=iconColor;
+  document.getElementById('pmIcon').innerHTML='<svg viewBox="0 0 24 24">'+icon+'</svg>';
+  document.getElementById('pmTitle').textContent=title;
+  document.getElementById('pmSub').textContent=sub||'';
+  document.getElementById('pmFieldWrap').style.display='none';
+  const btn=document.getElementById('pmConfirmBtn');
+  btn.className='btn '+(confirmClass||'btn-dark');
+  btn.textContent=confirmLabel||'Подтвердить';
+  btn.onclick=()=>{closePromptModal();onConfirm();};
+  document.getElementById('pmOv').classList.add('show');
+}
+window.closePromptModal=()=>document.getElementById('pmOv').classList.remove('show');
+const ICO_UNBAN='<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>';
+
+let allUsers=[];        // все пользователи из коллекции users (для поиска по email/имени)
+let allBans=new Map();  // uid -> ban data, живой снапшот коллекции bans
+let selUser=null;       // сейчас выбранный пользователь {id,email,displayName}
+
+function isBanActive(ban){
+  if(!ban)return false;
+  if(!ban.until)return true; // навсегда
+  const until=ban.until.toDate?ban.until.toDate():new Date(ban.until);
+  return until.getTime()>Date.now();
+}
+
+function updateStats(){
+  let active=0,perm=0;
+  allBans.forEach(b=>{if(isBanActive(b)){active++;if(!b.until)perm++;}});
+  document.getElementById('tActive').textContent=active;
+  document.getElementById('tPerm').textContent=perm;
+}
+
+window.renderList=function(){
+  const q=(document.getElementById('searchInp').value||'').trim().toLowerCase();
+  const list=document.getElementById('orderList');
+  if(!q){
+    // без запроса — показываем текущих забаненных, это самое полезное дефолтное состояние
+    const banned=[...allBans.entries()].filter(([,b])=>isBanActive(b));
+    if(!banned.length){list.innerHTML='<div class="es"><span style="font-size:2rem">✅</span>Сейчас никто не забанен</div>';return;}
+    list.innerHTML=banned.map(([uid,b])=>{
+      const u=allUsers.find(x=>x.id===uid);
+      const label=u?(u.displayName||u.name||u.email||uid):uid;
+      const email=u?.email||'';
+      return `<div class="or ${selUser?.id===uid?'sel':''}" onclick="selectUserById('${uid}')">
+        <div class="or-h"><span class="badge" style="background:rgba(232,99,79,.12);color:var(--red)">${b.until?'до '+fmtDate(b.until):'навсегда'}</span></div>
+        <div class="or-name">${esc(label)}</div>
+        <div class="or-email">${esc(email)}</div>
+      </div>`;
+    }).join('');
+    return;
+  }
+  const filtered=allUsers.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.displayName||u.name||'').toLowerCase().includes(q));
+  if(!filtered.length){list.innerHTML='<div class="es"><span style="font-size:2rem">🔍</span>Никого не найдено</div>';return;}
+  list.innerHTML=filtered.slice(0,50).map(u=>{
+    const b=allBans.get(u.id);
+    const banned=isBanActive(b);
+    return `<div class="or ${selUser?.id===u.id?'sel':''}" onclick="selectUserById('${u.id}')">
+      ${banned?'<div class="or-h"><span class="badge" style="background:rgba(232,99,79,.12);color:var(--red)">забанен</span></div>':''}
+      <div class="or-name">${esc(u.displayName||u.name||'Без имени')}</div>
+      <div class="or-email">${esc(u.email||u.id)}</div>
+    </div>`;
+  }).join('');
+};
+
+window.selectUserById=function(uid){
+  const u=allUsers.find(x=>x.id===uid)||{id:uid,email:uid,displayName:''};
+  selUser=u;
+  document.getElementById('detailEmpty').style.display='none';
+  document.getElementById('detailWrap').style.display='block';
+  document.getElementById('dId').textContent=u.displayName||u.name||u.email||uid;
+  document.getElementById('dHeroInfo').innerHTML=`
+    <div class="hc"><div class="hc-l">Email</div><div class="hc-v">${esc(u.email||'—')}</div></div>
+    <div class="hc"><div class="hc-l">UID</div><div class="hc-v" style="font-size:.72rem;opacity:.6">${esc(uid)}</div></div>`;
+  const ban=allBans.get(uid);
+  const active=isBanActive(ban);
+  document.getElementById('dBadge').innerHTML=active?'<span class="badge" style="background:rgba(232,99,79,.12);color:var(--red)">🚫 Забанен</span>':'<span class="badge" style="background:rgba(30,222,123,.12);color:var(--green-d)">Активен</span>';
+  const curSec=document.getElementById('curBanSec');
+  if(active){
+    curSec.style.display='block';
+    document.getElementById('curBanInfo').innerHTML=`
+      <div class="sf-row"><div class="sf-lbl">Причина</div><div style="font-size:.88rem;font-weight:300">${esc(ban.reason||'—')}</div></div>
+      <div class="sf-row"><div class="sf-lbl">Срок</div><div style="font-size:.88rem;font-weight:300">${ban.until?('до '+fmtDate(ban.until)):'навсегда'}</div></div>
+      <div class="sf-row"><div class="sf-lbl">Кто забанил</div><div style="font-size:.88rem;font-weight:300">${esc(ban.bannedBy||'—')}</div></div>`;
+    document.getElementById('banFormTitle').textContent='Изменить бан';
+  }else{
+    curSec.style.display='none';
+    document.getElementById('banFormTitle').textContent='Забанить пользователя';
+  }
+  // сброс формы
+  document.getElementById('banReason').value=active?(ban.reason||''):'';
+  document.getElementById('banUntil').value='';
+  document.getElementById('banShowBtn').checked=active?(ban.showButton!==false):true;
+  document.getElementById('banBtnLabel').value=active?(ban.btnLabel||'Написать в поддержку'):'Написать в поддержку';
+  document.getElementById('banBtnUrl').value=active?(ban.btnUrl||''):'';
+  toggleBanBtnUrl();
+};
+
+window.setBanDuration=function(days){
+  const inp=document.getElementById('banUntil');
+  if(days===null){inp.value='';document.getElementById('banUntilHint').textContent='Навсегда — до ручного разбана';return;}
+  const d=new Date();d.setDate(d.getDate()+days);
+  inp.value=d.toISOString().split('T')[0];
+  document.getElementById('banUntilHint').textContent='Пусто = навсегда';
+};
+
+window.toggleBanBtnUrl=function(){
+  document.getElementById('banBtnUrlRow').style.display=document.getElementById('banShowBtn').checked?'block':'none';
+};
+
+window.submitBan=async function(){
+  if(!selUser)return;
+  const reason=document.getElementById('banReason').value.trim();
+  if(!reason){toast('Укажите причину бана','error');return;}
+  const untilStr=document.getElementById('banUntil').value;
+  const until=untilStr?Timestamp.fromDate(new Date(untilStr+'T23:59:59')):null;
+  const showButton=document.getElementById('banShowBtn').checked;
+  const btnLabel=document.getElementById('banBtnLabel').value.trim()||'Написать в поддержку';
+  const btnUrl=document.getElementById('banBtnUrl').value.trim();
+  if(showButton&&!btnUrl){toast('Укажите ссылку для кнопки или выключите её','error');return;}
+  try{
+    await setDoc(doc(db,'bans',selUser.id),{
+      reason,until,showButton,btnLabel,btnUrl,
+      bannedAt:serverTimestamp(),bannedBy:auth.currentUser?.email||'admin'
+    });
+    toast('Пользователь забанен ✓','success');
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.unbanUser=async function(){
+  if(!selUser)return;
+  const u=selUser;
+  openPromptModal({
+    icon:ICO_UNBAN,iconBg:'rgba(30,222,123,.12)',iconColor:'var(--green-d)',
+    title:'Снять бан?',sub:'Пользователь сразу получит доступ обратно.',
+    confirmLabel:'Разбанить',confirmClass:'btn-green',
+    onConfirm:async()=>{
+      try{await deleteDoc(doc(db,'bans',u.id));toast('Разбанен ✓','success');}
+      catch(e){toast('Ошибка: '+e.message,'error');}
+    }
+  });
+};
+
+window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  let isAdmin=user.email===ADMIN_EMAIL;
+  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
+  document.getElementById('loadingScreen').style.display='none';
+  if(!isAdmin){window.location.href='/';return;}
+  document.getElementById('appWrap').style.display='flex';
+  document.getElementById('appTopbar').style.display='flex';
+  try{
+    const snap=await getDocs(collection(db,'users'));
+    allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
+  }catch(e){toast('Не удалось загрузить пользователей: '+e.message,'error');}
+  onSnapshot(collection(db,'bans'),snap=>{
+    allBans=new Map(snap.docs.map(d=>[d.id,d.data()]));
+    updateStats();renderList();
+    if(selUser)selectUserById(selUser.id);
+  });
+});
+</script>
+<script src="../GEOBLOCK.js"></script>
+<script src="../maintenance.js"></script>
+</body>
+</html>

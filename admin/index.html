@@ -160,6 +160,19 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
 .form-textarea{resize:vertical;min-height:80px;line-height:1.5}
 .form-select{cursor:pointer}
+.recipient-box{border:1px solid var(--border);border-radius:14px;background:var(--bg2);max-height:230px;overflow-y:auto}
+.recipient-item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border)}
+.recipient-item:last-child{border-bottom:none}
+.recipient-item:hover{background:var(--bg3)}
+.recipient-item.selected{background:rgba(30,222,123,.1)}
+.recipient-avatar{width:32px;height:32px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;flex-shrink:0;text-transform:uppercase}
+.recipient-avatar.all{background:var(--green);color:var(--dark);font-size:.85rem}
+.recipient-text{min-width:0;flex:1}
+.recipient-name{font-size:.83rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipient-email{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipient-check{margin-left:auto;color:var(--green-d);flex-shrink:0;opacity:0;font-size:.9rem}
+.recipient-item.selected .recipient-check{opacity:1}
+.recipient-empty{padding:22px 12px;text-align:center;color:var(--muted);font-size:.8rem}
 .modal-footer{display:flex;gap:8px;margin-top:22px}
 .modal-footer .btn{flex:1;justify-content:center}
 
@@ -379,7 +392,11 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 <div class="modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
   <div class="modal">
     <div class="modal-title">Уведомление <button class="modal-close" onclick="closeNotifModal()">✕</button></div>
-    <div class="form-group"><label class="form-label">Получатель</label><input class="form-input" id="notifSearch" type="text" placeholder="Поиск по имени или email..." style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/><select class="form-select" id="notifTarget" size="6" style="height:auto;min-height:44px;max-height:180px;overflow-y:auto"><option value="all">Всем пользователям</option></select></div>
+    <div class="form-group">
+      <label class="form-label">Получатель</label>
+      <input class="form-input" id="notifSearch" type="text" placeholder="Поиск по имени или email..." style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/>
+      <div class="recipient-box" id="notifTargetList"></div>
+    </div>
     <div class="form-group"><label class="form-label">Заголовок</label><input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
     <div class="form-group"><label class="form-label">Текст</label><textarea class="form-textarea" id="notifText" placeholder="Текст..."></textarea></div>
     <div class="modal-footer">
@@ -416,21 +433,50 @@ window.toggleMaintenance=async()=>{
   toast(next?'Сайт закрыт 🔧':'Сайт открыт ✅',next?'warn':'success');
 };
 
+// Пользователь считается удалившим аккаунт, если в его документе стоит
+// один из этих флагов — таких получателей исключаем из рассылки.
+function isDeletedAccount(data){
+  return data.deleted===true||data.isDeleted===true||data.accountDeleted===true||
+    data.disabled===true||(typeof data.status==='string'&&data.status.toLowerCase()==='deleted');
+}
+
 let _allUsers=[];
+let _notifTarget='all';
+
 function renderUserOptions(filter=''){
-  const sel=document.getElementById('notifTarget');
+  const box=document.getElementById('notifTargetList');
   const q=filter.toLowerCase();
   const filtered=_allUsers.filter(u=>!q||u.label.toLowerCase().includes(q));
-  sel.innerHTML='<option value="all">Всем пользователям</option>';
-  filtered.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${esc(u.label)}</option>`;});
-  if(filtered.length===1) sel.selectedIndex=1;
-  else sel.selectedIndex=0;
+  let html=`<div class="recipient-item ${_notifTarget==='all'?'selected':''}" onclick="selectNotifTarget('all')">
+    <div class="recipient-avatar all">✦</div>
+    <div class="recipient-text"><div class="recipient-name">Всем пользователям</div><div class="recipient-email">${_allUsers.length} активных получателей</div></div>
+    <span class="recipient-check">✓</span>
+  </div>`;
+  if(q&&!filtered.length){
+    html+='<div class="recipient-empty">Никого не найдено</div>';
+  }else{
+    html+=filtered.map(u=>`<div class="recipient-item ${_notifTarget===u.id?'selected':''}" onclick="selectNotifTarget('${u.id}')">
+      <div class="recipient-avatar">${esc(u.initial)}</div>
+      <div class="recipient-text"><div class="recipient-name">${esc(u.name)}</div><div class="recipient-email">${esc(u.email||'—')}</div></div>
+      <span class="recipient-check">✓</span>
+    </div>`).join('');
+  }
+  box.innerHTML=html;
 }
+window.selectNotifTarget=function(id){
+  _notifTarget=id;
+  renderUserOptions(document.getElementById('notifSearch').value);
+};
 window.filterNotifTarget=function(val){renderUserOptions(val);}
 window.openNotifModal=async()=>{
   try{
     const snap=await getDocs(collection(db,'users'));
-    _allUsers=snap.docs.map(d=>{const data=d.data();return{id:d.id,label:(data.displayName||data.name||d.id)+(data.email?' · '+data.email:'')};});
+    _allUsers=snap.docs.filter(d=>!isDeletedAccount(d.data())).map(d=>{
+      const data=d.data();
+      const name=data.displayName||data.name||data.email||d.id;
+      return{id:d.id,name,email:data.email||'',initial:(name||'?').trim().charAt(0)||'?',label:name+' '+(data.email||'')};
+    });
+    _notifTarget='all';
     document.getElementById('notifSearch').value='';
     renderUserOptions('');
     document.getElementById('notifTitle').value='';
@@ -441,16 +487,15 @@ window.openNotifModal=async()=>{
 };
 window.closeNotifModal=()=>document.getElementById('notifModal').classList.remove('show');
 window.sendNotif=async()=>{
-  const target=document.getElementById('notifTarget').value;
+  const target=_notifTarget;
   const title=document.getElementById('notifTitle').value.trim();
   const text=document.getElementById('notifText').value.trim();
   if(!title||!text){toast('Заполните все поля','error');return;}
   try{
     if(target==='all'){
-      const snp=await getDocs(collection(db,'users'));
-      if(!snp.docs.length){toast('Нет пользователей','error');return;}
-      await Promise.all(snp.docs.map(d=>addDoc(collection(db,'notifications',d.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
-      toast(`Отправлено ${snp.docs.length} пользователям ✓`,'success');
+      if(!_allUsers.length){toast('Нет активных пользователей','error');return;}
+      await Promise.all(_allUsers.map(u=>addDoc(collection(db,'notifications',u.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
+      toast(`Отправлено ${_allUsers.length} пользователям ✓`,'success');
     }else{
       await addDoc(collection(db,'notifications',target,'items'),{title,text,read:false,createdAt:serverTimestamp()});
       toast('Отправлено ✓','success');

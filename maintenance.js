@@ -89,6 +89,11 @@
       currentUser = user;
       authReady = true;
 
+      // signOut() внутри renderBan() сам вызывает этот колбэк с user=null.
+      // Если это тот самый вынужденный разлогин из-за бана — не сбрасываем
+      // banData, иначе экран бана появляется и тут же исчезает.
+      if (!user && signedOutForBan) { banChecked = true; render(); return; }
+
       if (!user || user.email === ADMIN) { banData = null; banChecked = true; render(); return; }
 
       const cached = readBanCache(user.uid);

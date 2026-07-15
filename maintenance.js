@@ -2,7 +2,7 @@
   try {
     const { initializeApp, getApps, getApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
     const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const { getAuth, onAuthStateChanged, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
+    const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
 
     const firebaseConfig = {
       apiKey: "AIzaSyBLGr2hpmnmj1Mxf9072m8vQXJkLUN6YyY",
@@ -21,7 +21,6 @@
     let mo = null, bo = null;
     let currentUser = null, authReady = false;
     let maintOn = null, banData = null, banChecked = false;
-    let signedOutForBan = false;
 
     // ===== Кэш в sessionStorage — общий принцип для обеих проверок:
     // тех.работы почти всегда выключены, бан почти всегда отсутствует,
@@ -88,11 +87,6 @@
     onAuthStateChanged(auth, async user => {
       currentUser = user;
       authReady = true;
-
-      // signOut() внутри renderBan() сам вызывает этот колбэк с user=null.
-      // Если это тот самый вынужденный разлогин из-за бана — не сбрасываем
-      // banData, иначе экран бана появляется и тут же исчезает.
-      if (!user && signedOutForBan) { banChecked = true; render(); return; }
 
       if (!user || user.email === ADMIN) { banData = null; banChecked = true; render(); return; }
 
@@ -168,14 +162,11 @@
     function renderBan() {
       const banned = isBanActive(banData);
       if (banned && !bo) {
-        if (!signedOutForBan) {
-          signedOutForBan = true;
-          // Сигнал для других onAuthStateChanged-слушателей на странице (напр. на главной),
-          // которые при user=null делают редирект — чтобы они его не делали именно в этом случае
-          // и не сносили только что показанный экран бана.
-          window.__antvizBanSignOut = true;
-          signOut(auth).catch(() => {});
-        }
+        // Раньше тут был signOut(auth) при показе бана — но это триггерило
+        // auth-listener'ы на других страницах (у некоторых при user=null стоит
+        // редирект на "/"), и редирект сносил только что показанный оверлей
+        // раньше, чем пользователь успевал его увидеть. Сам оверлей ниже уже
+        // полностью блокирует страницу — signOut для этого не нужен.
 
         const style = document.createElement('style');
         style.textContent = `
@@ -222,8 +213,6 @@
     function removeBan() {
       if (!bo) return;
       bo.remove(); bo = null;
-      signedOutForBan = false;
-      window.__antvizBanSignOut = false;
       if (!mo) document.body.style.overflow = '';
     }
   } catch(e) {}

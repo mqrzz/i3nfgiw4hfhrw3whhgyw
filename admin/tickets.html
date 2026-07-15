@@ -238,6 +238,7 @@ function renderTickets(){
       ${t.orderId
         ?`<a class="tc-order" href="/admin/orders?id=${t.orderId}"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(t.orderDomain||'№ '+t.orderId.slice(0,8).toUpperCase())}${t.orderSiteType?' · '+esc(t.orderSiteType):''}</a>`
         :`<span class="tc-no-order">⚠ Заказ не привязан</span>`}
+      ${t.description?`<div class="tc-desc">${esc(t.description)}</div>`:''}
       ${t.adminReply?`<div class="tc-reply-box">💬 Ваш ответ: ${esc(t.adminReply)}</div>`:''}
       ${t.images&&t.images.length?`<div class="tc-images">${t.images.map(src=>`<img class="tc-img" src="${src}" alt="" onclick="window.open('${src}','_blank')"/>`).join('')}</div>`:''}
       <textarea class="tc-inp" id="tr_${t.id}" rows="3" placeholder="Написать ответ клиенту...">${esc(t.adminReply||'')}</textarea>

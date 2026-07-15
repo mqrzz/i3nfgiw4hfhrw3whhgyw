@@ -144,13 +144,18 @@
           background:radial-gradient(circle,rgba(30,222,123,.35),rgba(30,222,123,0) 70%);
           filter:blur(10px);pointer-events:none;
         }
-        #maint-art { position:relative;width:132px;height:132px;margin:0 auto 32px; }
-        #maint-art svg { width:100%;height:100%;display:block; }
+        #maint-art {
+          position:relative;width:104px;height:104px;margin:0 auto 32px;border-radius:30px;
+          background:linear-gradient(135deg,#4eea94,#149955);
+          display:flex;align-items:center;justify-content:center;
+          box-shadow:0 20px 40px -14px rgba(20,153,85,.55);
+        }
+        #maint-art svg { width:50px;height:50px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round; }
         #maint-label { position:relative;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#149955;margin-bottom:18px; }
         #maint-title { position:relative;font-size:clamp(34px,5.5vw,52px);font-weight:500;letter-spacing:-.04em;line-height:1.08;color:#191b1e;margin:0 0 18px; }
         #maint-title em { font-style:normal;color:#1ede7b; }
         #maint-text { position:relative;font-size:15px;color:#707a8a;font-weight:300;line-height:1.6;max-width:400px;margin:0 auto; }
-        @media(max-width:600px){ #maint-card { border-radius:32px;padding:48px 26px 44px; } #maint-art { width:104px;height:104px;margin-bottom:24px; } }
+        @media(max-width:600px){ #maint-card { border-radius:32px;padding:48px 26px 44px; } #maint-art { width:88px;height:88px;border-radius:26px;margin-bottom:24px; } #maint-art svg { width:42px;height:42px; } }
       `;
       document.head.appendChild(style);
       mo = document.createElement('div');
@@ -158,31 +163,7 @@
       mo.innerHTML = `
         <div id="maint-card">
           <div id="maint-glow"></div>
-          <div id="maint-art">
-            <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-              <defs>
-                <linearGradient id="mGradTile" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#191b1e"/><stop offset="1" stop-color="#2b2f33"/>
-                </linearGradient>
-                <linearGradient id="mGradGear" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#4eea94"/><stop offset="1" stop-color="#149955"/>
-                </linearGradient>
-                <filter id="mShadow" x="-40%" y="-40%" width="180%" height="180%">
-                  <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#191b1e" flood-opacity="0.35"/>
-                </filter>
-              </defs>
-              <rect x="8" y="8" width="144" height="144" rx="40" fill="url(#mGradTile)" filter="url(#mShadow)"/>
-              <circle cx="128" cy="34" r="4" fill="#ffffff" opacity=".18"/>
-              <circle cx="138" cy="52" r="2.5" fill="#ffffff" opacity=".14"/>
-              <circle cx="30" cy="126" r="3" fill="#1ede7b" opacity=".3"/>
-              <path d="M 77.5 58.0 L 81.9 65.2 L 81.0 67.8 L 72.9 70.5 L 72.9 70.5 L 71.7 78.9 L 69.3 80.3 L 61.4 77.2 L 61.4 77.2 L 55.0 82.8 L 52.3 82.3 L 48.2 74.9 L 48.2 74.9 L 39.8 75.1 L 38.0 73.0 L 39.7 64.7 L 39.7 64.7 L 33.0 59.4 L 33.0 56.6 L 39.7 51.3 L 39.7 51.3 L 38.0 43.0 L 39.8 40.9 L 48.2 41.1 L 48.2 41.1 L 52.3 33.7 L 55.0 33.2 L 61.4 38.8 L 61.4 38.8 L 69.3 35.7 L 71.7 37.1 L 72.9 45.5 L 72.9 45.5 L 81.0 48.2 L 81.9 50.8 L 77.5 58.0 Z"
-                fill="url(#mGradGear)"/>
-              <circle cx="57" cy="58" r="8" fill="#191b1e"/>
-              <path d="M 108.0 90.0 L 110.9 95.9 L 109.9 98.0 L 103.5 99.4 L 103.5 99.4 L 100.7 105.3 L 98.4 105.8 L 93.3 101.7 L 93.3 101.7 L 86.9 103.2 L 85.2 101.8 L 85.2 95.2 L 85.2 95.2 L 80.0 91.1 L 80.0 88.9 L 85.2 84.8 L 85.2 84.8 L 85.2 78.2 L 86.9 76.8 L 93.3 78.3 L 93.3 78.3 L 98.4 74.2 L 100.7 74.7 L 103.5 80.6 L 103.5 80.6 L 109.9 82.0 L 108.0 90.0 Z"
-                fill="#ffffff" opacity=".92"/>
-              <circle cx="96" cy="90" r="5" fill="#191b1e"/>
-            </svg>
-          </div>
+          <div id="maint-art"><svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 0 0-4.9 4.66l-5.6 5.6a1.9 1.9 0 0 0 2.7 2.7l5.6-5.6a3.6 3.6 0 0 0 4.66-4.9l-2.53 2.53-2-2z"/></svg></div>
           <div id="maint-label">Технические работы</div>
           <h1 id="maint-title">Скоро<br><em>вернёмся</em></h1>
           <p id="maint-text">Сайт временно недоступен — идут технические работы. Обычно это занимает не больше часа.</p>
@@ -225,8 +206,13 @@
             background:radial-gradient(circle,rgba(232,99,79,.32),rgba(232,99,79,0) 70%);
             filter:blur(10px);pointer-events:none;
           }
-          #ban-art { position:relative;width:132px;height:132px;margin:0 auto 32px; }
-          #ban-art svg { width:100%;height:100%;display:block; }
+          #ban-art {
+            position:relative;width:104px;height:104px;margin:0 auto 32px;border-radius:30px;
+            background:linear-gradient(135deg,#ff8a75,#e8634f);
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 20px 40px -14px rgba(232,99,79,.55);
+          }
+          #ban-art svg { width:50px;height:50px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round; }
           #ban-label { position:relative;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#e8634f;margin-bottom:18px; }
           #ban-title { position:relative;font-size:clamp(34px,5.5vw,52px);font-weight:500;letter-spacing:-.04em;line-height:1.08;color:#191b1e;margin:0 0 18px; }
           #ban-title em { font-style:normal;color:#e8634f; }
@@ -234,7 +220,7 @@
           #ban-until { position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#191b1e;font-weight:500;margin:0 0 28px;background:rgba(232,99,79,.09);border:1px solid rgba(232,99,79,.22);padding:.5rem 1rem;border-radius:12px; }
           #ban-btn { position:relative;display:inline-flex;align-items:center;gap:8px;margin-top:4px;background:#191b1e;color:#fff;text-decoration:none;font-size:14px;font-weight:500;padding:14px 30px;border-radius:15px;transition:background .15s,transform .12s,box-shadow .15s;box-shadow:0 1px 2px rgba(25,27,30,.15),0 14px 26px -12px rgba(25,27,30,.5); }
           #ban-btn:hover { background:#2b2f33;transform:translateY(-1px); }
-          @media(max-width:600px){ #ban-card { border-radius:32px;padding:48px 26px 44px; } #ban-art { width:104px;height:104px;margin-bottom:24px; } }
+          @media(max-width:600px){ #ban-card { border-radius:32px;padding:48px 26px 44px; } #ban-art { width:88px;height:88px;border-radius:26px;margin-bottom:24px; } #ban-art svg { width:42px;height:42px; } }
         `;
         document.head.appendChild(style);
 
@@ -247,30 +233,7 @@
         bo.innerHTML = `
           <div id="ban-card">
             <div id="ban-glow"></div>
-            <div id="ban-art">
-              <svg viewBox="0 0 160 160" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <linearGradient id="bGradTile" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#191b1e"/><stop offset="1" stop-color="#2b2f33"/>
-                  </linearGradient>
-                  <linearGradient id="bGradLock" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stop-color="#ff8a75"/><stop offset="1" stop-color="#e8634f"/>
-                  </linearGradient>
-                  <filter id="bShadow" x="-40%" y="-40%" width="180%" height="180%">
-                    <feDropShadow dx="0" dy="10" stdDeviation="10" flood-color="#191b1e" flood-opacity="0.35"/>
-                  </filter>
-                </defs>
-                <rect x="8" y="8" width="144" height="144" rx="40" fill="url(#bGradTile)" filter="url(#bShadow)"/>
-                <circle cx="128" cy="34" r="4" fill="#ffffff" opacity=".18"/>
-                <circle cx="138" cy="52" r="2.5" fill="#ffffff" opacity=".14"/>
-                <circle cx="30" cy="126" r="3" fill="#e8634f" opacity=".35"/>
-                <path d="M58 76 V58 A22 22 0 0 1 102 58 V76" fill="none" stroke="url(#bGradLock)" stroke-width="9" stroke-linecap="round"/>
-                <rect x="44" y="74" width="72" height="56" rx="16" fill="url(#bGradLock)"/>
-                <ellipse cx="80" cy="86" rx="26" ry="7" fill="#ffffff" opacity=".16"/>
-                <circle cx="80" cy="98" r="8" fill="#191b1e"/>
-                <path d="M76 104 L84 104 L81.5 118 L78.5 118 Z" fill="#191b1e"/>
-              </svg>
-            </div>
+            <div id="ban-art"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></div>
             <div id="ban-label">Доступ ограничен</div>
             <h1 id="ban-title">Аккаунт<br><em>заблокирован</em></h1>
             <p id="ban-text">${reason}</p>

@@ -94,20 +94,22 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .buy-price{font-size:clamp(32px,4vw,44px);font-weight:500;letter-spacing:-.04em;color:var(--ink)}
 .buy-price span{font-size:16px;font-weight:300;color:var(--ink-faint);letter-spacing:0}
 
-/* Тайлы условий — bento-сетка вместо списка. Первые три — то, что входит
-   в подписку (акцентная иконка), нижние три — уточнения (тихий текст с
-   тире, как type-feat на главной), а не равноценный список из шести пунктов. */
-.buy-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden;margin-bottom:28px}
-.buy-tile{background:var(--bg3);padding:22px 20px;display:flex;flex-direction:column;gap:7px}
-.tile-ico{width:28px;height:28px;border-radius:8px;background:var(--accent-wash);display:flex;align-items:center;justify-content:center;margin-bottom:2px}
-.tile-ico svg{width:14px;height:14px;stroke:var(--accent-d);stroke-width:1.9;fill:none}
-.buy-tile strong{font-size:.82rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
-.buy-tile span{font-size:.78rem;color:var(--ink-dim);font-weight:300;line-height:1.5}
-.buy-tile em{font-style:normal;font-size:.72rem;color:var(--accent-d);font-weight:500;margin-top:1px}
-.buy-tile.muted{background:var(--bg)}
-.buy-tile.muted strong{color:var(--ink-dim);display:flex;align-items:center;gap:7px}
-.buy-tile.muted strong::before{content:'—';color:var(--ink-faint);font-weight:300}
-.buy-tile.muted span{color:var(--ink-faint);padding-left:13px}
+/* Условия тарифа — вертикальный список строк с акцентной иконкой слева
+   (не сетка одинаковых плиток), плюс тихая строка уточнений внизу. */
+.buy-feats{display:flex;flex-direction:column;margin-bottom:24px}
+.buy-feat{display:flex;align-items:flex-start;gap:16px;padding:16px 2px;border-bottom:1px solid var(--line)}
+.buy-feat:first-child{padding-top:0}
+.buy-feat:last-child{border-bottom:none}
+.tile-ico{width:34px;height:34px;border-radius:10px;background:var(--accent-wash);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tile-ico svg{width:16px;height:16px;stroke:var(--accent-d);stroke-width:1.9;fill:none}
+.buy-feat-text{padding-top:2px}
+.buy-feat strong{font-size:.88rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
+.buy-feat span{display:block;font-size:.8rem;color:var(--ink-dim);font-weight:300;line-height:1.5;margin-top:2px}
+.buy-feat em{font-style:normal;font-size:.72rem;color:var(--accent-d);font-weight:500;margin-left:8px}
+
+.fine-print{display:flex;flex-wrap:wrap;gap:8px 18px;margin-bottom:28px}
+.fine-print span{font-size:.76rem;color:var(--ink-faint);font-weight:300;display:flex;align-items:center;gap:6px}
+.fine-print span::before{content:'';width:3px;height:3px;border-radius:50%;background:var(--ink-faint)}
 
 .buy-divider{height:1px;background:var(--line);margin-bottom:28px}
 .buy-sub-title{font-size:1rem;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
@@ -194,11 +196,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .t-reply strong{font-weight:500;color:var(--ink)}
 .t-empty{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:64px 24px;color:var(--ink-dim);font-size:.88rem;font-weight:300}
 .t-empty svg{width:28px;height:28px;stroke:var(--accent);stroke-width:1.7;fill:none}
-
-.t-gate{display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center;padding:56px 40px 60px}
-.t-gate-text strong{display:block;font-size:.98rem;font-weight:500;letter-spacing:-.01em;color:var(--ink);margin-bottom:6px}
-.t-gate-text span{display:block;font-size:.84rem;color:var(--ink-dim);font-weight:300;line-height:1.55;max-width:340px}
-.t-gate .btn{margin-top:4px}
+.t-empty .spinner{width:20px;height:20px;border-width:2px}
 
 .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:900;padding:.65rem 1.5rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -211,7 +209,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 }
 @media(max-width:860px){
   .content-grid{grid-template-columns:1fr;gap:14px}
-  .buy-tiles{grid-template-columns:1fr 1fr}
   .empty-card,.buy-card{border-radius:24px;padding:30px 26px}
   .status-strip{border-radius:24px;padding:22px 24px;gap:20px}
   .card{border-radius:24px}
@@ -226,7 +223,6 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .empty-card{flex-direction:column;align-items:flex-start;border-radius:20px;padding:26px 22px}
   .empty-card-left{gap:18px}
   .buy-card{border-radius:20px;padding:22px 20px}
-  .buy-tiles{grid-template-columns:1fr}
   .status-strip{flex-direction:column;align-items:flex-start;gap:18px}
   .status-strip-prog,.status-strip-limit,.limit-bar{width:100%}
   .ico-badge.lg{width:48px;height:48px;border-radius:15px}
@@ -315,22 +311,24 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
         </div>
       </div>
 
-      <div class="buy-tiles">
-        <div class="buy-tile">
+      <div class="buy-feats">
+        <div class="buy-feat">
           <div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M15 4l5 5-11 11H4v-5z"/></svg></div>
-          <strong>Правки и доработки</strong><span>Тексты, изображения, стили, мелкие доработки разметки</span><em>до 5 заявок / месяц</em>
+          <div class="buy-feat-text"><strong>Правки и доработки</strong><em>до 5 заявок / мес.</em><span>Тексты, изображения, стили, мелкие доработки разметки</span></div>
         </div>
-        <div class="buy-tile">
+        <div class="buy-feat">
           <div class="tile-ico"><svg viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6z"/></svg></div>
-          <strong>Приоритетный ответ</strong><span>Обрабатываются в первую очередь, обычно в течение суток</span>
+          <div class="buy-feat-text"><strong>Приоритетный ответ</strong><span>Обрабатываются в первую очередь, обычно в течение суток</span></div>
         </div>
-        <div class="buy-tile">
+        <div class="buy-feat">
           <div class="tile-ico"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="16" rx="3"/><path d="M8 3v3M16 3v3M3.5 9.5h17"/></svg></div>
-          <strong>Срок действия</strong><span>30 дней с оплаты, лимит обнуляется при продлении</span>
+          <div class="buy-feat-text"><strong>Срок действия</strong><span>30 дней с оплаты, лимит обнуляется при продлении</span></div>
         </div>
-        <div class="buy-tile muted"><strong>Крупные доработки</strong><span>Новые разделы и смена структуры — отдельная оценка</span></div>
-        <div class="buy-tile muted"><strong>Без переноса</strong><span>Неиспользованные заявки не сохраняются</span></div>
-        <div class="buy-tile muted"><strong>Продление</strong><span>Отдельная оплата, без автосписания</span></div>
+      </div>
+      <div class="fine-print">
+        <span>Крупные доработки и новые разделы — отдельная оценка</span>
+        <span>Неиспользованные заявки не переносятся</span>
+        <span>Продление — отдельная оплата, без автосписания</span>
       </div>
 
       <div class="buy-divider"></div>
@@ -432,15 +430,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
           </div>
           <button class="panel-close" onclick="closePanel('ticketHistoryCard')" aria-label="Закрыть"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
         </div>
-        <div class="t-gate" id="tGate">
-          <div class="ico-badge xl dark"><svg viewBox="0 0 24 24"><path d="M4 6.5h16M4 12h16M4 17.5h10"/></svg></div>
-          <div class="t-gate-text">
-            <strong>История ещё не загружена</strong>
-            <span>Заявки подгружаются по запросу — так мы не расходуем лишние обращения к базе</span>
-          </div>
-          <button class="btn btn-primary" id="tGateBtn" onclick="showTicketsList()">Показать все заявки</button>
-        </div>
-        <div class="t-list" id="tList" style="display:none"></div>
+        <div class="t-list" id="tList"></div>
       </div>
     </div>
   </div>
@@ -565,7 +555,7 @@ function showActive(){
   document.getElementById('formSub').textContent=`Заявка для: ${name}`;
   document.getElementById('listSub').textContent=`Обращения: ${name}`;
   document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';
-  photos=[];renderPreviews();resetTicketsGate();loadTicketCount();
+  photos=[];renderPreviews();loadTickets();
 }
 
 window.requestSupport=async function(id){if(inFlight)return;pendId=id;pendBuyId=id;showBuyOne(done.find(o=>o.id===id));};
@@ -584,34 +574,14 @@ function periodStartFor(o){
   const d=new Date(o.supportExpiresAt.toDate());d.setDate(d.getDate()-30);return d;
 }
 
-async function loadTicketCount(){
-  if(!sel)return;const oid=sel.id;
-  const periodStart=periodStartFor(sel);
-  try{
-    const q=periodStart
-      ?query(collection(db,'service_tickets'),where('orderId','==',oid),where('createdAt','>=',periodStart))
-      :query(collection(db,'service_tickets'),where('orderId','==',oid));
-    const snap=await getCountFromServer(q);
-    if(!sel||sel.id!==oid)return;
-    ticketsThisPeriod=snap.data().count;
-  }catch(e){ticketsThisPeriod=0;}
-  renderLimit();
+function setListLoading(on){
+  const el=document.getElementById('tList');
+  if(on)el.innerHTML='<div class="t-empty"><div class="spinner"></div>Загрузка истории...</div>';
 }
-
-function resetTicketsGate(){
-  const gate=document.getElementById('tGate'),list=document.getElementById('tList'),btn=document.getElementById('tGateBtn');
-  gate.style.display='flex';list.style.display='none';list.innerHTML='';
-  btn.disabled=false;btn.textContent='Показать все заявки';
-}
-
-window.showTicketsList=async function(){
-  const btn=document.getElementById('tGateBtn');
-  btn.disabled=true;btn.textContent='Загрузка...';
-  await loadTickets();
-};
 
 async function loadTickets(){
   if(!sel)return;const oid=sel.id;
+  setListLoading(true);
   try{const s=await getDocs(query(collection(db,'service_tickets'),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
   const all=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
 
@@ -622,11 +592,8 @@ async function loadTickets(){
   ticketsThisPeriod=inPeriod.length;
   renderLimit();
   renderTickets(all);
-  document.getElementById('tGate').style.display='none';
-  document.getElementById('tList').style.display='flex';
   }catch(e){
-    const btn=document.getElementById('tGateBtn');
-    if(btn){btn.disabled=false;btn.textContent='Показать все заявки';}
+    document.getElementById('tList').innerHTML='<div class="t-empty">Не удалось загрузить заявки</div>';
     toast('Не удалось загрузить заявки','error');
   }
 }
@@ -676,7 +643,7 @@ window.submitTicket=async function(){
   try{
     await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:photos.length?photos:null,uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',orderId:sel.id,orderSiteType:sel.siteType||'',orderTariff:sel.tariff||sel.package||'',orderDomain:sel.siteDomain||'',status:'open',createdAt:serverTimestamp()});
     document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена','success');
-    if(document.getElementById('tList').style.display==='none'){loadTicketCount();}else{loadTickets();}
+    loadTickets();
     if(window.matchMedia('(max-width:640px)').matches){closePanel('ticketFormCard');}
   }catch(e){toast('Ошибка','error');}
   btn.disabled=false;btn.textContent='Отправить заявку';

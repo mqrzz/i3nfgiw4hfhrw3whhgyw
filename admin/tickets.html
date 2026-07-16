@@ -5,10 +5,10 @@
 <title>Обслуживание — Antviz Admin</title>
 <link rel="icon" href="../img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#f2f4f7}
+html,body{height:100%;background:#f2f4f7;overflow:hidden}
 :root{
   --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
   --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
@@ -16,19 +16,19 @@ html,body{height:100%;background:#f2f4f7}
   --dark:#191b1e;--dark2:#2b2f33;
   --red:#e8634f;--warn:#f59e0b;--info:#3b82f6;--purple:#8b5cf6;
   --font:'Geologica','Inter',sans-serif;
-  --sw:256px;--th:68px;
+  --sw:256px;--th:64px;--rail:340px;
 }
 body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoothing:antialiased}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-@keyframes slideDown{from{opacity:0;max-height:0}to{opacity:1;max-height:900px}}
-::-webkit-scrollbar{width:4px;height:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@keyframes popIn{from{opacity:0;transform:scale(.97) translateY(4px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 .ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 .sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 .lt{font-size:13px;color:rgba(255,255,255,.35)}
 
-/* SIDEBAR */
+/* SIDEBAR (shared admin nav — unchanged across admin pages) */
 .sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:200}
 .sb-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07)}
 .lm{width:34px;height:34px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -45,91 +45,86 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 .sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
 
 /* TOPBAR */
-.tb{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100}
-.tb-title{font-weight:500;font-size:1rem;letter-spacing:-.02em}
+.tb{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 28px;z-index:100;gap:16px}
+.tb-title{font-weight:600;font-size:1.05rem;letter-spacing:-.02em}
+.tb-back{display:none;background:none;border:none;cursor:pointer;color:var(--muted);width:32px;height:32px;align-items:center;justify-content:center;border-radius:10px}
+.tb-back svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.tb-back:hover{background:var(--bg2)}
 
-/* MAIN */
-.main{margin-left:var(--sw);margin-top:var(--th);padding:32px 40px 60px;min-height:calc(100vh - var(--th));animation:fadeIn .25s ease}
+/* WORKSPACE: two-pane */
+.workspace{position:fixed;top:var(--th);left:var(--sw);right:0;bottom:0;display:grid;grid-template-columns:var(--rail) 1fr}
 
-/* STAT CARDS */
-.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
-.stat-card{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;padding:18px 20px;display:flex;align-items:center;gap:14px}
-.stat-ic{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.stat-ic svg{width:18px;height:18px;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.stat-ic.si-open{background:rgba(59,130,246,.1)}.stat-ic.si-open svg{stroke:var(--info)}
-.stat-ic.si-done{background:rgba(30,222,123,.12)}.stat-ic.si-done svg{stroke:var(--green-d)}
-.stat-ic.si-urgent{background:rgba(232,99,79,.1)}.stat-ic.si-urgent svg{stroke:var(--red)}
-.stat-ic.si-sup{background:rgba(139,92,246,.1)}.stat-ic.si-sup svg{stroke:var(--purple)}
-.stat-num{font-size:1.3rem;font-weight:600;letter-spacing:-.02em;line-height:1.1}
-.stat-lbl{font-size:.76rem;color:var(--muted);margin-top:1px}
+/* RAIL */
+.rail{background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.rail-switch{display:flex;gap:4px;padding:14px 14px 10px;flex-shrink:0}
+.rs-btn{flex:1;background:var(--bg2);border:none;border-radius:11px;padding:.55rem 0;font-family:var(--font);font-size:.8rem;font-weight:500;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .12s}
+.rs-btn.active{background:var(--dark);color:#fff}
+.rs-btn .badge-cnt{background:rgba(232,99,79,.9);color:#fff;font-size:.62rem;padding:.05rem .38rem;border-radius:20px;font-weight:600}
+.rs-btn.active .badge-cnt{background:var(--red)}
 
-/* URGENT STRIP */
-.urgent-strip{display:flex;align-items:center;gap:10px;background:rgba(232,99,79,.08);border:1px solid rgba(232,99,79,.2);border-radius:16px;padding:12px 18px;margin-bottom:20px;font-size:.86rem;color:var(--red);font-weight:500;cursor:pointer}
-.urgent-strip svg{width:16px;height:16px;stroke:var(--red);stroke-width:2;fill:none;flex-shrink:0}
+.rail-search{padding:0 14px 10px;flex-shrink:0}
+.rail-search-box{display:flex;align-items:center;gap:8px;background:var(--bg2);border-radius:11px;padding:.5rem .8rem}
+.rail-search-box svg{width:14px;height:14px;stroke:var(--muted);stroke-width:2;fill:none;flex-shrink:0}
+.rail-search-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.83rem;font-weight:300;color:var(--text);width:100%}
 
-/* SUPPORT SECTION */
-.sup-section{background:var(--dark);border-radius:28px;padding:28px 30px;margin-bottom:24px}
-.sup-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-.sup-title{font-size:1.15rem;font-weight:500;color:#fff;letter-spacing:-.02em}
-.sup-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
-.sup-card{background:rgba(255,255,255,.06);border-radius:18px;padding:16px 18px;min-width:220px;flex-shrink:0}
-.sup-card.expiring{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.25)}
-.sup-name{font-size:.94rem;font-weight:500;color:#fff;margin-bottom:2px}
-.sup-email{font-size:.74rem;color:rgba(255,255,255,.4);margin-bottom:12px}
-.sup-prog-labels{display:flex;justify-content:space-between;font-size:.7rem;color:rgba(255,255,255,.35);margin-bottom:6px}
-.sup-prog{height:4px;background:rgba(255,255,255,.1);border-radius:3px}
-.sup-prog-fill{height:100%;border-radius:3px;background:var(--green)}
-.sup-prog-fill.warn{background:linear-gradient(90deg,var(--warn),var(--red))}
+.rail-filters{display:flex;gap:5px;padding:0 14px 12px;flex-shrink:0}
+.rf{background:none;border:1px solid var(--border);border-radius:8px;padding:.3rem .7rem;font-family:var(--font);font-size:.73rem;color:var(--muted);cursor:pointer}
+.rf.active{background:var(--bg2);border-color:var(--border2);color:var(--text);font-weight:500}
 
-/* CONTROLS ROW */
-.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.sb-box{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:14px;padding:.6rem 1.1rem;transition:border-color .15s;flex:1;min-width:220px;max-width:400px}
-.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
-.sb-box svg{width:15px;height:15px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
-.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.88rem;font-weight:300;color:var(--text);width:100%}
-.tab-row{display:flex;gap:5px}
-.tab{background:none;border:1.5px solid var(--border);border-radius:10px;padding:.42rem .9rem;font-family:var(--font);font-size:.8rem;font-weight:300;color:var(--muted);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:6px}
-.tab:hover{border-color:var(--border2);color:var(--text)}
-.tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
-.tab .cnt{background:rgba(0,0,0,.08);border-radius:6px;padding:0 5px;font-size:.72rem}
-.tab.active .cnt{background:rgba(255,255,255,.15)}
-.sort-sel{margin-left:auto;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;padding:.42rem .8rem;font-family:var(--font);font-size:.8rem;color:var(--muted);cursor:pointer;outline:none}
+.rail-list{flex:1;overflow-y:auto;border-top:1px solid var(--bg2)}
+.trow{display:flex;gap:11px;padding:13px 16px;cursor:pointer;border-left:3px solid transparent;border-bottom:1px solid var(--bg2);position:relative}
+.trow:hover{background:var(--bg3)}
+.trow.selected{background:var(--bg2);border-left-color:var(--green)}
+.trow.urgent{border-left-color:var(--red)}
+.trow-av{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:600;flex-shrink:0}
+.trow-mid{flex:1;min-width:0}
+.trow-top{display:flex;align-items:center;gap:6px;margin-bottom:2px}
+.trow-name{font-size:.85rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.trow-time{font-size:.68rem;color:var(--muted);flex-shrink:0}
+.trow-subj{font-size:.79rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px}
+.trow-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.trow-urgent-tag{font-size:.62rem;font-weight:600;color:var(--red);text-transform:uppercase;letter-spacing:.03em}
 
-/* TICKET ACCORDION */
-.tc-item{background:var(--bg);border:1.5px solid var(--border);border-radius:20px;margin-bottom:10px;overflow:hidden;transition:border-color .15s}
-.tc-item:hover{border-color:var(--border2)}
-.tc-item.urgent{border-left:4px solid var(--red)}
-.tc-item.open:not(.urgent){border-left:4px solid var(--info)}
-.tc-item.done{border-left:4px solid var(--border2);opacity:.8}
-.tc-head{display:flex;align-items:center;gap:14px;width:100%;background:none;border:none;padding:16px 20px;cursor:pointer;text-align:left;font-family:var(--font)}
-.tc-avatar{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.78rem;font-weight:600;flex-shrink:0}
-.tc-head-mid{flex:1;min-width:0}
-.tc-head-title-row{display:flex;align-items:center;gap:8px;margin-bottom:2px}
-.tc-head-title{font-size:.95rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tc-answered-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
-.tc-head-sub{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.tc-head-r{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.tc-time{font-size:.75rem;color:var(--muted);white-space:nowrap}
-.tc-chev{width:16px;height:16px;stroke:var(--muted);stroke-width:2;fill:none;transition:transform .18s;flex-shrink:0}
-.tc-item.expanded .tc-chev{transform:rotate(180deg)}
-.tc-body{display:none;padding:0 20px 22px;animation:fadeIn .18s ease}
-.tc-item.expanded .tc-body{display:block}
-.tc-body-inner{border-top:1px solid var(--border);padding-top:16px}
-.tc-desc{font-size:.9rem;color:var(--muted);line-height:1.65;margin-bottom:14px;padding:16px 18px;background:var(--bg2);border-radius:14px}
-.tc-reply-box{background:rgba(30,222,123,.06);border:1.5px solid rgba(30,222,123,.2);border-radius:14px;padding:14px 18px;font-size:.86rem;color:var(--green-d);line-height:1.5;margin-bottom:14px}
-.tc-order{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--info);font-size:.79rem;font-weight:500;padding:.4rem 1rem;border-radius:10px;text-decoration:none;margin-bottom:14px;transition:background .12s}
-.tc-order:hover{background:rgba(59,130,246,.14)}
-.tc-order svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
-.tc-no-order{display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--warn);font-size:.79rem;padding:.4rem 1rem;border-radius:10px;margin-bottom:14px}
-.tc-inp{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s;margin-bottom:14px;resize:vertical;min-height:80px;line-height:1.5}
-.tc-inp:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
-.tc-actions{display:flex;gap:8px;flex-wrap:wrap}
+/* DETAIL */
+.detail{display:flex;flex-direction:column;overflow:hidden;background:var(--bg3)}
+.detail-empty{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;color:var(--muted)}
+.detail-empty svg{width:44px;height:44px;stroke:var(--border2);stroke-width:1.3;fill:none}
+.detail-empty span{font-size:.9rem}
+
+.dhead{background:var(--bg);border-bottom:1px solid var(--border);padding:20px 32px;flex-shrink:0;animation:fadeIn .2s ease}
+.dhead-top{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.dhead-av{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.9rem;font-weight:600;flex-shrink:0}
+.dhead-name{font-size:1.15rem;font-weight:600;letter-spacing:-.02em}
+.dhead-email{font-size:.8rem;color:var(--muted)}
+.dhead-badges{display:flex;gap:8px;margin-left:auto;flex-shrink:0}
+.dhead-subj{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:8px}
+.dhead-meta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 
 .badge{display:inline-flex;align-items:center;gap:4px;padding:.25rem .7rem;border-radius:8px;font-size:.71rem;font-weight:500;white-space:nowrap;flex-shrink:0}
 .badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
 .b-open{background:rgba(59,130,246,.1);color:var(--info)}
 .b-done{background:rgba(30,222,123,.12);color:var(--green-d)}
 .b-urgent{background:rgba(232,99,79,.1);color:var(--red)}
+
+.tc-order{display:inline-flex;align-items:center;gap:6px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.2);color:var(--info);font-size:.79rem;font-weight:500;padding:.35rem .9rem;border-radius:10px;text-decoration:none}
+.tc-order:hover{background:rgba(59,130,246,.14)}
+.tc-order svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.tc-no-order{display:inline-flex;align-items:center;gap:6px;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:var(--warn);font-size:.79rem;padding:.35rem .9rem;border-radius:10px}
+
+.dbody{flex:1;overflow-y:auto;padding:24px 32px;display:flex;flex-direction:column;gap:16px}
+.msg{max-width:70%;padding:14px 18px;border-radius:18px;font-size:.88rem;line-height:1.55;animation:popIn .18s ease}
+.msg-lbl{font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;font-weight:600;margin-bottom:5px;opacity:.6}
+.msg.client{align-self:flex-start;background:var(--bg);border:1px solid var(--border);border-radius:18px 18px 18px 4px;color:var(--text)}
+.msg.admin{align-self:flex-end;background:var(--green);border-radius:18px 18px 4px 18px;color:#0d3320}
+.msg.admin .msg-lbl{opacity:.55}
+.dbody-images{display:flex;flex-wrap:wrap;gap:8px;align-self:flex-start;max-width:70%}
+.tc-img{width:84px;height:84px;border-radius:12px;object-fit:cover;border:1px solid var(--border);cursor:pointer;transition:opacity .15s}
+.tc-img:hover{opacity:.85}
+
+.dcompose{background:var(--bg);border-top:1px solid var(--border);padding:18px 32px 20px;flex-shrink:0;display:flex;flex-direction:column;gap:10px}
+.tc-inp{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.75rem 1.05rem;color:var(--text);font-family:var(--font);font-size:.89rem;font-weight:300;outline:none;transition:border-color .15s;resize:vertical;min-height:64px;line-height:1.5}
+.tc-inp:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.tc-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 .btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-weight:500;font-size:.84rem;border:none;border-radius:12px;padding:.55rem 1.1rem;cursor:pointer;transition:background .1s,transform .1s;text-decoration:none;white-space:nowrap}
 .btn:hover{transform:translateY(-1px)}
@@ -139,20 +134,35 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 .btn-danger{background:rgba(232,99,79,.08);color:var(--red);border:1px solid rgba(232,99,79,.2)}.btn-danger:hover{background:rgba(232,99,79,.15)}
 .btn-sm{padding:.4rem .9rem;font-size:.8rem;border-radius:10px}
 
-.tc-images{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
-.tc-img{width:80px;height:80px;border-radius:10px;object-fit:cover;border:1px solid var(--border);cursor:pointer;transition:opacity .15s}
-.tc-img:hover{opacity:.85}
+/* SUPPORTS TAB (inside rail) */
+.sup-row{display:flex;gap:11px;padding:13px 16px;border-bottom:1px solid var(--bg2);align-items:center}
+.sup-row.expiring{background:rgba(245,158,11,.06)}
+.sup-av{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.7rem;font-weight:600;flex-shrink:0}
+.sup-mid{flex:1;min-width:0}
+.sup-name{font-size:.83rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sup-email{font-size:.7rem;color:var(--muted);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sup-prog{height:4px;background:var(--bg2);border-radius:3px;margin-bottom:4px}
+.sup-prog-fill{height:100%;border-radius:3px;background:var(--green)}
+.sup-prog-fill.warn{background:linear-gradient(90deg,var(--warn),var(--red))}
+.sup-days{font-size:.68rem;color:var(--muted)}
+.sup-days.warn{color:var(--warn);font-weight:600}
+.sup-notify{background:none;border:1px solid var(--border2);border-radius:8px;font-size:.65rem;padding:.25rem .5rem;color:var(--muted);cursor:pointer;flex-shrink:0}
 
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:60px 20px;color:var(--muted);font-size:.9rem}
-.empty-icon{font-size:2.3rem}
+.rail-empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:.84rem}
 
-.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast{position:fixed;bottom:24px;right:24px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
 .toast.show{opacity:1;transform:none}
 .toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--warn);color:#fff}
 
-@media(max-width:900px){
-  .stat-row{grid-template-columns:repeat(2,1fr)}
-  .sort-sel{margin-left:0}
+@media(max-width:880px){
+  :root{--rail:100%}
+  .workspace{grid-template-columns:1fr}
+  .rail{display:flex}
+  .detail{position:fixed;top:var(--th);left:0;right:0;bottom:0;z-index:150;transform:translateX(100%);transition:transform .22s ease}
+  .workspace.detail-open .rail{display:none}
+  .workspace.detail-open .detail{transform:translateX(0)}
+  .tb-back{display:flex}
+  .msg{max-width:88%}
 }
 </style>
 </head>
@@ -185,54 +195,47 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 
 <!-- TOPBAR -->
 <div class="tb">
+  <button class="tb-back" id="tbBack" onclick="closeDetail()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
   <span class="tb-title">Обслуживание</span>
 </div>
 
-<!-- MAIN -->
-<div class="main" id="appWrap" style="display:none">
+<!-- WORKSPACE -->
+<div class="workspace" id="workspace">
 
-  <!-- STATS -->
-  <div class="stat-row">
-    <div class="stat-card"><div class="stat-ic si-open"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><div><div class="stat-num" id="statOpen">—</div><div class="stat-lbl">Открытых заявок</div></div></div>
-    <div class="stat-card"><div class="stat-ic si-urgent"><svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 001.7 3h15.2a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg></div><div><div class="stat-num" id="statUrgent">—</div><div class="stat-lbl">Без ответа &gt;24ч</div></div></div>
-    <div class="stat-card"><div class="stat-ic si-done"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="stat-num" id="statDone">—</div><div class="stat-lbl">Закрытых заявок</div></div></div>
-    <div class="stat-card"><div class="stat-ic si-sup"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div><div><div class="stat-num" id="statSupports">—</div><div class="stat-lbl">Активных обслуживаний</div></div></div>
-  </div>
+  <!-- RAIL -->
+  <div class="rail">
+    <div class="rail-switch">
+      <button class="rs-btn active" id="tabTickets" onclick="switchMode('tickets')">Заявки <span class="badge-cnt" id="urgentBadge" style="display:none">0</span></button>
+      <button class="rs-btn" id="tabSupports" onclick="switchMode('supports')">Обслуживание</button>
+    </div>
 
-  <!-- URGENT STRIP -->
-  <div class="urgent-strip" id="urgentStrip" style="display:none" onclick="applyUrgentFilter()">
-    <svg viewBox="0 0 24 24"><path d="M12 9v4M12 17h.01M10.3 3.9L2.7 17a2 2 0 001.7 3h15.2a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/></svg>
-    <span id="urgentStripText"></span>
-  </div>
+    <div id="ticketsPane">
+      <div class="rail-search">
+        <div class="rail-search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Поиск..." id="searchInp" oninput="renderTicketList()"/>
+        </div>
+      </div>
+      <div class="rail-filters">
+        <button class="rf active" onclick="switchFilter('all',this)">Все <span id="cntAll">0</span></button>
+        <button class="rf" onclick="switchFilter('open',this)">Открытые <span id="cntOpen">0</span></button>
+        <button class="rf" onclick="switchFilter('done',this)">Закрытые <span id="cntDone">0</span></button>
+      </div>
+      <div class="rail-list" id="ticketsList"></div>
+    </div>
 
-  <!-- ACTIVE SUPPORTS -->
-  <div class="sup-section">
-    <div class="sup-head"><div class="sup-title">Активные обслуживания</div></div>
-    <div class="sup-scroll" id="supportsList">
-      <div style="color:rgba(255,255,255,.3);font-size:.88rem">Загрузка...</div>
+    <div id="supportsPane" style="display:none;flex-direction:column;overflow:hidden;flex:1">
+      <div class="rail-list" id="supportsList" style="flex:1"></div>
     </div>
   </div>
 
-  <!-- CONTROLS -->
-  <div class="ctrl-row">
-    <div class="sb-box">
-      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-      <input type="text" placeholder="Поиск по имени, email, заявке..." id="searchInp" oninput="renderTickets()"/>
+  <!-- DETAIL -->
+  <div class="detail" id="detailPane">
+    <div class="detail-empty">
+      <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
+      <span>Выберите заявку слева</span>
     </div>
-    <div class="tab-row">
-      <button class="tab active" onclick="switchFilter('all',this)">Все<span class="cnt" id="cntAll">0</span></button>
-      <button class="tab" onclick="switchFilter('open',this)">Открытые<span class="cnt" id="cntOpen">0</span></button>
-      <button class="tab" onclick="switchFilter('done',this)">Закрытые<span class="cnt" id="cntDone">0</span></button>
-    </div>
-    <select class="sort-sel" id="sortSel" onchange="renderTickets()">
-      <option value="urgent">Сначала срочные</option>
-      <option value="new">Сначала новые</option>
-      <option value="old">Сначала старые</option>
-    </select>
   </div>
-
-  <!-- TICKETS -->
-  <div id="ticketsList"><div class="empty"><span class="empty-icon">🎫</span>Загрузка...</div></div>
 
 </div>
 
@@ -243,7 +246,7 @@ import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, where, orderBy, getDocs, getCountFromServer, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-let allTickets=[], allOrders=[], currentFilter='all', expandedIds=new Set();
+let allTickets=[], allOrders=[], currentFilter='all', selectedId=null, mode='tickets';
 const AVATAR_COLORS=['#1ede7b','#3b82f6','#8b5cf6','#f59e0b','#ec4899','#14b8a6','#6366f1'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
@@ -251,107 +254,108 @@ function fmtDT(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts)
 function toDate(ts){return ts?(ts.toDate?ts.toDate():new Date(ts)):null;}
 function timeAgo(ts){
   const d=toDate(ts); if(!d) return '—';
-  const diffMs=Date.now()-d.getTime(); const min=Math.floor(diffMs/60000);
-  if(min<1) return 'только что';
-  if(min<60) return min+' мин назад';
+  const min=Math.floor((Date.now()-d.getTime())/60000);
+  if(min<1) return 'сейчас';
+  if(min<60) return min+' мин';
   const h=Math.floor(min/60);
-  if(h<24) return h+' ч назад';
-  const days=Math.floor(h/24);
-  return days+' дн назад';
+  if(h<24) return h+' ч';
+  return Math.floor(h/24)+' дн';
 }
 function hoursSince(ts){const d=toDate(ts); if(!d) return 0; return(Date.now()-d.getTime())/36e5;}
 function isUrgent(t){return t.status!=='done' && !t.adminReply && hoursSince(t.createdAt)>24;}
-function initials(name){const parts=String(name||'?').trim().split(/\s+/);return((parts[0]?.[0]||'')+(parts[1]?.[0]||'')).toUpperCase()||'?';}
+function initials(name){const p=String(name||'?').trim().split(/\s+/);return((p[0]?.[0]||'')+(p[1]?.[0]||'')).toUpperCase()||'?';}
 function avatarColor(seed){let h=0;for(const c of String(seed||''))h=(h*31+c.charCodeAt(0))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
 
-window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTickets();};
 window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
-window.toggleTicket=id=>{expandedIds.has(id)?expandedIds.delete(id):expandedIds.add(id);renderTickets();};
-window.applyUrgentFilter=()=>{
-  document.getElementById('sortSel').value='urgent';
-  currentFilter='open';
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.tab')[1].classList.add('active');
-  const first=allTickets.find(isUrgent);
-  if(first)expandedIds.add(first.id);
-  renderTickets();
-  if(first)document.getElementById(`tc_${first.id}`)?.scrollIntoView({behavior:'smooth',block:'center'});
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.rf').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTicketList();};
+window.switchMode=m=>{
+  mode=m;
+  document.getElementById('tabTickets').classList.toggle('active',m==='tickets');
+  document.getElementById('tabSupports').classList.toggle('active',m==='supports');
+  document.getElementById('ticketsPane').style.display=m==='tickets'?'block':'none';
+  document.getElementById('supportsPane').style.display=m==='supports'?'flex':'none';
 };
+window.selectTicket=id=>{
+  selectedId=id;
+  renderTicketList();
+  renderDetail();
+  if(window.matchMedia('(max-width:880px)').matches) document.getElementById('workspace').classList.add('detail-open');
+};
+window.closeDetail=()=>{document.getElementById('workspace').classList.remove('detail-open');};
 
-function renderTickets(){
+function renderTicketList(){
   const el=document.getElementById('ticketsList');
   const q=(document.getElementById('searchInp').value||'').toLowerCase();
-  const sort=document.getElementById('sortSel').value;
   let list=allTickets;
   if(currentFilter==='open') list=list.filter(t=>t.status!=='done');
   else if(currentFilter==='done') list=list.filter(t=>t.status==='done');
   if(q) list=list.filter(t=>(t.title||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.userEmail||'').toLowerCase().includes(q)||(t.orderDomain||'').toLowerCase().includes(q));
-
-  list=[...list];
-  if(sort==='urgent') list.sort((a,b)=>(isUrgent(b)-isUrgent(a))||((b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)));
-  else if(sort==='old') list.sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
-  else list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  list=[...list].sort((a,b)=>(isUrgent(b)-isUrgent(a))||((b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)));
 
   const open=allTickets.filter(t=>t.status!=='done').length;
   const done=allTickets.filter(t=>t.status==='done').length;
-  const urgentList=allTickets.filter(isUrgent);
-  document.getElementById('statOpen').textContent=open;
-  document.getElementById('statDone').textContent=done;
-  document.getElementById('statUrgent').textContent=urgentList.length;
+  const urgentCount=allTickets.filter(isUrgent).length;
   document.getElementById('cntAll').textContent=allTickets.length;
   document.getElementById('cntOpen').textContent=open;
   document.getElementById('cntDone').textContent=done;
-  const badge=document.getElementById('navBadgeTickets');
-  if(badge){badge.style.display=open?'':'none';badge.textContent=open;}
-  const strip=document.getElementById('urgentStrip');
-  if(urgentList.length){strip.style.display='flex';document.getElementById('urgentStripText').textContent=`${urgentList.length} заявок ожидают ответа больше суток — нажмите, чтобы посмотреть`;}
-  else strip.style.display='none';
+  const ub=document.getElementById('urgentBadge');
+  ub.style.display=urgentCount?'inline-flex':'none';ub.textContent=urgentCount;
+  const nb=document.getElementById('navBadgeTickets');
+  if(nb){nb.style.display=open?'':'none';nb.textContent=open;}
 
-  if(!list.length){el.innerHTML=`<div class="empty"><span class="empty-icon">✅</span>Нет заявок по текущим фильтрам</div>`;return;}
+  if(!list.length){el.innerHTML=`<div class="rail-empty">Нет заявок по фильтру</div>`;return;}
 
   el.innerHTML=list.map(t=>{
     const urgent=isUrgent(t);
-    const expanded=expandedIds.has(t.id);
-    const statusClass=t.status==='done'?'done':(urgent?'urgent':'open');
-    const orderChip=t.orderId
-      ?`<a class="tc-order" href="/admin/orders?id=${t.orderId}" onclick="event.stopPropagation()"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(t.orderDomain||'№ '+t.orderId.slice(0,8).toUpperCase())}${t.orderSiteType?' · '+esc(t.orderSiteType):''}</a>`
-      :`<span class="tc-no-order">⚠ Заказ не привязан</span>`;
-    return `
-    <div class="tc-item ${statusClass}${expanded?' expanded':''}" id="tc_${t.id}">
-      <button class="tc-head" onclick="toggleTicket('${t.id}')">
-        <div class="tc-avatar" style="background:${avatarColor(t.userEmail||t.userName)}">${initials(t.userName)}</div>
-        <div class="tc-head-mid">
-          <div class="tc-head-title-row">
-            <span class="tc-head-title">${esc(t.title||'Без темы')}</span>
-            ${t.adminReply?'<span class="tc-answered-dot" title="Есть ответ"></span>':''}
-          </div>
-          <div class="tc-head-sub">${esc(t.userName||'—')} · ${esc(t.userEmail||'—')}</div>
-        </div>
-        <div class="tc-head-r">
-          ${urgent?'<span class="badge b-urgent">Срочно</span>':`<span class="badge ${t.status==='done'?'b-done':'b-open'}">${t.status==='done'?'Закрыта':'Открыта'}</span>`}
-          <span class="tc-time">${timeAgo(t.createdAt)}</span>
-          <svg class="tc-chev" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
-        </div>
-      </button>
-      <div class="tc-body">
-        <div class="tc-body-inner">
-          <div style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Создана: ${fmtDT(t.createdAt)}</div>
-          ${orderChip}
-          ${t.description?`<div class="tc-desc">${esc(t.description)}</div>`:''}
-          ${t.adminReply?`<div class="tc-reply-box">💬 Ваш ответ: ${esc(t.adminReply)}</div>`:''}
-          ${t.images&&t.images.length?`<div class="tc-images">${t.images.map(src=>`<img class="tc-img" src="${src}" alt="" onclick="event.stopPropagation();window.open('${src}','_blank')"/>`).join('')}</div>`:''}
-          <textarea class="tc-inp" id="tr_${t.id}" rows="3" placeholder="Написать ответ клиенту...">${esc(t.adminReply||'')}</textarea>
-          <div class="tc-actions">
-            <button class="btn btn-green btn-sm" onclick="saveReply('${t.id}','${esc(t.uid||'')}','${esc(t.title||'')}')">Сохранить ответ</button>
-            ${t.status!=='done'
-              ?`<button class="btn btn-dark btn-sm" onclick="closeTick('${t.id}')">Закрыть заявку</button>`
-              :`<button class="btn btn-outline btn-sm" onclick="reopenTick('${t.id}')">Открыть снова</button>`}
-            <button class="btn btn-danger btn-sm" onclick="deleteTick('${t.id}')">Удалить</button>
-          </div>
-        </div>
+    return `<div class="trow${t.id===selectedId?' selected':''}${urgent?' urgent':''}" onclick="selectTicket('${t.id}')">
+      <div class="trow-av" style="background:${avatarColor(t.userEmail||t.userName)}">${initials(t.userName)}</div>
+      <div class="trow-mid">
+        <div class="trow-top"><span class="trow-name">${esc(t.userName||'—')}</span><span class="trow-time">${timeAgo(t.createdAt)}</span></div>
+        <div class="trow-subj">${t.adminReply?'<span class="trow-dot"></span>':''}${esc(t.title||'Без темы')}</div>
+        ${urgent?'<span class="trow-urgent-tag">Ждёт ответа &gt;24ч</span>':''}
       </div>
     </div>`;
   }).join('');
+}
+
+function renderDetail(){
+  const el=document.getElementById('detailPane');
+  const t=allTickets.find(x=>x.id===selectedId);
+  if(!t){el.innerHTML=`<div class="detail-empty"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg><span>Выберите заявку слева</span></div>`;return;}
+  const urgent=isUrgent(t);
+  const orderChip=t.orderId
+    ?`<a class="tc-order" href="/admin/orders?id=${t.orderId}"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>${esc(t.orderDomain||'№ '+t.orderId.slice(0,8).toUpperCase())}${t.orderSiteType?' · '+esc(t.orderSiteType):''}</a>`
+    :`<span class="tc-no-order">⚠ Заказ не привязан</span>`;
+  el.innerHTML=`
+    <div class="dhead">
+      <div class="dhead-top">
+        <div class="dhead-av" style="background:${avatarColor(t.userEmail||t.userName)}">${initials(t.userName)}</div>
+        <div>
+          <div class="dhead-name">${esc(t.userName||'—')}</div>
+          <div class="dhead-email">${esc(t.userEmail||'—')}</div>
+        </div>
+        <div class="dhead-badges">
+          ${urgent?'<span class="badge b-urgent">Срочно</span>':`<span class="badge ${t.status==='done'?'b-done':'b-open'}">${t.status==='done'?'Закрыта':'Открыта'}</span>`}
+        </div>
+      </div>
+      <div class="dhead-subj">${esc(t.title||'Без темы')}</div>
+      <div class="dhead-meta">${orderChip}<span style="font-size:.78rem;color:var(--muted)">Создана ${fmtDT(t.createdAt)}</span></div>
+    </div>
+    <div class="dbody">
+      ${t.description?`<div class="msg client"><div class="msg-lbl">${esc(t.userName||'Клиент')}</div>${esc(t.description)}</div>`:''}
+      ${t.images&&t.images.length?`<div class="dbody-images">${t.images.map(src=>`<img class="tc-img" src="${src}" alt="" onclick="window.open('${src}','_blank')"/>`).join('')}</div>`:''}
+      ${t.adminReply?`<div class="msg admin"><div class="msg-lbl">Вы</div>${esc(t.adminReply)}</div>`:''}
+    </div>
+    <div class="dcompose">
+      <textarea class="tc-inp" id="replyInp" rows="3" placeholder="Написать ответ клиенту...">${esc(t.adminReply||'')}</textarea>
+      <div class="tc-actions">
+        <button class="btn btn-green btn-sm" onclick="saveReply('${t.id}','${esc(t.uid||'')}','${esc(t.title||'')}')">Сохранить ответ</button>
+        ${t.status!=='done'
+          ?`<button class="btn btn-dark btn-sm" onclick="closeTick('${t.id}')">Закрыть заявку</button>`
+          :`<button class="btn btn-outline btn-sm" onclick="reopenTick('${t.id}')">Открыть снова</button>`}
+        <button class="btn btn-danger btn-sm" onclick="deleteTick('${t.id}')">Удалить</button>
+      </div>
+    </div>`;
 }
 
 function renderSupports(){
@@ -362,8 +366,7 @@ function renderSupports(){
     if(o.supportExpiresAt){const exp=o.supportExpiresAt.toDate?o.supportExpiresAt.toDate():new Date(o.supportExpiresAt);return exp>now;}
     return true;
   });
-  document.getElementById('statSupports').textContent=active.length;
-  if(!active.length){el.innerHTML=`<div style="color:rgba(255,255,255,.3);font-size:.88rem">Нет активных обслуживаний</div>`;return;}
+  if(!active.length){el.innerHTML=`<div class="rail-empty">Нет активных обслуживаний</div>`;return;}
   const withMeta=active.map(o=>{
     let days=Infinity,pct=100,expiring=false;
     if(o.supportExpiresAt){
@@ -372,38 +375,42 @@ function renderSupports(){
     }
     return{o,days,pct,expiring};
   }).sort((a,b)=>a.days-b.days);
-  el.innerHTML=withMeta.map(({o,days,pct,expiring})=>`<div class="sup-card${expiring?' expiring':''}">
-      <div class="sup-name">${esc(o.clientName||'—')}</div>
-      <div class="sup-email">${esc(o.clientEmail||'—')}</div>
-      ${days!==Infinity?`<div>
-        <div class="sup-prog-labels"><span>Осталось</span><span style="color:${expiring?'var(--warn)':'rgba(255,255,255,.4)'}">${days} дн.</span></div>
-        <div class="sup-prog"><div class="sup-prog-fill${expiring?' warn':''}" style="width:${pct}%"></div></div>
-      </div>`:'<div style="font-size:.72rem;color:rgba(255,255,255,.35)">Бессрочно</div>'}
-      ${expiring?`<button class="btn btn-outline btn-sm" style="font-size:.74rem;padding:.3rem .8rem;margin-top:10px" onclick="notifyExpiry('${o.uid||''}')">🔔 Уведомить</button>`:''}
+  el.innerHTML=withMeta.map(({o,days,pct,expiring})=>`
+    <div class="sup-row${expiring?' expiring':''}">
+      <div class="sup-av" style="background:${avatarColor(o.clientEmail||o.clientName)}">${initials(o.clientName)}</div>
+      <div class="sup-mid">
+        <div class="sup-name">${esc(o.clientName||'—')}</div>
+        <div class="sup-email">${esc(o.clientEmail||'—')}</div>
+        ${days!==Infinity?`<div class="sup-prog"><div class="sup-prog-fill${expiring?' warn':''}" style="width:${pct}%"></div></div><div class="sup-days${expiring?' warn':''}">${days} дн. осталось</div>`:'<div class="sup-days">Бессрочно</div>'}
+      </div>
+      ${expiring?`<button class="sup-notify" onclick="notifyExpiry('${o.uid||''}')">🔔</button>`:''}
     </div>`).join('');
 }
 
 window.saveReply=async(id,uid,title)=>{
-  const val=document.getElementById('tr_'+id)?.value.trim()||'';
+  const val=document.getElementById('replyInp')?.value.trim()||'';
   try{
     await updateDoc(doc(db,'service_tickets',id),{adminReply:val});
     if(uid&&val)await addDoc(collection(db,'notifications',uid,'items'),{title:'💬 Ответ на заявку',text:`«${title}»: ${val}`,read:false,createdAt:serverTimestamp()}).catch(()=>{});
     toast('Ответ сохранён и клиент уведомлён ✓','success');
-    await loadTickets();renderTickets();
+    await loadTickets();renderTicketList();renderDetail();
   }catch(e){toast('Ошибка','error');}
 };
 window.closeTick=async id=>{
-  try{await updateDoc(doc(db,'service_tickets',id),{status:'done'});toast('Закрыта ✓','success');await loadTickets();renderTickets();}
+  try{await updateDoc(doc(db,'service_tickets',id),{status:'done'});toast('Закрыта ✓','success');await loadTickets();renderTicketList();renderDetail();}
   catch(e){toast('Ошибка','error');}
 };
 window.reopenTick=async id=>{
-  try{await updateDoc(doc(db,'service_tickets',id),{status:'open'});toast('Открыта','info');await loadTickets();renderTickets();}
+  try{await updateDoc(doc(db,'service_tickets',id),{status:'open'});toast('Открыта','info');await loadTickets();renderTicketList();renderDetail();}
   catch(e){toast('Ошибка','error');}
 };
 window.deleteTick=async id=>{
   if(!confirm('Удалить заявку?'))return;
-  try{await deleteDoc(doc(db,'service_tickets',id));expandedIds.delete(id);toast('Удалена','info');await loadTickets();renderTickets();}
-  catch(e){toast('Ошибка','error');}
+  try{
+    await deleteDoc(doc(db,'service_tickets',id));
+    if(selectedId===id){selectedId=null;closeDetail();}
+    toast('Удалена','info');await loadTickets();renderTicketList();renderDetail();
+  }catch(e){toast('Ошибка','error');}
 };
 window.notifyExpiry=async uid=>{
   if(!uid)return;
@@ -429,14 +436,13 @@ onAuthStateChanged(auth,async user=>{
   try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
   if(!isAdmin){window.location.href='/';return;}
-  document.getElementById('appWrap').style.display='block';
   getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
-  await loadTickets();renderTickets();
+  await loadTickets();renderTicketList();renderDetail();
   onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
     allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
     renderSupports();
   });
-  setInterval(async()=>{await loadTickets();renderTickets();},30000);
+  setInterval(async()=>{await loadTickets();renderTicketList();renderDetail();},30000);
 });
 </script>
 <script src="../GEOBLOCK.js"></script>

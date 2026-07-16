@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 /* STEP INDICATOR */
 .steps{display:flex;align-items:center;gap:10px;margin-bottom:24px}
 .step-pill{display:flex;align-items:center;gap:10px;font-size:.8rem;font-weight:500;color:var(--ink-faint);padding:9px 16px 9px 10px;border-radius:99px;background:var(--bg3);border:1.5px solid var(--line);transition:background .2s,border-color .2s,color .2s}
-.step-pill .step-n{width:22px;height:22px;border-radius:50%;background:var(--bg2);color:var(--ink-faint);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;transition:background .2s,color .2s}
+.step-pill .step-n{width:22px;height:22px;border-radius:50%;background:var(--orange-wash);color:var(--orange-d);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;transition:background .2s,color .2s}
 .step-pill.on{color:var(--ink);border-color:var(--ink);background:var(--bg)}
 .step-pill.on .step-n{background:var(--orange);color:#fff}
 .step-pill.done{color:var(--ink-dim)}
@@ -210,17 +210,32 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .card-title{font-size:1.1rem;font-weight:500;letter-spacing:-.02em;margin-bottom:5px}
 .card-sub{font-size:.84rem;color:var(--ink-dim);font-weight:300;line-height:1.55}
 .card-body{padding:32px 40px 40px}
-.field-g{display:flex;flex-direction:column;gap:16px}
-.field label{display:block;font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin-bottom:8px}
-.label-optional{text-transform:none;letter-spacing:0;font-weight:300;color:var(--ink-faint)}
+.field-g{display:flex;flex-direction:column;gap:20px}
+.field-label-row{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.field-ico{width:25px;height:25px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.field-ico svg{width:13px;height:13px;stroke:#fff;stroke-width:2.3;fill:none}
+.field-ico.t-teal{background:linear-gradient(135deg,#3fe0d8,#0fc7c0)}
+.field-ico.t-purple{background:linear-gradient(135deg,#a970ff,#8b3ffb)}
+.field-ico.t-orange{background:linear-gradient(135deg,#ffab4d,#ff8a1f)}
+.field label{font-size:.72rem;font-weight:500;letter-spacing:-.005em;color:var(--ink)}
+.label-optional{font-weight:300;color:var(--ink-faint)}
 .field input,.field textarea{width:100%;background:#fff;border:1.5px solid var(--line-strong);border-radius:14px;padding:.85rem 1.05rem;color:var(--ink);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s,box-shadow .15s}
 .field input:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
 .field input::placeholder,.field textarea::placeholder{color:var(--ink-faint)}
 .field textarea{resize:vertical;min-height:96px;line-height:1.6}
-.photo-lbl{display:inline-flex;align-items:center;gap:8px;padding:.6rem 1.1rem;background:#fff;border:1.5px solid var(--line-strong);border-radius:12px;font-size:.8rem;color:var(--ink-dim);cursor:pointer;transition:border-color .15s,color .15s;font-family:var(--font)}
-.photo-lbl svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
-.photo-lbl:hover{border-color:var(--ink);color:var(--ink)}
-.previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+
+/* DROPZONE — кастомная зона прикрепления фото, drag&drop + клик */
+.dropzone{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;padding:28px 20px;border:1.5px dashed var(--line-strong);border-radius:20px;background:#fff;cursor:pointer;transition:border-color .18s,background .18s,transform .18s}
+.dropzone:hover{border-color:var(--orange);background:var(--orange-wash)}
+.dropzone.drag{border-color:var(--orange);background:var(--orange-wash);transform:scale(1.01)}
+.dropzone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.dropzone-ico{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#ffab4d,#ff8a1f);display:flex;align-items:center;justify-content:center;box-shadow:0 12px 24px -10px rgba(255,138,31,.5);margin-bottom:6px;transition:transform .18s}
+.dropzone:hover .dropzone-ico,.dropzone.drag .dropzone-ico{transform:translateY(-2px) scale(1.05)}
+.dropzone-ico svg{width:23px;height:23px;stroke:#fff;stroke-width:1.7;fill:none}
+.dropzone-title{font-size:.86rem;font-weight:500;color:var(--ink)}
+.dropzone-title b{color:var(--orange-d)}
+.dropzone-sub{font-size:.74rem;color:var(--ink-faint);font-weight:300}
+.previews{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .prev-wrap{position:relative;width:68px;height:68px;border-radius:12px;overflow:hidden;border:1.5px solid var(--line)}
 .prev-wrap img{width:100%;height:100%;object-fit:cover;display:block}
 .prev-rm{position:absolute;top:3px;right:3px;width:17px;height:17px;border-radius:50%;background:rgba(25,27,30,.7);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -457,11 +472,31 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
             <span>Лимит заявок на этот период исчерпан (5 из 5). Новые заявки станут доступны после продления обслуживания, либо напишите в поддержку для срочного вопроса.</span>
           </div>
           <div class="field-g" id="ticketFormFields">
-            <div class="field"><label>Тема заявки</label><input id="tTitle" type="text" placeholder="Что нужно сделать?"/></div>
-            <div class="field"><label>Описание</label><textarea id="tDesc" placeholder="Подробнее: что изменить, где, как должно выглядеть..."></textarea></div>
             <div class="field">
-              <label>Фото <span class="label-optional">(необязательно)</span></label>
-              <label class="photo-lbl"><svg viewBox="0 0 24 24"><path d="M17 7l-6.5 6.5a2.5 2.5 0 003.54 3.54L20 11a5 5 0 00-7.07-7.07L6 10.86"/></svg>Прикрепить<input type="file" id="tPhoto" accept="image/*" multiple style="display:none" onchange="addPhotos()"/></label>
+              <div class="field-label-row">
+                <div class="field-ico t-teal"><svg viewBox="0 0 24 24"><path d="M13 3L4 14h6l-1 7 9-11h-6z"/></svg></div>
+                <label>Тема заявки</label>
+              </div>
+              <input id="tTitle" type="text" placeholder="Что нужно сделать?"/>
+            </div>
+            <div class="field">
+              <div class="field-label-row">
+                <div class="field-ico t-purple"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div>
+                <label>Описание</label>
+              </div>
+              <textarea id="tDesc" placeholder="Подробнее: что изменить, где, как должно выглядеть..."></textarea>
+            </div>
+            <div class="field">
+              <div class="field-label-row">
+                <div class="field-ico t-orange"><svg viewBox="0 0 24 24"><path d="M4 16l4.5-5.5a2 2 0 013 0L16 16M14 14l1.5-2a2 2 0 013 0L20 15M4 6h16v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6z"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor" stroke="none"/></svg></div>
+                <label>Фото <span class="label-optional">(необязательно, до 3)</span></label>
+              </div>
+              <label class="dropzone" id="dropzone">
+                <input type="file" id="tPhoto" accept="image/*" multiple onchange="addPhotos(this.files)"/>
+                <div class="dropzone-ico"><svg viewBox="0 0 24 24"><path d="M12 16V5M12 5l-4 4M12 5l4 4"/><path d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg></div>
+                <div class="dropzone-title"><b>Нажмите</b> или перетащите фото сюда</div>
+                <div class="dropzone-sub">PNG, JPG до 4 МБ</div>
+              </label>
               <div class="previews" id="tPreviews"></div>
             </div>
             <button class="btn btn-primary" id="submitBtn" onclick="submitTicket()">Отправить заявку</button>
@@ -628,10 +663,7 @@ function renderSiteGrid(){
   }).join('');
 }
 
-window.pickSite=function(id){
-  const o=done.find(x=>x.id===id);if(!o)return;
-  openTariffFor(o);goStep(2);
-};
+window.pickSite=function(id){switchSite(id);};
 
 function openTariffFor(o){
   pendBuyId=o.id;
@@ -673,8 +705,6 @@ function showActive(){
   document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';
   photos=[];renderPreviews();loadTickets();
 }
-
-window.requestSupport=async function(id){const o=done.find(x=>x.id===id);if(!o)return;openTariffFor(o);};
 
 window.payForSupport=async function(renew){
   const id=renew?pendId:pendBuyId||pendId;if(!id){toast('Не найден заказ','error');return;}if(inFlight)return;
@@ -751,14 +781,22 @@ function renderTickets(){
   }).join('');
 }
 
-window.addPhotos=function(){
-  const f=Array.from(document.getElementById('tPhoto').files);
-  if(!f.length)return;if(photos.length+f.length>3){toast('Максимум 3 фото','error');return;}
+function processFiles(fileList){
+  const f=Array.from(fileList||[]).filter(x=>x.type&&x.type.startsWith('image/'));
+  if(!f.length)return;
+  if(photos.length+f.length>3){toast('Максимум 3 фото','error');return;}
   f.forEach(file=>{if(file.size>4*1024*1024){toast('Файл больше 4 МБ','error');return;}const r=new FileReader();r.onload=e=>{photos.push(e.target.result);renderPreviews();};r.readAsDataURL(file);});
-  document.getElementById('tPhoto').value='';
-};
+}
+window.addPhotos=function(fileList){processFiles(fileList);document.getElementById('tPhoto').value='';};
 function renderPreviews(){const el=document.getElementById('tPreviews');if(!el)return;el.innerHTML=photos.map((s,i)=>`<div class="prev-wrap"><img src="${s}" alt=""/><button class="prev-rm" onclick="rmPhoto(${i})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`).join('');}
 window.rmPhoto=function(i){photos.splice(i,1);renderPreviews();};
+
+const dz=document.getElementById('dropzone');
+if(dz){
+  ['dragenter','dragover'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();dz.classList.add('drag');}));
+  ['dragleave','dragend'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{e.preventDefault();e.stopPropagation();dz.classList.remove('drag');processFiles(e.dataTransfer.files);});
+}
 
 window.submitTicket=async function(){
   if(ticketsThisPeriod>=TICKET_LIMIT){toast('Лимит заявок исчерпан','error');return;}

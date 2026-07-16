@@ -522,9 +522,15 @@ function getEstimate(o){
   else if(/Особый случай/.test(type)){minD+=2;maxD+=6;}
   if(extras.includes('shop')){minD+=2;maxD+=4;}
   if(extras.includes('content')){minD+=1;maxD+=2;}
-  if(urgent){const d=new Date();d.setDate(d.getDate()+1);return{text:d.toLocaleDateString('ru',{day:'numeric',month:'long'}),committed:false};}
-  const dMin=new Date();dMin.setDate(dMin.getDate()+minD);
-  const dMax=new Date();dMax.setDate(dMax.getDate()+maxD);
+  if(urgent){const base=o.createdAt?.toDate?o.createdAt.toDate():new Date();const d=new Date(base);d.setDate(d.getDate()+1);return{text:d.toLocaleDateString('ru',{day:'numeric',month:'long'}),committed:false};}
+  const base=o.createdAt?.toDate?o.createdAt.toDate():new Date();
+  const dMin=new Date(base);dMin.setDate(dMin.getDate()+minD);
+  const dMax=new Date(base);dMax.setDate(dMax.getDate()+maxD);
+  // Если исходная оценка (от даты заказа) уже прошла — заказ реально
+  // задержался. Показывать дату из прошлого ещё более странно, чем прежний
+  // баг с "плывущим" сроком, поэтому в этом случае просто не показываем
+  // оценку вовсе (трекер статуса и так виден).
+  if(dMax.getTime()<Date.now())return null;
   const fmt=d=>d.toLocaleDateString('ru',{day:'numeric',month:'long'});
   return{text:fmt(dMin)+' — '+fmt(dMax),committed:false};
 }

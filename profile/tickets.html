@@ -550,6 +550,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
     <!-- Разовая правка без подписки -->
     <div id="onceOffPanel" style="display:none">
       <button class="buy-back" onclick="closeOnceOff()"><svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Назад к тарифам</button>
+
+      <div class="buy-target" id="onceTargetWrap" style="display:none">
+        <div class="ico-badge sm c-orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
+        <div><div class="buy-target-name" id="onceTargetName">—</div><div class="buy-target-type" id="onceTargetType"></div></div>
+      </div>
+
       <div class="buy-card">
         <div class="buy-top">
           <div class="ico-badge md c-teal"><svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3.5a1 1 0 011-1h4a1 1 0 011 1V4"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
@@ -941,6 +947,16 @@ window.rateTicket=async function(id,val){
 window.startOnceOff=function(){
   document.getElementById('oTitle').value='';document.getElementById('oDesc').value='';
   oncePhotos=[];renderOncePreviews();
+  const targetId=pendBuyId||pendId;
+  const o=done.find(x=>x.id===targetId);
+  const wrap=document.getElementById('onceTargetWrap');
+  if(o){
+    wrap.style.display='flex';
+    document.getElementById('onceTargetName').textContent=o.siteDomain||'№ '+o.id.slice(0,8).toUpperCase();
+    document.getElementById('onceTargetType').innerHTML=olabel(o);
+  }else{
+    wrap.style.display='none';
+  }
   hide('buyStepTariff');show('onceOffPanel');
 };
 window.closeOnceOff=function(){

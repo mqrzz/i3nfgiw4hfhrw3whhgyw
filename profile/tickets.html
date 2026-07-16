@@ -59,6 +59,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .btn-full{width:100%}
 .btn:disabled{opacity:.4;cursor:default;transform:none}
 
+.btn-pay{font-size:15.5px;padding:19px 26px;border-radius:16px;gap:10px;background:linear-gradient(155deg,#3cf29c,var(--accent-h) 65%);box-shadow:0 1px 2px rgba(20,153,85,.2),0 22px 38px -16px rgba(20,153,85,.6)}
+.btn-pay:hover:not(:disabled){background:linear-gradient(155deg,#30e691,var(--accent-d) 65%);box-shadow:0 1px 2px rgba(20,153,85,.25),0 26px 42px -16px rgba(20,153,85,.65)}
+.btn-pay:disabled{background:var(--bg2);box-shadow:none;color:var(--ink-faint)}
+.btn-pay .btn-arrow{width:17px;height:17px;stroke-width:2.3;transition:transform .15s}
+.btn-pay:hover:not(:disabled) .btn-arrow{transform:translateX(3px)}
+.btn-indigo{background:linear-gradient(150deg,#9198ff,#5b63f0 70%);color:#fff;box-shadow:0 1px 2px rgba(91,99,240,.25),0 16px 28px -14px rgba(91,99,240,.55);font-size:14.5px;padding:15px 24px;border-radius:14px;flex-shrink:0}
+.btn-indigo:hover:not(:disabled){background:linear-gradient(150deg,#828aff,#4a52e0 70%);box-shadow:0 1px 2px rgba(91,99,240,.3),0 20px 32px -14px rgba(91,99,240,.6)}
+
 /* STATUS DOT */
 .dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex-shrink:0}
 .dot-accent{background:var(--accent)}
@@ -156,9 +164,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .buy-feat span{display:block;font-size:.8rem;color:var(--ink-dim);font-weight:300;line-height:1.5;margin-top:2px}
 .buy-feat em{font-style:normal;font-size:.72rem;color:var(--orange-d);font-weight:500;margin-left:8px;background:var(--orange-wash);padding:.15rem .5rem;border-radius:8px}
 
-.fine-print{display:flex;flex-wrap:wrap;gap:10px 20px;margin-bottom:28px}
-.fine-print span{font-size:.84rem;color:var(--ink-dim);font-weight:300;display:flex;align-items:center;gap:6px}
-.fine-print span::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--ink-faint)}
+.fine-list{display:flex;flex-direction:column;gap:14px;margin-bottom:28px}
+.fine-list-item{display:flex;align-items:flex-start;gap:12px}
+.fine-list-item .fi-ico{width:26px;height:26px;border-radius:9px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.fine-list-item .fi-ico svg{width:13px;height:13px;stroke:var(--ink-dim);stroke-width:2.2;fill:none}
+.fine-list-item span{font-size:.86rem;color:var(--ink-dim);font-weight:300;line-height:1.5;padding-top:3px}
 
 .buy-divider{height:1px;background:var(--line);margin-bottom:28px}
 .terms-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:20px;cursor:pointer}
@@ -194,15 +204,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .onceoff-text span{font-size:.88rem;color:var(--ink-dim);font-weight:300;line-height:1.5}
 
 /* SCOPE BLOCK (что входит / не входит, сворачиваемый, белый) */
-.scope-block{margin-bottom:22px}
-.scope-toggle{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:16px;width:100%;font-family:var(--font);padding:20px 26px;background:#fff;border:2px solid var(--line);border-radius:22px;transition:border-color .15s,box-shadow .15s}
-.scope-toggle:hover{border-color:var(--ink-dim);box-shadow:0 16px 32px -26px rgba(25,27,30,.25)}
+.scope-block{margin-bottom:22px;background:#fff;border:2px solid var(--line);border-radius:26px;box-shadow:0 1px 2px rgba(25,27,30,.03),0 20px 40px -30px rgba(25,27,30,.15);transition:border-color .15s,box-shadow .15s;overflow:hidden}
+.scope-block:has(.scope-toggle:hover){border-color:var(--ink-dim)}
+.scope-block.open{box-shadow:0 24px 44px -26px rgba(25,27,30,.2)}
+.scope-toggle{all:unset;cursor:pointer;box-sizing:border-box;display:flex;align-items:center;gap:16px;width:100%;font-family:var(--font);padding:22px 26px}
 .scope-toggle-title{flex:1;font-size:1rem;font-weight:500;color:var(--ink);text-align:left}
 .scope-toggle-sub{font-size:.84rem;color:var(--ink-dim);font-weight:300;margin-top:3px}
-.scope-toggle-chev{width:34px;height:34px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s}
+.scope-toggle-chev{width:34px;height:34px;border-radius:50%;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .2s,background .2s}
 .scope-toggle-chev svg{width:16px;height:16px;stroke:var(--ink-dim);stroke-width:2.2;fill:none}
-.scope-toggle.open .scope-toggle-chev{transform:rotate(180deg)}
-.scope-body{padding:26px 6px 6px}
+.scope-toggle.open .scope-toggle-chev{transform:rotate(180deg);background:var(--dark)}
+.scope-toggle.open .scope-toggle-chev svg{stroke:#fff}
+.scope-body{padding:2px 26px 30px;border-top:1px solid var(--line);margin-top:2px}
+.scope-body-in{padding-top:26px}
 .scope-cols{display:grid;grid-template-columns:1fr 1fr;gap:36px}
 .scope-col-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .scope-col-head h4{font-size:1rem;font-weight:500}
@@ -481,16 +494,16 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
           <strong>Не нужна подписка?</strong>
           <span>Разовая правка без обслуживания — оплата только за конкретную задачу</span>
         </div>
-        <button class="btn btn-secondary" onclick="startOnceOff()">Оформить разово · 350 ₽</button>
+        <button class="btn btn-indigo" onclick="startOnceOff()">Оформить разово · 350 ₽</button>
       </div>
 
-      <div class="scope-block">
+      <div class="scope-block" id="scopeBlock">
         <button class="scope-toggle" id="scopeToggle" onclick="toggleScope()">
           <div class="ico-badge md c-purple"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.6 5l-6 6a2 2 0 002.8 2.8l6-6a4 4 0 005-5.6l-2.8 2.8-2-2z"/></svg></div>
           <span class="scope-toggle-title">Что входит в обслуживание<span class="scope-toggle-sub" style="display:block">Границы услуги — что чиним бесплатно по подписке, а что нет</span></span>
           <div class="scope-toggle-chev"><svg viewBox="0 0 24 24" fill="none"><polyline points="6 9 12 15 18 9"/></svg></div>
         </button>
-        <div class="scope-body" id="scopeBody" style="display:none">
+        <div class="scope-body" id="scopeBody" style="display:none"><div class="scope-body-in">
           <div class="scope-cols">
             <div class="scope-col yes">
               <div class="scope-col-head"><div class="ico-badge sm c-green"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg></div><h4>Входит</h4></div>
@@ -513,14 +526,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
             </div>
           </div>
           <div class="scope-note">Обслуживание не обязательно — сайт остаётся рабочим и без подписки. Нужна правка изредка — закажите её разово. Правок много — подписка выходит дешевле и даёт приоритетный ответ.</div>
-        </div>
+        </div></div>
       </div>
 
       <div class="buy-card">
-        <div class="fine-print">
-          <span>Крупные доработки и новые разделы — отдельная оценка</span>
-          <span>Неиспользованные заявки не переносятся</span>
-          <span>Продление — отдельная оплата, без автосписания</span>
+        <div class="fine-list">
+          <div class="fine-list-item"><div class="fi-ico"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="5"/><path d="M8 12h8M12 8v8"/></svg></div><span>Крупные доработки и новые разделы — отдельная оценка</span></div>
+          <div class="fine-list-item"><div class="fi-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"/></svg></div><span>Неиспользованные заявки не переносятся на следующий период</span></div>
+          <div class="fine-list-item"><div class="fi-ico"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M3 10.5h18"/><path d="M5 3.5l16 16"/></svg></div><span>Продление — отдельная оплата, автосписания нет</span></div>
         </div>
 
         <div class="buy-divider"></div>
@@ -530,7 +543,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
           <span>Я ознакомлен(а) с условиями обслуживания и лимитом заявок</span>
         </label>
 
-        <button class="btn btn-primary btn-full" id="buyOneBtn" onclick="payForSupport(false)" disabled>Выберите тариф</button>
+        <button class="btn btn-primary btn-full btn-pay" id="buyOneBtn" onclick="payForSupport(false)" disabled><span class="btn-label">Выберите тариф</span><svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </div>
     </div>
 
@@ -566,11 +579,11 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
           </div>
         </div>
         <div class="buy-divider"></div>
-        <div class="fine-print" style="margin-bottom:20px">
-          <span>Оплата после отправки заявки в работу не возвращается</span>
-          <span>Крупные доработки сюда не входят — только точечная задача</span>
+        <div class="fine-list" style="margin-bottom:24px">
+          <div class="fine-list-item"><div class="fi-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v6"/><circle cx="12" cy="16.3" r="1" fill="currentColor" stroke="none"/></svg></div><span>Оплата после начала работы над заявкой не возвращается</span></div>
+          <div class="fine-list-item"><div class="fi-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></svg></div><span>Крупные доработки сюда не входят — только одна точечная задача</span></div>
         </div>
-        <button class="btn btn-primary btn-full" id="onceSubmitBtn" onclick="submitOnceOff()">Оплатить 350 ₽ и отправить</button>
+        <button class="btn btn-primary btn-full btn-pay" id="onceSubmitBtn" onclick="submitOnceOff()"><span class="btn-label">Оплатить 350 ₽ и отправить</span><svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
       </div>
     </div>
   </div>
@@ -821,6 +834,12 @@ function renderSiteGrid(){
 
 window.pickSite=function(id){switchSite(id);};
 
+function setBtnLabel(btn,text){
+  if(!btn)return;
+  const label=btn.querySelector('.btn-label');
+  if(label)label.textContent=text;else btn.textContent=text;
+}
+
 function openTariffFor(o){
   pendBuyId=o.id;
   pendTariff=null;
@@ -830,7 +849,7 @@ function openTariffFor(o){
   document.getElementById('buyTargetType').innerHTML=olabel(o);
   document.getElementById('termsCheckbox').checked=false;
   document.querySelectorAll('.tariff-card').forEach(c=>c.classList.remove('sel'));
-  const btn=document.getElementById('buyOneBtn');btn.disabled=true;btn.textContent='Выберите тариф';
+  const btn=document.getElementById('buyOneBtn');btn.disabled=true;setBtnLabel(btn,'Выберите тариф');
   hide('buyStepSite','onceOffPanel');show('buyStepTariff');
 }
 
@@ -838,16 +857,18 @@ window.selectTariff=function(key){
   pendTariff=key;
   document.querySelectorAll('.tariff-card').forEach(c=>c.classList.toggle('sel',c.dataset.tariff===key));
   const btn=document.getElementById('buyOneBtn');
-  btn.textContent=`Подключить за ${TARIFFS[key].price} ₽`;
+  setBtnLabel(btn,`Подключить за ${TARIFFS[key].price} ₽`);
   btn.disabled=!document.getElementById('termsCheckbox').checked;
 };
 
 window.toggleScope=function(){
   const body=document.getElementById('scopeBody');
   const btn=document.getElementById('scopeToggle');
+  const block=document.getElementById('scopeBlock');
   const open=body.style.display==='none';
   body.style.display=open?'block':'none';
   btn.classList.toggle('open',open);
+  block.classList.toggle('open',open);
 };
 
 document.getElementById('termsCheckbox')?.addEventListener('change',function(){
@@ -892,9 +913,9 @@ window.payForSupport=async function(renew){
   }
   const price=TARIFFS[tariff].price;
   inFlight=true;pendId=id;
-  const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;btn.textContent='Переходим к оплате...';}
+  const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;setBtnLabel(btn,'Переходим к оплате...');}
   try{const idToken=await auth.currentUser.getIdToken();const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId:id,amount:price,type:'support',tariff})});const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();}
-  catch(e){inFlight=false;if(btn){btn.disabled=false;btn.textContent=renew?`Продлить · ${price} ₽`:`Подключить за ${price} ₽`;}toast('Не удалось открыть оплату','error');}
+  catch(e){inFlight=false;if(btn){btn.disabled=false;setBtnLabel(btn,renew?`Продлить · ${price} ₽`:`Подключить за ${price} ₽`);}toast('Не удалось открыть оплату','error');}
 };
 
 function renderRating(t){
@@ -948,7 +969,7 @@ window.submitOnceOff=async function(){
   if(!title){toast('Введите тему заявки','error');return;}
   if(!targetId){toast('Не найден сайт','error');return;}
   if(inFlight)return;inFlight=true;
-  const btn=document.getElementById('onceSubmitBtn');btn.disabled=true;btn.textContent='Оформляем...';
+  const btn=document.getElementById('onceSubmitBtn');btn.disabled=true;setBtnLabel(btn,'Оформляем...');
   try{
     const o=done.find(x=>x.id===targetId);
     const ref=await addDoc(collection(db,'service_tickets'),{
@@ -965,7 +986,7 @@ window.submitOnceOff=async function(){
     if(d.paymentUrl){window.location.href=d.paymentUrl;return;}
     throw new Error();
   }catch(e){
-    inFlight=false;btn.disabled=false;btn.textContent='Оплатить 350 ₽ и отправить';
+    inFlight=false;btn.disabled=false;setBtnLabel(btn,'Оплатить 350 ₽ и отправить');
     toast('Не удалось оформить заявку','error');
   }
 };

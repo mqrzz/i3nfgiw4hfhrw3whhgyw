@@ -171,6 +171,43 @@
     }
     .btn-secondary:hover { border-color: var(--border2); background: var(--bg2); }
 
+    .pay-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin: 0 auto 28px;
+      max-width: 380px;
+      text-align: left;
+      animation: fade-up .5s ease both;
+      animation-delay: .35s;
+    }
+    .pay-meta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+    }
+    .pay-meta-row + .pay-meta-row {
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+    .pay-meta-label { color: var(--muted); }
+    .pay-meta-value {
+      font-weight: 500;
+      color: var(--text);
+      font-feature-settings: "tnum";
+    }
+    .pay-meta-value.mono {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 12.5px;
+      letter-spacing: 0;
+    }
+
     .support-link {
       display: inline-block;
       margin-top: 20px;
@@ -204,6 +241,16 @@
       </div>
       <h1 class="success-title">Оплата <em>прошла</em></h1>
       <p class="success-desc">Спасибо, что выбрали Antviz. Все готово — посмотрите статус в личном кабинете.</p>
+      <div class="pay-meta" id="payMeta">
+        <div class="pay-meta-row">
+          <span class="pay-meta-label">Сумма</span>
+          <span class="pay-meta-value" id="payAmount">—</span>
+        </div>
+        <div class="pay-meta-row" id="payIdRow" style="display:none">
+          <span class="pay-meta-label">Номер платежа</span>
+          <span class="pay-meta-value mono" id="payId">—</span>
+        </div>
+      </div>
       <div class="btn-group">
         <a href="profile" class="btn btn-primary">Перейти в личный кабинет</a>
         <a href="/" class="btn btn-secondary">На главную</a>
@@ -214,7 +261,7 @@
     <div id="stError" style="display:none">
       <div class="icon-wrap"><div class="icon-circle" style="background:rgba(232,99,79,.1);animation:none"><svg viewBox="0 0 44 44" fill="none" width="44" height="44"><path d="M14 14L30 30M30 14L14 30" stroke="#e8634f" stroke-width="3" stroke-linecap="round"/></svg></div></div>
       <h1 class="success-title" style="animation:none">Оплата <em style="color:#e8634f">не подтверждена</em></h1>
-      <p class="success-desc" style="animation:none">Оплата не найдена или ещё не обработана. Если вы только что оплатили — зайдите в личный кабинет через минуту.</p>
+      <p class="success-desc" style="animation:none" id="errorDesc">Оплата не найдена или ещё не обработана. Если вы только что оплатили — зайдите в личный кабинет через минуту.</p>
       <div class="btn-group" style="animation:none">
         <a href="profile" class="btn btn-primary">Личный кабинет</a>
         <a href="/" class="btn btn-secondary">На главную</a>
@@ -225,9 +272,105 @@
   </div>
 
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-<script>
-  document.getElementById('stLoading').style.display = 'none';
-  document.getElementById('stSuccess').style.display = 'block';
+<script type="module">
+  import { auth } from './firebase-config.js';
+  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+  const CHECK_URL = 'https://api-lac-six-78.vercel.app/api/checkPayment';
+  const POLL_ATTEMPTS = 8;
+  const POLL_DELAY_MS = 1500;
+  const AUTH_TIMEOUT_MS = 5000;
+
+  const stLoading = document.getElementById('stLoading');
+  const stSuccess = document.getElementById('stSuccess');
+  const stError   = document.getElementById('stError');
+
+  function show(state) {
+    stLoading.style.display = state === 'loading' ? '' : 'none';
+    stSuccess.style.display = state === 'success' ? 'block' : 'none';
+    stError.style.display   = state === 'error' ? 'block' : 'none';
+  }
+
+  function fail(message) {
+    if (message) document.getElementById('errorDesc').textContent = message;
+    show('error');
+  }
+
+  function renderSuccess({ amount, paymentId }) {
+    document.getElementById('payAmount').textContent = amount != null
+      ? `${Number(amount).toLocaleString('ru-RU')} ₽`
+      : '—';
+    if (paymentId) {
+      document.getElementById('payIdRow').style.display = '';
+      document.getElementById('payId').textContent = paymentId;
+    }
+    show('success');
+  }
+
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+  async function waitForUser() {
+    return new Promise(resolve => {
+      const timer = setTimeout(() => resolve(null), AUTH_TIMEOUT_MS);
+      const unsub = onAuthStateChanged(auth, u => {
+        clearTimeout(timer);
+        unsub();
+        resolve(u);
+      });
+    });
+  }
+
+  (async function init() {
+    show('loading');
+
+    // Случайный заход без параметров платежа — сразу показываем "не подтверждена",
+    // не дёргая бэкенд.
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get('orderId');
+    const type = params.get('type') || 'order';
+    const ticketId = params.get('ticketId');
+    if (!orderId) {
+      fail('Похоже, вы открыли эту страницу напрямую. Если вы оплачивали заказ — статус можно посмотреть в личном кабинете.');
+      return;
+    }
+
+    const user = await waitForUser();
+    if (!user) {
+      fail('Не удалось подтвердить вход в аккаунт. Зайдите в личный кабинет и проверьте статус оплаты там.');
+      return;
+    }
+
+    let idToken;
+    try {
+      idToken = await user.getIdToken();
+    } catch {
+      fail('Не удалось подтвердить вход в аккаунт. Зайдите в личный кабинет и проверьте статус оплаты там.');
+      return;
+    }
+
+    for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
+      try {
+        const r = await fetch(CHECK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+          body: JSON.stringify({ orderId, type, ticketId }),
+        });
+        if (r.ok) {
+          const d = await r.json();
+          if (d.paid) { renderSuccess(d); return; }
+        } else if (r.status === 403 || r.status === 404) {
+          // Чужой/несуществующий заказ — дальше опрашивать бессмысленно
+          fail('Оплата не найдена. Если вы только что оплатили — зайдите в личный кабинет через минуту.');
+          return;
+        }
+      } catch {
+        // сетевая ошибка — просто пробуем ещё раз
+      }
+      if (attempt < POLL_ATTEMPTS - 1) await sleep(POLL_DELAY_MS);
+    }
+
+    fail('Оплата ещё не подтверждена ЮKассой. Обычно это занимает несколько секунд — зайдите в личный кабинет через минуту.');
+  })();
 </script>
 <script src="GEOBLOCK.js"></script>
 <script type="module" src="maintenance.js"></script>

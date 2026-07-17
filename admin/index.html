@@ -6,189 +6,219 @@
   <title>Дашборд — Antviz Admin.</title>
   <link rel="icon" href="../img/favicon.png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
-  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
-  --dark:#191b1e;--dark2:#2b2f33;
-  --red:#e8634f;--warn:#f59e0b;--info:#3b82f6;
-  --font:'Geologica','Inter','Arial',sans-serif;
-  --sidebar-w:256px;
+  /* — переопределённые токены (имена сохранены для совместимости с JS-инлайн стилями) — */
+  --green:#ff5a1f;--green-h:#e0480d;--green-d:#b23c10;
+  --bg:#f6f1e6;--bg2:#ece3cd;--bg3:#faf7ee;
+  --text:#16171b;--muted:#8a8168;--border:#dcd0ac;--border2:#c6b98c;
+  --dark:#16171b;--dark2:#232630;
+  --red:#a83a28;--warn:#8f6c15;--info:#33566a;
+  --font:'Space Grotesk','Arial',sans-serif;
+  --font-display:'Fraunces','Georgia',serif;
+  --font-mono:'JetBrains Mono','Consolas',monospace;
+  --sidebar-w:236px;--topbar-h:56px;
+  --cut:16px;
 }
-html,body{height:100%;background:var(--bg2)}
-body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:var(--bg)}
+body{color:var(--text);font-family:var(--font);font-weight:400;line-height:1.5;-webkit-font-smoothing:antialiased}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes wipeIn{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes railIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 ::-webkit-scrollbar{width:4px;height:4px}
-::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb{background:var(--border2)}
 
 .loading-screen{position:fixed;inset:0;z-index:1000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.spinner{width:28px;height:28px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-.loading-text{font-size:13px;color:rgba(255,255,255,.4)}
+.spinner{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.loading-text{font-size:12px;font-family:var(--font-mono);letter-spacing:.06em;color:rgba(255,255,255,.4);text-transform:uppercase}
 
-/* SIDEBAR */
-.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--dark);display:flex;flex-direction:column;z-index:100}
-.sidebar-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07)}
-.sidebar-logo-mark{width:34px;height:34px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sidebar-logo-mark svg{width:18px;height:18px;fill:var(--dark)}
-.sidebar-logo-name{font-weight:500;font-size:.95rem;color:#fff;letter-spacing:-.02em}
-.sidebar-logo-badge{margin-left:auto;font-size:.58rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;background:rgba(232,99,79,.15);color:var(--red);border:1px solid rgba(232,99,79,.25);padding:.15rem .5rem;border-radius:7px;flex-shrink:0}
+/* ══════ SIDEBAR — узкая рейка-оглавление, без пилюль ══════ */
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sidebar-w);background:var(--dark);display:flex;flex-direction:column;z-index:100;border-right:1px solid rgba(255,255,255,.08)}
+.sidebar-logo{padding:0 20px;height:var(--topbar-h);display:flex;align-items:center;gap:11px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sidebar-logo-mark{width:26px;height:26px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;clip-path:polygon(0 0,100% 0,100% 100%,6px 100%,0 calc(100% - 6px))}
+.sidebar-logo-mark svg{width:14px;height:14px;fill:var(--dark)}
+.sidebar-logo-name{font-family:var(--font-display);font-weight:600;font-size:1rem;color:#fff;letter-spacing:-.02em}
+.sidebar-logo-badge{margin-left:auto;font-family:var(--font-mono);font-size:.56rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.18);padding:.15rem .4rem;flex-shrink:0}
 
-.sidebar-nav{flex:1;padding:14px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.sidebar-section{font-size:.6rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.25);padding:14px 10px 5px;margin-top:6px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;text-decoration:none;color:rgba(255,255,255,.45);font-size:.85rem;font-weight:300;transition:background .15s,color .15s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
-.nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
-.nav-item.active{background:rgba(30,222,123,.12);color:var(--green)}
-.nav-item svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.nav-badge{position:absolute;right:10px;background:var(--red);color:#fff;font-size:.58rem;font-weight:500;min-width:17px;height:17px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px}
-.sidebar-footer{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
+.sidebar-nav{flex:1;padding:10px 0;overflow-y:auto;display:flex;flex-direction:column}
+.sidebar-section{font-family:var(--font-mono);font-size:.58rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.22);padding:16px 20px 6px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;text-decoration:none;color:rgba(255,255,255,.42);font-size:.83rem;font-weight:400;transition:color .15s,background .15s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative;border-left:2px solid transparent;opacity:0;animation:railIn .35s ease forwards}
+.nav-item:nth-child(1){animation-delay:.02s}.nav-item:nth-child(2){animation-delay:.06s}.nav-item:nth-child(3){animation-delay:.1s}.nav-item:nth-child(4){animation-delay:.14s}.nav-item:nth-child(5){animation-delay:.18s}.nav-item:nth-child(6){animation-delay:.22s}
+.nav-idx{font-family:var(--font-mono);font-size:.62rem;color:rgba(255,255,255,.22);width:14px;flex-shrink:0}
+.nav-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.85)}
+.nav-item.active{background:rgba(255,90,31,.1);color:var(--green);border-left-color:var(--green)}
+.nav-item.active .nav-idx{color:var(--green)}
+.nav-item svg{width:15px;height:15px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.nav-badge{position:absolute;right:16px;background:var(--green);color:var(--dark);font-family:var(--font-mono);font-size:.6rem;font-weight:600;min-width:16px;height:16px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.sidebar-footer{padding:6px 0;border-top:1px solid rgba(255,255,255,.08)}
 
-/* TOPBAR */
-.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:68px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:90}
-.topbar-title{font-weight:500;font-size:1rem;color:var(--text);letter-spacing:-.02em}
-.topbar-right{display:flex;align-items:center;gap:10px}
+/* ══════ TOPBAR — тонкая утилитарная полоса, слита с рейкой ══════ */
+.topbar{position:fixed;top:0;left:var(--sidebar-w);right:0;height:var(--topbar-h);background:var(--dark);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:90}
+.topbar-title{font-family:var(--font-mono);font-weight:500;font-size:.72rem;color:rgba(255,255,255,.5);letter-spacing:.04em;text-transform:uppercase}
+.topbar-title::before{content:'admin / ';color:rgba(255,255,255,.25)}
+.topbar-right{display:flex;align-items:center;gap:8px}
 
-/* Кнопка технических работ */
-.maint-btn{display:inline-flex;align-items:center;gap:10px;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.5rem 1rem .5rem .6rem;font-family:var(--font);font-size:.82rem;font-weight:300;color:var(--muted);cursor:pointer;transition:all .2s}
-.maint-btn:hover{border-color:var(--border2);color:var(--text)}
-.maint-btn.on{background:rgba(245,158,11,.06);border-color:rgba(245,158,11,.3);color:var(--warn)}
-.maint-track{width:30px;height:17px;border-radius:50px;background:var(--border2);position:relative;flex-shrink:0;transition:background .2s}
-.maint-track::after{content:'';position:absolute;top:2.5px;left:2.5px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s,background .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.maint-btn{display:inline-flex;align-items:center;gap:9px;background:transparent;border:1px solid rgba(255,255,255,.16);padding:.4rem .8rem .4rem .5rem;font-family:var(--font);font-size:.78rem;font-weight:400;color:rgba(255,255,255,.55);cursor:pointer;transition:all .15s}
+.maint-btn:hover{border-color:rgba(255,255,255,.4);color:#fff}
+.maint-btn.on{background:rgba(143,108,21,.18);border-color:var(--warn);color:#e0c15c}
+.maint-track{width:26px;height:14px;border-radius:50px;background:rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:background .2s}
+.maint-track::after{content:'';position:absolute;top:2px;left:2px;width:10px;height:10px;border-radius:50%;background:#fff;transition:transform .2s}
 .maint-btn.on .maint-track{background:var(--warn)}
-.maint-btn.on .maint-track::after{transform:translateX(13px)}
+.maint-btn.on .maint-track::after{transform:translateX(12px)}
 .maint-label{white-space:nowrap}
 
-.topbar-btn{display:inline-flex;align-items:center;gap:7px;background:var(--dark);border:none;color:rgba(255,255,255,.8);font-family:var(--font);font-size:.82rem;font-weight:400;padding:.55rem 1.1rem;border-radius:14px;cursor:pointer;transition:background .15s}
-.topbar-btn:hover{background:var(--dark2)}
-.topbar-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.7;flex-shrink:0}
+.topbar-btn{display:inline-flex;align-items:center;gap:7px;background:var(--green);border:none;color:var(--dark);font-family:var(--font);font-size:.78rem;font-weight:600;padding:.45rem 1rem;cursor:pointer;transition:background .15s}
+.topbar-btn:hover{background:var(--green-h)}
+.topbar-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0}
 
-/* MAIN */
-.main{margin-left:var(--sidebar-w);margin-top:68px;padding:32px 36px;min-height:calc(100vh - 68px);animation:fadeUp .3s ease}
+/* ══════ MAIN ══════ */
+.main{margin-left:var(--sidebar-w);margin-top:var(--topbar-h);padding:40px 40px 60px;min-height:calc(100vh - var(--topbar-h));animation:fadeUp .4s ease}
 
-/* HERO BLOCK */
-.dash-hero{background:var(--dark);border-radius:32px;padding:36px 40px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.dash-hero-text h1{font-size:clamp(24px,2.5vw,36px);font-weight:500;color:#fff;letter-spacing:-.03em;margin-bottom:6px}
-.dash-hero-text p{font-size:.88rem;color:rgba(255,255,255,.4);font-weight:300}
-.dash-hero-actions{display:flex;gap:10px;flex-shrink:0}
-.btn-hero-green{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:var(--dark);font-family:var(--font);font-size:.84rem;font-weight:500;padding:.6rem 1.2rem;border-radius:12px;border:none;cursor:pointer;transition:background .15s,transform .12s;text-decoration:none}
+/* ══════ HERO / MASTHEAD — асимметричный, без центрирования ══════ */
+.dash-hero{position:relative;padding:38px 44px 34px;margin-bottom:34px;background:var(--dark);color:#fff;clip-path:polygon(0 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%);animation:wipeIn .55s cubic-bezier(.65,0,.35,1)}
+.dash-hero-text{max-width:640px}
+.dash-hero-text h1{font-family:var(--font-display);font-size:clamp(38px,5.2vw,74px);font-weight:600;font-style:italic;color:#fff;letter-spacing:-.02em;line-height:.98;margin-bottom:10px}
+.dash-hero-text p{font-family:var(--font-mono);font-size:.78rem;color:rgba(255,255,255,.4);letter-spacing:.01em}
+.dash-hero-actions{display:flex;gap:8px;flex-shrink:0;margin-top:24px;flex-wrap:wrap}
+.btn-hero-green{display:inline-flex;align-items:center;gap:7px;background:var(--green);color:var(--dark);font-family:var(--font);font-size:.82rem;font-weight:600;padding:.58rem 1.15rem;border:none;cursor:pointer;transition:background .15s,transform .12s;text-decoration:none;clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%)}
 .btn-hero-green:hover{background:var(--green-h);transform:translateY(-1px)}
-.btn-hero-outline{display:inline-flex;align-items:center;gap:7px;background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);font-family:var(--font);font-size:.84rem;font-weight:300;padding:.6rem 1.2rem;border-radius:12px;border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:all .15s;text-decoration:none}
-.btn-hero-outline:hover{background:rgba(255,255,255,.1);color:#fff}
+.btn-hero-outline{display:inline-flex;align-items:center;gap:7px;background:transparent;color:rgba(255,255,255,.62);font-family:var(--font);font-size:.82rem;font-weight:400;padding:.58rem 1.15rem;border:1px solid rgba(255,255,255,.18);cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-hero-outline:hover{border-color:rgba(255,255,255,.5);color:#fff}
 
-/* STAT GRID */
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:24px}
-.stat-card{background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:22px 24px;transition:box-shadow .15s,transform .15s}
-.stat-card:hover{box-shadow:0 8px 24px rgba(0,0,0,.06);transform:translateY(-1px)}
-.stat-card.dark{background:var(--dark);border-color:var(--dark)}
-.stat-label{font-size:.65rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:10px}
-.stat-card.dark .stat-label{color:rgba(255,255,255,.3)}
-.stat-num{font-size:2rem;font-weight:500;line-height:1;letter-spacing:-.04em;margin-bottom:4px;color:var(--text)}
-.stat-card.dark .stat-num{color:#fff}
+/* ══════ STATS — одна крупная цифра + плотный леджер ══════ */
+.stat-grid{display:grid;grid-template-columns:repeat(6,1fr);grid-template-rows:auto auto;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:28px}
+.stat-card{background:var(--bg3);padding:20px 22px;transition:background .15s}
+.stat-card:hover{background:var(--bg)}
+.stat-card.dark{background:var(--dark);grid-column:span 2;grid-row:span 2;display:flex;flex-direction:column;justify-content:flex-end;padding:26px}
+.stat-label{font-family:var(--font-mono);font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
+.stat-card.dark .stat-label{color:rgba(255,255,255,.32);font-size:.68rem}
+.stat-num{font-family:var(--font-mono);font-size:1.7rem;font-weight:600;line-height:1;letter-spacing:-.02em;margin-bottom:4px;color:var(--text)}
+.stat-card.dark .stat-num{font-family:var(--font-display);font-weight:600;font-style:italic;font-size:clamp(46px,4.4vw,76px);color:#fff;letter-spacing:-.02em;margin-bottom:6px}
 .stat-num.green{color:var(--green-d)}
 .stat-num.glow{color:var(--green)}
 .stat-num.blue{color:var(--info)}
 .stat-num.warn{color:var(--warn)}
 .stat-num.red{color:var(--red)}
-.stat-sub{font-size:.72rem;color:var(--muted)}
+.stat-sub{font-family:var(--font-mono);font-size:.68rem;color:var(--muted)}
 
-/* TARIFF ROW */
-.tariff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
-.tariff-card{background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:20px 22px;display:flex;align-items:center;gap:14px}
-.tariff-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px}
-.tariff-icon.blue{background:rgba(59,130,246,.1)}
-.tariff-icon.green{background:rgba(30,222,123,.12)}
-.tariff-icon.purple{background:rgba(139,92,246,.1)}
-.tariff-name{font-size:.72rem;color:var(--muted);margin-bottom:3px}
-.tariff-num{font-size:1.5rem;font-weight:500;letter-spacing:-.03em;color:var(--text)}
+/* ══════ TARIFFS — полоса-пропорция вместо трёх карточек ══════ */
+.tariff-row{display:flex;border:1px solid var(--border);margin-bottom:28px}
+.tariff-card{flex:1;background:var(--bg3);padding:16px 20px;display:flex;align-items:center;gap:12px;border-right:1px solid var(--border);position:relative;overflow:hidden}
+.tariff-card:last-child{border-right:none}
+.tariff-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.tariff-icon{width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tariff-icon svg{width:16px;height:16px;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tariff-icon.blue{color:var(--info)}.tariff-card:nth-child(1)::before{background:var(--info)}
+.tariff-icon.green{color:var(--green-d)}.tariff-card:nth-child(2)::before{background:var(--green)}
+.tariff-icon.purple{color:#6b5a8f}.tariff-card:nth-child(3)::before{background:#6b5a8f}
+.tariff-name{font-family:var(--font-mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:3px}
+.tariff-num{font-family:var(--font-display);font-size:1.5rem;font-weight:600;letter-spacing:-.02em;color:var(--text)}
 
-/* SECTIONS */
-.section{background:var(--bg);border:1px solid var(--border);border-radius:24px;overflow:hidden;margin-bottom:16px}
-.section-hdr{padding:18px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.section-title{font-weight:500;font-size:.88rem;letter-spacing:-.01em}
-.section-body{padding:20px 24px}
+/* ══════ SECTIONS — плоские леджер-блоки с автонумерацией ══════ */
+.dash-body{counter-reset:sect}
+.section{background:var(--bg3);border:1px solid var(--border);overflow:hidden;margin-bottom:16px;counter-increment:sect;opacity:0;animation:fadeUp .5s ease forwards;animation-delay:.1s}
+.section-hdr{padding:14px 22px;border-bottom:2px solid var(--dark);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.section-hdr::before{content:'0' counter(sect);font-family:var(--font-mono);font-size:.68rem;color:var(--green-d);margin-right:10px}
+.section-title{font-family:var(--font);font-weight:600;font-size:.82rem;letter-spacing:-.005em;flex:1}
+.section-hdr{display:flex}
+.section-body{padding:20px 22px}
 .section-body.no-pad{padding:0}
 
-/* TABLE */
+/* ══════ TABLE — леджер, моно-цифры ══════ */
 .tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:.63rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;padding:10px 20px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg3)}
-.tbl td{padding:13px 20px;font-size:.84rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl th{font-family:var(--font-mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:500;padding:9px 22px;text-align:left;border-bottom:1px solid var(--border);background:var(--bg2)}
+.tbl td{padding:12px 22px;font-size:.83rem;border-bottom:1px solid var(--border);vertical-align:middle}
 .tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--bg3);cursor:pointer}
-.tbl-id{font-size:.72rem;font-weight:500;color:var(--green-d)}
+.tbl tr:hover td{background:var(--bg2);cursor:pointer}
+.tbl-id{font-family:var(--font-mono);font-size:.72rem;font-weight:600;color:var(--green-d)}
 
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:4px;padding:.2rem .6rem;border-radius:8px;font-size:.68rem;font-weight:500;white-space:nowrap}
+/* ══════ BADGES / TAGS — приглушённая функциональная палитра ══════ */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:.22rem .55rem;font-family:var(--font-mono);font-size:.64rem;font-weight:500;white-space:nowrap;border:1px solid transparent}
 .badge-dot{width:4px;height:4px;border-radius:50%;background:currentColor;flex-shrink:0}
-.b0{background:#f2f4f7;color:var(--muted)}
-.b1{background:rgba(245,158,11,.1);color:var(--warn)}
-.b2{background:rgba(59,130,246,.1);color:var(--info)}
-.b3{background:rgba(139,92,246,.1);color:#7c3aed}
-.b4{background:rgba(245,158,11,.1);color:var(--warn)}
-.b5{background:rgba(30,222,123,.12);color:var(--green-d)}
-.tag{display:inline-block;padding:.2rem .65rem;border-radius:8px;font-size:.72rem;font-weight:300}
-.tag-blue{background:rgba(59,130,246,.1);color:var(--info)}
-.tag-green{background:rgba(30,222,123,.12);color:var(--green-d)}
-.tag-purple{background:rgba(139,92,246,.1);color:#7c3aed}
-.tag-warn{background:rgba(245,158,11,.1);color:var(--warn)}
+.b0{background:var(--bg2);color:var(--muted);border-color:var(--border)}
+.b1{background:rgba(143,108,21,.1);color:var(--warn)}
+.b2{background:rgba(51,86,106,.1);color:var(--info)}
+.b3{background:rgba(107,90,143,.1);color:#6b5a8f}
+.b4{background:rgba(143,108,21,.1);color:var(--warn)}
+.b5{background:rgba(255,90,31,.1);color:var(--green-d)}
+.tag{display:inline-block;padding:.2rem .6rem;font-family:var(--font-mono);font-size:.68rem;font-weight:500}
+.tag-blue{background:rgba(51,86,106,.1);color:var(--info)}
+.tag-green{background:rgba(255,90,31,.1);color:var(--green-d)}
+.tag-purple{background:rgba(107,90,143,.1);color:#6b5a8f}
+.tag-warn{background:rgba(143,108,21,.1);color:var(--warn)}
 
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:.5rem 1rem;border-radius:10px;font-family:var(--font);font-size:.8rem;font-weight:500;cursor:pointer;border:none;transition:background .12s,transform .1s;text-decoration:none;white-space:nowrap}
-.btn:hover{transform:translateY(-1px)}
-.btn-green{background:var(--green);color:var(--dark)}
+/* ══════ BUTTONS — плоские, единственный вырез только на акцентной ══════ */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:.5rem 1rem;font-family:var(--font);font-size:.78rem;font-weight:600;cursor:pointer;border:1px solid transparent;transition:background .12s,border-color .12s;text-decoration:none;white-space:nowrap}
+.btn-green{background:var(--green);color:var(--dark);clip-path:polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)}
 .btn-green:hover{background:var(--green-h)}
 .btn-dark{background:var(--dark);color:#fff}
 .btn-dark:hover{background:var(--dark2)}
-.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.btn-outline{background:transparent;border-color:var(--border2);color:var(--muted)}
 .btn-outline:hover{border-color:var(--text);color:var(--text)}
-.btn-danger{background:rgba(232,99,79,.08);color:var(--red);border:1px solid rgba(232,99,79,.2)}
-.btn-danger:hover{background:rgba(232,99,79,.15)}
-.btn-sm{padding:.35rem .7rem;font-size:.74rem;border-radius:9px}
+.btn-danger{background:transparent;color:var(--red);border-color:rgba(168,58,40,.35)}
+.btn-danger:hover{background:rgba(168,58,40,.08)}
+.btn-sm{padding:.35rem .7rem;font-size:.72rem}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+/* ══════ MODAL — без блюра, с фирменным вырезом ══════ */
+.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(22,23,27,.72);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
 .modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border-radius:28px;padding:32px;width:100%;max-width:480px;box-shadow:0 24px 64px rgba(0,0,0,.15)}
-.modal-title{font-weight:500;font-size:1rem;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.02em}
-.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s}
-.modal-close:hover{background:var(--bg2)}
+.modal{background:var(--bg3);padding:30px;width:100%;max-width:460px;clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%);border:1px solid var(--border)}
+.modal-title{font-family:var(--font-display);font-weight:600;font-style:italic;font-size:1.3rem;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em}
+.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:0;width:26px;height:26px;display:flex;align-items:center;justify-content:center;transition:color .15s}
+.modal-close:hover{color:var(--text)}
 .form-group{margin-bottom:14px}
-.form-label{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:500}
-.form-input,.form-textarea,.form-select{width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:var(--font);font-size:.86rem;font-weight:300;outline:none;transition:border-color .15s}
-.form-input:focus,.form-textarea:focus,.form-select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
-.form-textarea{resize:vertical;min-height:80px;line-height:1.5}
+.form-label{display:block;font-family:var(--font-mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-input,.form-textarea,.form-select,.si{width:100%;background:var(--bg2);border:none;border-bottom:1.5px solid var(--border2);padding:.7rem .1rem;color:var(--text);font-family:var(--font);font-size:.85rem;font-weight:400;outline:none;transition:border-color .15s}
+.form-input:focus,.form-textarea:focus,.form-select:focus,.si:focus{border-color:var(--green)}
+.form-textarea{resize:vertical;min-height:76px;line-height:1.5}
 .form-select{cursor:pointer}
-.recipient-box{border:1px solid var(--border);border-radius:14px;background:var(--bg2);max-height:230px;overflow-y:auto}
+.recipient-box{border:1px solid var(--border);background:var(--bg2);max-height:220px;overflow-y:auto}
 .recipient-item{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--border)}
 .recipient-item:last-child{border-bottom:none}
 .recipient-item:hover{background:var(--bg3)}
-.recipient-item.selected{background:rgba(30,222,123,.1)}
-.recipient-avatar{width:32px;height:32px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;flex-shrink:0;text-transform:uppercase}
-.recipient-avatar.all{background:var(--green);color:var(--dark);font-size:.85rem}
+.recipient-item.selected{background:rgba(255,90,31,.08)}
+.recipient-avatar{width:28px;height:28px;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:.68rem;font-weight:600;flex-shrink:0;text-transform:uppercase}
+.recipient-avatar.all{background:var(--green);color:var(--dark)}
 .recipient-text{min-width:0;flex:1}
-.recipient-name{font-size:.83rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recipient-email{font-size:.7rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipient-name{font-size:.82rem;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipient-email{font-family:var(--font-mono);font-size:.66rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .recipient-check{margin-left:auto;color:var(--green-d);flex-shrink:0;opacity:0;font-size:.9rem}
 .recipient-item.selected .recipient-check{opacity:1}
 .recipient-empty{padding:22px 12px;text-align:center;color:var(--muted);font-size:.8rem}
 .modal-footer{display:flex;gap:8px;margin-top:22px}
 .modal-footer .btn{flex:1;justify-content:center}
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:24px;z-index:600;padding:.65rem 1.3rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;transform:translateY(6px)}
+/* ══════ TOAST — плоский ярлык снизу-слева ══════ */
+.toast{position:fixed;bottom:22px;left:22px;z-index:600;padding:.6rem 1.1rem;font-family:var(--font-mono);font-size:.74rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(6px);clip-path:polygon(0 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%)}
 .toast.show{opacity:1;transform:translateY(0)}
-.toast.success{background:var(--green);color:#0d3320}
+.toast.success{background:var(--green);color:#2b1200}
 .toast.error{background:var(--red);color:#fff}
 .toast.info{background:var(--dark);color:#fff}
-.toast.warn{background:var(--warn);color:#fff}
+.toast.warn{background:var(--warn);color:#1c1500}
+
+/* ══════ RESPONSIVE ══════ */
+@media (max-width:900px){
+  :root{--sidebar-w:0px;--topbar-h:48px}
+  .sidebar{width:220px;transform:translateX(-100%);transition:transform .2s}
+  .topbar{left:0}
+  .main{padding:28px 18px 48px}
+  .dash-hero{padding:26px 22px 24px}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+  .stat-card.dark{grid-column:span 2}
+  .tariff-row{flex-direction:column}
+  .tariff-card{border-right:none;border-bottom:1px solid var(--border)}
+  .tariff-card:last-child{border-bottom:none}
+}
   </style>
 </head>
 <body>
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
-  <span class="loading-text">Загрузка...</span>
+  <span class="loading-text">Загрузка</span>
 </div>
 
 <div class="sidebar">
@@ -202,41 +232,49 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
   <nav class="sidebar-nav">
     <div class="sidebar-section">Основное</div>
     <a href="/admin" class="nav-item active">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
+      <span class="nav-idx">01</span>
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Дашборд
     </a>
     <a href="/admin/orders" class="nav-item">
+      <span class="nav-idx">02</span>
       <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
       Заказы
       <span class="nav-badge" id="navBadgeOrders" style="display:none"></span>
     </a>
     <div class="sidebar-section">Клиенты</div>
     <a href="/admin/tickets" class="nav-item">
+      <span class="nav-idx">03</span>
       <svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>
       Обслуживание
       <span class="nav-badge" id="navBadgeTickets" style="display:none"></span>
     </a>
     <a href="/admin/chats" class="nav-item">
+      <span class="nav-idx">04</span>
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       Тикеты поддержки
       <span class="nav-badge" id="navBadgeChats" style="display:none"></span>
     </a>
     <a href="/admin/bans" class="nav-item">
+      <span class="nav-idx">05</span>
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>
       Баны
     </a>
     <a href="/admin/promos" class="nav-item">
+      <span class="nav-idx">06</span>
       <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>
       Промокоды
     </a>
     <div class="sidebar-section">Система</div>
     <a href="/admin/reviews" class="nav-item">
+      <span class="nav-idx">07</span>
       <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
       Отзывы
     </a>
   </nav>
   <div class="sidebar-footer">
-    <button class="nav-item" onclick="doLogout()" style="color:rgba(232,99,79,.8)">
+    <button class="nav-item" onclick="doLogout()" style="color:rgba(168,58,40,.85)">
+      <span class="nav-idx">×</span>
       <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
       Выйти
     </button>
@@ -259,11 +297,11 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 
 <div class="main" id="appWrap" style="display:none">
 
-  <!-- HERO -->
+  <!-- HERO / MASTHEAD -->
   <div class="dash-hero">
     <div class="dash-hero-text">
-      <h1>Добро пожаловать, Админ 👋</h1>
-      <p>Управляйте заказами, клиентами и настройками сайта</p>
+      <h1>Пульт<br/>управления</h1>
+      <p>заказы · клиенты · настройки — antviz.ru</p>
     </div>
     <div class="dash-hero-actions">
       <button class="btn-hero-outline" id="dashRefreshBtn" onclick="loadDashboard()">Обновить</button>
@@ -312,18 +350,20 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
   <!-- TARIFFS -->
   <div class="tariff-row">
     <div class="tariff-card">
-      <div class="tariff-icon blue">🚀</div>
+      <div class="tariff-icon blue"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M4 19l6-6M14 4l6 6-9 9-6-2 2-6 7-7z"/></svg></div>
       <div><div class="tariff-name">Тариф Старт</div><div class="tariff-num" id="sStart">—</div></div>
     </div>
     <div class="tariff-card">
-      <div class="tariff-icon green">📈</div>
+      <div class="tariff-icon green"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M3 17l5-5 4 4 8-9M20 7v6h-6"/></svg></div>
       <div><div class="tariff-name">Тариф Рост</div><div class="tariff-num" id="sGrowth">—</div></div>
     </div>
     <div class="tariff-card">
-      <div class="tariff-icon purple">⚡</div>
+      <div class="tariff-icon purple"><svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 2l4 10-4 10-4-10 4-10z"/></svg></div>
       <div><div class="tariff-name">Тариф Масштаб</div><div class="tariff-num" id="sScale">—</div></div>
     </div>
   </div>
+
+  <div class="dash-body">
 
   <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px">
 
@@ -366,13 +406,13 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
     <div class="section">
       <div class="section-hdr"><span class="section-title">Отчёт для бухгалтерии</span></div>
       <div class="section-body">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end">
           <div>
-            <label style="display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px">С даты (оплаты)</label>
+            <label style="display:block;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:7px">С даты (оплаты)</label>
             <input type="date" class="si" id="repFrom"/>
           </div>
           <div>
-            <label style="display:block;font-size:.78rem;color:var(--muted);margin-bottom:6px">По дату</label>
+            <label style="display:block;font-family:var(--font-mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:7px">По дату</label>
             <input type="date" class="si" id="repTo"/>
           </div>
           <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--muted);padding-bottom:10px">
@@ -381,9 +421,11 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
           <button class="btn btn-dark btn-sm" onclick="generateAccountingReport()">Сформировать PDF</button>
           <button class="btn btn-outline btn-sm" onclick="generateAccountingCsv()">Экспорт CSV</button>
         </div>
-        <div style="font-size:.78rem;color:var(--muted);margin-top:10px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
+        <div style="font-family:var(--font-mono);font-size:.72rem;color:var(--muted);margin-top:12px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
       </div>
     </div>
+  </div>
+
   </div>
 
 </div>
@@ -636,7 +678,7 @@ onAuthStateChanged(auth,async user=>{
     orders.forEach(o=>{(o.extras||[]).forEach(e=>{const l=e==='domain'?'Домен':e==='support'?'Обслуживание':e==='seo'?'SEO':e==='content'?'Контент':e==='shop'?'Каталог':e==='urgent'?'Срочно':e;extrasMap[l]=(extrasMap[l]||0)+1;});});
     const sortedExtras=Object.entries(extrasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
     document.getElementById('popularExtras').innerHTML=sortedExtras.length?sortedExtras.map(([name,count])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--bg2);border-radius:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:var(--bg2)">
         <span style="font-size:.82rem">${name}</span>
         <span style="font-weight:500;font-size:.78rem;color:var(--green-d)">${count}</span>
       </div>`):'<div style="text-align:center;color:var(--muted);font-size:.82rem">Нет данных</div>';
@@ -646,14 +688,14 @@ onAuthStateChanged(auth,async user=>{
     document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
       <div style="margin-bottom:14px">
         <div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:5px"><span>${esc(t)}</span><span style="font-weight:500;color:var(--green-d)">${n}</span></div>
-        <div style="height:5px;background:var(--bg2);border-radius:3px"><div style="height:100%;border-radius:3px;background:var(--green);width:${n/mx*100}%"></div></div>
+        <div style="height:5px;background:var(--bg2)"><div style="height:100%;background:var(--green);width:${n/mx*100}%"></div></div>
       </div>`).join('')||'<div style="color:var(--muted);font-size:.82rem">Нет данных</div>';
 
     const now=new Date();
     const withSupport=orders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>now);
     document.getElementById('supportStats').innerHTML=withSupport.length?withSupport.slice(0,5).map(o=>{
       const exp=o.supportExpiresAt.toDate();const days=Math.ceil((exp-now)/864e5);
-      return`<div style="background:var(--bg2);border-radius:14px;padding:11px 14px;margin-bottom:8px">
+      return`<div style="background:var(--bg2);padding:11px 14px;margin-bottom:8px">
         <div style="font-size:.82rem;font-weight:500;margin-bottom:2px">${esc(o.clientName||'—')}</div>
         <div style="font-size:.72rem;color:${days<3?'var(--red)':'var(--muted)'}">Осталось ${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
       </div>`;}).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Нет активных обслуживаний</div>';

@@ -52,9 +52,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .name-screen-icon svg{width:46px;height:46px;fill:none}
 .name-screen-icon svg path,.name-screen-icon svg circle{stroke:var(--accent);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .name-screen-eyebrow{font-size:.78rem;font-weight:500;text-transform:uppercase;letter-spacing:.14em;color:var(--ink-faint)}
-.name-screen-text{font-size:clamp(2.4rem,8vw,5.2rem);font-weight:500;letter-spacing:-.03em;line-height:1.05;color:var(--ink);animation:popIn .6s cubic-bezier(.16,1,.3,1) both;overflow-wrap:break-word;word-break:break-word;max-width:100%}
+.name-screen-text{font-size:clamp(2.4rem,8vw,5.2rem);font-weight:500;letter-spacing:-.03em;line-height:1.05;color:var(--ink);overflow-wrap:break-word;word-break:break-word;max-width:100%}
 .name-screen-text em{font-style:normal;color:var(--accent-d)}
-.name-screen .btn{margin-top:6px;opacity:0;animation:popIn .5s cubic-bezier(.16,1,.3,1) .3s forwards}
+.name-screen .btn{margin-top:6px}
+.name-screen .btn.enter{animation:popIn .5s cubic-bezier(.16,1,.3,1) .3s}
 @media(min-width:1100px){
   .name-screen-icon{width:130px;height:130px;border-radius:38px}
   .name-screen-icon svg{width:58px;height:58px}
@@ -109,25 +110,30 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .step h1 em{font-style:normal;color:var(--accent-d)}
 .step p{max-width:440px;font-size:1rem;color:var(--ink-dim);font-weight:300;line-height:1.65}
 
-/* ===== покадровое появление контента шага (кроме шага 0 — у него своя хореография) ===== */
-.step:not([data-step="0"]) .step-eyebrow{opacity:0;animation:fadeUp .5s cubic-bezier(.16,1,.3,1) forwards}
-.step:not([data-step="0"]) > h1{opacity:0;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .08s forwards}
-.step:not([data-step="0"]) > p{opacity:0;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .16s forwards}
-.step:not([data-step="0"]) .demo-sidebar,
-.step:not([data-step="0"]) .demo-timeline,
-.step:not([data-step="0"]) .site-mock,
-.step:not([data-step="0"]) .demo-cards{opacity:0;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .26s forwards}
-.step:not([data-step="0"]) .site-stats{opacity:0;animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .34s forwards}
+/* ===== покадровое появление контента шага (кроме шага 0 — у него своя хореография) =====
+   по умолчанию всё видимо; анимация — это бонус поверх, включается JS-классом .enter-choreo
+   на активном шаге. Если анимация будет прервана (сворачивание вкладки), контент останется
+   видимым, а не зависнет невидимым навсегда. */
+.step.enter-choreo:not([data-step="0"]) .step-eyebrow{animation:fadeUp .5s cubic-bezier(.16,1,.3,1)}
+.step.enter-choreo:not([data-step="0"]) > h1{animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .08s}
+.step.enter-choreo:not([data-step="0"]) > p{animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .16s}
+.step.enter-choreo:not([data-step="0"]) .demo-sidebar,
+.step.enter-choreo:not([data-step="0"]) .demo-timeline,
+.step.enter-choreo:not([data-step="0"]) .site-mock,
+.step.enter-choreo:not([data-step="0"]) .demo-cards{animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .26s}
+.step.enter-choreo:not([data-step="0"]) .site-stats{animation:fadeUp .55s cubic-bezier(.16,1,.3,1) .34s}
 
 /* hero name letters */
 .hero-name{position:relative;display:inline-flex;flex-wrap:wrap;justify-content:center;max-width:100%}
 .letter{display:inline-block;opacity:0;transform:translateY(34px) scale(.7);animation:letterUp .65s cubic-bezier(.16,1,.3,1) forwards}
-.sparkle{position:absolute;opacity:0;pointer-events:none}
+.sparkle{position:absolute;pointer-events:none}
 .sparkle svg{width:100%;height:100%;stroke:var(--accent-d);stroke-width:1.6;fill:none}
-.sparkle.s1{top:-26px;left:-34px;width:22px;height:22px;animation:sparklePop .6s 1.05s cubic-bezier(.16,1,.3,1) forwards}
-.sparkle.s2{bottom:-18px;right:-38px;width:16px;height:16px;animation:sparklePop .6s 1.2s cubic-bezier(.16,1,.3,1) forwards}
-.step0-eyebrow{animation:popIn .5s .05s cubic-bezier(.16,1,.3,1) both}
-.step0-p{opacity:0;animation:popIn .6s 1.05s cubic-bezier(.16,1,.3,1) forwards}
+.sparkle.s1{top:-26px;left:-34px;width:22px;height:22px}
+.sparkle.s2{bottom:-18px;right:-38px;width:16px;height:16px}
+.sparkle.s1.enter{animation:sparklePop .6s 1.05s cubic-bezier(.16,1,.3,1)}
+.sparkle.s2.enter{animation:sparklePop .6s 1.2s cubic-bezier(.16,1,.3,1)}
+.step0-eyebrow.enter{animation:popIn .5s .05s cubic-bezier(.16,1,.3,1)}
+.step0-p.enter{animation:popIn .6s 1.05s cubic-bezier(.16,1,.3,1)}
 
 /* ===== STEP — интерактивный сайдбар ===== */
 .demo-sidebar{display:flex;gap:28px;align-items:flex-start;width:100%;text-align:left;margin-top:8px}
@@ -144,6 +150,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 /* ===== STEP — таймлайн заказа (6 статусов) ===== */
 .demo-timeline{display:flex;align-items:flex-start;justify-content:center;gap:0;width:100%;margin-top:8px;padding:0 6px}
 .tl-node{display:flex;flex-direction:column;align-items:center;gap:10px;position:relative;flex:1;min-width:0}
+.tl-body{display:flex;flex-direction:column;align-items:center;gap:8px}
 .tl-rail{position:relative;width:100%;display:flex;align-items:center;justify-content:center;height:15px}
 .tl-line{position:absolute;left:-50%;width:100%;height:2px;top:50%;transform:translateY(-50%);background:var(--line);z-index:1;transition:background .4s}
 .tl-node:first-child .tl-line{display:none}
@@ -270,18 +277,19 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .step-icon{width:76px;height:76px;border-radius:22px;margin-bottom:22px}
   .step-icon svg{width:34px;height:34px}
   .demo-sidebar{flex-direction:column}
-  .demo-nav{width:100%;flex-direction:row;overflow-x:auto;gap:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;-ms-overflow-style:none}
-  .demo-nav::-webkit-scrollbar{display:none}
-  .demo-item{width:auto;flex-shrink:0;white-space:nowrap}
-  .demo-info{min-height:140px}
-  .demo-timeline{flex-direction:column;align-items:stretch;gap:0}
-  .tl-node{flex-direction:row;align-items:flex-start;text-align:left;gap:14px;min-height:66px}
+  .demo-nav{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px}
+  .demo-item{flex-direction:column;justify-content:center;gap:6px;text-align:center;white-space:normal;padding:.9rem .6rem;border-radius:16px}
+  .demo-info{min-height:120px}
+  .demo-timeline{flex-direction:column;align-items:stretch;gap:6px}
+  .tl-node{flex-direction:row;align-items:stretch;text-align:left;gap:14px}
+  .tl-body{align-items:flex-start;gap:4px;padding-bottom:10px}
   .tl-rail{flex-direction:column;width:auto;height:auto;align-self:stretch;align-items:center;justify-content:flex-start}
   .tl-dot{order:1;flex-shrink:0}
   .tl-line{position:static;order:2;width:2px;flex:1;left:auto;top:auto;transform:none;min-height:20px;margin:4px 0 0}
   .tl-node:first-child .tl-line{display:block}
   .tl-node:last-child .tl-line{display:none}
-  .tl-title,.tl-text{text-align:left;max-width:none}
+  .tl-node:last-child .tl-body{padding-bottom:0}
+  .tl-title,.tl-text,.tl-time{text-align:left;max-width:none}
   .tl-title{justify-content:flex-start}
   .site-mock{max-width:100%}
   .site-mock-badge{right:12px}
@@ -526,9 +534,11 @@ function buildTimeline(){
   el.innerHTML = TL_STEPS.map((s,i)=>`
     <div class="tl-node">
       <div class="tl-rail"><div class="tl-line" data-i="${i}"></div><div class="tl-dot" data-i="${i}"></div></div>
-      <div class="tl-title" data-i="${i}">${s.title}</div>
-      <div class="tl-text">${s.text}</div>
-      <div class="tl-time" data-i="${i}" hidden></div>
+      <div class="tl-body">
+        <div class="tl-title" data-i="${i}">${s.title}</div>
+        <div class="tl-text">${s.text}</div>
+        <div class="tl-time" data-i="${i}" hidden></div>
+      </div>
     </div>`).join('');
   let n = 0;
   function tick(){
@@ -609,7 +619,11 @@ function showOutroScreen(name){
       wrap.style.display = 'none';
       document.getElementById('outroScreenText').textContent = name;
       screen.classList.add('show');
-      document.getElementById('outroBtn').addEventListener('click', ()=>resolve(), { once:true });
+      const btn = document.getElementById('outroBtn');
+      btn.classList.remove('enter');
+      void btn.offsetWidth;
+      btn.classList.add('enter');
+      btn.addEventListener('click', ()=>resolve(), { once:true });
     }, prefersReducedMotion ? 0 : 500);
   });
 }
@@ -617,15 +631,20 @@ function showOutroScreen(name){
 /* ---------- покадровое появление контента шагов 1-4 при входе (шаг 0 — своя хореография) ---------- */
 function replayStepEntrance(stepEl){
   if(prefersReducedMotion || !stepEl || stepEl.dataset.step === '0') return;
-  const targets = stepEl.querySelectorAll('.step-eyebrow, :scope > h1, :scope > p, .demo-sidebar, .demo-timeline, .site-mock, .site-stats, .demo-cards');
-  targets.forEach(el=>{ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });
+  stepEl.classList.remove('enter-choreo');
+  void stepEl.offsetWidth;
+  stepEl.classList.add('enter-choreo');
 }
 
 function replayHeroStep(){
   const eyebrow = document.querySelector('.step0-eyebrow');
   const p = document.querySelector('.step0-p');
   const sparkles = document.querySelectorAll('.sparkle');
-  [eyebrow,p,...sparkles].forEach(el=>{ el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });
+  [eyebrow,p,...sparkles].forEach(el=>{
+    el.classList.remove('enter');
+    void el.offsetWidth;
+    el.classList.add('enter');
+  });
   initDrawSVG(document.getElementById('heroSvg'));
 }
 
@@ -808,7 +827,7 @@ onAuthStateChanged(auth, async user => {
   renderNav();
   buildDemoNav();
   buildTimeline();
-  initDrawSVG(document.getElementById('heroSvg'));
+  replayHeroStep();
 });
 </script>
 

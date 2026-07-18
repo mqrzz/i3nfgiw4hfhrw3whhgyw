@@ -242,12 +242,14 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
       <div class="ts">В работе: <strong id="tWork">—</strong></div>
       <div class="ts">Готово: <strong id="tDone">—</strong></div>
       <div class="ts" style="color:#b45309">Возвраты: <strong id="tRefunds">—</strong></div>
+      <div class="ts" style="color:#4f46e5">Правки: <strong id="tRevisions">—</strong></div>
     </div>
   </div>
   <div class="tab-row">
     <button class="tab active" onclick="switchTab('active',this)">Активные</button>
     <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
     <button class="tab" onclick="switchTab('refunds',this)">Возвраты</button>
+    <button class="tab" onclick="switchTab('revisions',this)">Правки</button>
     <button class="tab" onclick="switchTab('all',this)">Все</button>
     <button class="tab" onclick="switchTab('archive',this)">Архив</button>
   </div>
@@ -327,6 +329,12 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
       <div class="sec" id="refundSec" style="display:none;border-color:rgba(245,158,11,.25)">
         <div class="sec-h" style="background:rgba(245,158,11,.05)"><span class="sec-title" style="color:#b45309">Возврат средств</span></div>
         <div class="sec-b" id="refundBody"></div>
+      </div>
+
+      <!-- REVISION REQUEST -->
+      <div class="sec" id="revisionSec" style="display:none;border-color:rgba(99,102,241,.25)">
+        <div class="sec-h" style="background:rgba(99,102,241,.05)"><span class="sec-title" style="color:#4f46e5">Запрошены правки</span></div>
+        <div class="sec-b" id="revisionBody"></div>
       </div>
 
       <!-- CLIENT -->
@@ -508,7 +516,7 @@ function renderList(){
     list=allOrders.filter(o=>o.archived);
   }else{
     const notArchived=allOrders.filter(o=>!o.archived);
-    list=currentTab==='active'?notArchived.filter(o=>o.status<5):currentTab==='done'?notArchived.filter(o=>o.status===5):currentTab==='refunds'?notArchived.filter(o=>o.refundStatus==='requested'):notArchived;
+    list=currentTab==='active'?notArchived.filter(o=>o.status<5):currentTab==='done'?notArchived.filter(o=>o.status===5):currentTab==='refunds'?notArchived.filter(o=>o.refundStatus==='requested'):currentTab==='revisions'?notArchived.filter(o=>o.revisionRequested):notArchived;
   }
   if(q)list=list.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q));
   if(!list.length){el.innerHTML='<div class="es"><span style="font-size:2rem">📋</span>Нет заказов</div>';return;}
@@ -516,7 +524,7 @@ function renderList(){
     const t=o.package||o.tariff||'—';
     const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
     return`<div class="or${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
-      <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:rgba(245,158,11,.15);color:#b45309">Возврат</span>':''}</div>
+      <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:rgba(245,158,11,.15);color:#b45309">Возврат</span>':''}${o.revisionRequested?'<span class="badge" style="background:rgba(99,102,241,.15);color:#4f46e5">Правки</span>':''}</div>
       <div class="or-name">${esc(o.clientName||'—')}</div>
       <div class="or-email">${esc(o.clientEmail||'')}</div>
       <div class="or-f">
@@ -533,8 +541,11 @@ function updateStats(){
   document.getElementById('tDone').textContent=allOrders.filter(o=>o.status===5||o.status===6).length;
   const pendingRefunds=allOrders.filter(o=>o.refundStatus==='requested').length;
   document.getElementById('tRefunds').textContent=pendingRefunds;
+  const pendingRevisions=allOrders.filter(o=>o.revisionRequested).length;
+  document.getElementById('tRevisions').textContent=pendingRevisions;
   const navBadge=document.getElementById('navBadgeOrders');
-  if(navBadge){navBadge.style.display=pendingRefunds?'':'none';navBadge.textContent=pendingRefunds;}
+  const pendingTotal=pendingRefunds+pendingRevisions;
+  if(navBadge){navBadge.style.display=pendingTotal?'':'none';navBadge.textContent=pendingTotal;}
 }
 
 window.selectOrder=id=>{
@@ -629,6 +640,7 @@ function showDetail(o){
   if(o.attachments?.length){as.style.display='';document.getElementById('attachGrid').innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="at" src="${a.fileData}" alt="${esc(a.fileName||'')}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')">`:` <a class="btn btn-outline btn-xs" href="${a.fileData}" download="${esc(a.fileName||'file')}">📎 ${esc(a.fileName||'Файл')}</a>`).join('');}else as.style.display='none';
   renderSupport(o);
   renderRefund(o);
+  renderRevision(o);
   const rev=allReviews.find(r=>r.orderId===o.id);const rs=document.getElementById('reviewSec');
   if(rev){rs.style.display='';document.getElementById('reviewContent').innerHTML=`<div style="background:var(--bg2);border-radius:18px;padding:20px 22px"><div style="color:var(--warn);margin-bottom:8px;font-size:1.2rem">${stars(rev.stars||0)}</div><div style="font-size:.9rem;color:var(--muted);line-height:1.6">${esc(rev.text||'Без текста')}</div></div>`;}else rs.style.display='none';
 }
@@ -687,6 +699,25 @@ function renderRefund(o){
       ${o.refundComment?`<div style="font-size:.85rem;color:var(--muted)">Комментарий: ${esc(o.refundComment)}</div>`:''}`;
   }
 }
+
+// Клиент жмёт "Запросить правки" на orders.html (доступно на статусе "На проверке"),
+// пишет order.revisionRequested=true. Раньше это нигде не отображалось в админке —
+// клиент видел "Запрос отправлен ✓", а заявка уходила в никуда. Показываем здесь,
+// пока флаг не снят.
+function renderRevision(o){
+  const sec=document.getElementById('revisionSec');
+  const body=document.getElementById('revisionBody');
+  if(!o.revisionRequested){sec.style.display='none';body.innerHTML='';return;}
+  sec.style.display='';
+  body.innerHTML=`<div style="font-size:.88rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Клиент запросил правки по заказу — свяжитесь с ним (кнопка «Написать в поддержку» у клиента ведёт в тикеты) и переведите заказ в статус «Правки».</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-dark btn-sm" onclick="markRevisionHandled()">Взято в работу</button>
+    </div>`;
+}
+window.markRevisionHandled=async()=>{
+  if(!selOrderId)return;
+  await safeUpdate(selOrderId,{revisionRequested:false},'Отмечено как взято в работу ✓');
+};
 
 function openPromptModal({icon,iconBg,iconColor,title,sub,field,confirmLabel,confirmClass,onConfirm}){
   document.getElementById('pmIcon').style.background=iconBg;

@@ -224,6 +224,35 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
    тот же брейкпоинт 980px, что и в sidebar.js) ══ */
 .quick-links-tile{display:none}
 @media(max-width:980px){.quick-links-tile{display:block}}
+
+/* ══ PUSH-УВЕДОМЛЕНИЯ — постоянная секция внизу кабинета, никогда не
+   скрывается (даже когда уже подключено — тогда просто меняется статус).
+   Та же тёмная карточка, что hero-block, но ниже всех разделов, во всю
+   ширину контейнера ══ */
+.push-panel{background:var(--dark);border-radius:40px;padding:48px 56px;margin-top:40px;display:flex;align-items:center;gap:48px;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.push-visual{flex-shrink:0;width:150px;height:150px}
+.push-illustration{width:100%;height:100%}
+@keyframes pushPulse{0%,100%{opacity:.3}50%{opacity:1}}
+.push-wave{animation:pushPulse 2.6s ease-in-out infinite}
+.push-wave.d1{animation-delay:.15s}
+.push-wave.d2{animation-delay:.3s}
+.push-wave.d3{animation-delay:.45s}
+.push-body{flex:1;min-width:0}
+.push-eyebrow{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:10px}
+.push-title{font-size:clamp(1.2rem,2vw,1.5rem);font-weight:500;letter-spacing:-.02em;color:#fff;margin-bottom:12px;max-width:560px}
+.push-desc{font-size:.88rem;line-height:1.55;color:rgba(255,255,255,.5);max-width:560px;margin-bottom:24px}
+.push-action{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:46px}
+.push-status{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:500;padding:11px 18px;border-radius:12px;white-space:nowrap}
+.push-status.on{background:var(--green-tint);color:var(--green)}
+.push-status.off{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55)}
+.push-status svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.push-hint{font-size:.78rem;color:rgba(255,255,255,.4);line-height:1.5}
+@media(max-width:860px){
+  .push-panel{flex-direction:column;text-align:center;padding:36px 28px;border-radius:32px;gap:26px}
+  .push-visual{width:110px;height:110px}
+  .push-title,.push-desc{max-width:none}
+  .push-action{justify-content:center}
+}
   </style>
 </head>
 <body>
@@ -328,6 +357,29 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
       </div>
 
     </div>
+
+    <section class="reveal push-panel" id="pushPanel">
+      <div class="push-visual">
+        <svg class="push-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="100" cy="100" r="94" stroke="rgba(30,222,123,.14)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="72" stroke="rgba(30,222,123,.22)" stroke-width="1"/>
+          <path class="push-wave d3" d="M150,70 Q180,100 150,130" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path class="push-wave d2" d="M142,82 Q160,100 142,118" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path class="push-wave d2" d="M58,82 Q40,100 58,118" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path class="push-wave d3" d="M50,70 Q20,100 50,130" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M100 56c-14 0-24 11-24 26 0 30-13 42-13 42h74s-13-12-13-42c0-15-10-26-24-26z" fill="rgba(30,222,123,.14)" stroke="var(--green)" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M90 128a10 10 0 0 0 20 0" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="100" cy="50" r="4" fill="var(--green)"/>
+        </svg>
+      </div>
+      <div class="push-body">
+        <p class="push-eyebrow">Push-уведомления браузера</p>
+        <h2 class="push-title">Узнавайте о новом, даже когда сайт закрыт</h2>
+        <p class="push-desc">Это отдельная вещь от страницы «Уведомления» в кабинете — те вы увидите, только если сами зайдёте на сайт. Push приходит системным уведомлением прямо в браузер или на телефон — даже если вкладка закрыта и вы вышли из аккаунта.</p>
+        <div class="push-action" id="pushAction"><span class="push-hint">Проверяем состояние…</span></div>
+      </div>
+    </section>
+
   </div>
 
 </div><!-- /cabinet -->
@@ -337,7 +389,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <script type="module">
 import { auth, db } from './firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, setDoc, arrayUnion, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 let currentUser=null, unsubOrders=null;
 
@@ -550,6 +603,80 @@ async function loadBento(uid){
   }catch(e){console.error(e);}
 }
 
+/* ══ PUSH-УВЕДОМЛЕНИЯ (FCM) ══
+   Отдельный канал от Firestore-уведомлений в кабинете: пока страница
+   "Уведомления" видна только когда человек сам зашёл на сайт, push
+   приходит системным уведомлением браузера/ОС даже при закрытой вкладке.
+   Секция в разметке никогда не скрывается — меняется только её содержимое
+   (renderPushState) в зависимости от Notification.permission. */
+
+// Project Settings → Cloud Messaging → Web configuration → Web Push
+// certificates (VAPID) в Firebase Console — вставь свой ключ сюда.
+const VAPID_KEY = 'ВСТАВЬ_VAPID_KEY_ИЗ_FIREBASE_CONSOLE';
+
+let fcmMessaging=null, fcmSwReg=null;
+
+async function initPushSection(user){
+  const box=document.getElementById('pushAction');
+  const supported='Notification' in window && 'serviceWorker' in navigator && await isSupported().catch(()=>false);
+  if(!supported){
+    box.innerHTML='<span class="push-hint">Этот браузер не поддерживает push-уведомления</span>';
+    return;
+  }
+  try{
+    fcmSwReg=await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+  }catch(e){
+    console.error('SW register:',e);
+    box.innerHTML='<span class="push-hint">Не удалось подключить push в этом браузере</span>';
+    return;
+  }
+  fcmMessaging=getMessaging();
+  // Пока вкладка открыта и активна, системное уведомление браузер не
+  // покажет сам (это поведение FCM) — показываем тот же текст тостом.
+  onMessage(fcmMessaging,payload=>{
+    const title=payload.notification?.title||'Antviz';
+    const body=payload.notification?.body||'';
+    toast(body?`${title}: ${body}`:title,'success');
+  });
+  renderPushState(user);
+}
+
+function renderPushState(user){
+  const box=document.getElementById('pushAction');
+  const perm=Notification.permission;
+  if(perm==='granted'){
+    box.innerHTML=`<span class="push-status on"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Подключено</span><span class="push-hint">В этом браузере уведомления придут, даже если сайт закрыт</span>`;
+    ensureTokenSaved(user);
+  }else if(perm==='denied'){
+    box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Заблокировано в браузере</span><span class="push-hint">Включить можно в настройках сайта в браузере — обычно значок замка рядом с адресной строкой → «Уведомления»</span>`;
+  }else{
+    box.innerHTML=`<button class="btn btn-green" id="pushEnableBtn" style="padding:13px 24px">Включить push-уведомления</button>`;
+    document.getElementById('pushEnableBtn').onclick=()=>enablePush(user);
+  }
+}
+
+async function ensureTokenSaved(user){
+  try{
+    const token=await getToken(fcmMessaging,{vapidKey:VAPID_KEY,serviceWorkerRegistration:fcmSwReg});
+    if(!token) return;
+    // setDoc+merge вместо updateDoc — документ users/{uid} может ещё не
+    // существовать на этот момент, updateDoc бы упал.
+    await setDoc(doc(db,'users',user.uid),{fcmTokens:arrayUnion(token)},{merge:true});
+  }catch(e){console.error('FCM token:',e);}
+}
+
+async function enablePush(user){
+  try{
+    const perm=await Notification.requestPermission();
+    renderPushState(user);
+    if(perm==='granted') toast('Push-уведомления включены ✓','success');
+    else if(perm==='denied') toast('Уведомления заблокированы в браузере','error');
+  }catch(e){
+    console.error(e);
+    toast('Не удалось включить уведомления','error');
+  }
+}
+
 function watchNotifDot(uid){
   const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
   onSnapshot(q,snap=>{
@@ -578,6 +705,7 @@ onAuthStateChanged(auth,async user=>{
   loadOrderStats(user.uid);
   loadBento(user.uid);
   watchNotifDot(user.uid);
+  initPushSection(user);
 });
 </script>
 

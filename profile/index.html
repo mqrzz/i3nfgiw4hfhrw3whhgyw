@@ -9,7 +9,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
-  <!-- Добавление -->
+  <!-- Раньше тут подключался внешний шрифт-иконки Phosphor с CDN — единственное
+       место на сайте, где иконки не инлайновый SVG прямо в коде, как везде
+       (settings.html, quick-links и т.д.). Из-за внешней зависимости страница
+       либо ждала загрузку шрифта чтобы вообще отрисоваться, либо (после первой
+       попытки ускорить через async-загрузку) иконки грузились не во всех
+       браузерах. Убрали шрифт целиком, все иконки теперь инлайн-SVG. -->
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -250,14 +255,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 }
   </style>
 <link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Antviz">
 <link rel="apple-touch-icon" href="/img/favicon.png">
 </head>
 <body>
-<script src="sidebar.js" data-page="profile"></script>
-<script src="nav.js"></script>
+<script src="/sidebar.js" data-page="profile"></script>
+<script src="/nav.js"></script>
 
 <div id="sbContent">
 
@@ -388,7 +394,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
+import { auth, db } from '/firebase-config.js';
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, setDoc, arrayUnion, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
@@ -742,12 +748,12 @@ onAuthStateChanged(auth,async user=>{
 });
 </script>
 
-<script src="footer.js" data-page="profile"></script>
+<script src="/footer.js" data-page="profile"></script>
 
 </div><!-- /sbContent -->
 
-<script src="GEOBLOCK.js"></script>
-<script type="module" src="maintenance.js"></script>
-<script src="notify.js"></script>
+<script src="/GEOBLOCK.js"></script>
+<script type="module" src="/maintenance.js"></script>
+<script src="/notify.js"></script>
 </body>
 </html>

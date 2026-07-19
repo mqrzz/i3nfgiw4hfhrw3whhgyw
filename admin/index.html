@@ -399,6 +399,15 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
     </div>
     <div class="form-group"><label class="form-label">Заголовок</label><input class="form-input" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
     <div class="form-group"><label class="form-label">Текст</label><textarea class="form-textarea" id="notifText" placeholder="Текст..."></textarea></div>
+    <div class="form-group">
+      <label class="form-label">Каналы отправки</label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.86rem;margin-bottom:8px;cursor:pointer">
+        <input type="checkbox" id="notifChanInApp" checked/> В личном кабинете (страница «Уведомления»)
+      </label>
+      <label style="display:flex;align-items:center;gap:8px;font-size:.86rem;cursor:pointer">
+        <input type="checkbox" id="notifChanPush" checked/> Push в браузер (только тем, кто подключил)
+      </label>
+    </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeNotifModal()">Отмена</button>
       <button class="btn btn-green" onclick="sendNotif()">Отправить</button>
@@ -419,6 +428,11 @@ function toast(m,t='info'){const el=document.getElementById('toast');el.textCont
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
 
+// URL функции /api/sendPush из отдельного репозитория antviz-push-api —
+// подставь сюда адрес
+const PUSH_API_URL='https://push-1829wjhgeeedht.vercel.app/api/sendPush';
+
+let currentAdminUser=null;
 let maintEnabled=false;
 onSnapshot(doc(db,'settings','maintenance'),snap=>{
   maintEnabled=snap.exists()&&snap.data().enabled===true;
@@ -486,20 +500,55 @@ window.openNotifModal=async()=>{
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 window.closeNotifModal=()=>document.getElementById('notifModal').classList.remove('show');
+// Push (FCM) шлётся отдельным запросом на бэкенд antviz-push-api — из
+// браузера напрямую в FCM достучаться нельзя, нужен Admin SDK с сервисным
+// ключом. Идёт независимо от Firestore-канала: если у части получателей
+// push не подключён, они просто не попадут в рассылку по этому каналу,
+// это не ошибка.
+async function sendPushChannel(target,title,text){
+  const idToken=await currentAdminUser.getIdToken();
+  const res=await fetch(PUSH_API_URL,{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
+    body:JSON.stringify({target,title,text}),
+  });
+  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error||'push отправка не удалась');}
+  return res.json();
+}
+
 window.sendNotif=async()=>{
   const target=_notifTarget;
   const title=document.getElementById('notifTitle').value.trim();
   const text=document.getElementById('notifText').value.trim();
+  const wantInApp=document.getElementById('notifChanInApp').checked;
+  const wantPush=document.getElementById('notifChanPush').checked;
   if(!title||!text){toast('Заполните все поля','error');return;}
+  if(!wantInApp&&!wantPush){toast('Выберите хотя бы один канал','error');return;}
+  if(target==='all'&&!_allUsers.length){toast('Нет активных пользователей','error');return;}
+
   try{
-    if(target==='all'){
-      if(!_allUsers.length){toast('Нет активных пользователей','error');return;}
-      await Promise.all(_allUsers.map(u=>addDoc(collection(db,'notifications',u.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
-      toast(`Отправлено ${_allUsers.length} пользователям ✓`,'success');
-    }else{
-      await addDoc(collection(db,'notifications',target,'items'),{title,text,read:false,createdAt:serverTimestamp()});
-      toast('Отправлено ✓','success');
+    if(wantInApp){
+      if(target==='all'){
+        await Promise.all(_allUsers.map(u=>addDoc(collection(db,'notifications',u.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
+      }else{
+        await addDoc(collection(db,'notifications',target,'items'),{title,text,read:false,createdAt:serverTimestamp()});
+      }
     }
+
+    let pushInfo='';
+    if(wantPush){
+      try{
+        const r=await sendPushChannel(target,title,text);
+        pushInfo=`, push: ${r.sent}${r.failed?` (${r.failed} не доставлено)`:''}`;
+      }catch(e){
+        console.error('push:',e);
+        toast('В кабинете отправлено, но push не удался: '+e.message,'error');
+        closeNotifModal();
+        return;
+      }
+    }
+
+    toast(target==='all'?`Отправлено ${_allUsers.length} пользователям${pushInfo} ✓`:`Отправлено ✓${pushInfo}`,'success');
     closeNotifModal();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
@@ -596,6 +645,7 @@ onAuthStateChanged(auth,async user=>{
   try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
   if(!isAdmin){window.location.href='/';return;}
+  currentAdminUser=user;
   document.getElementById('appWrap').style.display='block';
   getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
 

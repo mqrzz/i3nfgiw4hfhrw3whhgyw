@@ -60,7 +60,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .name-screen-text{font-size:clamp(2.4rem,8vw,5.2rem);font-weight:500;letter-spacing:-.03em;line-height:1.05;color:var(--ink);overflow-wrap:break-word;word-break:break-word;max-width:100%}
 .name-screen-text em{font-style:normal;color:var(--accent-d)}
 .name-screen .btn{margin-top:6px}
-.name-screen .btn.enter{animation:popIn .5s cubic-bezier(.16,1,.3,1) .3s}
+.name-screen .btn.enter{animation:popIn .5s cubic-bezier(.16,1,.3,1) .3s backwards}
 @media(min-width:1100px){
   .name-screen-icon{width:130px;height:130px;border-radius:38px}
   .name-screen-icon svg{width:58px;height:58px}
@@ -116,17 +116,9 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .step p{max-width:440px;font-size:1rem;color:var(--ink-dim);font-weight:300;line-height:1.65}
 
 /* ===== покадровое появление контента шага (кроме шага 0 — у него своя хореография) =====
-   по умолчанию всё видимо; анимация — это бонус поверх, включается JS-классом .enter-choreo
-   на активном шаге. Если анимация будет прервана (сворачивание вкладки), контент останется
-   видимым, а не зависнет невидимым навсегда. */
-.step.enter-choreo:not([data-step="0"]) .step-eyebrow{animation:fadeUp .6s cubic-bezier(.2,1.4,.4,1)}
-.step.enter-choreo:not([data-step="0"]) > h1{animation:fadeUp .65s cubic-bezier(.2,1.4,.4,1) .12s}
-.step.enter-choreo:not([data-step="0"]) > p{animation:fadeUp .65s cubic-bezier(.2,1.4,.4,1) .22s}
-.step.enter-choreo:not([data-step="0"]) .demo-sidebar,
-.step.enter-choreo:not([data-step="0"]) .demo-timeline,
-.step.enter-choreo:not([data-step="0"]) .site-mock,
-.step.enter-choreo:not([data-step="0"]) .demo-cards{animation:fadeUp .65s cubic-bezier(.2,1.4,.4,1) .34s}
-.step.enter-choreo:not([data-step="0"]) .site-stats{animation:fadeUp .65s cubic-bezier(.2,1.4,.4,1) .44s}
+   по умолчанию всё видимо; анимация запускается напрямую на каждом элементе из JS
+   (см. replayStepEntrance) — так же, как и на шаге 0, это надёжнее, чем перезапуск через
+   класс на родителе. Если анимация будет прервана — контент останется видимым. */
 
 /* hero name letters */
 .hero-name{position:relative;display:inline-flex;flex-wrap:wrap;justify-content:center;max-width:100%}
@@ -135,10 +127,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .sparkle svg{width:100%;height:100%;stroke:var(--accent-d);stroke-width:1.6;fill:none}
 .sparkle.s1{top:-26px;left:-34px;width:22px;height:22px}
 .sparkle.s2{bottom:-18px;right:-38px;width:16px;height:16px}
-.sparkle.s1.enter{animation:sparklePop .6s 1.05s cubic-bezier(.16,1,.3,1)}
-.sparkle.s2.enter{animation:sparklePop .6s 1.2s cubic-bezier(.16,1,.3,1)}
-.step0-eyebrow.enter{animation:popIn .5s .05s cubic-bezier(.16,1,.3,1)}
-.step0-p.enter{animation:popIn .6s 1.05s cubic-bezier(.16,1,.3,1)}
+.sparkle.s1.enter{animation:sparklePop .6s 1.05s cubic-bezier(.16,1,.3,1) backwards}
+.sparkle.s2.enter{animation:sparklePop .6s 1.2s cubic-bezier(.16,1,.3,1) backwards}
+.step0-eyebrow.enter{animation:popIn .5s .05s cubic-bezier(.16,1,.3,1) backwards}
+.step0-p.enter{animation:popIn .6s 1.05s cubic-bezier(.16,1,.3,1) backwards}
 
 /* ===== STEP — интерактивный сайдбар ===== */
 .demo-sidebar{display:flex;gap:28px;align-items:flex-start;width:100%;text-align:left;margin-top:8px}
@@ -637,11 +629,19 @@ function showOutroScreen(name){
 }
 
 /* ---------- покадровое появление контента шагов 1-4 при входе (шаг 0 — своя хореография) ---------- */
+function triggerFadeUp(el, delaySec){
+  if(!el) return;
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = `fadeUp .4s cubic-bezier(.2,1.4,.4,1) ${delaySec}s backwards`;
+}
 function replayStepEntrance(stepEl){
   if(prefersReducedMotion || !stepEl || stepEl.dataset.step === '0') return;
-  stepEl.classList.remove('enter-choreo');
-  void stepEl.offsetWidth;
-  stepEl.classList.add('enter-choreo');
+  triggerFadeUp(stepEl.querySelector('.step-eyebrow'), 0);
+  triggerFadeUp(stepEl.querySelector(':scope > h1'), .04);
+  triggerFadeUp(stepEl.querySelector(':scope > p'), .08);
+  triggerFadeUp(stepEl.querySelector('.demo-sidebar, .demo-timeline, .site-mock, .demo-cards'), .14);
+  triggerFadeUp(stepEl.querySelector('.site-stats'), .2);
 }
 
 function replayHeroStep(){

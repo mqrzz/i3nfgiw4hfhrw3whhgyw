@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Кабинет — Antviz</title>
+  <meta name="description" content="Личный кабинет Antviz: заказы, обслуживание, поддержка и настройки аккаунта." />
+  <link rel="icon" href="img/favicon.png" type="image/png"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <!-- Раньше тут подключался внешний шрифт-иконки Phosphor с CDN — единственное
+       место на сайте, где иконки не инлайновый SVG прямо в коде, как везде
+       (settings.html, quick-links и т.д.). Из-за внешней зависимости страница
+       либо ждала загрузку шрифта чтобы вообще отрисоваться, либо (после первой
+       попытки ускорить через async-загрузку) иконки грузились не во всех
+       браузерах. Убрали шрифт целиком, все иконки теперь инлайн-SVG. -->
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;--green-tint:rgba(30,222,123,.12);
+  --bg:#fff;--bg3:#f9fafc;
+  --text:#191b1e;--muted:#707a8a;--muted2:#9aa2b1;
+  --border:#dfe3e8;--border2:#cbcdd6;
+  --dark:#191b1e;--dark2:#2b2f33;
+  --warn:#f59e0b;--warn-tint:rgba(245,158,11,.1);
+  --info:#3b82f6;--info-tint:rgba(59,130,246,.1);
+  --font:'Geologica','Inter','Arial',sans-serif;
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.3;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--green-h);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* Раньше .container был скопирован из index.html (лендинга): свой
+   max-width:1328px + собственные брейкпоинты отступов 20/64/96px.
+   Но profile.html лежит внутри #sbContent, которому sidebar.js уже даёт
+   padding:20px 56px 60px — получались двойные отступы и контент был уже
+   и мельче, чем на остальных страницах кабинета (orders/sites/settings и
+   т.д.), где используется .shell{max-width:1240px} без своих отступов.
+   Приводим .container к тому же max-width и убираем дублирующие отступы —
+   масштаб теперь совпадает с остальным кабинетом. */
+.container{max-width:1240px;margin:0 auto;width:100%}
+
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
+.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+#cabinet{display:none}
+
+.eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
+.eyebrow.g{color:var(--green-d)}
+
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:15px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,box-shadow .12s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark);box-shadow:0 1px 2px rgba(20,153,85,.15),0 10px 24px -10px rgba(20,153,85,.45)}
+.btn-green:hover{background:var(--green-h);box-shadow:0 1px 2px rgba(20,153,85,.2),0 14px 28px -10px rgba(20,153,85,.55)}
+.btn svg,.btn i{font-size:16px}
+
+/* ══ HERO ══ */
+.hero-wrap{padding:44px 0 0}
+.hero-block{background:var(--dark);border-radius:56px;padding:56px 64px;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+@media(max-width:860px){.hero-block{padding:36px 28px;border-radius:32px}}
+
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:40px}
+.hero-id{display:flex;align-items:center;gap:16px;min-width:0}
+.avatar{width:56px;height:56px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:1.4rem;color:#fff;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;transition:opacity .2s}
+.avatar:hover{opacity:.85}
+.avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff}
+.avatar-overlay svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.avatar:hover .avatar-overlay{opacity:1}
+#avatarInput{display:none}
+.hero-id-text{min-width:0}
+.hero-greeting{color:rgba(255,255,255,.35);font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.hero-name{font-weight:500;font-size:clamp(1.5rem,2.6vw,2rem);letter-spacing:-.03em;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.hero-actions{display:flex;gap:8px;flex-shrink:0}
+.icon-btn{width:52px;height:52px;border-radius:15px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:background .18s,border-color .18s,transform .12s;text-decoration:none;flex-shrink:0;color:#fff}
+.icon-btn svg{width:23px;height:23px;stroke:currentColor;stroke-width:1.8;fill:none}
+.icon-btn:hover{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.24);transform:translateY(-1px)}
+.icon-btn .dot{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:#ff6b54;border:2px solid var(--dark);box-shadow:0 0 0 3px rgba(255,107,84,.2);display:none}
+.icon-btn .dot.show{display:block}
+
+.hero-headline{font-weight:500;font-size:clamp(2rem,4.5vw,3.4rem);letter-spacing:-.04em;line-height:1.04;color:#fff;margin-bottom:36px;max-width:720px}
+.hero-headline em{font-style:normal;color:var(--green)}
+
+.hero-bar{border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(3,1fr)}
+.hero-stat{padding:24px 0 0;border-right:1px solid rgba(255,255,255,.07)}
+.hero-stat:last-child{border-right:none}
+.hero-stat-n{font-size:clamp(1.6rem,3vw,2.2rem);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+.hero-stat-l{font-size:12px;color:rgba(255,255,255,.32);font-weight:300}
+
+
+/* ══ ГЛАВНАЯ РАСКЛАДКА — реальная 2-колоночная композиция для ПК,
+   а не растянутая мобильная колонка ══ */
+.main-grid{display:grid;grid-template-columns:1fr 400px;gap:40px;padding:64px 0;align-items:start}
+@media(max-width:960px){.main-grid{grid-template-columns:1fr;gap:48px;padding:48px 0}}
+.rail{position:sticky;top:24px;display:flex;flex-direction:column;gap:14px}
+@media(max-width:960px){.rail{position:static}}
+.rail-head{display:flex;align-items:center;gap:14px;margin:4px 2px 6px}
+.rail-head .sec-icon{width:44px;height:44px;border-radius:14px}
+.rail-head .sec-icon svg{width:21px;height:21px}
+.rail-head h2{font-size:22px;font-weight:500;letter-spacing:-.03em}
+
+.sec-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+.sec-head h2{font-size:clamp(24px,2.6vw,32px);font-weight:500;letter-spacing:-.03em;line-height:1.08}
+.sec-head-id{display:flex;align-items:center;gap:16px}
+.sec-icon{width:52px;height:52px;border-radius:16px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--green);flex-shrink:0;box-shadow:0 12px 26px -10px rgba(25,27,30,.4)}
+.sec-icon svg{width:25px;height:25px;stroke:currentColor;stroke-width:1.7;fill:none}
+.sec-link{font-size:.86rem;font-weight:500;color:var(--dark);text-decoration:none;display:flex;align-items:center;gap:8px;flex-shrink:0;background:var(--green);padding:12px 20px 12px 22px;border-radius:13px;box-shadow:0 1px 2px rgba(20,153,85,.15),0 12px 24px -10px rgba(20,153,85,.45);transition:background .15s,transform .12s,box-shadow .15s}
+.sec-link svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.3;fill:none;flex-shrink:0}
+.sec-link:hover{background:var(--green-h);transform:translateY(-1px);box-shadow:0 1px 2px rgba(20,153,85,.2),0 16px 28px -10px rgba(20,153,85,.55)}
+.main-col>section+section{margin-top:40px}
+.main-col>section.panel{background:var(--bg3);border:1.5px solid var(--border);border-radius:32px;padding:32px 34px 34px;box-shadow:0 1px 2px rgba(25,27,30,.03),0 26px 50px -32px rgba(25,27,30,.18)}
+
+/* ══ ЗАКАЗЫ — верхний активный заказ получает отдельную визуальную подачу
+   (не строка списка, а акцентная карточка с прогрессом), остальные — списком ══ */
+.featured-project{background:#fff;border:1.5px solid var(--border);border-radius:26px;padding:28px 30px;margin-bottom:14px;position:relative;overflow:hidden;box-shadow:0 1px 2px rgba(25,27,30,.03),0 20px 40px -26px rgba(25,27,30,.22)}
+.fp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.fp-eyebrow{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--green-d);margin-bottom:6px}
+.fp-title{font-size:1.15rem;font-weight:500;letter-spacing:-.01em}
+.fp-icon{width:48px;height:48px;border-radius:14px;background:var(--dark);display:flex;align-items:center;justify-content:center;color:var(--green);flex-shrink:0;box-shadow:0 8px 20px -8px rgba(25,27,30,.35)}
+.fp-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.8;fill:none}
+.fp-progress-track{height:6px;background:var(--bg3);border-radius:100px;overflow:hidden;margin-bottom:10px}
+.fp-progress-fill{height:100%;background:var(--green);border-radius:100px;transition:width .8s cubic-bezier(.22,1,.36,1)}
+.fp-meta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
+.fp-meta b{color:var(--text);font-weight:500}
+
+.plain-list{display:flex;flex-direction:column;gap:8px}
+.p-row{display:grid;grid-template-columns:44px 1fr auto;gap:16px;align-items:center;padding:14px 16px;border-radius:17px;text-decoration:none;color:inherit;background:#fff;border:1.5px solid var(--border);transition:transform .15s,box-shadow .15s,border-color .15s}
+.p-row:hover{transform:translateX(3px);box-shadow:0 10px 22px -14px rgba(25,27,30,.25);border-color:var(--border2)}
+.p-row-ico{flex-shrink:0;width:42px;height:42px;border-radius:12px;background:var(--bg3);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s}
+.p-row-ico svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none}
+.p-row:has(.p-tag.done) .p-row-ico{background:var(--green-tint);color:var(--green-d)}
+.p-row:has(.p-tag.progress) .p-row-ico{background:var(--info-tint);color:var(--info)}
+.p-row:hover .p-row-ico{background:var(--dark);color:var(--green)}
+.p-row-body{min-width:0}
+.p-row-title{font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-row-sub{font-size:.8rem;color:var(--muted)}
+.p-tag{font-size:.7rem;font-weight:500;padding:.32rem .7rem;border-radius:8px;white-space:nowrap;flex-shrink:0}
+.p-tag.done{background:var(--green-tint);color:var(--green-d)}
+.p-tag.progress{background:var(--info-tint);color:var(--info)}
+.list-empty{padding:32px 0;text-align:center;color:var(--muted);font-size:.9rem}
+
+/* ══ АКТИВНОСТЬ — настоящая временная лента (точка + линия), а не полоса ══ */
+.timeline{position:relative;padding-left:26px}
+.timeline::before{content:'';position:absolute;left:5px;top:6px;bottom:6px;width:1.5px;background:var(--border2)}
+.tl-item{position:relative;padding-bottom:26px}
+.tl-item:last-child{padding-bottom:0}
+.tl-dot{position:absolute;left:-26px;top:3px;width:12px;height:12px;border-radius:50%;background:var(--bg3);border:2px solid var(--border2);box-shadow:0 0 0 4px var(--bg3)}
+.tl-item.on .tl-dot{border-color:var(--green);background:var(--green);box-shadow:0 0 0 4px var(--bg3),0 0 0 6px var(--green-tint)}
+.tl-title{font-size:.92rem;font-weight:500;margin-bottom:2px}
+.tl-sub{font-size:.8rem;color:var(--muted)}
+.tl-date{font-size:.72rem;color:var(--muted2);margin-top:4px}
+
+/* ══ BENTO-СЕТКА (правая колонка) ══ */
+.bento-tile{border:1.5px solid var(--border);border-radius:26px;padding:26px;box-shadow:0 1px 2px rgba(25,27,30,.03),0 16px 32px -22px rgba(25,27,30,.18);transition:box-shadow .18s,transform .18s}
+.bento-tile:hover{box-shadow:0 1px 2px rgba(25,27,30,.04),0 20px 36px -20px rgba(25,27,30,.24);transform:translateY(-1px)}
+.bento-tile.dark{background:var(--dark);border-color:var(--dark);color:#fff;box-shadow:0 20px 40px -22px rgba(25,27,30,.5)}
+.bento-tile.accent{background:var(--green);border-color:var(--green);color:var(--dark);box-shadow:0 20px 40px -20px rgba(20,153,85,.4)}
+.bt-icon{width:44px;height:44px;border-radius:13px;background:var(--green-tint);display:flex;align-items:center;justify-content:center;color:var(--green-d);margin-bottom:14px}
+.bt-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.8;fill:none}
+.bento-tile.dark .bt-icon{background:rgba(255,255,255,.12);color:var(--green)}
+.bento-tile.accent .bt-icon{background:rgba(0,0,0,.12);color:var(--dark)}
+.bt-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.bento-tile.dark .bt-label{color:rgba(255,255,255,.4)}
+.bento-tile.accent .bt-label{color:rgba(25,27,30,.6)}
+.bt-value{font-size:1.4rem;font-weight:500;letter-spacing:-.02em;margin-bottom:3px}
+.bt-sub{font-size:.78rem;color:var(--muted);line-height:1.4}
+.bento-tile.dark .bt-sub{color:rgba(255,255,255,.4)}
+.bento-tile.accent .bt-sub{color:rgba(25,27,30,.6)}
+.bt-track{height:5px;background:var(--bg3);border-radius:100px;margin-top:12px;overflow:hidden}
+.bento-tile.dark .bt-track{background:rgba(255,255,255,.12)}
+.bt-fill{height:100%;background:var(--green);border-radius:100px}
+.bt-cta{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;text-decoration:none;margin-top:14px;background:var(--green);color:var(--dark);padding:9px 14px 9px 16px;border-radius:11px;box-shadow:0 1px 2px rgba(20,153,85,.15),0 10px 20px -10px rgba(20,153,85,.45);transition:background .15s,transform .12s,box-shadow .15s}
+.bt-cta:hover{background:var(--green-h);transform:translateY(-1px)}
+.bt-cta svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.2;fill:none;flex-shrink:0}
+.bento-tile.dark .bt-cta{background:var(--green);color:var(--dark)}
+.bento-tile.accent .bt-cta{background:var(--dark);color:var(--green)}
+
+/* ══ БЫСТРЫЙ ДОСТУП — компактно, внизу, без сетки плиток-иконок ══ */
+.quick-links{display:flex;flex-direction:column;gap:2px}
+.quick-links a{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-radius:16px;text-decoration:none;color:var(--text);font-size:.88rem;font-weight:500;transition:background .15s}
+.quick-links a:hover{background:var(--bg3)}
+.quick-links a span{flex:1}
+.quick-links a svg:last-child{width:14px;height:14px;stroke-width:2.1;margin-right:0;color:var(--muted2)}
+.ql-badge{background:var(--green);color:var(--dark);font-size:.66rem;font-weight:500;padding:.16rem .5rem;border-radius:8px;margin-right:8px}
+
+/* Цветные иконки быстрого доступа — те же акцентные градиенты, что и
+   у соответствующих разделов сайдбара (sidebar.js, .sb-c-*), нужны
+   только тут: это мобильный дубль меню, на десктопе плитка скрыта. */
+.ql-ico{width:34px;height:34px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;margin-right:12px;flex-shrink:0;transition:transform .15s,box-shadow .15s}
+.ql-ico svg{width:17px;height:17px;stroke:#fff;stroke-width:1.9;fill:none;margin-right:0}
+.quick-links a:hover .ql-ico{transform:scale(1.06);box-shadow:0 8px 16px -6px rgba(25,27,30,.35)}
+.ql-c-green{background:linear-gradient(135deg,#4eea94,#149955)}
+.ql-c-teal{background:linear-gradient(135deg,#3fe0d8,#0fc7c0)}
+.ql-c-purple{background:linear-gradient(135deg,#a970ff,#8b3ffb)}
+.ql-c-orange{background:linear-gradient(135deg,#ffab4d,#ff8a1f)}
+.ql-c-pink{background:linear-gradient(135deg,#ff6fac,#ff3f8f)}
+.ql-c-yellow{background:linear-gradient(135deg,#ffd75c,#ffc324)}
+.ql-c-indigo{background:linear-gradient(135deg,#8b93ff,#5b63f0)}
+
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;padding:.6rem 1.3rem;border-radius:14px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green);color:var(--dark)}
+.toast.error{background:#e8634f;color:#fff}
+
+@media(max-width:600px){
+  .hero-wrap{padding:24px 0 0}
+  .hero-block{border-radius:28px;padding:28px 22px}
+  .main-grid{padding:40px 0}
+  .hero-name{font-size:1.05rem;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25}
+  .main-col>section.panel{padding:24px 18px 26px;border-radius:24px}
+  .sec-icon{width:44px;height:44px;border-radius:14px}
+  .sec-icon svg{width:21px;height:21px}
+  .sec-link{padding:11px 16px 11px 18px}
+  .featured-project{padding:22px 20px}
+}
+
+/* ══ Быстрый доступ (quick-links) — дублирует навигацию сайдбара,
+   поэтому нужен только там, где сайдбар скрыт (мобильная версия,
+   тот же брейкпоинт 980px, что и в sidebar.js) ══ */
+.quick-links-tile{display:none}
+@media(max-width:980px){.quick-links-tile{display:block}}
+
+/* ══ PUSH-УВЕДОМЛЕНИЯ — постоянная секция внизу кабинета, никогда не
+   скрывается (даже когда уже подключено — тогда просто меняется статус).
+   Та же тёмная карточка, что hero-block, но ниже всех разделов, во всю
+   ширину контейнера ══ */
+.push-panel{background:var(--dark);border-radius:40px;padding:48px 56px;margin-top:40px;display:flex;align-items:center;gap:48px;position:relative;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.push-visual{flex-shrink:0;width:150px;height:150px}
+.push-illustration{width:100%;height:100%}
+@keyframes pushPulse{0%,100%{opacity:.3}50%{opacity:1}}
+.push-wave{animation:pushPulse 2.6s ease-in-out infinite}
+.push-wave.d1{animation-delay:.15s}
+.push-wave.d2{animation-delay:.3s}
+.push-wave.d3{animation-delay:.45s}
+.push-body{flex:1;min-width:0}
+.push-eyebrow{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.4);margin-bottom:10px}
+.push-title{font-size:clamp(1.2rem,2vw,1.5rem);font-weight:500;letter-spacing:-.02em;color:#fff;margin-bottom:12px;max-width:560px}
+.push-desc{font-size:.88rem;line-height:1.55;color:rgba(255,255,255,.5);max-width:560px;margin-bottom:24px}
+.push-action{display:flex;align-items:center;gap:14px;flex-wrap:wrap;min-height:46px}
+.push-status{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:500;padding:11px 18px;border-radius:12px;white-space:nowrap}
+.push-status.on{background:var(--green-tint);color:var(--green)}
+.push-status.off{background:rgba(255,255,255,.08);color:rgba(255,255,255,.55)}
+.push-status svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
+.push-hint{font-size:.78rem;color:rgba(255,255,255,.4);line-height:1.5}
+@media(max-width:860px){
+  .push-panel{flex-direction:column;text-align:center;padding:36px 28px;border-radius:32px;gap:26px}
+  .push-visual{width:110px;height:110px}
+  .push-title,.push-desc{max-width:none}
+  .push-action{justify-content:center}
+}
+  </style>
+<link rel="manifest" href="/manifest.json">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Antviz">
+<link rel="apple-touch-icon" href="/img/favicon.png">
+</head>
+<body>
+<script src="/sidebar.js" data-page="profile"></script>
+<script src="/nav.js"></script>
+
+<div id="sbContent">
+
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+
+<div id="cabinet">
+
+  <section class="hero-wrap">
+    <div class="container">
+      <div class="hero-block">
+        <div class="hero-top">
+          <div class="hero-id">
+            <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
+              <span id="avatarLetter">А</span>
+              <div class="avatar-overlay"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
+            </div>
+            <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
+            <div class="hero-id-text">
+              <div class="hero-greeting">Личный кабинет</div>
+              <div class="hero-name" id="heroSince">Antviz</div>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <a class="icon-btn" href="profile/notifications" title="Уведомления">
+              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+              <span class="dot" id="notifDot"></span>
+            </a>
+            <a class="icon-btn" href="profile/settings" title="Настройки">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-headline" id="heroHeadline">Здравствуйте, <em>Пользователь</em></div>
+
+        <div class="hero-bar">
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statTotal">0</div><div class="hero-stat-l">Всего заказов</div></div>
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statActive">0</div><div class="hero-stat-l">В работе</div></div>
+          <div class="hero-stat"><div class="hero-stat-n" data-count id="statDone">0</div><div class="hero-stat-l">Завершено</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="main-grid">
+
+      <div class="main-col">
+
+        <section class="reveal panel">
+          <div class="sec-head">
+            <div class="sec-head-id">
+              <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 012-2h3l1.5-2h3L15 6h3a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8z"/><path d="M8 12.5h8M8 16h5"/></svg></div>
+              <div><p class="eyebrow g">Ваши заказы</p><h2>Заказы</h2></div>
+            </div>
+            <a href="profile/orders" class="sec-link">Все заказы <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          </div>
+          <div id="featuredProjectSlot"></div>
+          <div class="plain-list" id="recentProjects"><div class="list-empty">Загрузка...</div></div>
+        </section>
+
+        <section class="reveal panel">
+          <div class="sec-head">
+            <div class="sec-head-id">
+              <div class="sec-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3.2 2"/></svg></div>
+              <div><p class="eyebrow g">История</p><h2>Активность</h2></div>
+            </div>
+          </div>
+          <div class="timeline" id="activityTimeline"><div class="list-empty">Загрузка...</div></div>
+        </section>
+
+      </div>
+
+      <div class="rail">
+
+        <div class="rail-head">
+          <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
+          <div><p class="eyebrow g">Статус</p><h2>Сервис</h2></div>
+        </div>
+
+        <div class="reveal" id="bentoSupport"></div>
+        <div class="reveal" id="bentoMessages"></div>
+        <div class="reveal" id="bentoReview" style="display:none"></div>
+
+        <div class="reveal bento-tile quick-links-tile" style="padding:8px 6px">
+          <div class="quick-links">
+            <a href="profile/orders"><span class="ql-ico ql-c-green"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg></span><span>Мои заказы</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/sites"><span class="ql-ico ql-c-teal"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></span><span>Мои сайты</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/support"><span class="ql-ico ql-c-purple"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></span><span>Чат с командой</span><span class="ql-badge" id="qlHelpBadge" style="display:none">!</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/tickets"><span class="ql-ico ql-c-orange"><svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg></span><span>Обслуживание</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/notifications"><span class="ql-ico ql-c-pink"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span><span>Уведомления</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="order"><span class="ql-ico ql-c-yellow"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span>Новый заказ</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+            <a href="profile/settings"><span class="ql-ico ql-c-indigo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg></span><span>Настройки</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <section class="reveal push-panel" id="pushPanel">
+      <div class="push-visual">
+        <svg class="push-illustration" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="100" cy="100" r="94" stroke="rgba(30,222,123,.14)" stroke-width="1"/>
+          <circle cx="100" cy="100" r="72" stroke="rgba(30,222,123,.22)" stroke-width="1"/>
+          <path class="push-wave d3" d="M150,70 Q180,100 150,130" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path class="push-wave d2" d="M142,82 Q160,100 142,118" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path class="push-wave d2" d="M58,82 Q40,100 58,118" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path class="push-wave d3" d="M50,70 Q20,100 50,130" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <path d="M100 56c-14 0-24 11-24 26 0 30-13 42-13 42h74s-13-12-13-42c0-15-10-26-24-26z" fill="rgba(30,222,123,.14)" stroke="var(--green)" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M90 128a10 10 0 0 0 20 0" stroke="var(--green)" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="100" cy="50" r="4" fill="var(--green)"/>
+        </svg>
+      </div>
+      <div class="push-body">
+        <p class="push-eyebrow">Push-уведомления браузера</p>
+        <h2 class="push-title">Узнавайте о новом, даже когда сайт закрыт</h2>
+        <p class="push-desc">Это отдельная вещь от страницы «Уведомления» в кабинете — те вы увидите, только если сами зайдёте на сайт. Push приходит системным уведомлением прямо в браузер или на телефон — даже если вкладка закрыта и вы вышли из аккаунта.</p>
+        <p class="push-hint" style="margin:-14px 0 20px;display:block">Работает в Chrome, Edge, Firefox и большинстве браузеров на компьютере и Android. На iPhone — только после добавления сайта на экран «Домой» через Safari (так требует сама Apple).</p>
+        <div class="push-action" id="pushAction"><span class="push-hint">Проверяем состояние…</span></div>
+      </div>
+    </section>
+
+  </div>
+
+</div><!-- /cabinet -->
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { auth, db } from '/firebase-config.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, setDoc, arrayUnion, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
+
+let currentUser=null, unsubOrders=null;
+
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
+function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
+function fmtDateLong(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+
+/* Градиентная аватарка вместо плоской заливки — генерируется из имени/uid,
+   у каждого пользователя свой оттенок, а не одинаковый зелёный квадрат */
+function avatarGradient(seed){
+  let h=0; for(let i=0;i<seed.length;i++) h=seed.charCodeAt(i)+((h<<5)-h);
+  const hueA=Math.abs(h)%360, hueB=(hueA+42)%360;
+  return `linear-gradient(135deg, hsl(${hueA} 70% 45%), hsl(${hueB} 65% 38%))`;
+}
+
+window.handleAvatarUpload=async function(file){
+  if(!file) return;
+  if(file.size>3*1024*1024){toast('Файл больше 3 МБ','error');return;}
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    const dataUrl=e.target.result;
+    const av=document.getElementById('heroAvatar');
+    document.getElementById('avatarLetter').style.display='none';
+    let img=av.querySelector('img');
+    if(!img){img=document.createElement('img');av.insertBefore(img,av.firstChild);}
+    img.src=dataUrl;
+    try{await updateDoc(doc(db,'users',currentUser.uid),{avatarDataUrl:dataUrl});toast('Фото обновлено ✓','success');}catch(e){console.error(e);}
+  };
+  reader.readAsDataURL(file);
+};
+
+/* ══ Scroll reveal — тот же приём, что и на сайте ══ */
+const revealObs=new IntersectionObserver(es=>{es.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
+
+/* ══ Живой счётчик цифр — тот же приём, что и на сайте ══ */
+function animCount(el){
+  const target=parseInt(el.textContent)||0;
+  if(!target){return;}
+  let cur=0; const step=Math.max(1,Math.ceil(target/30));
+  const t=setInterval(()=>{cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=cur;},28);
+}
+const countObs=new IntersectionObserver(es=>{es.forEach(el=>{if(el.isIntersecting){animCount(el.target);countObs.unobserve(el.target)}})},{threshold:.5});
+/* loadOrderStats слушает заказы через onSnapshot и на каждое обновление
+   заново дергает observe() по тем же элементам — без этой пометки цифры
+   переигрывали анимацию с нуля при каждом изменении заказа в реальном
+   времени. Помечаем уже посчитанные элементы и больше их не трогаем. */
+function observeCountOnce(el){
+  if(el.dataset.counted) return;
+  el.dataset.counted='1';
+  countObs.observe(el);
+}
+
+const STATUS_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
+const STATUS_PROGRESS={0:5,1:25,2:45,3:70,4:85,5:100,6:70};
+const ICON_FILE_TEXT='<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 13h6M9 16.5h6M9 9.5h2"/></svg>';
+const ICON_HAMMER='<svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 0 0-4.9 4.66l-5.6 5.6a1.9 1.9 0 0 0 2.7 2.7l5.6-5.6a3.6 3.6 0 0 0 4.66-4.9l-2.53 2.53-2-2z"/></svg>';
+const ICON_EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICON_PENCIL='<svg viewBox="0 0 24 24"><path d="M16.5 3.5l4 4L8 20l-5 1 1-5 12.5-12.5z"/></svg>';
+const ICON_CHECK_CIRCLE='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
+const ICON_WALLET='<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M16 12.5h2.5"/></svg>';
+const STATUS_ICON={0:ICON_FILE_TEXT,1:ICON_HAMMER,2:ICON_HAMMER,3:ICON_EYE,4:ICON_PENCIL,5:ICON_CHECK_CIRCLE,6:ICON_WALLET};
+
+function renderFeaturedAndList(orders){
+  const slot=document.getElementById('featuredProjectSlot');
+  const list=document.getElementById('recentProjects');
+  if(!orders.length){
+    slot.innerHTML='';
+    list.innerHTML='<div class="list-empty">Заказов пока нет — <a href="order" style="color:var(--green-d);text-decoration:none;font-weight:500">оформите первый</a></div>';
+    document.getElementById('qlProjectsBadge').style.display='none';
+    return;
+  }
+  const active=orders.filter(o=>(o.status||0)>=1&&(o.status||0)<=4);
+  const featured=active[0];
+  const rest=orders.filter(o=>o.id!==featured?.id).slice(0,4);
+
+  if(featured){
+    const pct=STATUS_PROGRESS[featured.status]||10;
+    slot.innerHTML=`<div class="featured-project">
+      <div class="fp-top">
+        <div><div class="fp-eyebrow">Сейчас в работе</div><div class="fp-title">${featured.siteName||featured.siteDomain||featured.siteType||'Проект'}</div></div>
+        <div class="fp-icon">${STATUS_ICON[featured.status]||ICON_HAMMER}</div>
+      </div>
+      <div class="fp-progress-track"><div class="fp-progress-fill" style="width:0%" data-target="${pct}"></div></div>
+      <div class="fp-meta"><span>Этап: <b>${STATUS_LABEL[featured.status]}</b></span><a href="profile/orders" style="color:var(--green-d);text-decoration:none;font-weight:500">Подробнее →</a></div>
+    </div>`;
+    requestAnimationFrame(()=>{const f=slot.querySelector('.fp-progress-fill');setTimeout(()=>f.style.width=f.dataset.target+'%',100);});
+  } else slot.innerHTML='';
+
+  if(!rest.length){
+    list.innerHTML=featured?'':'<div class="list-empty">Больше заказов нет</div>';
+  } else {
+    list.innerHTML=rest.map(o=>{
+      const st=o.status||0, done=st===5;
+      return `<a href="profile/orders" class="p-row">
+        <span class="p-row-ico">${STATUS_ICON[st]}</span>
+        <div class="p-row-body"><div class="p-row-title">${o.siteName||o.siteDomain||o.siteType||'Заказ'}</div><div class="p-row-sub">${fmtDateShort(o.createdAt)?'Создан '+fmtDateShort(o.createdAt):''}</div></div>
+        <span class="p-tag ${done?'done':'progress'}">${STATUS_LABEL[st]}</span>
+      </a>`;
+    }).join('');
+  }
+
+  const activeCount=active.length;
+  const badge=document.getElementById('qlProjectsBadge');
+  if(activeCount>0){badge.textContent=activeCount;badge.style.display='inline-block';}else badge.style.display='none';
+}
+
+function buildTimeline(orders){
+  const events=[];
+  orders.forEach(o=>{
+    const name=o.siteName||o.siteDomain||o.siteType||'Заказ';
+    if(o.createdAt) events.push({ts:o.createdAt,title:'Создан заказ',sub:name,on:false});
+    if(o.status===5&&o.updatedAt) events.push({ts:o.updatedAt,title:'Заказ завершён',sub:name,on:true});
+    else if(o.status>=1&&o.status<=4&&o.updatedAt) events.push({ts:o.updatedAt,title:'Статус обновлён',sub:`${name} — ${STATUS_LABEL[o.status]}`,on:false});
+    if(o.supportActive&&o.supportExpiresAt) events.push({ts:o.supportExpiresAt,title:'Поддержка активна',sub:name,on:true});
+  });
+  events.sort((a,b)=>{
+    const ta=a.ts?.toDate?a.ts.toDate():new Date(a.ts);
+    const tb=b.ts?.toDate?b.ts.toDate():new Date(b.ts);
+    return tb-ta;
+  });
+  const tl=document.getElementById('activityTimeline');
+  const top=events.slice(0,5);
+  if(!top.length){tl.innerHTML='<div class="list-empty">Активность появится после первого заказа</div>';return;}
+  tl.innerHTML=top.map(e=>`<div class="tl-item${e.on?' on':''}">
+    <div class="tl-dot"></div>
+    <div class="tl-title">${e.title}</div>
+    <div class="tl-sub">${e.sub}</div>
+    <div class="tl-date">${fmtDateShort(e.ts)}</div>
+  </div>`).join('');
+}
+
+function loadOrderStats(uid){
+  if(unsubOrders) unsubOrders();
+  const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
+  unsubOrders=onSnapshot(q,snap=>{
+    // status:-1 = заявка создана, оплата ещё не подтверждена — такой заказ
+    // не должен попадать ни в счётчики, ни в списки на главной кабинета
+    // (ровно как их уже не показывает profile/orders.html), иначе цифра
+    // "Всего заказов" не совпадает со списком, а неоплаченная заявка может
+    // всплыть с пустым статусом.
+    const orders=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>(o.status??0)!==-1);
+    const active=orders.filter(o=>(o.status||0)>=1&&(o.status||0)<=4).length;
+    document.getElementById('statTotal').textContent=orders.length;
+    document.getElementById('statActive').textContent=active;
+    document.getElementById('statDone').textContent=orders.filter(o=>o.status===5).length;
+    document.querySelectorAll('.hero-stat-n[data-count]').forEach(observeCountOnce);
+    renderFeaturedAndList(orders);
+    buildTimeline(orders);
+  },err=>console.error('Orders:',err));
+}
+
+async function loadBento(uid){
+  try{
+    const [ordersSnap, chatSnap] = await Promise.all([
+      getDocs(query(collection(db,'orders'),where('uid','==',uid))),
+      getDocs(query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false))),
+    ]);
+    const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
+
+    const activeSupport=orders.find(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
+    const supportSlot=document.getElementById('bentoSupport');
+    if(activeSupport){
+      const days=Math.ceil((activeSupport.supportExpiresAt.toDate()-new Date())/86400000);
+      const pct=Math.max(4,Math.min(100,Math.round(days/30*100)));
+      supportSlot.innerHTML=`<div class="bento-tile dark">
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
+        <div class="bt-label">Обслуживание</div>
+        <div class="bt-value">${days} дн.</div>
+        <div class="bt-sub">${activeSupport.siteName||activeSupport.siteDomain||'осталось по подписке'}</div>
+        <div class="bt-track"><div class="bt-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    } else {
+      supportSlot.innerHTML=`<div class="bento-tile">
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
+        <div class="bt-label">Обслуживание</div>
+        <div class="bt-value" style="font-size:1rem">Не подключено</div>
+        <a class="bt-cta" href="profile/tickets">Подключить <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>`;
+    }
+
+    const msgSlot=document.getElementById('bentoMessages');
+    const unread=chatSnap.size;
+    msgSlot.innerHTML=unread>0?`<div class="bento-tile accent">
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.5 0 1115.48-4.6z"/><circle cx="9" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r=".65" fill="currentColor" stroke="none"/></svg></div>
+        <div class="bt-label">Сообщения</div>
+        <div class="bt-value">${unread} новых</div>
+        <a class="bt-cta" href="profile/support">Открыть <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>`:`<div class="bento-tile">
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.5 0 1115.48-4.6z"/><circle cx="9" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r=".65" fill="currentColor" stroke="none"/></svg></div>
+        <div class="bt-label">Сообщения</div>
+        <div class="bt-value" style="font-size:1rem">Всё прочитано</div>
+        <div class="bt-sub">Команда на связи в поддержке</div>
+      </div>`;
+
+    const doneUnreviewed=orders.find(o=>o.status===5&&!o.reviewed);
+    const reviewSlot=document.getElementById('bentoReview');
+    if(doneUnreviewed){
+      reviewSlot.style.display='block';
+      reviewSlot.innerHTML=`<div class="bento-tile">
+        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.7-4.3 4.1 1.1 5.9L12 16.8 6.7 19.6l1.1-5.9-4.3-4.1 5.9-.7L12 3.5z"/></svg></div>
+        <div class="bt-label">Отзыв</div>
+        <div class="bt-value" style="font-size:1rem">Как всё прошло?</div>
+        <a class="bt-cta" href="profile/orders">Оставить отзыв <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>`;
+    }
+
+    document.getElementById('qlHelpBadge').style.display=unread>0?'inline-block':'none';
+    document.querySelectorAll('.rail .reveal').forEach(el=>revealObs.observe(el));
+  }catch(e){console.error(e);}
+}
+
+/* ══ PUSH-УВЕДОМЛЕНИЯ (FCM) ══
+   Отдельный канал от Firestore-уведомлений в кабинете: пока страница
+   "Уведомления" видна только когда человек сам зашёл на сайт, push
+   приходит системным уведомлением браузера/ОС даже при закрытой вкладке.
+   Секция в разметке никогда не скрывается — меняется только её содержимое
+   (renderPushState) в зависимости от Notification.permission. */
+
+// Project Settings → Cloud Messaging → Web configuration → Web Push
+// certificates (VAPID) в Firebase Console — вставь свой ключ сюда.
+const VAPID_KEY = 'ВСТАВЬ_VAPID_KEY_ИЗ_FIREBASE_CONSOLE';
+
+let fcmMessaging=null, fcmSwReg=null;
+
+function isIOSDevice(){
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+}
+function isStandalonePWA(){
+  return window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+}
+
+async function initPushSection(user){
+  const box=document.getElementById('pushAction');
+
+  // iOS/iPadOS в обычной вкладке (даже в Safari) push вообще не отдаёт —
+  // это ограничение самой Apple, а не браузера или нашего кода. Работает
+  // только если сайт добавлен на экран «Домой» и открыт оттуда как
+  // отдельное приложение (PWA), причём добавить так можно только через
+  // Safari — в Chrome/Firefox на iOS такой кнопки нет физически.
+  if(isIOSDevice() && !isStandalonePWA()){
+    box.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+      <span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>На iPhone нужна установка сайта</span>
+      <span class="push-hint">Safari не отдаёт push обычной вкладке — только сайту, добавленному на экран «Домой». Откройте сайт именно в Safari (не в Chrome), нажмите «Поделиться» внизу экрана → «На экран «Домой»» → зайдите уже с этой иконки, и здесь появится кнопка «Включить».</span>
+    </div>`;
+    return;
+  }
+
+  const supported='Notification' in window && 'serviceWorker' in navigator && await isSupported().catch(()=>false);
+  if(!supported){
+    box.innerHTML='<span class="push-hint">Этот браузер не поддерживает push-уведомления</span>';
+    return;
+  }
+  try{
+    fcmSwReg=await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+  }catch(e){
+    console.error('SW register:',e);
+    box.innerHTML='<span class="push-hint">Не удалось подключить push в этом браузере</span>';
+    return;
+  }
+  fcmMessaging=getMessaging();
+  onMessage(fcmMessaging,payload=>{
+    const title=payload.notification?.title||'Antviz';
+    const body=payload.notification?.body||'';
+    toast(body?`${title}: ${body}`:title,'success');
+  });
+  renderPushState(user);
+}
+
+async function renderPushState(user){
+  const box=document.getElementById('pushAction');
+  const perm=Notification.permission;
+  if(perm==='granted'){
+    // Раньше тут сразу рисовалось "Подключено" по факту разрешения ОС,
+    // хотя сохранение токена в Firestore шло отдельно и могло тихо упасть —
+    // пилюля врала. Теперь ждём реального результата сохранения токена.
+    box.innerHTML='<span class="push-hint">Проверяем токен…</span>';
+    const ok=await ensureTokenSaved(user);
+    if(ok){
+      box.innerHTML=`<span class="push-status on"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Подключено</span><span class="push-hint">В этом браузере уведомления придут, даже если сайт закрыт</span>`;
+    }else{
+      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Не удалось подключить</span><button class="btn btn-green" id="pushRetryBtn" style="padding:10px 18px;margin-left:10px">Повторить</button>`;
+      document.getElementById('pushRetryBtn').onclick=()=>renderPushState(user);
+    }
+  }else if(perm==='denied'){
+    box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Заблокировано в браузере</span><span class="push-hint">Включить можно в настройках сайта в браузере — обычно значок замка рядом с адресной строкой → «Уведомления»</span>`;
+  }else{
+    box.innerHTML=`<button class="btn btn-green" id="pushEnableBtn" style="padding:13px 24px">Включить push-уведомления</button>`;
+    document.getElementById('pushEnableBtn').onclick=()=>enablePush(user);
+  }
+}
+
+async function ensureTokenSaved(user){
+  try{
+    const token=await getToken(fcmMessaging,{vapidKey:VAPID_KEY,serviceWorkerRegistration:fcmSwReg});
+    if(!token) return false;
+    // setDoc+merge вместо updateDoc — документ users/{uid} может ещё не
+    // существовать на этот момент, updateDoc бы упал.
+    await setDoc(doc(db,'users',user.uid),{fcmTokens:arrayUnion(token)},{merge:true});
+    return true;
+  }catch(e){
+    console.error('FCM token:',e);
+    return false;
+  }
+}
+
+async function enablePush(user){
+  try{
+    const perm=await Notification.requestPermission();
+    renderPushState(user);
+    if(perm==='granted') toast('Push-уведомления включены ✓','success');
+    else if(perm==='denied') toast('Уведомления заблокированы в браузере','error');
+  }catch(e){
+    console.error(e);
+    toast('Не удалось включить уведомления','error');
+  }
+}
+
+function watchNotifDot(uid){
+  const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
+  onSnapshot(q,snap=>{
+    const hasUnread=snap.docs.some(d=>!d.data().read);
+    document.getElementById('notifDot').classList.toggle('show',hasUnread);
+  },()=>{});
+}
+
+onAuthStateChanged(auth,async user=>{
+  if(!user){window.location.href='auth';return;}
+  currentUser=user;
+  const name=user.displayName||'Пользователь';
+  document.getElementById('heroHeadline').innerHTML='Здравствуйте, <em>'+name+'</em>';
+  document.getElementById('avatarLetter').textContent=name[0].toUpperCase();
+  document.getElementById('heroAvatar').style.background=avatarGradient(user.uid||name);
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('cabinet').style.display='block';
+
+  getDoc(doc(db,'users',user.uid)).then(snap=>{
+    if(snap.exists()){const d=snap.data();
+      if(d.createdAt) document.getElementById('heroSince').textContent='В Antviz с '+fmtDateLong(d.createdAt);
+      if(d.avatarDataUrl){const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';const img=document.createElement('img');img.src=d.avatarDataUrl;av.insertBefore(img,av.firstChild);}
+    }
+  }).catch(e=>console.warn('users doc:',e));
+
+  loadOrderStats(user.uid);
+  loadBento(user.uid);
+  watchNotifDot(user.uid);
+  initPushSection(user);
+});
+</script>
+
+<script src="/footer.js" data-page="profile"></script>
+
+</div><!-- /sbContent -->
+
+<script src="/GEOBLOCK.js"></script>
+<script type="module" src="/maintenance.js"></script>
+<script src="/notify.js"></script>
+</body>
+</html>

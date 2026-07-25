@@ -27,7 +27,7 @@ const NOTIFY_CONFIG = {
   ],
 
   // Текст-подсказка под буллетами (можно оставить пустым '')
-  footnote: 'Если сайт не открывается — попробуйте VPN или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
+  footnote: 'Если сайт не открывается — попробуйте подождать или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
 
   primaryText: 'Понятно',                // текст тёмной кнопки
   primaryHref: null,                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
@@ -169,6 +169,7 @@ const NOTIFY_CONFIG = {
       .an-visual{ flex:0 0 auto; padding:22px 20px 14px; }
       .an-visual svg{ max-width:110px; }
       .an-content{ padding:12px 24px calc(26px + env(safe-area-inset-bottom)); flex:1; }
+      .an-actions{ margin-top:24px; }
       .an-title{ font-size:1.4rem; }
     }
   `;

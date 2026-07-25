@@ -27,10 +27,10 @@ const NOTIFY_CONFIG = {
   ],
 
   // Текст-подсказка под буллетами (можно оставить пустым '')
-  footnote: 'Если сайт не открывается — попробуйте VPN или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
+  footnote: 'Если сайт не открывается — попробуйте подождать или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
 
   primaryText: 'Понятно',                // текст тёмной кнопки
-  primaryHref: null,                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
+  primaryHref: null,                     // если нужна ссылка вместо простого закрытия
 
   dontShowAgainText: 'Не показывать снова', // текстовая кнопка-ссылка под основной кнопкой ('' или null — убрать)
 
@@ -61,17 +61,14 @@ const NOTIFY_CONFIG = {
     check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/>'
   };
 
-  // Иконка для правой (тёмной) панели — сигнал wifi, где дальняя дуга
-  // перечёркнута (заблокирована), средняя приглушена, а ближняя к точке —
-  // целая и зелёная: связь урезана, но не пропала совсем.
+  // Иконка для правой (тёмной) панели — простой сигнал wifi: ближняя
+  // дуга к точке зелёная (яркая), дальше — приглушённее. Без зачёркиваний.
   const PANEL_ICON = `
     <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="110" cy="170" r="7" fill="#1ede7b"/>
-      <path d="M84 170 A26 26 0 0 1 136 170" fill="none" stroke="#1ede7b" stroke-width="6" stroke-linecap="round"/>
-      <path d="M58 170 A52 52 0 0 1 162 170" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="6" stroke-linecap="round"/>
-      <path d="M32 170 A78 78 0 0 1 188 170" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="6"
-            stroke-linecap="round" stroke-dasharray="1 14"/>
-      <line x1="52" y1="118" x2="168" y2="92" stroke="#707a8a" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="110" cy="150" r="7" fill="#1ede7b"/>
+      <path d="M84 150 A26 26 0 0 1 136 150" fill="none" stroke="#1ede7b" stroke-width="7" stroke-linecap="round"/>
+      <path d="M56 150 A54 54 0 0 1 164 150" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="7" stroke-linecap="round"/>
+      <path d="M28 150 A82 82 0 0 1 192 150" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="7" stroke-linecap="round"/>
     </svg>`;
 
   const CSS = `

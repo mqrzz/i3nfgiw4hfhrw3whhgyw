@@ -27,7 +27,7 @@ const NOTIFY_CONFIG = {
   ],
 
   // Текст-подсказка под буллетами (можно оставить пустым '')
-  footnote: 'Если сайт не открывается — попробуйте подождать или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
+  footnote: 'Если сайт не открывается — попробуйте VPN или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
 
   primaryText: 'Понятно',                // текст тёмной кнопки
   primaryHref: null,                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
@@ -75,7 +75,7 @@ const NOTIFY_CONFIG = {
 
   const CSS = `
     .an-overlay{
-      position:fixed; inset:0; z-index:800;
+      position:fixed; inset:0; z-index:999999;
       background:rgba(25,27,30,.5); backdrop-filter:blur(4px);
       display:flex; align-items:center; justify-content:center; padding:24px;
       opacity:0; pointer-events:none;
@@ -159,16 +159,16 @@ const NOTIFY_CONFIG = {
     .an-dismiss:hover{ color:#191b1e; }
 
     @media (max-width:720px){
-      .an-overlay{ padding:0; align-items:flex-end; }
+      .an-overlay{ padding:0; align-items:flex-start; }
       .an-card{
-        flex-direction:column; max-width:none; border-radius:28px 28px 0 0;
-        transform:translateY(100%); opacity:1;
-        max-height:92vh; overflow-y:auto;
+        flex-direction:column; max-width:none; width:100%; height:100dvh; height:100vh;
+        border-radius:0; transform:translateY(100%); opacity:1;
+        overflow-y:auto;
       }
       .an-overlay.show .an-card{ transform:translateY(0); }
-      .an-visual{ flex:0 0 auto; padding:36px 20px; }
-      .an-visual svg{ max-width:210px; }
-      .an-content{ padding:30px 24px calc(26px + env(safe-area-inset-bottom)); }
+      .an-visual{ flex:0 0 auto; padding:22px 20px 14px; }
+      .an-visual svg{ max-width:110px; }
+      .an-content{ padding:12px 24px calc(26px + env(safe-area-inset-bottom)); flex:1; }
       .an-title{ font-size:1.4rem; }
     }
   `;

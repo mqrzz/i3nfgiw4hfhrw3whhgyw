@@ -11,25 +11,39 @@
  */
 
 const NOTIFY_CONFIG = {
-  // id — "метка версии". Пока эта строка не меняется, тем,
-  // кто уже закрыл окно, оно больше не покажется.
-  // Хочешь показать объявление заново всем — поменяй id на новый
-  // (например update-2026-08) и поменяй текст ниже.
-  id: '6',
+  // id — "метка версии". Меняешь текст/буллеты ниже — обязательно
+  // поменяй и id (например 'whitelist-2026-07' -> 'whitelist-2026-08'),
+  // иначе те, кто уже нажал «Не показывать снова», не увидят обновление.
+  id: 'whitelist-1',
 
-  eyebrow: 'Обновление',                 // маленькая зелёная надпись сверху ('' — чтобы убрать)
-  title: 'Страница входа стала удобнее',            // крупный заголовок
-  text: 'Мы починили замеченные баги, а ещё добавили новый блок — теперь вход в аккаунт стал приятнее и быстрее. Обо всем остальном можно узнать по кнопке ниже :)', // текст под заголовком
+  eyebrow: 'Важно',                      // маленький бейдж сверху ('' — чтобы убрать)
+  title: 'Сайт может открываться нестабильно',   // крупный заголовок
+
+  // Буллеты слева, как на референсе. icon: 'globe' | 'clock' | 'shield' | 'check'
+  bullets: [
+    { icon: 'globe', text: 'Из-за блокировок и замедления интернета в России сайт иногда может открываться с задержкой или не открываться вовсе.' },
+    { icon: 'clock', text: 'По той же причине сроки обработки заказов и ответов в поддержке могут немного смещаться.' },
+    { icon: 'shield', text: 'Это последствия действий властей, а не наша ошибка — мы всё чиним и работаем в штатном режиме.' }
+  ],
+
+  // Текст-подсказка под буллетами (можно оставить пустым '')
+  footnote: 'Если сайт не открывается — попробуйте VPN или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
 
   primaryText: 'Понятно',                // текст тёмной кнопки
   primaryHref: null,                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
 
-  secondaryText: 'Что нового',           // текст второй кнопки ('' или null — чтобы убрать кнопку)
-  secondaryHref: 'https://blog.antviz.ru/updates',
+  dontShowAgainText: 'Не показывать снова', // текстовая кнопка-ссылка под основной кнопкой ('' или null — убрать)
 
-  persist: 'local',                      // 'local' — не показывать больше никогда (пока id не сменится)
-                                          // 'session' — не показывать до закрытия вкладки браузера
-                                          // false — показывать при каждом заходе (удобно для теста)
+  // persist управляет тем, что делает КРЕСТИК и кнопка "Понятно":
+  //   false    — просто закрывают окно, при следующей загрузке страницы оно появится снова.
+  //              (Кнопка "Не показывать снова" всё равно работает и запоминает навсегда.)
+  //   'session'— закрытие прячет окно до конца вкладки браузера (снова покажется в новой вкладке).
+  //   'local'  — закрытие запоминает навсегда, как и кнопка "Не показывать снова".
+  //
+  // Сейчас стоит false — окно будет всплывать при каждой загрузке страницы, пока
+  // пользователь сам не нажмёт "Не показывать снова". Удобно, пока объявление актуально.
+  persist: false,
+
   delay: 400                             // задержка перед появлением, в миллисекундах
 };
 
@@ -37,13 +51,43 @@ const NOTIFY_CONFIG = {
  *  Дальше — код самого компонента, трогать не нужно
  * ═══════════════════════════════════════════════════════════════ */
 (function () {
-  const STORAGE_PREFIX = 'antviz_notify_seen_';
+  const STORAGE_PREFIX = 'antviz_notify_seen_';       // постоянный флаг (кнопка "Не показывать снова")
+  const SESSION_PREFIX = 'antviz_notify_session_';    // временный флаг (persist:'session')
+
+  const ICONS = {
+    globe: '<path d="M12 3a15 15 0 010 18M12 3a15 15 0 000 18M3 12h18M4.5 7.5h15M4.5 16.5h15"/><circle cx="12" cy="12" r="9"/>',
+    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    shield: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
+    check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/>'
+  };
+
+  // Иконка для правой (тёмной) панели — щит с галочкой и узлами
+  // "разрешённой" сети вокруг. Нарисована вручную под тему белых списков.
+  const PANEL_ICON = `
+    <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+      <g fill="none" stroke="#1ede7b" stroke-width="1.4" stroke-dasharray="3 5" opacity="0.55">
+        <line x1="110" y1="110" x2="34" y2="58"/>
+        <line x1="110" y1="110" x2="182" y2="52"/>
+        <line x1="110" y1="110" x2="44" y2="168"/>
+        <line x1="110" y1="110" x2="176" y2="164"/>
+      </g>
+      <g fill="#191b1e" stroke="#1ede7b" stroke-width="1.4">
+        <circle cx="34" cy="58" r="6"/>
+        <circle cx="182" cy="52" r="5"/>
+        <circle cx="44" cy="168" r="5"/>
+        <circle cx="176" cy="164" r="6.5"/>
+      </g>
+      <path d="M110 40 L156 58 C156 108 148 148 110 172 C72 148 64 108 64 58 Z"
+            fill="rgba(30,222,123,0.06)" stroke="#1ede7b" stroke-width="2.2"/>
+      <path d="M89 108 L104 124 L134 90" fill="none" stroke="#1ede7b" stroke-width="4"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
 
   const CSS = `
     .an-overlay{
       position:fixed; inset:0; z-index:800;
-      background:rgba(25,27,30,.45); backdrop-filter:blur(3px);
-      display:flex; align-items:center; justify-content:center; padding:20px;
+      background:rgba(25,27,30,.5); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center; padding:24px;
       opacity:0; pointer-events:none;
       transition:opacity .35s cubic-bezier(.16,1,.3,1);
       font-family:'Geologica','Inter','Arial',sans-serif;
@@ -51,65 +95,91 @@ const NOTIFY_CONFIG = {
     .an-overlay.show{ opacity:1; pointer-events:auto; }
 
     .an-card{
-      position:relative; width:100%; max-width:440px;
+      position:relative; width:100%; max-width:860px;
       background:#fff; border:1px solid #dfe3e8; border-radius:28px;
-      padding:36px 34px 30px;
-      box-shadow:0 30px 70px -30px rgba(25,27,30,.35);
-      transform:scale(.92) translateY(10px); opacity:0;
+      box-shadow:0 40px 90px -30px rgba(25,27,30,.4);
+      display:flex; overflow:hidden;
+      transform:scale(.94) translateY(10px); opacity:0;
       transition:transform .4s cubic-bezier(.16,1,.3,1), opacity .35s cubic-bezier(.16,1,.3,1);
     }
     .an-overlay.show .an-card{ transform:scale(1) translateY(0); opacity:1; }
 
     .an-close{
-      position:absolute; top:18px; right:18px; width:34px; height:34px; border-radius:11px;
-      background:#f9fafc; border:1px solid #dfe3e8; display:flex; align-items:center; justify-content:center;
-      cursor:pointer; color:#707a8a; transition:background .15s,color .15s;
+      position:absolute; top:18px; right:18px; z-index:2; width:36px; height:36px; border-radius:11px;
+      background:#fff; border:1px solid #dfe3e8; display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:#191b1e; transition:background .15s,color .15s; box-shadow:0 6px 16px -6px rgba(25,27,30,.3);
     }
-    .an-close:hover{ background:#f2f4f7; color:#191b1e; }
+    .an-close:hover{ background:#f2f4f7; }
     .an-close svg{ width:14px; height:14px; stroke:currentColor; stroke-width:2; fill:none; }
 
-    .an-icon{
-      width:56px; height:56px; border-radius:17px; background:#191b1e;
-      display:flex; align-items:center; justify-content:center; margin-bottom:22px;
+    .an-content{
+      flex:1 1 56%; padding:44px 40px 36px; display:flex; flex-direction:column; min-width:0;
     }
-    .an-icon svg{ width:26px; height:26px; stroke:#1ede7b; stroke-width:1.6; fill:none; }
+    .an-visual{
+      flex:0 0 44%; background:#191b1e;
+      background-image:
+        radial-gradient(circle at 20% 20%, rgba(30,222,123,.10), transparent 55%),
+        radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size:auto, 16px 16px;
+      display:flex; align-items:center; justify-content:center; padding:30px;
+    }
+    .an-visual svg{ width:100%; max-width:200px; height:auto; }
 
     .an-eyebrow{
-      font-size:.72rem; font-weight:500; text-transform:uppercase; letter-spacing:.1em;
-      color:#149955; margin-bottom:10px;
+      display:inline-block; align-self:flex-start;
+      font-size:.72rem; font-weight:500; letter-spacing:.02em;
+      color:#149955; background:#eafaf1; border-radius:8px; padding:5px 11px;
+      margin-bottom:16px;
     }
     .an-title{
-      font-size:1.5rem; font-weight:500; letter-spacing:-.03em; line-height:1.15; color:#191b1e;
-      margin-bottom:12px;
-    }
-    .an-text{
-      font-size:.92rem; color:#707a8a; font-weight:300; line-height:1.55; margin-bottom:26px;
+      font-size:1.6rem; font-weight:600; letter-spacing:-.03em; line-height:1.18; color:#191b1e;
+      margin-bottom:20px;
     }
 
-    .an-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+    .an-bullets{ display:flex; flex-direction:column; gap:14px; margin-bottom:18px; }
+    .an-bullet{ display:flex; align-items:flex-start; gap:12px; }
+    .an-bullet-icon{
+      flex:0 0 auto; width:26px; height:26px; border-radius:8px; background:#f2f4f7;
+      display:flex; align-items:center; justify-content:center; margin-top:1px;
+    }
+    .an-bullet-icon svg{ width:14px; height:14px; stroke:#191b1e; stroke-width:1.8; fill:none; }
+    .an-bullet-text{ font-size:.88rem; color:#3d434c; font-weight:300; line-height:1.5; }
+
+    .an-footnote{
+      font-size:.8rem; color:#707a8a; font-weight:300; line-height:1.5;
+      border-top:1px solid #eef0f3; padding-top:14px; margin-bottom:22px;
+    }
+
+    .an-actions{ margin-top:auto; display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
     .an-btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
       font-family:inherit; font-weight:500; text-decoration:none; cursor:pointer; border:none;
-      border-radius:13px; padding:13px 22px; font-size:.88rem; letter-spacing:-.01em;
-      transition:background .12s, transform .15s cubic-bezier(.16,1,.3,1), color .12s, border-color .12s;
+      border-radius:13px; padding:14px 22px; font-size:.9rem; letter-spacing:-.01em;
+      transition:background .12s, transform .15s cubic-bezier(.16,1,.3,1);
     }
     .an-btn:hover{ transform:translateY(-1px); }
     .an-btn-dark{ background:#191b1e; color:#fff; }
     .an-btn-dark:hover{ background:#2b2f33; }
-    .an-btn-ghost{ background:none; border:1.5px solid #dfe3e8; color:#707a8a; }
-    .an-btn-ghost:hover{ border-color:#cbcdd6; color:#191b1e; }
 
-    @media (max-width:640px){
+    .an-dismiss{
+      background:none; border:none; cursor:pointer; font-family:inherit;
+      font-size:.8rem; font-weight:400; color:#9aa1ab; text-decoration:underline;
+      text-underline-offset:3px; padding:2px; align-self:center; margin:0 auto;
+    }
+    .an-dismiss:hover{ color:#191b1e; }
+
+    @media (max-width:720px){
       .an-overlay{ padding:0; align-items:flex-end; }
       .an-card{
-        max-width:none; border-radius:28px 28px 0 0;
-        padding:32px 24px calc(28px + env(safe-area-inset-bottom));
+        flex-direction:column; max-width:none; border-radius:28px 28px 0 0;
         transform:translateY(100%); opacity:1;
-        max-height:86vh; overflow-y:auto;
+        max-height:92vh; overflow-y:auto;
       }
       .an-overlay.show .an-card{ transform:translateY(0); }
-      .an-actions{ flex-direction:column; }
-      .an-btn{ width:100%; padding:16px 22px; }
+      .an-visual{ flex:0 0 auto; padding:36px 20px; }
+      .an-visual svg{ max-width:150px; }
+      .an-content{ padding:30px 24px calc(26px + env(safe-area-inset-bottom)); }
+      .an-title{ font-size:1.4rem; }
     }
   `;
 
@@ -125,21 +195,36 @@ const NOTIFY_CONFIG = {
   }
 
   function seenKey(id) { return STORAGE_PREFIX + id; }
+  function sessionKey(id) { return SESSION_PREFIX + id; }
 
-  function hasBeenSeen(id, persist) {
-    if (!persist) return false;
-    const store = persist === 'session' ? sessionStorage : localStorage;
-    try { return store.getItem(seenKey(id)) === '1'; } catch (e) { return false; }
+  // Постоянный флаг (ставится ТОЛЬКО кнопкой "Не показывать снова")
+  function isDismissedForever(id) {
+    try { return localStorage.getItem(seenKey(id)) === '1'; } catch (e) { return false; }
+  }
+  function markDismissedForever(id) {
+    try { localStorage.setItem(seenKey(id), '1'); } catch (e) {}
   }
 
-  function markSeen(id, persist) {
-    if (!persist) return;
-    const store = persist === 'session' ? sessionStorage : localStorage;
-    try { store.setItem(seenKey(id), '1'); } catch (e) {}
+  // Флаг обычного закрытия — поведение зависит от persist
+  function isClosedByPersist(id, persist) {
+    if (persist === 'local') return isDismissedForever(id);
+    if (persist === 'session') {
+      try { return sessionStorage.getItem(sessionKey(id)) === '1'; } catch (e) { return false; }
+    }
+    return false; // persist:false — обычное закрытие ничего не запоминает
+  }
+  function markClosedByPersist(id, persist) {
+    if (persist === 'local') { markDismissedForever(id); return; }
+    if (persist === 'session') {
+      try { sessionStorage.setItem(sessionKey(id), '1'); } catch (e) {}
+    }
   }
 
   function reset(id) {
-    try { localStorage.removeItem(seenKey(id)); sessionStorage.removeItem(seenKey(id)); } catch (e) {}
+    try {
+      localStorage.removeItem(seenKey(id));
+      sessionStorage.removeItem(sessionKey(id));
+    } catch (e) {}
   }
 
   function hide() {
@@ -148,47 +233,60 @@ const NOTIFY_CONFIG = {
     setTimeout(() => { overlayEl?.remove(); overlayEl = null; }, 400);
   }
 
-  function btnHtml(cls, text, href) {
-    if (!text) return '';
-    return href
-      ? `<a class="an-btn ${cls}" href="${href}">${text}</a>`
-      : `<button class="an-btn ${cls}" data-an-action>${text}</button>`;
+  function bulletHtml(b) {
+    const icon = ICONS[b.icon] || ICONS.check;
+    return `
+      <div class="an-bullet">
+        <div class="an-bullet-icon"><svg viewBox="0 0 24 24">${icon}</svg></div>
+        <div class="an-bullet-text">${b.text}</div>
+      </div>`;
   }
 
   function show(opts) {
     opts = opts || {};
     const id = opts.id || 'default';
-    const persist = 'persist' in opts ? opts.persist : 'local';
+    const persist = 'persist' in opts ? opts.persist : false;
 
-    if (hasBeenSeen(id, persist)) return;
+    if (isDismissedForever(id)) return;
+    if (isClosedByPersist(id, persist)) return;
 
     injectStyle();
     if (overlayEl) overlayEl.remove();
 
-    const icon = opts.icon || '<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>';
+    const bullets = Array.isArray(opts.bullets) ? opts.bullets : [];
 
     overlayEl = document.createElement('div');
     overlayEl.className = 'an-overlay';
     overlayEl.innerHTML = `
       <div class="an-card" role="dialog" aria-modal="true">
         <button class="an-close" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
-        <div class="an-icon"><svg viewBox="0 0 24 24">${icon}</svg></div>
-        ${opts.eyebrow ? `<div class="an-eyebrow">${opts.eyebrow}</div>` : ''}
-        <div class="an-title">${opts.title || ''}</div>
-        <div class="an-text">${opts.text || ''}</div>
-        <div class="an-actions">
-          ${btnHtml('an-btn-dark', opts.primaryText || 'Понятно', opts.primaryHref)}
-          ${btnHtml('an-btn-ghost', opts.secondaryText, opts.secondaryHref)}
+        <div class="an-content">
+          ${opts.eyebrow ? `<div class="an-eyebrow">${opts.eyebrow}</div>` : ''}
+          <div class="an-title">${opts.title || ''}</div>
+          <div class="an-bullets">${bullets.map(bulletHtml).join('')}</div>
+          ${opts.footnote ? `<div class="an-footnote">${opts.footnote}</div>` : ''}
+          <div class="an-actions">
+            ${opts.primaryHref
+              ? `<a class="an-btn an-btn-dark" href="${opts.primaryHref}">${opts.primaryText || 'Понятно'}</a>`
+              : `<button class="an-btn an-btn-dark" data-an-primary>${opts.primaryText || 'Понятно'}</button>`}
+            ${opts.dontShowAgainText ? `<button class="an-dismiss" data-an-dismiss>${opts.dontShowAgainText}</button>` : ''}
+          </div>
         </div>
+        <div class="an-visual">${PANEL_ICON}</div>
       </div>`;
     document.body.appendChild(overlayEl);
 
-    function close() { markSeen(id, persist); hide(); }
+    function closeNormal() { markClosedByPersist(id, persist); hide(); }
+    function closeForever() { markDismissedForever(id); hide(); }
 
-    overlayEl.querySelector('.an-close').addEventListener('click', close);
-    overlayEl.addEventListener('click', e => { if (e.target === overlayEl) close(); });
-    overlayEl.querySelectorAll('[data-an-action]').forEach(b => b.addEventListener('click', close));
-    overlayEl.querySelectorAll('.an-btn[href]').forEach(a => a.addEventListener('click', () => markSeen(id, persist)));
+    overlayEl.querySelector('.an-close').addEventListener('click', closeNormal);
+    overlayEl.addEventListener('click', e => { if (e.target === overlayEl) closeNormal(); });
+    const primaryBtn = overlayEl.querySelector('[data-an-primary]');
+    if (primaryBtn) primaryBtn.addEventListener('click', closeNormal);
+    const primaryLink = overlayEl.querySelector('a.an-btn-dark');
+    if (primaryLink) primaryLink.addEventListener('click', () => markClosedByPersist(id, persist));
+    const dismissBtn = overlayEl.querySelector('[data-an-dismiss]');
+    if (dismissBtn) dismissBtn.addEventListener('click', closeForever);
 
     requestAnimationFrame(() => requestAnimationFrame(() => overlayEl.classList.add('show')));
   }

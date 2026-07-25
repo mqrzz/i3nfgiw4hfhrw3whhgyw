@@ -61,26 +61,17 @@ const NOTIFY_CONFIG = {
     check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/>'
   };
 
-  // Иконка для правой (тёмной) панели — щит с галочкой и узлами
-  // "разрешённой" сети вокруг. Нарисована вручную под тему белых списков.
+  // Иконка для правой (тёмной) панели — сигнал wifi, где дальняя дуга
+  // перечёркнута (заблокирована), средняя приглушена, а ближняя к точке —
+  // целая и зелёная: связь урезана, но не пропала совсем.
   const PANEL_ICON = `
     <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
-      <g fill="none" stroke="#1ede7b" stroke-width="1.4" stroke-dasharray="3 5" opacity="0.55">
-        <line x1="110" y1="110" x2="34" y2="58"/>
-        <line x1="110" y1="110" x2="182" y2="52"/>
-        <line x1="110" y1="110" x2="44" y2="168"/>
-        <line x1="110" y1="110" x2="176" y2="164"/>
-      </g>
-      <g fill="#191b1e" stroke="#1ede7b" stroke-width="1.4">
-        <circle cx="34" cy="58" r="6"/>
-        <circle cx="182" cy="52" r="5"/>
-        <circle cx="44" cy="168" r="5"/>
-        <circle cx="176" cy="164" r="6.5"/>
-      </g>
-      <path d="M110 40 L156 58 C156 108 148 148 110 172 C72 148 64 108 64 58 Z"
-            fill="rgba(30,222,123,0.06)" stroke="#1ede7b" stroke-width="2.2"/>
-      <path d="M89 108 L104 124 L134 90" fill="none" stroke="#1ede7b" stroke-width="4"
-            stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="110" cy="170" r="7" fill="#1ede7b"/>
+      <path d="M84 170 A26 26 0 0 1 136 170" fill="none" stroke="#1ede7b" stroke-width="6" stroke-linecap="round"/>
+      <path d="M58 170 A52 52 0 0 1 162 170" fill="none" stroke="rgba(255,255,255,.28)" stroke-width="6" stroke-linecap="round"/>
+      <path d="M32 170 A78 78 0 0 1 188 170" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="6"
+            stroke-linecap="round" stroke-dasharray="1 14"/>
+      <line x1="52" y1="118" x2="168" y2="92" stroke="#707a8a" stroke-width="6" stroke-linecap="round"/>
     </svg>`;
 
   const CSS = `

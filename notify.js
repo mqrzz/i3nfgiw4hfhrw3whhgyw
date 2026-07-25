@@ -166,7 +166,7 @@ const NOTIFY_CONFIG = {
         overflow-y:auto;
       }
       .an-overlay.show .an-card{ transform:translateY(0); }
-      .an-visual{ flex:0 0 auto; padding:22px 20px 14px; }
+      .an-visual{ flex:0 0 auto; padding:22px 20px 14px; order:-1; }
       .an-visual svg{ max-width:110px; }
       .an-content{ padding:12px 24px calc(26px + env(safe-area-inset-bottom)); flex:1; }
       .an-actions{ margin-top:24px; }

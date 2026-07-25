@@ -587,12 +587,7 @@ async function loadBento(uid){
   }catch(e){console.error(e);}
 }
 
-/* ══ PUSH-УВЕДОМЛЕНИЯ (FCM) ══
-   Отдельный канал от Firestore-уведомлений в кабинете: пока страница
-   "Уведомления" видна только когда человек сам зашёл на сайт, push
-   приходит системным уведомлением браузера/ОС даже при закрытой вкладке.
-   Секция в разметке никогда не скрывается — меняется только её содержимое
-   (renderPushState) в зависимости от Notification.permission. */
+
 
 // Project Settings → Cloud Messaging → Web configuration → Web Push
 // certificates
@@ -654,7 +649,7 @@ async function renderPushState(user){
     if(status==='ok'){
       box.innerHTML=`<span class="push-status on"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Подключено</span><span class="push-hint">В этом браузере уведомления придут, даже если сайт закрыт</span>`;
     }else if(status==='timeout'){
-      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Не отвечает за 8 секунд</span><span class="push-hint">Похоже, антивирус (проверка защищённых соединений) или VPN блокирует запрос к Google. Попробуйте временно отключить их и нажать «Повторить».</span><button class="btn btn-green" id="pushRetryBtn" style="padding:10px 18px">Повторить</button>`;
+      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Сервер не ответил</span><span class="push-hint">Похоже, антивирус (проверка защищённых соединений) или VPN блокирует запрос к нашим серверам. Попробуйте временно отключить их и нажать «Повторить».</span><button class="btn btn-green" id="pushRetryBtn" style="padding:10px 18px">Повторить</button>`;
       document.getElementById('pushRetryBtn').onclick=()=>renderPushState(user);
     }else{
       box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Не удалось подключить</span><button class="btn btn-green" id="pushRetryBtn" style="padding:10px 18px;margin-left:10px">Повторить</button>`;
@@ -677,7 +672,7 @@ function withTimeout(promise, ms){
 
 async function ensureTokenSaved(user){
   try{
-    // 8 секунд с запасом — обычный getToken() отвечает за доли секунды,
+    // 15 секунд с запасом — обычный getToken() отвечает за доли секунды,
     // но если что-то на пути (антивирус с проверкой HTTPS, VPN, файрвол)
     // рвёт соединение к googleapis.com, запрос может виснуть без ограничения
     // по времени, и вкладка браузера будет казаться "вечно грузящейся".

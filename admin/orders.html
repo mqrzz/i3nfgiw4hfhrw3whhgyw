@@ -120,7 +120,7 @@ svg{display:block}
 .col{display:flex;flex-direction:column;gap:16px;min-width:0}
 
 /* SECTION CARDS */
-.sec{background:var(--card);border:1.5px solid var(--border);border-radius:26px;overflow:visible}
+.sec{background:var(--card);border:1.5px solid var(--border);border-radius:26px;overflow:hidden}
 .sec-h{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
 .sec-h-l{display:flex;align-items:center;gap:12px;min-width:0}
 .sec-icon{width:36px;height:36px;border-radius:11px;background:var(--accent-bg,var(--green-light));color:var(--accent,var(--green-d));display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -143,11 +143,6 @@ svg{display:block}
 .step-label{font-size:.72rem;color:var(--muted);text-align:center;font-weight:400;line-height:1.3}
 .step.cur .step-label{color:var(--text);font-weight:600}
 .step.done .step-label{color:var(--green-d);font-weight:500}
-.pipeline-extra{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:16px 4px 20px;border-top:1px solid var(--border);margin-top:6px}
-.pipeline-extra-l{font-size:.82rem;color:var(--muted)}
-.step-side{display:inline-flex;align-items:center;gap:8px;padding:.55rem 1.1rem;border-radius:12px;border:1.5px solid var(--amber);color:var(--amber-d);background:var(--amber-light);font-family:var(--font);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .12s}
-.step-side.cur{background:var(--amber);border-color:var(--amber);color:#fff}
-.step-side svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
 .pipeline-comment{padding:0 24px 22px}
 
 /* PAY */
@@ -200,9 +195,11 @@ svg{display:block}
 .btn:hover{transform:translateY(-1px)}
 .btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
 .btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:var(--dark2)}
-.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--muted)}.btn-outline:hover{border-color:var(--text);color:var(--text)}
+.btn-outline{background:transparent;border:1.5px solid var(--dark);color:var(--dark)}.btn-outline:hover{background:var(--dark);color:#fff}
 .btn-danger{background:var(--red-light);color:var(--red);border:1px solid rgba(232,99,79,.25)}.btn-danger:hover{background:rgba(232,99,79,.18)}
 .btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid rgba(59,130,246,.22)}.btn-blue:hover{background:rgba(59,130,246,.2)}
+.btn-warn{background:var(--amber-light);color:var(--amber-d);border:1px solid rgba(245,158,11,.3)}.btn-warn:hover{background:rgba(245,158,11,.22)}
+.btn-warn.active{background:var(--amber);color:#fff;border-color:var(--amber)}
 .btn-sm{padding:.45rem .95rem;font-size:.8rem;border-radius:10px}
 .btn-xs{padding:.3rem .7rem;font-size:.72rem;border-radius:8px}
 
@@ -353,10 +350,6 @@ svg{display:block}
           <button class="step" data-status="4" onclick="setStatus(4)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span><span class="step-label">Правки</span></button>
           <button class="step" data-status="5" onclick="setStatus(5)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-label">Готово</span></button>
         </div>
-        <div class="pipeline-extra">
-          <span class="pipeline-extra-l">Особый статус, если оплачена только часть суммы:</span>
-          <button class="step-side" id="stepSide" data-status="6" onclick="setStatus(6)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Ожидает доплаты</button>
-        </div>
         <div class="pipeline-comment">
           <textarea class="textarea" id="commentInp" placeholder="Внутренний комментарий..." rows="2"></textarea>
           <div style="margin-top:10px"><button class="btn btn-dark btn-sm" onclick="saveComment()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Сохранить</button></div>
@@ -393,10 +386,11 @@ svg{display:block}
                 <span class="pay-lbl" id="payLabel">Нажмите чтобы изменить</span>
               </div>
               <div id="partialPayInfo"></div>
-              <div style="display:flex;gap:10px">
-                <input class="si" id="payLinkInp" type="text" placeholder="Ссылка на оплату..." style="flex:1"/>
-                <button class="btn btn-blue btn-sm" onclick="sendPayLink(selOrderId,selUid)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Отправить</button>
+              <div style="display:flex;gap:10px;margin-bottom:10px">
+                <input class="si" id="payLinkInp" type="text" placeholder="Ссылка на оплату..." style="flex:1" autocomplete="off"/>
+                <button class="btn btn-blue btn-sm" onclick="sendPayLink(selOrderId,selUid)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Отправить</button>
               </div>
+              <button class="btn btn-warn btn-sm" id="doplataBtn" onclick="setStatus(6)" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Отметить «Ожидает доплаты»</button>
             </div>
           </div>
 
@@ -474,11 +468,11 @@ svg{display:block}
             </div>
             <div class="sec-b">
               <div class="sf">
-                <div class="sf-row"><div class="sf-lbl">Домен</div><input class="si" id="siteDomain" type="text" placeholder="antviz.ru"/></div>
-                <div class="sf-row"><div class="sf-lbl">URL сайта</div><input class="si" id="siteUrl" type="text" placeholder="https://..."/></div>
-                <div class="sf-row"><div class="sf-lbl">URL favicon</div><input class="si" id="siteFavicon" type="text" placeholder="https://.../favicon.png"/></div>
-                <div class="sf-row"><div class="sf-lbl">Количество страниц</div><input class="si" id="sitePages" type="text" placeholder="5"/></div>
-                <div class="sf-row"><div class="sf-lbl">Репозиторий</div><input class="si" id="siteRepo" type="text" placeholder="https://github.com/owner/repo"/></div>
+                <div class="sf-row"><div class="sf-lbl">Домен</div><input class="si" id="siteDomain" type="text" placeholder="antviz.ru" autocomplete="off"/></div>
+                <div class="sf-row"><div class="sf-lbl">URL сайта</div><input class="si" id="siteUrl" type="text" placeholder="https://..." autocomplete="off"/></div>
+                <div class="sf-row"><div class="sf-lbl">URL favicon</div><input class="si" id="siteFavicon" type="text" placeholder="https://.../favicon.png" autocomplete="off"/></div>
+                <div class="sf-row"><div class="sf-lbl">Количество страниц</div><input class="si" id="sitePages" type="text" placeholder="5" autocomplete="off"/></div>
+                <div class="sf-row"><div class="sf-lbl">Репозиторий</div><input class="si" id="siteRepo" type="text" name="antviz-repo-url-field" placeholder="https://github.com/owner/repo" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/></div>
               </div>
             </div>
           </div>
@@ -493,7 +487,7 @@ svg{display:block}
         <div class="sec-b" style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="btn btn-danger" id="archiveBtn" onclick="archiveOrder()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>В архив</button>
           <button class="btn btn-outline" onclick="printReceipt(selOrderId)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Печать квитанции</button>
-          <button class="btn btn-outline" onclick="manualRefund()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Оформить возврат вручную</button>
+          <button class="btn btn-warn" onclick="manualRefund()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Оформить возврат вручную</button>
         </div>
       </div>
 
@@ -678,8 +672,8 @@ function renderPipeline(status){
     b.classList.toggle('done',s<status);
     b.classList.toggle('cur',s===status);
   });
-  const side=document.getElementById('stepSide');
-  if(side)side.classList.toggle('cur',status===6);
+  const doplataBtn=document.getElementById('doplataBtn');
+  if(doplataBtn)doplataBtn.classList.toggle('active',status===6);
 }
 
 function showDetail(o){
@@ -742,7 +736,7 @@ function showDetail(o){
   if(hasGoals||hasReadiness||hasLaunch||hasRefs){
     bs.style.display='';
     const cells=[];
-    if(hasGoals)cells.push(icCard('Цель сайта',o.goals.map(g=>esc(GOALS[g]||g)).join(', ')));
+    if(hasGoals)cells.push(icCard('Цель сайта'+(o.goals.length>1?' ('+o.goals.length+')':''),`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px">${o.goals.map(g=>`<span class="tag tag-purple">${esc(GOALS[g]||g)}</span>`).join('')}</div>`));
     if(hasReadiness)cells.push(icCard('Готовность материалов',esc(READINESS[o.contentReadiness]||o.contentReadiness)));
     if(hasLaunch)cells.push(icCard('Желаемый запуск',esc(new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}))));
     document.getElementById('briefGrid').innerHTML=cells.join('');
@@ -799,8 +793,8 @@ function renderSupport(o){
     <div style="display:flex;flex-direction:column;gap:8px">
       <div class="sf-lbl">Ссылка на оплату (500 ₽)</div>
       <div style="display:flex;gap:10px">
-        <input class="si" id="payLink_${o.id}" type="text" placeholder="https://..." style="flex:1"/>
-        <button class="btn btn-blue btn-sm" onclick="sendPayLink('${o.id}','${o.uid||''}')">Отправить</button>
+        <input class="si" id="payLink_${o.id}" type="text" placeholder="https://..." style="flex:1" autocomplete="off"/>
+        <button class="btn btn-blue btn-sm" onclick="sendPayLink('${o.id}','${o.uid||''}')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Отправить</button>
       </div>
     </div>`;
   }else{

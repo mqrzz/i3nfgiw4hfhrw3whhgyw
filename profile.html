@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Кабинет — Antviz (мокап)</title>
+<link rel="icon" href="img/favicon.png" type="image/png"/>
+<title>Кабинет — Antviz</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&family=Fraunces:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
@@ -33,6 +34,9 @@
   --line-strong:#393e45;
 }
 html{scroll-behavior:smooth}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--paper);display:flex;align-items:center;justify-content:center}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--green-d);border-radius:50%;animation:spin .7s linear infinite}
 body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-weight:300;line-height:1.4;letter-spacing:-.01em;transition:background .2s,color .2s}
 .wrap{max-width:1060px;margin:0 auto;padding:48px 28px 90px}
 
@@ -155,6 +159,11 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
 </style>
 </head>
 <body>
+<script src="/sidebar.js" data-page="profile"></script>
+<script src="/nav.js"></script>
+<div id="sbContent">
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+<div id="cabinet" style="display:none">
 <div class="wrap">
 
   <div class="topbar">
@@ -267,7 +276,8 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
     </div>
   </div>
 
-</div>
+</div><!-- /wrap -->
+</div><!-- /cabinet -->
 
 <div class="cmdk-overlay" id="cmdkOverlay">
   <div class="cmdk-panel">
@@ -505,10 +515,17 @@ onAuthStateChanged(auth,user=>{
   currentUser=user;
   const name=(user.displayName||'Пользователь').split(' ')[0];
   document.getElementById('heroGreeting').innerHTML=greetingWord()+', <em id="heroName">'+name+'</em>';
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('cabinet').style.display='block';
   loadOrders(user.uid);
   loadRail(user.uid);
   initPush(user);
-});
+},err=>{console.error('Auth:',err);document.getElementById('loadingScreen').style.display='none';document.getElementById('cabinet').style.display='block';});
 </script>
+<script src="/footer.js" data-page="profile"></script>
+</div><!-- /sbContent -->
+<script src="/GEOBLOCK.js"></script>
+<script type="module" src="/maintenance.js"></script>
+<script src="/notify.js"></script>
 </body>
 </html>

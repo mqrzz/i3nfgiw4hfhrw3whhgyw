@@ -112,16 +112,29 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
 .rail-ico{width:15px;height:15px;stroke:var(--muted);stroke-width:1.7;fill:none;flex-shrink:0}
 .rail-stat-value{font-size:.94rem;font-weight:500}
 
-.support-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
-.support-row:last-child{border-bottom:none}
-.support-ring{position:relative;width:44px;height:44px;flex-shrink:0}
-.support-ring svg{width:44px;height:44px;transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--line);stroke-width:3}
-.ring-fg{fill:none;stroke:var(--green-d);stroke-width:3;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
-.support-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:500;color:var(--ink)}
-.support-info{min-width:0}
-.support-name{font-size:.88rem;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
-.support-sub{font-size:.76rem;color:var(--muted);margin-top:1px}
+.support-row{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
+.support-row:last-child{margin-bottom:0}
+.support-ring{position:relative;width:72px;height:72px;flex-shrink:0}
+.support-ring svg{width:72px;height:72px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--line);stroke-width:5}
+.ring-fg{fill:none;stroke:var(--green-d);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.support-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.support-ring-num{font-family:var(--font-voice);font-size:1.3rem;color:var(--ink);line-height:1}
+.support-ring-unit{font-size:.58rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.support-name{font-size:.95rem;font-weight:500}
+.support-sub{font-size:.8rem;color:var(--muted);margin-top:2px}
+
+.donut-wrap{position:relative;width:132px;height:132px;margin:2px auto 20px}
+.donut-svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut-bg{fill:none;stroke:var(--line);stroke-width:11}
+.donut-seg{fill:none;stroke-width:11;transition:stroke-dashoffset .7s ease}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-total{font-family:var(--font-voice);font-size:1.9rem;color:var(--ink);line-height:1}
+.donut-total-label{font-size:.68rem;color:var(--muted);margin-top:3px}
+.legend{display:flex;flex-direction:column;gap:9px}
+.legend-item{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--ink-soft)}
+.legend-item b{color:var(--ink);font-weight:500;margin-left:auto}
+.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 .empty-state{display:flex;align-items:center;gap:12px;padding:16px 0;color:var(--muted);font-size:.86rem}
 .empty-state svg{width:20px;height:20px;stroke:var(--muted);stroke-width:1.6;fill:none;flex-shrink:0}
@@ -245,8 +258,16 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
     <div class="rail">
 
       <div class="block">
+        <div class="block-head"><span class="block-title">Обзор</span></div>
+        <div id="overviewChart"></div>
+      </div>
+
+      <div class="block">
         <div class="block-head"><span class="block-title">Сервис</span></div>
         <div id="supportList"><div class="rail-stat"><span class="rail-stat-label">Обслуживание</span><span class="rail-stat-value">Загрузка…</span></div></div>
+      </div>
+
+      <div class="block">
         <div class="rail-stat"><span class="rail-stat-label"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M12 2l2.6 5.3 5.9.8-4.2 4.2 1 5.8L12 15.9 6.7 18l1-5.8L3.5 8l5.9-.8L12 2z"/></svg>Открытых тикетов</span><span class="rail-stat-value" id="railTickets">1</span></div>
         <div class="rail-stat"><span class="rail-stat-label"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>Непрочитанные</span><span class="rail-stat-value" id="railUnread" style="color:var(--green-d)">2 новых</span></div>
       </div>
@@ -379,7 +400,9 @@ function renderFeatured(order){
     return;
   }
   const name=order.siteName||order.siteDomain||order.siteType||'Проект';
-  const step=STATUS_TO_STEP[order.status||0]||0;
+  const st=order.status||0;
+  const step=STATUS_TO_STEP[st]||0;
+  const FULL_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
   const stepsHtml=STEP_LABELS.map((label,i)=>{
     const cls=i<step?'done':(i===step?'current':'');
     return `<div class="step ${cls}"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">${label}</div></div>`;
@@ -387,7 +410,7 @@ function renderFeatured(order){
   slot.innerHTML=`<div class="order-card">
     <div class="order-top">
       <div><div class="order-name">${name}</div><div class="order-sub">Заказ #${order.id.slice(0,6)}</div></div>
-      <div class="order-eta">В работе</div>
+      <div class="order-eta">${st===6?'<span style="color:var(--red)">Ожидает доплаты</span>':FULL_LABEL[st]}</div>
     </div>
     <div class="steps">${stepsHtml}</div>
   </div>`;
@@ -438,7 +461,7 @@ function renderSupportList(orders){
     box.innerHTML=`<div class="empty-state" style="padding:14px 0"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.4-3.4a5 5 0 01-6.5 6.5L6.7 20.3a2 2 0 01-2.8-2.8L11.8 9.6a5 5 0 016.5-6.5l-3.4 3.4z"/></svg><span>Обслуживание не подключено</span></div>`;
     return;
   }
-  const C=113.1; // 2πr, r=18
+  const C=188.5; // 2πr, r=30
   box.innerHTML=actives.map(o=>{
     const name=o.siteName||o.siteDomain||o.siteType||'Сайт';
     const expires=o.supportExpiresAt.toDate();
@@ -450,17 +473,48 @@ function renderSupportList(orders){
     const frac=Math.min(1,Math.max(0,daysLeft/totalDays));
     const offset=C*(1-frac);
     return `<div class="support-row">
-      <div class="support-ring"><svg viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="18"/><circle class="ring-fg" cx="22" cy="22" r="18" style="stroke-dasharray:${C};stroke-dashoffset:${offset}"/></svg><span class="support-ring-label">${daysLeft}</span></div>
-      <div class="support-info"><div class="support-name">${name}</div><div class="support-sub">${daysLeft} из ${totalDays} дней</div></div>
+      <div class="support-ring"><svg viewBox="0 0 72 72"><circle class="ring-bg" cx="36" cy="36" r="30"/><circle class="ring-fg" cx="36" cy="36" r="30" style="stroke-dasharray:${C};stroke-dashoffset:${offset}"/></svg><span class="support-ring-label"><span class="support-ring-num">${daysLeft}</span><span class="support-ring-unit">дней</span></span></div>
+      <div class="support-info"><div class="support-name">${name}</div><div class="support-sub">Осталось ${daysLeft} из ${totalDays} дней</div></div>
     </div>`;
   }).join('');
+}
+
+function renderOverview(orders){
+  const box=document.getElementById('overviewChart');
+  const total=orders.length;
+  if(!total){
+    box.innerHTML=`<div class="empty-state" style="padding:6px 0 2px"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg><span>Появится после первого заказа</span></div>`;
+    return;
+  }
+  const cats=[
+    {label:'Готово',count:orders.filter(o=>o.status===5).length,color:'var(--green-d)'},
+    {label:'В работе',count:orders.filter(o=>o.status>=1&&o.status<=4).length,color:'#3b82f6'},
+    {label:'Новые',count:orders.filter(o=>(o.status||0)===0).length,color:'var(--line-strong)'},
+    {label:'Ждут оплаты',count:orders.filter(o=>o.status===6).length,color:'var(--red)'},
+  ].filter(c=>c.count>0);
+  const C=2*Math.PI*40;
+  let acc=0;
+  const segs=cats.map(c=>{
+    const len=C*(c.count/total);
+    const seg=`<circle class="donut-seg" cx="50" cy="50" r="40" stroke="${c.color}" style="stroke-dasharray:${len} ${C-len};stroke-dashoffset:${-acc}"/>`;
+    acc+=len;
+    return seg;
+  }).join('');
+  box.innerHTML=`<div class="donut-wrap">
+    <svg class="donut-svg" viewBox="0 0 100 100">
+      <circle class="donut-bg" cx="50" cy="50" r="40"/>
+      ${segs}
+    </svg>
+    <div class="donut-center"><span class="donut-total">${total}</span><span class="donut-total-label">заказ${total===1?'':total<5?'а':'ов'}</span></div>
+  </div>
+  <div class="legend">${cats.map(c=>`<div class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.label}<b>${c.count}</b></div>`).join('')}</div>`;
 }
 
 function loadOrders(uid){
   const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
   onSnapshot(q,snap=>{
     const orders=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>(o.status??0)!==-1);
-    const active=orders.filter(o=>(o.status||0)>=1&&(o.status||0)<=4);
+    const active=orders.filter(o=>o.status!==5);
     const done=orders.filter(o=>o.status===5);
     document.getElementById('statTotal').textContent=orders.length;
     document.getElementById('statActive').textContent=active.length;

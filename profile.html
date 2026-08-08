@@ -8,211 +8,173 @@
   <link rel="icon" href="img/favicon.png" type="image/png"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&family=Fraunces:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+  <link rel="manifest" href="/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Antviz">
+  <link rel="apple-touch-icon" href="/img/favicon.png">
   <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;--green-tint:rgba(30,222,123,.1);
-  --bg:#fff;--bg3:#f9fafc;
-  --text:#191b1e;--muted:#707a8a;--muted2:#9aa2b1;
-  --border:#dfe3e8;--border2:#cbcdd6;
-  --dark:#191b1e;--dark2:#2b2f33;
-  --warn:#f59e0b;--warn-tint:rgba(245,158,11,.1);
-  --info:#3b82f6;--info-tint:rgba(59,130,246,.1);
-  --font:'Geologica','Inter','Arial',sans-serif;
+  --ink:#191b1e;
+  --ink-soft:#707a8a;
+  --muted:#9aa2b1;
+  --paper:#ffffff;
+  --paper-2:#f9fafc;
+  --line:#dfe3e8;
+  --line-strong:#cbcdd6;
+  --green:#1ede7b;
+  --green-d:#149955;
+  --red:#e8634f;
+  --font-ui:'Geologica','Arial',sans-serif;
   --font-voice:'Fraunces','Georgia',serif;
 }
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.3;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+[data-theme="dark"]{
+  --ink:#ffffff;
+  --ink-soft:#b9bec7;
+  --muted:#7d8492;
+  --paper:#191b1e;
+  --paper-2:#141518;
+  --line:#2b2f34;
+  --line-strong:#393e45;
+}
+html{scroll-behavior:smooth}
+body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-weight:300;line-height:1.4;letter-spacing:-.01em;transition:background .2s,color .2s}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-:focus-visible{outline:2px solid var(--green-h);outline-offset:2px}
+:focus-visible{outline:2px solid var(--green-d);outline-offset:2px}
 @keyframes spin{to{transform:rotate(360deg)}}
-.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
-
-.container{max-width:1240px;margin:0 auto;width:100%}
-
-.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
-.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--paper);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.9rem}
+.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--green-d);border-radius:50%;animation:spin .7s linear infinite}
 #cabinet{display:none}
+.wrap{max-width:1060px;margin:0 auto;padding:48px 28px 90px}
 
-.eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:12px}
-.eyebrow.g{color:var(--muted)}
+/* top bar */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px}
+.logo-img{width:26px;height:26px;border-radius:7px;display:block}
+.topbar-icons{display:flex;align-items:center;gap:8px}
+.icon-btn{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--ink);text-decoration:none;position:relative;flex-shrink:0;transition:border-color .15s}
+.icon-btn:hover{border-color:var(--line-strong)}
+.icon-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none}
+.icon-btn .dot{position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--green-d);border:2px solid var(--paper);display:none}
+.icon-btn .dot.show{display:block}
+.theme-toggle{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:100px;padding:6px 6px;cursor:pointer;background:var(--paper)}
+.theme-toggle span{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);transition:background .15s,color .15s}
+.theme-toggle span.active{background:var(--ink);color:var(--paper)}
 
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:1px solid transparent;border-radius:10px;padding:13px 24px;font-size:14px;letter-spacing:-.01em;transition:opacity .12s,border-color .12s,color .12s,background .12s;white-space:nowrap}
-.btn:hover{opacity:.85}
-.btn-green{background:var(--dark);color:#fff}
-.btn-green:hover{opacity:.85}
-.btn svg,.btn i{font-size:16px}
-
-/* ══ HERO — светлый, без тёмной плашки; линия снизу вместо блока ══ */
-.hero-wrap{padding:44px 0 0}
-.hero-block{padding:0 0 36px;border-bottom:1px solid var(--border)}
-
-.hero-brand{display:flex;align-items:center;gap:8px;margin-bottom:24px}
-.hero-logo{width:22px;height:22px;border-radius:6px;display:block}
-.hero-brand span{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-
-.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:32px}
-.hero-id{display:flex;align-items:center;gap:16px;min-width:0}
-.avatar{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:1.3rem;color:#fff;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;transition:opacity .2s}
+/* hero */
+.hero{border-bottom:1px solid var(--line);padding-bottom:40px;margin-bottom:48px}
+.hero-eyebrow{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
+.hero-person{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.avatar{width:46px;height:46px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:1.1rem;color:#fff;overflow:hidden;cursor:pointer;position:relative;flex-shrink:0;transition:opacity .2s}
 .avatar:hover{opacity:.85}
 .avatar img{width:100%;height:100%;object-fit:cover;display:block}
 .avatar-overlay{position:absolute;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s;color:#fff}
-.avatar-overlay svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.avatar-overlay svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
 .avatar:hover .avatar-overlay{opacity:1}
 #avatarInput{display:none}
-.hero-id-text{min-width:0}
-.hero-greeting{color:var(--muted);font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
-.hero-name{font-weight:400;font-size:clamp(1.2rem,2vw,1.5rem);letter-spacing:-.01em;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--font-voice)}
+.hero-greeting{font-family:var(--font-voice);font-weight:400;font-size:clamp(2.1rem,4.4vw,3.1rem);letter-spacing:-.01em;line-height:1.08;margin-bottom:18px}
+.hero-greeting em{font-style:italic;color:var(--green-d)}
+.hero-status{font-size:1.02rem;color:var(--ink-soft);max-width:560px;margin-bottom:26px}
+.hero-status b{color:var(--ink);font-weight:500}
+.hero-status .dot{color:var(--line-strong);margin:0 10px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font-family:var(--font-ui);font-size:.86rem;font-weight:500;border-radius:9px;padding:11px 18px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:opacity .15s,border-color .15s;border:1px solid transparent}
+.btn-primary{background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
+.btn-primary:hover{opacity:.85}
+.btn-line{background:transparent;color:var(--ink);border:1px solid var(--line-strong)}
+.btn-line:hover{border-color:var(--ink)}
+.btn-green{background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
+.btn-green:hover{opacity:.85}
 
-.hero-actions{display:flex;gap:8px;flex-shrink:0}
-.icon-btn{width:44px;height:44px;border-radius:11px;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-color .15s,transform .12s;text-decoration:none;flex-shrink:0;color:var(--text)}
-.icon-btn svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none}
-.icon-btn:hover{border-color:var(--border2);transform:translateY(-1px)}
-.icon-btn .dot{position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;background:var(--green-d);border:2px solid var(--bg);display:none}
-.icon-btn .dot.show{display:block}
+/* grid */
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:64px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr;gap:44px}}
 
-.hero-headline{font-weight:400;font-size:clamp(1.9rem,4vw,3rem);letter-spacing:-.01em;line-height:1.1;color:var(--text);margin-bottom:20px;max-width:720px;font-family:var(--font-voice)}
-.hero-headline em{font-style:italic;color:var(--green-d)}
+.block{margin-bottom:52px}
+.block:last-child{margin-bottom:0}
+.block-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px}
+.block-title{font-size:1.05rem;font-weight:500;letter-spacing:-.01em}
+.block-link{font-size:.8rem;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
+.block-link:hover{color:var(--ink);border-color:var(--ink)}
 
-/* статус одной строкой вместо трёх плашек */
-.hero-bar{display:flex;flex-wrap:wrap;align-items:center;gap:0;font-size:1rem;color:var(--muted)}
-.hero-stat{display:flex;align-items:baseline;gap:6px}
-.hero-stat:not(:last-child)::after{content:'·';margin:0 12px;color:var(--border2)}
-.hero-stat-n{font-weight:500;color:var(--text);letter-spacing:-.01em}
-.hero-stat-l{font-size:1rem;color:var(--muted)}
+/* featured order — стадии вместо процента */
+.order-card{border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px}
+.order-name{font-size:1rem;font-weight:500}
+.order-sub{font-size:.78rem;color:var(--muted);margin-top:3px}
+.order-eta{font-size:.78rem;color:var(--muted);text-align:right;white-space:nowrap}
+.order-eta b{color:var(--ink);font-weight:500}
+.steps{display:flex;align-items:center}
+.step{flex:1;display:flex;flex-direction:column;gap:8px;position:relative}
+.step-bar{height:2px;background:var(--line-strong);position:relative}
+.step.done .step-bar,.step.current .step-bar{background:var(--green-d)}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--line-strong);position:absolute;left:0;top:-3px}
+.step.done .step-dot{background:var(--green-d)}
+.step.current .step-dot{background:var(--green-d);box-shadow:0 0 0 4px rgba(20,153,85,.18)}
+.step-label{font-size:.68rem;color:var(--muted);margin-top:4px}
+.step.current .step-label{color:var(--ink);font-weight:500}
 
+.plain-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.plain-row:last-child{border-bottom:none}
+.plain-row-title{font-size:.92rem;font-weight:400}
+.plain-row-sub{font-size:.78rem;color:var(--muted);margin-top:2px}
+.tag{font-size:.7rem;color:var(--muted);border:1px solid var(--line-strong);border-radius:100px;padding:3px 10px;white-space:nowrap}
+.tag.on{color:var(--green-d);border-color:var(--green-d)}
+.list-empty{padding:20px 0;color:var(--muted);font-size:.88rem}
+.list-empty a{color:var(--green-d);text-decoration:none;font-weight:500}
 
-/* ══ ГЛАВНАЯ РАСКЛАДКА ══ */
-.main-grid{display:grid;grid-template-columns:1fr 360px;gap:56px;padding:56px 0;align-items:start}
-@media(max-width:960px){.main-grid{grid-template-columns:1fr;gap:44px;padding:44px 0}}
-.rail{position:sticky;top:24px;display:flex;flex-direction:column;gap:0}
-@media(max-width:960px){.rail{position:static}}
-.rail-head{margin:0 0 20px}
-.rail-head h2{font-size:18px;font-weight:500;letter-spacing:-.01em}
-
-.sec-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.sec-head h2{font-size:19px;font-weight:500;letter-spacing:-.01em}
-.sec-head-id{display:flex;align-items:baseline;gap:10px}
-.sec-icon{display:none}
-.sec-link{font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;flex-shrink:0;background:transparent;padding:0;border-radius:0;box-shadow:none;transition:color .15s}
-.sec-link svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.2;fill:none;flex-shrink:0}
-.sec-link:hover{color:var(--text)}
-.main-col>section+section{margin-top:48px}
-.main-col>section.panel{background:transparent;border:none;border-radius:0;padding:0;box-shadow:none}
-
-/* ══ ЗАКАЗЫ ══ */
-.featured-project{background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:24px 26px;margin-bottom:12px;position:relative;overflow:hidden}
-.fp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:22px}
-.fp-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
-.fp-title{font-size:1.05rem;font-weight:500;letter-spacing:-.01em}
-.fp-icon{width:36px;height:36px;border-radius:10px;background:transparent;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0}
-.fp-icon svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none}
-.fp-progress-track{height:2px;background:var(--border);border-radius:0;overflow:hidden;margin-bottom:10px}
-.fp-progress-fill{height:100%;background:var(--green-d);border-radius:0;transition:width .8s cubic-bezier(.22,1,.36,1)}
-.fp-meta{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted)}
-.fp-meta b{color:var(--text);font-weight:500}
-
-.plain-list{display:flex;flex-direction:column}
-.p-row{display:grid;grid-template-columns:38px 1fr auto;gap:14px;align-items:center;padding:14px 4px;border-radius:0;text-decoration:none;color:inherit;background:transparent;border:none;border-bottom:1px solid var(--border);transition:padding-left .15s}
-.p-row:last-child{border-bottom:none}
-.p-row:hover{padding-left:8px}
-.p-row-ico{flex-shrink:0;width:36px;height:36px;border-radius:9px;background:transparent;border:1px solid var(--border);color:var(--muted);display:flex;align-items:center;justify-content:center}
-.p-row-ico svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.7;fill:none}
-.p-row:has(.p-tag.done) .p-row-ico{color:var(--green-d);border-color:var(--green-d)}
-.p-row:has(.p-tag.progress) .p-row-ico{color:var(--info);border-color:var(--info)}
-.p-row-body{min-width:0}
-.p-row-title{font-size:.9rem;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.p-row-sub{font-size:.78rem;color:var(--muted)}
-.p-tag{font-size:.7rem;font-weight:500;padding:.3rem .65rem;border-radius:100px;white-space:nowrap;flex-shrink:0;border:1px solid var(--border2);color:var(--muted)}
-.p-tag.done{background:transparent;color:var(--green-d);border-color:var(--green-d)}
-.p-tag.progress{background:transparent;color:var(--info);border-color:var(--info)}
-.list-empty{padding:28px 0;text-align:center;color:var(--muted);font-size:.88rem}
-
-/* ══ АКТИВНОСТЬ ══ */
-.timeline{position:relative;padding-left:20px}
-.timeline::before{content:'';position:absolute;left:4px;top:6px;bottom:6px;width:1px;background:var(--border)}
-.tl-item{position:relative;padding-bottom:22px}
+/* activity — относительное время */
+.tl{border-left:1px solid var(--line);padding-left:20px}
+.tl-item{padding-bottom:20px;position:relative}
 .tl-item:last-child{padding-bottom:0}
-.tl-dot{position:absolute;left:-20px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--border2)}
-.tl-item.on .tl-dot{background:var(--green-d)}
-.tl-title{font-size:.9rem;font-weight:400;margin-bottom:2px}
-.tl-sub{font-size:.78rem;color:var(--muted)}
-.tl-date{font-size:.72rem;color:var(--muted2);margin-top:3px}
+.tl-item::before{content:'';position:absolute;left:-24px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--line-strong)}
+.tl-item.on::before{background:var(--green-d)}
+.tl-title{font-size:.9rem}
+.tl-sub{font-size:.78rem;color:var(--muted);margin-top:1px}
+.tl-time{font-size:.76rem;color:var(--muted);margin-top:2px}
 
-/* ══ ПРАВАЯ КОЛОНКА — плоские строки статуса вместо цветных плиток ══ */
-.bento-tile{border:none;border-bottom:1px solid var(--border);border-radius:0;padding:16px 0;box-shadow:none;transition:none;display:flex;align-items:center;justify-content:space-between;gap:14px}
-.bento-tile:hover{box-shadow:none;transform:none}
-.bento-tile.dark,.bento-tile.accent{background:transparent;border-color:var(--border);color:var(--text);box-shadow:none}
-.bt-icon{display:none}
-.bt-label{font-size:.86rem;font-weight:400;color:var(--text);margin-bottom:0}
-.bento-tile.dark .bt-label,.bento-tile.accent .bt-label{color:var(--text)}
-.bt-value{font-size:.9rem;font-weight:500;letter-spacing:0;margin-bottom:0;text-align:right}
-.bento-tile.accent .bt-value{color:var(--green-d)}
-.bt-sub{font-size:.78rem;color:var(--muted);line-height:1.4;text-align:right}
-.bento-tile.dark .bt-sub,.bento-tile.accent .bt-sub{color:var(--muted)}
-.bt-track{display:none}
-.bt-fill{display:none}
-.bt-cta{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:500;text-decoration:none;margin-top:0;background:transparent;color:var(--muted);padding:0;border-radius:0;box-shadow:none;transition:color .15s}
-.bt-cta:hover{color:var(--text);background:transparent;transform:none}
-.bt-cta svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none;flex-shrink:0}
-.bento-tile.dark .bt-cta{background:transparent;color:var(--muted)}
-.bento-tile.accent .bt-cta{background:transparent;color:var(--green-d)}
+/* rail */
+.rail-stat{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
+.rail-stat:last-child{border-bottom:none}
+.rail-stat-label{font-size:.86rem;color:var(--ink-soft)}
+.rail-stat-value{font-size:.94rem;font-weight:500}
 
-/* ══ БЫСТРЫЙ ДОСТУП — только там, где нет сайдбара (мобильная версия) ══ */
-.quick-links{display:flex;flex-direction:column}
-.quick-links a{display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-radius:0;border-bottom:1px solid var(--border);text-decoration:none;color:var(--text);font-size:.88rem;font-weight:400;transition:padding-left .15s}
-.quick-links a:last-child{border-bottom:none}
-.quick-links a:hover{padding-left:6px}
-.quick-links a span{flex:1}
-.quick-links a svg:last-child{width:13px;height:13px;stroke-width:2.1;margin-right:0;color:var(--muted2)}
-.ql-badge{background:transparent;color:var(--green-d);font-size:.7rem;font-weight:500;padding:0;border-radius:0;margin-right:8px;border:none}
+.quick{display:flex;flex-direction:column}
+.quick a{display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);font-size:.88rem;transition:padding-left .15s}
+.quick a:hover{padding-left:6px}
+.quick a:last-child{border-bottom:none}
+.quick-arrow{color:var(--muted);font-size:.8rem}
+.quick-badge{background:transparent;color:var(--green-d);font-size:.72rem;font-weight:500;margin-right:8px}
+.quick-tile{display:none}
+@media(max-width:980px){.quick-tile{display:block}}
 
-.ql-ico{width:30px;height:30px;border-radius:8px;background:transparent!important;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--muted);margin-right:12px;flex-shrink:0;transition:none;box-shadow:none!important}
-.ql-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none;margin-right:0}
-.quick-links a:hover .ql-ico{transform:none;box-shadow:none}
+/* command hint */
+.cmdk{border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:36px;cursor:pointer}
+.cmdk kbd{border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;font-family:var(--font-ui);font-size:.72rem;color:var(--ink-soft)}
 
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;padding:.6rem 1.3rem;border-radius:10px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .26s,transform .26s;pointer-events:none;white-space:nowrap}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--dark);color:#fff}
-.toast.error{background:#e8634f;color:#fff}
-
-@media(max-width:600px){
-  .hero-wrap{padding:24px 0 0}
-  .main-grid{padding:36px 0}
-  .hero-name{font-size:1.05rem;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25}
-  .featured-project{padding:20px 18px}
-}
-
-.quick-links-tile{display:none}
-@media(max-width:980px){.quick-links-tile{display:block}}
-
-/* ══ PUSH-УВЕДОМЛЕНИЯ — тонкая строка-баннер, фото слева, без роста высоты ══ */
-.push-panel{background:var(--bg);border:1px solid var(--border);border-radius:14px;margin-top:40px;display:flex;align-items:center;justify-content:space-between;gap:16px;overflow:hidden;box-shadow:none;padding:14px 18px}
-.push-photo{width:40px;height:40px;flex-shrink:0;object-fit:cover;display:block;border-radius:9px}
-.push-left{display:flex;align-items:center;gap:14px;min-width:0}
-.push-body{flex:1;min-width:0;padding:0}
-.push-eyebrow{display:none}
-.push-title{font-size:.88rem;font-weight:500;letter-spacing:-.01em;color:var(--text);margin-bottom:0;max-width:none}
-.push-desc{display:none}
-.push-action{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-height:0;flex-shrink:0}
-.push-status{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;font-weight:500;padding:0;border-radius:0;white-space:nowrap;background:transparent!important}
+/* push banner — тонкая строка, фото слева */
+.notice{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:56px}
+.notice-left{display:flex;align-items:center;gap:14px;min-width:0}
+.notice-photo{width:40px;height:40px;border-radius:10px;object-fit:cover;flex-shrink:0}
+.notice-text{font-size:.86rem;color:var(--ink-soft)}
+.notice-actions{display:flex;gap:14px;flex-shrink:0;align-items:center}
+.notice-dismiss{font-size:.78rem;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.push-status{display:inline-flex;align-items:center;gap:7px;font-size:.84rem;font-weight:500}
 .push-status.on{color:var(--green-d)}
 .push-status.off{color:var(--muted)}
 .push-status svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0}
-.push-hint{font-size:.76rem;color:var(--muted);line-height:1.4}
-@media(max-width:860px){
-  .push-panel{flex-direction:column;align-items:flex-start;border-radius:14px}
-  .push-action{justify-content:flex-start}
+.push-hint{font-size:.78rem;color:var(--muted);line-height:1.4}
+@media(max-width:640px){
+  .notice{flex-direction:column;align-items:flex-start}
+  .notice-actions{width:100%;justify-content:space-between}
 }
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(14px);z-index:700;padding:.6rem 1.2rem;border-radius:10px;font-size:.8rem;font-weight:500;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;background:var(--ink);color:var(--paper)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:var(--red);color:#fff}
   </style>
-<link rel="manifest" href="/manifest.json">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Antviz">
-<link rel="apple-touch-icon" href="/img/favicon.png">
 </head>
 <body>
 <script src="/sidebar.js" data-page="profile"></script>
@@ -223,119 +185,119 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
 <div id="cabinet">
+<div class="wrap">
 
-  <section class="hero-wrap">
-    <div class="container">
-      <div class="hero-block">
-        <div class="hero-brand"><img src="/img/favicon.png" class="hero-logo" alt="Antviz"><span>Antviz</span></div>
-        <div class="hero-top">
-          <div class="hero-id">
-            <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
-              <span id="avatarLetter">А</span>
-              <div class="avatar-overlay"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
-            </div>
-            <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
-            <div class="hero-id-text">
-              <div class="hero-greeting">Личный кабинет</div>
-              <div class="hero-name" id="heroSince">Antviz</div>
-            </div>
-          </div>
-          <div class="hero-actions">
-            <a class="icon-btn" href="profile/notifications" title="Уведомления">
-              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-              <span class="dot" id="notifDot"></span>
-            </a>
-            <a class="icon-btn" href="profile/settings" title="Настройки">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg>
-            </a>
-          </div>
-        </div>
-
-        <div class="hero-headline" id="heroHeadline">Здравствуйте, <em>Пользователь</em></div>
-
-        <div class="hero-bar">
-          <div class="hero-stat"><div class="hero-stat-n" data-count id="statTotal">0</div><div class="hero-stat-l">Всего заказов</div></div>
-          <div class="hero-stat"><div class="hero-stat-n" data-count id="statActive">0</div><div class="hero-stat-l">В работе</div></div>
-          <div class="hero-stat"><div class="hero-stat-n" data-count id="statDone">0</div><div class="hero-stat-l">Завершено</div></div>
-        </div>
+  <div class="topbar">
+    <img src="/img/favicon.png" class="logo-img" alt="Antviz">
+    <div class="topbar-icons">
+      <a class="icon-btn" href="profile/notifications" title="Уведомления">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span class="dot" id="notifDot"></span>
+      </a>
+      <a class="icon-btn" href="profile/settings" title="Настройки">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg>
+      </a>
+      <div class="theme-toggle" id="themeToggle">
+        <span id="thLight" class="active">☀</span>
+        <span id="thDark">●</span>
       </div>
+    </div>
+  </div>
+
+  <div class="cmdk">
+    <span>Найти заказ, тикет, настройку…</span>
+    <kbd>⌘K</kbd>
+  </div>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Кабинет</p>
+    <div class="hero-person">
+      <div class="avatar" id="heroAvatar" onclick="document.getElementById('avatarInput').click()">
+        <span id="avatarLetter">А</span>
+        <div class="avatar-overlay"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 0 1 2-2h2l1.5-2h5L16 6h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8z"/><circle cx="12" cy="13" r="3.2"/></svg></div>
+      </div>
+      <input type="file" id="avatarInput" accept="image/*" onchange="handleAvatarUpload(this.files[0])"/>
+    </div>
+    <h1 class="hero-greeting" id="heroGreeting">Здравствуйте, <em id="heroName">Пользователь</em></h1>
+    <p class="hero-status"><b data-count id="statTotal">0</b> заказов<span class="dot">·</span><b data-count id="statActive">0</b> сейчас в работе<span class="dot">·</span><b data-count id="statDone">0</b> завершено</p>
+    <div class="hero-actions">
+      <a href="order" class="btn btn-primary">Новый заказ</a>
+      <a href="profile/orders" class="btn btn-line">Все заказы</a>
     </div>
   </section>
 
-  <div class="container">
-    <div class="main-grid">
+  <div class="grid">
 
-      <div class="main-col">
+    <div class="main">
 
-        <section class="reveal panel">
-          <div class="sec-head">
-            <div class="sec-head-id">
-              <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M4 8a2 2 0 012-2h3l1.5-2h3L15 6h3a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V8z"/><path d="M8 12.5h8M8 16h5"/></svg></div>
-              <div><p class="eyebrow g">Ваши заказы</p><h2>Заказы</h2></div>
-            </div>
-            <a href="profile/orders" class="sec-link">Все заказы <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-          </div>
-          <div id="featuredProjectSlot"></div>
-          <div class="plain-list" id="recentProjects"><div class="list-empty">Загрузка...</div></div>
-        </section>
-
-        <section class="reveal panel">
-          <div class="sec-head">
-            <div class="sec-head-id">
-              <div class="sec-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5l3.2 2"/></svg></div>
-              <div><p class="eyebrow g">История</p><h2>Активность</h2></div>
-            </div>
-          </div>
-          <div class="timeline" id="activityTimeline"><div class="list-empty">Загрузка...</div></div>
-        </section>
-
+      <div class="block">
+        <div class="block-head">
+          <span class="block-title">Активный заказ</span>
+          <a href="profile/orders" class="block-link">все заказы →</a>
+        </div>
+        <div id="featuredOrderSlot"><div class="list-empty">Загрузка…</div></div>
+        <div id="recentProjects"></div>
       </div>
 
-      <div class="rail">
-
-        <div class="rail-head">
-          <div class="sec-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
-          <div><p class="eyebrow g">Статус</p><h2>Сервис</h2></div>
-        </div>
-
-        <div class="reveal" id="bentoSupport"></div>
-        <div class="reveal" id="bentoMessages"></div>
-        <div class="reveal" id="bentoReview" style="display:none"></div>
-
-        <div class="reveal bento-tile quick-links-tile" style="padding:8px 6px">
-          <div class="quick-links">
-            <a href="profile/orders"><span class="ql-ico ql-c-green"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/></svg></span><span>Мои заказы</span><span class="ql-badge" id="qlProjectsBadge" style="display:none">0</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-            <a href="profile/sites"><span class="ql-ico ql-c-teal"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></span><span>Мои сайты</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-            <a href="profile/support"><span class="ql-ico ql-c-purple"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/></svg></span><span>Чат с командой</span><span class="ql-badge" id="qlHelpBadge" style="display:none">!</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-            <a href="profile/tickets"><span class="ql-ico ql-c-orange"><svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/></svg></span><span>Обслуживание</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-            <a href="profile/notifications"><span class="ql-ico ql-c-pink"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></span><span>Уведомления</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-            <a href="order"><span class="ql-ico ql-c-yellow"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span><span>Новый заказ</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-            <a href="profile/settings"><span class="ql-ico ql-c-indigo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2.7"/><path d="M19.1 14.6a1.5 1.5 0 00.3 1.65l.05.06a1.75 1.75 0 11-2.48 2.48l-.06-.05a1.5 1.5 0 00-1.65-.3 1.5 1.5 0 00-.9 1.37V20a1.75 1.75 0 01-3.5 0v-.08a1.5 1.5 0 00-.9-1.38 1.5 1.5 0 00-1.65.3l-.06.06a1.75 1.75 0 11-2.48-2.48l.05-.06a1.5 1.5 0 00.3-1.65 1.5 1.5 0 00-1.37-.9H4a1.75 1.75 0 010-3.5h.08a1.5 1.5 0 001.38-.9 1.5 1.5 0 00-.3-1.65l-.05-.06A1.75 1.75 0 117.59 5.3l.06.05a1.5 1.5 0 001.65.3H9.4a1.5 1.5 0 00.9-1.37V4a1.75 1.75 0 013.5 0v.08a1.5 1.5 0 00.9 1.38 1.5 1.5 0 001.65-.3l.06-.06a1.75 1.75 0 112.48 2.48l-.05.06a1.5 1.5 0 00-.3 1.65V9.4a1.5 1.5 0 001.37.9H20a1.75 1.75 0 010 3.5h-.08a1.5 1.5 0 00-1.38.9z"/></svg></span><span>Настройки</span><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></a>
-          </div>
-        </div>
-
+      <div class="block">
+        <div class="block-head"><span class="block-title">Активность</span></div>
+        <div class="tl" id="activityTimeline"><div class="list-empty">Загрузка…</div></div>
       </div>
 
     </div>
 
-    <section class="reveal push-panel" id="pushPanel">
-      <div class="push-left">
-        <img class="push-photo" src="/img/uved_vers1.png" alt="" aria-hidden="true">
-        <div class="push-body">
-          <p class="push-eyebrow">Push-уведомления браузера</p>
-          <h2 class="push-title">Узнавайте о новом, даже когда сайт закрыт</h2>
-          <p class="push-desc">Это отдельная вещь от страницы «Уведомления» в кабинете — те вы увидите, только если сами зайдёте на сайт. Push приходит системным уведомлением прямо в браузер или на телефон — даже если вкладка закрыта и вы вышли из аккаунта.</p>
-          <p class="push-hint" style="display:none">Работает в Chrome, Edge, Firefox и большинстве браузеров на компьютере и Android. На iPhone — только после добавления сайта на экран «Домой» через Safari (так требует сама Apple).</p>
+    <div class="rail">
+
+      <div class="block">
+        <div class="block-head"><span class="block-title">Сервис</span></div>
+        <div class="rail-stat"><span class="rail-stat-label">Обслуживание</span><span class="rail-stat-value" id="railSupport">—</span></div>
+        <div class="rail-stat" id="railDaysRow" style="display:none"><span class="rail-stat-label">Дней осталось</span><span class="rail-stat-value" id="railDays">—</span></div>
+        <div class="rail-stat"><span class="rail-stat-label">Сообщения</span><span class="rail-stat-value" id="railMessages">—</span></div>
+        <div class="rail-stat" id="railReviewRow" style="display:none"><span class="rail-stat-label">Отзыв</span><a class="rail-stat-value" id="railReview" href="profile/orders" style="text-decoration:none;color:var(--green-d)">Оставить →</a></div>
+      </div>
+
+      <div class="block quick-tile">
+        <div class="block-head"><span class="block-title">Быстрый доступ</span></div>
+        <div class="quick">
+          <a href="profile/orders"><span><span class="quick-badge" id="qlProjectsBadge" style="display:none">0</span>Мои заказы</span><span class="quick-arrow">→</span></a>
+          <a href="profile/sites"><span>Мои сайты</span><span class="quick-arrow">→</span></a>
+          <a href="profile/support"><span><span class="quick-badge" id="qlHelpBadge" style="display:none">!</span>Чат с командой</span><span class="quick-arrow">→</span></a>
+          <a href="profile/tickets"><span>Обслуживание</span><span class="quick-arrow">→</span></a>
+          <a href="profile/settings"><span>Настройки</span><span class="quick-arrow">→</span></a>
         </div>
       </div>
-      <div class="push-action" id="pushAction"><span class="push-hint">Проверяем состояние…</span></div>
-    </section>
+
+    </div>
 
   </div>
 
+  <div class="notice" id="pushPanel">
+    <div class="notice-left">
+      <img class="notice-photo" src="/img/uved_vers1.png" alt="" aria-hidden="true">
+      <span class="notice-text">Push-уведомления — узнавайте о новом, даже когда сайт закрыт.</span>
+    </div>
+    <div class="notice-actions">
+      <div id="pushAction"><span class="push-hint">Проверяем состояние…</span></div>
+      <span class="notice-dismiss" id="noticeDismiss">Скрыть</span>
+    </div>
+  </div>
+
+</div>
 </div><!-- /cabinet -->
 
 <div class="toast" id="toast"></div>
+
+<script>
+const root=document.documentElement;
+const light=document.getElementById('thLight'), dark=document.getElementById('thDark');
+document.getElementById('themeToggle').onclick=()=>{
+  const isDark=root.getAttribute('data-theme')==='dark';
+  root.setAttribute('data-theme', isDark?'light':'dark');
+  light.classList.toggle('active', isDark);
+  dark.classList.toggle('active', !isDark);
+};
+document.getElementById('noticeDismiss').onclick=e=>{e.target.closest('.notice').style.display='none';};
+</script>
 
 <script type="module">
 import { auth, db } from '/firebase-config.js';
@@ -347,10 +309,25 @@ let currentUser=null, unsubOrders=null;
 
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
-function fmtDateLong(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function timeAgo(ts){
+  if(!ts) return '';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  const diff=Math.floor((Date.now()-d.getTime())/1000);
+  if(diff<60) return 'только что';
+  if(diff<3600) return Math.floor(diff/60)+' мин назад';
+  if(diff<86400) return Math.floor(diff/3600)+' ч назад';
+  if(diff<172800) return 'вчера';
+  if(diff<604800) return Math.floor(diff/86400)+' дн назад';
+  return fmtDateShort(ts);
+}
+function greetingWord(){
+  const h=new Date().getHours();
+  if(h<5) return 'Доброй ночи';
+  if(h<12) return 'Доброе утро';
+  if(h<18) return 'Добрый день';
+  return 'Добрый вечер';
+}
 
-/* Градиентная аватарка вместо плоской заливки — генерируется из имени/uid,
-   у каждого пользователя свой оттенок, а не одинаковый зелёный квадрат */
 function avatarGradient(seed){
   let h=0; for(let i=0;i<seed.length;i++) h=seed.charCodeAt(i)+((h<<5)-h);
   const hueA=Math.abs(h)%360, hueB=(hueA+42)%360;
@@ -373,44 +350,15 @@ window.handleAvatarUpload=async function(file){
   reader.readAsDataURL(file);
 };
 
-/* ══ Scroll reveal — тот же приём, что и на сайте ══ */
-const revealObs=new IntersectionObserver(es=>{es.forEach(el=>{if(el.isIntersecting)el.target.classList.add('visible')})},{threshold:.08});
-document.querySelectorAll('.reveal').forEach(el=>revealObs.observe(el));
-
-/* ══ Живой счётчик цифр — тот же приём, что и на сайте ══ */
-function animCount(el){
-  const target=parseInt(el.textContent)||0;
-  if(!target){return;}
-  let cur=0; const step=Math.max(1,Math.ceil(target/30));
-  const t=setInterval(()=>{cur+=step; if(cur>=target){cur=target;clearInterval(t);} el.textContent=cur;},28);
-}
-const countObs=new IntersectionObserver(es=>{es.forEach(el=>{if(el.isIntersecting){animCount(el.target);countObs.unobserve(el.target)}})},{threshold:.5});
-/* loadOrderStats слушает заказы через onSnapshot и на каждое обновление
-   заново дергает observe() по тем же элементам — без этой пометки цифры
-   переигрывали анимацию с нуля при каждом изменении заказа в реальном
-   времени. Помечаем уже посчитанные элементы и больше их не трогаем. */
-function observeCountOnce(el){
-  if(el.dataset.counted) return;
-  el.dataset.counted='1';
-  countObs.observe(el);
-}
-
 const STATUS_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
-const STATUS_PROGRESS={0:5,1:25,2:45,3:70,4:85,5:100,6:70};
-const ICON_FILE_TEXT='<svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v5h5M9 13h6M9 16.5h6M9 9.5h2"/></svg>';
-const ICON_HAMMER='<svg viewBox="0 0 24 24"><path d="M14.5 6.2a3.6 3.6 0 0 0-4.9 4.66l-5.6 5.6a1.9 1.9 0 0 0 2.7 2.7l5.6-5.6a3.6 3.6 0 0 0 4.66-4.9l-2.53 2.53-2-2z"/></svg>';
-const ICON_EYE='<svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>';
-const ICON_PENCIL='<svg viewBox="0 0 24 24"><path d="M16.5 3.5l4 4L8 20l-5 1 1-5 12.5-12.5z"/></svg>';
-const ICON_CHECK_CIRCLE='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.5 2.5L16 9.5"/></svg>';
-const ICON_WALLET='<svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"/><path d="M16 12.5h2.5"/></svg>';
-const STATUS_ICON={0:ICON_FILE_TEXT,1:ICON_HAMMER,2:ICON_HAMMER,3:ICON_EYE,4:ICON_PENCIL,5:ICON_CHECK_CIRCLE,6:ICON_WALLET};
+const STEP_LABELS=STATUS_LABEL.slice(0,6);
 
 function renderFeaturedAndList(orders){
-  const slot=document.getElementById('featuredProjectSlot');
+  const slot=document.getElementById('featuredOrderSlot');
   const list=document.getElementById('recentProjects');
   if(!orders.length){
-    slot.innerHTML='';
-    list.innerHTML='<div class="list-empty">Заказов пока нет — <a href="order" style="color:var(--green-d);text-decoration:none;font-weight:500">оформите первый</a></div>';
+    slot.innerHTML='<div class="list-empty">Заказов пока нет — <a href="order">оформите первый</a></div>';
+    list.innerHTML='';
     document.getElementById('qlProjectsBadge').style.display='none';
     return;
   }
@@ -419,34 +367,44 @@ function renderFeaturedAndList(orders){
   const rest=orders.filter(o=>o.id!==featured?.id).slice(0,4);
 
   if(featured){
-    const pct=STATUS_PROGRESS[featured.status]||10;
-    slot.innerHTML=`<div class="featured-project">
-      <div class="fp-top">
-        <div><div class="fp-eyebrow">Сейчас в работе</div><div class="fp-title">${featured.siteName||featured.siteDomain||featured.siteType||'Проект'}</div></div>
-        <div class="fp-icon">${STATUS_ICON[featured.status]||ICON_HAMMER}</div>
+    const name=featured.siteName||featured.siteDomain||featured.siteType||'Проект';
+    const st=featured.status||0;
+    let stepsHtml;
+    if(st===6){
+      stepsHtml=`<div class="order-sub" style="color:var(--red);margin-top:4px">Ожидает доплаты</div>`;
+    }else{
+      stepsHtml=`<div class="steps">${STEP_LABELS.map((label,i)=>{
+        const cls=i<st?'done':(i===st?'current':'');
+        return `<div class="step ${cls}"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">${label}</div></div>`;
+      }).join('')}</div>`;
+    }
+    slot.innerHTML=`<div class="order-card">
+      <div class="order-top">
+        <div><div class="order-name">${name}</div><div class="order-sub">Заказ #${featured.id.slice(0,6)}</div></div>
+        <div class="order-eta">Этап: <b>${STATUS_LABEL[st]}</b></div>
       </div>
-      <div class="fp-progress-track"><div class="fp-progress-fill" style="width:0%" data-target="${pct}"></div></div>
-      <div class="fp-meta"><span>Этап: <b>${STATUS_LABEL[featured.status]}</b></span><a href="profile/orders" style="color:var(--green-d);text-decoration:none;font-weight:500">Подробнее →</a></div>
+      ${stepsHtml}
     </div>`;
-    requestAnimationFrame(()=>{const f=slot.querySelector('.fp-progress-fill');setTimeout(()=>f.style.width=f.dataset.target+'%',100);});
-  } else slot.innerHTML='';
+  } else {
+    slot.innerHTML='';
+  }
 
   if(!rest.length){
-    list.innerHTML=featured?'':'<div class="list-empty">Больше заказов нет</div>';
+    list.innerHTML='';
   } else {
     list.innerHTML=rest.map(o=>{
       const st=o.status||0, done=st===5;
-      return `<a href="profile/orders" class="p-row">
-        <span class="p-row-ico">${STATUS_ICON[st]}</span>
-        <div class="p-row-body"><div class="p-row-title">${o.siteName||o.siteDomain||o.siteType||'Заказ'}</div><div class="p-row-sub">${fmtDateShort(o.createdAt)?'Создан '+fmtDateShort(o.createdAt):''}</div></div>
-        <span class="p-tag ${done?'done':'progress'}">${STATUS_LABEL[st]}</span>
+      const name=o.siteName||o.siteDomain||o.siteType||'Заказ';
+      return `<a href="profile/orders" class="plain-row">
+        <div><div class="plain-row-title">${name}</div><div class="plain-row-sub">${fmtDateShort(o.createdAt)?'Создан '+fmtDateShort(o.createdAt):''}</div></div>
+        <span class="tag ${done?'on':''}">${STATUS_LABEL[st]}</span>
       </a>`;
     }).join('');
   }
 
   const activeCount=active.length;
   const badge=document.getElementById('qlProjectsBadge');
-  if(activeCount>0){badge.textContent=activeCount;badge.style.display='inline-block';}else badge.style.display='none';
+  if(activeCount>0){badge.textContent=activeCount;badge.style.display='inline';}else badge.style.display='none';
 }
 
 function buildTimeline(orders){
@@ -467,10 +425,9 @@ function buildTimeline(orders){
   const top=events.slice(0,5);
   if(!top.length){tl.innerHTML='<div class="list-empty">Активность появится после первого заказа</div>';return;}
   tl.innerHTML=top.map(e=>`<div class="tl-item${e.on?' on':''}">
-    <div class="tl-dot"></div>
     <div class="tl-title">${e.title}</div>
     <div class="tl-sub">${e.sub}</div>
-    <div class="tl-date">${fmtDateShort(e.ts)}</div>
+    <div class="tl-time">${timeAgo(e.ts)}</div>
   </div>`).join('');
 }
 
@@ -478,23 +435,17 @@ function loadOrderStats(uid){
   if(unsubOrders) unsubOrders();
   const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
   unsubOrders=onSnapshot(q,snap=>{
-    // status:-1 = заявка создана, оплата ещё не подтверждена — такой заказ
-    // не должен попадать ни в счётчики, ни в списки на главной кабинета
-    // (ровно как их уже не показывает profile/orders.html), иначе цифра
-    // "Всего заказов" не совпадает со списком, а неоплаченная заявка может
-    // всплыть с пустым статусом.
     const orders=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>(o.status??0)!==-1);
-    const active=orders.filter(o=>(o.status||0)>=1&&(o.status||0)<=4).length;
+    const active=orders.filter(o=>(o.status||0)>=1&&(o.status||0)<=4);
     document.getElementById('statTotal').textContent=orders.length;
-    document.getElementById('statActive').textContent=active;
+    document.getElementById('statActive').textContent=active.length;
     document.getElementById('statDone').textContent=orders.filter(o=>o.status===5).length;
-    document.querySelectorAll('.hero-stat-n[data-count]').forEach(observeCountOnce);
     renderFeaturedAndList(orders);
     buildTimeline(orders);
   },err=>console.error('Orders:',err));
 }
 
-async function loadBento(uid){
+async function loadRail(uid){
   try{
     const [ordersSnap, chatSnap] = await Promise.all([
       getDocs(query(collection(db,'orders'),where('uid','==',uid))),
@@ -503,63 +454,39 @@ async function loadBento(uid){
     const orders=ordersSnap.docs.map(d=>({id:d.id,...d.data()}));
 
     const activeSupport=orders.find(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
-    const supportSlot=document.getElementById('bentoSupport');
     if(activeSupport){
       const days=Math.ceil((activeSupport.supportExpiresAt.toDate()-new Date())/86400000);
-      const pct=Math.max(4,Math.min(100,Math.round(days/30*100)));
-      supportSlot.innerHTML=`<div class="bento-tile dark">
-        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
-        <div class="bt-label">Обслуживание</div>
-        <div class="bt-value">${days} дн.</div>
-        <div class="bt-sub">${activeSupport.siteName||activeSupport.siteDomain||'осталось по подписке'}</div>
-        <div class="bt-track"><div class="bt-fill" style="width:${pct}%"></div></div>
-      </div>`;
+      document.getElementById('railSupport').textContent='Активно';
+      document.getElementById('railSupport').style.color='var(--green-d)';
+      document.getElementById('railDaysRow').style.display='flex';
+      document.getElementById('railDays').textContent=days+' дн.';
     } else {
-      supportSlot.innerHTML=`<div class="bento-tile">
-        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6l7-3z"/><path d="M9 12.5l2 2 4-4.5"/></svg></div>
-        <div class="bt-label">Обслуживание</div>
-        <div class="bt-value" style="font-size:1rem">Не подключено</div>
-        <a class="bt-cta" href="profile/tickets">Подключить <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>`;
+      document.getElementById('railSupport').textContent='Не подключено';
+      document.getElementById('railDaysRow').style.display='none';
     }
 
-    const msgSlot=document.getElementById('bentoMessages');
     const unread=chatSnap.size;
-    msgSlot.innerHTML=unread>0?`<div class="bento-tile accent">
-        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.5 0 1115.48-4.6z"/><circle cx="9" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r=".65" fill="currentColor" stroke="none"/></svg></div>
-        <div class="bt-label">Сообщения</div>
-        <div class="bt-value">${unread} новых</div>
-        <a class="bt-cta" href="profile/support">Открыть <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>`:`<div class="bento-tile">
-        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.5 0 1115.48-4.6z"/><circle cx="9" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r=".65" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r=".65" fill="currentColor" stroke="none"/></svg></div>
-        <div class="bt-label">Сообщения</div>
-        <div class="bt-value" style="font-size:1rem">Всё прочитано</div>
-        <div class="bt-sub">Команда на связи в поддержке</div>
-      </div>`;
+    const msgEl=document.getElementById('railMessages');
+    msgEl.textContent=unread>0?unread+' новых':'Всё прочитано';
+    msgEl.style.color=unread>0?'var(--green-d)':'var(--ink)';
 
     const doneUnreviewed=orders.find(o=>o.status===5&&!o.reviewed);
-    const reviewSlot=document.getElementById('bentoReview');
-    if(doneUnreviewed){
-      reviewSlot.style.display='block';
-      reviewSlot.innerHTML=`<div class="bento-tile">
-        <div class="bt-icon"><svg viewBox="0 0 24 24"><path d="M12 3.5l2.6 5.4 5.9.7-4.3 4.1 1.1 5.9L12 16.8 6.7 19.6l1.1-5.9-4.3-4.1 5.9-.7L12 3.5z"/></svg></div>
-        <div class="bt-label">Отзыв</div>
-        <div class="bt-value" style="font-size:1rem">Как всё прошло?</div>
-        <a class="bt-cta" href="profile/orders">Оставить отзыв <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-      </div>`;
-    }
+    document.getElementById('railReviewRow').style.display=doneUnreviewed?'flex':'none';
 
-    document.getElementById('qlHelpBadge').style.display=unread>0?'inline-block':'none';
-    document.querySelectorAll('.rail .reveal').forEach(el=>revealObs.observe(el));
+    document.getElementById('qlHelpBadge').style.display=unread>0?'inline':'none';
   }catch(e){console.error(e);}
 }
 
+function watchNotifDot(uid){
+  const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
+  onSnapshot(q,snap=>{
+    const hasUnread=snap.docs.some(d=>!d.data().read);
+    document.getElementById('notifDot').classList.toggle('show',hasUnread);
+  },()=>{});
+}
 
-
-// Project Settings → Cloud Messaging → Web configuration → Web Push
-// certificates
+// ══ Push-уведомления — та же логика, что и раньше, просто другой контейнер ══
 const VAPID_KEY = 'BH2Ea24Lg6vaS8_0xzFvQGtvSf24KjeyLFuNqOoAIYOwmi6tiFZKGzC8rruX3p1hAm-_evTFeOnthVOuMeDSQTI';
-
 let fcmMessaging=null, fcmSwReg=null;
 
 function isIOSDevice(){
@@ -572,29 +499,20 @@ function isStandalonePWA(){
 async function initPushSection(user){
   const box=document.getElementById('pushAction');
 
-  // iOS/iPadOS в обычной вкладке (даже в Safari) push вообще не отдаёт —
-  // это ограничение самой Apple, а не браузера или нашего кода. Работает
-  // только если сайт добавлен на экран «Домой» и открыт оттуда как
-  // отдельное приложение (PWA), причём добавить так можно только через
-  // Safari — в Chrome/Firefox на iOS такой кнопки нет физически.
   if(isIOSDevice() && !isStandalonePWA()){
-    box.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
-      <span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>На iPhone нужна установка сайта</span>
-      <span class="push-hint">Safari не отдаёт push обычной вкладке — только сайту, добавленному на экран «Домой». Откройте сайт именно в Safari (не в Chrome), нажмите «Поделиться» внизу экрана → «На экран «Домой»» → зайдите уже с этой иконки, и здесь появится кнопка «Включить».</span>
-    </div>`;
+    box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Нужна установка сайта</span>`;
     return;
   }
-
   const supported='Notification' in window && 'serviceWorker' in navigator && await isSupported().catch(()=>false);
   if(!supported){
-    box.innerHTML='<span class="push-hint">Этот браузер не поддерживает push-уведомления</span>';
+    box.innerHTML='<span class="push-hint">Браузер не поддерживает push</span>';
     return;
   }
   try{
     fcmSwReg=await navigator.serviceWorker.register('/firebase-messaging-sw.js');
   }catch(e){
     console.error('SW register:',e);
-    box.innerHTML='<span class="push-hint">Не удалось подключить push в этом браузере</span>';
+    box.innerHTML='<span class="push-hint">Не удалось подключить push</span>';
     return;
   }
   fcmMessaging=getMessaging();
@@ -610,23 +528,22 @@ async function renderPushState(user){
   const box=document.getElementById('pushAction');
   const perm=Notification.permission;
   if(perm==='granted'){
-    // Раньше тут сразу рисовалось "Подключено" по факту разрешения ОС
     box.innerHTML='<span class="push-hint">Проверяем токен…</span>';
     const status=await ensureTokenSaved(user);
     if(status==='ok'){
-      box.innerHTML=`<span class="push-status on"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Подключено</span><span class="push-hint">В этом браузере уведомления придут, даже если сайт закрыт</span>`;
+      box.innerHTML=`<span class="push-status on"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Подключено</span>`;
     }else if(status==='timeout'){
-      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Сервер не ответил</span><span class="push-hint">Похоже, антивирус (проверка защищённых соединений) или VPN блокирует запрос к нашим серверам. Попробуйте временно отключить их и нажать «Повторить».</span><button class="btn btn-green" id="pushRetryBtn" style="padding:10px 18px">Повторить</button>`;
+      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Сервер не ответил</span><button class="btn btn-green" id="pushRetryBtn" style="padding:8px 14px">Повторить</button>`;
       document.getElementById('pushRetryBtn').onclick=()=>renderPushState(user);
     }else{
-      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Не удалось подключить</span><button class="btn btn-green" id="pushRetryBtn" style="padding:10px 18px;margin-left:10px">Повторить</button>`;
+      box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Не удалось подключить</span><button class="btn btn-green" id="pushRetryBtn" style="padding:8px 14px">Повторить</button>`;
       document.getElementById('pushRetryBtn').onclick=()=>renderPushState(user);
     }
   }else if(perm==='denied'){
-    box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Заблокировано в браузере</span><span class="push-hint">Включить можно в настройках сайта в браузере — обычно значок замка рядом с адресной строкой → «Уведомления»</span>`;
+    box.innerHTML=`<span class="push-status off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>Заблокировано в браузере</span>`;
   }else{
-    box.innerHTML=`<button class="btn btn-green" id="pushEnableBtn" style="padding:13px 24px">Включить push-уведомления</button>`;
-    document.getElementById('pushEnableBtn').onclick=()=>enablePush(user);
+    box.innerHTML=`<a href="#" class="btn btn-line" id="pushEnableBtn" style="padding:8px 14px">Включить</a>`;
+    document.getElementById('pushEnableBtn').onclick=(e)=>{e.preventDefault();enablePush(user);};
   }
 }
 
@@ -639,10 +556,6 @@ function withTimeout(promise, ms){
 
 async function ensureTokenSaved(user){
   try{
-    // 15 секунд с запасом — обычный getToken() отвечает за доли секунды,
-    // но если что-то на пути (антивирус с проверкой HTTPS, VPN, файрвол)
-    // рвёт соединение к googleapis.com, запрос может виснуть без ограничения
-    // по времени, и вкладка браузера будет казаться "вечно грузящейся".
     const token=await withTimeout(
       getToken(fcmMessaging,{vapidKey:VAPID_KEY,serviceWorkerRegistration:fcmSwReg}),
       15000
@@ -671,19 +584,11 @@ async function enablePush(user){
   }
 }
 
-function watchNotifDot(uid){
-  const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
-  onSnapshot(q,snap=>{
-    const hasUnread=snap.docs.some(d=>!d.data().read);
-    document.getElementById('notifDot').classList.toggle('show',hasUnread);
-  },()=>{});
-}
-
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='auth';return;}
   currentUser=user;
   const name=user.displayName||'Пользователь';
-  document.getElementById('heroHeadline').innerHTML='Здравствуйте, <em>'+name+'</em>';
+  document.getElementById('heroGreeting').innerHTML=greetingWord()+', <em id="heroName">'+name+'</em>';
   document.getElementById('avatarLetter').textContent=name[0].toUpperCase();
   document.getElementById('heroAvatar').style.background=avatarGradient(user.uid||name);
   document.getElementById('loadingScreen').style.display='none';
@@ -691,13 +596,12 @@ onAuthStateChanged(auth,async user=>{
 
   getDoc(doc(db,'users',user.uid)).then(snap=>{
     if(snap.exists()){const d=snap.data();
-      if(d.createdAt) document.getElementById('heroSince').textContent='В Antviz с '+fmtDateLong(d.createdAt);
       if(d.avatarDataUrl){const av=document.getElementById('heroAvatar');document.getElementById('avatarLetter').style.display='none';const img=document.createElement('img');img.src=d.avatarDataUrl;av.insertBefore(img,av.firstChild);}
     }
   }).catch(e=>console.warn('users doc:',e));
 
   loadOrderStats(user.uid);
-  loadBento(user.uid);
+  loadRail(user.uid);
   watchNotifDot(user.uid);
   initPushSection(user);
 });

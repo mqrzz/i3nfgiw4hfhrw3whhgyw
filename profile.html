@@ -3,177 +3,140 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<link rel="icon" href="img/favicon.png" type="image/png"/>
 <title>Кабинет — Antviz</title>
+<link rel="icon" href="img/favicon.png" type="image/png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&family=Fraunces:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#191b1e;
-  --ink-soft:#707a8a;
-  --muted:#9aa2b1;
-  --paper:#ffffff;
-  --paper-2:#f9fafc;
-  --line:#dfe3e8;
-  --line-strong:#cbcdd6;
-  --green:#1ede7b;
-  --green-d:#149955;
-  --red:#e8634f;
-  --font-ui:'Geologica','Arial',sans-serif;
-  --font-voice:'Fraunces','Georgia',serif;
-}
-[data-theme="dark"]{
-  --ink:#ffffff;
-  --ink-soft:#b9bec7;
-  --muted:#7d8492;
-  --paper:#191b1e;
-  --paper-2:#141518;
-  --line:#2b2f34;
-  --line-strong:#393e45;
+  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;--green-light:#d2f8e5;--green-lighter:#e8fcf2;
+  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
+  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
+  --dark:#191b1e;--dark2:#2b2f33;
+  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
+  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
+  --font:'Geologica','Arial',sans-serif;
 }
 html{scroll-behavior:smooth}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-screen{position:fixed;inset:0;z-index:999;background:var(--paper);display:flex;align-items:center;justify-content:center}
-.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--green-d);border-radius:50%;animation:spin .7s linear infinite}
-body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-weight:300;line-height:1.4;letter-spacing:-.01em;transition:background .2s,color .2s}
-.wrap{max-width:1060px;margin:0 auto;padding:48px 28px 90px}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg2);display:flex;align-items:center;justify-content:center}
+.spinner{width:26px;height:26px;border:2px solid var(--border2);border-top-color:var(--green-d);border-radius:50%;animation:spin .7s linear infinite}
+body{background:var(--bg2);color:var(--text);font-family:var(--font);font-weight:300;line-height:1.3;letter-spacing:-.01em}
+.container{max-width:1180px;margin:0 auto;padding:0 24px}
+.eyebrow{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:16px}
 
-/* top bar */
-.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px}
-.logo{width:26px;height:26px;border-radius:7px;display:block}
-.theme-toggle{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:100px;padding:6px 6px;cursor:pointer;background:var(--paper)}
-.theme-toggle span{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);transition:background .15s,color .15s}
-.theme-toggle span.active{background:var(--ink);color:var(--paper)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:15px 26px;font-size:15px;transition:background .1s,transform .12s;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark)}
+.btn-green:hover{background:var(--green-h)}
+.btn-inv{background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.18);color:#fff}
+.btn-inv:hover{border-color:rgba(255,255,255,.4)}
+.icon-btn{width:46px;height:46px;border-radius:13px;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;color:#fff;cursor:pointer;position:relative;flex-shrink:0;transition:border-color .15s}
+.icon-btn:hover{border-color:rgba(255,255,255,.4)}
+.icon-btn svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.8;fill:none}
+.icon-btn .dot{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--green);border:2px solid var(--dark)}
 
-/* hero */
-.hero{border-bottom:1px solid var(--line);padding-bottom:40px;margin-bottom:48px}
-.hero-eyebrow{font-size:.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px}
-.hero-greeting{font-family:var(--font-voice);font-weight:400;font-size:clamp(2.1rem,4.4vw,3.1rem);letter-spacing:-.01em;line-height:1.08;margin-bottom:18px}
-.hero-greeting em{font-style:italic;color:var(--green-d)}
-.hero-status{font-size:1.02rem;color:var(--ink-soft);max-width:560px;margin-bottom:26px}
-.hero-status b{color:var(--ink);font-weight:500}
-.hero-status .dot{color:var(--line-strong);margin:0 10px}
-.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
-.btn{font-family:var(--font-ui);font-size:.86rem;font-weight:500;border-radius:9px;padding:11px 18px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:opacity .15s,border-color .15s}
-.btn-primary{background:var(--ink);color:var(--paper);border:1px solid var(--ink)}
-.btn-primary:hover{opacity:.85}
-.btn-line{background:transparent;color:var(--ink);border:1px solid var(--line-strong)}
-.btn-line:hover{border-color:var(--ink)}
+/* ══ HERO ══ */
+.hero-wrap{padding:40px 0 0}
+.hero-block{background:var(--dark);border-radius:48px;padding:52px 56px 0;position:relative;overflow:hidden}
+@media(max-width:720px){.hero-block{padding:36px 24px 0;border-radius:32px}}
+.hero-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:40px}
+.hero-logo{width:30px;height:30px;border-radius:8px}
+.hero-actions-top{display:flex;gap:8px}
+.hero-greeting{font-size:clamp(28px,4.6vw,46px);font-weight:500;letter-spacing:-.03em;line-height:1.08;color:#fff;margin-bottom:14px}
+.hero-greeting em{font-style:normal;color:var(--green)}
+.hero-sub{font-size:16px;color:rgba(255,255,255,.4);font-weight:300;max-width:460px;margin-bottom:32px}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:48px}
 
-/* grid */
-.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:64px;align-items:start}
-@media(max-width:860px){.grid{grid-template-columns:1fr;gap:44px}}
+.hero-bar{border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(3,1fr)}
+@media(max-width:600px){.hero-bar{grid-template-columns:1fr}}
+.hero-stat{padding:28px 8px;border-right:1px solid rgba(255,255,255,.07);text-align:center}
+.hero-stat:last-child{border-right:none}
+.hero-stat-n{font-size:clamp(26px,3vw,38px);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+.hero-stat-l{font-size:13px;color:rgba(255,255,255,.35);font-weight:300}
 
-.block{margin-bottom:52px}
-.block:last-child{margin-bottom:0}
-.block-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:20px}
-.block-title{font-size:1.05rem;font-weight:500;letter-spacing:-.01em}
-.block-link{font-size:.8rem;color:var(--muted);text-decoration:none;border-bottom:1px solid transparent}
-.block-link:hover{color:var(--ink);border-color:var(--ink)}
+/* ══ GRID ══ */
+.main-grid{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;padding:32px 0 60px;align-items:start}
+@media(max-width:900px){.main-grid{grid-template-columns:1fr}}
 
-/* featured order — стадии вместо процента */
-.order-card{border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px}
-.order-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px}
-.order-name{font-size:1rem;font-weight:500}
-.order-sub{font-size:.78rem;color:var(--muted);margin-top:3px}
-.order-eta{font-size:.78rem;color:var(--muted);text-align:right;white-space:nowrap}
-.steps{display:flex;align-items:center}
-.step{flex:1;display:flex;flex-direction:column;gap:8px;position:relative}
-.step-bar{height:2px;background:var(--line-strong);position:relative}
-.step.done .step-bar,.step.current .step-bar{background:var(--green-d)}
-.step-dot{width:8px;height:8px;border-radius:50%;background:var(--line-strong);position:absolute;left:0;top:-3px}
-.step.done .step-dot{background:var(--green-d)}
-.step.current .step-dot{background:var(--green-d);box-shadow:0 0 0 4px rgba(20,153,85,.18)}
-.step-label{font-size:.68rem;color:var(--muted);margin-top:4px}
-.step.current .step-label{color:var(--ink);font-weight:500}
+.card{background:var(--bg);border:1px solid var(--border);border-radius:32px;padding:32px;margin-bottom:20px;transition:transform .15s ease-out,box-shadow .15s}
+.card:hover{box-shadow:var(--sh2)}
+.card:last-child{margin-bottom:0}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px}
+.card-title{font-size:19px;font-weight:500;letter-spacing:-.02em}
+.card-link{font-size:13px;font-weight:500;color:var(--green-d);text-decoration:none}
+.card-link:hover{color:var(--green-h)}
 
-.plain-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
-.plain-row:last-child{border-bottom:none}
-.plain-row-title{font-size:.92rem;font-weight:400}
-.plain-row-sub{font-size:.78rem;color:var(--muted);margin-top:2px}
-.tag{font-size:.7rem;color:var(--muted);border:1px solid var(--line-strong);border-radius:100px;padding:3px 10px;white-space:nowrap}
-.tag.on{color:var(--green-d);border-color:var(--green-d)}
+/* featured order */
+.fp-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:26px;gap:12px}
+.fp-name{font-size:18px;font-weight:500;letter-spacing:-.01em}
+.fp-sub{font-size:13px;color:var(--muted);margin-top:4px}
+.fp-badge{background:var(--green-light);color:var(--green-d);font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;white-space:nowrap}
+.steps{display:flex;align-items:center;gap:0}
+.step{flex:1;display:flex;flex-direction:column;gap:10px;position:relative}
+.step-bar{height:4px;background:var(--border);border-radius:100px}
+.step.done .step-bar,.step.current .step-bar{background:var(--green)}
+.step-label{font-size:11px;color:var(--muted);font-weight:500}
+.step.current .step-label{color:var(--text)}
 
-/* activity — относительное время */
-.tl{border-left:1px solid var(--line);padding-left:20px}
-.tl-item{padding-bottom:20px;position:relative}
-.tl-item:last-child{padding-bottom:0}
-.tl-item::before{content:'';position:absolute;left:-24px;top:5px;width:7px;height:7px;border-radius:50%;background:var(--line-strong)}
-.tl-item.on::before{background:var(--green-d)}
-.tl-title{font-size:.9rem}
-.tl-time{font-size:.76rem;color:var(--muted);margin-top:2px}
+.p-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 0;border-bottom:1px solid var(--border)}
+.p-row:last-child{border-bottom:none}
+.p-row-title{font-size:15px;font-weight:400}
+.p-row-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.tag{font-size:12px;font-weight:500;padding:6px 13px;border-radius:100px;background:var(--bg3);color:var(--muted)}
+.tag.on{background:var(--green-light);color:var(--green-d)}
 
-/* rail */
-.rail-stat{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid var(--line)}
-.rail-stat:last-child{border-bottom:none}
-.rail-stat-label{font-size:.86rem;color:var(--ink-soft);display:flex;align-items:center;gap:9px}
-.rail-ico{width:15px;height:15px;stroke:var(--muted);stroke-width:1.7;fill:none;flex-shrink:0}
-.rail-stat-value{font-size:.94rem;font-weight:500}
+.tl{display:flex;flex-direction:column;gap:20px}
+.tl-item{display:flex;gap:14px;align-items:flex-start}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--border2);margin-top:6px;flex-shrink:0}
+.tl-item.on .tl-dot{background:var(--green)}
+.tl-title{font-size:15px}
+.tl-time{font-size:13px;color:var(--muted);margin-top:2px}
 
-.support-row{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--line);border-radius:14px;margin-bottom:10px}
-.support-row:last-child{margin-bottom:0}
-.support-ring{position:relative;width:72px;height:72px;flex-shrink:0}
-.support-ring svg{width:72px;height:72px;transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:var(--line);stroke-width:5}
-.ring-fg{fill:none;stroke:var(--green-d);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
-.support-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.support-ring-num{font-family:var(--font-voice);font-size:1.3rem;color:var(--ink);line-height:1}
-.support-ring-unit{font-size:.58rem;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
-.support-name{font-size:.95rem;font-weight:500}
-.support-sub{font-size:.8rem;color:var(--muted);margin-top:2px}
-
-.donut-wrap{position:relative;width:132px;height:132px;margin:2px auto 20px}
+/* rail: overview donut */
+.donut-wrap{position:relative;width:150px;height:150px;margin:4px auto 24px}
 .donut-svg{width:100%;height:100%;transform:rotate(-90deg)}
-.donut-bg{fill:none;stroke:var(--line);stroke-width:11}
-.donut-seg{fill:none;stroke-width:11;transition:stroke-dashoffset .7s ease}
+.donut-bg{fill:none;stroke:var(--bg3);stroke-width:13}
+.donut-seg{fill:none;stroke-width:13;stroke-linecap:round}
 .donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.donut-total{font-family:var(--font-voice);font-size:1.9rem;color:var(--ink);line-height:1}
-.donut-total-label{font-size:.68rem;color:var(--muted);margin-top:3px}
-.legend{display:flex;flex-direction:column;gap:9px}
-.legend-item{display:flex;align-items:center;gap:9px;font-size:.82rem;color:var(--ink-soft)}
-.legend-item b{color:var(--ink);font-weight:500;margin-left:auto}
-.legend-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.donut-total{font-size:32px;font-weight:500;letter-spacing:-.03em}
+.donut-total-label{font-size:12px;color:var(--muted);margin-top:2px}
+.legend{display:flex;flex-direction:column;gap:12px}
+.legend-item{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);font-weight:300}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.legend-item b{margin-left:auto;font-weight:500}
 
-.empty-state{display:flex;align-items:center;gap:12px;padding:16px 0;color:var(--muted);font-size:.86rem}
-.empty-state svg{width:20px;height:20px;stroke:var(--muted);stroke-width:1.6;fill:none;flex-shrink:0}
-.empty-state a{color:var(--green-d);text-decoration:none;font-weight:500}
+/* rail: support ring — dark card for contrast */
+.card.dark{background:var(--dark);border-color:var(--dark)}
+.card.dark .card-title{color:#fff}
+.support-row{display:flex;align-items:center;gap:18px;padding:14px 0}
+.support-ring{position:relative;width:76px;height:76px;flex-shrink:0}
+.support-ring svg{width:76px;height:76px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:6}
+.ring-fg{fill:none;stroke:var(--green);stroke-width:6;stroke-linecap:round}
+.support-ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.support-ring-num{font-size:22px;font-weight:500;color:#fff;line-height:1}
+.support-ring-unit{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;text-transform:uppercase;letter-spacing:.04em}
+.support-name{font-size:16px;font-weight:500;color:#fff}
+.support-sub{font-size:13px;color:rgba(255,255,255,.4);margin-top:3px}
 
-.quick{display:flex;flex-direction:column}
-.quick a{display:flex;align-items:center;justify-content:space-between;padding:13px 2px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);font-size:.88rem;transition:padding-left .15s}
-.quick a:hover{padding-left:6px}
-.quick a:last-child{border-bottom:none}
-.quick-arrow{color:var(--muted);font-size:.8rem}
-.quick-ico{width:16px;height:16px;stroke:var(--muted);stroke-width:1.8;fill:none;margin-right:12px;flex-shrink:0}
-.quick-left{display:flex;align-items:center}
-.quick-tile{display:none}
-@media(max-width:980px){.quick-tile{display:block}}
+/* quick access — icon tiles, not a list */
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.quick-tile-card{display:none}
+@media(max-width:980px){.quick-tile-card{display:block}}
+.quick-tile{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:20px 16px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:14px;transition:transform .15s ease-out,box-shadow .15s,border-color .15s}
+.quick-tile:hover{transform:translateY(-2px);box-shadow:var(--sh1);border-color:var(--border2)}
+.quick-tile svg{width:20px;height:20px;stroke:var(--green-d);stroke-width:1.8;fill:none}
+.quick-tile span{font-size:14px;font-weight:400}
 
-/* command hint */
-.cmdk{border:1px solid var(--line);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:36px;cursor:pointer}
-.cmdk kbd{border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;font-family:var(--font-ui);font-size:.72rem;color:var(--ink-soft)}
-
-/* search modal */
-.cmdk-overlay{position:fixed;inset:0;background:rgba(20,22,25,.4);z-index:900;display:none;align-items:flex-start;justify-content:center;padding-top:14vh}
-.cmdk-overlay.show{display:flex}
-.cmdk-panel{background:var(--paper);border-radius:14px;border:1px solid var(--line);width:min(560px,90vw);max-height:60vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.18)}
-.cmdk-input{border:none;border-bottom:1px solid var(--line);padding:16px 18px;font-family:var(--font-ui);font-size:1rem;font-weight:300;color:var(--ink);background:transparent;outline:none;width:100%}
-.cmdk-results{overflow-y:auto;padding:8px}
-.cmdk-item{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:9px;cursor:pointer;font-size:.88rem;color:var(--ink);text-decoration:none}
-.cmdk-item:hover,.cmdk-item.active{background:var(--paper-2)}
-.cmdk-item svg{width:15px;height:15px;stroke:var(--muted);stroke-width:1.8;fill:none;flex-shrink:0}
-.cmdk-item-sub{color:var(--muted);font-size:.76rem;margin-left:auto}
-.cmdk-empty{padding:20px;text-align:center;color:var(--muted);font-size:.86rem}
-
-/* push banner — тонкая строка, не карточка на пол-экрана */
-.notice{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid var(--line);border-radius:12px;padding:12px 18px;margin-top:56px}
-.notice-left{display:flex;align-items:center;gap:14px;min-width:0}
-.notice-icon{width:40px;height:40px;border-radius:10px;background:var(--paper-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--ink)}
-.notice-icon svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.7;fill:none}
-.notice-text{font-size:.86rem;color:var(--ink-soft)}
-.notice-actions{display:flex;gap:10px;flex-shrink:0;align-items:center}
-.notice-dismiss{font-size:.78rem;color:var(--muted);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+/* push banner */
+.notice{display:flex;align-items:center;justify-content:space-between;gap:16px;background:var(--bg);border:1px solid var(--border);border-radius:24px;padding:20px 26px;margin-top:8px}
+.notice-left{display:flex;align-items:center;gap:16px}
+.notice-icon{width:44px;height:44px;border-radius:13px;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--green-d);flex-shrink:0}
+.notice-icon svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none}
+.notice-text{font-size:14px;color:var(--text)}
+@media(max-width:640px){.notice{flex-direction:column;align-items:flex-start}}
 </style>
 </head>
 <body>
@@ -182,74 +145,67 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
 <div id="sbContent">
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 <div id="cabinet" style="display:none">
-<div class="wrap">
+<div class="container">
 
-  <div class="topbar">
-    <img src="img/favicon.png" class="logo" alt="Antviz">
-  </div>
-
-  <div class="cmdk" id="cmdkTrigger">
-    <span>Найти заказ, тикет, настройку…</span>
-    <kbd>⌘K</kbd>
-  </div>
-
-  <section class="hero">
-    <p class="hero-eyebrow">Кабинет</p>
-    <h1 class="hero-greeting" id="heroGreeting">Доброе утро, <em id="heroName">Иван</em></h1>
-    <p class="hero-status"><b id="statTotal">12</b> заказов<span class="dot">·</span><b id="statActive">2</b> сейчас в работе<span class="dot">·</span><b id="statDone">10</b> завершено</p>
-    <div class="hero-actions">
-      <a href="order" class="btn btn-primary">Новый заказ</a>
-      <a href="profile/orders" class="btn btn-line">Все заказы</a>
+  <div class="hero-wrap">
+    <div class="hero-block">
+      <div class="hero-top">
+        <img src="img/favicon.png" class="hero-logo" alt="Antviz">
+        <div class="hero-actions-top">
+          <a class="icon-btn" href="profile/notifications"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><span class="dot" id="notifDot" style="display:none"></span></a>
+          <a class="icon-btn" href="profile/settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></a>
+        </div>
+      </div>
+      <p class="eyebrow">Кабинет</p>
+      <h1 class="hero-greeting" id="heroGreeting">Здравствуйте, <em id="heroName">Пользователь</em></h1>
+      <p class="hero-sub" id="heroSub">Загружаем ваши заказы…</p>
+      <div class="hero-btns">
+        <a href="order" class="btn btn-green">Новый заказ</a>
+        <a href="profile/orders" class="btn btn-inv">Все заказы</a>
+      </div>
+      <div class="hero-bar">
+        <div class="hero-stat"><div class="hero-stat-n counting" id="statTotal" data-target="0">0</div><div class="hero-stat-l">Всего заказов</div></div>
+        <div class="hero-stat"><div class="hero-stat-n counting" id="statActive" data-target="0">0</div><div class="hero-stat-l">В работе</div></div>
+        <div class="hero-stat"><div class="hero-stat-n counting" id="statDone" data-target="0">0</div><div class="hero-stat-l">Завершено</div></div>
+      </div>
     </div>
-  </section>
+  </div>
 
-  <div class="grid">
+  <div class="main-grid">
 
     <div class="main">
 
-      <div class="block">
-        <div class="block-head">
-          <span class="block-title">Активный заказ</span>
-          <a href="profile/orders" class="block-link">все заказы →</a>
-        </div>
-
+      <div class="card">
+        <div class="card-head"><span class="card-title">Активный заказ</span><a href="profile/orders" class="card-link">все заказы →</a></div>
         <div id="featuredOrderSlot">
-        <div class="order-card">
-          <div class="order-top">
-            <div>
-              <div class="order-name">Интернет-магазин «Северный дом»</div>
-              <div class="order-sub">Тариф Приоритет</div>
-            </div>
-            <div class="order-eta">Сдача ~ 14 авг</div>
-          </div>
-          <div class="steps">
-            <div class="step done"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">Оплата</div></div>
-            <div class="step done"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">Дизайн</div></div>
-            <div class="step current"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">Разработка</div></div>
-            <div class="step"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">Тест</div></div>
-            <div class="step"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">Готово</div></div>
-          </div>
+        <div class="fp-top">
+          <div><div class="fp-name">Интернет-магазин «Северный дом»</div><div class="fp-sub">Заказ #A83F21</div></div>
+          <span class="fp-badge">В работе</span>
         </div>
+        <div class="steps">
+          <div class="step done"><div class="step-bar"></div><div class="step-label">Оплата</div></div>
+          <div class="step done"><div class="step-bar"></div><div class="step-label">Дизайн</div></div>
+          <div class="step current"><div class="step-bar"></div><div class="step-label">Разработка</div></div>
+          <div class="step"><div class="step-bar"></div><div class="step-label">Тест</div></div>
+          <div class="step"><div class="step-bar"></div><div class="step-label">Готово</div></div>
         </div>
-
-        <div id="recentProjects">
-        <a href="#" class="plain-row">
-          <div><div class="plain-row-title">Лендинг «Кофейня на Речной»</div><div class="plain-row-sub">Завершён 2 июля</div></div>
-          <span class="tag">Готово</span>
-        </a>
-        <a href="#" class="plain-row">
-          <div><div class="plain-row-title">Визитка для стоматологии</div><div class="plain-row-sub">Завершён 18 июня</div></div>
-          <span class="tag">Готово</span>
-        </a>
         </div>
       </div>
 
-      <div class="block">
-        <div class="block-head"><span class="block-title">Активность</span></div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">Завершённые</span></div>
+        <div id="recentProjects">
+        <div class="p-row"><div><div class="p-row-title">Лендинг «Кофейня на Речной»</div><div class="p-row-sub">Завершён 2 июля</div></div><span class="tag on">Готово</span></div>
+        <div class="p-row"><div><div class="p-row-title">Визитка для стоматологии</div><div class="p-row-sub">Завершён 18 июня</div></div><span class="tag on">Готово</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-title">Активность</span></div>
         <div class="tl" id="activityTimeline">
-          <div class="tl-item on"><div class="tl-title">Дизайнер загрузил макет главной</div><div class="tl-time">2 часа назад</div></div>
-          <div class="tl-item"><div class="tl-title">Оплачен тариф «Приоритет»</div><div class="tl-time">вчера</div></div>
-          <div class="tl-item"><div class="tl-title">Заказ «Северный дом» принят в работу</div><div class="tl-time">3 дня назад</div></div>
+          <div class="tl-item on"><div class="tl-dot"></div><div><div class="tl-title">Дизайнер загрузил макет главной</div><div class="tl-time">2 часа назад</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Оплачен тариф «Приоритет»</div><div class="tl-time">вчера</div></div></div>
+          <div class="tl-item"><div class="tl-dot"></div><div><div class="tl-title">Заказ «Северный дом» принят в работу</div><div class="tl-time">3 дня назад</div></div></div>
         </div>
       </div>
 
@@ -257,29 +213,41 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
 
     <div class="rail">
 
-      <div class="block">
-        <div class="block-head"><span class="block-title">Обзор</span></div>
-        <div id="overviewChart"></div>
+      <div class="card">
+        <div class="card-head"><span class="card-title">Обзор</span></div>
+        <div id="overviewChart">
+        <div class="donut-wrap">
+          <svg class="donut-svg" viewBox="0 0 100 100">
+            <circle class="donut-bg" cx="50" cy="50" r="40"/>
+            <circle class="donut-seg" cx="50" cy="50" r="40" stroke="#149955" style="stroke-dasharray:209 42"/>
+            <circle class="donut-seg" cx="50" cy="50" r="40" stroke="#3b82f6" style="stroke-dasharray:42 209;stroke-dashoffset:-209"/>
+          </svg>
+          <div class="donut-center"><span class="donut-total">12</span><span class="donut-total-label">заказов</span></div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot" style="background:#149955"></span>Готово<b>10</b></div>
+          <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span>В работе<b>2</b></div>
+        </div>
+        </div>
       </div>
 
-      <div class="block">
-        <div class="block-head"><span class="block-title">Сервис</span></div>
-        <div id="supportList"><div class="rail-stat"><span class="rail-stat-label">Обслуживание</span><span class="rail-stat-value">Загрузка…</span></div></div>
+      <div class="card dark">
+        <div class="card-head"><span class="card-title">Обслуживание</span></div>
+        <div id="supportList">
+        <div class="support-row">
+          <div class="support-ring"><svg viewBox="0 0 76 76"><circle class="ring-bg" cx="38" cy="38" r="32"/><circle class="ring-fg" cx="38" cy="38" r="32" style="stroke-dasharray:201;stroke-dashoffset:60"/></svg><span class="support-ring-label"><span class="support-ring-num">18</span><span class="support-ring-unit">дней</span></span></div>
+          <div><div class="support-name">Северный дом</div><div class="support-sub">Осталось 18 из 30 дней</div></div>
+        </div>
+        </div>
       </div>
 
-      <div class="block">
-        <div class="rail-stat"><span class="rail-stat-label"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M12 2l2.6 5.3 5.9.8-4.2 4.2 1 5.8L12 15.9 6.7 18l1-5.8L3.5 8l5.9-.8L12 2z"/></svg>Открытых тикетов</span><span class="rail-stat-value" id="railTickets">1</span></div>
-        <div class="rail-stat"><span class="rail-stat-label"><svg class="rail-ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>Непрочитанные</span><span class="rail-stat-value" id="railUnread" style="color:var(--green-d)">2 новых</span></div>
-      </div>
-
-      <div class="block quick-tile">
-        <div class="block-head"><span class="block-title">Быстрый доступ</span></div>
-        <div class="quick">
-          <a href="profile/orders"><span class="quick-left"><svg class="quick-ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v-1M16 4v-1"/></svg><span>Мои заказы</span></span><span class="quick-arrow">→</span></a>
-          <a href="profile/sites"><span class="quick-left"><svg class="quick-ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/><circle cx="6.5" cy="7" r=".5" fill="currentColor" stroke="none"/></svg><span>Мои сайты</span></span><span class="quick-arrow">→</span></a>
-          <a href="profile/support"><span class="quick-left"><svg class="quick-ico" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg><span>Чат с командой</span></span><span class="quick-arrow">→</span></a>
-          <a href="profile/tickets"><span class="quick-left"><svg class="quick-ico" viewBox="0 0 24 24"><path d="M12 2l2.6 5.3 5.9.8-4.2 4.2 1 5.8L12 15.9 6.7 18l1-5.8L3.5 8l5.9-.8L12 2z"/></svg><span>Обслуживание</span></span><span class="quick-arrow">→</span></a>
-          <a href="profile/settings"><span class="quick-left"><svg class="quick-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Настройки</span></span><span class="quick-arrow">→</span></a>
+      <div class="card quick-tile-card">
+        <div class="card-head"><span class="card-title">Быстрый доступ</span></div>
+        <div class="quick-grid">
+          <a href="profile/orders" class="quick-tile"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg><span>Мои заказы</span></a>
+          <a href="profile/sites" class="quick-tile"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg><span>Мои сайты</span></a>
+          <a href="profile/support" class="quick-tile"><svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg><span>Чат с командой</span></a>
+          <a href="profile/settings" class="quick-tile"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span>Настройки</span></a>
         </div>
       </div>
 
@@ -287,79 +255,23 @@ body{background:var(--paper-2);color:var(--ink);font-family:var(--font-ui);font-
 
   </div>
 
-  <div class="notice">
+  <div class="notice" id="pushPanel">
     <div class="notice-left">
       <div class="notice-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
       <span class="notice-text">Push-уведомления выключены — узнавайте о новом, даже когда сайт закрыт.</span>
     </div>
-    <div class="notice-actions">
-      <div id="pushAction"><a href="#" class="btn btn-line" style="padding:8px 14px">Включить</a></div>
-      <span class="notice-dismiss">Скрыть</span>
-    </div>
+    <div id="pushAction"><a href="#" class="btn btn-green" style="padding:10px 20px">Включить</a></div>
   </div>
 
-</div><!-- /wrap -->
+</div>
 </div><!-- /cabinet -->
 
-<div class="cmdk-overlay" id="cmdkOverlay">
-  <div class="cmdk-panel">
-    <input class="cmdk-input" id="cmdkInput" placeholder="Найти заказ, тикет, настройку…" autocomplete="off">
-    <div class="cmdk-results" id="cmdkResults"></div>
-  </div>
-</div>
-
 <script>
-const root=document.documentElement;
-document.querySelector('.notice-dismiss').onclick=e=>{e.target.closest('.notice').style.display='none';};
-
-// ══ поиск (⌘K) ══
-const CMDK_STATIC=[
-  {title:'Новый заказ',href:'order',icon:'plus'},
-  {title:'Мои заказы',href:'profile/orders',icon:'orders'},
-  {title:'Мои сайты',href:'profile/sites',icon:'sites'},
-  {title:'Чат с командой',href:'profile/support',icon:'chat'},
-  {title:'Обслуживание',href:'profile/tickets',icon:'ticket'},
-  {title:'Настройки',href:'profile/settings',icon:'gear'},
-];
-const CMDK_ICONS={
-  plus:'<path d="M12 5v14M5 12h14"/>',
-  orders:'<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/>',
-  sites:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9h18"/>',
-  chat:'<path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>',
-  ticket:'<path d="M12 2l2.6 5.3 5.9.8-4.2 4.2 1 5.8L12 15.9 6.7 18l1-5.8L3.5 8l5.9-.8L12 2z"/>',
-  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82"/>',
-  order:'<path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h5"/>',
-};
-window.__cmdkOrders=[]; // заполняется реальными заказами из firebase-модуля ниже
-
-function cmdkOpen(){
-  document.getElementById('cmdkOverlay').classList.add('show');
-  const input=document.getElementById('cmdkInput');
-  input.value='';
-  input.focus();
-  cmdkRender('');
+function animCount(el){
+  const t=parseFloat(el.dataset.target);const dur=1200;const st=performance.now();
+  const run=now=>{const p=Math.min((now-st)/dur,1);const e=1-Math.pow(1-p,3);el.textContent=Math.round(t*e);if(p<1)requestAnimationFrame(run)};
+  requestAnimationFrame(run);
 }
-function cmdkClose(){document.getElementById('cmdkOverlay').classList.remove('show');}
-function cmdkRender(q){
-  const query=q.trim().toLowerCase();
-  const results=document.getElementById('cmdkResults');
-  const staticMatches=CMDK_STATIC.filter(c=>c.title.toLowerCase().includes(query));
-  const orderMatches=window.__cmdkOrders.filter(o=>o.title.toLowerCase().includes(query));
-  const all=[...staticMatches,...orderMatches];
-  if(!all.length){results.innerHTML='<div class="cmdk-empty">Ничего не найдено</div>';return;}
-  results.innerHTML=all.map((item,i)=>`<a href="${item.href}" class="cmdk-item${i===0?' active':''}"><svg viewBox="0 0 24 24">${CMDK_ICONS[item.icon]||CMDK_ICONS.order}</svg><span>${item.title}</span>${item.sub?`<span class="cmdk-item-sub">${item.sub}</span>`:''}</a>`).join('');
-}
-document.getElementById('cmdkTrigger').onclick=cmdkOpen;
-document.getElementById('cmdkOverlay').onclick=e=>{if(e.target.id==='cmdkOverlay') cmdkClose();};
-document.getElementById('cmdkInput').addEventListener('input',e=>cmdkRender(e.target.value));
-document.addEventListener('keydown',e=>{
-  if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();cmdkOpen();}
-  else if(e.key==='Escape') cmdkClose();
-  else if(e.key==='Enter'&&document.getElementById('cmdkOverlay').classList.contains('show')){
-    const first=document.querySelector('.cmdk-item');
-    if(first) window.location.href=first.getAttribute('href');
-  }
-});
 </script>
 
 <script type="module">
@@ -369,9 +281,10 @@ import { collection, query, where, orderBy, onSnapshot, doc, setDoc, arrayUnion,
 import { getMessaging, getToken, onMessage, isSupported } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
 const STEP_LABELS=['Оплата','Дизайн','Разработка','Тест','Готово'];
-const STATUS_TO_STEP=[0,1,2,3,3,4,3]; // status 0..6 -> индекс шага
+const STATUS_TO_STEP=[0,1,2,3,3,4,3];
+const FULL_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 const VAPID_KEY='BH2Ea24Lg6vaS8_0xzFvQGtvSf24KjeyLFuNqOoAIYOwmi6tiFZKGzC8rruX3p1hAm-_evTFeOnthVOuMeDSQTI';
-let fcmMessaging=null, fcmSwReg=null, currentUser=null;
+let fcmMessaging=null, fcmSwReg=null;
 
 function fmtDateShort(ts){if(!ts) return '';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'});}
 function timeAgo(ts){
@@ -396,39 +309,32 @@ function greetingWord(){
 function renderFeatured(order){
   const slot=document.getElementById('featuredOrderSlot');
   if(!order){
-    slot.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v-1M16 4v-1"/></svg><span>Активных заказов нет — <a href="order">оформите новый</a></span></div>`;
+    slot.innerHTML=`<div style="display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px;padding:8px 0"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>Активных заказов нет — <a href="order" style="color:var(--green-d);font-weight:500;text-decoration:none">оформите новый</a></div>`;
     return;
   }
   const name=order.siteName||order.siteDomain||order.siteType||'Проект';
   const st=order.status||0;
   const step=STATUS_TO_STEP[st]||0;
-  const FULL_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
   const stepsHtml=STEP_LABELS.map((label,i)=>{
     const cls=i<step?'done':(i===step?'current':'');
-    return `<div class="step ${cls}"><div class="step-bar"><div class="step-dot"></div></div><div class="step-label">${label}</div></div>`;
+    return `<div class="step ${cls}"><div class="step-bar"></div><div class="step-label">${label}</div></div>`;
   }).join('');
-  slot.innerHTML=`<div class="order-card">
-    <div class="order-top">
-      <div><div class="order-name">${name}</div><div class="order-sub">Заказ #${order.id.slice(0,6)}</div></div>
-      <div class="order-eta">${st===6?'<span style="color:var(--red)">Ожидает доплаты</span>':FULL_LABEL[st]}</div>
-    </div>
-    <div class="steps">${stepsHtml}</div>
-  </div>`;
+  slot.innerHTML=`<div class="fp-top">
+    <div><div class="fp-name">${name}</div><div class="fp-sub">Заказ #${order.id.slice(0,6)}</div></div>
+    <span class="fp-badge"${st===6?' style="background:#fde3df;color:#c2462f"':''}>${FULL_LABEL[st]}</span>
+  </div>
+  <div class="steps">${stepsHtml}</div>`;
 }
 
 function renderRecent(orders){
   const box=document.getElementById('recentProjects');
   if(!orders.length){
-    box.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></svg><span>Завершённых заказов пока нет</span></div>`;
+    box.innerHTML=`<div style="display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px;padding:8px 0"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M5 12.5l4.5 4.5L19 7"/></svg>Завершённых заказов пока нет</div>`;
     return;
   }
   box.innerHTML=orders.map(o=>{
     const name=o.siteName||o.siteDomain||o.siteType||'Заказ';
-    const done=o.status===5;
-    return `<a href="profile/orders" class="plain-row">
-      <div><div class="plain-row-title">${name}</div><div class="plain-row-sub">${fmtDateShort(o.createdAt)?'Завершён '+fmtDateShort(o.createdAt):''}</div></div>
-      <span class="tag ${done?'on':''}">${done?'Готово':'В работе'}</span>
-    </a>`;
+    return `<div class="p-row"><div><div class="p-row-title">${name}</div><div class="p-row-sub">${fmtDateShort(o.createdAt)?'Завершён '+fmtDateShort(o.createdAt):''}</div></div><span class="tag on">Готово</span></div>`;
   }).join('');
 }
 
@@ -447,50 +353,24 @@ function renderTimeline(orders){
   const tl=document.getElementById('activityTimeline');
   const top=events.slice(0,3);
   if(!top.length){
-    tl.innerHTML=`<div class="empty-state" style="padding-left:0"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg><span>Активность появится после первого заказа</span></div>`;
+    tl.innerHTML=`<div style="display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Активность появится после первого заказа</div>`;
     return;
   }
-  tl.innerHTML=top.map(e=>`<div class="tl-item${e.on?' on':''}"><div class="tl-title">${e.title}</div><div class="tl-time">${timeAgo(e.ts)}</div></div>`).join('');
-}
-
-function renderSupportList(orders){
-  const box=document.getElementById('supportList');
-  const now=new Date();
-  const actives=orders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>now);
-  if(!actives.length){
-    box.innerHTML=`<div class="empty-state" style="padding:14px 0"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.4-3.4a5 5 0 01-6.5 6.5L6.7 20.3a2 2 0 01-2.8-2.8L11.8 9.6a5 5 0 016.5-6.5l-3.4 3.4z"/></svg><span>Обслуживание не подключено</span></div>`;
-    return;
-  }
-  const C=188.5; // 2πr, r=30
-  box.innerHTML=actives.map(o=>{
-    const name=o.siteName||o.siteDomain||o.siteType||'Сайт';
-    const expires=o.supportExpiresAt.toDate();
-    const daysLeft=Math.max(0,Math.ceil((expires-now)/86400000));
-    let totalDays=o.supportDays||30;
-    if(!o.supportDays&&o.supportActivatedAt){
-      totalDays=Math.max(1,Math.round((expires-o.supportActivatedAt.toDate())/86400000));
-    }
-    const frac=Math.min(1,Math.max(0,daysLeft/totalDays));
-    const offset=C*(1-frac);
-    return `<div class="support-row">
-      <div class="support-ring"><svg viewBox="0 0 72 72"><circle class="ring-bg" cx="36" cy="36" r="30"/><circle class="ring-fg" cx="36" cy="36" r="30" style="stroke-dasharray:${C};stroke-dashoffset:${offset}"/></svg><span class="support-ring-label"><span class="support-ring-num">${daysLeft}</span><span class="support-ring-unit">дней</span></span></div>
-      <div class="support-info"><div class="support-name">${name}</div><div class="support-sub">Осталось ${daysLeft} из ${totalDays} дней</div></div>
-    </div>`;
-  }).join('');
+  tl.innerHTML=top.map(e=>`<div class="tl-item${e.on?' on':''}"><div class="tl-dot"></div><div><div class="tl-title">${e.title}</div><div class="tl-time">${timeAgo(e.ts)}</div></div></div>`).join('');
 }
 
 function renderOverview(orders){
   const box=document.getElementById('overviewChart');
   const total=orders.length;
   if(!total){
-    box.innerHTML=`<div class="empty-state" style="padding:6px 0 2px"><svg viewBox="0 0 24 24"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg><span>Появится после первого заказа</span></div>`;
+    box.innerHTML=`<div style="display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px;padding:8px 0"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M21.21 15.89A10 10 0 118 2.83M22 12A10 10 0 0012 2v10z"/></svg>Появится после первого заказа</div>`;
     return;
   }
   const cats=[
-    {label:'Готово',count:orders.filter(o=>o.status===5).length,color:'var(--green-d)'},
+    {label:'Готово',count:orders.filter(o=>o.status===5).length,color:'#149955'},
     {label:'В работе',count:orders.filter(o=>o.status>=1&&o.status<=4).length,color:'#3b82f6'},
-    {label:'Новые',count:orders.filter(o=>(o.status||0)===0).length,color:'var(--line-strong)'},
-    {label:'Ждут оплаты',count:orders.filter(o=>o.status===6).length,color:'var(--red)'},
+    {label:'Новые',count:orders.filter(o=>(o.status||0)===0).length,color:'#cbcdd6'},
+    {label:'Ждут оплаты',count:orders.filter(o=>o.status===6).length,color:'#e8634f'},
   ].filter(c=>c.count>0);
   const C=2*Math.PI*40;
   let acc=0;
@@ -510,34 +390,56 @@ function renderOverview(orders){
   <div class="legend">${cats.map(c=>`<div class="legend-item"><span class="legend-dot" style="background:${c.color}"></span>${c.label}<b>${c.count}</b></div>`).join('')}</div>`;
 }
 
+function renderSupportList(orders){
+  const box=document.getElementById('supportList');
+  const now=new Date();
+  const actives=orders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>now);
+  if(!actives.length){
+    box.innerHTML=`<div style="display:flex;align-items:center;gap:12px;color:rgba(255,255,255,.4);font-size:14px;padding:8px 0"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="1.6" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.4-3.4a5 5 0 01-6.5 6.5L6.7 20.3a2 2 0 01-2.8-2.8L11.8 9.6a5 5 0 016.5-6.5l-3.4 3.4z"/></svg>Обслуживание не подключено</div>`;
+    return;
+  }
+  const C=201;
+  box.innerHTML=actives.map(o=>{
+    const name=o.siteName||o.siteDomain||o.siteType||'Сайт';
+    const expires=o.supportExpiresAt.toDate();
+    const daysLeft=Math.max(0,Math.ceil((expires-now)/86400000));
+    let totalDays=o.supportDays||30;
+    if(!o.supportDays&&o.supportActivatedAt){
+      totalDays=Math.max(1,Math.round((expires-o.supportActivatedAt.toDate())/86400000));
+    }
+    const frac=Math.min(1,Math.max(0,daysLeft/totalDays));
+    const offset=C*(1-frac);
+    return `<div class="support-row">
+      <div class="support-ring"><svg viewBox="0 0 76 76"><circle class="ring-bg" cx="38" cy="38" r="32"/><circle class="ring-fg" cx="38" cy="38" r="32" style="stroke-dasharray:${C};stroke-dashoffset:${offset}"/></svg><span class="support-ring-label"><span class="support-ring-num">${daysLeft}</span><span class="support-ring-unit">дней</span></span></div>
+      <div><div class="support-name">${name}</div><div class="support-sub">Осталось ${daysLeft} из ${totalDays} дней</div></div>
+    </div>`;
+  }).join('');
+}
+
+function setStat(id,val){
+  const el=document.getElementById(id);
+  el.dataset.target=val;
+  animCount(el);
+}
+
 function loadOrders(uid){
   const q=query(collection(db,'orders'),where('uid','==',uid),orderBy('createdAt','desc'));
   onSnapshot(q,snap=>{
     const orders=snap.docs.map(d=>({id:d.id,...d.data()})).filter(o=>(o.status??0)!==-1);
     const active=orders.filter(o=>o.status!==5);
     const done=orders.filter(o=>o.status===5);
-    document.getElementById('statTotal').textContent=orders.length;
-    document.getElementById('statActive').textContent=active.length;
-    document.getElementById('statDone').textContent=done.length;
+    setStat('statTotal',orders.length);
+    setStat('statActive',active.length);
+    setStat('statDone',done.length);
+    document.getElementById('heroSub').textContent=active.length
+      ?`${active.length} заказ${active.length===1?'':active.length<5?'а':'ов'} сейчас в работе, ${done.length} уже сдано.`
+      :(orders.length?`Все заказы сданы — ${done.length} из ${orders.length}.`:'Здесь появятся ваши заказы после первого оформления.');
     renderFeatured(active[0]||null);
     renderRecent(done.slice(0,4));
     renderTimeline(orders);
+    renderOverview(orders);
     renderSupportList(orders);
-    window.__cmdkOrders=orders.map(o=>({title:o.siteName||o.siteDomain||o.siteType||'Заказ',href:'profile/orders',icon:'order',sub:['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'][o.status||0]}));
   },err=>console.error('Orders:',err));
-}
-
-async function loadRail(uid){
-  try{
-    const [chatSnap, ticketsSnap]=await Promise.all([
-      getDocs(query(collection(db,'chats',uid,'messages'),where('sender','==','admin'),where('readByUser','==',false))),
-      getDocs(query(collection(db,'tickets'),where('uid','==',uid),where('status','!=','closed'))).catch(()=>({size:0})),
-    ]);
-    document.getElementById('railTickets').textContent=ticketsSnap.size||0;
-    const unread=chatSnap.size;
-    const unreadEl=document.getElementById('railUnread');
-    unreadEl.textContent=unread>0?unread+' новых':'Нет новых';
-  }catch(e){console.error('Rail:',e);}
 }
 
 async function initPush(user){
@@ -557,26 +459,33 @@ async function renderPushState(user){
     try{
       const token=await getToken(fcmMessaging,{vapidKey:VAPID_KEY,serviceWorkerRegistration:fcmSwReg});
       if(token) await setDoc(doc(db,'users',user.uid),{fcmTokens:arrayUnion(token)},{merge:true});
-      box.innerHTML='<span style="font-size:.8rem;color:var(--green-d);font-weight:500">Подключено</span>';
+      box.innerHTML='<span style="font-size:14px;color:var(--green-d);font-weight:500">Подключено ✓</span>';
     }catch(e){console.error(e);}
   }else if(perm==='denied'){
-    box.innerHTML='<span style="font-size:.8rem;color:var(--muted)">Заблокировано</span>';
+    box.innerHTML='<span style="font-size:14px;color:var(--muted)">Заблокировано в браузере</span>';
   }else{
-    box.innerHTML='<a href="#" class="btn btn-line" id="pushEnableBtn" style="padding:8px 14px">Включить</a>';
+    box.innerHTML='<a href="#" class="btn btn-green" id="pushEnableBtn" style="padding:10px 20px">Включить</a>';
     document.getElementById('pushEnableBtn').onclick=async(e)=>{e.preventDefault();await Notification.requestPermission();renderPushState(user);};
   }
 }
 
+function watchNotifDot(uid){
+  const q=query(collection(db,'notifications',uid,'items'),orderBy('createdAt','desc'));
+  onSnapshot(q,snap=>{
+    const hasUnread=snap.docs.some(d=>!d.data().read);
+    document.getElementById('notifDot').style.display=hasUnread?'block':'none';
+  },()=>{});
+}
+
 onAuthStateChanged(auth,user=>{
   if(!user){window.location.href='auth';return;}
-  currentUser=user;
   const name=(user.displayName||'Пользователь').split(' ')[0];
   document.getElementById('heroGreeting').innerHTML=greetingWord()+', <em id="heroName">'+name+'</em>';
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('cabinet').style.display='block';
   loadOrders(user.uid);
-  loadRail(user.uid);
   initPush(user);
+  watchNotifDot(user.uid);
 },err=>{console.error('Auth:',err);document.getElementById('loadingScreen').style.display='none';document.getElementById('cabinet').style.display='block';});
 </script>
 <script src="/footer.js" data-page="profile"></script>

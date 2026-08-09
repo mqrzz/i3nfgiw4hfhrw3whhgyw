@@ -43,11 +43,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .shell{width:100%;animation:fadeUp .3s ease}
 
 /* HERO */
-.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px 0;margin-bottom:24px;overflow:hidden}
+.page-hero-top{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding-bottom:48px}
 .page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
 .page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
 .page-hero-title em{font-style:normal;color:var(--accent)}
 .page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+.page-hero-bar{border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:repeat(4,1fr)}
+.page-hero-stat{padding:26px 8px;border-right:1px solid rgba(255,255,255,.07);text-align:center}
+.page-hero-stat:last-child{border-right:none}
+.page-hero-stat-n{font-size:clamp(22px,2.6vw,32px);font-weight:500;color:#fff;letter-spacing:-.03em;line-height:1;margin-bottom:6px}
+.page-hero-stat-l{font-size:.72rem;color:rgba(255,255,255,.35);font-weight:300}
+@media(max-width:720px){.page-hero-bar{grid-template-columns:1fr 1fr}}
 
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,opacity .15s;white-space:nowrap}
@@ -77,7 +84,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
 /* LIST */
 .ord-list{display:flex;flex-direction:column;gap:12px}
-.ord-row-wrap{position:relative;border:1.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--bg);box-shadow:var(--sh1);animation:rowIn .2s ease both;transition:box-shadow .15s,border-color .15s,transform .15s}
+.ord-row-wrap{position:relative;border:1.5px solid var(--line);border-radius:28px;overflow:hidden;background:var(--bg);box-shadow:var(--sh1);animation:rowIn .2s ease both;transition:box-shadow .15s,border-color .15s,transform .15s}
 .ord-row-wrap:hover{border-color:var(--line-strong);box-shadow:var(--sh2);transform:translateY(-1px)}
 .ord-row-wrap::before{content:'';position:absolute;left:14px;top:16px;bottom:16px;width:3px;border-radius:3px;background:var(--line-strong);opacity:.4}
 .ord-row-wrap[data-status="1"]::before,.ord-row-wrap[data-status="2"]::before{background:var(--info);opacity:1}
@@ -140,8 +147,14 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .ord-chip.paid-no{background:rgba(255,255,255,.05);color:rgba(255,255,255,.35)}
 .ord-chip-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
 .ord-chip-ico{width:12px;height:12px;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0}
+.ord-modal-price-row{display:flex;align-items:center;gap:20px}
 .ord-modal-price{font-size:clamp(2.2rem,4vw,3.2rem);font-weight:500;letter-spacing:-.04em;color:#fff;margin-top:18px}
 .ord-modal-price small{font-size:.42em;font-weight:300;color:rgba(255,255,255,.3);margin-right:6px}
+.ord-pay-ring{position:relative;width:58px;height:58px;flex-shrink:0;margin-top:18px}
+.ord-pay-ring svg{width:58px;height:58px;transform:rotate(-90deg)}
+.ord-pay-ring .ring-bg{fill:none;stroke:rgba(255,255,255,.12);stroke-width:5}
+.ord-pay-ring .ring-fg{fill:none;stroke:var(--accent);stroke-width:5;stroke-linecap:round;transition:stroke-dashoffset .6s ease}
+.ord-pay-ring-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff}
 .ord-modal-close{position:absolute;top:32px;right:32px;width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(255,255,255,.15);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);transition:all .15s;flex-shrink:0}
 .ord-modal-close:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
 .ord-modal-close svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
@@ -290,7 +303,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
 /* MOBILE */
 @media(max-width:900px){
-  .page-hero{border-radius:32px;padding:40px 36px}
+  .page-hero{border-radius:32px;padding:40px 36px 0}
+  .page-hero-top{padding-bottom:28px}
   .page-hero-title{font-size:2.4rem}
   .ord-modal-body{grid-template-columns:1fr;padding:20px 24px}
   .ord-modal{max-height:95vh}
@@ -311,7 +325,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
   .ord-modal-overlay{padding:0}
   .ord-modal{border-radius:0;max-height:100dvh;height:100dvh}
   .ord-modal-header{border-radius:0}
-  .page-hero{border-radius:24px;padding:28px 24px}
+  .page-hero{border-radius:24px;padding:28px 24px 0}
+  .page-hero-top{padding-bottom:20px}
   .page-hero-title{font-size:1.9rem}
   .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
   .tabs{overflow-x:auto;max-width:100%;width:100%}
@@ -412,7 +427,10 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
       <div class="ord-modal-eyebrow">Antviz · Детали заказа</div>
       <div class="ord-modal-title" id="ordModalTitle"></div>
       <div class="ord-modal-chips" id="ordModalChips"></div>
-      <div class="ord-modal-price" id="ordModalPrice"></div>
+      <div class="ord-modal-price-row">
+        <div class="ord-modal-price" id="ordModalPrice"></div>
+        <div id="ordModalPayRing"></div>
+      </div>
     </div>
     <div class="ord-modal-body">
       <div class="ord-modal-left" id="ordModalLeft"></div>
@@ -425,15 +443,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <div class="shell" id="appWrap">
 
   <div class="page-hero">
-    <div>
-      <div class="page-hero-eyebrow">Личный кабинет</div>
-      <div class="page-hero-title">Мои <em>заказы</em></div>
-      <div class="page-hero-sub">Статусы, документы и история работ</div>
+    <div class="page-hero-top">
+      <div>
+        <div class="page-hero-eyebrow">Личный кабинет</div>
+        <div class="page-hero-title">Мои <em>заказы</em></div>
+        <div class="page-hero-sub">Статусы, документы и история работ</div>
+      </div>
+      <a href="../order" class="btn btn-ghost">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Новый заказ
+      </a>
     </div>
-    <a href="../order" class="btn btn-ghost">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-      Новый заказ
-    </a>
+    <div class="page-hero-bar">
+      <div class="page-hero-stat"><div class="page-hero-stat-n" id="heroStatTotal">0</div><div class="page-hero-stat-l">Всего</div></div>
+      <div class="page-hero-stat"><div class="page-hero-stat-n" id="heroStatActive">0</div><div class="page-hero-stat-l">В работе</div></div>
+      <div class="page-hero-stat"><div class="page-hero-stat-n" id="heroStatDone">0</div><div class="page-hero-stat-l">Завершено</div></div>
+      <div class="page-hero-stat"><div class="page-hero-stat-n" id="heroStatPaid">0 ₽</div><div class="page-hero-stat-l">Оплачено всего</div></div>
+    </div>
   </div>
 
   <div class="toolbar">
@@ -647,6 +673,15 @@ window.openOrderModal=function(id){
 
   document.getElementById('ordModalTitle').textContent=(o.siteType||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
   document.getElementById('ordModalPrice').innerHTML=totalPrice?'<small>₽</small>'+totalPrice.toLocaleString('ru'):'';
+  const ringBox=document.getElementById('ordModalPayRing');
+  if(isPartial&&totalPrice>0){
+    const pct=Math.min(100,Math.round((paidAmount/totalPrice)*100));
+    const C=2*Math.PI*24;
+    const offset=C*(1-pct/100);
+    ringBox.innerHTML=`<div class="ord-pay-ring"><svg viewBox="0 0 58 58"><circle class="ring-bg" cx="29" cy="29" r="24"/><circle class="ring-fg" cx="29" cy="29" r="24" style="stroke-dasharray:${C};stroke-dashoffset:${offset}"/></svg><span class="ord-pay-ring-label">${pct}%</span></div>`;
+  }else{
+    ringBox.innerHTML='';
+  }
   document.getElementById('ordModalChips').innerHTML=
     '<span class="ord-chip status s'+s+'">'
       +'<svg viewBox="0 0 24 24" class="ord-chip-ico">'+STATUS_ICONS[s]+'</svg>'+STATUS_LABELS[s]
@@ -809,6 +844,31 @@ function launchConfetti(){
   setTimeout(()=>{wrap.innerHTML='';},5000);
 }
 
+function animCount(el,target){
+  const start=parseFloat(el.dataset.raw||0);const dur=900;const st=performance.now();
+  const fmt=el.dataset.money==='1';
+  const run=now=>{
+    const p=Math.min((now-st)/dur,1);const e=1-Math.pow(1-p,3);
+    const v=Math.round(start+(target-start)*e);
+    el.textContent=fmt?v.toLocaleString('ru')+' ₽':v;
+    if(p<1)requestAnimationFrame(run);else el.dataset.raw=target;
+  };
+  requestAnimationFrame(run);
+}
+function updateHeroStats(orders){
+  const total=orders.length;
+  const done=orders.filter(o=>o.status===5).length;
+  const active=total-done;
+  const paidSum=orders.reduce((sum,o)=>{
+    const isPartial=o.paymentType==='partial';
+    const paidAmt=isPartial?(o.paidAmount||0):(o.paid?(o.totalPrice||0):0);
+    return sum+paidAmt;
+  },0);
+  const tEl=document.getElementById('heroStatTotal'),aEl=document.getElementById('heroStatActive'),dEl=document.getElementById('heroStatDone'),pEl=document.getElementById('heroStatPaid');
+  animCount(tEl,total);animCount(aEl,active);animCount(dEl,done);
+  pEl.dataset.money='1';animCount(pEl,paidSum);
+}
+
 function loadOrders(uid){
   if(unsubOrders)unsubOrders();
   const q=query(collection(db,'orders'),where('uid','==',uid));
@@ -818,6 +878,7 @@ function loadOrders(uid){
       .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
     allOrders=orders;
     renderOrders(orders);
+    updateHeroStats(orders);
     snap.docChanges().forEach(ch=>{
       if(ch.type==='modified'){
         const o={id:ch.doc.id,...ch.doc.data()};

@@ -55,10 +55,10 @@ const NOTIFY_CONFIG = {
   const SESSION_PREFIX = 'antviz_notify_session_';    // временный флаг (persist:'session')
 
   const ICONS = {
-    globe: '<path d="M12 3a15 15 0 010 18M12 3a15 15 0 000 18M3 12h18M4.5 7.5h15M4.5 16.5h15"/><circle cx="12" cy="12" r="9"/>',
-    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
-    shield: '<path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/>',
-    check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l2.5 2.5L16 9"/>'
+    globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    shield: '<path d="M12 2l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"/><path d="M9 12l2 2 4-4"/>',
+    check: '<circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/>'
   };
 
   // Иконка для правой (тёмной) панели — стандартный сигнал wifi
@@ -80,14 +80,15 @@ const NOTIFY_CONFIG = {
       display:flex; align-items:center; justify-content:center; padding:24px;
       opacity:0; pointer-events:none;
       transition:opacity .35s cubic-bezier(.16,1,.3,1);
-      font-family:'Geologica','Inter','Arial',sans-serif;
+      font-family:var(--font,'Geologica','Arial',sans-serif);
+      letter-spacing:-.01em;
     }
     .an-overlay.show{ opacity:1; pointer-events:auto; }
 
     .an-card{
       position:relative; width:100%; max-width:860px;
-      background:#fff; border:1px solid #dfe3e8; border-radius:28px;
-      box-shadow:0 40px 90px -30px rgba(25,27,30,.4);
+      background:var(--bg,#fff); border:1px solid var(--border,#dfe3e8); border-radius:40px;
+      box-shadow:var(--sh2,0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08));
       display:flex; overflow:hidden;
       transform:scale(.94) translateY(10px); opacity:0;
       transition:transform .4s cubic-bezier(.16,1,.3,1), opacity .35s cubic-bezier(.16,1,.3,1);
@@ -95,68 +96,64 @@ const NOTIFY_CONFIG = {
     .an-overlay.show .an-card{ transform:scale(1) translateY(0); opacity:1; }
 
     .an-close{
-      position:absolute; top:18px; right:18px; z-index:2; width:36px; height:36px; border-radius:11px;
-      background:#fff; border:1px solid #dfe3e8; display:flex; align-items:center; justify-content:center;
-      cursor:pointer; color:#191b1e; transition:background .15s,color .15s; box-shadow:0 6px 16px -6px rgba(25,27,30,.3);
+      position:absolute; top:18px; right:18px; z-index:2; width:40px; height:40px; border-radius:14px;
+      background:var(--bg3,#f9fafc); border:1px solid var(--border,#dfe3e8); display:flex; align-items:center; justify-content:center;
+      cursor:pointer; color:var(--text,#191b1e); transition:border-color .15s;
     }
-    .an-close:hover{ background:#f2f4f7; }
-    .an-close svg{ width:14px; height:14px; stroke:currentColor; stroke-width:2; fill:none; }
+    .an-close:hover{ border-color:var(--border2,#cbcdd6); }
+    .an-close svg{ width:16px; height:16px; stroke:currentColor; stroke-width:1.8; fill:none; }
 
     .an-content{
-      flex:1 1 56%; padding:44px 40px 36px; display:flex; flex-direction:column; min-width:0;
+      flex:1 1 56%; padding:48px 44px 40px; display:flex; flex-direction:column; min-width:0;
     }
     .an-visual{
-      flex:0 0 44%; background:#191b1e;
-      background-image:
-        radial-gradient(circle at 20% 20%, rgba(30,222,123,.10), transparent 55%),
-        radial-gradient(rgba(255,255,255,.05) 1px, transparent 1px);
-      background-size:auto, 16px 16px;
+      flex:0 0 42%; background:var(--dark,#191b1e);
       display:flex; align-items:center; justify-content:center; padding:30px;
     }
-    .an-visual svg{ width:100%; max-width:280px; height:auto; }
+    .an-visual svg{ width:100%; max-width:150px; height:auto; }
 
     .an-eyebrow{
-      display:inline-block; align-self:flex-start;
-      font-size:.72rem; font-weight:500; letter-spacing:.02em;
-      color:#149955; background:#eafaf1; border-radius:8px; padding:5px 11px;
-      margin-bottom:16px;
-    }
-    .an-title{
-      font-size:1.6rem; font-weight:600; letter-spacing:-.03em; line-height:1.18; color:#191b1e;
+      display:inline-flex; align-self:flex-start;
+      background:var(--green-light,#d2f8e5); color:var(--green-d,#149955);
+      font-size:12px; font-weight:500; padding:6px 14px; border-radius:100px;
       margin-bottom:20px;
     }
-
-    .an-bullets{ display:flex; flex-direction:column; gap:14px; margin-bottom:18px; }
-    .an-bullet{ display:flex; align-items:flex-start; gap:12px; }
-    .an-bullet-icon{
-      flex:0 0 auto; width:26px; height:26px; border-radius:8px; background:#f2f4f7;
-      display:flex; align-items:center; justify-content:center; margin-top:1px;
+    .an-title{
+      font-size:clamp(24px,3vw,30px); font-weight:500; letter-spacing:-.03em; line-height:1.15; color:var(--text,#191b1e);
+      margin-bottom:24px;
     }
-    .an-bullet-icon svg{ width:14px; height:14px; stroke:#191b1e; stroke-width:1.8; fill:none; }
-    .an-bullet-text{ font-size:.88rem; color:#3d434c; font-weight:300; line-height:1.5; }
+
+    .an-bullets{ display:flex; flex-direction:column; gap:16px; margin-bottom:20px; }
+    .an-bullet{ display:flex; align-items:flex-start; gap:14px; }
+    .an-bullet-icon{
+      flex:0 0 auto; width:32px; height:32px; border-radius:12px; background:var(--bg3,#f9fafc);
+      border:1px solid var(--border,#dfe3e8); display:flex; align-items:center; justify-content:center; margin-top:1px;
+    }
+    .an-bullet-icon svg{ width:16px; height:16px; stroke:var(--green-d,#149955); stroke-width:1.8; fill:none; }
+    .an-bullet-text{ font-size:14px; color:var(--text,#191b1e); font-weight:300; line-height:1.5; letter-spacing:-.01em; }
 
     .an-footnote{
-      font-size:.8rem; color:#707a8a; font-weight:300; line-height:1.5;
-      border-top:1px solid #eef0f3; padding-top:14px; margin-bottom:22px;
+      font-size:13px; color:var(--muted,#707a8a); font-weight:300; line-height:1.5;
+      border-top:1px solid var(--border,#dfe3e8); padding-top:16px; margin-bottom:24px;
     }
 
     .an-actions{ margin-top:auto; display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
     .an-btn{
       display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;
       font-family:inherit; font-weight:500; text-decoration:none; cursor:pointer; border:none;
-      border-radius:13px; padding:14px 22px; font-size:.9rem; letter-spacing:-.01em;
-      transition:background .12s, transform .15s cubic-bezier(.16,1,.3,1);
+      border-radius:12px; padding:15px 26px; font-size:15px;
+      transition:background .1s, transform .12s;
     }
     .an-btn:hover{ transform:translateY(-1px); }
-    .an-btn-dark{ background:#191b1e; color:#fff; }
-    .an-btn-dark:hover{ background:#2b2f33; }
+    .an-btn-dark{ background:var(--dark,#191b1e); color:#fff; }
+    .an-btn-dark:hover{ background:var(--dark2,#2b2f33); }
 
     .an-dismiss{
       background:none; border:none; cursor:pointer; font-family:inherit;
-      font-size:.8rem; font-weight:400; color:#9aa1ab; text-decoration:underline;
+      font-size:13px; font-weight:300; color:var(--muted,#707a8a); text-decoration:underline;
       text-underline-offset:3px; padding:2px; align-self:center; margin:0 auto;
     }
-    .an-dismiss:hover{ color:#191b1e; }
+    .an-dismiss:hover{ color:var(--text,#191b1e); }
 
     @media (max-width:720px){
       .an-overlay{ padding:0; align-items:flex-start; }
@@ -166,11 +163,11 @@ const NOTIFY_CONFIG = {
         overflow-y:auto;
       }
       .an-overlay.show .an-card{ transform:translateY(0); }
-      .an-visual{ flex:0 0 auto; padding:22px 20px 14px; order:-1; }
+      .an-visual{ flex:0 0 auto; padding:24px 20px 16px; order:-1; }
       .an-visual svg{ max-width:110px; }
-      .an-content{ padding:12px 24px calc(26px + env(safe-area-inset-bottom)); flex:1; }
+      .an-content{ padding:16px 24px calc(28px + env(safe-area-inset-bottom)); flex:1; }
       .an-actions{ margin-top:24px; }
-      .an-title{ font-size:1.4rem; }
+      .an-title{ font-size:22px; }
     }
   `;
 
@@ -250,7 +247,7 @@ const NOTIFY_CONFIG = {
     overlayEl.className = 'an-overlay';
     overlayEl.innerHTML = `
       <div class="an-card" role="dialog" aria-modal="true">
-        <button class="an-close" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+        <button class="an-close" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
         <div class="an-content">
           ${opts.eyebrow ? `<div class="an-eyebrow">${opts.eyebrow}</div>` : ''}
           <div class="an-title">${opts.title || ''}</div>

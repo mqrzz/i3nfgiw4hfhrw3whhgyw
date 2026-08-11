@@ -243,6 +243,39 @@
         padding:88px 1.2rem 80px;
       }
     }
+
+    /* Мобильное меню — открывается кнопкой #menuBtnMobile (если она есть
+       на странице). Использует те же пункты и цветные иконки, что и
+       десктопный сайдбар (buildNav переиспользуется), плюс переменные
+       темы страницы (--bg/--text/--stroke/--text-dim/--green), поэтому
+       автоматически подхватывает светлую/тёмную тему без своего JS. */
+    .sb-mnav-overlay{
+      position:fixed; inset:0; z-index:900;
+      background:rgba(0,0,0,.5);
+      opacity:0; visibility:hidden;
+      transition:opacity .18s ease;
+    }
+    .sb-mnav-overlay.is-open{ opacity:1; visibility:visible; }
+    .sb-mnav-panel{
+      position:absolute; top:0; left:0; bottom:0;
+      width:280px; max-width:82%;
+      background:var(--bg,#fff);
+      border-right:1px solid var(--border, var(--stroke,#dfe3e8));
+      padding:20px 12px; overflow-y:auto;
+      display:flex; flex-direction:column; gap:3px;
+      transform:translateX(-100%);
+      transition:transform .2s ease;
+    }
+    .sb-mnav-overlay.is-open .sb-mnav-panel{ transform:translateX(0); }
+    .sb-mnav-brand{
+      display:flex; align-items:center; gap:10px;
+      padding:8px 10px 18px; margin-bottom:6px;
+      border-bottom:1px solid var(--border, var(--stroke,#dfe3e8));
+      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:500; font-size:1rem;
+      color:var(--text,#191b1e); text-decoration:none;
+    }
+    .sb-mnav-brand img{ width:26px; height:26px; border-radius:8px; }
+    @media (min-width:981px){ .sb-mnav-overlay{ display:none; } }
   `;
 
   const NAV_ITEMS = [
@@ -260,11 +293,11 @@
 
   function renderItem(item) {
     const active = item.key === page ? ' is-active' : '';
-    const badge = item.badgeKey ? `<span class="sb-badge" id="sbBadge-${item.badgeKey}" style="display:none"></span>` : '';
+    const badge = item.badgeKey ? `<span class="sb-badge" data-badge-key="${item.badgeKey}" style="display:none"></span>` : '';
     const label = `<span class="sb-link-label">${item.label}</span>`;
     const icon = `<span class="sb-link-ico${item.color ? ' sb-c-' + item.color : ''}"><svg viewBox="0 0 24 24">${item.icon}</svg></span>`;
     if (item.logout) {
-      return `<button class="sb-link danger" id="sbLogout" aria-label="${item.label}">${icon}${label}</button>`;
+      return `<button class="sb-link danger" data-logout aria-label="${item.label}">${icon}${label}</button>`;
     }
     return `<a href="${item.href}" class="sb-link${active}" aria-label="${item.label}">${icon}${label}${badge}</a>`;
   }
@@ -321,6 +354,30 @@
     }
 
     const navEl = document.getElementById('sbNav');
+
+    // --- Мобильное меню: отдельный оверлей, не завязан на .sb-shell,
+    //     открывается кнопкой #menuBtnMobile, если она есть на странице
+    //     (её рисует сама страница в topbar, sidebar.js её не создаёт).
+    const mnavOverlay = document.createElement('div');
+    mnavOverlay.className = 'sb-mnav-overlay';
+    mnavOverlay.id = 'sbMnavOverlay';
+    mnavOverlay.innerHTML = `<nav class="sb-mnav-panel">
+      <a class="sb-mnav-brand" href="${b || '/'}">
+        <img src="${b}img/favicon.png" alt=""/>
+        <span>Antviz</span>
+      </a>
+      ${buildNav()}
+    </nav>`;
+    document.body.appendChild(mnavOverlay);
+
+    const menuBtnMobile = document.getElementById('menuBtnMobile');
+    if (menuBtnMobile) {
+      const openMnav  = () => mnavOverlay.classList.add('is-open');
+      const closeMnav = () => mnavOverlay.classList.remove('is-open');
+      menuBtnMobile.addEventListener('click', openMnav);
+      mnavOverlay.addEventListener('click', e => { if (e.target === mnavOverlay) closeMnav(); });
+      mnavOverlay.querySelectorAll('.sb-link').forEach(link => link.addEventListener('click', closeMnav));
+    }
 
     function toggleCollapse() {
       const nowCollapsed = navEl.classList.toggle('is-collapsed');
@@ -384,7 +441,7 @@
       link.addEventListener('click', () => tooltip.classList.remove('is-visible'));
     });
 
-    document.getElementById('sbLogout')?.addEventListener('click', async () => {
+    document.querySelectorAll('[data-logout]').forEach(btn => btn.addEventListener('click', async () => {
       try {
         const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
         const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
@@ -393,16 +450,16 @@
         }
       } catch (e) { console.error('sidebar.js signOut:', e); }
       window.location.href = b || '/';
-    });
+    }));
   }
 
   function setBadge(key, value, variant) {
-    const el = document.getElementById(`sbBadge-${key}`);
-    if (!el) return;
-    if (!value) { el.style.display = 'none'; return; }
-    el.className = 'sb-badge' + (variant ? ' ' + variant : '');
-    el.textContent = String(value);
-    el.style.display = 'inline-block';
+    document.querySelectorAll(`[data-badge-key="${key}"]`).forEach(el => {
+      if (!value) { el.style.display = 'none'; return; }
+      el.className = 'sb-badge' + (variant ? ' ' + variant : '');
+      el.textContent = String(value);
+      el.style.display = 'inline-block';
+    });
   }
 
   // Подписки на бейджи — те же данные, что и в nav.js, но отдельная

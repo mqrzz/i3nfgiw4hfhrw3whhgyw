@@ -1,5 +1,5 @@
 /**
- * sidebar.js — общая боковая панель личного кабинетаа Antviz
+ * sidebar.js — общая боковая панель личного кабинета Antviz
  * <script src="../sidebar.js" data-page="profile"></script>
  *
  * Подключается на всех страницах кабинета: profile, orders, sites,

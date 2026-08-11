@@ -52,7 +52,7 @@
       position:sticky; top:0; flex-shrink:0;
       width:var(--sb-w); height:calc(100vh - var(--sb-gap) * 2);
       background:var(--bg,#fff);
-      border:1px solid var(--border,#dfe3e8);
+      border:1px solid var(--border, var(--stroke,#dfe3e8));
       border-radius:32px;
       display:flex; flex-direction:column;
       margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
@@ -66,12 +66,12 @@
     .sb-brand{
       display:flex; align-items:center; gap:10px;
       padding:8px 10px 20px; margin-bottom:8px;
-      border-bottom:1px solid var(--border,#dfe3e8);
+      border-bottom:1px solid var(--border, var(--stroke,#dfe3e8));
       text-decoration:none;
     }
     .sb-brand img{ width:26px; height:26px; border-radius:8px; object-fit:cover; flex-shrink:0; }
     .sb-brand span{ font-family:'Geologica','Inter','Arial',sans-serif; font-weight:500; font-size:1rem; letter-spacing:-.01em; color:var(--text,#191b1e); white-space:nowrap; overflow:hidden; }
-    .sb-brand-row{ display:flex; align-items:center; gap:6px; padding:4px 4px 20px; margin-bottom:8px; border-bottom:1px solid var(--border,#dfe3e8); }
+    .sb-brand-row{ display:flex; align-items:center; gap:6px; padding:4px 4px 20px; margin-bottom:8px; border-bottom:1px solid var(--border, var(--stroke,#dfe3e8)); }
     .sb-brand-row .sb-brand{ padding:4px 6px; margin:0; border:none; flex:1; min-width:0; }
 
     /* Кнопка сворачивания текста — иконка-переключатель рядом с лого.
@@ -82,7 +82,7 @@
       display:flex; align-items:center; justify-content:center;
       width:48px; height:48px; flex-shrink:0;
       border-radius:13px; border:none; background:none; cursor:pointer;
-      color:var(--muted,#707a8a);
+      color:var(--muted, var(--text-dim,#707a8a));
       transition:background .15s, color .15s;
     }
     .sb-collapse-btn:hover{ background:var(--bg,#fff); color:var(--text,#191b1e); }
@@ -96,7 +96,7 @@
       position:relative;
       display:flex; align-items:center; gap:13px;
       padding:.6rem 1rem .6rem .6rem; border-radius:14px;
-      color:var(--muted,#707a8a); text-decoration:none;
+      color:var(--muted, var(--text-dim,#707a8a)); text-decoration:none;
       font-family:'Geologica','Inter','Arial',sans-serif; font-weight:400; font-size:.92rem;
       background:none; border:none; cursor:pointer; width:100%; text-align:left;
       transition:background .15s, color .15s;
@@ -104,13 +104,13 @@
     .sb-link-ico{
       width:36px; height:36px; flex-shrink:0; border-radius:11px;
       display:flex; align-items:center; justify-content:center;
-      background:var(--bg2,#f2f4f7);
+      background:var(--bg2, var(--card-elevated,#f2f4f7));
       transition:background .15s, color .15s, box-shadow .15s, transform .15s;
     }
     .sb-link-ico svg{ width:18px; height:18px; stroke:currentColor; stroke-width:1.8; flex-shrink:0; fill:none; }
-    .sb-link:hover{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); }
+    .sb-link:hover{ background:var(--bg2, var(--card-elevated,#f2f4f7)); color:var(--text,#191b1e); }
     .sb-link:hover .sb-link-ico:not([class*="sb-c-"]){ background:var(--bg,#fff); box-shadow:0 6px 14px -8px rgba(25,27,30,.2); }
-    .sb-link.is-active{ background:var(--bg2,#f2f4f7); color:var(--text,#191b1e); font-weight:500; }
+    .sb-link.is-active{ background:var(--bg2, var(--card-elevated,#f2f4f7)); color:var(--text,#191b1e); font-weight:500; }
     .sb-link.is-active .sb-link-ico:not([class*="sb-c-"]){ background:var(--text,#191b1e); color:var(--green,#1ede7b); box-shadow:0 8px 18px -8px rgba(25,27,30,.4); }
     .sb-link-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
@@ -135,7 +135,7 @@
       min-width:19px; text-align:center; flex-shrink:0;
     }
     .sb-badge.warn{ background:#f59e0b; color:#1a1400; }
-    .sb-sep{ height:1px; background:var(--border,#dfe3e8); margin:10px 6px; flex-shrink:0; }
+    .sb-sep{ height:1px; background:var(--border, var(--stroke,#dfe3e8)); margin:10px 6px; flex-shrink:0; }
     .sb-link.danger{ color:#d95a48; }
     .sb-link.danger:hover{ background:none; color:#c44432; }
     .sb-link.danger .sb-link-ico:not([class*="sb-c-"]){ color:#d95a48; }
@@ -179,7 +179,7 @@
     .sb-brand-row{ position:relative; }
     .sb-collapse-hint{
       position:absolute; top:100%; right:0; margin-top:10px; width:216px;
-      background:var(--bg,#fff); border:1px solid var(--border,#dfe3e8);
+      background:var(--bg,#fff); border:1px solid var(--border, var(--stroke,#dfe3e8));
       border-radius:14px; padding:.75rem 1.6rem .75rem .9rem;
       box-shadow:0 10px 28px rgba(25,27,30,.12);
       font-family:'Geologica','Inter','Arial',sans-serif; font-size:.78rem; line-height:1.4;
@@ -190,14 +190,14 @@
     .sb-collapse-hint.is-visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
     .sb-collapse-hint::before{
       content:''; position:absolute; top:-6px; right:15px; width:11px; height:11px;
-      background:var(--bg,#fff); border-left:1px solid var(--border,#dfe3e8);
-      border-top:1px solid var(--border,#dfe3e8); transform:rotate(45deg);
+      background:var(--bg,#fff); border-left:1px solid var(--border, var(--stroke,#dfe3e8));
+      border-top:1px solid var(--border, var(--stroke,#dfe3e8)); transform:rotate(45deg);
     }
     .sb-collapse-hint-close{
       position:absolute; top:6px; right:6px; width:20px; height:20px;
       display:flex; align-items:center; justify-content:center;
       border:none; background:none; cursor:pointer; border-radius:50%;
-      color:var(--muted,#707a8a); font-size:1rem; line-height:1; padding:0;
+      color:var(--muted, var(--text-dim,#707a8a)); font-size:1rem; line-height:1; padding:0;
     }
     .sb-collapse-hint-close:hover{ background:#eceef1; color:var(--text,#191b1e); }
 
@@ -212,7 +212,7 @@
       overflow-y:auto; -webkit-overflow-scrolling:touch;
       margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
       background:var(--bg,#fff);
-      border:1px solid var(--border,#dfe3e8);
+      border:1px solid var(--border, var(--stroke,#dfe3e8));
       border-radius:32px;
       padding:20px 56px 60px;
     }

@@ -244,34 +244,36 @@
       }
     }
 
-    /* Мобильное меню — открывается кнопкой #menuBtnMobile (если она есть
-       на странице). Использует те же пункты и цветные иконки, что и
-       десктопный сайдбар (buildNav переиспользуется), плюс переменные
-       темы страницы (--bg/--text/--stroke/--text-dim/--green), поэтому
-       автоматически подхватывает светлую/тёмную тему без своего JS. */
-    .sb-mnav-overlay{
-      position:fixed; inset:0; z-index:900;
-      background:rgba(0,0,0,.5);
-      opacity:0; visibility:hidden;
-      transition:opacity .18s ease;
-    }
-    .sb-mnav-overlay.is-open{ opacity:1; visibility:visible; }
-    .sb-mnav-panel{
-      position:absolute; top:0; left:0; bottom:0;
-      width:280px; max-width:82%;
+    /* Мобильное нижнее меню — плавающая капсула как в мокапе (не во всю
+       ширину экрана, с отступами по бокам). Только на мобильных, ПК не
+       трогает. Пункты — те же NAV_ITEMS, что и в десктопном сайдбаре,
+       без "Новый заказ" (он уже есть на главной) и без "Выйти" (переезжает
+       в настройки, только на мобильных). Тема — через var(--card)/
+       var(--green)/var(--stroke) страницы, свой JS для темы не нужен. */
+    .sb-bottom-nav{
+      display:none;
+      position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
+      width:calc(100% - 32px); max-width:420px;
       background:var(--card, var(--bg,#fff));
-      transition:transform .2s ease;
+      border:1px solid var(--border, var(--stroke,#dfe3e8));
+      border-radius:24px;
+      padding:8px 6px;
+      justify-content:space-around; align-items:center;
+      box-shadow:0 12px 30px rgba(0,0,0,.18);
+      z-index:850;
     }
-    .sb-mnav-overlay.is-open .sb-mnav-panel{ transform:translateX(0); }
-    .sb-mnav-brand{
-      display:flex; align-items:center; gap:10px;
-      padding:8px 10px 18px; margin-bottom:6px;
-      border-bottom:1px solid var(--border, var(--stroke,#dfe3e8));
-      font-family:'Geologica','Inter','Arial',sans-serif; font-weight:500; font-size:1rem;
-      color:var(--text,#191b1e); text-decoration:none;
+    .sb-bnav-item{
+      display:flex; align-items:center; justify-content:center;
+      width:40px; height:40px; border-radius:14px; flex-shrink:0;
+      color:var(--muted, var(--text-dim,#707a8a));
+      text-decoration:none;
     }
-    .sb-mnav-brand img{ width:26px; height:26px; border-radius:8px; }
-    @media (min-width:981px){ .sb-mnav-overlay{ display:none; } }
+    .sb-bnav-item svg{ width:19px; height:19px; }
+    .sb-bnav-item.is-active{
+      color:var(--green-text, var(--green,#1ede7b));
+      background:var(--green-dim, rgba(30,222,123,.14));
+    }
+    @media (max-width:980px){ .sb-bottom-nav{ display:flex; } }
   `;
 
   const NAV_ITEMS = [
@@ -351,29 +353,18 @@
 
     const navEl = document.getElementById('sbNav');
 
-    // --- Мобильное меню: отдельный оверлей, не завязан на .sb-shell,
-    //     открывается кнопкой #menuBtnMobile, если она есть на странице
-    //     (её рисует сама страница в topbar, sidebar.js её не создаёт).
-    const mnavOverlay = document.createElement('div');
-    mnavOverlay.className = 'sb-mnav-overlay';
-    mnavOverlay.id = 'sbMnavOverlay';
-    mnavOverlay.innerHTML = `<nav class="sb-mnav-panel">
-      <a class="sb-mnav-brand" href="${b || '/'}">
-        <img src="${b}img/favicon.png" alt=""/>
-        <span>Antviz</span>
-      </a>
-      ${buildNav()}
-    </nav>`;
-    document.body.appendChild(mnavOverlay);
-
-    const menuBtnMobile = document.getElementById('menuBtnMobile');
-    if (menuBtnMobile) {
-      const openMnav  = () => mnavOverlay.classList.add('is-open');
-      const closeMnav = () => mnavOverlay.classList.remove('is-open');
-      menuBtnMobile.addEventListener('click', openMnav);
-      mnavOverlay.addEventListener('click', e => { if (e.target === mnavOverlay) closeMnav(); });
-      mnavOverlay.querySelectorAll('.sb-link').forEach(link => link.addEventListener('click', closeMnav));
-    }
+    // --- Мобильное нижнее меню: плавающая капсула, отдельно от .sb-shell.
+    //     "Новый заказ" не дублируем (он уже на главной), "Выйти" сюда
+    //     не выносим (мобильный логаут — в настройках, отдельная задача).
+    const bottomItems = NAV_ITEMS.filter(i => !i.sep && i.key !== 'order' && !i.logout);
+    const bottomNav = document.createElement('nav');
+    bottomNav.className = 'sb-bottom-nav';
+    bottomNav.id = 'sbBottomNav';
+    bottomNav.innerHTML = bottomItems.map(item => {
+      const active = item.key === page ? ' is-active' : '';
+      return `<a href="${item.href}" class="sb-bnav-item${active}" aria-label="${item.label}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${item.icon}</svg></a>`;
+    }).join('');
+    document.body.appendChild(bottomNav);
 
     function toggleCollapse() {
       const nowCollapsed = navEl.classList.toggle('is-collapsed');

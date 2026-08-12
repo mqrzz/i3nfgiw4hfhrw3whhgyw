@@ -45,7 +45,7 @@
   .app{display:flex;justify-content:center;}
   .content{width:100%;max-width:640px;padding:4px 0 8px;display:flex;flex-direction:column;gap:20px;}
 
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 4px 8px;gap:10px;}
+  .topbar{display:flex;align-items:center;padding:4px 4px 4px 8px;gap:14px;}
   .page-title{font-size:19px;font-weight:600;}
   .topbar-right{display:flex;gap:10px;}
   .icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;}
@@ -115,7 +115,7 @@
   .empty-row svg{width:32px;height:32px;opacity:.5;}
 
   /* ── chat panel (mobile = fullscreen slide-in, desktop = static column) ── */
-  .chat-wrap{position:fixed;inset:0;background:var(--bg);z-index:400;transform:translateX(100%);transition:transform .25s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;}
+  .chat-wrap{position:fixed;inset:0;background:var(--bg);z-index:500;transform:translateX(100%);transition:transform .25s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;}
   .chat-wrap.open{transform:translateX(0);}
   .chat-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--stroke);flex-shrink:0;background:var(--card);}
   .chat-back{display:flex;}
@@ -136,7 +136,16 @@
   .msg-group.user .msg-bubble{background:var(--green);color:#0d1210;border-radius:18px 18px 4px 18px;}
   .msg-group.support .msg-bubble{background:var(--card-elevated);color:var(--text);border-radius:18px 18px 18px 4px;border:1px solid var(--stroke);}
   .msg-time{font-size:10px;opacity:.65;display:inline-block;margin-left:8px;float:right;margin-top:4px;}
-  .msg-img{max-width:200px;border-radius:12px;display:block;margin-bottom:4px;}
+  .msg-bubble.has-image{padding:0;overflow:hidden;position:relative;}
+  .msg-bubble.has-image .msg-img{display:block;width:100%;max-width:240px;max-height:300px;object-fit:cover;cursor:zoom-in;}
+  .msg-bubble.has-image .msg-caption{padding:9px 13px 8px;}
+  .msg-time-overlay{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px;}
+
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:800;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+  .lightbox.show{display:flex;}
+  .lightbox img{max-width:100%;max-height:100%;border-radius:8px;}
+  .lightbox-close{position:absolute;top:20px;right:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .lightbox-close svg{width:18px;height:18px;}
 
   .chat-input-row{display:flex;gap:8px;align-items:center;padding:12px 14px;padding-bottom:calc(12px + env(safe-area-inset-bottom));border-top:1px solid var(--stroke);flex-shrink:0;background:var(--card);}
   .chat-input-pill{flex:1;display:flex;align-items:center;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:22px;padding:0 6px 0 16px;min-height:44px;}
@@ -240,12 +249,6 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
       </button>
       <div class="page-title">Поддержка</div>
-      <div class="topbar-right">
-        <a class="icon-btn" href="notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          <span class="dot" id="notifDot"></span>
-        </a>
-      </div>
     </div>
 
     <div class="hero">
@@ -384,6 +387,13 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<div class="lightbox" id="lightbox" onclick="if(event.target===this) closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <img id="lightboxImg" src="" alt="Просмотр">
+</div>
 
 <script>
 // ── тема (общая для всех страниц кабинета через localStorage, переключатель на странице настроек) ──
@@ -575,17 +585,30 @@ function buildChat(msgs){
     if(dateStr !== lastDate){ html += `<div class="date-sep">${dateStr}</div>`; lastDate = dateStr; }
     const time = d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
     const cls = m.sender==='user' ? 'user' : 'support';
-    html += `<div class="msg-group ${cls}">
-      ${cls==='support' ? '<div class="msg-author">Поддержка Antviz</div>' : ''}
-      <div class="msg-bubble">
-        ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение">` : ''}
-        ${m.text && m.text!=='Вложение' ? esc(m.text).replace(/\n/g,'<br>') : ''}
-        <span class="msg-time">${time}</span>
-      </div>
-    </div>`;
+    const caption = (m.text && m.text!=='Вложение') ? esc(m.text).replace(/\n/g,'<br>') : '';
+    if(m.imageUrl){
+      html += `<div class="msg-group ${cls}">
+        ${cls==='support' ? '<div class="msg-author">Поддержка Antviz</div>' : ''}
+        <div class="msg-bubble has-image">
+          <img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение" onclick="openLightbox('${esc(m.imageUrl)}')">
+          ${caption ? `<div class="msg-caption">${caption}<span class="msg-time">${time}</span></div>` : `<span class="msg-time-overlay">${time}</span>`}
+        </div>
+      </div>`;
+    } else {
+      html += `<div class="msg-group ${cls}">
+        ${cls==='support' ? '<div class="msg-author">Поддержка Antviz</div>' : ''}
+        <div class="msg-bubble">${caption}<span class="msg-time">${time}</span></div>
+      </div>`;
+    }
   });
   return html;
 }
+window.openLightbox = function(url){
+  const lb = document.getElementById('lightbox');
+  document.getElementById('lightboxImg').src = url;
+  lb.classList.add('show');
+};
+window.closeLightbox = function(){ document.getElementById('lightbox').classList.remove('show'); };
 
 function openTicket(id){
   const ticket = allTickets.find(t=>t.id===id);
@@ -772,14 +795,6 @@ async function loadUserOrders(uid){
   }catch(e){ userOrders = []; }
 }
 
-function watchNotifDot(uid){
-  const q = query(collection(db,'notifications',uid,'items'), orderBy('createdAt','desc'));
-  onSnapshot(q, snap=>{
-    const hasUnread = snap.docs.some(d=>!d.data().read);
-    document.getElementById('notifDot').style.display = hasUnread ? 'block' : 'none';
-  }, ()=>{});
-}
-
 onAuthStateChanged(auth, async user=>{
   if(!user){ window.location.href = '../auth'; return; }
   currentUser = user;
@@ -787,7 +802,6 @@ onAuthStateChanged(auth, async user=>{
   document.getElementById('cabinet').style.display = 'block';
 
   await loadUserOrders(user.uid);
-  watchNotifDot(user.uid);
 
   const q = query(collection(db,'tickets'), where('uid','==',user.uid), orderBy('createdAt','desc'));
   unsubTickets = onSnapshot(q, async snap=>{

@@ -115,7 +115,7 @@
   .empty-row svg{width:32px;height:32px;opacity:.5;}
 
   /* ── chat panel (mobile = fullscreen slide-in, desktop = static column) ── */
-  .chat-wrap{position:fixed;inset:0;background:var(--bg);z-index:50000;transform:translateX(100%);transition:transform .25s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;}
+  .chat-wrap{position:fixed;inset:0;background:var(--bg);z-index:500;transform:translateX(100%);transition:transform .25s cubic-bezier(.22,1,.36,1);display:flex;flex-direction:column;}
   .chat-wrap.open{transform:translateX(0);}
   .chat-head{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--stroke);flex-shrink:0;background:var(--card);}
   .chat-back{display:flex;}
@@ -141,7 +141,7 @@
   .msg-bubble.has-image .msg-caption{padding:9px 13px 8px;}
   .msg-time-overlay{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;font-size:10px;padding:3px 8px;border-radius:20px;}
 
-  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:800;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
+  .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:50800;display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out;}
   .lightbox.show{display:flex;}
   .lightbox img{max-width:100%;max-height:100%;border-radius:8px;}
   .lightbox-close{position:absolute;top:20px;right:20px;width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
@@ -162,7 +162,7 @@
   .chat-empty-state span{font-size:13px;}
 
   /* ── new ticket modal ── */
-  .modal-overlay{position:fixed;inset:0;z-index:600;background:rgba(10,10,11,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .modal-overlay{position:fixed;inset:0;z-index:50600;background:rgba(10,10,11,.6);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s;}
   .modal-overlay.show{opacity:1;pointer-events:all;}
   .modal{background:var(--card);border-radius:var(--r24);border:1px solid var(--stroke);padding:26px;width:100%;max-width:420px;max-height:88vh;overflow-y:auto;transform:translateY(16px);transition:transform .22s cubic-bezier(.22,1,.36,1);}
   .modal-overlay.show .modal{transform:translateY(0);}
@@ -198,7 +198,7 @@
   .btn-outline{width:100%;background:transparent;color:var(--text-dim);font-weight:500;font-size:13.5px;padding:13px;border-radius:var(--r16);border:1px solid var(--stroke);cursor:pointer;}
   .modal-actions{display:flex;gap:10px;margin-top:6px;}
 
-  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);z-index:700;padding:12px 20px;border-radius:var(--r16);font-size:13px;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;}
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);z-index:50700;padding:12px 20px;border-radius:var(--r16);font-size:13px;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.success{background:var(--green);color:#0d1210;}
   .toast.error{background:var(--red);color:#fff;}
@@ -342,8 +342,11 @@
   </div>
 </div>
 </div><!-- /cabinet -->
+</div><!-- /sbContent -->
 
-<!-- NEW TICKET MODAL -->
+<!-- NEW TICKET MODAL — вынесено за пределы #sbContent намеренно: некоторые фреймворки страниц (например переходы в sidebar.js)
+     применяют transform к #sbContent для анимаций, а position:fixed внутри transform-контейнера ведёт себя некорректно
+     в Safari/WebView (обрезается/неверно стекуется). Модалка, тост и лайтбокс должны жить на уровне <body>. -->
 <div class="modal-overlay" id="ticketFormOverlay">
   <div class="modal">
     <div class="modal-head">
@@ -590,7 +593,7 @@ function buildChat(msgs){
       html += `<div class="msg-group ${cls}">
         ${cls==='support' ? '<div class="msg-author">Поддержка Antviz</div>' : ''}
         <div class="msg-bubble has-image">
-          <img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение" onclick="openLightbox('${esc(m.imageUrl)}')">
+          <img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение">
           ${caption ? `<div class="msg-caption">${caption}<span class="msg-time">${time}</span></div>` : `<span class="msg-time-overlay">${time}</span>`}
         </div>
       </div>`;
@@ -609,6 +612,12 @@ window.openLightbox = function(url){
   lb.classList.add('show');
 };
 window.closeLightbox = function(){ document.getElementById('lightbox').classList.remove('show'); };
+
+// делегирование клика по фото в чате — не inline onclick, чтобы не зависеть от длины/экранирования data:URL
+document.getElementById('chatMessages').addEventListener('click', e=>{
+  const img = e.target.closest('.msg-img');
+  if(img) openLightbox(img.getAttribute('src'));
+});
 
 function openTicket(id){
   const ticket = allTickets.find(t=>t.id===id);
@@ -831,5 +840,6 @@ onAuthStateChanged(auth, async user=>{
 
 <script src="../GEOBLOCK.js"></script>
 <script type="module" src="../maintenance.js"></script>
+<script src="../notify.js"></script>
 </body>
 </html>

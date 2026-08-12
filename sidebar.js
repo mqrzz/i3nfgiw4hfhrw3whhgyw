@@ -33,7 +33,7 @@
     /* Страница снова обычная — скроллится целиком, футер (подключается
        отдельным footer.js на каждой странице) остаётся в нормальном
        потоке документа под sb-shell. */
-    html, body{ margin:0; background:#eceef1; }
+    html, body{ margin:0; background:var(--bg, var(--card-elevated,#eceef1)); }
 
     /* App-frame: серая рамка на весь экран. Сайдбар — часть этой рамки
        (тот же фон, без своей карточки), рабочая область — единственный
@@ -51,7 +51,7 @@
     .sb-nav{
       position:sticky; top:0; flex-shrink:0;
       width:var(--sb-w); height:calc(100vh - var(--sb-gap) * 2);
-      background:var(--bg,#fff);
+      background:var(--card, var(--bg,#fff));
       border:1px solid var(--border, var(--stroke,#dfe3e8));
       border-radius:32px;
       display:flex; flex-direction:column;
@@ -179,7 +179,7 @@
     .sb-brand-row{ position:relative; }
     .sb-collapse-hint{
       position:absolute; top:100%; right:0; margin-top:10px; width:216px;
-      background:var(--bg,#fff); border:1px solid var(--border, var(--stroke,#dfe3e8));
+      background:var(--card, var(--bg,#fff)); border:1px solid var(--border, var(--stroke,#dfe3e8));
       border-radius:14px; padding:.75rem 1.6rem .75rem .9rem;
       box-shadow:0 10px 28px rgba(25,27,30,.12);
       font-family:'Geologica','Inter','Arial',sans-serif; font-size:.78rem; line-height:1.4;
@@ -190,7 +190,7 @@
     .sb-collapse-hint.is-visible{ opacity:1; transform:translateY(0); pointer-events:auto; }
     .sb-collapse-hint::before{
       content:''; position:absolute; top:-6px; right:15px; width:11px; height:11px;
-      background:var(--bg,#fff); border-left:1px solid var(--border, var(--stroke,#dfe3e8));
+      background:var(--card, var(--bg,#fff)); border-left:1px solid var(--border, var(--stroke,#dfe3e8));
       border-top:1px solid var(--border, var(--stroke,#dfe3e8)); transform:rotate(45deg);
     }
     .sb-collapse-hint-close{
@@ -199,7 +199,7 @@
       border:none; background:none; cursor:pointer; border-radius:50%;
       color:var(--muted, var(--text-dim,#707a8a)); font-size:1rem; line-height:1; padding:0;
     }
-    .sb-collapse-hint-close:hover{ background:#eceef1; color:var(--text,#191b1e); }
+    .sb-collapse-hint-close:hover{ background:var(--bg2, var(--card-elevated,#eceef1)); color:var(--text,#191b1e); }
 
     /* Рабочая область — плавающая панель приложения: отступы от рамки
        сверху/справа/снизу, вплотную к сайдбару слева, скругления по
@@ -211,7 +211,7 @@
       height:calc(100vh - var(--sb-gap) * 2);
       overflow-y:auto; -webkit-overflow-scrolling:touch;
       margin:var(--sb-gap) var(--sb-gap) var(--sb-gap) var(--sb-gap);
-      background:var(--bg,#fff);
+      background:var(--card, var(--bg,#fff));
       border:1px solid var(--border, var(--stroke,#dfe3e8));
       border-radius:32px;
       padding:20px 56px 60px;
@@ -259,11 +259,7 @@
     .sb-mnav-panel{
       position:absolute; top:0; left:0; bottom:0;
       width:280px; max-width:82%;
-      background:var(--bg,#fff);
-      border-right:1px solid var(--border, var(--stroke,#dfe3e8));
-      padding:20px 12px; overflow-y:auto;
-      display:flex; flex-direction:column; gap:3px;
-      transform:translateX(-100%);
+      background:var(--card, var(--bg,#fff));
       transition:transform .2s ease;
     }
     .sb-mnav-overlay.is-open .sb-mnav-panel{ transform:translateX(0); }

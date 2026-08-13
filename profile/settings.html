@@ -25,7 +25,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 :focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 
 .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
 .spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
@@ -33,36 +33,75 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 
 .shell{width:100%;animation:fadeUp .3s ease}
 
-/* HERO */
-.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:28px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
-.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
-.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+/* ===== HEAD ROW ===== */
+.settings-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:28px}
+.settings-title{font-size:clamp(1.7rem,3vw,2.1rem);font-weight:500;letter-spacing:-.035em;color:var(--ink)}
+.settings-sub{color:var(--ink-dim);font-size:.86rem;margin-top:6px}
 
-.set-identity{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:10px 20px 10px 10px}
-.set-avatar{width:42px;height:42px;border-radius:14px;background:var(--accent);color:var(--dark);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:.92rem;font-weight:500;flex-shrink:0}
-.set-identity-name{font-size:.86rem;font-weight:500;color:#fff}
-.set-identity-mail{font-size:.74rem;color:rgba(255,255,255,.35)}
+.settings-identity-wrap{position:relative}
+.settings-identity{display:flex;align-items:center;gap:12px;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:8px 14px 8px 8px;cursor:pointer;font-family:var(--font);transition:border-color .15s,box-shadow .15s}
+.settings-identity:hover{border-color:var(--line-strong)}
+.settings-identity.open{border-color:var(--accent-h);box-shadow:0 0 0 3px var(--accent-wash)}
+.set-avatar{width:38px;height:38px;border-radius:12px;background:var(--accent);color:var(--dark);display:flex;align-items:center;justify-content:center;font-family:var(--font);font-size:.86rem;font-weight:500;flex-shrink:0}
+.settings-identity-text{text-align:left}
+.set-identity-name{font-size:.84rem;font-weight:500;color:var(--ink)}
+.set-identity-mail{font-size:.72rem;color:var(--ink-faint);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.identity-chevron{width:15px;height:15px;stroke:var(--ink-faint);stroke-width:2;flex-shrink:0;transition:transform .18s}
+.settings-identity.open .identity-chevron{transform:rotate(180deg)}
 
-.set-main{display:flex;flex-direction:column;gap:16px;min-width:0}
+.identity-dropdown{position:absolute;top:calc(100% + 8px);right:0;min-width:190px;background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:6px;box-shadow:0 20px 48px -18px rgba(25,27,30,.28);opacity:0;pointer-events:none;transform:translateY(-6px) scale(.98);transform-origin:top right;transition:opacity .15s,transform .15s;z-index:70}
+.identity-dropdown.show{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
+.identity-dropdown button{width:100%;display:flex;align-items:center;gap:10px;padding:.65rem .75rem;border-radius:11px;background:none;border:none;font-family:var(--font);font-size:.83rem;font-weight:500;color:var(--ink);cursor:pointer;text-align:left}
+.identity-dropdown button:hover{background:var(--bg2)}
+.identity-dropdown button svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+.identity-dropdown button.danger{color:#c44432}
+.identity-dropdown button.danger:hover{background:var(--bad-wash)}
 
-/* SECTION CARD */
+/* ===== BODY: NAV + MAIN ===== */
+.settings-body{display:flex;align-items:flex-start;gap:24px}
+
+.settings-nav{flex-shrink:0;width:232px;display:flex;flex-direction:column;gap:2px;background:var(--bg3);border:1.5px solid var(--line);border-radius:24px;padding:14px;position:sticky;top:24px}
+.settings-nav-label{font-size:.64rem;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-faint);font-weight:500;padding:10px 10px 8px}
+.settings-nav-label.danger-label{margin-top:8px;padding-top:16px;border-top:1px solid var(--line)}
+.settings-nav-item{display:flex;align-items:center;gap:10px;padding:.7rem .8rem;border-radius:14px;background:none;border:none;font-family:var(--font);font-size:.85rem;font-weight:500;color:var(--ink-dim);cursor:pointer;text-align:left;transition:background .15s,color .15s,box-shadow .15s;white-space:nowrap}
+.settings-nav-item svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+.settings-nav-item:hover{background:var(--bg2);color:var(--ink)}
+.settings-nav-item.active{background:var(--accent);color:var(--dark);box-shadow:0 10px 20px -12px rgba(30,222,123,.6)}
+.settings-nav-item.danger{color:#c44432}
+.settings-nav-item.danger:hover{background:var(--bad-wash);color:#c44432}
+.settings-nav-item.danger.active{background:var(--bad);color:#fff;box-shadow:0 10px 20px -12px rgba(232,99,79,.55)}
+
+.settings-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:36px}
+.settings-main>section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:28px}
+
+/* ===== SECTION CARD (reused across all panels) ===== */
 .set-card{background:var(--bg3);border:1.5px solid var(--line);border-radius:32px;padding:28px 32px;box-shadow:0 1px 2px rgba(25,27,30,.03),0 20px 44px -30px rgba(25,27,30,.18)}
 .set-card-head{margin-bottom:20px}
-.set-card-head-row{display:flex;align-items:center;gap:14px}
+.set-card-head-row{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.set-card-head-left{display:flex;align-items:center;gap:14px;min-width:0}
 .set-card-icon{width:44px;height:44px;border-radius:14px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 10px 22px -10px rgba(25,27,30,.4)}
 .set-card-icon svg{width:20px;height:20px;stroke:var(--accent);stroke-width:1.8;fill:none}
-.set-card-title{font-size:1.05rem;font-weight:500;letter-spacing:-.02em}
+.set-card-title{font-size:1.02rem;font-weight:500;letter-spacing:-.02em}
 .set-card-sub{color:var(--ink-dim);font-size:.82rem;margin-top:3px;line-height:1.5}
 
-.set-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media(max-width:640px){.set-row{grid-template-columns:1fr}}
+.status-badge{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:500;padding:.32rem .7rem;border-radius:9px;background:var(--accent-wash);color:var(--accent-d);border:1px solid rgba(30,222,123,.25);white-space:nowrap;flex-shrink:0}
+.status-badge svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.4;fill:none}
+.status-badge.unsaved{background:var(--warn-wash);color:#b97a0a;border-color:rgba(245,158,11,.25)}
+.status-badge.unverified{background:var(--bad-wash);color:#c44432;border-color:rgba(232,99,79,.25)}
+
 .set-label{display:block;font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;font-weight:500}
 .set-input{width:100%;background:#fff;border:1.5px solid var(--line-strong);border-radius:14px;padding:.85rem 1.05rem;color:var(--ink);font-family:var(--font);font-size:.92rem;font-weight:300;outline:none;transition:border-color .18s,box-shadow .18s}
 .set-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-wash)}
 .set-input:disabled{opacity:.5;cursor:default;background:var(--bg2)}
 .set-input::placeholder{color:var(--ink-faint)}
 .set-field-foot{display:flex;justify-content:flex-end;margin-top:16px}
+
+/* EMAIL ROW */
+.email-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.email-row-info{display:flex;align-items:center;gap:12px;flex:1;min-width:220px}
+.email-icon{width:40px;height:40px;border-radius:12px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.email-icon svg{width:18px;height:18px;stroke:var(--accent);stroke-width:1.8;fill:none}
+.email-value{font-size:.92rem;font-weight:500;color:var(--ink)}
 
 /* AUTH METHOD */
 .auth-method-icon{width:46px;height:46px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 18px -10px rgba(25,27,30,.3)}
@@ -74,7 +113,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .auth-method-label{font-size:.72rem;color:var(--ink-faint);margin-bottom:3px}
 .auth-method-value{font-size:.92rem;font-weight:500;color:var(--ink)}
 .auth-method-badge{font-size:.72rem;font-weight:500;padding:.28rem .7rem;border-radius:8px;background:var(--accent-wash);color:var(--accent-d);border:1px solid rgba(30,222,123,.25)}
-#authMethodRow{display:flex;align-items:center;gap:16px}
+#authMethodRow{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 
 .set-divider-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-faint);margin:22px 0 14px;padding-top:22px;border-top:1px solid var(--line);font-weight:500}
 
@@ -102,6 +141,12 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .sessions-empty,.sessions-loading{color:var(--ink-faint);font-size:.86rem;padding:8px 4px}
 @media(max-width:560px){.session-row{padding:16px}.session-end-btn{width:100%;justify-content:center}}
 
+/* COMING SOON */
+.soon-box{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px;padding:36px 20px;background:#fff;border:1.5px dashed var(--line-strong);border-radius:18px}
+.soon-box svg{width:26px;height:26px;stroke:var(--ink-faint);stroke-width:1.6;fill:none;margin-bottom:2px}
+.soon-box strong{font-size:.9rem;font-weight:500;color:var(--ink)}
+.soon-box span{font-size:.8rem;color:var(--ink-faint);max-width:320px}
+
 /* DANGER */
 .danger-card{background:var(--dark);border-radius:32px;padding:6px 32px;box-shadow:0 24px 50px -28px rgba(25,27,30,.5)}
 .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:22px 0;border-bottom:1px solid rgba(255,255,255,.08)}
@@ -125,7 +170,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .btn-danger-solid:hover{background:#d4543f}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
 
-/* DELETE POPOVER — привязан к кнопке, не центральная модалка */
+/* DELETE POPOVER */
 .delete-pop-wrap{position:relative}
 .delete-pop{position:absolute;top:calc(100% + 10px);right:0;width:310px;background:var(--bg);border:1.5px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 24px 60px -14px rgba(0,0,0,.4);z-index:80;opacity:0;pointer-events:none;transform:translateY(-6px) scale(.97);transform-origin:top right;transition:opacity .15s,transform .15s}
 .delete-pop.show{opacity:1;pointer-events:all;transform:translateY(0) scale(1)}
@@ -148,17 +193,23 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 .toast.error{background:var(--dark);color:#fff}
 .toast.info{background:var(--dark);color:#fff}
 
-@media(max-width:880px){
-  .page-hero{border-radius:32px;padding:40px 36px}
-  .page-hero-title{font-size:2.4rem}
-  .set-card{padding:22px 20px}
-  .danger-card{padding:4px 20px}
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  .settings-body{flex-direction:column}
+  .settings-nav{position:static;width:100%;flex-direction:row;align-items:center;overflow-x:auto;gap:6px;padding:8px;border-radius:18px;-ms-overflow-style:none;scrollbar-width:none}
+  .settings-nav::-webkit-scrollbar{display:none}
+  .settings-nav-label{display:none}
+  .settings-nav-item{flex-shrink:0;padding:.62rem .95rem;border-radius:12px}
+  .settings-main{gap:28px}
 }
 @media(max-width:600px){
-  .page-hero{border-radius:24px;padding:28px 24px;flex-direction:column;align-items:flex-start}
-  .page-hero-title{font-size:1.9rem}
+  .set-card{padding:22px 20px}
+  .danger-card{padding:4px 20px}
   .danger-row{flex-direction:column;align-items:flex-start}
   .danger-row .btn{align-self:flex-start}
+  .settings-identity-text{display:none}
+  .identity-chevron{display:none}
+  .settings-identity{padding:6px;border-radius:14px}
 }
 #sbContent{padding-bottom:80px}
   </style>
@@ -175,107 +226,228 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <div id="sbContent" style="display:none">
 <div class="shell" id="appWrap">
 
-  <div class="page-hero">
+  <div class="settings-head">
     <div>
-      <div class="page-hero-eyebrow">Личный кабинет</div>
-      <div class="page-hero-title">Настройки</div>
-      <div class="page-hero-sub">Профиль и доступ к аккаунту</div>
+      <div class="settings-title">Настройки</div>
+      <div class="settings-sub">Управляйте своим аккаунтом и безопасностью</div>
     </div>
-    <div class="set-identity">
-      <div class="set-avatar" id="identityAvatar">A</div>
-      <div>
-        <div class="set-identity-name" id="identityName">—</div>
-        <div class="set-identity-mail" id="identityMail">—</div>
+    <div class="settings-identity-wrap">
+      <button class="settings-identity" id="identityToggle">
+        <div class="set-avatar" id="identityAvatar">A</div>
+        <div class="settings-identity-text">
+          <div class="set-identity-name" id="identityName">—</div>
+          <div class="set-identity-mail" id="identityMail">—</div>
+        </div>
+        <svg class="identity-chevron" viewBox="0 0 24 24" fill="none"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="identity-dropdown" id="identityDropdown">
+        <button onclick="scrollToPanel('profile')">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+          Профиль
+        </button>
+        <button class="danger" onclick="doLogout()">
+          <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Выйти
+        </button>
       </div>
     </div>
   </div>
 
-    <div class="set-main">
+  <div class="settings-body">
+
+    <nav class="settings-nav" id="settingsNav">
+      <div class="settings-nav-label">Настройки</div>
+      <button class="settings-nav-item active" data-panel="profile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+        Профиль
+      </button>
+      <button class="settings-nav-item" data-panel="security">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Безопасность
+      </button>
+      <button class="settings-nav-item" data-panel="devices">
+        <svg viewBox="0 0 24 24"><rect x="2.5" y="3.5" width="19" height="13" rx="1.8"/><path d="M8 20.5h8M12 16.5v4" stroke-linecap="round"/></svg>
+        Устройства
+      </button>
+      <button class="settings-nav-item" data-panel="notifications">
+        <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        Уведомления
+      </button>
+      <button class="settings-nav-item" data-panel="integrations">
+        <svg viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v3a6 6 0 0 1-12 0V8Z"/></svg>
+        Интеграции
+      </button>
+      <div class="settings-nav-label danger-label">Опасная зона</div>
+      <button class="settings-nav-item danger" data-panel="danger">
+        <svg viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        Удаление аккаунта
+      </button>
+    </nav>
+
+    <div class="settings-main">
 
       <!-- ПРОФИЛЬ -->
-      <section class="set-card" id="sec-profile">
-        <div class="set-card-head">
-          <div class="set-card-head-row">
-            <div class="set-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
-            <div>
-              <div class="set-card-title">Профиль</div>
-              <div class="set-card-sub">Видно в кабинете, приходит вместе с заявками</div>
+      <section id="sec-profile" data-panel="profile">
+        <div class="set-card">
+          <div class="set-card-head">
+            <div class="set-card-head-row">
+              <div class="set-card-head-left">
+                <div class="set-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+                <div>
+                  <div class="set-card-title">Профиль</div>
+                  <div class="set-card-sub">Эти данные видны в вашем кабинете и используются в заявках</div>
+                </div>
+              </div>
+              <span class="status-badge" id="nameSavedBadge"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Сохранено</span>
             </div>
           </div>
-        </div>
-        <div class="set-row">
           <div>
             <label class="set-label">Имя</label>
             <input class="set-input" type="text" id="settingName"/>
           </div>
-          <div>
-            <label class="set-label">Email</label>
-            <input class="set-input" id="settingEmail" disabled/>
+          <div class="set-field-foot">
+            <button class="btn btn-green" onclick="saveSettings()">Сохранить изменения</button>
           </div>
         </div>
-        <div class="set-field-foot">
-          <button class="btn btn-green" onclick="saveSettings()">Сохранить изменения</button>
-        </div>
-      </section>
 
-      <!-- ВХОД И БЕЗОПАСНОСТЬ -->
-      <section class="set-card" id="sec-access">
-        <div class="set-card-head">
-          <div class="set-card-head-row">
-            <div class="set-card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
-            <div>
-              <div class="set-card-title">Вход и безопасность</div>
-              <div class="set-card-sub">Способ входа и восстановление пароля</div>
-            </div>
-          </div>
-        </div>
-        <div id="authMethodRow"><!-- filled by JS --></div>
-        <div class="set-divider-label">Сброс пароля</div>
-        <div class="google-alert" id="googleResetAlert" style="display:none">
-          <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          <span>Вы вошли через Google — управляйте паролем в настройках Google-аккаунта.</span>
-        </div>
-        <div class="reset-form" id="resetForm">
-          <p class="reset-hint">Введите email — пришлём ссылку для сброса пароля.</p>
-          <div style="margin-bottom:18px">
-            <label class="set-label">Email для подтверждения</label>
-            <input class="set-input" type="email" id="resetEmailInput" placeholder="your@email.com"/>
-          </div>
-          <button class="btn btn-ghost" onclick="sendPasswordReset()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-            Отправить ссылку
-          </button>
-        </div>
-      </section>
-
-      <!-- УСТРОЙСТВА И СЕАНСЫ -->
-      <section class="set-card" id="sec-sessions">
-        <div class="sessions-head-row">
-          <div class="set-card-head" style="margin-bottom:0">
+        <div class="set-card">
+          <div class="set-card-head">
             <div class="set-card-head-row">
-              <div class="set-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="19" height="13" rx="1.8"/><path d="M8 20.5h8M12 16.5v4" stroke-linecap="round"/></svg></div>
-              <div>
-                <div class="set-card-title">Устройства и сеансы</div>
-                <div class="set-card-sub">Где выполнен вход в аккаунт</div>
+              <div class="set-card-head-left">
+                <div>
+                  <div class="set-card-title">Email</div>
+                  <div class="set-card-sub">Используется для входа и получения уведомлений</div>
+                </div>
               </div>
             </div>
           </div>
-          <button class="btn btn-ghost" id="endAllBtn" onclick="endAllOther()" style="display:none">
-            Завершить все другие сеансы
-          </button>
+          <label class="set-label">Ваш email</label>
+          <div class="email-row">
+            <div class="email-row-info">
+              <div class="email-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+              <span class="email-value" id="emailValue">—</span>
+              <span class="status-badge" id="emailVerifyBadge"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Подтверждён</span>
+            </div>
+            <button class="btn btn-ghost" onclick="requestEmailChange()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Изменить email
+            </button>
+          </div>
         </div>
-        <div class="sessions-list" id="sessionsList">
-          <div class="sessions-loading">Загрузка сеансов…</div>
+      </section>
+
+      <!-- БЕЗОПАСНОСТЬ -->
+      <section id="sec-security" data-panel="security">
+        <div class="set-card">
+          <div class="set-card-head">
+            <div class="set-card-head-row">
+              <div class="set-card-head-left">
+                <div class="set-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div>
+                  <div class="set-card-title">Способ входа</div>
+                  <div class="set-card-sub">Ваш текущий способ входа в аккаунт</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div id="authMethodRow"><!-- filled by JS --></div>
+          <div class="set-divider-label">Сброс пароля</div>
+          <div class="google-alert" id="googleResetAlert" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span>Вы вошли через Google — управляйте паролем в настройках Google-аккаунта.</span>
+          </div>
+          <div class="reset-form" id="resetForm">
+            <p class="reset-hint">Введите email — пришлём ссылку для сброса пароля.</p>
+            <div style="margin-bottom:18px">
+              <label class="set-label">Email для подтверждения</label>
+              <input class="set-input" type="email" id="resetEmailInput" placeholder="your@email.com"/>
+            </div>
+            <button class="btn btn-ghost" onclick="sendPasswordReset()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              Отправить ссылку
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- УСТРОЙСТВА -->
+      <section id="sec-devices" data-panel="devices">
+        <div class="set-card">
+          <div class="sessions-head-row">
+            <div class="set-card-head" style="margin-bottom:0">
+              <div class="set-card-head-row">
+                <div class="set-card-head-left">
+                  <div class="set-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="19" height="13" rx="1.8"/><path d="M8 20.5h8M12 16.5v4" stroke-linecap="round"/></svg></div>
+                  <div>
+                    <div class="set-card-title">Устройства</div>
+                    <div class="set-card-sub">Управляйте устройствами, на которых выполнен вход в аккаунт</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-ghost" id="endAllBtn" onclick="endAllOther()" style="display:none">
+              Выйти со всех устройств
+            </button>
+          </div>
+          <div class="sessions-list" id="sessionsList">
+            <div class="sessions-loading">Загрузка сеансов…</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- УВЕДОМЛЕНИЯ -->
+      <section id="sec-notifications" data-panel="notifications">
+        <div class="set-card">
+          <div class="set-card-head">
+            <div class="set-card-head-row">
+              <div class="set-card-head-left">
+                <div class="set-card-icon"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
+                <div>
+                  <div class="set-card-title">Уведомления</div>
+                  <div class="set-card-sub">Настройка оповещений по заявкам и переписке</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="soon-box">
+            <svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+            <strong>Скоро здесь появятся настройки</strong>
+            <span>Пока уведомления приходят на email и в кабинет автоматически.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ИНТЕГРАЦИИ -->
+      <section id="sec-integrations" data-panel="integrations">
+        <div class="set-card">
+          <div class="set-card-head">
+            <div class="set-card-head-row">
+              <div class="set-card-head-left">
+                <div class="set-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v3a6 6 0 0 1-12 0V8Z"/></svg></div>
+                <div>
+                  <div class="set-card-title">Интеграции</div>
+                  <div class="set-card-sub">Подключение сторонних сервисов к аккаунту</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="soon-box">
+            <svg viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v3a6 6 0 0 1-12 0V8Z"/></svg>
+            <strong>Интеграций пока нет</strong>
+            <span>Раздел появится, когда будут готовы первые подключения.</span>
+          </div>
         </div>
       </section>
 
       <!-- ОПАСНАЯ ЗОНА -->
-      <section id="sec-danger">
-        <div class="set-card-head-row" style="margin-bottom:16px;padding:0 4px">
-          <div class="set-card-icon" style="background:var(--bad-wash)"><svg viewBox="0 0 24 24" stroke="#c44432" stroke-width="1.8" fill="none"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-          <div>
-            <div class="set-card-title">Осторожная зона</div>
-            <div class="set-card-sub">Действия с аккаунтом, которые нельзя отменить</div>
+      <section id="sec-danger" data-panel="danger">
+        <div class="set-card-head-row" style="padding:0 4px">
+          <div class="set-card-head-left">
+            <div class="set-card-icon" style="background:var(--bad-wash)"><svg viewBox="0 0 24 24" stroke="#c44432" stroke-width="1.8" fill="none"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div>
+              <div class="set-card-title">Опасная зона</div>
+              <div class="set-card-sub">Действия с аккаунтом, которые нельзя отменить</div>
+            </div>
           </div>
         </div>
         <div class="danger-card">
@@ -307,6 +479,8 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
       </section>
 
     </div>
+  </div>
+
 </div><!-- /shell -->
 </div><!-- /sbContent -->
 
@@ -324,6 +498,7 @@ import {
 let currentUser = null;
 let isGoogleUser = false;
 let sessionsUnsub = null;
+let initialName = '';
 
 function toast(msg, type='info'){
   const t=document.getElementById('toast');
@@ -369,6 +544,18 @@ function renderAuthMethod(user){
     document.getElementById('googleResetAlert').style.display='none';
     document.getElementById('resetForm').classList.add('visible');
     document.getElementById('resetEmailInput').value = user.email || '';
+  }
+}
+
+function renderEmailCard(user){
+  document.getElementById('emailValue').textContent = user.email || '—';
+  const badge = document.getElementById('emailVerifyBadge');
+  if(user.emailVerified){
+    badge.className = 'status-badge';
+    badge.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Подтверждён';
+  } else {
+    badge.className = 'status-badge unverified';
+    badge.innerHTML = '<svg viewBox="0 0 24 24"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>Не подтверждён';
   }
 }
 
@@ -450,8 +637,25 @@ window.saveSettings=async function(){
   try{
     await updateProfile(currentUser,{displayName:name});
     await updateDoc(doc(db,'users',currentUser.uid),{name}).catch(()=>{});
+    initialName = name;
+    setSavedBadge(true);
     toast('Сохранено ✓','success');
   }catch(e){toast('Ошибка сохранения','error');}
+};
+
+function setSavedBadge(saved){
+  const badge = document.getElementById('nameSavedBadge');
+  if(saved){
+    badge.className = 'status-badge';
+    badge.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>Сохранено';
+  } else {
+    badge.className = 'status-badge unsaved';
+    badge.innerHTML = '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3" stroke-linecap="round"/></svg>Не сохранено';
+  }
+}
+
+window.requestEmailChange=function(){
+  toast('Смена email пока недоступна — напишите в поддержку','info');
 };
 
 window.sendPasswordReset=async function(){
@@ -520,9 +724,13 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape') closeDeleteModal();
 onAuthStateChanged(auth,async user=>{
   if(!user){window.location.href='../auth';return;}
   currentUser=user;
-  document.getElementById('settingName').value=user.displayName||'';
-  document.getElementById('settingEmail').value=user.email||'';
+  initialName = user.displayName||'';
+  document.getElementById('settingName').value=initialName;
+  document.getElementById('settingName').addEventListener('input',()=>{
+    setSavedBadge(document.getElementById('settingName').value.trim()===initialName);
+  });
   renderAuthMethod(user);
+  renderEmailCard(user);
   startSessionsWatch(user);
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
@@ -533,22 +741,67 @@ onAuthStateChanged(auth,async user=>{
 (function(){
   function fillIdentity(){
     const nameEl = document.getElementById('settingName');
-    const mailEl = document.getElementById('settingEmail');
+    const mailEl = document.getElementById('emailValue');
     if(!nameEl || !mailEl) return;
     const sync = () => {
       const name = nameEl.value.trim();
-      const mail = mailEl.value.trim();
+      const mail = mailEl.textContent.trim();
       document.getElementById('identityName').textContent = name || 'Без имени';
-      document.getElementById('identityMail').textContent = mail || '—';
+      document.getElementById('identityMail').textContent = (mail && mail !== '—') ? mail : '—';
       document.getElementById('identityAvatar').textContent = (name || mail || 'A').trim().charAt(0).toUpperCase();
     };
     nameEl.addEventListener('input', sync);
     const obs = new MutationObserver(()=>{ sync(); });
-    obs.observe(document.getElementById('sbContent'), { attributes:true, attributeFilter:['style'] });
+    obs.observe(document.getElementById('sbContent'), { attributes:true, attributeFilter:['style'], childList:true, subtree:true });
     sync();
     setTimeout(sync, 400);
   }
   fillIdentity();
+
+  // identity dropdown
+  const idBtn = document.getElementById('identityToggle');
+  const idDrop = document.getElementById('identityDropdown');
+  idBtn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const willShow = !idDrop.classList.contains('show');
+    idDrop.classList.toggle('show', willShow);
+    idBtn.classList.toggle('open', willShow);
+  });
+  document.addEventListener('click', e=>{
+    if(!idBtn.contains(e.target) && !idDrop.contains(e.target)){
+      idDrop.classList.remove('show');
+      idBtn.classList.remove('open');
+    }
+  });
+
+  // settings sub-nav: click to scroll + scrollspy
+  const navItems = Array.from(document.querySelectorAll('.settings-nav-item'));
+  const sections = navItems.map(btn => document.getElementById('sec-' + btn.dataset.panel)).filter(Boolean);
+
+  window.scrollToPanel = function(panel){
+    const target = document.getElementById('sec-' + panel);
+    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+  };
+
+  navItems.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      navItems.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      scrollToPanel(btn.dataset.panel);
+    });
+  });
+
+  if('IntersectionObserver' in window){
+    const observer = new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          const panel = entry.target.dataset.panel;
+          navItems.forEach(b=>b.classList.toggle('active', b.dataset.panel === panel));
+        }
+      });
+    }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+    sections.forEach(sec=>observer.observe(sec));
+  }
 })();
 </script>
 

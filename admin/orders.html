@@ -513,6 +513,20 @@ const GOALS={leads:'Заявки и звонки',sales:'Продажи онла
 const READINESS={ready:'Всё готово',partial:'Частично готово',none:'Ничего нет — с нуля'};
 const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Наличными при получении'};
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
+
+// Домен бэкенда бота — вписать после деплоя на Vercel (см. README у antviz-tgbot)
+const TG_NOTIFY_URL='https://antviz-tgbot.vercel.app/api/notify';
+
+// Пишет уведомление в кабинет клиента И дублирует его в Telegram, если он привязан.
+// Используется везде вместо прямого addDoc(collection(db,'notifications',...)).
+async function notifyClient(uid,title,text){
+  if(!uid)return;
+  await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+  try{
+    const idToken=await auth.currentUser.getIdToken();
+    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({uid,text:`${title}\n${text}`})}).catch(()=>{});
+  }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}
+}
 let allOrders=[],allReviews=[],_cache=[];
 let selOrderId=null,selUid=null;
 let currentTab='active',currentPaid=false;
@@ -886,7 +900,7 @@ window.approveRefund=async()=>{
     confirmLabel:'Одобрить',confirmClass:'btn-green',
     onConfirm:async(val)=>{
       const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:serverTimestamp()},'Возврат одобрен ✓');
-      if(ok&&o.uid)await addDoc(collection(db,'notifications',o.uid,'items'),{title:'✅ Возврат одобрен',text:'Средства поступят на счёт в ближайшее время.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+      if(ok&&o.uid)await notifyClient(o.uid,'✅ Возврат одобрен','Средства поступят на счёт в ближайшее время.');
     }
   });
 };
@@ -900,7 +914,7 @@ window.rejectRefund=async()=>{
     confirmLabel:'Отклонить',confirmClass:'btn-danger',
     onConfirm:async(val)=>{
       const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:serverTimestamp()},'Возврат отклонён');
-      if(ok&&o?.uid)await addDoc(collection(db,'notifications',o.uid,'items'),{title:'❌ Возврат отклонён',text:val||'Свяжитесь с поддержкой для уточнения.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+      if(ok&&o?.uid)await notifyClient(o.uid,'❌ Возврат отклонён',val||'Свяжитесь с поддержкой для уточнения.');
     }
   });
 };
@@ -913,7 +927,7 @@ window.markRefunded=async()=>{
     confirmLabel:'Подтвердить',confirmClass:'btn-dark',
     onConfirm:async()=>{
       const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:serverTimestamp()},'Возврат завершён ✓');
-      if(ok&&o?.uid)await addDoc(collection(db,'notifications',o.uid,'items'),{title:'💸 Средства возвращены',text:'Возврат по заказу завершён.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+      if(ok&&o?.uid)await notifyClient(o.uid,'💸 Средства возвращены','Возврат по заказу завершён.');
     }
   });
 };
@@ -966,7 +980,8 @@ window.setStatus=async s=>{
     else { upd.doneAt=now; msg='Статус → '+S[s]+' ✓'; }
   } else { msg='Статус → '+S[s]+' ✓'; }
   upd.statusHistory=arrayUnion({status:histStatus,at:now});
-  await safeUpdate(selOrderId,upd,msg);
+  const ok=await safeUpdate(selOrderId,upd,msg);
+  if(ok&&o?.uid)await notifyClient(o.uid,'Статус заказа изменён',`№${selOrderId.slice(0,7).toUpperCase()} — ${statusLabel(upd.status)}`);
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
 window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))},'Дата сохранена ✓');};
@@ -979,14 +994,14 @@ window.saveSite=async()=>{
   const repo=document.getElementById('siteRepo').value.trim();
   const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,siteRepo:repo,status:5,doneAt:serverTimestamp()});
   if(!ok)return;
-  if(selUid&&domain)await addDoc(collection(db,'notifications',selUid,'items'),{title:'🎉 Ваш сайт готов!',text:`Сайт готов: ${domain}${url?' — '+url:''}`,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось отправить уведомление клиенту:',err));
+  if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`);
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{
   const exp=new Date(Date.now()+30*864e5);
   const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:serverTimestamp(),supportExpiresAt:Timestamp.fromDate(exp),supportRequested:false});
   if(!ok)return;
-  if(uid)await addDoc(collection(db,'notifications',uid,'items'),{title:'✅ Обслуживание активировано',text:'Обслуживание подключено на 30 дней.',read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+  if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.');
   toast('Активировано ✓','success');
 };
 window.renewSupport=async orderId=>{
@@ -998,14 +1013,14 @@ window.sendPayLink=async(orderId,uid)=>{
   const link=inp?.value.trim();if(!link){toast('Введите ссылку','error');return;}
   if(!uid){toast('UID не найден','error');return;}
   try{
-    await addDoc(collection(db,'notifications',uid,'items'),{title:'💳 Ссылка на оплату',text:`Ссылка: ${link}`,read:false,createdAt:serverTimestamp()});
+    await notifyClient(uid,'💳 Ссылка на оплату',`Ссылка: ${link}`);
     toast('Ссылка отправлена ✓','success');if(inp)inp.value='';
   }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
   try{
-    await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Истекает обслуживание',text:'Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
+    await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.');
     toast('Уведомление отправлено ✓','success');
   }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };

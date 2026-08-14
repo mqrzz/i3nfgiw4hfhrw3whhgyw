@@ -1,5 +1,5 @@
 /**
- * nav.js — Antviz
+ * nav.js — Antviz..
  * <script src="nav.js" data-page="home"></script>
  *
  * ПОЛНАЯ ПЕРЕСБОРКА (v2):

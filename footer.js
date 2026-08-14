@@ -1,4 +1,4 @@
-// footer.js - универсальный подвал для всех страниц.
+// footer.js - универсальный подвал для всех страниц
 
 (function() {
     // Логотип-вордмарк antviz инлайн-SVG — подвал всегда чёрный (#000000),
@@ -41,7 +41,7 @@
             margin-bottom: 36px;
         }
         .antviz-footer .logo svg {
-            height: 26px; width: auto;
+            height: 39px; width: auto;
             display: block;
         }
         .antviz-footer .contacts {
@@ -176,7 +176,7 @@
         
         @media (min-width: 1440px) {
             .antviz-footer .inner { max-width: 1480px; }
-            .antviz-footer .logo svg { height: 30px; }
+            .antviz-footer .logo svg { height: 45px; }
             .antviz-footer .contact-link { font-size: 25px; }
             .antviz-footer .group-title { font-size: 18px; }
             .antviz-footer .group-items { font-size: 18px; }

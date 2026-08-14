@@ -63,7 +63,7 @@ svg{display:block}
 .tab:hover{border-color:var(--border2);color:var(--text)}
 .tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
 
-/* WORKSPACE */
+/* WORKSPACE: list + detail */
 .ws{display:flex;position:fixed;top:var(--th);left:var(--sw);right:0;bottom:0}
 
 /* COL LIST */
@@ -514,17 +514,19 @@ const READINESS={ready:'Всё готово',partial:'Частично гото�
 const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Наличными при получении'};
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 
-// Домен бэкенда бота
-const TG_NOTIFY_URL='https://3ssqztgbot22wsq.vercel.app/';
+// Домен бэкенда бота — вписать после деплоя на Vercel (см. README у antviz-tgbot)
+const TG_NOTIFY_URL='https://3ssqztgbot22wsq.vercel.app/api/notify';
 
 // Пишет уведомление в кабинет клиента И дублирует его в Telegram, если он привязан.
 // Используется везде вместо прямого addDoc(collection(db,'notifications',...)).
-async function notifyClient(uid,title,text){
+async function notifyClient(uid,title,text,button){
   if(!uid)return;
   await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
   try{
     const idToken=await auth.currentUser.getIdToken();
-    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({uid,text:`${title}\n${text}`})}).catch(()=>{});
+    const body={uid,text:`${title}\n${text}`};
+    if(button){body.buttonText=button.text;body.buttonUrl=button.url;}
+    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(()=>{});
   }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}
 }
 let allOrders=[],allReviews=[],_cache=[];
@@ -994,7 +996,7 @@ window.saveSite=async()=>{
   const repo=document.getElementById('siteRepo').value.trim();
   const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,siteRepo:repo,status:5,doneAt:serverTimestamp()});
   if(!ok)return;
-  if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`);
+  if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`,url?{text:'🌐 Открыть сайт',url}:null);
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{
@@ -1013,14 +1015,14 @@ window.sendPayLink=async(orderId,uid)=>{
   const link=inp?.value.trim();if(!link){toast('Введите ссылку','error');return;}
   if(!uid){toast('UID не найден','error');return;}
   try{
-    await notifyClient(uid,'💳 Ссылка на оплату',`Ссылка: ${link}`);
+    await notifyClient(uid,'💳 Ссылка на оплату',`Ссылка: ${link}`,{text:'💳 Оплатить',url:link});
     toast('Ссылка отправлена ✓','success');if(inp)inp.value='';
   }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
   try{
-    await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.');
+    await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',{text:'⚙️ Продлить',url:'https://antviz.ru/profile/tickets.html'});
     toast('Уведомление отправлено ✓','success');
   }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };

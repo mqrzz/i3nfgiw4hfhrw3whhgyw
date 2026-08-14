@@ -248,6 +248,35 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
         </div>
       </section>
 
+      <!-- TELEGRAM -->
+      <section class="set-card" id="sec-telegram">
+        <div class="set-card-head">
+          <div class="set-card-head-row">
+            <div class="set-card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 3 2 10.5l6.5 2.5M22 3l-3.2 17-8.3-6.5M22 3 10.2 13.5"/></svg></div>
+            <div>
+              <div class="set-card-title">Telegram</div>
+              <div class="set-card-sub">Уведомления о заказе и статус — прямо в боте</div>
+            </div>
+          </div>
+        </div>
+        <div id="tgNotLinked">
+          <p class="reset-hint">Аккаунт не привязан. Нажмите кнопку — откроется бот, привязка произойдёт автоматически.</p>
+          <button class="btn btn-green" id="tgLinkBtn" onclick="linkTelegram()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:16px;height:16px"><path d="M22 3 2 10.5l6.5 2.5M22 3l-3.2 17-8.3-6.5M22 3 10.2 13.5"/></svg>
+            Привязать Telegram
+          </button>
+        </div>
+        <div id="tgLinked" style="display:none">
+          <div class="google-alert" style="background:rgba(30,222,123,.08);border-color:rgba(30,222,123,.25);color:var(--text)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>Telegram привязан<span id="tgUsernameLabel"></span> — уведомления и статус заказа приходят в бота.</span>
+          </div>
+          <div class="set-field-foot">
+            <button class="btn btn-ghost" onclick="unlinkTelegram()">Отвязать</button>
+          </div>
+        </div>
+      </section>
+
       <!-- УСТРОЙСТВА И СЕАНСЫ -->
       <section class="set-card" id="sec-sessions">
         <div class="sessions-head-row">
@@ -315,7 +344,46 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 <script type="module">
 import { auth, db } from '../firebase-config.js';
 import { onAuthStateChanged, signOut, updateProfile, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, doc, updateDoc, deleteDoc, getDocs, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { collection, query, where, doc, updateDoc, deleteDoc, getDocs, onSnapshot, orderBy, setDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// Юзернейм
+const TG_BOT_USERNAME = 'Antviz_Bot';
+
+window.linkTelegram = async function(){
+  if(!currentUser) return;
+  const btn = document.getElementById('tgLinkBtn');
+  btn.disabled = true; btn.textContent = 'Готовим ссылку...';
+  try{
+    const token = crypto.randomUUID();
+    await setDoc(doc(db,'linkTokens',token),{
+      uid: currentUser.uid,
+      createdAt: new Date(),
+      expiresAt: new Date(Date.now()+15*60*1000) // 15 минут на переход в бота
+    });
+    window.open(`https://t.me/${TG_BOT_USERNAME}?start=${token}`,'_blank');
+    toast('Открылся Telegram — нажмите Start в боте','info');
+  }catch(e){
+    toast('Не удалось создать ссылку, попробуйте ещё раз','error');
+  }
+  btn.disabled = false; btn.textContent = 'Привязать Telegram';
+};
+
+window.unlinkTelegram = async function(){
+  if(!currentUser) return;
+  try{
+    await updateDoc(doc(db,'users',currentUser.uid),{tgChatId:deleteField(),tgUsername:deleteField()});
+    document.getElementById('tgLinked').style.display='none';
+    document.getElementById('tgNotLinked').style.display='block';
+    toast('Telegram отвязан','info');
+  }catch(e){toast('Не удалось отвязать, попробуйте позже','error');}
+};
+
+function renderTelegramStatus(userData){
+  const linked = !!(userData && userData.tgChatId);
+  document.getElementById('tgLinked').style.display = linked ? 'block' : 'none';
+  document.getElementById('tgNotLinked').style.display = linked ? 'none' : 'block';
+  document.getElementById('tgUsernameLabel').textContent = (linked && userData.tgUsername) ? ` (@${userData.tgUsername})` : '';
+}
 import {
   getSessionId, endSession, endAllOtherSessions, endCurrentSession,
   timeAgo, deviceLabel, deviceIconSVG, endSessionIconSVG
@@ -496,7 +564,7 @@ window.confirmDeleteAccount=async function(){
     toast('Email не совпадает','error');return;
   }
   const btn=document.getElementById('deleteConfirmBtn');
-  btn.textContent='Удаляю...';btn.disabled=true;
+  btn.textContent='Удаляем...';btn.disabled=true;
   try{
     const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
     for(const x of ordSnap.docs) await updateDoc(x.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
@@ -524,6 +592,7 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('settingEmail').value=user.email||'';
   renderAuthMethod(user);
   startSessionsWatch(user);
+  onSnapshot(doc(db,'users',user.uid), snap=>renderTelegramStatus(snap.data()));
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
 });

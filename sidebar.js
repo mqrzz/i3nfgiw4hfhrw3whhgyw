@@ -77,7 +77,7 @@
     /* Вордмарк вместо favicon+текста — currentColor берёт цвет из
        --text, поэтому логотип сам следует за темой (тёмный на светлой,
        белый на тёмной), без отдельного файла под каждую тему. */
-    .sb-brand-logo{ height:20px; width:auto; flex-shrink:0; color:var(--text,#191b1e); display:block; }
+    .sb-brand-logo{ height:30px; width:auto; flex-shrink:0; color:var(--text,#191b1e); display:block; }
     .sb-brand-row{ display:flex; align-items:center; gap:6px; padding:4px 4px 20px; margin-bottom:8px; border-bottom:1px solid var(--border, var(--stroke,#dfe3e8)); }
     .sb-brand-row .sb-brand{ padding:4px 6px; margin:0; border:none; flex:1; min-width:0; }
 

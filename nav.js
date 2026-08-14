@@ -1,22 +1,27 @@
 /**
- * nav.js — Antviz..
+ * nav.js — Antviz
  * <script src="nav.js" data-page="home"></script>
  *
- * ПОЛНАЯ ПЕРЕСБОРКА (v2):
- * — визуальный язык взят напрямую с главной страницы (тени с синим
- *   подтоном --sh2, радиусы из той же лестницы 28/32/40, зелёный —
- *   только как акцент состояния, никакой декоративной "зелёной полоски");
- * — один-единственный триггер открытия/закрытия (клик), никакого
- *   гибрида hover+aria — это и было источником "дёрганых" анимаций;
- * — новый набор иконок: единая толщина линии, единая геометрия
- *   (rounded-square контейнер + простой глиф), никакого разнобоя фигур;
- * — капсула полностью непрозрачная (--nv-bg), без blur/glassmorphism —
- *   такого эффекта в интерфейсе Antviz принципиально нет;
- * — логотип — сам файл фавикона крупным планом, без декоративной
- *   круглой подложки; никаких градиентов нигде в навигации (в т.ч.
- *   в индикаторе непрочитанного — это точка, а не conic-gradient);
- * — все радиусы и letter-spacing выровнены под системную лестницу сайта;
- * — уважение reduced-motion и видимый focus-visible.
+ * ПОЛНАЯ ПЕРЕСБОРКА (v3) — светлая капсула вместо тёмной:
+ * — капсула теперь белая (--nv-bg:#fff), с тонкой светлой обводкой и
+ *   мягкой нейтральной тенью — тот же язык, что и у остальных белых
+ *   карточек кабинета (.sb-nav/.sb-content), а не отдельный тёмный
+ *   остров посреди страницы;
+ * — у каждого верхнеуровневого пункта теперь есть простая линейная
+ *   иконка (обводка 1.6px, без фоновой плашки) перед подписью —
+ *   активный раздел красится в зелёный и получает зелёное подчёркивание;
+ * — иконки внутри выпадающих меню/профиля остались в скруглённых
+ *   плитках, но плитка теперь нейтрально-серая (не зелёная) по
+ *   умолчанию, зеленеет только на hover/active — тот же паттерн,
+ *   что уже используется в sidebar.js (.sb-link-ico);
+ * — добавлена отдельная кнопка-колокольчик для уведомлений в правой
+ *   части капсулы — то же значение бейджа, что и в выпадающем меню
+ *   профиля (общий data-badge-key, обновляются синхронно);
+ * — логотип — inline SVG-вордмарк antviz (currentColor), просто
+ *   наследует --nv-ink и тем самым остаётся тёмным на светлой капсуле
+ *   без отдельного файла под тему;
+ * — мобильное выезжающее меню тоже светлое, тот же паттерн иконок;
+ * — уважение reduced-motion и видимый focus-visible сохранены.
  *
  * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
  * инициализирует САМА СТРАНИЦА, и подключается к уже существующему
@@ -39,22 +44,22 @@
   /* ─────────────── CSS ─────────────── */
   const CSS = `
     :root {
-      --nv-bg:        #191b1e;
-      --nv-bg-soft:   rgba(25,27,30,.82);
-      --nv-surface:   #232629;
-      --nv-surface2:  #2b2f33;
-      --nv-line:      rgba(255,255,255,.09);
-      --nv-line-soft: rgba(255,255,255,.05);
-      --nv-ink:       #ffffff;
-      --nv-ink-dim:   rgba(255,255,255,.5);
-      --nv-ink-faint: rgba(255,255,255,.3);
+      --nv-bg:        #ffffff;
+      --nv-bg-soft:   rgba(255,255,255,.92);
+      --nv-surface:   #ffffff;
+      --nv-surface2:  #f2f4f7;
+      --nv-line:      rgba(20,22,26,.09);
+      --nv-line-soft: rgba(20,22,26,.06);
+      --nv-ink:       #14161a;
+      --nv-ink-dim:   rgba(20,22,26,.52);
+      --nv-ink-faint: rgba(20,22,26,.34);
       --nv-green:     #1ede7b;
-      --nv-green-h:   #1ac16b;
+      --nv-green-h:   #17c76a;
       --nv-green-ink: #0e1512;
       --nv-green-dim: rgba(30,222,123,.12);
       --nv-warn:      #f5a623;
       --nv-danger:    #ff6b54;
-      --nv-sh:        0 26px 54px rgba(4,10,26,.42), 0 6px 18px rgba(4,10,26,.26), 0 16px 36px -10px rgba(30,222,123,.14);
+      --nv-sh:        0 22px 46px rgba(15,23,42,.10), 0 4px 14px rgba(15,23,42,.05);
       --nv-font:      'Geologica','Inter','Arial',sans-serif;
       --nv-ease:      cubic-bezier(.16,1,.3,1);
     }
@@ -62,14 +67,10 @@
     .antviz-nav, .antviz-nav * { box-sizing: border-box; }
 
     /* ── Капсула ──
-       Было: полупрозрачный blur поверх белого сайта — от этого капсула
-       читалась серой, а не чёрной. Теперь — плотный непрозрачный
-       --nv-bg (тот же тон, что .hero-block/.calc-block на сайте),
-       плюс тёплое зелёное свечение снизу для уверенности бренда.
-       Форма — почти полная пилюля (радиус ~ половина высоты), ссылки —
-       просто текст без фоновых "таблеток" при ховере, один явный
-       контрастный CTA справа (см. референс Darkweb X, который прислал
-       заказчик). */
+       Белая плавающая панель, тот же язык, что у карточек кабинета
+       (.sb-nav/.sb-content): тонкая светлая обводка + мягкая нейтральная
+       тень, без тёмного острова и без зелёного свечения — зелёный
+       остаётся только акцентом состояния (активный пункт, CTA, бейджи). */
     .antviz-nav {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
       z-index: 9000;
@@ -79,13 +80,13 @@
       height: 72px;
       width: calc(100% - 32px); max-width: 1120px;
       background: var(--nv-bg);
-      border: 1px solid rgba(255,255,255,.07);
+      border: 1px solid var(--nv-line);
       border-radius: 40px;
-      box-shadow: 0 24px 50px rgba(0,0,0,.44), 0 0 0 1px rgba(30,222,123,.04), 0 14px 36px -6px rgba(30,222,123,.16);
+      box-shadow: var(--nv-sh);
       font-family: var(--nv-font);
       transition: border-color .2s var(--nv-ease), box-shadow .2s var(--nv-ease);
     }
-    .antviz-nav:hover { border-color: rgba(30,222,123,.2); }
+    .antviz-nav:hover { border-color: rgba(30,222,123,.28); }
 
     .nv-logo {
       font-family: var(--nv-font); font-weight: 500;
@@ -93,33 +94,33 @@
       color: var(--nv-ink); text-decoration: none;
       display: flex; align-items: center; gap: 10px; flex-shrink: 0;
     }
-    /* Вордмарк вместо иконки+текста — капсула всегда тёмная, поэтому
-       просто currentColor от .nv-logo (белый), без темизации. */
+    /* Вордмарк — просто currentColor от .nv-logo (тёмный на белой
+       капсуле), тема капсулы не переключается, поэтому один цвет. */
     .nv-logo-mark { height: 29px; width: auto; flex-shrink: 0; display: block; }
 
-    /* ── Центр: просто текстовые ссылки, без плашек при ховере ── */
+    /* ── Центр: текстовые ссылки с простой линейной иконкой перед
+       подписью — без фоновой плашки, минимализм из референса.
+       Активный пункт красится в зелёный + получает подчёркивание. ── */
     .nv-center {
       position: absolute; left: 50%; transform: translateX(-50%);
       display: flex; align-items: center; gap: 30px;
     }
     .nv-link {
       color: var(--nv-ink-dim);
-      font-family: var(--nv-font); font-weight: 300; font-size: 15px;
+      font-family: var(--nv-font); font-weight: 400; font-size: 15px;
       text-decoration: none;
       white-space: nowrap; position: relative;
-      display: flex; align-items: center;
+      display: flex; align-items: center; gap: 7px;
       transition: color .15s var(--nv-ease);
     }
     .nv-link:hover { color: var(--nv-ink); }
-    .nv-link.active { color: var(--nv-ink); font-weight: 500; }
+    .nv-link.active { color: var(--nv-green); font-weight: 500; }
     .nv-link.active::after {
       content: ''; position: absolute; left: 0; right: 0; bottom: -15px;
       height: 3px; border-radius: 2px; background: var(--nv-green);
     }
 
-    /* Основной CTA — единственный контрастный элемент капсулы,
-       ровно как белая "Get started" в референсе, только в нашем
-       зелёном. Рендерится отдельно от плоских ссылок, справа. */
+    /* Основной CTA — единственный контрастный элемент капсулы. */
     .nv-cta {
       display: flex; align-items: center; flex-shrink: 0;
       background: var(--nv-green); color: var(--nv-green-ink);
@@ -133,19 +134,28 @@
     .nv-drop { position: relative; display: flex; align-items: center; }
     .nv-drop-btn {
       color: var(--nv-ink-dim);
-      font-family: var(--nv-font); font-weight: 300; font-size: 15px;
+      font-family: var(--nv-font); font-weight: 400; font-size: 15px;
       background: none; border: none; cursor: pointer;
-      padding: 0; display: flex; align-items: center; gap: 6px;
+      padding: 0; display: flex; align-items: center; gap: 7px;
       white-space: nowrap;
       transition: color .15s var(--nv-ease);
     }
     .nv-drop-btn:hover { color: var(--nv-ink); }
-    .nv-drop-btn.is-active { color: var(--nv-ink); font-weight: 500; }
+    .nv-drop-btn.is-active { color: var(--nv-green); font-weight: 500; }
     .nv-chev {
-      width: 9px; height: 9px; opacity: .45; flex-shrink: 0;
+      width: 9px; height: 9px; opacity: .5; flex-shrink: 0;
       transition: transform .22s var(--nv-ease), opacity .15s;
     }
-    .nv-drop.open .nv-chev { transform: rotate(180deg); opacity: .8; }
+    .nv-drop.open .nv-chev { transform: rotate(180deg); opacity: .9; }
+
+    /* Простая линейная иконка перед подписью верхнего пункта — без
+       фоновой плитки, толщина 1.6, цвет = currentColor родителя, поэтому
+       сама следует за hover/active состоянием ссылки/кнопки. */
+    .nv-link-ico, .nv-drop-btn svg.nv-link-ico {
+      width: 17px; height: 17px; flex-shrink: 0;
+      stroke: currentColor; stroke-width: 1.6; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
 
     /* Наведение вместо клика — только для этого конкретного дропдауна
        (Блог) и только на устройствах с настоящим курсором, чтобы не
@@ -162,7 +172,7 @@
         transform: translate(-50%, 0) scale(1);
         transition: opacity .15s var(--nv-ease), transform .15s var(--nv-ease), visibility 0s;
       }
-      .nv-drop:hover .nv-chev { transform: rotate(180deg); opacity: .8; }
+      .nv-drop:hover .nv-chev { transform: rotate(180deg); opacity: .9; }
     }
 
     .nv-menu {
@@ -192,53 +202,75 @@
     }
     .nv-menu-item {
       display: flex; align-items: center; gap: 10px;
-      padding: 9px 10px; border-radius: 12px;
-      font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
+      padding: 8px 10px; border-radius: 12px;
+      font-size: 13.5px; color: var(--nv-ink); font-weight: 400;
       text-decoration: none; transition: background .12s, color .12s;
       white-space: nowrap;
     }
-    .nv-menu-item:hover { background: var(--nv-green-dim); color: #fff; }
-    .nv-menu-item:hover .nv-ico { color: var(--nv-green-ink); border-color: transparent; background: var(--nv-green); box-shadow: 0 8px 18px -8px rgba(30,222,123,.5); }
+    .nv-menu-item:hover { background: var(--nv-surface2); }
+    .nv-menu-item:hover .nv-ico { color: var(--nv-green-ink); border-color: transparent; background: var(--nv-green); box-shadow: 0 8px 18px -8px rgba(30,222,123,.45); }
     .nv-menu-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 8px; }
 
-    /* ── Иконки: единая геометрия — скруглённый квадрат-контейнер
-       + простой глиф; никакого разнобоя форм ── */
+    /* ── Плитка-иконка внутри выпадающих меню/профиля: нейтрально-серая
+       по умолчанию, зеленеет только на hover/active — тот же паттерн,
+       что и .sb-link-ico в sidebar.js, для единого языка по кабинету. ── */
     .nv-ico {
       width: 34px; height: 34px; flex-shrink: 0; border-radius: 11px;
       display: flex; align-items: center; justify-content: center;
-      color: var(--nv-green);
-      background: var(--nv-green-dim);
-      border: 1px solid rgba(30,222,123,.16);
+      color: var(--nv-ink-dim);
+      background: var(--nv-surface2);
+      border: 1px solid transparent;
       transition: color .15s, border-color .15s, background .15s, box-shadow .15s;
     }
-    .nv-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .nv-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 
-    .nv-right { display: flex; align-items: center; gap: 20px; margin-left: auto; }
+    .nv-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+
+    /* ── Колокольчик уведомлений — отдельная быстрая ссылка, тот же
+       бейдж (data-badge-key="notif"), что и в выпадающем меню профиля,
+       обновляются синхронно через setBadge(). Виден только авторизованным. */
+    .nv-notify-btn {
+      position: relative; display: none; align-items: center; justify-content: center;
+      width: 40px; height: 40px; flex-shrink: 0;
+      background: var(--nv-surface2); border: 1px solid transparent;
+      border-radius: 13px; cursor: pointer; text-decoration: none;
+      color: var(--nv-ink-dim);
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .nv-notify-btn.show { display: flex; }
+    .nv-notify-btn:hover { background: #fff; color: var(--nv-ink); border-color: var(--nv-line); box-shadow: 0 6px 14px -8px rgba(20,22,26,.18); }
+    .nv-notify-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+    .nv-notify-badge {
+      position: absolute; top: -3px; right: -3px;
+      min-width: 17px; height: 17px; padding: 0 4px; border-radius: 7px;
+      background: var(--nv-green); color: var(--nv-green-ink);
+      font-size: 10px; font-weight: 600; font-family: var(--nv-font);
+      display: none; align-items: center; justify-content: center;
+      border: 2px solid var(--nv-bg);
+    }
+    .nv-notify-badge.warn { background: var(--nv-warn); color: #1a1400; }
 
     /* ── Пользователь ── */
     .nv-user { position: relative; display: flex; }
     .nv-user-btn {
       display: flex; align-items: center; gap: 9px;
-      background: none; border: 1px solid transparent;
+      background: var(--nv-surface2); border: 1px solid transparent;
       border-radius: 14px; padding: 4px 12px 4px 4px;
       cursor: pointer; transition: border-color .15s, background .15s;
-      font-family: var(--nv-font); font-weight: 300; font-size: 13.5px; color: var(--nv-ink);
+      font-family: var(--nv-font); font-weight: 400; font-size: 13.5px; color: var(--nv-ink);
       text-decoration: none; position: relative;
     }
-    .nv-user-btn:hover { border-color: var(--nv-line); background: rgba(255,255,255,.05); }
+    .nv-user-btn:hover { background: #fff; border-color: var(--nv-line); box-shadow: 0 6px 14px -8px rgba(20,22,26,.18); }
     .nv-user-btn.guest {
-      padding: 0; border: none; background: none;
-      font-weight: 300; font-size: 15px; color: var(--nv-ink-dim);
+      padding: 8px 16px; border: none; background: var(--nv-surface2);
+      font-weight: 400; font-size: 14.5px; color: var(--nv-ink-dim);
     }
-    .nv-user-btn.guest:hover { border-color: transparent; background: none; color: var(--nv-ink); }
+    .nv-user-btn.guest:hover { border-color: transparent; background: #fff; color: var(--nv-ink); box-shadow: 0 6px 14px -8px rgba(20,22,26,.18); }
     .nv-user-btn.guest .nv-avatar-wrap,
     .nv-user-btn.guest .nv-chev-user { display: none; }
 
-    /* Раньше тут было конус-градиентное "кольцо" вокруг аватара для
-       индикации непрочитанных — прямое нарушение правила "никаких
-       градиентов в UI". Заменили на обычную точку-бейдж в углу,
-       тот же паттерн, что уже используется в .nv-badge.dot внутри
-       выпадающего меню — единообразно со всем остальным интерфейсом. */
+    /* Точка-бейдж поверх аватара для индикации непрочитанного — тот же
+       паттерн, что и .nv-badge.dot внутри выпадающего меню. */
     .nv-avatar-wrap { position: relative; width: 32px; height: 32px; flex-shrink: 0; }
     .nv-avatar {
       width: 100%; height: 100%; border-radius: 12px;
@@ -257,7 +289,7 @@
     }
     .nv-avatar-dot.show { display: block; }
     .nv-uname { max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .nv-chev-user { width: 10px; height: 10px; opacity: .4; flex-shrink: 0; transition: transform .2s var(--nv-ease); }
+    .nv-chev-user { width: 10px; height: 10px; opacity: .45; flex-shrink: 0; transition: transform .2s var(--nv-ease); }
     .nv-user-btn[aria-expanded="true"] .nv-chev-user { transform: rotate(180deg); }
 
     .nv-dd {
@@ -291,16 +323,16 @@
       display: flex; align-items: center; justify-content: center;
       font-size: 16px; font-weight: 500; color: var(--nv-green-ink);
       flex-shrink: 0; overflow: hidden;
-      box-shadow: 0 10px 22px -10px rgba(30,222,123,.5);
+      box-shadow: 0 10px 22px -10px rgba(30,222,123,.45);
     }
     .nv-dd-head-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .nv-dd-head-info { min-width: 0; flex: 1; }
     .nv-dd-head-name {
-      font-size: 15px; font-weight: 500; color: #fff;
+      font-size: 15px; font-weight: 500; color: var(--nv-ink);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.03em;
     }
     .nv-dd-head-email {
-      font-weight: 300; font-size: 11.5px; color: var(--nv-ink-faint);
+      font-weight: 400; font-size: 11.5px; color: var(--nv-ink-faint);
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 3px;
     }
 
@@ -312,17 +344,17 @@
     .nv-dd-item {
       display: flex; align-items: center; gap: 11px;
       padding: 8px 10px; border-radius: 12px;
-      font-size: 13.5px; color: rgba(255,255,255,.85); font-weight: 300;
+      font-size: 13.5px; color: var(--nv-ink); font-weight: 400;
       text-decoration: none; cursor: pointer;
       transition: background .12s, color .12s;
       border: none; background: none; width: 100%; text-align: left;
       position: relative; font-family: var(--nv-font);
     }
-    .nv-dd-item:hover { background: var(--nv-green-dim); color: #fff; }
-    .nv-dd-item:hover .nv-ico { color: var(--nv-green-ink); border-color: transparent; background: var(--nv-green); box-shadow: 0 8px 18px -8px rgba(30,222,123,.5); }
-    .nv-dd-item.danger .nv-ico { color: var(--nv-danger); background: rgba(255,107,84,.12); border-color: rgba(255,107,84,.2); }
-    .nv-dd-item.danger:hover { background: rgba(255,107,84,.1); color: #ffb3a3; }
-    .nv-dd-item.danger:hover .nv-ico { color: #fff; border-color: transparent; background: var(--nv-danger); box-shadow: 0 8px 18px -8px rgba(255,107,84,.5); }
+    .nv-dd-item:hover { background: var(--nv-surface2); }
+    .nv-dd-item:hover .nv-ico { color: var(--nv-green-ink); border-color: transparent; background: var(--nv-green); box-shadow: 0 8px 18px -8px rgba(30,222,123,.45); }
+    .nv-dd-item.danger .nv-ico { color: var(--nv-danger); background: rgba(255,107,84,.1); border-color: rgba(255,107,84,.16); }
+    .nv-dd-item.danger:hover { background: rgba(255,107,84,.08); color: #d9432e; }
+    .nv-dd-item.danger:hover .nv-ico { color: #fff; border-color: transparent; background: var(--nv-danger); box-shadow: 0 8px 18px -8px rgba(255,107,84,.45); }
     .nv-dd-sep { height: 1px; background: var(--nv-line-soft); margin: 6px 10px; }
 
     .nv-badge {
@@ -340,11 +372,11 @@
     .nv-burger {
       display: none; align-items: center; justify-content: center;
       width: 40px; height: 40px;
-      background: none; border: 1px solid var(--nv-line);
+      background: var(--nv-surface2); border: 1px solid transparent;
       border-radius: 12px; cursor: pointer; flex-shrink: 0;
       transition: border-color .15s, background .15s;
     }
-    .nv-burger:hover { border-color: rgba(255,255,255,.22); background: rgba(255,255,255,.05); }
+    .nv-burger:hover { background: #fff; border-color: var(--nv-line); }
     .nv-burger-box { position: relative; width: 16px; height: 12px; }
     .nv-burger-box span {
       position: absolute; left: 0; width: 16px; height: 1.6px; background: var(--nv-ink);
@@ -357,6 +389,8 @@
     .nv-burger.open .nv-burger-box span:nth-child(2) { opacity: 0; }
     .nv-burger.open .nv-burger-box span:nth-child(3) { top: 5px; transform: rotate(-45deg); }
 
+    /* ── Выезжающее мобильное меню — светлое, тот же язык, что и
+       остальная капсула, а не отдельный тёмный остров. ── */
     .nv-sheet {
       position: fixed; top: calc(20px + 72px + 10px); left: 50%;
       transform: translateX(-50%) translateY(-8px) scale(.98);
@@ -365,14 +399,14 @@
       max-height: calc(100vh - 20px - 72px - 34px);
       overflow-y: auto;
       background: var(--nv-bg);
-      border: 1px solid rgba(255,255,255,.09);
+      border: 1px solid var(--nv-line);
       border-radius: 24px;
       padding: 8px;
       display: none; flex-direction: column; gap: 2px;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity .2s var(--nv-ease), transform .2s var(--nv-ease), visibility 0s linear .2s;
       font-family: var(--nv-font);
-      box-shadow: 0 22px 46px rgba(0,0,0,.42), 0 12px 34px -6px rgba(30,222,123,.18);
+      box-shadow: var(--nv-sh);
     }
     .nv-sheet.open {
       opacity: 1; visibility: visible; pointer-events: all;
@@ -381,12 +415,13 @@
     }
     .nv-mlink {
       display: flex; align-items: center; gap: 12px;
-      color: var(--nv-ink-dim); font-weight: 300; font-size: 15px;
+      color: var(--nv-ink-dim); font-weight: 400; font-size: 15px;
       text-decoration: none; padding: 13px 14px;
       border-radius: 14px; transition: background .12s, color .12s;
     }
-    .nv-mlink:hover, .nv-mlink.active { color: #fff; background: rgba(255,255,255,.06); }
-    .nv-mlink.active { font-weight: 500; }
+    .nv-mlink:hover { color: var(--nv-ink); background: var(--nv-surface2); }
+    .nv-mlink.active { color: var(--nv-green); font-weight: 500; background: var(--nv-green-dim); }
+    .nv-mlink.active .nv-ico { color: var(--nv-green-ink); background: var(--nv-green); }
     .nv-mcta {
       display: block; text-align: center; margin-top: 4px;
       background: var(--nv-green); color: var(--nv-green-ink);
@@ -423,11 +458,12 @@
       .nv-logo-mark { height: 24px; }
       .nv-center { display: none; }
       .nv-cta { display: none; }
+      .nv-notify-btn { width: 36px; height: 36px; }
       .nv-burger { display: flex; }
       .nv-sheet { display: flex; top: calc(14px + 60px + 8px); }
       .nv-uname { display: none; }
-      .nv-user-btn { padding: 4px; }
-      .nv-user-btn.guest { padding: 0; font-size: 14px; }
+      .nv-user-btn { padding: 4px; background: none; }
+      .nv-user-btn.guest { padding: 6px 8px; font-size: 14px; }
       .nv-user-btn.guest .nv-uname { display: inline; max-width: 60px; }
     }
   `;
@@ -437,11 +473,14 @@
   ];
 
   // Единая иконка-контейнер: <rect/> квадрат-скругление + один простой
-  // глиф внутри, толщина линии всегда 1.7 — см. .nv-ico
+  // глиф внутри, толщина линии всегда 1.7 — см. .nv-ico (иконки внутри
+  // выпадающих меню). Поле icon верхнего уровня — плоская линейная
+  // иконка перед подписью в самой капсуле, см. .nv-link-ico.
   const NAV_DROPDOWNS = [
     {
       label: 'Услуги',
       key: 'services',
+      icon: '<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>',
       sections: [
         {
           label: 'Примеры работ',
@@ -462,6 +501,7 @@
     {
       label: 'О сервисе',
       key: 'company',
+      icon: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8h.01M11 11.5h1.4v5"/>',
       sections: [
         {
           items: [
@@ -476,6 +516,7 @@
     {
       label: 'Блог',
       key: 'blog',
+      icon: '<path d="M4 5.5A2.5 2.5 0 016.5 3H18a1 1 0 011 1v15a1 1 0 01-1 1H6.5A2.5 2.5 0 014 17.5v-12z"/><path d="M8 8h8M8 11.5h8M8 15h5"/>',
       sections: [
         {
           items: [
@@ -486,6 +527,7 @@
       ]
     },
   ];
+
 
   const NAV_CONFIG = {
     home:     { centerLinks: PUBLIC_LINKS, showCta: true },
@@ -520,13 +562,16 @@
   ];
 
   function iconHtml(svg) { return `<span class="nv-ico"><svg viewBox="0 0 24 24">${svg}</svg></span>`; }
+  // Плоская линейная иконка перед подписью верхнеуровневого пункта
+  // капсулы/мобильного заголовка секции — без фоновой плитки.
+  function plainIconHtml(svg) { return `<svg class="nv-link-ico" viewBox="0 0 24 24">${svg}</svg>`; }
 
   function buildDD() {
     return DD_ITEMS.map(item => {
       if (item.section) return `<div class="nv-dd-section">${item.section}</div>`;
       if (item.sep)     return `<div class="nv-dd-sep"></div>`;
       if (item.logout)  return `<button class="nv-dd-item danger" id="anSignOut">${iconHtml('<path d="M9 4H6.5A2.5 2.5 0 004 6.5v11A2.5 2.5 0 006.5 20H9"/><path d="M20 12H10.5"/><path d="M16 8l4 4-4 4"/>')}Выйти</button>`;
-      const badgeSlot = item.badgeKey ? `<span class="nv-badge" id="anBadge-${item.badgeKey}" style="display:none"></span>` : '';
+      const badgeSlot = item.badgeKey ? `<span class="nv-badge" data-badge-key="${item.badgeKey}" style="display:none"></span>` : '';
       return `<a href="${item.href}" class="nv-dd-item">${iconHtml(item.icon)}${item.label}${badgeSlot}</a>`;
     }).join('');
   }
@@ -551,7 +596,7 @@
       const isActive = drop.sections.some(s => s.items && s.items.some(i => i.href === b + drop.key));
       return '<div class="nv-drop" data-drop="' + drop.key + '">' +
         '<button class="nv-drop-btn' + (isActive ? ' is-active' : '') + '" aria-expanded="false">' +
-        drop.label + chevronSvg +
+        plainIconHtml(drop.icon) + '<span>' + drop.label + '</span>' + chevronSvg +
         '</button>' +
         '<div class="nv-menu" id="anDrop-' + drop.key + '">' +
         buildNavMenu(drop.sections) +
@@ -559,7 +604,8 @@
     }).join('');
 
     const plainLinks = links.map(l =>
-      '<a href="' + l.href + '" class="nv-link' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>'
+      '<a href="' + l.href + '" class="nv-link' + (page === l.key ? ' active' : '') + '">' +
+      (l.icon ? plainIconHtml(l.icon) : '') + '<span>' + l.label + '</span></a>'
     ).join('');
 
     if (!dropdowns && !plainLinks) return '';
@@ -567,7 +613,7 @@
   }
 
   // Единственный контрастный элемент капсулы — по образцу референса
-  // (сплошная светлая пилюля справа на тёмной панели). Рендерится
+  // (сплошная зелёная пилюля справа на светлой панели). Рендерится
   // отдельно от плоских ссылок центра и садится в nv-right.
   function buildCta() {
     if (cfg.inApp || cfg.hideCta) return '';
@@ -595,7 +641,7 @@
 
     const plainLinks = (cfg.centerLinks || []).filter(l => !l.accent);
     plainLinks.forEach(l => {
-      html += '<a href="' + l.href + '" class="nv-mlink' + (page === l.key ? ' active' : '') + '">' + l.label + '</a>';
+      html += '<a href="' + l.href + '" class="nv-mlink' + (page === l.key ? ' active' : '') + '">' + (l.icon ? iconHtml(l.icon) : '') + l.label + '</a>';
     });
 
     const ctaHtml = (!cfg.hideCta) ? '<a href="' + b + 'order" class="nv-mcta">Заказать сайт</a>' : '';
@@ -612,6 +658,11 @@
   ${buildCenter()}
 
   <div class="nv-right">
+    <a href="${b}profile/notifications" class="nv-notify-btn" id="anNotifyBtn" aria-label="Уведомления">
+      <svg viewBox="0 0 24 24"><path d="M6.5 9.2a5.5 5.5 0 0111 0c0 6 2 7.3 2 7.3H4.5s2-1.3 2-7.3z"/><path d="M10.2 20.5a2 2 0 003.6 0"/></svg>
+      <span class="nv-notify-badge" data-badge-key="notif" style="display:none"></span>
+    </a>
+
     <div class="nv-user" id="anUser">
       <a href="${b}auth" class="nv-user-btn guest" id="anUserBtn" aria-expanded="false">
         <div class="nv-avatar-wrap">
@@ -722,22 +773,28 @@ ${buildMobileSheet()}`;
     }
   });
 
+  // Бейдж может встречаться сразу в нескольких местах капсулы —
+  // например "notif" одновременно в выпадающем меню профиля и в
+  // отдельной кнопке-колокольчике справа. Обновляем все совпадения
+  // по data-badge-key, у каждого элемента своя базовая CSS-класс-плитка
+  // (nv-badge внутри dd/меню, nv-notify-badge — на самой кнопке),
+  // поэтому базовый класс берём из текущего className элемента.
   function setBadge(key, value, variant) {
-    const el = document.getElementById(`anBadge-${key}`);
-    if (!el) return;
-    if (!value) { el.style.display = 'none'; return; }
-    el.className = 'nv-badge' + (variant ? ' ' + variant : '');
-    el.textContent = (variant === 'dot') ? '' : String(value);
-    el.style.display = 'flex';
+    document.querySelectorAll(`[data-badge-key="${key}"]`).forEach(el => {
+      const baseClass = el.classList.contains('nv-notify-badge') ? 'nv-notify-badge' : 'nv-badge';
+      if (!value) { el.style.display = 'none'; return; }
+      el.className = baseClass + (variant && variant !== 'dot' ? ' ' + variant : '');
+      el.textContent = (variant === 'dot' && baseClass === 'nv-badge') ? '' : String(value);
+      el.style.display = (baseClass === 'nv-notify-badge') ? 'flex' : 'flex';
+    });
   }
   function refreshNotifyDot() {
     const dot = document.getElementById('anAvatarDot');
-    if (!dot) return;
     const any = ['support','tickets','notif'].some(k => {
-      const el = document.getElementById(`anBadge-${k}`);
+      const el = document.querySelector(`.nv-badge[data-badge-key="${k}"]`);
       return el && el.style.display !== 'none';
     });
-    dot.classList.toggle('show', any);
+    dot?.classList.toggle('show', any);
   }
 
   let unsubSupport = null;
@@ -757,9 +814,11 @@ ${buildMobileSheet()}`;
     const ddHeadAv = document.getElementById('anDdHeadAvatar');
     const ddHeadNm = document.getElementById('anDdHeadName');
     const ddHeadEm = document.getElementById('anDdHeadEmail');
+    const notifyBtn = document.getElementById('anNotifyBtn');
 
     isAuthed = true;
     if (cfg.inApp && centerEl) centerEl.style.display = 'none';
+    notifyBtn?.classList.add('show');
 
     userBtn.classList.remove('guest');
     userBtn.removeAttribute('href');
@@ -784,8 +843,10 @@ ${buildMobileSheet()}`;
     const avatarEl = document.getElementById('anAvatar');
     const avatarDot = document.getElementById('anAvatarDot');
     const ddHead   = document.getElementById('anDdHead');
+    const notifyBtn = document.getElementById('anNotifyBtn');
 
     isAuthed = false;
+    notifyBtn?.classList.remove('show');
     userBtn.classList.add('guest');
     userBtn.setAttribute('href', `${b}auth`);
     if (unameEl) unameEl.textContent = 'Войти';

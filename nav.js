@@ -18,7 +18,7 @@
  * — все радиусы и letter-spacing выровнены под системную лестницу сайта;
  * — уважение reduced-motion и видимый focus-visible.
  *
- * Не импортирует firebase-config js сам — ждёт, пока Firebase App
+ * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
  * инициализирует САМА СТРАНИЦА, и подключается к уже существующему
  * приложению через getApps()/getAuth(). Логика авторизации, бейджей
  * и сессий не менялась — менялся только визуальный слой и разметка
@@ -95,7 +95,7 @@
     }
     /* Вордмарк вместо иконки+текста — капсула всегда тёмная, поэтому
        просто currentColor от .nv-logo (белый), без темизации. */
-    .nv-logo-mark { height: 19px; width: auto; flex-shrink: 0; display: block; }
+    .nv-logo-mark { height: 29px; width: auto; flex-shrink: 0; display: block; }
 
     /* ── Центр: просто текстовые ссылки, без плашек при ховере ── */
     .nv-center {
@@ -420,7 +420,7 @@
     @media (max-width: 768px) {
       .antviz-nav { top: 14px; height: 60px; padding: 6px 6px 6px 18px; width: calc(100% - 24px); border-radius: 24px; }
       .nv-logo { font-size: 15px; gap: 8px; }
-      .nv-logo-mark { height: 16px; }
+      .nv-logo-mark { height: 24px; }
       .nv-center { display: none; }
       .nv-cta { display: none; }
       .nv-burger { display: flex; }

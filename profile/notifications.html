@@ -315,7 +315,20 @@ onAuthStateChanged(auth, user=>{
 });
 </script>
 
-<script src="../footer.js" data-page="notifications"></script>
+<script>
+// ── тема (общая для всех страниц кабинета через localStorage) ──
+(function(){
+  const btn=document.getElementById('themeToggle');
+  if(!btn) return;
+  btn.addEventListener('click', ()=>{
+    const cur=document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark';
+    const next = cur==='light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('antviz-theme', next); }catch(e){}
+  });
+})();
+</script>
+
 <script src="../GEOBLOCK.js"></script>
 <script type="module" src="../maintenance.js"></script>
 </body>

@@ -1412,6 +1412,7 @@ async function submitOrder(paymentType) {
   if(state.extras.domain&&state.extras.domainOpt==='new')extrasArr.push('domain_reg');
   if(state.extras.domain&&state.extras.domainOpt==='own')extrasArr.push('domain_own');
   if(state.extras.content)extrasArr.push('content');if(state.extras.shop)extrasArr.push('shop');if(state.extras.urgent)extrasArr.push('urgent');
+  if(state.extras.botPay)extrasArr.push('bot_pay');if(state.extras.botCrm)extrasArr.push('bot_crm');
   let favData=null;if(favFile){try{favData=await f2b(favFile);}catch(e){toast('Не удалось прикрепить фавикон','error');}}
   const BUDGET=850*1024;let used=favData?Math.round(favData.length*0.75):0;const attachments=[];
   for(const f of uploadedFiles){try{const d=await f2b(f);const b=Math.round(d.length*0.75);if(used+b>BUDGET){toast(`«${f.name}» не поместился — пришлите в чат поддержки`,'error');continue;}used+=b;attachments.push({fileData:d,fileName:f.name,fileType:f.type});}catch(e){toast(`Не удалось: «${f.name}»`,'error');}}

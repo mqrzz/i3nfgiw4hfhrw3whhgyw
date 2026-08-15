@@ -690,7 +690,8 @@ onAuthStateChanged(auth, user=>{
   let sinceText = 'antviz.ru';
   const created = user.metadata && user.metadata.creationTime ? new Date(user.metadata.creationTime) : null;
   if(created){
-    sinceText += ' · клиент с ' + created.toLocaleDateString('ru',{month:'long',year:'numeric'});
+    const monthsGenitive = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+    sinceText += ' · клиент с ' + monthsGenitive[created.getMonth()] + ' ' + created.getFullYear();
   }
   document.getElementById('heroSub').textContent = sinceText;
   document.getElementById('loadingScreen').style.display='none';

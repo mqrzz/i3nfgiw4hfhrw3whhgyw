@@ -30,7 +30,7 @@ const NOTIFY_CONFIG = {
   footnote: '',
 
   primaryText: 'Подключить в настройках',                // текст тёмной кнопки
-  primaryHref: '../settings#sec-telegram',                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
+  primaryHref: 'https://antviz.ru/profile/settings',                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
 
   dontShowAgainText: 'Не показывать снова', // текстовая кнопка-ссылка под основной кнопкой ('' или null — убрать)
 
@@ -71,6 +71,7 @@ const NOTIFY_CONFIG = {
           <stop offset="1" stop-color="#229ED9"/>
         </linearGradient>
       </defs>
+      <circle cx="8" cy="8" r="8" fill="#fff"/>
       <path fill="url(#an-tg-grad)" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/>
     </svg>`;
 
@@ -88,7 +89,7 @@ const NOTIFY_CONFIG = {
 
     .an-card{
       position:relative; width:100%; max-width:860px;
-      background:var(--bg,#fff); border:1px solid var(--border,#dfe3e8); border-radius:40px;
+      background:var(--bg,#fff); border:1px solid var(--stroke,#dfe3e8); border-radius:40px;
       box-shadow:var(--sh2,0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08));
       display:flex; overflow:hidden;
       transform:scale(.94) translateY(10px); opacity:0;
@@ -98,10 +99,10 @@ const NOTIFY_CONFIG = {
 
     .an-close{
       position:absolute; top:18px; right:18px; z-index:2; width:40px; height:40px; border-radius:14px;
-      background:var(--bg3,#f9fafc); border:1px solid var(--border,#dfe3e8); display:flex; align-items:center; justify-content:center;
+      background:var(--bg3,#f9fafc); border:1px solid var(--stroke,#dfe3e8); display:flex; align-items:center; justify-content:center;
       cursor:pointer; color:var(--text,#191b1e); transition:border-color .15s;
     }
-    .an-close:hover{ border-color:var(--border2,#cbcdd6); }
+    .an-close:hover{ border-color:var(--stroke,#cbcdd6); }
     .an-close svg{ width:16px; height:16px; stroke:currentColor; stroke-width:1.8; fill:none; }
 
     .an-content{
@@ -115,7 +116,7 @@ const NOTIFY_CONFIG = {
 
     .an-eyebrow{
       display:inline-flex; align-self:flex-start;
-      background:var(--green-light,#d2f8e5); color:var(--green-d,#149955);
+      background:var(--green-dim,#d2f8e5); color:var(--green-text,#149955);
       font-size:12px; font-weight:500; padding:6px 14px; border-radius:100px;
       margin-bottom:20px;
     }
@@ -128,14 +129,14 @@ const NOTIFY_CONFIG = {
     .an-bullet{ display:flex; align-items:flex-start; gap:14px; }
     .an-bullet-icon{
       flex:0 0 auto; width:32px; height:32px; border-radius:12px; background:var(--bg3,#f9fafc);
-      border:1px solid var(--border,#dfe3e8); display:flex; align-items:center; justify-content:center; margin-top:1px;
+      border:1px solid var(--stroke,#dfe3e8); display:flex; align-items:center; justify-content:center; margin-top:1px;
     }
-    .an-bullet-icon svg{ width:16px; height:16px; stroke:var(--green-d,#149955); stroke-width:1.8; fill:none; }
+    .an-bullet-icon svg{ width:16px; height:16px; stroke:var(--green-text,#149955); stroke-width:1.8; fill:none; }
     .an-bullet-text{ font-size:14px; color:var(--text,#191b1e); font-weight:300; line-height:1.5; letter-spacing:-.01em; }
 
     .an-footnote{
-      font-size:13px; color:var(--muted,#707a8a); font-weight:300; line-height:1.5;
-      border-top:1px solid var(--border,#dfe3e8); padding-top:16px; margin-bottom:24px;
+      font-size:13px; color:var(--text-dim,#707a8a); font-weight:300; line-height:1.5;
+      border-top:1px solid var(--stroke,#dfe3e8); padding-top:16px; margin-bottom:24px;
     }
 
     .an-actions{ margin-top:auto; display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
@@ -151,7 +152,7 @@ const NOTIFY_CONFIG = {
 
     .an-dismiss{
       background:none; border:none; cursor:pointer; font-family:inherit;
-      font-size:13px; font-weight:300; color:var(--muted,#707a8a); text-decoration:underline;
+      font-size:13px; font-weight:300; color:var(--text-dim,#707a8a); text-decoration:underline;
       text-underline-offset:3px; padding:2px; align-self:center; margin:0 auto;
     }
     .an-dismiss:hover{ color:var(--text,#191b1e); }

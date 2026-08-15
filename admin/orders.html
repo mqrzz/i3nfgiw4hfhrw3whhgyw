@@ -507,6 +507,21 @@ const S=['Новая заявка','Обсуждение','В работе','Н�
 // status -1 = заказ создан, но оплата ещё не подтверждена вебхуком (не путать с "Новая заявка" = 0)
 function statusLabel(st){return st===-1?'Ожидает оплаты':(S[st??0]??'—');}
 function statusBadgeClass(st){return st===-1?'b-pending':('b'+(st??0));}
+// Живые формулировки для Telegram-уведомлений при смене статуса (эмодзи + заголовок + фраза-предложение)
+const STATUS_NOTICE={
+  '-1':{emoji:'💳',title:'Ждём оплату',text:'Заказ оформлен — осталось оплатить, чтобы мы начали работу.'},
+  0:{emoji:'🆕',title:'Заявка принята',text:'Ваша заявка принята в работу, скоро свяжемся для уточнения деталей.'},
+  1:{emoji:'💬',title:'Обсуждаем проект',text:'Сейчас уточняем детали и договариваемся о структуре сайта.'},
+  2:{emoji:'🛠️',title:'В работе',text:'Начали разработку — команда уже занимается вашим сайтом.'},
+  3:{emoji:'👀',title:'На проверке',text:'Сайт собран и проходит внутреннюю проверку перед показом вам.'},
+  4:{emoji:'✏️',title:'Вносим правки',text:'Учитываем ваши замечания и дорабатываем сайт.'},
+  5:{emoji:'🎉',title:'Готово!',text:'Сайт готов — загляните в кабинет, чтобы посмотреть результат.'},
+  6:{emoji:'💳',title:'Нужна доплата',text:'Пришло время внести доплату по заказу, чтобы двигаться дальше.'}
+};
+function statusNotice(st){
+  const n=STATUS_NOTICE[st]||STATUS_NOTICE[0];
+  return {title:`${n.emoji} ${n.title}`,text:n.text};
+}
 const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
 const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 const GOALS={leads:'Заявки и звонки',sales:'Продажи онлайн',brand:'Имидж / представительство',info:'Информирование'};
@@ -983,7 +998,7 @@ window.setStatus=async s=>{
   } else { msg='Статус → '+S[s]+' ✓'; }
   upd.statusHistory=arrayUnion({status:histStatus,at:now});
   const ok=await safeUpdate(selOrderId,upd,msg);
-  if(ok&&o?.uid)await notifyClient(o.uid,'Статус заказа изменён',`№${selOrderId.slice(0,7).toUpperCase()} — ${statusLabel(upd.status)}`);
+  if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`);}
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
 window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))},'Дата сохранена ✓');};

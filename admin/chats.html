@@ -291,6 +291,19 @@ import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDo
 
 let allTickets=[], selectedId=null, currentFilter='all', unsubMsgs=null;
 
+// Домен бэкенда бота — впиши свой (тот же, что уже стоит в admin/orders.html)
+const TG_NOTIFY_URL='https://antviz-tgbot.vercel.app/api/notify';
+async function notifyClient(uid,title,text,button){
+  if(!uid)return;
+  await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
+  try{
+    const idToken=await auth.currentUser.getIdToken();
+    const body={uid,title,text};
+    if(button){body.buttonText=button.text;body.buttonUrl=button.url;}
+    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(()=>{});
+  }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}
+}
+
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtDT(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
@@ -376,6 +389,8 @@ window.sendReply=async function(){
   try{
     await addDoc(collection(db,'tickets',selectedId,'messages'),{sender:'support',senderName:'Поддержка',text,imageUrl:null,createdAt:serverTimestamp()});
     await updateDoc(doc(db,'tickets',selectedId),{updatedAt:serverTimestamp(),_read:false,_adminRead:true});
+    const t=allTickets.find(x=>x.id===selectedId);
+    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support.html'});
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
@@ -388,6 +403,8 @@ window.sendImg=async function(){
     try{
       await addDoc(collection(db,'tickets',selectedId,'messages'),{sender:'support',senderName:'Поддержка',text:'Изображение',imageUrl:e.target.result,createdAt:serverTimestamp()});
       await updateDoc(doc(db,'tickets',selectedId),{updatedAt:serverTimestamp(),_read:false,_adminRead:true});
+      const t=allTickets.find(x=>x.id===selectedId);
+      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support.html'});
       toast('Изображение отправлено ✓','success');
     }catch(e){toast('Ошибка','error');}
     inp.value='';

@@ -522,7 +522,7 @@ function statusNotice(st){
   const n=STATUS_NOTICE[st]||STATUS_NOTICE[0];
   return {title:`${n.emoji} ${n.title}`,text:n.text};
 }
-const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
+const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание',bot_pay:'Оплата в боте',bot_crm:'Интеграция CRM'};
 const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 const GOALS={leads:'Заявки и звонки',sales:'Продажи онлайн',brand:'Имидж / представительство',info:'Информирование'};
 const READINESS={ready:'Всё готово',partial:'Частично готово',none:'Ничего нет — с нуля'};
@@ -759,7 +759,7 @@ function showDetail(o){
     icCard('Промокод',o.promoCode?esc(o.promoCode)+(o.discountApplied?' (-'+fmtP(o.discountApplied)+')':''):'—')+
     icCard('Создан',fmtDT(o.createdAt));
   const ea=o.extras||[];const es=document.getElementById('extrasSec');
-  if(ea.length){es.style.display='';document.getElementById('extrasList').innerHTML=ea.map(e=>{const l=EX[e]||e;const ec=e==='domain_reg'?'tag-blue':e==='domain_own'?'tag-green':e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':'tag-warn';return`<span class="tag ${ec}">${esc(l)}</span>`;}).join('');}else es.style.display='none';
+  if(ea.length){es.style.display='';document.getElementById('extrasList').innerHTML=ea.map(e=>{const l=EX[e]||e;const ec=e==='domain_reg'?'tag-blue':e==='domain_own'?'tag-green':e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':(e==='bot_pay'||e==='bot_crm')?'tag-purple':'tag-warn';return`<span class="tag ${ec}">${esc(l)}</span>`;}).join('');}else es.style.display='none';
   const ds=document.getElementById('descSec');if(o.description){ds.style.display='';document.getElementById('descBox').textContent=o.description;}else ds.style.display='none';
   const bs=document.getElementById('briefSec');
   const hasGoals=Array.isArray(o.goals)&&o.goals.length;

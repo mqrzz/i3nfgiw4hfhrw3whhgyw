@@ -1,165 +1,187 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Уведомления — Antviz</title>
-  <link rel="icon" href="../img/favicon.png" type="image/png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;500&display=swap" rel="stylesheet"/>
-  <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --line:#dfe3e8;--line-strong:#cbcdd6;
-  --ink:#191b1e;--ink-dim:#707a8a;--ink-faint:#9aa2b1;
-  --accent:#1ede7b;--accent-h:#1ac16b;--accent-d:#149955;
-  --accent-wash:rgba(30,222,123,.12);
-  --warn:#f59e0b;--warn-wash:rgba(245,158,11,.08);
-  --bad:#e8634f;--bad-wash:rgba(232,99,79,.08);
-  --info:#3b82f6;--info-wash:rgba(59,130,246,.1);
-  --dark:#191b1e;--dark2:#2b2f33;
-  --font:'Geologica','Inter','Arial',sans-serif;
-  --sh1:0 4px 16px rgba(0,51,153,.04),0 2px 2px rgba(0,51,153,.08);
-  --sh2:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
-}
-html{scroll-behavior:smooth;overflow-x:hidden}
-body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:300;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-:focus-visible{outline:2px solid var(--accent-h);outline-offset:2px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-@keyframes rowIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Уведомления — Antviz</title>
+<link rel="icon" href="../img/favicon.png" type="image/png"/>
+<script>
+  // Читаем сохранённую тему до отрисовки — тот же ключ, что и на остальных страницах кабинета.
+  try{
+    var t = localStorage.getItem('antviz-theme');
+    if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+  }catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#101113; --card:#191b1e; --card-elevated:#1e2124; --stroke:#2a2d31;
+    --text:#f4f5f6; --text-dim:#9a9da2; --text-faint:#65686d;
+    --green:#1ede7b; --green-dim:rgba(30,222,123,0.14); --green-text:#1ede7b;
+    --blue:#4d9fff; --blue-dim:rgba(77,159,255,0.14);
+    --amber:#ffb74d; --amber-dim:rgba(255,183,77,0.14);
+    --red:#ff5c5c; --red-dim:rgba(255,92,92,0.14);
+    --shadow:0 12px 30px rgba(0,0,0,0.4);
+    --r64:64px;--r40:40px;--r32:32px;--r24:24px;--r20:20px;--r16:16px;--r14:14px;--r12:12px;
+  }
+  html[data-theme="light"]{
+    --bg:#f3f4f6; --card:#ffffff; --card-elevated:#fafbfc; --stroke:#e6e8eb;
+    --text:#15171a; --text-dim:#6b6f76; --text-faint:#9a9da2;
+    --green-dim:rgba(18,184,102,0.12); --green-text:#0fa860;
+    --blue-dim:rgba(77,159,255,0.12);
+    --amber-dim:rgba(230,150,40,0.14);
+    --red-dim:rgba(230,60,60,0.10);
+    --shadow:0 12px 30px rgba(20,20,25,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;overflow-x:hidden;}
+  html,body{background:var(--bg);}
+  body{color:var(--text);font-family:'Geologica',sans-serif;letter-spacing:-0.03em;font-weight:400;transition:background .2s ease,color .2s ease;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  :focus-visible{outline:2px solid var(--green);outline-offset:2px;}
 
-.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
-.spinner{width:26px;height:26px;border:2px solid var(--line-strong);border-top-color:var(--accent);border-radius:50%;animation:spin .65s linear infinite}
-.loading-text{color:var(--ink-faint);font-size:.75rem}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+  .loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;}
+  .spinner{width:26px;height:26px;border:2px solid var(--stroke);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite;}
 
-.shell{width:100%;animation:fadeUp .3s ease}
+  .app{display:flex;justify-content:center;}
+  .content{width:100%;max-width:920px;padding:4px 0 40px;display:flex;flex-direction:column;gap:20px;animation:fadeUp .3s ease;}
 
-/* HERO 1 */
-.page-hero{background:var(--dark);border-radius:64px;padding:72px 80px;margin-bottom:24px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap}
-.page-hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:16px}
-.page-hero-title{font-size:clamp(2.8rem,5vw,4.5rem);font-weight:500;letter-spacing:-.04em;line-height:1.02;color:#fff;margin-bottom:10px}
-.page-hero-sub{color:rgba(255,255,255,.3);font-size:.92rem;font-weight:300}
+  /* ===== topbar — идентичен profile.html/support.html ===== */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 4px 8px;gap:10px;}
+  .topbar-right{display:flex;gap:10px;}
+  .icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;}
+  .icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);display:none;}
+  .icon-btn svg{width:21px;height:21px;}
+  .icon-btn .sun{display:none;}
+  html[data-theme="light"] .icon-btn .moon{display:none;}
+  html[data-theme="light"] .icon-btn .sun{display:block;}
+  #menuBtnMobile{display:flex;}
+  @media (min-width:981px){ #menuBtnMobile{display:none;} }
 
-.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;text-decoration:none;cursor:pointer;border:none;border-radius:12px;padding:16px 28px;font-size:15px;letter-spacing:-.01em;transition:background .1s,transform .12s,border-color .12s,color .12s,opacity .15s;white-space:nowrap}
-.btn:hover:not(:disabled){transform:translateY(-1px)}
-.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
-.btn-ghost{background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);color:rgba(255,255,255,.75)}
-.btn-ghost:hover{background:rgba(255,255,255,.13);color:#fff}
-.btn:disabled{opacity:.4;cursor:default;transform:none}
+  /* ===== hero ===== */
+  .hero{background:var(--card);border-radius:var(--r32);padding:24px;border:1px solid var(--stroke);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .hero-title{font-size:19px;font-weight:600;display:flex;align-items:center;gap:10px;}
+  .hero-sub{font-size:13px;color:var(--text-dim);margin-top:4px;}
+  .unread-pip{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:var(--r20);background:var(--red-dim);color:var(--red);font-size:11px;font-weight:600;}
+  .mark-all-btn{background:var(--card-elevated);color:var(--text-dim);font-weight:600;font-size:13px;padding:12px 18px;border-radius:var(--r16);display:inline-flex;align-items:center;gap:6px;border:1px solid var(--stroke);cursor:pointer;font-family:inherit;flex-shrink:0;transition:color .15s,border-color .15s;}
+  .mark-all-btn:hover:not(:disabled){color:var(--text);border-color:var(--text-faint);}
+  .mark-all-btn:disabled{opacity:.45;cursor:default;}
+  .mark-all-btn svg{width:15px;height:15px;}
+  @media (min-width:981px){
+    .hero{padding:30px 34px;}
+    .hero-title{font-size:23px;}
+    .hero-sub{font-size:14px;}
+  }
 
-/* TOOLBAR */
-.toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
-.tabs{display:inline-flex;background:var(--bg3);border:1.5px solid var(--line);border-radius:20px;padding:4px;gap:2px;overflow-x:auto;max-width:100%}
-.tab{border:none;background:transparent;color:var(--ink-faint);font-family:var(--font);font-size:.78rem;font-weight:500;padding:.45rem 1.1rem;border-radius:16px;cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
-.tab:hover{color:var(--ink)}
-.tab.is-active{background:var(--dark);color:#fff}
-.tab-badge{background:rgba(0,0,0,.08);color:inherit;font-size:.68rem;font-weight:500;padding:.05rem .4rem;border-radius:10px;line-height:1.5}
-.tab.is-active .tab-badge{background:rgba(255,255,255,.18)}
-.count-label{color:var(--ink-faint);font-size:.76rem;white-space:nowrap}
+  /* ===== toolbar ===== */
+  .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 4px;}
+  .tabs{display:inline-flex;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r20);padding:4px;gap:2px;overflow-x:auto;max-width:100%;}
+  .tab{border:none;background:transparent;color:var(--text-dim);font-family:inherit;font-size:12.5px;font-weight:500;padding:8px 14px;border-radius:var(--r16);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap;}
+  .tab:hover{color:var(--text);}
+  .tab.is-active{background:var(--green);color:#0d1210;}
+  .count-label{font-size:12px;color:var(--text-faint);flex-shrink:0;padding-right:4px;white-space:nowrap;}
 
-/* LIST */
-.notif-list{display:flex;flex-direction:column;gap:12px}
-.notif-row-wrap{position:relative;border:1.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--bg);box-shadow:var(--sh1);animation:rowIn .2s ease both;transition:box-shadow .15s,border-color .15s,transform .15s}
-.notif-row-wrap:hover{border-color:var(--line-strong);box-shadow:var(--sh2);transform:translateY(-1px)}
-.notif-row-wrap::before{content:'';position:absolute;left:14px;top:16px;bottom:16px;width:3px;border-radius:3px;background:var(--line-strong);opacity:.4}
-.notif-row-wrap[data-type="order"]::before{background:var(--accent-d);opacity:1}
-.notif-row-wrap[data-type="support"]::before{background:var(--info);opacity:1}
-.notif-row-wrap[data-type="service"]::before{background:var(--warn);opacity:1}
-.notif-row-wrap.is-filtered{display:none}
-.notif-item{all:unset;box-sizing:border-box;display:flex;align-items:flex-start;gap:16px;width:100%;padding:24px 32px 24px 40px;cursor:pointer;transition:background .15s;font-family:var(--font)}
-.notif-item:hover{background:var(--bg2)}
-.notif-row-wrap.unread .notif-item{background:var(--accent-wash)}
-.notif-row-wrap.unread .notif-item:hover{background:rgba(30,222,123,.18)}
-.notif-ico{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--bg2)}
-.notif-ico svg{width:19px;height:19px;stroke:var(--ink-dim);stroke-width:1.8;fill:none}
-.notif-ico.order{background:var(--dark)}
-.notif-ico.order svg{stroke:var(--accent)}
-.notif-ico.support{background:var(--info-wash)}
-.notif-ico.support svg{stroke:var(--info)}
-.notif-ico.service{background:var(--warn-wash)}
-.notif-ico.service svg{stroke:var(--warn)}
-.notif-body{flex:1;min-width:0;padding-top:2px}
-.notif-title-row{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.notif-title{font-size:.95rem;font-weight:500;color:var(--ink);letter-spacing:-.01em}
-.notif-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-h);flex-shrink:0}
-.notif-text{font-size:.85rem;color:var(--ink-dim);line-height:1.6;margin-bottom:8px}
-.notif-time{font-size:.72rem;color:var(--ink-faint)}
-.notif-chevron{width:16px;height:16px;stroke:var(--ink-faint);stroke-width:2;fill:none;flex-shrink:0;margin-top:14px}
+  /* ===== notification list ===== */
+  .card{background:var(--card);border-radius:var(--r24);padding:8px 20px;border:1px solid var(--stroke);}
+  .notif-row{all:unset;display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--stroke);cursor:pointer;width:100%;font-family:inherit;animation:fadeUp .2s ease both;}
+  .notif-list-inner .notif-row:last-child{border-bottom:none;}
+  .notif-row:hover .notif-chevron{transform:translateX(2px);}
+  .notif-icon{width:40px;height:40px;border-radius:var(--r14);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text-dim);}
+  .notif-icon svg{width:18px;height:18px;}
+  .notif-icon.order{background:var(--blue-dim);color:var(--blue);border-color:transparent;}
+  .notif-icon.support{background:var(--green-dim);color:var(--green-text);border-color:transparent;}
+  .notif-icon.service{background:var(--amber-dim);color:var(--amber);border-color:transparent;}
+  .notif-icon .unread-dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--card);}
+  .notif-mid{flex:1;min-width:0;}
+  .notif-title{font-size:14px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .notif-title.unread{color:var(--green-text);}
+  .notif-text{font-size:12px;color:var(--text-faint);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .notif-right{text-align:right;flex-shrink:0;display:flex;align-items:center;gap:8px;}
+  .notif-time{font-size:12px;color:var(--text-faint);white-space:nowrap;}
+  .notif-chevron{width:15px;height:15px;stroke:var(--text-faint);stroke-width:2;fill:none;transition:transform .15s;flex-shrink:0;}
+  .empty-state{text-align:center;padding:64px 16px;}
+  .empty-state svg{width:38px;height:38px;stroke:var(--text-faint);stroke-width:1.4;fill:none;margin-bottom:16px;}
+  .empty-state h3{font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px;}
+  .empty-state p{font-size:13px;color:var(--text-dim);}
 
-/* EMPTY */
-.empty{text-align:center;padding:96px 16px}
-.empty-ico{margin-bottom:24px;display:flex;justify-content:center}
-.empty-ico svg{width:56px;height:56px;stroke:var(--accent);stroke-width:1;fill:none;opacity:.4}
-.empty h3{font-size:1.15rem;font-weight:500;color:var(--ink);margin-bottom:8px;letter-spacing:-.01em}
-.empty p{font-size:.88rem;color:var(--ink-dim);font-weight:300;line-height:1.6}
+  @media (max-width:640px){
+    .toolbar{flex-direction:column;align-items:stretch;}
+    .count-label{display:none;}
+    .notif-time{display:none;}
+    .notif-chevron{display:none;}
+  }
 
-/* TOAST */
-.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:14px;font-size:.78rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.success{background:var(--accent);color:var(--dark)}
-.toast.error{background:var(--dark);color:#fff}
-.toast.info{background:var(--dark);color:#fff}
-
-@media(max-width:900px){
-  .page-hero{border-radius:32px;padding:40px 36px}
-  .page-hero-title{font-size:2.4rem}
-}
-@media(max-width:600px){
-  .page-hero{border-radius:24px;padding:28px 24px;flex-direction:column;align-items:flex-start}
-  .page-hero-title{font-size:1.9rem}
-  .page-hero>.btn{align-self:flex-start}
-  .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
-  .tabs{width:100%}
-  .notif-item{padding:18px 20px 18px 26px}
-  .notif-chevron{display:none}
-}
-#sbContent{padding-bottom:80px}
-  </style>
+  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.65rem 1.4rem;border-radius:var(--r16);font-size:.8rem;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;font-family:'Geologica',sans-serif;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.success{background:var(--green);color:#0d1210;}
+  .toast.error{background:var(--card);color:var(--text);border:1px solid var(--stroke);}
+  .toast.info{background:var(--card);color:var(--text);border:1px solid var(--stroke);}
+  #sbContent{padding-bottom:60px;}
+</style>
 </head>
 <body>
-<script src="../nav.js" data-page="notifications"></script>
 <script src="../sidebar.js" data-page="notifications"></script>
 
-<div class="loading-screen" id="loadingScreen">
-  <div class="spinner"></div>
-  <span class="loading-text">Загружаю уведомления...</span>
-</div>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
 <div id="sbContent" style="display:none">
-<div class="shell" id="appWrap">
+<div class="app">
+  <div class="content">
 
-  <div class="page-hero">
-    <div>
-      <div class="page-hero-eyebrow">Личный кабинет</div>
-      <div class="page-hero-title">Уведомления</div>
-      <div class="page-hero-sub">Статусы заказов, ответы поддержки и обслуживание сайта</div>
+    <div class="topbar">
+      <button class="icon-btn" id="menuBtnMobile" aria-label="Меню" title="Меню">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+      </button>
+      <div class="topbar-right">
+        <a class="icon-btn" href="../" title="На antviz.ru">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>
+        </a>
+        <div class="icon-btn" id="themeToggle" title="Сменить тему">
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>
+        </div>
+        <a class="icon-btn" href="notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span class="dot" id="notifDot"></span>
+        </a>
+      </div>
     </div>
-    <button class="btn btn-ghost" id="markAllBtn">
-      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-      Прочитать все
-    </button>
-  </div>
 
-  <div class="toolbar">
-    <div class="tabs" id="notifTabs">
-      <button class="tab is-active" data-filter="all">Все</button>
-      <button class="tab" data-filter="unread">Непрочитанные <span class="tab-badge" id="unreadBadge" style="display:none">0</span></button>
-      <button class="tab" data-filter="order">Заказы</button>
-      <button class="tab" data-filter="support">Поддержка</button>
-      <button class="tab" data-filter="service">Обслуживание</button>
+    <div class="hero">
+      <div>
+        <div class="hero-title">Уведомления <span class="unread-pip" id="headerUnread" style="display:none">0</span></div>
+        <div class="hero-sub">Статусы заказов, ответы поддержки и обслуживание сайта</div>
+      </div>
+      <button class="mark-all-btn" id="markAllBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Прочитать все
+      </button>
     </div>
-    <span class="count-label" id="notifCount"></span>
-  </div>
 
-  <div class="notif-list" id="notifList">
-    <div style="padding:32px;color:var(--ink-faint);font-size:.85rem">Загрузка...</div>
-  </div>
+    <div class="toolbar">
+      <div class="tabs" id="notifTabs">
+        <button class="tab is-active" data-filter="all">Все</button>
+        <button class="tab" data-filter="unread">Непрочитанные</button>
+        <button class="tab" data-filter="order">Заказы</button>
+        <button class="tab" data-filter="support">Поддержка</button>
+        <button class="tab" data-filter="service">Обслуживание</button>
+      </div>
+      <span class="count-label" id="notifCount"></span>
+    </div>
 
+    <div class="card">
+      <div class="notif-list-inner" id="notifList">
+        <div style="padding:32px;color:var(--text-faint);font-size:13px;text-align:center">Загрузка...</div>
+      </div>
+    </div>
+
+  </div>
 </div>
-</div>
+</div><!-- /sbContent -->
 
 <div class="toast" id="toast"></div>
 
@@ -186,30 +208,29 @@ function fmtTime(ts){
   return d.toLocaleDateString('ru',{day:'numeric',month:'long'})+' · '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
 }
 
+// Монохромные иконки-линии (fill=none/stroke=currentColor) — цвет задаёт .notif-icon.<type>,
+// это тот же принцип, что и цветные мини-иконки статистики в profile.html.
 const ICONS = {
-  order: '<svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
-  support: '<svg viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
-  service: '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>',
+  order: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
+  support: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+  service: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M6.34 17.66l-1.41 1.41M2 12h2M20 12h2M17.66 17.66l1.41 1.41M4.93 4.93l1.41 1.41M12 2v2M12 20v2"/></svg>',
 };
 
-function notifItem(n, idx){
+function notifRow(n){
   const type = n.type || 'order';
   const unread = !n.read;
   const link = n.link || '';
-  return `<div class="notif-row-wrap${unread?' unread':''}" data-type="${esc(type)}" data-id="${esc(n.id)}" style="animation-delay:${idx*30}ms">
-    <button type="button" class="notif-item" data-id="${esc(n.id)}" data-link="${esc(link)}">
-      <div class="notif-ico ${esc(type)}">${ICONS[type]||ICONS.order}</div>
-      <div class="notif-body">
-        <div class="notif-title-row">
-          <div class="notif-title">${esc(n.title||'Уведомление')}</div>
-          ${unread?'<div class="notif-dot"></div>':''}
-        </div>
-        ${n.text?`<div class="notif-text">${esc(n.text)}</div>`:''}
-        <div class="notif-time">${fmtTime(n.createdAt)}</div>
-      </div>
-      ${link?'<svg class="notif-chevron" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>':''}
-    </button>
-  </div>`;
+  return `<button type="button" class="notif-row" data-id="${esc(n.id)}" data-link="${esc(link)}">
+    <div class="notif-icon ${esc(type)}">${ICONS[type]||ICONS.order}${unread?'<span class="unread-dot"></span>':''}</div>
+    <div class="notif-mid">
+      <div class="notif-title${unread?' unread':''}">${esc(n.title||'Уведомление')}</div>
+      ${n.text?`<div class="notif-text">${esc(n.text)}</div>`:''}
+    </div>
+    <div class="notif-right">
+      <span class="notif-time">${fmtTime(n.createdAt)}</span>
+      ${link?'<svg class="notif-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>':''}
+    </div>
+  </button>`;
 }
 
 function render(){
@@ -219,20 +240,20 @@ function render(){
   else if(activeFilter!=='all') filtered = allNotifs.filter(n=>(n.type||'order')===activeFilter);
 
   if(!filtered.length){
-    el.innerHTML = `<div class="empty">
-      <div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+    el.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
       <h3>${activeFilter==='unread'?'Нет непрочитанных':'Здесь появятся уведомления'}</h3>
       <p>Статусы заказов и ответы поддержки будут отображаться здесь</p>
     </div>`;
   }else{
-    el.innerHTML = filtered.map(notifItem).join('');
+    el.innerHTML = filtered.map(notifRow).join('');
   }
 
   const unreadCount = allNotifs.filter(n=>!n.read).length;
   document.getElementById('markAllBtn').disabled = !unreadCount;
-  const badge = document.getElementById('unreadBadge');
-  badge.style.display = unreadCount ? '' : 'none';
-  badge.textContent = unreadCount;
+  const headerBadge = document.getElementById('headerUnread');
+  headerBadge.style.display = unreadCount ? 'inline-flex' : 'none';
+  headerBadge.textContent = unreadCount;
   document.getElementById('notifCount').textContent = allNotifs.length ? `Показано ${filtered.length} из ${allNotifs.length}` : '';
 }
 
@@ -245,7 +266,7 @@ window.openNotif = async function(id, link){
 };
 
 document.getElementById('notifList').addEventListener('click', e=>{
-  const btn = e.target.closest('.notif-item');
+  const btn = e.target.closest('.notif-row');
   if(!btn) return;
   window.openNotif(btn.dataset.id, btn.dataset.link);
 });

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Вход — Antviz</title>
@@ -712,8 +713,18 @@
 
 
   let _registering = false;
-  onAuthStateChanged(auth, user => {
+  const TG_LINK_URL = 'https://3ssqztgbot22wsq.vercel.app/api/link-webapp';
+  const inTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
+  async function linkTelegramIfNeeded(user){
+    if(!inTelegram) return;
+    try{
+      const idToken = await user.getIdToken();
+      await fetch(TG_LINK_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({initData:window.Telegram.WebApp.initData})});
+    }catch(e){console.error('Telegram link failed:',e);}
+  }
+  onAuthStateChanged(auth, async user => {
     if(user && !_registering) {
+      await linkTelegramIfNeeded(user);
       const ref = document.referrer;
       window.location.href = (ref && ref.includes('order')) ? 'order' : 'profile';
     }
@@ -829,6 +840,7 @@
         console.error('Firestore saveProfile error:',fsErr);
       }
       registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
+      await linkTelegramIfNeeded(cred.user);
       window.location.href='welcome';
     }
     catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));document.getElementById('registerBtn').disabled=true;toast(friendlyAuthError(e),'error');}

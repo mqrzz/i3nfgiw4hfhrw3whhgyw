@@ -541,8 +541,10 @@ async function notifyClient(uid,title,text,button){
     const idToken=await auth.currentUser.getIdToken();
     const body={uid,title,text};
     if(button){body.buttonText=button.text;body.buttonUrl=button.url;}
-    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(()=>{});
-  }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}
+    const r=await fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)});
+    if(!r.ok){const errBody=await r.text().catch(()=>'');console.error('[TG notify] бот ответил ошибкой',r.status,errBody);}
+    else{const j=await r.json().catch(()=>({}));if(j.sent===false)console.warn('[TG notify] клиент не привязал Telegram — это нормально, не ошибка');}
+  }catch(e){console.error('[TG notify] запрос не ушёл (сеть/CORS):',e);}
 }
 let allOrders=[],allReviews=[],_cache=[];
 let selOrderId=null,selUid=null;

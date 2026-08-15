@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Заказы — Antviz Admin.</title>
+<title>Заказы — Antviz Admin</title>
 <link rel="icon" href="../img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
@@ -515,7 +515,7 @@ const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Налич�
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 
 // Домен бэкенда бота — вписать после деплоя на Vercel (см. README у antviz-tgbot)
-const TG_NOTIFY_URL='https://3ssqztgbot22wsq.vercel.app/api/notify';
+const TG_NOTIFY_URL='https://antviz-tgbot.vercel.app/api/notify';
 
 // Пишет уведомление в кабинет клиента И дублирует его в Telegram, если он привязан.
 // Используется везде вместо прямого addDoc(collection(db,'notifications',...)).
@@ -524,7 +524,7 @@ async function notifyClient(uid,title,text,button){
   await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
   try{
     const idToken=await auth.currentUser.getIdToken();
-    const body={uid,text:`${title}\n${text}`};
+    const body={uid,title,text};
     if(button){body.buttonText=button.text;body.buttonUrl=button.url;}
     fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(()=>{});
   }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}

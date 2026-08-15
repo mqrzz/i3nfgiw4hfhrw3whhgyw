@@ -154,7 +154,17 @@
   .chat-msg.user{background:var(--green);color:#0d1210;border-bottom-right-radius:4px;}
   .chat-msg.support{background:var(--card);border:1px solid var(--stroke);color:var(--text);border-bottom-left-radius:4px;}
   .chat-msg .msg-time{display:block;font-size:10.5px;margin-top:4px;opacity:.65;}
-  .chat-msg .msg-img{max-width:200px;border-radius:10px;margin-top:6px;display:block;}
+  .chat-msg .msg-img{max-width:200px;border-radius:10px;margin-top:6px;display:block;cursor:zoom-in;transition:opacity .15s;}
+  .chat-msg .msg-img:hover{opacity:.9;}
+
+  /* ===== лайтбокс для просмотра вложений ===== */
+  .lightbox-overlay{position:fixed;inset:0;z-index:9800;background:rgba(8,9,10,.88);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .lightbox-overlay.show{opacity:1;pointer-events:all;}
+  .lightbox-overlay img{max-width:92vw;max-height:88vh;border-radius:var(--r16);box-shadow:0 20px 60px rgba(0,0,0,.5);}
+  .lightbox-close{position:absolute;top:22px;right:22px;width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .lightbox-close:hover{background:rgba(255,255,255,.18);}
+  .lightbox-close svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;}
+  @media(max-width:640px){ .lightbox-close{top:max(16px,env(safe-area-inset-top));right:16px;} }
 
   .chat-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:50px 20px;color:var(--text-faint);margin:auto;}
   .chat-empty svg{width:32px;height:32px;stroke-width:1.4;}
@@ -293,20 +303,6 @@
           <button class="tab" data-filter="in-progress">В обработке</button>
           <button class="tab" data-filter="resolved">Решённые</button>
         </div>
-        <div class="topic-select">
-          <select id="topicFilter">
-            <option value="all">Все темы</option>
-            <option value="Техническая проблема">Техническая проблема</option>
-            <option value="Идея / предложение">Идея / предложение</option>
-            <option value="Вопрос по оплате">Вопрос по оплате</option>
-            <option value="Правки по проекту">Правки по проекту</option>
-            <option value="Другое">Другое</option>
-          </select>
-        </div>
-        <div class="search-box">
-          <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="searchInput" placeholder="Поиск..."/>
-        </div>
       </div>
       <span class="count-label" id="ticketCount"></span>
     </div>
@@ -322,6 +318,14 @@
 </div><!-- /sbContent -->
 
 <div class="toast" id="toast"></div>
+
+<!-- LIGHTBOX для просмотра вложений -->
+<div class="lightbox-overlay" id="lightboxOverlay" onclick="closeLightbox(event)">
+  <button class="lightbox-close" onclick="closeLightbox(event)" aria-label="Закрыть">
+    <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+  </button>
+  <img id="lightboxImg" src="" alt="Вложение">
+</div>
 
 <!-- TICKET CHAT DRAWER -->
 <div class="drawer-overlay" id="drawerOverlay">
@@ -411,8 +415,18 @@ document.getElementById('drawerOverlay').addEventListener('click', e => {
   if (e.target === document.getElementById('drawerOverlay')) closeDrawer();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closeDrawer(); document.getElementById('ticketFormOverlay').classList.remove('show'); }
+  if (e.key === 'Escape') { closeDrawer(); document.getElementById('ticketFormOverlay').classList.remove('show'); closeLightbox(); }
 });
+
+window.openLightbox = function(src){
+  document.getElementById('lightboxImg').src = src;
+  document.getElementById('lightboxOverlay').classList.add('show');
+};
+window.closeLightbox = function(e){
+  if (e && e.target.tagName === 'IMG') return;
+  document.getElementById('lightboxOverlay').classList.remove('show');
+  setTimeout(() => { document.getElementById('lightboxImg').src = ''; }, 200);
+};
 </script>
 
 <script type="module">
@@ -516,20 +530,8 @@ window.selectOrder = function(id){
 
 function renderTickets() {
   const el = document.getElementById('ticketsList');
-  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  const topicFilter = document.getElementById('topicFilter')?.value || 'all';
   const statusFilter = document.querySelector('.tab.is-active')?.dataset.filter || 'all';
-  let filtered = allTickets.filter(t => {
-    if (statusFilter !== 'all' && t.status !== statusFilter) return false;
-    if (topicFilter !== 'all' && t.topic !== topicFilter) return false;
-    if (search) {
-      const inSubject = (t.subject || '').toLowerCase().includes(search);
-      const inTopic = (t.topic || '').toLowerCase().includes(search);
-      const inMsgs = (t._messages || []).some(m => (m.text || '').toLowerCase().includes(search));
-      return inSubject || inTopic || inMsgs;
-    }
-    return true;
-  });
+  let filtered = allTickets.filter(t => statusFilter === 'all' || t.status === statusFilter);
   filtered.sort((a, b) => {
     const au = hasUnread(a) ? 1 : 0, bu = hasUnread(b) ? 1 : 0;
     if (au !== bu) return bu - au;
@@ -572,8 +574,8 @@ function renderTickets() {
   }).join('');
 }
 
-const ICON_SUPPORT = '<svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>';
-const ICON_USER = '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.6 3.3-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></svg>';
+const ICON_SUPPORT = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>';
+const ICON_USER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20.5c0-3.6 3.3-6.2 7.5-6.2s7.5 2.6 7.5 6.2"/></svg>';
 
 function buildChat(msgs) {
   if (!msgs.length) return '<div class="chat-empty"><div class="chat-avatar" style="width:44px;height:44px">' + ICON_SUPPORT.replace('viewBox="0 0 24 24"','viewBox="0 0 24 24" style="width:20px;height:20px"') + '</div><span style="font-size:13px">Начните диалог — напишите первым</span></div>';
@@ -588,7 +590,7 @@ function buildChat(msgs) {
     html += `<div class="chat-row ${cls}">
       <div class="chat-avatar">${cls === 'user' ? ICON_USER : ICON_SUPPORT}</div>
       <div class="chat-msg ${cls}">
-        ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение"/>` : ''}
+        ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение" onclick="openLightbox('${esc(m.imageUrl)}')"/>` : ''}
         ${m.text && m.text !== 'Вложение' ? esc(m.text).replace(/\n/g,'<br>') : ''}
         <span class="msg-time">${time}</span>
       </div>
@@ -720,10 +722,6 @@ document.getElementById('ticketTabs').addEventListener('click', e => {
   document.querySelectorAll('.tab').forEach(b => b.classList.toggle('is-active', b === btn));
   renderTickets();
 });
-
-let searchTimeout;
-document.getElementById('searchInput').addEventListener('input', () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(renderTickets, 250); });
-document.getElementById('topicFilter').addEventListener('change', renderTickets);
 
 function subscribeMessages(ticketId) {
   if (unsubMessages[ticketId]) return;

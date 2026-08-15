@@ -14,23 +14,23 @@ const NOTIFY_CONFIG = {
   // id — "метка версии". Меняешь текст/буллеты ниже — обязательно
   // поменяй и id (например 'whitelist-2026-07' -> 'whitelist-2026-08'),
   // иначе те, кто уже нажал «Не показывать снова», не увидят обновление.
-  id: 'whitelist-1',
+  id: 'tg-bot-1',
 
-  eyebrow: 'Важно',                      // маленький бейдж сверху ('' — чтобы убрать)
-  title: 'Сайт может открываться нестабильно',   // крупный заголовок
+  eyebrow: 'Новое',                      // маленький бейдж сверху ('' — чтобы убрать)
+  title: 'У нас появился Telegram-бот',   // крупный заголовок
 
-  // Буллеты слева, как на референсе. icon: 'globe' | 'clock' | 'shield' | 'check'
+  // Буллеты слева, как на референсе. icon: 'bell' | 'status' | 'zap' | 'check'
   bullets: [
-    { icon: 'globe', text: 'Из-за блокировок и замедления интернета в России сайт иногда может открываться с задержкой или не открываться вовсе.' },
-    { icon: 'clock', text: 'По той же причине сроки обработки заказов и ответов в поддержке могут немного смещаться.' },
-    { icon: 'shield', text: 'Это последствия действий властей, а не наша ошибка — мы всё чиним и работаем в штатном режиме.' }
+    { icon: 'bell', text: 'Подключите уведомления — они будут приходить прямо в Telegram, как только что-то меняется по вашему заказу.' },
+    { icon: 'status', text: 'Смотрите статусы заказов в реальном времени, не заходя в личный кабинет.' },
+    { icon: 'zap', text: 'В боте много других полезных функций — постепенно будем добавлять ещё.' }
   ],
 
   // Текст-подсказка под буллетами (можно оставить пустым '')
-  footnote: 'Если сайт не открывается — попробуйте подождать или добавьте antviz.ru в белый список вашего провайдера/антивируса.',
+  footnote: '',
 
-  primaryText: 'Понятно',                // текст тёмной кнопки
-  primaryHref: null,                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
+  primaryText: 'Подключить в настройках',                // текст тёмной кнопки
+  primaryHref: '../settings#sec-telegram',                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
 
   dontShowAgainText: 'Не показывать снова', // текстовая кнопка-ссылка под основной кнопкой ('' или null — убрать)
 
@@ -55,22 +55,23 @@ const NOTIFY_CONFIG = {
   const SESSION_PREFIX = 'antviz_notify_session_';    // временный флаг (persist:'session')
 
   const ICONS = {
-    globe: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>',
-    clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
-    shield: '<path d="M12 2l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5z"/><path d="M9 12l2 2 4-4"/>',
+    bell: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+    status: '<path d="M12 22V12"/><path d="m16 17 2 2 4-4"/><path d="M21 11.127V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l1.32-.753"/><path d="M3.29 7 12 12l8.71-5"/><path d="m7.5 4.27 8.997 5.148"/>',
+    zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
     check: '<circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/>'
   };
 
-  // Иконка для правой (тёмной) панели — стандартный сигнал wifi
-  // (пропорции как у обычной иконки: дуги сужаются к центру, а не
-  // растягиваются во всю ширину). Ближняя дуга и точка — зелёные.
+  // Иконка для правой (тёмной) панели — настоящий логотип Telegram
+  // (Bootstrap Icons, bi-telegram), перекрашенный в фирменный градиент.
   const PANEL_ICON = `
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"
-         fill="none" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 18l.01 0" stroke="#1ede7b" stroke-width="2.5"/>
-      <path d="M9.172 15.172a4 4 0 0 1 5.656 0" stroke="#1ede7b" stroke-width="2"/>
-      <path d="M6.343 12.343a8 8 0 0 1 11.314 0" stroke="rgba(255,255,255,.32)" stroke-width="2"/>
-      <path d="M3.515 9.515c4.686 -4.687 12.284 -4.687 17 0" stroke="rgba(255,255,255,.16)" stroke-width="2"/>
+    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="an-tg-grad" x1="0" y1="0" x2="16" y2="16" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#2AABEE"/>
+          <stop offset="1" stop-color="#229ED9"/>
+        </linearGradient>
+      </defs>
+      <path fill="url(#an-tg-grad)" d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/>
     </svg>`;
 
   const CSS = `
@@ -156,18 +157,17 @@ const NOTIFY_CONFIG = {
     .an-dismiss:hover{ color:var(--text,#191b1e); }
 
     @media (max-width:720px){
-      .an-overlay{ padding:0; align-items:flex-start; }
+      .an-overlay{ padding:16px; align-items:center; }
       .an-card{
-        flex-direction:column; max-width:none; width:100%; height:100dvh; height:100vh;
-        border-radius:0; transform:translateY(100%); opacity:1;
+        flex-direction:column; max-width:440px; width:100%; max-height:90vh;
+        border-radius:32px;
         overflow-y:auto;
       }
-      .an-overlay.show .an-card{ transform:translateY(0); }
-      .an-visual{ flex:0 0 auto; padding:24px 20px 16px; order:-1; }
-      .an-visual svg{ max-width:110px; }
-      .an-content{ padding:16px 24px calc(28px + env(safe-area-inset-bottom)); flex:1; }
-      .an-actions{ margin-top:24px; }
-      .an-title{ font-size:22px; }
+      .an-visual{ flex:0 0 auto; padding:24px 20px 8px; order:-1; }
+      .an-visual svg{ max-width:96px; }
+      .an-content{ padding:16px 24px calc(24px + env(safe-area-inset-bottom)); flex:1; }
+      .an-actions{ margin-top:20px; }
+      .an-title{ font-size:21px; }
     }
   `;
 

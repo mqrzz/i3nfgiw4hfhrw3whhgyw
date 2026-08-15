@@ -117,6 +117,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .tiers-grid{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:16px;margin-top:48px}
 @media(max-width:900px){.tiers-grid{grid-template-columns:1fr}}
 .tier{background:var(--bg3);border:1.5px solid var(--border);border-radius:40px;padding:40px 36px;cursor:pointer;text-decoration:none;color:inherit;display:block;transition:transform .15s,box-shadow .15s,border-color .15s}
+.tier[hidden]{display:none}
 @media(max-width:900px){.tier{border-radius:24px}}
 .tier:hover{transform:translateY(-2px);box-shadow:var(--sh2)}
 .tier.dark{background:var(--dark);border-color:var(--dark)}
@@ -360,20 +361,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 <!-- PROGRESS BAR -->
 <div class="progress-bar" id="progressBar">
   <div class="progress-inner">
-    <a class="progress-step" id="ps1" href="#step-format" onclick="smoothTo('step-format',event)">
+    <a class="progress-step" id="ps0" href="#step-track" onclick="smoothTo('step-track',event)">
       <span class="progress-num">1</span>
+      <span class="progress-step-label">Что нужно</span>
+    </a>
+    <a class="progress-step" id="ps1" href="#step-format" onclick="smoothTo('step-format',event)">
+      <span class="progress-num">2</span>
       <span class="progress-step-label">Формат</span>
     </a>
     <a class="progress-step" id="ps2" href="#step-tier" onclick="smoothTo('step-tier',event)">
-      <span class="progress-num">2</span>
+      <span class="progress-num">3</span>
       <span class="progress-step-label">Масштаб</span>
     </a>
     <a class="progress-step" id="ps3" href="#step-extras" onclick="smoothTo('step-extras',event)">
-      <span class="progress-num">3</span>
+      <span class="progress-num">4</span>
       <span class="progress-step-label">Опции</span>
     </a>
     <a class="progress-step" id="ps4" href="#step-details" onclick="smoothTo('step-details',event)">
-      <span class="progress-num">4</span>
+      <span class="progress-num">5</span>
       <span class="progress-step-label">Детали</span>
     </a>
   </div>
@@ -383,10 +388,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
   <div class="container">
     <div class="hero-block reveal">
       <div class="hero-eyebrow">Новый заказ · Antviz</div>
-      <h1>Сайт под ключ —<br/><em>за четыре шага</em></h1>
-      <p>Выберите формат и масштаб, включите нужные опции — стоимость считается сразу. Ответ — в течение часа.</p>
+      <h1>Сайт или бот —<br/><em>под ключ</em></h1>
+      <p>Выберите, что нужно, включите опции — стоимость считается сразу. Ответ — в течение часа.</p>
       <div class="hero-btns">
-        <a href="#step-format" class="btn btn-green btn-lg" onclick="smoothTo('step-format',event)">Начать оформление</a>
+        <a href="#step-track" class="btn btn-green btn-lg" onclick="smoothTo('step-track',event)">Начать оформление</a>
         <a href="/" class="btn btn-inv btn-lg">На главную</a>
       </div>
     </div>
@@ -891,8 +896,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 function smoothTo(id,e){if(e)e.preventDefault();const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
 
 // Progress bar highlight
-const sections=['step-format','step-tier','step-extras','step-details'];
-const pSteps=[document.getElementById('ps1'),document.getElementById('ps2'),document.getElementById('ps3'),document.getElementById('ps4')];
+const sections=['step-track','step-format','step-tier','step-extras','step-details'];
+const pSteps=[document.getElementById('ps0'),document.getElementById('ps1'),document.getElementById('ps2'),document.getElementById('ps3'),document.getElementById('ps4')];
 function updateProgress(){
   let active=0;
   sections.forEach((id,i)=>{

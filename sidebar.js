@@ -286,7 +286,7 @@
   const NAV_ITEMS = [
     { key:'profile',       href:b+'profile',               icon:'<rect x="3.5" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="13" y="3.5" width="7.5" height="7.5" rx="2"/><rect x="3.5" y="13" width="7.5" height="7.5" rx="2"/><rect x="13" y="13" width="7.5" height="7.5" rx="2"/>', label:'Обзор', color:'blue' },
     { key:'orders',        href:b+'profile/orders',        icon:'<rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 9.5h8M8 13h8M8 16.5h4.5"/>', label:'Мои заказы', badgeKey:'orders', color:'green' },
-    { key:'sites',         href:b+'profile/sites',         icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>', label:'Мои сайты', color:'teal' },
+    { key:'sites',         href:b+'profile/sites',         icon:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/>', label:'Мои проекты', color:'teal' },
     { key:'support',       href:b+'profile/support',       icon:'<path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/>', label:'Чат с командой', badgeKey:'support', color:'purple' },
     { key:'tickets',       href:b+'profile/tickets',       icon:'<path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/>', label:'Обслуживание', badgeKey:'tickets', color:'orange' },
     { key:'notifications', href:b+'profile/notifications', icon:'<path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>', label:'Уведомления', badgeKey:'notif', color:'pink' },

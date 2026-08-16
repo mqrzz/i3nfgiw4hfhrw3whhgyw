@@ -24,7 +24,7 @@
 
 <script type="module">
 import { auth } from './firebase-config.js';
-import { signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const EXCHANGE_URL = 'https://3ssqztgbot22wsq.vercel.app/api/exchange-app-token';
 
@@ -42,7 +42,7 @@ function fail(text){
   fallbackEl.innerHTML = `<a class="btn" href="${to}">Открыть кабинет</a>`;
 }
 
-(async () => {
+async function exchangeAndSignIn(){
   if(!code){ fail('Ссылка неполная — откройте кабинет и войдите обычным способом.'); return; }
   try{
     const r = await fetch(EXCHANGE_URL, {
@@ -54,14 +54,28 @@ function fail(text){
     const data = await r.json();
     if(!data.customToken) throw new Error('no customToken');
     await signInWithCustomToken(auth, data.customToken);
-    // Сессия сохраняется в браузере на весь домен antviz.ru — дальше просто
-    // переходим на нужную страницу, она сама увидит уже вошедшего пользователя.
     window.location.replace(to);
   }catch(e){
     console.error('tg-enter error:', e);
     fail('Не получилось войти автоматически — ссылка могла устареть. Откройте кабинет и войдите обычным способом.');
   }
-})();
+}
+
+// ГЛАВНОЕ: если в этом Telegram-браузере уже есть действующая сессия (заходили
+// отсюда раньше) — сразу переходим дальше, без единого запроса к серверу.
+// Обмен кода на вход идёт в сеть (Vercel + Firestore + Firebase) только один
+// раз, при самом первом заходе — все следующие нажатия кнопок в боте открывают
+// кабинет мгновенно, локально, без сети.
+let decided = false;
+onAuthStateChanged(auth, user => {
+  if(decided) return;
+  decided = true;
+  if(user){
+    window.location.replace(to);
+  }else{
+    exchangeAndSignIn();
+  }
+});
 </script>
 </body>
 </html>

@@ -248,17 +248,16 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
 
 function siteCard(o){
-  // Best-effort: у бот-заказов пока нет отдельного поля с "адресом" — угадываем
-  // по нескольким вероятным именам полей, чтобы ссылка "Открыть" не терялась.
-  // Когда появится точная схема данных для ботов/миниапп — заменить на неё.
-  const botHandle = o.botUsername || o.tgBotUsername || o.botLink || null;
+  // Поля бота (botUsername/botLink) пишет admin-orders.html при доставке заказа
+  // через блок «Готовый бот / миниапп» — это уже реальная схема, не догадка.
+  const botHandle = o.botUsername || o.botLink || null;
   const href = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl)
     : (o.siteDomain ? 'https://'+o.siteDomain
     : (botHandle ? (botHandle.match(/^https?:\/\//) ? botHandle : 'https://t.me/'+botHandle.replace(/^@|^https?:\/\/t\.me\//i,''))
     : (o.projectUrl || null)));
   const pagesCount = o.sitePages ? parseInt(o.sitePages,10) : null;
   const repoHref = o.siteRepo ? (o.siteRepo.match(/^https?:\/\//) ? o.siteRepo : 'https://github.com/'+o.siteRepo.replace(/^\/+/,'')) : null;
-  const isBotLike = /бот|bot|telegram|тг[\s-]?бот|миниап|mini\s?app/i.test(o.siteType||'');
+  const isBotLike = !!o.botUsername || /бот|bot|telegram|тг[\s-]?бот|миниап|mini\s?app/i.test(o.siteType||'');
 
   const hasSupport = o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > new Date();
   const statusPill = hasSupport
@@ -279,7 +278,7 @@ function siteCard(o){
       </div>
       ${statusPill}
     </div>
-    <div class="site-domain">${esc(o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase()))}</div>
+    <div class="site-domain">${esc(o.siteDomain || (o.botUsername ? '@'+o.botUsername : ('№ '+o.id.slice(0,8).toUpperCase())))}</div>
     <div class="site-meta-list">
       <span class="site-meta-chip"><span class="site-meta-ico mic-blue"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="site-meta-text">${fmtDate(o.createdAt)}</span></span>
       <span class="site-meta-chip"><span class="site-meta-ico mic-green"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span><span class="site-meta-text">${esc(o.siteType||'Проект')} · ${esc(o.tariff||o.package||'')}</span></span>

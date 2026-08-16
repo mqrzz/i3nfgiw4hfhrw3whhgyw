@@ -522,12 +522,12 @@ html[data-theme="light"] .icon-btn .sun{display:block}
       <div class="empty-card-left">
         <div class="ico-badge xl c-orange"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 00-5.6 5l-6 6a2 2 0 002.8 2.8l6-6a4 4 0 005-5.6l-2.8 2.8-2-2z"/></svg></div>
         <div class="empty-card-text">
-          <h2>Обслуживание сайта</h2>
+          <h2>Обслуживание проекта</h2>
           <p>Подключите ежемесячную поддержку — и отправляйте заявки на правки, замену контента и доработки без новых заказов.</p>
           <p class="empty-note">Для подключения сначала нужен завершённый проект.</p>
         </div>
       </div>
-      <a href="../order" class="btn btn-primary">Оформить сайт</a>
+      <a href="../order" class="btn btn-primary">Оформить заказ</a>
     </div>
   </div>
 
@@ -539,14 +539,14 @@ html[data-theme="light"] .icon-btn .sun{display:block}
       <div class="step-pill" id="stepPill2"><span class="step-n">2</span>Тариф</div>
     </div>
 
-    <!-- Шаг 1: выбор сайта -->
+    <!-- Шаг 1: выбор проекта -->
     <div id="buyStepSite" style="display:none">
       <div class="site-grid" id="siteGrid"></div>
     </div>
 
     <!-- Шаг 2: тариф -->
     <div id="buyStepTariff" style="display:none">
-      <button class="buy-back" id="buyBackBtn" style="display:none" onclick="goStep(1)"><svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Выбрать другой сайт</button>
+      <button class="buy-back" id="buyBackBtn" style="display:none" onclick="goStep(1)"><svg viewBox="0 0 24 24" fill="none"><polyline points="15 18 9 12 15 6"/></svg>Выбрать другой проект</button>
 
       <div class="buy-target" id="buyTargetWrap" style="display:none">
         <div class="ico-badge sm c-orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>
@@ -620,7 +620,7 @@ html[data-theme="light"] .icon-btn .sun{display:block}
               </ul>
             </div>
           </div>
-          <div class="scope-note">Обслуживание не обязательно — сайт остаётся рабочим и без подписки. Нужна правка изредка — закажите её разово. Правок много — подписка выходит дешевле и даёт приоритетный ответ.</div>
+          <div class="scope-note">Обслуживание не обязательно — проект остаётся рабочим и без подписки. Нужна правка изредка — закажите её разово. Правок много — подписка выходит дешевле и даёт приоритетный ответ.</div>
         </div></div>
       </div>
 
@@ -773,7 +773,7 @@ html[data-theme="light"] .icon-btn .sun{display:block}
           <div class="ico-badge lg c-indigo"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg></div>
           <div>
             <div class="card-title">История заявок</div>
-            <div class="card-sub" id="listSub">Все обращения по этому сайту</div>
+            <div class="card-sub" id="listSub">Все обращения по этому проекту</div>
           </div>
         </div>
         <div class="chip-row" id="chipRow">
@@ -793,7 +793,8 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 
 <script type="module">
 import{auth,db}from'../firebase-config.js';
-import{onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{touchSession,watchSessionRevocation}from'./sessions.js?v=3';
 import{collection,query,where,orderBy,getDocs,getCountFromServer,addDoc,serverTimestamp,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const PAY_URL='https://api-lac-six-78.vercel.app/api/createPayment';
@@ -1078,7 +1079,7 @@ window.submitOnceOff=async function(){
   const title=document.getElementById('oTitle').value.trim();
   const targetId=pendBuyId||pendId;
   if(!title){toast('Введите тему заявки','error');return;}
-  if(!targetId){toast('Не найден сайт','error');return;}
+  if(!targetId){toast('Не найден проект','error');return;}
   if(inFlight)return;inFlight=true;
   const btn=document.getElementById('onceSubmitBtn');btn.disabled=true;setBtnLabel(btn,'Оформляем...');
   try{
@@ -1110,7 +1111,14 @@ function setListLoading(on){
 async function loadTickets(){
   if(!sel)return;const oid=sel.id;
   setListLoading(true);
-  try{const s=await getDocs(query(collection(db,'service_tickets'),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
+  // ВАЖНО: раньше запрос фильтровал только по orderId, без uid. Заявка
+  // создаётся успешно (addDoc проходит), но правила безопасности Firestore
+  // не могут подтвердить для ВСЕЙ выборки (list), что все документы
+  // принадлежат текущему пользователю, если это не видно из самого запроса —
+  // и просто отклоняют чтение целиком (permission-denied), хотя запись уже
+  // есть в базе. Отсюда "заявки не отправляются, история не загружается,
+  // но в Firestore они есть". Фильтр по uid устраняет это.
+  try{const s=await getDocs(query(collection(db,'service_tickets'),where('uid','==',cu.uid),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
   const all=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
 
   const periodStart=periodStartFor(sel);
@@ -1189,7 +1197,7 @@ if(dz){
 window.submitTicket=async function(){
   if(ticketsThisPeriod>=TICKET_LIMIT){toast('Лимит заявок исчерпан','error');return;}
   const title=document.getElementById('tTitle').value.trim(),desc=document.getElementById('tDesc').value.trim();
-  if(!title){toast('Введите тему заявки','error');return;}if(!sel){toast('Не выбран сайт','error');return;}
+  if(!title){toast('Введите тему заявки','error');return;}if(!sel){toast('Не выбран проект','error');return;}
   const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Отправка...';
   try{
     await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:photos.length?photos:null,uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',orderId:sel.id,orderSiteType:sel.siteType||'',orderTariff:sel.tariff||sel.package||'',orderDomain:sel.siteDomain||'',billing:'subscription',status:'open',createdAt:serverTimestamp()});
@@ -1205,6 +1213,10 @@ onAuthStateChanged(auth,async u=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
   await init(u);
+  touchSession(db, auth, u);
+  watchSessionRevocation(db, u.uid, () => {
+    signOut(auth).finally(() => { window.location.href = '../auth'; });
+  });
 });
 </script>
 <script>

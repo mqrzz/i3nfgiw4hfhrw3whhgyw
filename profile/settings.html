@@ -435,12 +435,14 @@ function renderTelegramStatus(userData){
 }
 import {
   getSessionId, endSession, endAllOtherSessions, endCurrentSession,
-  timeAgo, deviceLabel, deviceIconSVG, endSessionIconSVG
+  timeAgo, deviceLabel, deviceIconSVG, endSessionIconSVG,
+  touchSession, watchSessionRevocation
 } from './sessions.js?v=3';
 
 let currentUser = null;
 let isGoogleUser = false;
 let sessionsUnsub = null;
+let revocationUnsub = null;
 
 function toast(msg, type='info'){
   const t=document.getElementById('toast');
@@ -615,14 +617,44 @@ window.confirmDeleteAccount=async function(){
   const btn=document.getElementById('deleteConfirmBtn');
   btn.textContent='Удаляем...';btn.disabled=true;
   try{
-    const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',currentUser.uid)));
-    for(const x of ordSnap.docs) await updateDoc(x.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
-    const chatSnap=await getDocs(collection(db,'chats',currentUser.uid,'messages'));
+    const uid=currentUser.uid;
+
+    // Раньше заказы только анонимизировались (оставались в базе), а тикеты
+    // поддержки, тикеты обслуживания и уведомления не удалялись вообще —
+    // хотя попап прямо обещает "заказы и переписка будут стёрты без
+    // возможности восстановления". Приводим код в соответствие с текстом.
+
+    // Заказы — полное удаление
+    const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',uid)));
+    for(const x of ordSnap.docs) await deleteDoc(x.ref).catch(()=>{});
+
+    // Тикеты поддержки (общие) + их переписка
+    const ticketSnap=await getDocs(query(collection(db,'tickets'),where('uid','==',uid)));
+    for(const t of ticketSnap.docs){
+      const msgSnap=await getDocs(collection(db,'tickets',t.id,'messages'));
+      for(const m of msgSnap.docs) await deleteDoc(m.ref).catch(()=>{});
+      await deleteDoc(t.ref).catch(()=>{});
+    }
+
+    // Тикеты обслуживания (заявки по подписке/разово)
+    const svcSnap=await getDocs(query(collection(db,'service_tickets'),where('uid','==',uid)));
+    for(const x of svcSnap.docs) await deleteDoc(x.ref).catch(()=>{});
+
+    // Уведомления
+    const notifSnap=await getDocs(collection(db,'notifications',uid,'items'));
+    for(const x of notifSnap.docs) await deleteDoc(x.ref).catch(()=>{});
+    await deleteDoc(doc(db,'notifications',uid)).catch(()=>{});
+
+    // Старый чат (если использовался)
+    const chatSnap=await getDocs(collection(db,'chats',uid,'messages'));
     for(const x of chatSnap.docs) await deleteDoc(x.ref).catch(()=>{});
-    await deleteDoc(doc(db,'chats',currentUser.uid)).catch(()=>{});
-    const sessSnap=await getDocs(collection(db,'users',currentUser.uid,'sessions'));
+    await deleteDoc(doc(db,'chats',uid)).catch(()=>{});
+
+    // Сеансы
+    const sessSnap=await getDocs(collection(db,'users',uid,'sessions'));
     for(const x of sessSnap.docs) await deleteDoc(x.ref).catch(()=>{});
-    await deleteDoc(doc(db,'users',currentUser.uid)).catch(()=>{});
+
+    await deleteDoc(doc(db,'users',uid)).catch(()=>{});
     await deleteUser(currentUser);
     window.location.href='../auth';
   }catch(e){
@@ -644,6 +676,12 @@ onAuthStateChanged(auth,async user=>{
   onSnapshot(doc(db,'users',user.uid), snap=>renderTelegramStatus(snap.data()));
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('cabinet').style.display='block';
+
+  touchSession(db, auth, user);
+  if(revocationUnsub) revocationUnsub();
+  revocationUnsub = watchSessionRevocation(db, user.uid, () => {
+    signOut(auth).finally(() => { window.location.href = '../auth'; });
+  });
 });
 </script>
 

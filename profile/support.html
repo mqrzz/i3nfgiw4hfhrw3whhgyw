@@ -457,10 +457,23 @@ let _activeTicketId = null;
 
 // ── presence: помечаем юзера "онлайн в поддержке", пока эта страница
 // открыта и вкладка активна — чтобы админка не дублировала уведомление
-// в notifications + Telegram, если он и так тут всё видит вживую ──
+// в notifications + Telegram, если он и так тут всё видит вживую.
+// Кроме мгновенной записи по событиям — держим лёгкий heartbeat (раз в
+// 20 сек, пока вкладка видима): событие ухода (pagehide) не гарантированно
+// успевает долететь до сервера, если вкладку закрыли резко — без heartbeat
+// online:true может зависнуть навсегда. Админка сама считает статус
+// протухшим, если updatedAt старше ~40 сек, так что зависание живёт
+// максимум до следующего протухания, а не бесконечно.
+let _presenceInterval = null;
 function setPresence(online) {
   if (!currentUser) return;
   setDoc(doc(db, 'presence', currentUser.uid), { online, updatedAt: serverTimestamp() }, { merge: true }).catch(() => {});
+}
+function startPresenceHeartbeat() {
+  if (_presenceInterval) return;
+  _presenceInterval = setInterval(() => {
+    if (document.visibilityState === 'visible') setPresence(true);
+  }, 20000);
 }
 document.addEventListener('visibilitychange', () => setPresence(document.visibilityState === 'visible'));
 window.addEventListener('pagehide', () => setPresence(false));
@@ -790,6 +803,7 @@ onAuthStateChanged(auth, async user => {
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('sbContent').style.display = 'block';
   setPresence(true);
+  startPresenceHeartbeat();
   await loadUserOrders(user.uid);
   const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
   unsubTickets = onSnapshot(q, async snap => {

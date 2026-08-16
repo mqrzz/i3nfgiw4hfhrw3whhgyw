@@ -436,12 +436,12 @@ html[data-theme="light"] .icon-btn .sun{display:block}
     <div class="modal-icon">
       <svg viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>
     </div>
-    <h3>Ваш сайт готов!</h3>
+    <h3>Ваш заказ готов!</h3>
     <p class="modal-p">Работа завершена — можно посмотреть результат</p>
     <div id="deliveryModalContent"></div>
     <div class="modal-btns">
       <button class="btn btn-outline" onclick="closeDelivery()">Закрыть</button>
-      <a class="btn btn-green" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть сайт →</a>
+      <a class="btn btn-green" id="deliveryLink" href="#" target="_blank" rel="noopener">Открыть →</a>
     </div>
   </div>
 </div>
@@ -546,7 +546,8 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 
 <script type="module">
 import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
 import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
@@ -701,7 +702,7 @@ function orderCard(o){
 function renderOrders(orders){
   const el=document.getElementById('ordersList');
   if(!orders.length){
-    el.innerHTML=`<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><h3>Здесь появятся ваши заказы</h3><p>Оформите первый проект — это займёт пару минут</p><a href="../order" class="btn btn-green btn-sm">Заказать сайт</a></div>`;
+    el.innerHTML=`<div class="empty"><div class="empty-ico"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div><h3>Здесь появятся ваши заказы</h3><p>Оформите первый проект — это займёт пару минут</p><a href="../order" class="btn btn-green btn-sm">Оформить заказ</a></div>`;
     return;
   }
   el.innerHTML=orders.map(o=>orderCard(o)).join('');
@@ -746,10 +747,10 @@ window.openOrderModal=function(id){
   if(hasSite){
     const href=o.siteUrl?(o.siteUrl.match(/^https?:\/\//)?o.siteUrl:'https://'+o.siteUrl):('https://'+(o.siteDomain||''));
     const pages=(o.sitePages||'').split('\n').filter(Boolean);
-    siteBlock='<div class="delivery-card"><div class="delivery-card-eyebrow">Готовый сайт</div>'
+    siteBlock='<div class="delivery-card"><div class="delivery-card-eyebrow">Готовый проект</div>'
       +(o.siteDomain?'<div class="site-domain-big">'+esc(o.siteDomain)+'</div>':'')
       +(pages.length?'<div style="display:flex;flex-direction:column;gap:4px;margin-bottom:16px">'+pages.map(p=>'<div style="font-size:12px;color:var(--ink-dim);display:flex;gap:8px"><span style="color:var(--accent)">→</span>'+esc(p)+'</div>').join('')+'</div>':'')
-      +'<a href="'+href+'" target="_blank" rel="noopener" class="btn btn-green" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть сайт</a>'
+      +'<a href="'+href+'" target="_blank" rel="noopener" class="btn btn-green" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть</a>'
       +'</div>';
   }
 
@@ -781,7 +782,7 @@ window.openOrderModal=function(id){
   // RIGHT
   let rightHtml='';
   if(isPartial&&halfPaid&&(s===5||s===6)){
-    rightHtml+='<div class="pay-gate-banner"><div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div><div class="pay-gate-sub">Для получения сайта оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div><button class="btn btn-green" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center">Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить сайт</button></div>';
+    rightHtml+='<div class="pay-gate-banner"><div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div><div class="pay-gate-sub">Для получения заказа оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div><button class="btn btn-green" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center">Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить заказ</button></div>';
   }else if(isPartial&&halfPaid){
     rightHtml+='<div class="pay-remaining-banner"><div class="pay-remaining-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Предоплата получена</div><div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ можно оплатить в любое время.</div><button class="btn btn-remaining-cta" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center;margin-top:4px">Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
   }
@@ -884,7 +885,7 @@ window.printReceipt=function(id){
   const fP=o.paid||(isP&&pA>=(o.totalPrice||0));
   const pSt=fP?'Оплачен полностью':(isP&&pA>0?'Предоплата 50%':'Не оплачен');
   const pRows=isP?`<tr><td>Оплачено</td><td>${pA.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fP?'—':rA.toLocaleString('ru')+' ₽'}</td></tr>`:'';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${esc(o.clientName||'—')}</td></tr><tr><td>Email</td><td>${esc(o.clientEmail||'—')}</td></tr><tr><td>Тип сайта</td><td>${esc(o.siteType||'—')}</td></tr><tr><td>Тариф</td><td>${esc(o.tariff||o.package||'—')}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${esc(o.clientName||'—')}</td></tr><tr><td>Email</td><td>${esc(o.clientEmail||'—')}</td></tr><tr><td>Тип заказа</td><td>${esc(o.siteType||'—')}</td></tr><tr><td>Тариф</td><td>${esc(o.tariff||o.package||'—')}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
   w.document.write(html);w.document.close();
 };
 
@@ -933,6 +934,10 @@ onAuthStateChanged(auth,async user=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
   loadOrders(user.uid);
+  touchSession(db, auth, user);
+  watchSessionRevocation(db, user.uid, () => {
+    signOut(auth).finally(() => { window.location.href = '../auth'; });
+  });
 });
 </script>
 

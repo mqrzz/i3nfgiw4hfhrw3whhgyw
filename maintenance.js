@@ -139,28 +139,50 @@
           display:flex;overflow:hidden;
         }
         #maint-content {
-          flex:1 1 56%;padding:56px 48px;display:flex;flex-direction:column;justify-content:center;min-width:0;
+          flex:1 1 56%;padding:48px 44px 40px;display:flex;flex-direction:column;min-width:0;
         }
         #maint-visual {
           flex:0 0 42%;background:var(--dark,#191b1e);
-          display:flex;align-items:center;justify-content:center;padding:20px;
+          display:flex;align-items:center;justify-content:flex-end;padding:20px 20px 36px;
         }
-        #maint-visual svg { width:100%;max-width:220px;height:auto;stroke:#fff;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
+        #maint-visual svg { width:100%;max-width:220px;height:auto;stroke:#1ede7b;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
         #maint-label {
           display:inline-flex;align-self:flex-start;
           background:var(--green-dim,#d2f8e5);color:var(--green-text,#149955);
           font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:20px;
         }
-        #maint-title { font-size:clamp(26px,3.4vw,34px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:var(--text,#191b1e);margin:0 0 16px; }
+        #maint-title { font-size:clamp(24px,3vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:var(--text,#191b1e);margin:0 0 24px; }
         #maint-title em { font-style:normal;color:#1ede7b; }
-        #maint-text { font-size:15px;color:var(--text-dim,#707a8a);font-weight:300;line-height:1.6;max-width:400px; }
+        #maint-bullets { display:flex;flex-direction:column;gap:16px;margin-bottom:24px; }
+        #maint-bullets .mt-bullet { display:flex;align-items:flex-start;gap:14px; }
+        #maint-bullets .mt-bullet-icon {
+          flex:0 0 auto;width:32px;height:32px;border-radius:12px;background:var(--bg3,#f9fafc);
+          border:1px solid var(--stroke,#dfe3e8);display:flex;align-items:center;justify-content:center;margin-top:1px;
+        }
+        #maint-bullets .mt-bullet-icon svg { width:16px;height:16px;stroke:var(--green-text,#149955);stroke-width:1.8;fill:none; }
+        #maint-bullets .mt-bullet-text { font-size:14px;color:var(--text,#191b1e);font-weight:300;line-height:1.5;letter-spacing:-.01em; }
+        #maint-actions { margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:12px; }
+        #maint-actions .mt-btn {
+          display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+          font-family:inherit;font-weight:500;text-decoration:none;cursor:pointer;border:none;
+          background:var(--dark,#191b1e);color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
+          transition:background .1s,transform .12s;
+        }
+        #maint-actions .mt-btn:hover { background:var(--dark2,#2b2f33);transform:translateY(-1px); }
+        #maint-support {
+          background:none;border:none;cursor:pointer;font-family:inherit;
+          font-size:13px;font-weight:300;color:var(--text-dim,#707a8a);text-decoration:underline;
+          text-underline-offset:3px;padding:2px;align-self:center;margin:0 auto;
+        }
+        #maint-support:hover { color:var(--text,#191b1e); }
         @media(max-width:720px){
           #maint-overlay { padding:16px; }
           #maint-card { flex-direction:column;max-width:440px;width:100%;max-height:90vh;border-radius:32px;overflow-y:auto; }
-          #maint-visual { flex:0 0 auto;padding:24px 20px 8px;order:-1; }
+          #maint-visual { flex:0 0 auto;padding:24px 20px 8px;order:-1;justify-content:center; }
           #maint-visual svg { max-width:150px; }
-          #maint-content { padding:24px 24px calc(28px + env(safe-area-inset-bottom)); }
-          #maint-title { font-size:23px; }
+          #maint-content { padding:16px 24px calc(24px + env(safe-area-inset-bottom)); flex:1; }
+          #maint-actions { margin-top:20px; }
+          #maint-title { font-size:21px; }
         }
       `;
       document.head.appendChild(style);
@@ -171,12 +193,31 @@
           <div id="maint-content">
             <div id="maint-label">Технические работы</div>
             <h1 id="maint-title">Скоро <em>вернёмся</em></h1>
-            <p id="maint-text">Сайт временно недоступен — идут технические работы. Обычно это занимает не больше часа.</p>
+            <div id="maint-bullets">
+              <div class="mt-bullet">
+                <div class="mt-bullet-icon"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+                <div class="mt-bullet-text">Устраняем ошибки и баги, найденные в работе кабинета.</div>
+              </div>
+              <div class="mt-bullet">
+                <div class="mt-bullet-icon"><svg viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg></div>
+                <div class="mt-bullet-text">Добавляем новый функционал и улучшения кабинета.</div>
+              </div>
+              <div class="mt-bullet">
+                <div class="mt-bullet-icon"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                <div class="mt-bullet-text">Повышаем стабильность и скорость работы сайта.</div>
+              </div>
+            </div>
+            <div id="maint-actions">
+              <button class="mt-btn" id="maint-refresh">Обновить страницу</button>
+              <a id="maint-support" href="https://t.me/antviz_official" target="_blank" rel="noopener">Поддержка в Telegram</a>
+            </div>
           </div>
           <div id="maint-visual"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
         </div>`;
       document.body.appendChild(mo);
       document.body.style.overflow = 'hidden';
+      const refreshBtn = mo.querySelector('#maint-refresh');
+      if (refreshBtn) refreshBtn.addEventListener('click', () => window.location.reload());
     }
     function removeMaint() {
       if (!mo) return;

@@ -395,7 +395,7 @@
         </div>
         <div class="fgroup">
           <label>Краткое описание</label>
-          <input type="text" id="ticketSubject" placeholder="Например: не загружается сайт"/>
+          <input type="text" id="ticketSubject" placeholder="Например: не работает после оплаты"/>
         </div>
         <div class="fgroup">
           <label>Сообщение</label>
@@ -440,7 +440,8 @@ window.closeLightbox = function(e){
 
 <script type="module">
 import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
 import {
   collection, query, where, orderBy, onSnapshot,
   addDoc, serverTimestamp, doc, updateDoc, getDocs
@@ -783,6 +784,20 @@ onAuthStateChanged(auth, async user => {
     }
     allTickets = incoming;
     renderTickets();
+  }, err => {
+    // Раньше ошибку тут никак не обрабатывали — если запрос падал (например
+    // из-за отсутствующего составного индекса uid+createdAt в Firestore),
+    // список тикетов молча оставался в состоянии "Загрузка..." навсегда,
+    // хотя сами тикеты создавались нормально. Показываем это явно.
+    console.error('tickets onSnapshot error:', err);
+    const el = document.getElementById('ticketsList');
+    if (el) el.innerHTML = '<div style="padding:32px;color:var(--text-faint);font-size:13px;text-align:center">Не удалось загрузить историю обращений. Обновите страницу.</div>';
+    toast('Не удалось загрузить историю обращений', 'error');
+  });
+
+  touchSession(db, auth, user);
+  watchSessionRevocation(db, user.uid, () => {
+    signOut(auth).finally(() => { window.location.href = '../auth'; });
   });
 
   // Если пришли по ссылке с конкретным заказом — сразу открываем форму создания

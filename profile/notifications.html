@@ -161,7 +161,7 @@
     <div class="hero">
       <div>
         <div class="hero-title">Уведомления <span class="unread-pip" id="headerUnread" style="display:none">0</span></div>
-        <div class="hero-sub">Статусы заказов, ответы поддержки и обслуживание сайта</div>
+        <div class="hero-sub">Статусы заказов, ответы поддержки и обслуживание проектов</div>
       </div>
       <button class="mark-all-btn" id="markAllBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -194,8 +194,9 @@
 
 <script type="module">
 import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
 
 let currentUser = null;
 let allNotifs = [];
@@ -319,6 +320,10 @@ onAuthStateChanged(auth, user=>{
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
   loadNotifications(user.uid);
+  touchSession(db, auth, user);
+  watchSessionRevocation(db, user.uid, () => {
+    signOut(auth).finally(() => { window.location.href = '../auth'; });
+  });
 });
 </script>
 

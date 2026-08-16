@@ -552,7 +552,7 @@
     { sep: true },
     { section: 'Кабинет' },
     { href: b+'profile/orders',        icon: '<path d="M7 5h6l4 4v10a1 1 0 01-1 1H7a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M13 5v4h4"/><path d="M9 13h6M9 16h4"/>', label: 'Мои заказы', badgeKey: 'orders' },
-    { href: b+'profile/sites',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.8 2.8 2.8 14.2 0 17M12 3.5c-2.8 2.8-2.8 14.2 0 17"/>', label: 'Мои сайты' },
+    { href: b+'profile/sites',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.8 2.8 2.8 14.2 0 17M12 3.5c-2.8 2.8-2.8 14.2 0 17"/>', label: 'Мои проекты' },
     { href: b+'profile/tickets',       icon: '<path d="M14.5 6.2a3.6 3.6 0 00-4.9 4.66l-5.6 5.6a1.9 1.9 0 002.7 2.7l5.6-5.6a3.6 3.6 0 004.66-4.9l-2.53 2.53-2-2z"/>', label: 'Обслуживание', badgeKey: 'tickets' },
     { href: b+'profile/support',       icon: '<path d="M20.5 11.5a8.5 8.5 0 01-12.4 7.55L4 20l1.02-3.9a8.5 8.4 0 1115.48-4.6z"/>', label: 'Поддержка', badgeKey: 'support' },
     { href: b+'profile/notifications', icon: '<path d="M6.5 9.2a5.5 5.5 0 0111 0c0 6 2 7.3 2 7.3H4.5s2-1.3 2-7.3z"/><path d="M10.2 20.5a2 2 0 003.6 0"/>', label: 'Уведомления', badgeKey: 'notif' },

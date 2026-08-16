@@ -126,6 +126,7 @@
       if (mo) return;
       const style = document.createElement('style');
       style.textContent = `
+        #maint-overlay, #maint-overlay *{ box-sizing:border-box; }
         #maint-overlay {
           position:fixed;inset:0;z-index:99999;
           background:rgba(25,27,30,.5);backdrop-filter:blur(4px);
@@ -143,7 +144,7 @@
         }
         #maint-visual {
           flex:0 0 42%;background:var(--dark,#191b1e);
-          display:flex;align-items:center;justify-content:flex-end;padding:20px 20px 36px;
+          display:flex;align-items:flex-end;justify-content:center;padding:20px 20px 36px;
         }
         #maint-visual svg { width:100%;max-width:220px;height:auto;stroke:#1ede7b;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
         #maint-label {
@@ -163,6 +164,7 @@
         #maint-bullets .mt-bullet-text { font-size:14px;color:var(--text,#191b1e);font-weight:300;line-height:1.5;letter-spacing:-.01em; }
         #maint-actions { margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:12px; }
         #maint-actions .mt-btn {
+          box-sizing:border-box;
           display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
           font-family:inherit;font-weight:500;text-decoration:none;cursor:pointer;border:none;
           background:var(--dark,#191b1e);color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
@@ -236,39 +238,53 @@
 
         const style = document.createElement('style');
         style.textContent = `
+          #ban-overlay, #ban-overlay *{ box-sizing:border-box; }
           #ban-overlay {
-            position:fixed;inset:0;z-index:99999;background:#fff;
-            display:flex;align-items:center;justify-content:center;
-            padding:24px;font-family:Geologica,Inter,Arial,sans-serif;
+            position:fixed;inset:0;z-index:99999;
+            background:rgba(25,27,30,.5);backdrop-filter:blur(4px);
+            display:flex;align-items:center;justify-content:center;padding:24px;
+            font-family:var(--font,'Geologica',Inter,Arial,sans-serif);letter-spacing:-.01em;
           }
           #ban-card {
-            position:relative;overflow:hidden;
-            background:#f9fafc;border-radius:56px;padding:64px 72px 68px;
-            text-align:center;max-width:600px;width:100%;
-            border:1.5px solid #dfe3e8;
-            box-shadow:0 1px 2px rgba(25,27,30,.03),0 40px 70px -36px rgba(25,27,30,.22);
+            position:relative;width:100%;max-width:860px;
+            background:var(--bg,#fff);border:1px solid var(--stroke,#dfe3e8);border-radius:40px;
+            box-shadow:var(--sh2,0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08));
+            display:flex;overflow:hidden;
           }
-          #ban-glow {
-            position:absolute;top:-90px;left:50%;transform:translateX(-50%);
-            width:340px;height:340px;border-radius:50%;
-            background:radial-gradient(circle,rgba(232,99,79,.32),rgba(232,99,79,0) 70%);
-            filter:blur(10px);pointer-events:none;
+          #ban-content {
+            flex:1 1 56%;padding:48px 44px 40px;display:flex;flex-direction:column;min-width:0;
           }
-          #ban-art {
-            position:relative;width:104px;height:104px;margin:0 auto 32px;border-radius:30px;
-            background:linear-gradient(135deg,#ff8a75,#e8634f);
-            display:flex;align-items:center;justify-content:center;
-            box-shadow:0 20px 40px -14px rgba(232,99,79,.55);
+          #ban-visual {
+            flex:0 0 42%;background:var(--dark,#191b1e);
+            display:flex;align-items:flex-end;justify-content:center;padding:20px 20px 36px;
           }
-          #ban-art svg { width:50px;height:50px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round; }
-          #ban-label { position:relative;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#e8634f;margin-bottom:18px; }
-          #ban-title { position:relative;font-size:clamp(34px,5.5vw,52px);font-weight:500;letter-spacing:-.04em;line-height:1.08;color:#191b1e;margin:0 0 18px; }
+          #ban-visual svg { width:100%;max-width:220px;height:auto;stroke:#ff6b52;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
+          #ban-label {
+            display:inline-flex;align-self:flex-start;
+            background:rgba(232,99,79,.12);color:#e8634f;
+            font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:20px;
+          }
+          #ban-title { font-size:clamp(24px,3vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:var(--text,#191b1e);margin:0 0 16px; }
           #ban-title em { font-style:normal;color:#e8634f; }
-          #ban-text { position:relative;font-size:15px;color:#707a8a;font-weight:300;line-height:1.6;max-width:400px;margin:0 auto 22px; }
-          #ban-until { position:relative;display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#191b1e;font-weight:500;margin:0 0 28px;background:rgba(232,99,79,.09);border:1px solid rgba(232,99,79,.22);padding:.5rem 1rem;border-radius:12px; }
-          #ban-btn { position:relative;display:inline-flex;align-items:center;gap:8px;margin-top:4px;background:#191b1e;color:#fff;text-decoration:none;font-size:14px;font-weight:500;padding:14px 30px;border-radius:15px;transition:background .15s,transform .12s,box-shadow .15s;box-shadow:0 1px 2px rgba(25,27,30,.15),0 14px 26px -12px rgba(25,27,30,.5); }
-          #ban-btn:hover { background:#2b2f33;transform:translateY(-1px); }
-          @media(max-width:600px){ #ban-card { border-radius:32px;padding:48px 26px 44px; } #ban-art { width:88px;height:88px;border-radius:26px;margin-bottom:24px; } #ban-art svg { width:42px;height:42px; } }
+          #ban-text { font-size:15px;color:var(--text-dim,#707a8a);font-weight:300;line-height:1.6;max-width:400px;margin-bottom:20px; }
+          #ban-until { display:inline-flex;align-self:flex-start;align-items:center;gap:7px;font-size:13px;color:var(--text,#191b1e);font-weight:500;margin-bottom:28px;background:rgba(232,99,79,.09);border:1px solid rgba(232,99,79,.22);padding:.5rem 1rem;border-radius:12px; }
+          #ban-actions { margin-top:auto; }
+          #ban-btn {
+            box-sizing:border-box;
+            display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
+            font-family:inherit;font-weight:500;text-decoration:none;cursor:pointer;border:none;
+            background:var(--dark,#191b1e);color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
+            transition:background .1s,transform .12s;
+          }
+          #ban-btn:hover { background:var(--dark2,#2b2f33);transform:translateY(-1px); }
+          @media(max-width:720px){
+            #ban-overlay { padding:16px; }
+            #ban-card { flex-direction:column;max-width:440px;width:100%;max-height:90vh;border-radius:32px;overflow-y:auto; }
+            #ban-visual { flex:0 0 auto;padding:24px 20px 8px;order:-1;justify-content:center; }
+            #ban-visual svg { max-width:150px; }
+            #ban-content { padding:16px 24px calc(24px + env(safe-area-inset-bottom)); flex:1; }
+            #ban-title { font-size:21px; }
+          }
         `;
         document.head.appendChild(style);
 
@@ -280,13 +296,14 @@
         bo.id = 'ban-overlay';
         bo.innerHTML = `
           <div id="ban-card">
-            <div id="ban-glow"></div>
-            <div id="ban-art"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></div>
-            <div id="ban-label">Доступ ограничен</div>
-            <h1 id="ban-title">Аккаунт<br><em>заблокирован</em></h1>
-            <p id="ban-text">${reason}</p>
-            <div id="ban-until">${until ? `До ${until}` : 'Блокировка бессрочная'}</div><br>
-            ${showBtn ? `<a id="ban-btn" href="${banData.btnUrl}" target="_blank" rel="noopener">${(banData.btnLabel || 'Написать в поддержку').replace(/[<>]/g, '')} <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>` : ''}
+            <div id="ban-content">
+              <div id="ban-label">Доступ ограничен</div>
+              <h1 id="ban-title">Аккаунт <em>заблокирован</em></h1>
+              <p id="ban-text">${reason}</p>
+              <div id="ban-until">${until ? `До ${until}` : 'Блокировка бессрочная'}</div>
+              ${showBtn ? `<div id="ban-actions"><a id="ban-btn" href="${banData.btnUrl}" target="_blank" rel="noopener">${(banData.btnLabel || 'Написать в поддержку').replace(/[<>]/g, '')}</a></div>` : ''}
+            </div>
+            <div id="ban-visual"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 018 0v3"/></svg></div>
           </div>`;
         document.body.appendChild(bo);
         document.body.style.overflow = 'hidden';

@@ -295,6 +295,12 @@ let allTickets=[], selectedId=null, currentFilter='all', unsubMsgs=null;
 const TG_NOTIFY_URL='https://3ssqztgbot22wsq.vercel.app/api/notify';
 async function notifyClient(uid,title,text,button){
   if(!uid)return;
+  // если клиент прямо сейчас в чате поддержки — он и так увидит ответ вживую,
+  // дублировать в уведомления и телеграм не нужно
+  try{
+    const presSnap=await getDoc(doc(db,'presence',uid));
+    if(presSnap.exists()&&presSnap.data().online)return;
+  }catch(e){/* не удалось проверить presence — считаем офлайн, шлём как раньше */}
   await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
   try{
     const idToken=await auth.currentUser.getIdToken();

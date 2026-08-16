@@ -349,7 +349,7 @@
 
     <a class="cta" href="order">
       <div class="cta-glow"></div>
-      <div class="cta-title">Нужен новый сайт?</div>
+      <div class="cta-title">Нужен новый проект?</div>
       <div class="cta-sub">Оформите заказ на разработку прямо из кабинета</div>
       <div class="cta-btn">Оформить заказ
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -389,6 +389,7 @@ function setStat(id,val){
 <script type="module">
 import { auth, db } from '/firebase-config.js';
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { touchSession, watchSessionRevocation } from '/sessions.js';
 import { collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const FULL_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
@@ -698,6 +699,10 @@ onAuthStateChanged(auth, user=>{
   document.getElementById('cabinet').style.display='block';
   loadOrders(user.uid);
   watchNotifDot(user.uid);
+  touchSession(db, auth, user);
+  watchSessionRevocation(db, user.uid, () => {
+    signOut(auth).finally(() => { window.location.href = 'auth'; });
+  });
 }, err=>{
   console.error('Auth:',err);
   document.getElementById('loadingScreen').style.display='none';

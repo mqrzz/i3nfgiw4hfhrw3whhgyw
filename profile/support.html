@@ -444,7 +444,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
 import {
   collection, query, where, orderBy, onSnapshot,
-  addDoc, serverTimestamp, doc, updateDoc, getDocs
+  addDoc, serverTimestamp, doc, updateDoc, getDocs, setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 let currentUser = null;
@@ -454,6 +454,16 @@ let unsubTickets = null;
 let unsubMessages = {};
 let selectedOrderId = null;
 let _activeTicketId = null;
+
+// ── presence: помечаем юзера "онлайн в поддержке", пока эта страница
+// открыта и вкладка активна — чтобы админка не дублировала уведомление
+// в notifications + Telegram, если он и так тут всё видит вживую ──
+function setPresence(online) {
+  if (!currentUser) return;
+  setDoc(doc(db, 'presence', currentUser.uid), { online, updatedAt: serverTimestamp() }, { merge: true }).catch(() => {});
+}
+document.addEventListener('visibilitychange', () => setPresence(document.visibilityState === 'visible'));
+window.addEventListener('pagehide', () => setPresence(false));
 
 function toast(msg, type = 'info') {
   const t = document.getElementById('toast');
@@ -713,6 +723,14 @@ document.getElementById('submitTicketBtn').addEventListener('click', async funct
         status: 'open', _read: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
       });
       await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), { sender: 'user', text: message, imageUrl: imageUrl || null, createdAt: serverTimestamp() });
+      // Автоответ сразу после создания тикета — предупреждаем про возможную
+      // задержку из-за нагрузки, чтобы человек не ждал в недоумении первого
+      // живого ответа поддержки
+      await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
+        sender: 'support', senderName: 'Поддержка',
+        text: 'Спасибо за обращение! Сейчас у нас повышенная нагрузка, поэтому ответ может занять несколько часов. Приносим извинения за ожидание — мы обязательно ответим.',
+        imageUrl: null, createdAt: serverTimestamp()
+      });
       document.getElementById('ticketFormOverlay').classList.remove('show');
       toast('Тикет создан ✓', 'success');
     } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
@@ -771,6 +789,7 @@ onAuthStateChanged(auth, async user => {
   currentUser = user;
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('sbContent').style.display = 'block';
+  setPresence(true);
   await loadUserOrders(user.uid);
   const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
   unsubTickets = onSnapshot(q, async snap => {

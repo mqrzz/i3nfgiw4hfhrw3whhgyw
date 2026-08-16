@@ -476,6 +476,19 @@ svg{display:block}
               </div>
             </div>
           </div>
+
+          <div class="sec">
+            <div class="sec-h">
+              <div class="sec-h-l"><div class="sec-icon" style="--accent:var(--blue);--accent-bg:var(--blue-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="sec-title">Готовый бот / миниапп</span></div>
+              <button class="btn btn-blue btn-sm" onclick="saveBot()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Сохранить и уведомить</button>
+            </div>
+            <div class="sec-b">
+              <div class="sf">
+                <div class="sf-row"><div class="sf-lbl">Юзернейм бота (без @)</div><input class="si" id="botUsername" type="text" placeholder="my_shop_bot" autocomplete="off"/></div>
+              </div>
+              <div style="font-size:.78rem;color:var(--muted);margin-top:10px;line-height:1.5">Ссылка t.me/юзернейм соберётся автоматически. Поле «Репозиторий» — общее, оно в блоке «Готовый сайт» выше, использовать его можно и для кода бота.</div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -511,11 +524,11 @@ function statusBadgeClass(st){return st===-1?'b-pending':('b'+(st??0));}
 const STATUS_NOTICE={
   '-1':{emoji:'💳',title:'Ждём оплату',text:'Заказ оформлен — осталось оплатить, чтобы мы начали работу.'},
   0:{emoji:'🆕',title:'Заявка принята',text:'Ваша заявка принята в работу, скоро свяжемся для уточнения деталей.'},
-  1:{emoji:'💬',title:'Обсуждаем проект',text:'Сейчас уточняем детали и договариваемся о структуре сайта.'},
-  2:{emoji:'🛠️',title:'В работе',text:'Начали разработку — команда уже занимается вашим сайтом.'},
-  3:{emoji:'👀',title:'На проверке',text:'Сайт собран и проходит внутреннюю проверку перед показом вам.'},
-  4:{emoji:'✏️',title:'Вносим правки',text:'Учитываем ваши замечания и дорабатываем сайт.'},
-  5:{emoji:'🎉',title:'Готово!',text:'Сайт готов — загляните в кабинет, чтобы посмотреть результат.'},
+  1:{emoji:'💬',title:'Обсуждаем проект',text:'Сейчас уточняем детали и договариваемся о структуре проекта.'},
+  2:{emoji:'🛠️',title:'В работе',text:'Начали разработку — команда уже занимается вашим проектом.'},
+  3:{emoji:'👀',title:'На проверке',text:'Проект собран и проходит внутреннюю проверку перед показом вам.'},
+  4:{emoji:'✏️',title:'Вносим правки',text:'Учитываем ваши замечания и дорабатываем проект.'},
+  5:{emoji:'🎉',title:'Готово!',text:'Заказ готов — загляните в кабинет, чтобы посмотреть результат.'},
   6:{emoji:'💳',title:'Нужна доплата',text:'Пришло время внести доплату по заказу, чтобы двигаться дальше.'}
 };
 function statusNotice(st){
@@ -719,7 +732,7 @@ function showDetail(o){
   document.getElementById('dPrice').textContent=fmtP(o.totalPrice);
   document.getElementById('dBadge').innerHTML=`<span class="tag ${tc}" style="font-size:.8rem;padding:.35rem 1.1rem">${esc(t)}</span>`;
   document.getElementById('dHeroInfo').innerHTML=
-    heroChip('Формат сайта',esc(o.siteType||'—'))+
+    heroChip('Формат',esc(o.siteType||'—'))+
     heroChip('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
     heroChip('Создан',fmtD(o.createdAt))+
     heroChip('Клиент',esc(o.clientEmail||'—'));
@@ -745,6 +758,7 @@ function showDetail(o){
   document.getElementById('siteFavicon').value=o.siteFaviconUrl||'';
   document.getElementById('sitePages').value=o.sitePages||'';
   document.getElementById('siteRepo').value=o.siteRepo||'';
+  document.getElementById('botUsername').value=o.botUsername||'';
   document.getElementById('clientInfo').innerHTML=
     icCard('Имя',esc(o.clientName||'—'))+
     icCard('Email',esc(o.clientEmail||'—'));
@@ -1014,6 +1028,16 @@ window.saveSite=async()=>{
   const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,siteRepo:repo,status:5,doneAt:serverTimestamp()});
   if(!ok)return;
   if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`,url?{text:'🌐 Открыть сайт',url}:null);
+  toast('Сохранено и клиент уведомлён ✓','success');
+};
+window.saveBot=async()=>{
+  if(!selOrderId)return;
+  const raw=document.getElementById('botUsername').value.trim();
+  const username=raw.replace(/^@/,'').replace(/^https?:\/\/t\.me\//i,'').replace(/^t\.me\//i,'').replace(/\/+$/,'');
+  const link=username?'https://t.me/'+username:'';
+  const ok=await safeUpdate(selOrderId,{botUsername:username,botLink:link,status:5,doneAt:serverTimestamp()});
+  if(!ok)return;
+  if(selUid&&username)await notifyClient(selUid,'🎉 Ваш бот готов!',`Бот готов: @${username}`,link?{text:'🤖 Открыть бота',url:link}:null);
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{

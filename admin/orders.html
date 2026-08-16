@@ -540,7 +540,7 @@ async function notifyClient(uid,title,text,button){
   try{
     const idToken=await auth.currentUser.getIdToken();
     const body={uid,title,text};
-    if(button){body.buttonText=button.text;body.buttonUrl=button.url;}
+    if(button){body.buttonText=button.text;body.buttonUrl=button.url;if(button.webApp)body.buttonWebApp=true;}
     const r=await fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)});
     if(!r.ok){const errBody=await r.text().catch(()=>'');console.error('[TG notify] бот ответил ошибкой',r.status,errBody);}
     else{const j=await r.json().catch(()=>({}));if(j.sent===false)console.warn('[TG notify] клиент не привязал Telegram — это нормально, не ошибка');}
@@ -919,7 +919,7 @@ window.approveRefund=async()=>{
     confirmLabel:'Одобрить',confirmClass:'btn-green',
     onConfirm:async(val)=>{
       const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:serverTimestamp()},'Возврат одобрен ✓');
-      if(ok&&o.uid)await notifyClient(o.uid,'✅ Возврат одобрен','Средства поступят на счёт в ближайшее время.');
+      if(ok&&o.uid)await notifyClient(o.uid,'✅ Возврат одобрен','Средства поступят на счёт в ближайшее время.',{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});
     }
   });
 };
@@ -933,7 +933,7 @@ window.rejectRefund=async()=>{
     confirmLabel:'Отклонить',confirmClass:'btn-danger',
     onConfirm:async(val)=>{
       const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:serverTimestamp()},'Возврат отклонён');
-      if(ok&&o?.uid)await notifyClient(o.uid,'❌ Возврат отклонён',val||'Свяжитесь с поддержкой для уточнения.');
+      if(ok&&o?.uid)await notifyClient(o.uid,'❌ Возврат отклонён',val||'Свяжитесь с поддержкой для уточнения.',{text:'🆘 Поддержка',url:'https://antviz.ru/profile/support.html',webApp:true});
     }
   });
 };
@@ -946,7 +946,7 @@ window.markRefunded=async()=>{
     confirmLabel:'Подтвердить',confirmClass:'btn-dark',
     onConfirm:async()=>{
       const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:serverTimestamp()},'Возврат завершён ✓');
-      if(ok&&o?.uid)await notifyClient(o.uid,'💸 Средства возвращены','Возврат по заказу завершён.');
+      if(ok&&o?.uid)await notifyClient(o.uid,'💸 Средства возвращены','Возврат по заказу завершён.',{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});
     }
   });
 };
@@ -1000,7 +1000,7 @@ window.setStatus=async s=>{
   } else { msg='Статус → '+S[s]+' ✓'; }
   upd.statusHistory=arrayUnion({status:histStatus,at:now});
   const ok=await safeUpdate(selOrderId,upd,msg);
-  if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`);}
+  if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`,{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});}
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
 window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))},'Дата сохранена ✓');};
@@ -1020,7 +1020,7 @@ window.activateSupport=async(orderId,uid)=>{
   const exp=new Date(Date.now()+30*864e5);
   const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:serverTimestamp(),supportExpiresAt:Timestamp.fromDate(exp),supportRequested:false});
   if(!ok)return;
-  if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.');
+  if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.',{text:'⚙️ Обслуживание',url:'https://antviz.ru/profile/tickets.html',webApp:true});
   toast('Активировано ✓','success');
 };
 window.renewSupport=async orderId=>{
@@ -1039,7 +1039,7 @@ window.sendPayLink=async(orderId,uid)=>{
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
   try{
-    await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',{text:'⚙️ Продлить',url:'https://antviz.ru/profile/tickets.html'});
+    await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',{text:'⚙️ Продлить',url:'https://antviz.ru/profile/tickets.html',webApp:true});
     toast('Уведомление отправлено ✓','success');
   }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
 };

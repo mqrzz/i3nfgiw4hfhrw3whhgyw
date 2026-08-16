@@ -165,15 +165,18 @@
   @media(max-width:560px){.session-row{padding:14px;}.session-end-btn{width:100%;justify-content:center;}}
 
   /* ОПАСНАЯ ЗОНА */
-  .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:16px 0;border-bottom:1px solid var(--stroke);}
-  .danger-row:last-child{border-bottom:none;}
+  .danger-item{border-bottom:1px solid var(--stroke);}
+  .danger-item:last-child{border-bottom:none;}
+  .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:16px 0;}
   .danger-row h4{font-size:14px;font-weight:500;margin-bottom:3px;}
   .danger-row p{font-size:12px;color:var(--text-dim);}
 
-  /* ПОПОВЕР УДАЛЕНИЯ */
-  .delete-pop-wrap{position:relative;}
-  .delete-pop{position:absolute;top:calc(100% + 10px);right:0;width:300px;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r20);padding:18px;box-shadow:var(--shadow);z-index:80;opacity:0;pointer-events:none;transform:translateY(-6px) scale(.97);transform-origin:top right;transition:opacity .15s,transform .15s;}
-  .delete-pop.show{opacity:1;pointer-events:all;transform:translateY(0) scale(1);}
+  /* РАЗВОРАЧИВАЮЩАЯСЯ СЕКЦИЯ УДАЛЕНИЯ */
+  .delete-pop-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.4,0,.2,1);}
+  .delete-pop-wrap.show{grid-template-rows:1fr;}
+  .delete-pop{min-height:0;overflow:hidden;}
+  .delete-pop-inner{background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r20);padding:18px;margin-bottom:18px;opacity:0;transform:translateY(-6px);transition:opacity .22s ease .06s,transform .22s ease .06s;}
+  .delete-pop-wrap.show .delete-pop-inner{opacity:1;transform:translateY(0);}
   .delete-pop-head{display:flex;gap:12px;margin-bottom:14px;}
   .delete-pop-icon{width:36px;height:36px;border-radius:var(--r12);background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .delete-pop-icon svg{width:17px;height:17px;stroke:var(--red);}
@@ -182,10 +185,6 @@
   .delete-pop .field-input{margin-bottom:12px;font-size:13px;padding:10px 12px;}
   .delete-pop-btns{display:flex;gap:8px;}
   .delete-pop-btns .btn{flex:1;justify-content:center;padding:9px 12px;font-size:12px;}
-  @media(max-width:600px){
-    .delete-pop{position:fixed;top:auto;bottom:20px;left:20px;right:20px;width:auto;transform:translateY(10px) scale(.97);}
-    .delete-pop.show{transform:translateY(0) scale(1);}
-  }
 
   .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:11px 20px;border-radius:var(--r16);font-size:13px;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -357,26 +356,32 @@
           <div class="card-sub">Действия с аккаунтом, которые нельзя отменить</div>
         </div>
       </div>
-      <div class="danger-row">
-        <div><h4>Выйти из аккаунта</h4><p>Завершить текущую сессию на этом устройстве</p></div>
-        <button class="btn btn-ghost" onclick="doLogout()">Выйти</button>
+      <div class="danger-item">
+        <div class="danger-row">
+          <div><h4>Выйти из аккаунта</h4><p>Завершить текущую сессию на этом устройстве</p></div>
+          <button class="btn btn-ghost" onclick="doLogout()">Выйти</button>
+        </div>
       </div>
-      <div class="danger-row">
-        <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить личные данные, обращения, уведомления и историю обслуживания</p></div>
-        <div class="delete-pop-wrap">
+      <div class="danger-item">
+        <div class="danger-row">
+          <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить личные данные, обращения, уведомления и историю обслуживания</p></div>
           <button class="btn btn-danger-solid" onclick="toggleDeletePopover()">Удалить</button>
-          <div class="delete-pop" id="deletePopover">
-            <div class="delete-pop-head">
-              <div class="delete-pop-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linejoin="round"/></svg></div>
-              <div>
-                <strong>Удалить аккаунт?</strong>
-                <span>Необратимо — личные данные, переписка, заявки на обслуживание и уведомления будут полностью стёрты. Оформленные (оплаченные) заказы останутся в истории компании обезличенными, без привязки к вам</span>
+        </div>
+        <div class="delete-pop-wrap" id="deletePopover">
+          <div class="delete-pop">
+            <div class="delete-pop-inner">
+              <div class="delete-pop-head">
+                <div class="delete-pop-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linejoin="round"/></svg></div>
+                <div>
+                  <strong>Удалить аккаунт?</strong>
+                  <span>Необратимо — личные данные, переписка, заявки на обслуживание и уведомления будут полностью стёрты. Оформленные (оплаченные) заказы останутся в истории компании обезличенными, без привязки к вам</span>
+                </div>
               </div>
-            </div>
-            <input class="field-input" id="deleteConfirmInput" type="email" placeholder="Введите email для подтверждения">
-            <div class="delete-pop-btns">
-              <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
-              <button class="btn btn-danger" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">Удалить</button>
+              <input class="field-input" id="deleteConfirmInput" type="email" placeholder="Введите email для подтверждения">
+              <div class="delete-pop-btns">
+                <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
+                <button class="btn btn-danger" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">Удалить</button>
+              </div>
             </div>
           </div>
         </div>
@@ -606,8 +611,9 @@ window.toggleDeletePopover=function(){
 };
 window.closeDeleteModal=function(){document.getElementById('deletePopover').classList.remove('show');};
 document.addEventListener('click',e=>{
-  const wrap=document.querySelector('.delete-pop-wrap');
-  if(wrap && !wrap.contains(e.target)) closeDeleteModal();
+  const wrap=document.getElementById('deletePopover');
+  const isDeleteBtn=e.target.closest('.btn-danger-solid');
+  if(wrap && !wrap.contains(e.target) && !isDeleteBtn) closeDeleteModal();
 });
 window.confirmDeleteAccount=async function(){
   if(!currentUser) return;

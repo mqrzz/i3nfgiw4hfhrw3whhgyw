@@ -299,8 +299,8 @@ async function notifyClient(uid,title,text,button){
   try{
     const idToken=await auth.currentUser.getIdToken();
     const body={uid,title,text};
-    if(button){body.buttonText=button.text;body.buttonUrl=button.url;}
-    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(()=>{});
+    if(button){body.buttonText=button.text;body.buttonUrl=button.url;if(button.webApp)body.buttonWebApp=true;}
+    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(err=>console.error('[TG notify]',err));
   }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}
 }
 
@@ -390,7 +390,7 @@ window.sendReply=async function(){
     await addDoc(collection(db,'tickets',selectedId,'messages'),{sender:'support',senderName:'Поддержка',text,imageUrl:null,createdAt:serverTimestamp()});
     await updateDoc(doc(db,'tickets',selectedId),{updatedAt:serverTimestamp(),_read:false,_adminRead:true});
     const t=allTickets.find(x=>x.id===selectedId);
-    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support.html'});
+    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
@@ -404,7 +404,7 @@ window.sendImg=async function(){
       await addDoc(collection(db,'tickets',selectedId,'messages'),{sender:'support',senderName:'Поддержка',text:'Изображение',imageUrl:e.target.result,createdAt:serverTimestamp()});
       await updateDoc(doc(db,'tickets',selectedId),{updatedAt:serverTimestamp(),_read:false,_adminRead:true});
       const t=allTickets.find(x=>x.id===selectedId);
-      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support.html'});
+      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
       toast('Изображение отправлено ✓','success');
     }catch(e){toast('Ошибка','error');}
     inp.value='';

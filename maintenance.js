@@ -127,46 +127,53 @@
       const style = document.createElement('style');
       style.textContent = `
         #maint-overlay {
-          position:fixed;inset:0;z-index:99999;background:#fff;
-          display:flex;align-items:center;justify-content:center;
-          padding:24px;font-family:Geologica,Inter,Arial,sans-serif;
+          position:fixed;inset:0;z-index:99999;
+          background:rgba(25,27,30,.5);backdrop-filter:blur(4px);
+          display:flex;align-items:center;justify-content:center;padding:24px;
+          font-family:var(--font,'Geologica',Inter,Arial,sans-serif);letter-spacing:-.01em;
         }
         #maint-card {
-          position:relative;overflow:hidden;
-          background:#f9fafc;border-radius:56px;padding:64px 72px 68px;
-          text-align:center;max-width:600px;width:100%;
-          border:1.5px solid #dfe3e8;
-          box-shadow:0 1px 2px rgba(25,27,30,.03),0 40px 70px -36px rgba(25,27,30,.22);
+          position:relative;width:100%;max-width:860px;
+          background:var(--bg,#fff);border:1px solid var(--stroke,#dfe3e8);border-radius:40px;
+          box-shadow:var(--sh2,0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08));
+          display:flex;overflow:hidden;
         }
-        #maint-glow {
-          position:absolute;top:-90px;left:50%;transform:translateX(-50%);
-          width:340px;height:340px;border-radius:50%;
-          background:radial-gradient(circle,rgba(30,222,123,.35),rgba(30,222,123,0) 70%);
-          filter:blur(10px);pointer-events:none;
+        #maint-content {
+          flex:1 1 56%;padding:56px 48px;display:flex;flex-direction:column;justify-content:center;min-width:0;
         }
-        #maint-art {
-          position:relative;width:104px;height:104px;margin:0 auto 32px;border-radius:30px;
-          background:linear-gradient(135deg,#4eea94,#149955);
-          display:flex;align-items:center;justify-content:center;
-          box-shadow:0 20px 40px -14px rgba(20,153,85,.55);
+        #maint-visual {
+          flex:0 0 42%;background:var(--dark,#191b1e);
+          display:flex;align-items:center;justify-content:center;padding:20px;
         }
-        #maint-art svg { width:50px;height:50px;stroke:#fff;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round; }
-        #maint-label { position:relative;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:#149955;margin-bottom:18px; }
-        #maint-title { position:relative;font-size:clamp(34px,5.5vw,52px);font-weight:500;letter-spacing:-.04em;line-height:1.08;color:#191b1e;margin:0 0 18px; }
+        #maint-visual svg { width:100%;max-width:220px;height:auto;stroke:#fff;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
+        #maint-label {
+          display:inline-flex;align-self:flex-start;
+          background:var(--green-dim,#d2f8e5);color:var(--green-text,#149955);
+          font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:20px;
+        }
+        #maint-title { font-size:clamp(26px,3.4vw,34px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:var(--text,#191b1e);margin:0 0 16px; }
         #maint-title em { font-style:normal;color:#1ede7b; }
-        #maint-text { position:relative;font-size:15px;color:#707a8a;font-weight:300;line-height:1.6;max-width:400px;margin:0 auto; }
-        @media(max-width:600px){ #maint-card { border-radius:32px;padding:48px 26px 44px; } #maint-art { width:88px;height:88px;border-radius:26px;margin-bottom:24px; } #maint-art svg { width:42px;height:42px; } }
+        #maint-text { font-size:15px;color:var(--text-dim,#707a8a);font-weight:300;line-height:1.6;max-width:400px; }
+        @media(max-width:720px){
+          #maint-overlay { padding:16px; }
+          #maint-card { flex-direction:column;max-width:440px;width:100%;max-height:90vh;border-radius:32px;overflow-y:auto; }
+          #maint-visual { flex:0 0 auto;padding:24px 20px 8px;order:-1; }
+          #maint-visual svg { max-width:150px; }
+          #maint-content { padding:24px 24px calc(28px + env(safe-area-inset-bottom)); }
+          #maint-title { font-size:23px; }
+        }
       `;
       document.head.appendChild(style);
       mo = document.createElement('div');
       mo.id = 'maint-overlay';
       mo.innerHTML = `
         <div id="maint-card">
-          <div id="maint-glow"></div>
-          <div id="maint-art"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
-          <div id="maint-label">Технические работы</div>
-          <h1 id="maint-title">Скоро<br><em>вернёмся</em></h1>
-          <p id="maint-text">Сайт временно недоступен — идут технические работы. Обычно это занимает не больше часа.</p>
+          <div id="maint-content">
+            <div id="maint-label">Технические работы</div>
+            <h1 id="maint-title">Скоро <em>вернёмся</em></h1>
+            <p id="maint-text">Сайт временно недоступен — идут технические работы. Обычно это занимает не больше часа.</p>
+          </div>
+          <div id="maint-visual"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
         </div>`;
       document.body.appendChild(mo);
       document.body.style.overflow = 'hidden';

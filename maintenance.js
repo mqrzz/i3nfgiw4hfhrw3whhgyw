@@ -144,7 +144,7 @@
         }
         #maint-visual {
           flex:0 0 42%;background:var(--dark,#191b1e);
-          display:flex;align-items:flex-end;justify-content:center;padding:20px 20px 36px;
+          display:flex;align-items:center;justify-content:center;padding:20px;
         }
         #maint-visual svg { width:100%;max-width:220px;height:auto;stroke:#1ede7b;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
         #maint-label {
@@ -256,7 +256,7 @@
           }
           #ban-visual {
             flex:0 0 42%;background:var(--dark,#191b1e);
-            display:flex;align-items:flex-end;justify-content:center;padding:20px 20px 36px;
+            display:flex;align-items:center;justify-content:center;padding:20px;
           }
           #ban-visual svg { width:100%;max-width:220px;height:auto;stroke:#ff6b52;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
           #ban-label {

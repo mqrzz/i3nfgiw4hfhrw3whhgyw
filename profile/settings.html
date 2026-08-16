@@ -362,7 +362,7 @@
         <button class="btn btn-ghost" onclick="doLogout()">Выйти</button>
       </div>
       <div class="danger-row">
-        <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить личные данные, обращения и историю обслуживания</p></div>
+        <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить личные данные, обращения, уведомления и историю обслуживания</p></div>
         <div class="delete-pop-wrap">
           <button class="btn btn-danger-solid" onclick="toggleDeletePopover()">Удалить</button>
           <div class="delete-pop" id="deletePopover">
@@ -370,7 +370,7 @@
               <div class="delete-pop-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linejoin="round"/></svg></div>
               <div>
                 <strong>Удалить аккаунт?</strong>
-                <span>Необратимо — личные данные, переписка и уведомления будут стёрты. Оформленные (оплаченные) заказы останутся в истории компании обезличенными, без привязки к вам</span>
+                <span>Необратимо — личные данные, переписка, заявки на обслуживание и уведомления будут полностью стёрты. Оформленные (оплаченные) заказы останутся в истории компании обезличенными, без привязки к вам</span>
               </div>
             </div>
             <input class="field-input" id="deleteConfirmInput" type="email" placeholder="Введите email для подтверждения">
@@ -619,26 +619,15 @@ window.confirmDeleteAccount=async function(){
   try{
     const uid=currentUser.uid;
 
-    // Сверено с firestore.rules (актуальными на момент правки):
-    // - orders: delete владельцу разрешён ТОЛЬКО для черновиков (status:-1) —
-    //   это осознанное ограничение (оплаченные заказы = финансовая история,
-    //   их может удалить только админ). Черновики удаляем, остальные — как
-    //   и раньше, анонимизируем.
-    // - tickets: сам тикет владелец удалить может, а вот его /messages —
-    //   НЕТ (delete там только у админа). Оставляю попытку удаления
-    //   сообщений закомментированной ниже как TODO: либо расширить правило
-    //   /tickets/{id}/messages на delete по владельцу (симметрично read/create),
-    //   либо чистить их Cloud Function'ей. Без этого сообщения останутся
-    //   в базе (но нечитаемы — после удаления родительского тикета get()
-    //   в правилах на чтение сообщений будет падать, то есть по факту
-    //   для пользователя данные недоступны, просто физически не стёрты).
-    // - service_tickets: delete у владельца ЗАПРЕЩЁН правилами (только
-    //   админ), а update — разрешён. Поэтому обезличиваем вместо удаления.
-    // - notifications/items: то же самое — delete только у админа,
-    //   update у владельца есть. Обезличиваем.
-    // Если хочешь настоящее полное удаление везде — нужно расширить
-    // правила (delete по uid) для service_tickets и notifications/items,
-    // и для tickets/messages. Могу подготовить diff отдельно.
+    // Сверено с обновлённым firestore.rules (delete владельцу добавлен для
+    // service_tickets, notifications/items и tickets/messages):
+    // - orders: delete владельцу по-прежнему только для черновиков
+    //   (status:-1) — осознанное ограничение, оплаченные заказы это
+    //   финансовая история, их удаляет только админ. Черновики удаляем,
+    //   остальные анонимизируем.
+    // - tickets: сообщения удаляем ПЕРВЫМИ, потом сам тикет — иначе
+    //   правило на delete сообщений (get() на родителя) сломается.
+    // - service_tickets и notifications/items: теперь удаляются по-настоящему.
 
     // Заказы — черновики удаляем, остальные анонимизируем
     const ordSnap=await getDocs(query(collection(db,'orders'),where('uid','==',uid)));
@@ -647,20 +636,21 @@ window.confirmDeleteAccount=async function(){
       else await updateDoc(x.ref,{clientName:'Удалённый пользователь',clientEmail:null,description:null,attachments:null,favicon:null,accountDeleted:true}).catch(()=>{});
     }
 
-    // Тикеты поддержки (общие) — сам тикет удаляем; сообщения правилами
-    // пока запрещены владельцу (см. комментарий выше)
+    // Тикеты поддержки (общие) + переписка — сообщения удаляем до тикета
     const ticketSnap=await getDocs(query(collection(db,'tickets'),where('uid','==',uid)));
     for(const t of ticketSnap.docs){
+      const msgSnap=await getDocs(collection(db,'tickets',t.id,'messages'));
+      for(const m of msgSnap.docs) await deleteDoc(m.ref).catch(()=>{});
       await deleteDoc(t.ref).catch(()=>{});
     }
 
-    // Тикеты обслуживания — delete запрещён правилами владельцу, обезличиваем
+    // Тикеты обслуживания — полное удаление
     const svcSnap=await getDocs(query(collection(db,'service_tickets'),where('uid','==',uid)));
-    for(const x of svcSnap.docs) await updateDoc(x.ref,{title:'Удалено',description:null,images:null,userName:'Удалённый пользователь',userEmail:null,accountDeleted:true}).catch(()=>{});
+    for(const x of svcSnap.docs) await deleteDoc(x.ref).catch(()=>{});
 
-    // Уведомления — delete запрещён правилами владельцу, обезличиваем
+    // Уведомления — полное удаление
     const notifSnap=await getDocs(collection(db,'notifications',uid,'items'));
-    for(const x of notifSnap.docs) await updateDoc(x.ref,{title:'Удалено',text:null,link:null,read:true}).catch(()=>{});
+    for(const x of notifSnap.docs) await deleteDoc(x.ref).catch(()=>{});
 
     // Старый чат (если использовался)
     const chatSnap=await getDocs(collection(db,'chats',uid,'messages'));

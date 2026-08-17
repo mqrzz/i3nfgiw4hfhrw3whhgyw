@@ -226,30 +226,6 @@
 
     .nv-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
-    /* ── Колокольчик уведомлений — отдельная быстрая ссылка, тот же
-       бейдж (data-badge-key="notif"), что и в выпадающем меню профиля,
-       обновляются синхронно через setBadge(). Виден только авторизованным. */
-    .nv-notify-btn {
-      position: relative; display: none; align-items: center; justify-content: center;
-      width: 40px; height: 40px; flex-shrink: 0;
-      background: var(--nv-surface2); border: 1px solid transparent;
-      border-radius: 13px; cursor: pointer; text-decoration: none;
-      color: var(--nv-ink-dim);
-      transition: background .15s, color .15s, border-color .15s;
-    }
-    .nv-notify-btn.show { display: flex; }
-    .nv-notify-btn:hover { background: #fff; color: var(--nv-ink); border-color: var(--nv-line); box-shadow: 0 6px 14px -8px rgba(20,22,26,.18); }
-    .nv-notify-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-    .nv-notify-badge {
-      position: absolute; top: -3px; right: -3px;
-      min-width: 17px; height: 17px; padding: 0 4px; border-radius: 7px;
-      background: var(--nv-green); color: var(--nv-green-ink);
-      font-size: 10px; font-weight: 600; font-family: var(--nv-font);
-      display: none; align-items: center; justify-content: center;
-      border: 2px solid var(--nv-bg);
-    }
-    .nv-notify-badge.warn { background: var(--nv-warn); color: #1a1400; }
-
     /* ── Пользователь ── */
     .nv-user { position: relative; display: flex; }
     .nv-user-btn {
@@ -458,7 +434,6 @@
       .nv-logo-mark { height: 24px; }
       .nv-center { display: none; }
       .nv-cta { display: none; }
-      .nv-notify-btn { width: 36px; height: 36px; }
       .nv-burger { display: flex; }
       .nv-sheet { display: flex; top: calc(14px + 60px + 8px); }
       .nv-uname { display: none; }
@@ -507,8 +482,6 @@
           items: [
             { href: 'https://antviz.ru/about', label: 'О сервисе',         icon: '<circle cx="12" cy="12" r="8.5"/><path d="M12 8h.01M11 11.5h1.4v5"/>' },
             { href: 'https://antviz.ru/price',  label: 'Цены',             icon: '<path d="M12.5 3.5H19a1 1 0 011 1v6.5a1 1 0 01-.3.7l-8 8a1 1 0 01-1.4 0l-7.2-7.2a1 1 0 010-1.4l8-8a1 1 0 01.4-.3z"/><circle cx="15.6" cy="7.9" r="1.4"/>' },
-            { href: b+'rules',                  label: 'Правила',          icon: '<path d="M12 3l7 3.2v4.8c0 4.8-3 8-7 9.5-4-1.5-7-4.7-7-9.5V6.2L12 3z"/><path d="M9.2 12l1.9 1.9L15.2 10"/>' },
-            { href: b+'privacy',                 label: 'Конфиденциальность', icon: '<rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8 10.5V8a4 4 0 018 0v2.5"/><circle cx="12" cy="14.7" r="1.3"/>' },
           ]
         }
       ]
@@ -658,11 +631,6 @@
   ${buildCenter()}
 
   <div class="nv-right">
-    <a href="${b}profile/notifications" class="nv-notify-btn" id="anNotifyBtn" aria-label="Уведомления">
-      <svg viewBox="0 0 24 24"><path d="M6.5 9.2a5.5 5.5 0 0111 0c0 6 2 7.3 2 7.3H4.5s2-1.3 2-7.3z"/><path d="M10.2 20.5a2 2 0 003.6 0"/></svg>
-      <span class="nv-notify-badge" data-badge-key="notif" style="display:none"></span>
-    </a>
-
     <div class="nv-user" id="anUser">
       <a href="${b}auth" class="nv-user-btn guest" id="anUserBtn" aria-expanded="false">
         <div class="nv-avatar-wrap">
@@ -773,19 +741,16 @@ ${buildMobileSheet()}`;
     }
   });
 
-  // Бейдж может встречаться сразу в нескольких местах капсулы —
-  // например "notif" одновременно в выпадающем меню профиля и в
-  // отдельной кнопке-колокольчике справа. Обновляем все совпадения
-  // по data-badge-key, у каждого элемента своя базовая CSS-класс-плитка
-  // (nv-badge внутри dd/меню, nv-notify-badge — на самой кнопке),
+  // Бейдж может встречаться в нескольких местах капсулы —
+  // обновляем все совпадения по data-badge-key, у каждого элемента
+  // своя базовая CSS-класс-плитка (nv-badge внутри dd/меню),
   // поэтому базовый класс берём из текущего className элемента.
   function setBadge(key, value, variant) {
     document.querySelectorAll(`[data-badge-key="${key}"]`).forEach(el => {
-      const baseClass = el.classList.contains('nv-notify-badge') ? 'nv-notify-badge' : 'nv-badge';
       if (!value) { el.style.display = 'none'; return; }
-      el.className = baseClass + (variant && variant !== 'dot' ? ' ' + variant : '');
-      el.textContent = (variant === 'dot' && baseClass === 'nv-badge') ? '' : String(value);
-      el.style.display = (baseClass === 'nv-notify-badge') ? 'flex' : 'flex';
+      el.className = 'nv-badge' + (variant && variant !== 'dot' ? ' ' + variant : '');
+      el.textContent = (variant === 'dot') ? '' : String(value);
+      el.style.display = 'flex';
     });
   }
   function refreshNotifyDot() {
@@ -814,11 +779,9 @@ ${buildMobileSheet()}`;
     const ddHeadAv = document.getElementById('anDdHeadAvatar');
     const ddHeadNm = document.getElementById('anDdHeadName');
     const ddHeadEm = document.getElementById('anDdHeadEmail');
-    const notifyBtn = document.getElementById('anNotifyBtn');
 
     isAuthed = true;
     if (cfg.inApp && centerEl) centerEl.style.display = 'none';
-    notifyBtn?.classList.add('show');
 
     userBtn.classList.remove('guest');
     userBtn.removeAttribute('href');
@@ -843,10 +806,8 @@ ${buildMobileSheet()}`;
     const avatarEl = document.getElementById('anAvatar');
     const avatarDot = document.getElementById('anAvatarDot');
     const ddHead   = document.getElementById('anDdHead');
-    const notifyBtn = document.getElementById('anNotifyBtn');
 
     isAuthed = false;
-    notifyBtn?.classList.remove('show');
     userBtn.classList.add('guest');
     userBtn.setAttribute('href', `${b}auth`);
     if (unameEl) unameEl.textContent = 'Войти';

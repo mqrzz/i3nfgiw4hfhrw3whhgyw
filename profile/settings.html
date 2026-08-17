@@ -118,8 +118,8 @@
   .btn svg{width:15px;height:15px;}
   .btn-primary{background:var(--green);color:#0d1210;}
   .btn-primary:hover{opacity:.9;}
-  .btn-ghost{background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text-dim);}
-  .btn-ghost:hover{border-color:var(--green);color:var(--green-text);}
+  .btn-ghost{background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text);box-shadow:0 1px 0 rgba(0,0,0,0.02);}
+  .btn-ghost:hover{border-color:var(--green);color:var(--green-text);background:var(--green-dim);}
   .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid transparent;}
   .btn-danger:hover{opacity:.85;}
   .btn-danger-solid{background:var(--red);color:#fff;}
@@ -304,7 +304,7 @@
     <!-- TELEGRAM -->
     <section class="card" id="sec-telegram">
       <div class="card-head">
-        <div class="card-icon" style="background:var(--blue-dim);color:var(--blue);"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M21.05 3.16 2.68 10.4c-1.25.5-1.25 1.2-.23 1.51l4.7 1.47 10.9-6.87c.51-.31.98-.15.59.2l-8.84 7.98h-.01l.01.01-.32 4.98c.47 0 .68-.22.93-.47l2.24-2.17 4.65 3.43c.86.47 1.47.23 1.68-.8l3.05-14.36c.32-1.26-.48-1.83-1.28-1.45Z"/></svg></div>
+        <div class="card-icon" style="background:var(--blue-dim);color:var(--blue);"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/></svg></div>
         <div>
           <div class="card-title">Telegram</div>
           <div class="card-sub">Уведомления о заказе и статус — прямо в боте</div>
@@ -313,7 +313,7 @@
       <div id="tgNotLinked">
         <p class="reset-hint">Аккаунт не привязан. Нажмите кнопку — откроется бот, привязка произойдёт автоматически.</p>
         <button class="btn btn-primary" id="tgLinkBtn" onclick="linkTelegram()">
-          <svg viewBox="0 0 24 24" fill="currentColor" style="width:15px;height:15px"><path d="M21.05 3.16 2.68 10.4c-1.25.5-1.25 1.2-.23 1.51l4.7 1.47 10.9-6.87c.51-.31.98-.15.59.2l-8.84 7.98h-.01l.01.01-.32 4.98c.47 0 .68-.22.93-.47l2.24-2.17 4.65 3.43c.86.47 1.47.23 1.68-.8l3.05-14.36c.32-1.26-.48-1.83-1.28-1.45Z"/></svg>
+          <svg viewBox="0 0 16 16" fill="currentColor" style="width:15px;height:15px"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/></svg>
           Привязать Telegram
         </button>
       </div>
@@ -378,6 +378,7 @@
                 </div>
               </div>
               <input class="field-input" id="deleteConfirmInput" type="email" placeholder="Введите email для подтверждения">
+              <input class="field-input" id="deletePasswordInput" type="password" placeholder="Введите пароль для подтверждения" style="display:none">
               <div class="delete-pop-btns">
                 <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
                 <button class="btn btn-danger" id="deleteConfirmBtn" onclick="confirmDeleteAccount()">Удалить</button>
@@ -397,7 +398,7 @@
 
 <script type="module">
 import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged, signOut, updateProfile, deleteUser, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { onAuthStateChanged, signOut, updateProfile, deleteUser, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider, reauthenticateWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { collection, query, where, doc, updateDoc, deleteDoc, getDocs, onSnapshot, orderBy, setDoc, deleteField } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // Юзернейм бота — заменить после создания в BotFather
@@ -603,6 +604,11 @@ window.toggleDeletePopover=function(){
   const willShow=!pop.classList.contains('show');
   if(willShow){
     document.getElementById('deleteConfirmInput').value='';
+    const pwField=document.getElementById('deletePasswordInput');
+    pwField.value='';
+    pwField.style.display=isGoogleUser?'none':'block';
+    const cBtn=document.getElementById('deleteConfirmBtn');
+    cBtn.textContent='Удалить';cBtn.disabled=false;
     pop.classList.add('show');
     setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),150);
   }else{
@@ -621,6 +627,32 @@ window.confirmDeleteAccount=async function(){
     toast('Email не совпадает','error');return;
   }
   const btn=document.getElementById('deleteConfirmBtn');
+
+  // Реавторизация — прямо здесь, без выхода из аккаунта. Firebase не даёт
+  // удалить пользователя без "свежего" входа, но вместо разлогина просто
+  // подтверждаем личность на месте: паролем (email-аккаунты) или всплывающим
+  // окном Google. Делаем это ДО удаления данных Firestore, иначе при сбое
+  // реавторизации данные уже будут стёрты, а сам аккаунт — нет.
+  const origLabel=btn.textContent;
+  try{
+    if(isGoogleUser){
+      btn.textContent='Подтвердите вход...';btn.disabled=true;
+      await reauthenticateWithPopup(currentUser, new GoogleAuthProvider());
+    }else{
+      const pw=document.getElementById('deletePasswordInput').value;
+      if(!pw){toast('Введите пароль','error');return;}
+      btn.textContent='Проверяем пароль...';btn.disabled=true;
+      const cred=EmailAuthProvider.credential(currentUser.email, pw);
+      await reauthenticateWithCredential(currentUser, cred);
+    }
+  }catch(e){
+    if(e.code==='auth/wrong-password'||e.code==='auth/invalid-credential') toast('Неверный пароль','error');
+    else if(e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request') toast('Подтверждение отменено','error');
+    else toast('Не удалось подтвердить вход. Попробуйте ещё раз.','error');
+    btn.textContent=origLabel;btn.disabled=false;
+    return;
+  }
+
   btn.textContent='Удаляем...';btn.disabled=true;
   try{
     const uid=currentUser.uid;
@@ -671,7 +703,7 @@ window.confirmDeleteAccount=async function(){
     await deleteUser(currentUser);
     window.location.href='../auth';
   }catch(e){
-    if(e.code==='auth/requires-recent-login') toast('Для удаления нужен недавний вход: выйдите и зайдите снова, затем повторите','error');
+    if(e.code==='auth/requires-recent-login') toast('Не удалось подтвердить вход. Попробуйте ещё раз.','error');
     else toast('Ошибка. Попробуйте позже.','error');
     btn.textContent='Удалить';btn.disabled=false;
   }

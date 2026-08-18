@@ -297,6 +297,7 @@
                             <li><a href="${base}rules">Правила</a></li>
                             <li><a href="${base}privacy">Конфиденциальность</a></li>
                             <li><a href="${base}terms">Соглашение</a></li>
+                            <li><a href="https://antviz.ru/obrabotka-pd">Обработка ПД</a></li>
                             <li><a href="${base}p_oferta.docx" download="p_oferta.docx">Публичная оферта ↓</a></li>
                             <li><a href="${base}requisites">Реквизиты</a></li>
                         </ul>

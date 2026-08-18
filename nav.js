@@ -666,7 +666,7 @@ ${buildMobileSheet()}`;
   document.head.appendChild(style);
 
   const bodyPad = document.createElement('style');
-  bodyPad.textContent = 'body { padding-top: 110px; } @media(max-width:768px){ body { padding-top: 94px; } }';
+  bodyPad.textContent = 'body { padding-top: 55px; } @media(max-width:768px){ body { padding-top: 47px; } }';
   document.head.appendChild(bodyPad);
 
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);

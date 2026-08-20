@@ -665,15 +665,10 @@
       <a href="#" class="forgot" onclick="openForgot(event)">Забыли пароль?</a>
       <div class="cf-turnstile" id="turnstile-login" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onLoginVerified" data-expired-callback="onLoginExpired" data-error-callback="onLoginCaptchaError"></div>
       <button class="btn-main" id="loginBtn" onclick="doLogin()" disabled>Войти</button>
-      <div class="divider">или</div>
-      <button class="btn-google" onclick="openGoogleRestrictedModal(event)"> 
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        Войти через Google
-      </button>
     </div>
 
     <div class="panel" id="panel-register">
-      <div class="fg">
+      <div class="fg" id="r-step-email">
         <label class="label" for="r-name">Ваше имя <span style="color:var(--green)">*</span></label>
         <div class="field-wrap">
           <span class="field-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
@@ -681,7 +676,7 @@
         </div>
         <div class="errmsg" id="err-r-name">Введите имя</div>
       </div>
-      <div class="fg">
+      <div class="fg" id="r-step-email-2">
         <label class="label" for="r-email">Email <span style="color:var(--green)">*</span></label>
         <div class="field-wrap">
           <span class="field-icon"><svg viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
@@ -689,7 +684,7 @@
         </div>
         <div class="errmsg" id="err-r-email"></div>
       </div>
-      <div class="fg">
+      <div class="fg" id="r-step-pass">
         <label class="label" for="r-pass">Пароль <span style="color:var(--green)">*</span></label>
         <div class="field-wrap">
           <span class="field-icon"><svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
@@ -701,17 +696,21 @@
         </div>
         <div class="errmsg" id="err-r-pass"></div>
       </div>
-      <div class="consent-row">
+      <div class="fg" id="r-step-code" style="display:none">
+        <label class="label" for="r-code">Код из письма</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input class="inp" type="text" inputmode="numeric" maxlength="6" id="r-code" autocomplete="one-time-code" placeholder="000000"/>
+        </div>
+        <div class="errmsg" id="err-r-code"></div>
+        <a href="#" class="forgot" onclick="backToRegisterStart();return false;">Изменить данные</a>
+      </div>
+      <div class="consent-row" id="r-consent-row">
         <input type="checkbox" id="r-consent" />
         <label for="r-consent">Я согласен(-на) на <a href="https://antviz.ru/obrabotka-pd" target="_blank" rel="noopener">обработку персональных данных</a></label>
       </div>
       <div class="cf-turnstile" id="turnstile-register" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onRegisterVerified" data-expired-callback="onRegisterExpired" data-error-callback="onRegisterCaptchaError"></div>
-      <button class="btn-main" id="registerBtn" onclick="doRegister()" disabled>Создать аккаунт</button>
-      <div class="divider">или</div>
-      <button class="btn-google" onclick="openGoogleRestrictedModal(event)">
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        Регистрация через Google
-      </button>
+      <button class="btn-main" id="registerBtn" onclick="doRegisterStart()" disabled>Создать аккаунт</button>
     </div>
     <a href="/" class="back">← Вернуться на главную</a>
   </div>
@@ -719,42 +718,280 @@
 
 </div>
 
-<div class="modal-bg" id="googleRestrictModal">
-  <div class="modal">
-    <div class="modal-icon">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="5" y="11" width="14" height="10" rx="3" stroke="var(--green)" stroke-width="1.8"/>
-        <path d="M8 11V7.5C8 5.01472 10.0147 3 12.5 3C14.9853 3 17 5.01472 17 7.5V11" stroke="var(--green)" stroke-width="1.8" stroke-linecap="round"/>
-        <circle cx="12" cy="16" r="1.6" fill="var(--green)"/>
-      </svg>
-    </div>
-    <h3>Вход через Google</h3>
-    <p>В соответствии с новым законодательством РФ вход через Google временно недоступен. Альтернативные способы входа уже готовятся — они скоро появятся.</p>
-    <div class="modal-btns">
-      <button class="btn-outline" onclick="closeGoogleModal()">Понятно</button>
-    </div>
-  </div>
-</div>
-
 <div class="modal-bg" id="forgotModal">
   <div class="modal">
     <h3>Восстановление <span class="hl">пароля</span></h3>
-    <p>Введите email от аккаунта — пришлём ссылку для сброса пароля.</p>
-    <div class="fg">
-      <label class="label" for="forgot-email">Email</label>
-      <div class="field-wrap">
-        <span class="field-icon"><svg viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
-        <input class="inp" type="email" id="forgot-email" autocomplete="email" placeholder="your@email.com"/>
+    <div id="forgot-step-email">
+      <p>Введите email от аккаунта — пришлём код для сброса пароля.</p>
+      <div class="fg">
+        <label class="label" for="forgot-email">Email</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></span>
+          <input class="inp" type="email" id="forgot-email" autocomplete="email" placeholder="your@email.com"/>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-outline" onclick="closeForgot()">Отмена</button>
+        <button class="btn-main" style="flex:1;margin-top:0" id="forgotSendBtn" onclick="sendResetCode()">Отправить код</button>
       </div>
     </div>
-    <div class="modal-btns">
-      <button class="btn-outline" onclick="closeForgot()">Отмена</button>
-      <button class="btn-main" style="flex:1;margin-top:0" onclick="sendReset()">Отправить</button>
+    <div id="forgot-step-reset" style="display:none">
+      <p>Введите код из письма и новый пароль.</p>
+      <div class="fg">
+        <label class="label" for="forgot-code">Код из письма</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input class="inp" type="text" inputmode="numeric" maxlength="6" id="forgot-code" autocomplete="one-time-code" placeholder="000000"/>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="label" for="forgot-newpass">Новый пароль</label>
+        <div class="field-wrap">
+          <span class="field-icon"><svg viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+          <input class="inp" type="password" id="forgot-newpass" autocomplete="new-password" placeholder="Минимум 6 символов"/>
+        </div>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-outline" onclick="closeForgot()">Отмена</button>
+        <button class="btn-main" style="flex:1;margin-top:0" id="forgotResetBtn" onclick="confirmResetPassword()">Сохранить пароль</button>
+      </div>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
+
+
+<script type="module">
+  const API = 'https://antviz.ru/api';
+
+  function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
+
+  function setBtnState(id, loadingText, idleText, on){
+    const b=document.getElementById(id);
+    if(!b) return;
+    b.disabled=on;
+    b.textContent = on ? loadingText : idleText;
+  }
+
+  async function friendlyApiError(resp, fallback){
+    try{
+      const data = await resp.json();
+      return data?.error || fallback;
+    }catch(e){
+      return fallback;
+    }
+  }
+
+  async function verifyCaptcha(token){
+    try{
+      const ctrl = new AbortController();
+      const timer = setTimeout(()=>ctrl.abort(), 6000);
+      const vResp = await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({token}), signal:ctrl.signal
+      });
+      clearTimeout(timer);
+      const vData = await vResp.json();
+      return { reachable:true, ok:!!vData.success };
+    }catch(e){
+      console.warn('Проверка капчи недоступна, пропускаем без блокировки:', e);
+      return { reachable:false, ok:true };
+    }
+  }
+
+  async function apiPost(path, body){
+    const resp = await fetch(`${API}${path}`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body),
+      credentials:'include'
+    });
+    if(!resp.ok){
+      const msg = await friendlyApiError(resp, 'Что-то пошло не так. Попробуйте ещё раз');
+      throw new Error(msg);
+    }
+    return resp.json();
+  }
+
+  window.switchTab=function(tab){
+    document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
+    document.getElementById('panel-login').classList.toggle('active',tab==='login');
+    document.getElementById('panel-register').classList.toggle('active',tab==='register');
+    document.getElementById('tabsWrap').classList.toggle('reg',tab==='register');
+  };
+
+  window.togglePass=function(fieldId, btn){
+    const input = document.getElementById(fieldId);
+    const showing = input.type === 'text';
+    input.type = showing ? 'password' : 'text';
+    btn.classList.toggle('show', !showing);
+  };
+
+  // ── ВХОД: email + пароль ──
+  window.doLogin=async function(){
+    const email=document.getElementById('l-email').value.trim();
+    const pass=document.getElementById('l-pass').value;
+    let ok=true;
+    ['l-email','l-pass'].forEach(id=>{document.getElementById(id).classList.remove('err');document.getElementById('err-'+id).className='errmsg';});
+    if(!email){document.getElementById('l-email').classList.add('err');document.getElementById('err-l-email').textContent='Введите email';document.getElementById('err-l-email').className='errmsg show';ok=false;}
+    if(!pass){document.getElementById('l-pass').classList.add('err');document.getElementById('err-l-pass').textContent='Введите пароль';document.getElementById('err-l-pass').className='errmsg show';ok=false;}
+    if(!ok)return;
+    const cfToken=turnstile.getResponse(document.getElementById('turnstile-login'));
+    setBtnState('loginBtn','Подождите...','Войти',true);
+    if(cfToken){
+      const v = await verifyCaptcha(cfToken);
+      if(v.reachable && !v.ok){
+        toast('Проверка капчи не пройдена','error');
+        turnstile.reset(document.getElementById('turnstile-login'));
+        setBtnState('loginBtn','Подождите...','Войти',false);
+        return;
+      }
+    }
+    try{
+      await apiPost('/auth/login', { email, password: pass });
+      const ref = document.referrer;
+      window.location.href = (ref && ref.includes('order')) ? 'order' : 'profile';
+    }catch(e){
+      setBtnState('loginBtn','Подождите...','Войти',false);
+      turnstile.reset(document.getElementById('turnstile-login'));
+      document.getElementById('loginBtn').disabled=true;
+      toast(e.message,'error');
+    }
+  };
+
+  window.backToRegisterStart=function(){
+    document.getElementById('r-step-email').style.display='';
+    document.getElementById('r-step-email-2').style.display='';
+    document.getElementById('r-step-pass').style.display='';
+    document.getElementById('r-step-code').style.display='none';
+    document.getElementById('r-consent-row').style.display='';
+    setBtnState('registerBtn','Подождите...','Создать аккаунт',false);
+    document.getElementById('registerBtn').setAttribute('onclick','doRegisterStart()');
+  };
+
+  // ── РЕГИСТРАЦИЯ: шаг 1 — имя+email+пароль, отправка кода подтверждения ──
+  window.doRegisterStart=async function(){
+    const name=document.getElementById('r-name').value.trim();
+    const email=document.getElementById('r-email').value.trim();
+    const pass=document.getElementById('r-pass').value;
+    let ok=true;
+    ['r-name','r-email','r-pass'].forEach(id=>{document.getElementById(id).classList.remove('err');document.getElementById('err-'+id).className='errmsg';});
+    if(!name){document.getElementById('r-name').classList.add('err');document.getElementById('err-r-name').className='errmsg show';ok=false;}
+    if(!email){document.getElementById('r-email').classList.add('err');document.getElementById('err-r-email').textContent='Введите email';document.getElementById('err-r-email').className='errmsg show';ok=false;}
+    if(pass.length<6){document.getElementById('r-pass').classList.add('err');document.getElementById('err-r-pass').textContent='Минимум 6 символов';document.getElementById('err-r-pass').className='errmsg show';ok=false;}
+    const consent=document.getElementById('r-consent');
+    if(!consent || !consent.checked){consent?.classList.add('err');toast('Нужно согласие на обработку персональных данных','error');ok=false;}
+    if(!ok)return;
+    const cfToken=turnstile.getResponse(document.getElementById('turnstile-register'));
+    setBtnState('registerBtn','Подождите...','Создать аккаунт',true);
+    if(cfToken){
+      const v = await verifyCaptcha(cfToken);
+      if(v.reachable && !v.ok){
+        toast('Проверка капчи не пройдена','error');
+        turnstile.reset(document.getElementById('turnstile-register'));
+        setBtnState('registerBtn','Подождите...','Создать аккаунт',false);
+        return;
+      }
+    }
+    try{
+      await apiPost('/auth/register', { name, email, password: pass });
+      document.getElementById('r-step-email').style.display='none';
+      document.getElementById('r-step-email-2').style.display='none';
+      document.getElementById('r-step-pass').style.display='none';
+      document.getElementById('r-consent-row').style.display='none';
+      document.getElementById('r-step-code').style.display='';
+      setBtnState('registerBtn','Подождите...','Подтвердить',false);
+      document.getElementById('registerBtn').setAttribute('onclick','doRegisterConfirm()');
+      toast('Код подтверждения отправлен на почту','success');
+    }catch(e){
+      setBtnState('registerBtn','Подождите...','Создать аккаунт',false);
+      toast(e.message,'error');
+    }
+  };
+
+  // ── РЕГИСТРАЦИЯ: шаг 2 — подтверждение email кодом ──
+  window.doRegisterConfirm=async function(){
+    const email=document.getElementById('r-email').value.trim();
+    const code=document.getElementById('r-code').value.trim();
+    document.getElementById('r-code').classList.remove('err');
+    document.getElementById('err-r-code').className='errmsg';
+    if(!code){
+      document.getElementById('r-code').classList.add('err');
+      document.getElementById('err-r-code').textContent='Введите код';
+      document.getElementById('err-r-code').className='errmsg show';
+      return;
+    }
+    setBtnState('registerBtn','Подождите...','Подтвердить',true);
+    try{
+      await apiPost('/auth/register/verify', { email, code });
+      window.location.href='welcome';
+    }catch(e){
+      setBtnState('registerBtn','Подождите...','Подтвердить',false);
+      document.getElementById('r-code').classList.add('err');
+      document.getElementById('err-r-code').textContent=e.message;
+      document.getElementById('err-r-code').className='errmsg show';
+    }
+  };
+
+  // ── ВОССТАНОВЛЕНИЕ ПАРОЛЯ ──
+  window.openForgot=function(e){
+    e.preventDefault();
+    document.getElementById('forgot-step-email').style.display='';
+    document.getElementById('forgot-step-reset').style.display='none';
+    document.getElementById('forgot-email').value = document.getElementById('l-email').value.trim();
+    document.getElementById('forgotModal').classList.add('show');
+  };
+  window.closeForgot=function(){document.getElementById('forgotModal').classList.remove('show');};
+
+  window.sendResetCode=async function(){
+    const email=document.getElementById('forgot-email').value.trim();
+    if(!email){toast('Введите email','error');return;}
+    setBtnState('forgotSendBtn','Отправляем...','Отправить код',true);
+    try{
+      await apiPost('/auth/forgot-password', { email });
+      document.getElementById('forgot-step-email').style.display='none';
+      document.getElementById('forgot-step-reset').style.display='';
+      toast('Если такой аккаунт есть — код отправлен','success');
+    }catch(e){
+      toast(e.message,'error');
+    }finally{
+      setBtnState('forgotSendBtn','Отправляем...','Отправить код',false);
+    }
+  };
+
+  window.confirmResetPassword=async function(){
+    const email=document.getElementById('forgot-email').value.trim();
+    const code=document.getElementById('forgot-code').value.trim();
+    const newPassword=document.getElementById('forgot-newpass').value;
+    if(!code || !newPassword){toast('Заполните код и новый пароль','error');return;}
+    if(newPassword.length<6){toast('Пароль должен быть не короче 6 символов','error');return;}
+    setBtnState('forgotResetBtn','Сохраняем...','Сохранить пароль',true);
+    try{
+      await apiPost('/auth/reset-password', { email, code, newPassword });
+      toast('Пароль изменён, войдите заново','success');
+      closeForgot();
+      document.getElementById('l-email').value = email;
+    }catch(e){
+      toast(e.message,'error');
+    }finally{
+      setBtnState('forgotResetBtn','Сохраняем...','Сохранить пароль',false);
+    }
+  };
+
+  document.getElementById('forgotModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeForgot();});
+
+  // Если юзер уже залогинен — сразу в профиль
+  (async function checkExistingSession(){
+    try{
+      const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+      if(resp.ok){
+        const ref = document.referrer;
+        window.location.href = (ref && ref.includes('order')) ? 'order' : 'profile';
+      }
+    }catch(e){ /* не залогинен — остаёмся на странице входа, это ожидаемо */ }
+  })();
+</script>
 
 <script>
   window.onLoginVerified = function() {
@@ -788,8 +1025,6 @@
     this.classList.remove('err');
     updateRegisterBtn();
   });
-  // страховка: если Cloudflare вообще не поднялся (сеть/блокировки) и не вызвал
-  // ни callback, ни error-callback — через 8 сек всё равно пускаем к кнопке
   setTimeout(()=>{
     const lb = document.getElementById('loginBtn');
     if(lb && lb.disabled) lb.disabled = false;
@@ -822,177 +1057,6 @@
       current = next;
     }, 2400);
   })();
-</script>
-
-<script type="module">
-  import { auth, db } from './firebase-config.js';
-  import {
-    signInWithEmailAndPassword, createUserWithEmailAndPassword,
-    onAuthStateChanged, updateProfile, sendPasswordResetEmail
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-  import { registerSession } from './profile/sessions.js?v=2';
-
-
-  let _registering = false;
-  const TG_LINK_URL = 'https://3ssqztgbot22wsq.vercel.app/api/link-webapp';
-  const inTelegram = !!(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData);
-  async function linkTelegramIfNeeded(user){
-    if(!inTelegram) return;
-    try{
-      const idToken = await user.getIdToken();
-      await fetch(TG_LINK_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({initData:window.Telegram.WebApp.initData})});
-    }catch(e){console.error('Telegram link failed:',e);}
-  }
-  onAuthStateChanged(auth, async user => {
-    if(user && !_registering) {
-      await linkTelegramIfNeeded(user);
-      const ref = document.referrer;
-      window.location.href = (ref && ref.includes('order')) ? 'order' : 'profile';
-    }
-  });
-
-  function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
-  function setLoading(id,on){const b=document.getElementById(id);if(b){b.disabled=on; b.textContent=on?'Подождите...':(id==='loginBtn'?'Войти':'Создать аккаунт');}}
-
-  // Человеко-понятные сообщения об ошибках — без кодов и текста SDK.
-  function friendlyAuthError(e, fallback){
-    const known = {
-      'auth/invalid-credential': 'Неверный email или пароль',
-      'auth/wrong-password': 'Неверный email или пароль',
-      'auth/user-not-found': 'Неверный email или пароль',
-      'auth/too-many-requests': 'Слишком много попыток, подождите немного',
-      'auth/network-request-failed': 'Не удалось подключиться. Проверьте интернет-соединение и попробуйте снова',
-      'auth/email-already-in-use': 'Этот email уже зарегистрирован',
-      'auth/invalid-email': 'Некорректный email',
-      'auth/weak-password': 'Пароль слишком простой, придумайте другой',
-      'auth/requires-recent-login': 'Нужно войти заново, чтобы выполнить это действие'
-    };
-    return known[e?.code] || fallback || 'Что-то пошло не так. Попробуйте ещё раз чуть позже';
-  }
-
-  // Проверяем токен капчи на своём сервере. Если сервер недоступен/не отвечает —
-  // не блокируем человека, пропускаем (fail-open). Блокируем только если сервер
-  // ответил и явно сказал, что капча невалидна.
-  async function verifyCaptcha(token){
-    try{
-      const ctrl = new AbortController();
-      const timer = setTimeout(()=>ctrl.abort(), 6000);
-      const vResp = await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile',{
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({token}), signal:ctrl.signal
-      });
-      clearTimeout(timer);
-      const vData = await vResp.json();
-      return { reachable:true, ok:!!vData.success };
-    }catch(e){
-      console.warn('Проверка капчи недоступна, пропускаем без блокировки:', e);
-      return { reachable:false, ok:true };
-    }
-  }
-
-  async function saveProfile(user,name){
-    await user.getIdToken(true);
-    const r=doc(db,'users',user.uid);
-    const s=await getDoc(r);
-    if(!s.exists()) await setDoc(r,{uid:user.uid,name:name||user.displayName||'Пользователь',email:user.email,createdAt:serverTimestamp(),ordersCount:0,onboardingDone:false});
-  }
-
-  window.switchTab=function(tab){
-    document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
-    document.getElementById('panel-login').classList.toggle('active',tab==='login');
-    document.getElementById('panel-register').classList.toggle('active',tab==='register');
-    document.getElementById('tabsWrap').classList.toggle('reg',tab==='register');
-  };
-
-  window.togglePass=function(fieldId, btn){
-    const input = document.getElementById(fieldId);
-    const showing = input.type === 'text';
-    input.type = showing ? 'password' : 'text';
-    btn.classList.toggle('show', !showing);
-  };
-
-  window.doLogin=async function(){
-    const email=document.getElementById('l-email').value.trim();
-    const pass=document.getElementById('l-pass').value;
-    let ok=true;
-    ['l-email','l-pass'].forEach(id=>{document.getElementById(id).classList.remove('err');document.getElementById('err-'+id).className='errmsg';});
-    if(!email){document.getElementById('l-email').classList.add('err');document.getElementById('err-l-email').textContent='Введите email';document.getElementById('err-l-email').className='errmsg show';ok=false;}
-    if(!pass){document.getElementById('l-pass').classList.add('err');document.getElementById('err-l-pass').textContent='Введите пароль';document.getElementById('err-l-pass').className='errmsg show';ok=false;}
-    if(!ok)return;
-    const cfToken=turnstile.getResponse(document.getElementById('turnstile-login'));
-    setLoading('loginBtn',true);
-    if(cfToken){
-      const v = await verifyCaptcha(cfToken);
-      if(v.reachable && !v.ok){
-        toast('Проверка капчи не пройдена','error');
-        turnstile.reset(document.getElementById('turnstile-login'));
-        setLoading('loginBtn',false);
-        return;
-      }
-    }
-    try{
-      const cred=await signInWithEmailAndPassword(auth,email,pass);
-      try{await saveProfile(cred.user,cred.user.displayName);}catch(fsErr){console.error('Firestore saveProfile error:',fsErr);}
-      registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
-    }
-    catch(e){setLoading('loginBtn',false);turnstile.reset(document.getElementById('turnstile-login'));document.getElementById('loginBtn').disabled=true;toast(friendlyAuthError(e),'error');}
-  };
-
-  window.doRegister=async function(){
-    const name=document.getElementById('r-name').value.trim();
-    const email=document.getElementById('r-email').value.trim();
-    const pass=document.getElementById('r-pass').value;
-    let ok=true;
-    ['r-name','r-email','r-pass'].forEach(id=>{document.getElementById(id).classList.remove('err');document.getElementById('err-'+id).className='errmsg';});
-    if(!name){document.getElementById('r-name').classList.add('err');document.getElementById('err-r-name').className='errmsg show';ok=false;}
-    if(!email){document.getElementById('r-email').classList.add('err');document.getElementById('err-r-email').textContent='Введите email';document.getElementById('err-r-email').className='errmsg show';ok=false;}
-    if(pass.length<6){document.getElementById('r-pass').classList.add('err');document.getElementById('err-r-pass').textContent='Минимум 6 символов';document.getElementById('err-r-pass').className='errmsg show';ok=false;}
-    const consent=document.getElementById('r-consent');
-    if(!consent || !consent.checked){consent?.classList.add('err');toast('Нужно согласие на обработку персональных данных','error');ok=false;}
-    if(!ok)return;
-    const cfToken=turnstile.getResponse(document.getElementById('turnstile-register'));
-    setLoading('registerBtn',true);
-    if(cfToken){
-      const v = await verifyCaptcha(cfToken);
-      if(v.reachable && !v.ok){
-        toast('Проверка капчи не пройдена','error');
-        turnstile.reset(document.getElementById('turnstile-register'));
-        setLoading('registerBtn',false);
-        return;
-      }
-    }
-    _registering=true;
-    try{
-      const cred=await createUserWithEmailAndPassword(auth,email,pass);
-      await updateProfile(cred.user,{displayName:name});
-      try{
-        await saveProfile(cred.user,name);
-      }catch(fsErr){
-        console.error('Firestore saveProfile error:',fsErr);
-      }
-      registerSession(db,cred.user).catch(e=>console.error('registerSession error:',e));
-      await linkTelegramIfNeeded(cred.user);
-      window.location.href='welcome';
-    }
-    catch(e){_registering=false;setLoading('registerBtn',false);turnstile.reset(document.getElementById('turnstile-register'));document.getElementById('registerBtn').disabled=true;toast(friendlyAuthError(e),'error');}
-  };
-
-  window.openGoogleRestrictedModal = function(e){if(e)e.preventDefault();document.getElementById('googleRestrictModal').classList.add('show');};
-  window.closeGoogleModal = function(){document.getElementById('googleRestrictModal').classList.remove('show');};
-  window.openForgot=function(e){e.preventDefault();document.getElementById('forgotModal').classList.add('show');};
-  window.closeForgot=function(){document.getElementById('forgotModal').classList.remove('show');};
-  window.sendReset=async function(){
-    const email=document.getElementById('forgot-email').value.trim();
-    if(!email){toast('Введите email','error');return;}
-    try{await sendPasswordResetEmail(auth,email);}
-    catch(e){ if(e.code!=='auth/user-not-found'){ toast(friendlyAuthError(e),'error'); return; } }
-    toast('Если такой аккаунт есть — письмо отправлено. Проверьте почту.','success');
-    closeForgot();
-  };
-
-  document.getElementById('forgotModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeForgot();});
-  document.getElementById('googleRestrictModal')?.addEventListener('click',e=>{if(e.target===e.currentTarget)closeGoogleModal();});
 </script>
 
 <script src="../GEOBLOCK.js"></script>

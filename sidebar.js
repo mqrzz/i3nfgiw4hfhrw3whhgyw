@@ -436,11 +436,7 @@
 
     document.querySelectorAll('[data-logout]').forEach(btn => btn.addEventListener('click', async () => {
       try {
-        const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-        const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-        if (appMod.getApps().length) {
-          await authMod.signOut(authMod.getAuth(appMod.getApp()));
-        }
+        await fetch('https://antviz.ru/api/auth/logout', { method: 'POST', credentials: 'include' });
       } catch (e) { console.error('sidebar.js signOut:', e); }
       window.location.href = b || '/';
     }));
@@ -455,44 +451,14 @@
     });
   }
 
-  // Подписки на бейджи — те же данные, что и в nav.js, но отдельная
-  // подписка (sidebar.js и nav.js работают независимо, оба могут быть
-  // на странице одновременно).
-  function watchBadges(db, fsMod, user) {
-    const { collection, query, where, onSnapshot } = fsMod;
-
-    onSnapshot(
-      query(collection(db, 'chats', user.uid, 'messages'), where('sender', '==', 'admin'), where('readByUser', '==', false)),
-      snap => setBadge('support', snap.size, 'warn'),
-      () => {}
-    );
-
-    onSnapshot(
-      query(collection(db, 'notifications', user.uid, 'items'), where('read', '==', false)),
-      snap => setBadge('notif', snap.size, 'warn'),
-      () => {}
-    );
-
-    onSnapshot(
-      query(collection(db, 'orders'), where('uid', '==', user.uid)),
-      snap => {
-        const orders = snap.docs.map(d => d.data());
-        const active = orders.filter(o => (o.status || 0) >= 1 && (o.status || 0) <= 4).length;
-        setBadge('orders', active, null);
-
-        const activeSupport = orders.find(o =>
-          o.supportActive && o.supportExpiresAt?.toDate &&
-          o.supportExpiresAt.toDate() > new Date()
-        );
-        if (activeSupport) {
-          const daysLeft = Math.ceil((activeSupport.supportExpiresAt.toDate() - new Date()) / (1000 * 60 * 60 * 24));
-          setBadge('tickets', daysLeft <= 2 ? '!' : 0, 'warn');
-        } else {
-          setBadge('tickets', 0, null);
-        }
-      },
-      () => {}
-    );
+  // Подписки на бейджи — временно отключены: данные (chats/orders/notifications)
+  // ещё живут на Firestore и не перенесены на новый бэкенд. Когда появится
+  // API для заказов/тикетов/уведомлений — вернуть сюда реальные значения.
+  function watchBadges(user) {
+    setBadge('support', 0, null);
+    setBadge('notif', 0, null);
+    setBadge('orders', 0, null);
+    setBadge('tickets', 0, null);
   }
 
   if (document.readyState === 'loading') {
@@ -503,24 +469,11 @@
 
   (async () => {
     try {
-      const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-      const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      const fsMod   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-
-      let tries = 0;
-      while (appMod.getApps().length === 0 && tries < 100) {
-        await new Promise(r => setTimeout(r, 50));
-        tries++;
+      const resp = await fetch('https://antviz.ru/api/auth/me', { credentials: 'include' });
+      if (resp.ok) {
+        const user = await resp.json();
+        watchBadges(user);
       }
-      if (appMod.getApps().length === 0) return;
-
-      const app  = appMod.getApp();
-      const auth = authMod.getAuth(app);
-      const db   = fsMod.getFirestore(app);
-
-      authMod.onAuthStateChanged(auth, user => {
-        if (user) watchBadges(db, fsMod, user);
-      });
     } catch (e) {
       console.error('sidebar.js auth error:', e);
     }

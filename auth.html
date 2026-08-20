@@ -370,6 +370,30 @@
       box-shadow:0 0 0 3px rgba(30,222,123,.12);
     }
     .inp.err{border-color:var(--error)!important}
+    .code-boxes{display:flex;gap:.5rem;justify-content:space-between}
+    .code-box{
+      width:100%;
+      aspect-ratio:1/1;
+      background:var(--bg3);
+      border:1.5px solid var(--border);
+      border-radius:14px;
+      color:var(--text);
+      font-family:var(--font);
+      font-size:1.3rem;
+      font-weight:500;
+      text-align:center;
+      outline:none;
+      transition:border-color .2s,box-shadow .2s;
+      -moz-appearance:textfield;
+    }
+    .code-box::-webkit-outer-spin-button,
+    .code-box::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    .code-box:focus{
+      border-color:var(--green);
+      box-shadow:0 0 0 3px rgba(30,222,123,.12);
+    }
+    .code-box.err{border-color:var(--error)!important}
+    .code-box.filled{border-color:var(--green)}
     .pass-toggle{
       position:absolute;
       right:.7rem; top:50%;
@@ -697,11 +721,9 @@
         <div class="errmsg" id="err-r-pass"></div>
       </div>
       <div class="fg" id="r-step-code" style="display:none">
-        <label class="label" for="r-code">Код из письма</label>
-        <div class="field-wrap">
-          <span class="field-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          <input class="inp" type="text" inputmode="numeric" maxlength="6" id="r-code" autocomplete="one-time-code" placeholder="000000"/>
-        </div>
+        <label class="label">Код из письма</label>
+        <div class="code-boxes" id="r-code-boxes" data-hidden-id="r-code"></div>
+        <input type="hidden" id="r-code"/>
         <div class="errmsg" id="err-r-code"></div>
         <a href="#" class="forgot" onclick="backToRegisterStart();return false;">Изменить данные</a>
       </div>
@@ -738,11 +760,9 @@
     <div id="forgot-step-reset" style="display:none">
       <p>Введите код из письма и новый пароль.</p>
       <div class="fg">
-        <label class="label" for="forgot-code">Код из письма</label>
-        <div class="field-wrap">
-          <span class="field-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
-          <input class="inp" type="text" inputmode="numeric" maxlength="6" id="forgot-code" autocomplete="one-time-code" placeholder="000000"/>
-        </div>
+        <label class="label">Код из письма</label>
+        <div class="code-boxes" id="forgot-code-boxes"></div>
+        <input type="hidden" id="forgot-code"/>
       </div>
       <div class="fg">
         <label class="label" for="forgot-newpass">Новый пароль</label>
@@ -814,6 +834,63 @@
     return resp.json();
   }
 
+  // ── Код в виде 6 отдельных ячеек: автопереход, backspace, вставка, Enter — подтвердить ──
+  function setupCodeBoxes(containerId, hiddenInputId, onSubmit){
+    const container = document.getElementById(containerId);
+    const hidden = document.getElementById(hiddenInputId);
+    if(!container || container.dataset.ready) return;
+    container.dataset.ready = '1';
+
+    const boxes = [];
+    for(let i=0;i<6;i++){
+      const b = document.createElement('input');
+      b.type='text';
+      b.inputMode='numeric';
+      b.maxLength=1;
+      b.className='code-box';
+      b.autocomplete = i===0 ? 'one-time-code' : 'off';
+      container.appendChild(b);
+      boxes.push(b);
+    }
+
+    function sync(){
+      hidden.value = boxes.map(b=>b.value).join('');
+    }
+
+    boxes.forEach((b,i)=>{
+      b.addEventListener('input', ()=>{
+        b.value = b.value.replace(/\D/g,'').slice(-1);
+        b.classList.toggle('filled', !!b.value);
+        b.classList.remove('err');
+        if(b.value && i<5) boxes[i+1].focus();
+        sync();
+        if(boxes.every(x=>x.value) ) onSubmit?.();
+      });
+      b.addEventListener('keydown', e=>{
+        if(e.key==='Backspace' && !b.value && i>0){ boxes[i-1].focus(); }
+        if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); }
+        if(e.key==='ArrowLeft' && i>0) boxes[i-1].focus();
+        if(e.key==='ArrowRight' && i<5) boxes[i+1].focus();
+      });
+      b.addEventListener('paste', e=>{
+        e.preventDefault();
+        const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+        text.split('').forEach((ch,idx)=>{ if(boxes[idx]){ boxes[idx].value=ch; boxes[idx].classList.add('filled'); } });
+        sync();
+        const next = boxes[Math.min(text.length,5)];
+        next?.focus();
+        if(text.length===6) onSubmit?.();
+      });
+    });
+
+    container._focusFirst = () => boxes[0]?.focus();
+    container._reset = () => { boxes.forEach(b=>{b.value='';b.classList.remove('filled','err');}); sync(); boxes[0]?.focus(); };
+    container._markErr = () => boxes.forEach(b=>b.classList.add('err'));
+  }
+
+  setupCodeBoxes('r-code-boxes','r-code', ()=>window.doRegisterConfirm?.());
+  setupCodeBoxes('forgot-code-boxes','forgot-code', ()=>window.confirmResetPassword?.());
+
   window.switchTab=function(tab){
     document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
     document.getElementById('panel-login').classList.toggle('active',tab==='login');
@@ -866,6 +943,7 @@
     document.getElementById('r-step-pass').style.display='';
     document.getElementById('r-step-code').style.display='none';
     document.getElementById('r-consent-row').style.display='';
+    document.getElementById('r-code-boxes')._reset?.();
     setBtnState('registerBtn','Подождите...','Создать аккаунт',false);
     document.getElementById('registerBtn').setAttribute('onclick','doRegisterStart()');
   };
@@ -904,6 +982,7 @@
       setBtnState('registerBtn','Подождите...','Подтвердить',false);
       document.getElementById('registerBtn').setAttribute('onclick','doRegisterConfirm()');
       toast('Код подтверждения отправлен на почту','success');
+      document.getElementById('r-code-boxes')._focusFirst?.();
     }catch(e){
       setBtnState('registerBtn','Подождите...','Создать аккаунт',false);
       toast(e.message,'error');
@@ -914,11 +993,9 @@
   window.doRegisterConfirm=async function(){
     const email=document.getElementById('r-email').value.trim();
     const code=document.getElementById('r-code').value.trim();
-    document.getElementById('r-code').classList.remove('err');
     document.getElementById('err-r-code').className='errmsg';
-    if(!code){
-      document.getElementById('r-code').classList.add('err');
-      document.getElementById('err-r-code').textContent='Введите код';
+    if(code.length<6){
+      document.getElementById('err-r-code').textContent='Введите все 6 цифр кода';
       document.getElementById('err-r-code').className='errmsg show';
       return;
     }
@@ -928,7 +1005,7 @@
       window.location.href='welcome';
     }catch(e){
       setBtnState('registerBtn','Подождите...','Подтвердить',false);
-      document.getElementById('r-code').classList.add('err');
+      document.getElementById('r-code-boxes')._markErr?.();
       document.getElementById('err-r-code').textContent=e.message;
       document.getElementById('err-r-code').className='errmsg show';
     }
@@ -940,6 +1017,8 @@
     document.getElementById('forgot-step-email').style.display='';
     document.getElementById('forgot-step-reset').style.display='none';
     document.getElementById('forgot-email').value = document.getElementById('l-email').value.trim();
+    document.getElementById('forgot-code-boxes')._reset?.();
+    document.getElementById('forgot-newpass').value='';
     document.getElementById('forgotModal').classList.add('show');
   };
   window.closeForgot=function(){document.getElementById('forgotModal').classList.remove('show');};
@@ -953,6 +1032,7 @@
       document.getElementById('forgot-step-email').style.display='none';
       document.getElementById('forgot-step-reset').style.display='';
       toast('Если такой аккаунт есть — код отправлен','success');
+      document.getElementById('forgot-code-boxes')._focusFirst?.();
     }catch(e){
       toast(e.message,'error');
     }finally{
@@ -964,7 +1044,8 @@
     const email=document.getElementById('forgot-email').value.trim();
     const code=document.getElementById('forgot-code').value.trim();
     const newPassword=document.getElementById('forgot-newpass').value;
-    if(!code || !newPassword){toast('Заполните код и новый пароль','error');return;}
+    if(code.length<6){toast('Введите все 6 цифр кода','error');return;}
+    if(!newPassword){toast('Введите новый пароль','error');return;}
     if(newPassword.length<6){toast('Пароль должен быть не короче 6 символов','error');return;}
     setBtnState('forgotResetBtn','Сохраняем...','Сохранить пароль',true);
     try{
@@ -973,6 +1054,7 @@
       closeForgot();
       document.getElementById('l-email').value = email;
     }catch(e){
+      document.getElementById('forgot-code-boxes')._markErr?.();
       toast(e.message,'error');
     }finally{
       setBtnState('forgotResetBtn','Сохраняем...','Сохранить пароль',false);

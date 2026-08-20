@@ -460,9 +460,7 @@ body{background:var(--bg);color:var(--ink);font-family:var(--font);font-weight:3
 </div>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { doc, getDoc, updateDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const isFinePointer = window.matchMedia('(hover:hover) and (pointer:fine)').matches;
@@ -774,7 +772,7 @@ async function finish(){
   const nextBtn = document.getElementById('nextBtn');
   if(nextBtn){ nextBtn.disabled = true; nextBtn.style.opacity = '.6'; }
 
-  const savePromise = setDoc(doc(db,'users',currentUser.uid), { onboardingDone:true }, { merge:true })
+  const savePromise = fetch(`${API}/auth/onboarding-done`, { method:'POST', credentials:'include' })
     .catch(e=>console.error('onboarding finish error:', e));
 
   const displayName = document.getElementById('userName').textContent || 'друг';
@@ -820,25 +818,25 @@ document.addEventListener('visibilitychange', ()=>{
   }
 });
 
-/* ---------- auth + firestore ---------- */
+/* ---------- auth ---------- */
 let currentUser = null;
 
-onAuthStateChanged(auth, async user => {
+(async function initAuth(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){ /* сеть недоступна — считаем как незалогинен */ }
+
   if(!user){ window.location.href = './auth'; return; }
   currentUser = user;
 
-  let data = {};
-  try{
-    const snap = await getDoc(doc(db,'users',user.uid));
-    if(snap.exists()) data = snap.data();
-  }catch(e){ console.error('welcome: user doc error', e); }
-
-  if(data.onboardingDone === true){
+  if(user.onboardingDone === true){
     window.location.href = './profile';
     return;
   }
 
-  const displayName = data.name || user.displayName || 'друг';
+  const displayName = user.displayName || 'друг';
 
   await showNameScreen(displayName);
 
@@ -852,7 +850,7 @@ onAuthStateChanged(auth, async user => {
   buildDemoNav();
   buildTimeline();
   replayHeroStep();
-});
+})();
 </script>
 
 <script src="GEOBLOCK.js"></script>

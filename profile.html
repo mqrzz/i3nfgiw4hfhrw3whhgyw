@@ -387,10 +387,8 @@ function setStat(id,val){
 </script>
 
 <script type="module">
-import { auth, db } from '/firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { touchSession, watchSessionRevocation } from './profile/sessions.js';
-import { collection, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
+import { touchSession } from './profile/sessions.js';
 
 const FULL_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 
@@ -633,63 +631,51 @@ periodSelectEl.addEventListener('change', ()=>{
   updateSpendCard(latestOrders, currentPeriodDays());
 });
 
-function loadOrders(uid){
-  const q = query(collection(db,'orders'), where('uid','==',uid), orderBy('createdAt','desc'));
-  onSnapshot(q, snap=>{
-    const orders = snap.docs.map(d=>{
-      const data=d.data();
-      return {id:d.id, ...data, status:Number(data.status ?? 0)};
-    }).filter(o=>o.status!==-1);
-    latestOrders = orders;
+// TODO: подключить реальные данные, когда заказы переедут с Firestore на
+// новый бэкенд (см. schema.sql: таблица orders уже готова, endpoints — нет).
+// До этого момента дашборд показывает честный «0 заказов» — тот же самый
+// путь отрисовки, что видел бы совершенно новый пользователь и раньше.
+function loadOrders(){
+  const orders = [];
+  latestOrders = orders;
 
-    const active = orders.filter(o=>o.status!==5);
-    const done = orders.filter(o=>o.status===5);
-    setStat('statTotal', orders.length);
-    setStat('statActive', active.length);
-    setStat('statDone', done.length);
+  setStat('statTotal', 0);
+  setStat('statActive', 0);
+  setStat('statDone', 0);
 
-    // Дельта за месяц (в шапке — всегда фиксированный месяц, не завязана на селектор)
-    const now = new Date();
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-    const newThisMonth = orders.filter(o=>{ const d=toDate(o.createdAt); return d && d>=monthStart; }).length;
-    const deltaEl = document.getElementById('heroDeltaText');
-    deltaEl.textContent = newThisMonth>0 ? `+${newThisMonth} за последний месяц` : 'Нет новых за месяц';
+  document.getElementById('heroDeltaText').textContent = 'Нет новых за месяц';
+  document.getElementById('heroSpark').setAttribute('points', buildSparkPoints(Array(8).fill(0),120,40));
 
-    // Спарклайн шапки — по количеству заказов за последние 8 недель
-    const weeks = Array(8).fill(0);
-    orders.forEach(o=>{
-      const d=toDate(o.createdAt); if(!d) return;
-      const diffWeeks = Math.floor((now-d)/(7*86400000));
-      if(diffWeeks>=0 && diffWeeks<8) weeks[7-diffWeeks]++;
-    });
-    document.getElementById('heroSpark').setAttribute('points', buildSparkPoints(weeks,120,40));
-
-    updateSpendCard(orders, currentPeriodDays());
-    renderServiceDonut(orders);
-    renderHeatmap(orders, latestNotifications);
-    renderRecentOrders(orders);
-  }, err=>console.error('Orders:',err));
+  updateSpendCard(orders, currentPeriodDays());
+  renderServiceDonut(orders);
+  renderHeatmap(orders, latestNotifications);
+  renderRecentOrders(orders);
 }
 
 let latestNotifications = [];
 
-function watchNotifDot(uid){
-  const q = query(collection(db,'notifications',uid,'items'), orderBy('createdAt','desc'));
-  onSnapshot(q, snap=>{
-    const hasUnread = snap.docs.some(d=>!d.data().read);
-    document.getElementById('notifDot').style.display = hasUnread ? 'block' : 'none';
-    latestNotifications = snap.docs.map(d=>d.data());
-    renderHeatmap(latestOrders, latestNotifications);
-  }, ()=>{});
+// TODO: то же самое для уведомлений — вернуть реальные данные, когда
+// появится /api/notifications.
+function watchNotifDot(){
+  document.getElementById('notifDot').style.display = 'none';
+  latestNotifications = [];
+  renderHeatmap(latestOrders, latestNotifications);
 }
 
-onAuthStateChanged(auth, user=>{
+(async function initProfile(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){ /* сеть недоступна — считаем как незалогинен */ }
+
   if(!user){ window.location.href='auth'; return; }
+
   const name = (user.displayName||'Пользователь').split(' ')[0];
   document.getElementById('heroGreeting').textContent = 'Здравствуйте, ' + name;
   document.getElementById('heroAvatar').textContent = name.slice(0,2).toUpperCase();
   let sinceText = 'antviz.ru';
-  const created = user.metadata && user.metadata.creationTime ? new Date(user.metadata.creationTime) : null;
+  const created = user.createdAt ? new Date(user.createdAt) : null;
   if(created){
     const monthsGenitive = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
     sinceText += ' · клиент с ' + monthsGenitive[created.getMonth()] + ' ' + created.getFullYear();
@@ -697,17 +683,10 @@ onAuthStateChanged(auth, user=>{
   document.getElementById('heroSub').textContent = sinceText;
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('cabinet').style.display='block';
-  loadOrders(user.uid);
-  watchNotifDot(user.uid);
-  touchSession(db, auth, user);
-  watchSessionRevocation(db, user.uid, () => {
-    signOut(auth).finally(() => { window.location.href = 'auth'; });
-  });
-}, err=>{
-  console.error('Auth:',err);
-  document.getElementById('loadingScreen').style.display='none';
-  document.getElementById('cabinet').style.display='block';
-});
+  loadOrders();
+  watchNotifDot();
+  touchSession();
+})();
 </script>
 </div><!-- /sbContent -->
 <script src="/GEOBLOCK.js"></script>

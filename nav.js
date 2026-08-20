@@ -23,11 +23,11 @@
  * — мобильное выезжающее меню тоже светлое, тот же паттерн иконок;
  * — уважение reduced-motion и видимый focus-visible сохранены.
  *
- * Не импортирует firebase-config.js сам — ждёт, пока Firebase App
- * инициализирует САМА СТРАНИЦА, и подключается к уже существующему
- * приложению через getApps()/getAuth(). Логика авторизации, бейджей
- * и сессий не менялась — менялся только визуальный слой и разметка
- * вокруг него (id остались прежними, чтобы ничего не сломать).
+ * Авторизация теперь идёт через собственный API antviz (/api/auth/me,
+ * /api/auth/logout) вместо Firebase Auth — cookie-сессия проверяется
+ * запросом при загрузке страницы. Бейджи (заказы/тикеты/уведомления)
+ * временно отключены (стоят в 0) до переноса соответствующих данных
+ * с Firestore на новый бэкенд.
  */
 (function () {
 
@@ -840,110 +840,46 @@ ${buildMobileSheet()}`;
     refreshNotifyDot();
   }
 
-  async function watchBadges(db, fsMod, user) {
-    const { collection, query, where, getDocs } = fsMod;
-    teardownListeners();
-
-    const cached = readBadgeCache(user.uid);
-    if (cached) { applyBadgeData(cached); return; }
-
-    // Разовое чтение вместо realtime-подписки: бейджам в шапке не нужно
-    // обновляться «прямо сейчас, пока страница открыта» — этого достаточно
-    // раз на заход, а следующие переходы по сайту берут значение из кэша.
-    try {
-      const [supportSnap, ordersSnap, notifSnap] = await Promise.all([
-        getDocs(query(collection(db, 'chats', user.uid, 'messages'), where('sender', '==', 'admin'), where('readByUser', '==', false))),
-        getDocs(query(collection(db, 'orders'), where('uid', '==', user.uid))),
-        getDocs(query(collection(db, 'notifications', user.uid, 'items'), where('read', '==', false))),
-      ]);
-
-      const orders = ordersSnap.docs.map(d => d.data());
-      const active = orders.filter(o => (o.status || 0) >= 1 && (o.status || 0) <= 4).length;
-      const activeSupport = orders.some(o =>
-        o.supportActive && o.supportExpiresAt?.toDate &&
-        o.supportExpiresAt.toDate() > new Date()
-      );
-
-      const data = {
-        support: supportSnap.size,
-        orders: active,
-        tickets: activeSupport ? 1 : 0,
-        notif: notifSnap.size,
-      };
-      writeBadgeCache(user.uid, data);
-      applyBadgeData(data);
-    } catch (e) {}
+  async function watchBadges(user) {
+    // Бейджи (непрочитанные тикеты/заказы/уведомления) переедут сюда, когда
+    // будет готов бэкенд для orders/tickets/notifications — сейчас эти данные
+    // ещё на Firestore и не перенесены, поэтому временно держим бейджи в 0,
+    // а не показываем ложные/устаревшие числа.
+    applyBadgeData({ support: 0, orders: 0, tickets: 0, notif: 0 });
   }
 
-  /* ── Ждём, пока сама страница инициализирует Firebase App, и подключаемся
-     к УЖЕ СУЩЕСТВУЮЩЕМУ приложению — без своего импорта firebase-config.js. */
+  const API = `${b}api`.startsWith('http') ? `${b}api` : 'https://antviz.ru/api';
+
   (async () => {
     try {
-      const appMod  = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-      const authMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-      const fsMod   = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-      const sessMod = await import(`${b}profile/sessions.js?v=4`).catch(e => { console.error('nav.js sessions.js import error:', e); return null; });
-
-      let tries = 0;
-      while (appMod.getApps().length === 0 && tries < 100) {
-        await new Promise(r => setTimeout(r, 50));
-        tries++;
-      }
-      if (appMod.getApps().length === 0) {
-        console.error('nav.js: Произошла ошибка — профиль не может загрузиться.');
-        return;
-      }
-
-      const app  = appMod.getApp();
-      const auth = authMod.getAuth(app);
-      const db   = fsMod.getFirestore(app);
-
       document.getElementById('anSignOut')?.addEventListener('click', async () => {
         try {
           teardownListeners();
-          const uidBefore = auth.currentUser?.uid;
-          if (sessMod && uidBefore) await sessMod.endCurrentSession(db, uidBefore).catch(() => {});
-          await authMod.signOut(auth);
+          await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' }).catch(() => {});
           window.location.href = b || '/';
-        } catch(e) { console.error('nav.js signOut:', e); }
+        } catch (e) { console.error('nav.js signOut:', e); }
       });
 
-      let unwatchRevoke = null;
+      let apiUser = null;
+      try {
+        const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+        if (resp.ok) apiUser = await resp.json();
+      } catch (e) { /* сеть недоступна — считаем как незалогинен */ }
 
-      authMod.onAuthStateChanged(auth, user => {
-        teardownListeners();
-        unwatchRevoke?.(); unwatchRevoke = null;
+      teardownListeners();
 
-        if (user) {
-          applyAuthedUI(user);
-          watchBadges(db, fsMod, user);
-          if (sessMod) {
-            // lastActive пишем не чаще раза в 5 минут — как и было.
-            sessMod.touchSession(db, auth, user).catch(e => console.error('touchSession:', e));
-            // А вот отзыв конкретно ЭТОГО сеанса ловим сразу же через
-            // realtime-подписку — без ожидания следующего touch и без
-            // Cloud Function/revokeRefreshTokens (токены не тратим).
-            unwatchRevoke = sessMod.watchSessionRevocation(db, user.uid, async () => {
-              unwatchRevoke?.(); unwatchRevoke = null;
-              teardownListeners();
-              // КРИТИЧНО: очищаем sessionId до signOut. Без этого при
-              // следующем входе registerSession() переиспользует тот же
-              // sid, а его документ в Firestore всё ещё revoked:true —
-              // из-за гонки с асинхронной геолокацией/Client Hints внутри
-              // registerSession() новый onSnapshot-листенер может поймать
-              // старое значение раньше, чем оно успеет обновиться, и тут
-              // же выкинет пользователя обратно. Именно это и была причина
-              // случайных разлогинов сразу после повторного входа.
-              sessMod.clearSessionId(user.uid);
-              try { await authMod.signOut(auth); } catch(e) {}
-              window.location.href = `${b}auth`;
-            });
-          }
-        } else {
-          applyGuestUI();
-        }
-      });
-    } catch(e) {
+      if (apiUser) {
+        applyAuthedUI({
+          uid: apiUser.id,
+          displayName: apiUser.displayName,
+          email: apiUser.email,
+          photoURL: apiUser.photoUrl,
+        });
+        watchBadges(apiUser);
+      } else {
+        applyGuestUI();
+      }
+    } catch (e) {
       console.error('nav.js auth error:', e);
     }
   })();

@@ -1,22 +1,6 @@
 (async () => {
   try {
-    const { initializeApp, getApps, getApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    const { getAuth, onAuthStateChanged } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js');
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBLGr2hpmnmj1Mxf9072m8vQXJkLUN6YyY",
-      authDomain: "antviz-515c8.firebaseapp.com",
-      projectId: "antviz-515c8",
-      storageBucket: "antviz-515c8.firebasestorage.app",
-      messagingSenderId: "140073712504",
-      appId: "1:140073712504:web:8a844268e38229cebde68d"
-    };
-    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-
-    const db = getFirestore(app);
-    const auth = getAuth(app);
-    const ADMIN = 'wbtipoofficialcom@gmail.com';
+    const API = 'https://antviz.ru/api';
 
     let mo = null, bo = null;
     let currentUser = null, authReady = false;
@@ -24,7 +8,7 @@
 
     // ===== Кэш в sessionStorage — общий принцип для обеих проверок:
     // тех.работы почти всегда выключены, бан почти всегда отсутствует,
-    // незачем читать Firestore на каждом переходе между страницами.
+    // незачем дёргать API на каждом переходе между страницами.
     const MAINT_KEY = 'antviz_maint_status';
     const MAINT_TTL_OFF = 5 * 60 * 1000;
     const MAINT_TTL_ON  = 20 * 1000;
@@ -59,56 +43,45 @@
     function writeBanCache(uid, ban) {
       try { sessionStorage.setItem(banCacheKey(uid), JSON.stringify({ ban, ts: Date.now() })); } catch (e) {}
     }
-    function isBanActive(ban) {
-      if (!ban) return false;
-      if (!ban.until) return true;
-      const untilMs = ban.until.seconds ? ban.until.seconds * 1000 : new Date(ban.until).getTime();
-      return untilMs > Date.now();
-    }
     function fmtBanDate(ban) {
       if (!ban || !ban.until) return null;
-      const ms = ban.until.seconds ? ban.until.seconds * 1000 : new Date(ban.until).getTime();
-      return new Date(ms).toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' });
+      return new Date(ban.until).toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    // ===== Тех.работы — не зависят от авторизации, стартуют сразу
-    (async () => {
-      const cached = readMaintCache();
-      if (cached !== null) { maintOn = cached; render(); return; }
-      try {
-        const snap = await getDoc(doc(db, 'settings', 'maintenance'));
-        maintOn = snap.exists() && snap.data().enabled === true;
-        writeMaintCache(maintOn);
-      } catch (e) { maintOn = false; }
-      render();
-    })();
+    // ===== Тех.работы — временно всегда выключены. Флаг тех.работ раньше
+    // жил в Firestore (settings/maintenance) и пока не перенесён на новый
+    // бэкенд — включать здесь нечего, пока не появится соответствующий
+    // эндпоинт и admin-переключатель на сервере.
+    maintOn = false;
+    render();
 
-    // ===== Бан — только для авторизованных, ждёт onAuthStateChanged
-    onAuthStateChanged(auth, async user => {
-      currentUser = user;
-      authReady = true;
+    // ===== Бан — только для авторизованных
+    try {
+      const meResp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+      currentUser = meResp.ok ? await meResp.json() : null;
+    } catch (e) { currentUser = null; }
+    authReady = true;
 
-      if (!user || user.email === ADMIN) { banData = null; banChecked = true; render(); return; }
-
-      const cached = readBanCache(user.uid);
-      if (cached !== undefined) { banData = cached; banChecked = true; render(); return; }
-      try {
-        const snap = await getDoc(doc(db, 'bans', user.uid));
-        banData = snap.exists() ? snap.data() : null;
-        writeBanCache(user.uid, banData);
-      } catch (e) { banData = null; }
-      banChecked = true;
-      render();
-    });
+    if (!currentUser) {
+      banData = null; banChecked = true; render();
+    } else {
+      const cached = readBanCache(currentUser.id);
+      if (cached !== undefined) {
+        banData = cached; banChecked = true; render();
+      } else {
+        try {
+          const banResp = await fetch(`${API}/auth/ban-status`, { credentials: 'include' });
+          const banJson = banResp.ok ? await banResp.json() : { banned: false };
+          banData = banJson.banned ? banJson : null;
+          writeBanCache(currentUser.id, banData);
+        } catch (e) { banData = null; }
+        banChecked = true;
+        render();
+      }
+    }
 
     function render() {
       if (!authReady || maintOn === null) return;
-
-      // Админа не блокируем ничем — ни тех.работами, ни (не должно случиться) баном
-      if (currentUser?.email === ADMIN) {
-        removeMaint(); removeBan();
-        return;
-      }
 
       // Тех.работы важнее бана — если сайт лежит для всех, экран бана не нужен
       if (maintOn) {
@@ -228,7 +201,7 @@
     }
 
     function renderBan() {
-      const banned = isBanActive(banData);
+      const banned = !!banData;
       if (banned && !bo) {
         // Раньше тут был signOut(auth) при показе бана — но это триггерило
         // auth-listener'ы на других страницах (у некоторых при user=null стоит

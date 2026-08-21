@@ -439,13 +439,8 @@ window.closeLightbox = function(e){
 </script>
 
 <script type="module">
-import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
-import {
-  collection, query, where, orderBy, onSnapshot,
-  addDoc, serverTimestamp, doc, updateDoc, getDocs, setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
+import { touchSession } from './sessions.js?v=4';
 
 let currentUser = null;
 let allTickets = [];
@@ -464,11 +459,10 @@ let _activeTicketId = null;
 // online:true может зависнуть навсегда. Админка сама считает статус
 // протухшим, если updatedAt старше ~40 сек, так что зависание живёт
 // максимум до следующего протухания, а не бесконечно.
+// TODO: presence переедет вместе с чатом поддержки на новый бэкенд —
+// пока держим функции как no-op, чтобы не трогать остальную логику страницы.
 let _presenceInterval = null;
-function setPresence(online) {
-  if (!currentUser) return;
-  setDoc(doc(db, 'presence', currentUser.uid), { online, updatedAt: serverTimestamp() }, { merge: true }).catch(() => {});
-}
+function setPresence(online) { /* Firestore presence отключён, ждёт миграции чата */ }
 function startPresenceHeartbeat() {
   if (_presenceInterval) return;
   _presenceInterval = setInterval(() => {
@@ -639,7 +633,6 @@ window.openDrawer = async function(id) {
 
   if (ticket._read === false) {
     ticket._read = true;
-    updateDoc(doc(db, 'tickets', id), { _read: true }).catch(() => {});
     renderTickets();
   }
 
@@ -666,32 +659,14 @@ window.closeDrawer = function() {
 
 window.sendChatDrawer = async function() {
   if (!_activeTicketId) return;
-  const inp = document.getElementById('chatInput');
-  const text = inp?.value.trim();
-  if (!text) return toast('Напишите сообщение', 'error');
-  inp.value = '';
-  try {
-    await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), { sender: 'user', text, imageUrl: null, createdAt: serverTimestamp() });
-    await updateDoc(doc(db, 'tickets', _activeTicketId), { updatedAt: serverTimestamp(), _read: true, status: 'open' });
-    setTimeout(() => { const b = document.getElementById('chatBody'); if(b) b.scrollTop = b.scrollHeight; }, 100);
-  } catch(e) { toast('Ошибка отправки', 'error'); }
+  // TODO: подключить реальную отправку сообщений, когда чат поддержки переедет на новый бэкенд.
+  toast('Чат временно недоступен, скоро вернём', 'info');
 };
 
 window.attachImgDrawer = async function(fileInput) {
   if (!_activeTicketId) return;
-  const file = fileInput.files[0];
-  if (!file) return;
-  if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
-  const reader = new FileReader();
-  reader.onload = async e => {
-    try {
-      await addDoc(collection(db, 'tickets', _activeTicketId, 'messages'), { sender: 'user', text: 'Вложение', imageUrl: e.target.result, createdAt: serverTimestamp() });
-      await updateDoc(doc(db, 'tickets', _activeTicketId), { updatedAt: serverTimestamp(), _read: true });
-      toast('Изображение отправлено ✓', 'success');
-      setTimeout(() => { const b = document.getElementById('chatBody'); if(b) b.scrollTop = b.scrollHeight; }, 100);
-    } catch(err) { toast('Ошибка', 'error'); }
-  };
-  reader.readAsDataURL(file);
+  // TODO: подключить реальную загрузку вложений, когда чат поддержки переедет на новый бэкенд.
+  toast('Чат временно недоступен, скоро вернём', 'info');
   fileInput.value = '';
 };
 
@@ -718,43 +693,12 @@ document.getElementById('ticketFile').addEventListener('change', function() {
 });
 
 document.getElementById('submitTicketBtn').addEventListener('click', async function() {
-  const topic = document.getElementById('ticketTopic').value;
-  const priority = document.getElementById('ticketPriority').value;
   const subject = document.getElementById('ticketSubject').value.trim();
   const message = document.getElementById('ticketMessage').value.trim();
   if (!subject) return toast('Введите краткое описание', 'error');
   if (!message) return toast('Напишите сообщение', 'error');
-  this.disabled = true; this.textContent = 'Отправка...';
-  const linkedOrder = selectedOrderId ? userOrders.find(o=>o.id===selectedOrderId) : null;
-  const doCreate = async (imageUrl) => {
-    try {
-      const ticketRef = await addDoc(collection(db, 'tickets'), {
-        uid: currentUser.uid, userName: currentUser.displayName || 'Пользователь',
-        userEmail: currentUser.email || '', topic, priority, subject,
-        orderId: selectedOrderId || null,
-        orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
-        status: 'open', _read: true, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
-      });
-      await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), { sender: 'user', text: message, imageUrl: imageUrl || null, createdAt: serverTimestamp() });
-      // Автоответ сразу после создания тикета — предупреждаем про возможную
-      // задержку из-за нагрузки, чтобы человек не ждал в недоумении первого
-      // живого ответа поддержки
-      await addDoc(collection(db, 'tickets', ticketRef.id, 'messages'), {
-        sender: 'support', senderName: 'Поддержка',
-        text: 'Спасибо за обращение! Сейчас у нас повышенная нагрузка, поэтому ответ может занять несколько часов. Приносим извинения за ожидание — мы обязательно ответим.',
-        imageUrl: null, createdAt: serverTimestamp()
-      });
-      document.getElementById('ticketFormOverlay').classList.remove('show');
-      toast('Тикет создан ✓', 'success');
-    } catch(e) { toast('Ошибка: ' + e.message, 'error'); }
-    this.disabled = false; this.textContent = 'Отправить';
-  };
-  const file = window._pendingFile;
-  if (file && file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = e => doCreate(e.target.result);
-    reader.readAsDataURL(file);
-  } else { await doCreate(null); }
+  // TODO: подключить реальное создание тикета, когда чат поддержки переедет на новый бэкенд.
+  toast('Отправка обращений временно недоступна, скоро вернём', 'info');
 });
 
 document.getElementById('ticketTabs').addEventListener('click', e => {
@@ -764,74 +708,35 @@ document.getElementById('ticketTabs').addEventListener('click', e => {
   renderTickets();
 });
 
-function subscribeMessages(ticketId) {
-  if (unsubMessages[ticketId]) return;
-  const q = query(collection(db, 'tickets', ticketId, 'messages'), orderBy('createdAt', 'asc'));
-  unsubMessages[ticketId] = onSnapshot(q, snap => {
-    const ticket = allTickets.find(t => t.id === ticketId);
-    if (!ticket) return;
-    ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    if (_activeTicketId === ticketId) {
-      const box = document.getElementById('chatBody');
-      if (box) {
-        const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 40;
-        box.innerHTML = buildChat(ticket._messages);
-        if (wasAtBottom) setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
-      }
-    }
-    renderTickets();
-  });
+// TODO: подключить реальный realtime-чат, когда тикеты переедут на новый бэкенд.
+function subscribeMessages(ticketId) { /* пока нечего слушать — тикетов нет */ }
+
+async function loadMessages(ticket) { ticket._messages = []; }
+
+// TODO: подключить реальные заказы, когда orders переедут с Firestore.
+async function loadUserOrders(){
+  userOrders = [];
 }
 
-async function loadMessages(ticket) {
-  const snap = await getDocs(query(collection(db, 'tickets', ticket.id, 'messages'), orderBy('createdAt', 'asc')));
-  ticket._messages = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-}
-
-async function loadUserOrders(uid){
+(async function initSupportPage(){
+  let user = null;
   try{
-    const snap = await getDocs(query(collection(db,'orders'), where('uid','==',uid)));
-    userOrders = snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(o=>(o.status??0) !== -1)
-      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  }catch(e){ userOrders = []; }
-}
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
 
-onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href = '../auth'; return; }
   currentUser = user;
   document.getElementById('loadingScreen').style.display = 'none';
   document.getElementById('sbContent').style.display = 'block';
-  setPresence(true);
-  startPresenceHeartbeat();
-  await loadUserOrders(user.uid);
-  const q = query(collection(db, 'tickets'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
-  unsubTickets = onSnapshot(q, async snap => {
-    const incoming = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    for (const t of incoming) {
-      const existing = allTickets.find(x => x.id === t.id);
-      t._messages = existing?._messages || [];
-      t._read = existing?._read ?? t._read ?? true;
-      if (!t._messages.length) await loadMessages(t);
-      subscribeMessages(t.id);
-    }
-    allTickets = incoming;
-    renderTickets();
-  }, err => {
-    // Раньше ошибку тут никак не обрабатывали — если запрос падал (например
-    // из-за отсутствующего составного индекса uid+createdAt в Firestore),
-    // список тикетов молча оставался в состоянии "Загрузка..." навсегда,
-    // хотя сами тикеты создавались нормально. Показываем это явно.
-    console.error('tickets onSnapshot error:', err);
-    const el = document.getElementById('ticketsList');
-    if (el) el.innerHTML = '<div style="padding:32px;color:var(--text-faint);font-size:13px;text-align:center">Не удалось загрузить историю обращений. Обновите страницу.</div>';
-    toast('Не удалось загрузить историю обращений', 'error');
-  });
+  await loadUserOrders();
 
-  touchSession(db, auth, user);
-  watchSessionRevocation(db, user.uid, () => {
-    signOut(auth).finally(() => { window.location.href = '../auth'; });
-  });
+  // TODO: подключить реальную историю тикетов, когда чат поддержки переедет
+  // на новый бэкенд (таблицы tickets/ticket_messages в schema.sql уже готовы).
+  allTickets = [];
+  renderTickets();
+
+  touchSession();
 
   // Если пришли по ссылке с конкретным заказом — сразу открываем форму создания
   // тикета с этим заказом предвыбранным
@@ -841,7 +746,7 @@ onAuthStateChanged(auth, async user => {
     openModal();
     setTimeout(() => window.selectOrder(preOrderId), 50);
   }
-});
+})();
 </script>
 
 <script>

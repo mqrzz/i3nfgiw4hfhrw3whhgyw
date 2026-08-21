@@ -366,9 +366,12 @@
 </section>
 
 <script type="module">
-  import { auth } from './firebase-config.js';
-  import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  onAuthStateChanged(auth, user => {
+  (async () => {
+    let user = null;
+    try{
+      const resp = await fetch('https://antviz.ru/api/auth/me', { credentials: 'include' });
+      if(resp.ok) user = await resp.json();
+    }catch(e){}
     const np = document.getElementById('navProfile');
     const nl = document.getElementById('navLogin');
     if (user) {
@@ -378,7 +381,7 @@
       if (np) np.style.display = 'none';
       if (nl) nl.style.display = 'flex';
     }
-  });
+  })();
 </script>
 
 <script>
@@ -414,6 +417,5 @@
 
 <script src="footer.js" data-page="404"></script>
 <script src="GEOBLOCK.js"></script>
-<script type="module" src="maintenance.js"></script>
 </body>
 </html>

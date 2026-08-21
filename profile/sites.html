@@ -239,10 +239,8 @@ a.site-meta-chip:hover .site-meta-ico{border-color:var(--violet)}
 </div>
 
 <script type="module">
-import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
+const API = 'https://antviz.ru/api';
+import { touchSession } from './sessions.js?v=4';
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
@@ -307,30 +305,24 @@ function render(orders){
   el.innerHTML = orders.map(siteCard).join('');
 }
 
-onAuthStateChanged(auth, user=>{
+(async function initSites(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){ window.location.href='../auth'; return; }
+
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
 
-  const q = query(collection(db,'orders'), where('uid','==',user.uid));
-  onSnapshot(q, snap=>{
-    const done = snap.docs.map(d=>({id:d.id,...d.data()}))
-      // ВАЖНО: раньше тут требовалось siteUrl или siteDomain — завершённые
-      // заказы без домена (например, будущие Telegram-боты/миниапы) просто
-      // никогда бы не показались на этой странице. Фильтруем только по статусу.
-      .filter(o => o.status === 5)
-      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    render(done);
-  }, err=>{
-    console.error('Sites error:', err);
-    render([]);
-  });
+  // TODO: подключить реальные завершённые заказы, когда orders переедут
+  // с Firestore на новый бэкенд (таблица orders в schema.sql уже готова).
+  render([]);
 
-  touchSession(db, auth, user);
-  watchSessionRevocation(db, user.uid, () => {
-    signOut(auth).finally(() => { window.location.href = '../auth'; });
-  });
-});
+  touchSession();
+})();
 </script>
 
 <script>

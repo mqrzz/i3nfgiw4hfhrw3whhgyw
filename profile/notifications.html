@@ -193,10 +193,8 @@
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
+const API = 'https://antviz.ru/api';
+import { touchSession } from './sessions.js?v=4';
 
 let currentUser = null;
 let allNotifs = [];
@@ -266,10 +264,10 @@ function render(){
 }
 
 window.openNotif = async function(id, link){
+  // TODO: подключить реальную отметку "прочитано", когда появится
+  // /api/notifications на новом бэкенде.
   const n = allNotifs.find(x=>x.id===id);
-  if(n && !n.read){
-    try{ await updateDoc(doc(db,'notifications',currentUser.uid,'items',id),{read:true}); }catch(e){ toast('Не удалось отметить как прочитанное','error'); }
-  }
+  if(n) n.read = true;
   if(link) window.location.href = link;
 };
 
@@ -282,16 +280,10 @@ document.getElementById('notifList').addEventListener('click', e=>{
 document.getElementById('markAllBtn').addEventListener('click', async function(){
   const unread = allNotifs.filter(n=>!n.read);
   if(!unread.length) return;
-  this.disabled = true;
-  try{
-    const batch = writeBatch(db);
-    unread.forEach(n=>batch.update(doc(db,'notifications',currentUser.uid,'items',n.id),{read:true}));
-    await batch.commit();
-    toast('Все уведомления прочитаны ✓','success');
-  }catch(e){
-    toast('Не удалось обновить уведомления','error');
-    this.disabled = !allNotifs.some(n=>!n.read);
-  }
+  // TODO: подключить реальный batch-update, когда появится /api/notifications.
+  unread.forEach(n=>n.read=true);
+  render();
+  toast('Все уведомления прочитаны ✓','success');
 });
 
 document.getElementById('notifTabs').addEventListener('click', e=>{
@@ -302,29 +294,27 @@ document.getElementById('notifTabs').addEventListener('click', e=>{
   render();
 });
 
-function loadNotifications(uid){
-  const q = query(collection(db,'notifications',uid,'items'), orderBy('createdAt','desc'), limit(100));
-  onSnapshot(q, snap=>{
-    allNotifs = snap.docs.map(d=>({id:d.id,...d.data()}));
-    render();
-  }, err=>{
-    console.error('Notifications error:', err);
-    allNotifs = [];
-    render();
-  });
+// TODO: подключить реальные уведомления, когда появится /api/notifications
+// на новом бэкенде (таблица notifications в schema.sql уже готова).
+function loadNotifications(){
+  allNotifs = [];
+  render();
 }
 
-onAuthStateChanged(auth, user=>{
+(async function initNotifications(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){ window.location.href='../auth'; return; }
   currentUser = user;
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
-  loadNotifications(user.uid);
-  touchSession(db, auth, user);
-  watchSessionRevocation(db, user.uid, () => {
-    signOut(auth).finally(() => { window.location.href = '../auth'; });
-  });
-});
+  loadNotifications();
+  touchSession();
+})();
 </script>
 
 <script>

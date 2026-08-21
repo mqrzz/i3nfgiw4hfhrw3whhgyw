@@ -854,13 +854,12 @@ window.toggleTicket=function(id){
 
 async function init(u){
   cu=u;
-  // TODO: подключить реальные завершённые заказы, когда orders переедут
-  // с Firestore на новый бэкенд (таблица orders в schema.sql уже готова).
-  // До этого момента честно показываем "нет проектов", как у совершенно
-  // нового клиента.
-  orders=[];
+  try{
+    const resp = await fetch(`${API}/orders`, { credentials: 'include' });
+    orders = resp.ok ? await resp.json() : [];
+  }catch(e){ console.error('tickets init orders:', e); orders=[]; }
   done=orders.filter(o=>o.status===5);
-  active=done.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
+  active=done.filter(o=>o.supportActive&&o.supportExpiresAt&&new Date(o.supportExpiresAt)>new Date());
   hide('secLoad');
   if(!done.length){show('secNone');return;}
   const urlId=new URLSearchParams(location.search).get('order');
@@ -894,7 +893,7 @@ window.switchSite=function(id){
 
 function showForSel(){
   hide('secNone','secBuy','secActive');
-  const hs=sel.supportActive&&sel.supportExpiresAt&&sel.supportExpiresAt.toDate()>new Date();
+  const hs=sel.supportActive&&sel.supportExpiresAt&&new Date(sel.supportExpiresAt)>new Date();
   if(hs){pendId=sel.id;showActive();}
   else{show('secBuy');
     if(done.length>1){
@@ -981,7 +980,7 @@ document.getElementById('termsCheckbox')?.addEventListener('change',function(){
 
 function periodStartFor(o){
   if(!o.supportExpiresAt)return null;
-  const d=new Date(o.supportExpiresAt.toDate());d.setDate(d.getDate()-30);return d;
+  const d=new Date(o.supportExpiresAt);d.setDate(d.getDate()-30);return d;
 }
 
 function showActive(){
@@ -990,7 +989,7 @@ function showActive(){
   const tariffKey=sel.supportTariff&&TARIFFS[sel.supportTariff]?sel.supportTariff:'basic';
   TICKET_LIMIT=TARIFFS[tariffKey].limit;
   document.getElementById('renewBtn').textContent=`Продлить · ${TARIFFS[tariffKey].price} ₽`;
-  const exp=sel.supportExpiresAt.toDate();
+  const exp=new Date(sel.supportExpiresAt);
   const left=exp-new Date();const dl=Math.max(0,Math.ceil(left/(864e5)));const pct=Math.max(0,Math.min(100,left/(30*864e5)*100));
   const warnState=dl<=2;
   document.getElementById('statusDot').className='dot '+(warnState?'dot-warn':'dot-accent');
@@ -1025,8 +1024,16 @@ function renderRating(t){
 }
 
 window.rateTicket=async function(id,val){
-  // TODO: подключить реальный /api/service-tickets/:id/rate, когда появится бэкенд.
-  toast('Функция временно недоступна, скоро вернём','info');
+  try{
+    const resp = await fetch(`${API}/service-tickets/${id}/rate`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ rating: val }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    const t=allTickets.find(x=>x.id===id);if(t)t.rating=val;
+    renderTickets();
+    toast('Спасибо за оценку','success');
+  }catch(e){toast(e.message||'Не удалось сохранить оценку','error');}
 };
 
 /* ===== Разовая правка без подписки ===== */
@@ -1077,9 +1084,18 @@ function setListLoading(on){
 
 async function loadTickets(){
   if(!sel)return;
-  // TODO: подключить реальные тикеты, когда появится /api/service-tickets.
-  allTickets=[];
-  ticketsThisPeriod=0;
+  try{
+    const resp = await fetch(`${API}/service-tickets?orderId=${sel.id}`, { credentials: 'include' });
+    const all = resp.ok ? await resp.json() : [];
+    const periodStart=periodStartFor(sel);
+    const inPeriod=periodStart?all.filter(t=>t.createdAt && new Date(t.createdAt)>=periodStart):all;
+    ticketsThisPeriod=inPeriod.length;
+    allTickets=all;
+  }catch(e){
+    console.error('loadTickets:', e);
+    allTickets=[];
+    ticketsThisPeriod=0;
+  }
   renderLimit();
   renderTickets();
 }
@@ -1103,7 +1119,7 @@ function renderTickets(){
   if(!ts.length){el.innerHTML='<div class="t-empty"><div class="ico-badge lg c-indigo"><svg viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/></svg></div>Заявок пока нет</div>';return;}
   el.innerHTML=ts.map(t=>{
     const st=ticketStatus(t);
-    const date=t.createdAt?.toDate?t.createdAt.toDate().toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    const date=t.createdAt?new Date(t.createdAt).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
     const stIco=st==='done'?'<path d="M9 12l2 2 4-4"/><rect x="3.5" y="4.5" width="17" height="16" rx="4"/>':st==='progress'?'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>':'<path d="M15 4l5 5-11 11H4v-5z"/>';
     const unread=isUnseen(t);
     return`<div class="t-item st-${st}" id="t-${t.id}">
@@ -1143,8 +1159,26 @@ if(dz){
 }
 
 window.submitTicket=async function(){
-  // TODO: подключить реальный /api/service-tickets, когда появится бэкенд.
-  toast('Функция временно недоступна, скоро вернём','info');
+  if(ticketsThisPeriod>=TICKET_LIMIT){toast('Лимит заявок исчерпан','error');return;}
+  const title=document.getElementById('tTitle').value.trim(),desc=document.getElementById('tDesc').value.trim();
+  if(!title){toast('Введите тему заявки','error');return;}if(!sel){toast('Не выбран проект','error');return;}
+  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Отправка...';
+  try{
+    const resp = await fetch(`${API}/service-tickets`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({
+        orderId: sel.id, title, description: desc || '',
+        images: photos.length ? photos : null,
+        orderSiteType: sel.siteType||'', orderTariff: sel.tariff||sel.package||'', orderDomain: sel.siteDomain||'',
+        billing: 'subscription',
+      }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена','success');
+    loadTickets();
+    switchTab('history');
+  }catch(e){toast(e.message||'Ошибка','error');}
+  btn.disabled=false;btn.textContent='Отправить заявку';
 };
 
 (async function initTicketsPage(){

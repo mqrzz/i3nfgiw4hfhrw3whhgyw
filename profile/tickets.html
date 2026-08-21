@@ -792,10 +792,8 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import{auth,db}from'../firebase-config.js';
-import{onAuthStateChanged,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{touchSession,watchSessionRevocation}from'./sessions.js?v=3';
-import{collection,query,where,orderBy,getDocs,getCountFromServer,addDoc,serverTimestamp,doc,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API='https://antviz.ru/api';
+import{touchSession}from'./sessions.js?v=4';
 
 const PAY_URL='https://api-lac-six-78.vercel.app/api/createPayment';
 // ВАЖНО: цены/лимиты ниже — источник истины только на фронте для отображения.
@@ -856,7 +854,11 @@ window.toggleTicket=function(id){
 
 async function init(u){
   cu=u;
-  try{const s=await getDocs(query(collection(db,'orders'),where('uid','==',u.uid)));orders=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));}catch(e){orders=[];}
+  // TODO: подключить реальные завершённые заказы, когда orders переедут
+  // с Firestore на новый бэкенд (таблица orders в schema.sql уже готова).
+  // До этого момента честно показываем "нет проектов", как у совершенно
+  // нового клиента.
+  orders=[];
   done=orders.filter(o=>o.status===5);
   active=done.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date());
   hide('secLoad');
@@ -1006,18 +1008,10 @@ function showActive(){
   photos=[];renderPreviews();loadTickets();
 }
 
+// TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase
+// ID-токен — переедет вместе с остальной оплатой отдельным этапом.
 window.payForSupport=async function(renew){
-  const id=renew?pendId:pendBuyId||pendId;if(!id){toast('Не найден заказ','error');return;}if(inFlight)return;
-  const tariff=renew?(sel.supportTariff&&TARIFFS[sel.supportTariff]?sel.supportTariff:'basic'):pendTariff;
-  if(!renew){
-    if(!tariff){toast('Выберите тариф','error');return;}
-    if(!document.getElementById('termsCheckbox').checked){toast('Подтвердите ознакомление с условиями','error');return;}
-  }
-  const price=TARIFFS[tariff].price;
-  inFlight=true;pendId=id;
-  const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;setBtnLabel(btn,'Переходим к оплате...');}
-  try{const idToken=await auth.currentUser.getIdToken();const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId:id,amount:price,type:'support',tariff})});const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();}
-  catch(e){inFlight=false;if(btn){btn.disabled=false;setBtnLabel(btn,renew?`Продлить · ${price} ₽`:`Подключить за ${price} ₽`);}toast('Не удалось открыть оплату','error');}
+  toast('Оплата временно недоступна, скоро вернём','info');
 };
 
 function renderRating(t){
@@ -1031,12 +1025,8 @@ function renderRating(t){
 }
 
 window.rateTicket=async function(id,val){
-  try{
-    await updateDoc(doc(db,'service_tickets',id),{rating:val});
-    const t=allTickets.find(x=>x.id===id);if(t)t.rating=val;
-    renderTickets();
-    toast('Спасибо за оценку','success');
-  }catch(e){toast('Не удалось сохранить оценку','error');}
+  // TODO: подключить реальный /api/service-tickets/:id/rate, когда появится бэкенд.
+  toast('Функция временно недоступна, скоро вернём','info');
 };
 
 /* ===== Разовая правка без подписки ===== */
@@ -1076,31 +1066,8 @@ if(oDz){
 }
 
 window.submitOnceOff=async function(){
-  const title=document.getElementById('oTitle').value.trim();
-  const targetId=pendBuyId||pendId;
-  if(!title){toast('Введите тему заявки','error');return;}
-  if(!targetId){toast('Не найден проект','error');return;}
-  if(inFlight)return;inFlight=true;
-  const btn=document.getElementById('onceSubmitBtn');btn.disabled=true;setBtnLabel(btn,'Оформляем...');
-  try{
-    const o=done.find(x=>x.id===targetId);
-    const ref=await addDoc(collection(db,'service_tickets'),{
-      title,description:document.getElementById('oDesc').value.trim()||'',
-      images:oncePhotos.length?oncePhotos:null,
-      uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',
-      orderId:targetId,orderSiteType:o?.siteType||'',orderTariff:o?.tariff||o?.package||'',orderDomain:o?.siteDomain||'',
-      billing:'once',status:'awaiting_payment',paid:false,
-      createdAt:serverTimestamp()
-    });
-    const idToken=await auth.currentUser.getIdToken();
-    const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId:targetId,ticketId:ref.id,amount:ONE_OFF_PRICE,type:'ticket_once'})});
-    const d=await r.json();
-    if(d.paymentUrl){window.location.href=d.paymentUrl;return;}
-    throw new Error();
-  }catch(e){
-    inFlight=false;btn.disabled=false;setBtnLabel(btn,'Оплатить 350 ₽ и отправить');
-    toast('Не удалось оформить заявку','error');
-  }
+  // TODO: подключить реальный /api/service-tickets + оплату, когда появится бэкенд.
+  toast('Функция временно недоступна, скоро вернём','info');
 };
 
 function setListLoading(on){
@@ -1109,31 +1076,12 @@ function setListLoading(on){
 }
 
 async function loadTickets(){
-  if(!sel)return;const oid=sel.id;
-  setListLoading(true);
-  // ВАЖНО: раньше запрос фильтровал только по orderId, без uid. Заявка
-  // создаётся успешно (addDoc проходит), но правила безопасности Firestore
-  // не могут подтвердить для ВСЕЙ выборки (list), что все документы
-  // принадлежат текущему пользователю, если это не видно из самого запроса —
-  // и просто отклоняют чтение целиком (permission-denied), хотя запись уже
-  // есть в базе. Отсюда "заявки не отправляются, история не загружается,
-  // но в Firestore они есть". Фильтр по uid устраняет это.
-  try{const s=await getDocs(query(collection(db,'service_tickets'),where('uid','==',cu.uid),where('orderId','==',oid)));if(!sel||sel.id!==oid)return;
-  const all=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-
-  const periodStart=periodStartFor(sel);
-  const inPeriod=periodStart?all.filter(t=>t.createdAt&&t.createdAt.toDate()>=periodStart):all;
-  ticketsThisPeriod=inPeriod.length;
+  if(!sel)return;
+  // TODO: подключить реальные тикеты, когда появится /api/service-tickets.
+  allTickets=[];
+  ticketsThisPeriod=0;
   renderLimit();
-  allTickets=all;
-  const unreadCount=all.filter(isUnseen).length;
-  const tc=document.getElementById('tabCount');
-  if(unreadCount>0){tc.style.display='inline-block';tc.textContent=unreadCount;}else{tc.style.display='none';}
   renderTickets();
-  }catch(e){
-    document.getElementById('tList').innerHTML='<div class="t-empty">Не удалось загрузить заявки</div>';
-    toast('Не удалось загрузить заявки','error');
-  }
 }
 
 function renderLimit(){
@@ -1195,29 +1143,23 @@ if(dz){
 }
 
 window.submitTicket=async function(){
-  if(ticketsThisPeriod>=TICKET_LIMIT){toast('Лимит заявок исчерпан','error');return;}
-  const title=document.getElementById('tTitle').value.trim(),desc=document.getElementById('tDesc').value.trim();
-  if(!title){toast('Введите тему заявки','error');return;}if(!sel){toast('Не выбран проект','error');return;}
-  const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Отправка...';
-  try{
-    await addDoc(collection(db,'service_tickets'),{title,description:desc||'',images:photos.length?photos:null,uid:cu.uid,userName:cu.displayName||'Пользователь',userEmail:cu.email||'',orderId:sel.id,orderSiteType:sel.siteType||'',orderTariff:sel.tariff||sel.package||'',orderDomain:sel.siteDomain||'',billing:'subscription',status:'open',createdAt:serverTimestamp()});
-    document.getElementById('tTitle').value='';document.getElementById('tDesc').value='';photos=[];renderPreviews();toast('Заявка отправлена','success');
-    loadTickets();
-    switchTab('history');
-  }catch(e){toast('Ошибка','error');}
-  btn.disabled=false;btn.textContent='Отправить заявку';
+  // TODO: подключить реальный /api/service-tickets, когда появится бэкенд.
+  toast('Функция временно недоступна, скоро вернём','info');
 };
 
-onAuthStateChanged(auth,async u=>{
+(async function initTicketsPage(){
+  let u = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) u = await resp.json();
+  }catch(e){}
+
   if(!u){window.location.href='../auth';return;}
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
   await init(u);
-  touchSession(db, auth, u);
-  watchSessionRevocation(db, u.uid, () => {
-    signOut(auth).finally(() => { window.location.href = '../auth'; });
-  });
-});
+  touchSession();
+})();
 </script>
 <script>
 // ── тема (общая для всех страниц кабинета через localStorage) ──

@@ -545,10 +545,8 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { touchSession, watchSessionRevocation } from './sessions.js?v=3';
-import { collection, query, where, orderBy, onSnapshot, addDoc, serverTimestamp, doc, updateDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
+import { touchSession } from './sessions.js?v=4';
 
 const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 const STATUS_ICONS = [
@@ -577,7 +575,7 @@ const ICO_MSG='<path d="M22 17a2 2 0 0 1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.
 const ICO_EXTLINK='<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>';
 const ICO_X='<path d="M18 6 6 18"/><path d="m6 6 12 12"/>';
 
-let currentUser = null, unsubOrders = null;
+let currentUser = null;
 let allOrders = [], lastStatuses = {}, reviewOrderId = null, reviewStars = 0, bannerTimer = null;
 let isInitialLoad = true;
 
@@ -808,12 +806,18 @@ window.openOrderModal=function(id){
   document.body.style.overflow='hidden';
 };
 
+// TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase
+// ID-токен для проверки личности — переезжает вместе с остальной оплатой,
+// когда до этого дойдём (отдельный репозиторий, который скинешь позже).
 window.payRemaining=async function(orderId){
-  try{const idToken=await auth.currentUser.getIdToken();const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId,type:'remaining'})});const data=await resp.json();if(data.paymentUrl){window.location.href=data.paymentUrl;}else toast('Ошибка создания платежа','error');}catch(e){toast('Не удалось создать платёж','error');}
+  toast('Доплата временно недоступна, скоро вернём','info');
 };
 
 window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');document.body.style.overflow='';};
-window.requestRevision=async function(id){try{await updateDoc(doc(db,'orders',id),{revisionRequested:true});toast('Запрос отправлен ✓','success');}catch(e){toast('Ошибка','error');}};
+window.requestRevision=async function(id){
+  // TODO: подключить реальный /api/orders/:id/revision, когда заказы переедут с Firestore.
+  toast('Функция временно недоступна, скоро вернём','info');
+};
 
 // ══ REFUND ══
 window.openRefundModal=function(id){
@@ -827,17 +831,9 @@ window.submitRefundRequest=async function(){
   const id=window._refundOrderId;if(!id)return;
   const o=allOrders.find(x=>x.id===id);
   if(!o||(o.status||0)>=2){toast('Возврат уже недоступен для этого заказа','error');closeRefundModal();return;}
-  const reason=document.getElementById('refundReasonSelect').value;
-  const comment=document.getElementById('refundComment').value.trim();
-  try{
-    await updateDoc(doc(db,'orders',id),{
-      refundStatus:'requested',
-      refundReason:comment?reason+' — '+comment:reason,
-      refundRequestedAt:serverTimestamp()
-    });
-    toast('Заявка на возврат отправлена ✓','success');
-    closeRefundModal();closeOrderModal();
-  }catch(e){toast('Не удалось отправить заявку','error');}
+  // TODO: подключить реальный /api/orders/:id/refund, когда заказы переедут с Firestore.
+  toast('Функция временно недоступна, скоро вернём','info');
+  closeRefundModal();
 };
 
 // ══ REVIEW ══
@@ -854,11 +850,9 @@ window.setStar=function(n){reviewStars=n;document.querySelectorAll('.star').forE
 window.submitReview=async function(){
   if(!reviewStars){toast('Выберите оценку','error');return;}
   if(!currentUser||!reviewOrderId)return;
-  try{
-    await addDoc(collection(db,'reviews'),{uid:currentUser.uid,orderId:reviewOrderId,stars:reviewStars,text:document.getElementById('reviewText').value.trim(),clientName:currentUser.displayName||'',clientEmail:currentUser.email,createdAt:serverTimestamp()});
-    await updateDoc(doc(db,'orders',reviewOrderId),{reviewed:true}).catch(()=>{});
-    closeReview();toast('Спасибо за отзыв! ✓','success');
-  }catch(e){toast('Ошибка','error');}
+  // TODO: подключить реальный /api/reviews, когда заказы переедут с Firestore.
+  toast('Функция временно недоступна, скоро вернём','info');
+  closeReview();
 };
 
 // ══ DELIVERY ══
@@ -896,49 +890,32 @@ function launchConfetti(){
   setTimeout(()=>{wrap.innerHTML='';},5000);
 }
 
-function loadOrders(uid){
-  if(unsubOrders)unsubOrders();
-  const q=query(collection(db,'orders'),where('uid','==',uid));
-  unsubOrders=onSnapshot(q,snap=>{
-    const orders=snap.docs.map(d=>({id:d.id,...d.data()}))
-      .filter(o=>(o.status??0)!==-1)
-      .sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-    allOrders=orders;
-    renderOrders(orders);
-    snap.docChanges().forEach(ch=>{
-      if(ch.type==='modified'){
-        const o={id:ch.doc.id,...ch.doc.data()};
-        const prev=lastStatuses[ch.doc.id];const cur=o.status??0;
-        if(prev!==undefined&&prev!==cur){
-          showBanner(STATUS_LABELS[cur]);
-          if(cur===5&&!o.deliveryShown){const lsKey='antviz_delivery_seen_'+ch.doc.id;if(!localStorage.getItem(lsKey)){localStorage.setItem(lsKey,'1');setTimeout(()=>showDeliveryPopup(o),800);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});}}
-          if(cur===5&&!o.reviewed)setTimeout(()=>openReview(o.id),5000);
-        }
-        lastStatuses[ch.doc.id]=cur;
-      }else if(ch.type==='added'){
-        const o={id:ch.doc.id,...ch.doc.data()};lastStatuses[ch.doc.id]=o.status??0;
-        const lsKey='antviz_delivery_seen_'+ch.doc.id;
-        if(!isInitialLoad&&o.status===5&&!o.deliveryShown&&!localStorage.getItem(lsKey)){localStorage.setItem(lsKey,'1');setTimeout(()=>{showDeliveryPopup(o);updateDoc(doc(db,'orders',ch.doc.id),{deliveryShown:true}).catch(()=>{});},1500);}
-      }
-    });
-    if(isInitialLoad)isInitialLoad=false;
-  },err=>{console.error(err);renderOrders([]);});
+// TODO: подключить реальные заказы, когда orders переедут с Firestore на
+// новый бэкенд (таблица orders в schema.sql уже готова). Realtime-обновления
+// статуса (баннер смены статуса, попап выдачи, авто-предложение отзыва)
+// вернутся вместе с этим — пока показываем честный пустой список.
+function loadOrders(){
+  allOrders=[];
+  renderOrders([]);
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeReview();closeDelivery();closeOrderModal();}});
 document.getElementById('ordModalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('ordModalOverlay'))closeOrderModal();});
 
-onAuthStateChanged(auth,async user=>{
-  if(!user){window.location.href='../auth';return;}
+(async function initOrders(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){ window.location.href='../auth'; return; }
   currentUser=user;
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
-  loadOrders(user.uid);
-  touchSession(db, auth, user);
-  watchSessionRevocation(db, user.uid, () => {
-    signOut(auth).finally(() => { window.location.href = '../auth'; });
-  });
-});
+  loadOrders();
+  touchSession();
+})();
 </script>
 
 <script>

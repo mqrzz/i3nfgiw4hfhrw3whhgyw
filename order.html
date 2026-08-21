@@ -943,9 +943,7 @@ updateProgress();
 </script>
 
 <script type="module">
-import { auth, db } from './firebase-config.js';
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, addDoc, serverTimestamp, doc, getDoc, getDocs, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 let currentUser=null,agreed=false,favFile=null,uploadedFiles=[];
 const FORMAT_LABELS={landing:'Лендинг-визитка',multipage:'Многостраничный сайт',shop:'Интернет-магазин',custom:'Особый случай',bot:'Telegram-бот / мини-апп'};
@@ -989,23 +987,23 @@ async function verifyCaptcha(token){
 // перед созданием нового заказа (см. submitOrder) — так зависший "хвост"
 // не будет висеть неделями в админке, ожидая, что юзер случайно вернётся
 // на order.html.
-async function cleanupStalePending(uid, maxAgeMs=10*60*1000){
+async function cleanupStalePending(){
   try{
-    const staleQ=query(collection(db,'orders'),where('uid','==',uid),where('status','==',-1));
-    const staleSnap=await getDocs(staleQ);
-    const cutoff=Date.now()-maxAgeMs;
-    for(const d of staleSnap.docs){
-      const ts=d.data().createdAt?.toMillis?.();
-      if(!ts||ts<cutoff) await deleteDoc(doc(db,'orders',d.id));
-    }
+    await fetch(`${API}/orders/cleanup-drafts`, { method:'POST', credentials:'include' });
   }catch(_){}
 }
 
-onAuthStateChanged(auth,async user=>{
-  if(!user){currentUser=null;window.location.href='auth';return;}
+(async function initOrderPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){ currentUser=null; window.location.href='auth'; return; }
   currentUser=user;
-  await cleanupStalePending(user.uid);
-});
+  await cleanupStalePending();
+})();
 
 document.querySelectorAll('.type-card[data-track]').forEach(card=>{
   card.addEventListener('click',()=>{
@@ -1249,12 +1247,13 @@ document.getElementById('promoBtn').addEventListener('click',async()=>{
   if(!code){fb.style.display='block';fb.style.color='#dc2626';fb.textContent='Введите промокод';return;}
   btn.disabled=true;btn.textContent='Проверяем...';
   try{
-    const snap=await getDocs(query(collection(db,'promoCodes'),where('code','==',code),where('active','==',true)));
-    if(snap.empty){state.promo=null;fb.style.display='block';fb.style.color='#dc2626';fb.textContent='Промокод не найден';btn.disabled=false;btn.textContent='Применить';recalc();return;}
-    const p=snap.docs[0].data();
-    if(p.expiresAt?.toDate&&p.expiresAt.toDate()<new Date()){state.promo=null;fb.style.display='block';fb.style.color='#dc2626';fb.textContent='Срок действия истёк';btn.disabled=false;btn.textContent='Применить';recalc();return;}
-    if(p.forUid&&currentUser&&p.forUid!==currentUser.uid){state.promo=null;fb.style.display='block';fb.style.color='#dc2626';fb.textContent='Этот промокод вам не подходит';btn.disabled=false;btn.textContent='Применить';recalc();return;}
-    state.promo={type:p.discountType,value:p.discountValue,code};
+    const resp=await fetch(`${API}/promo-codes/${encodeURIComponent(code)}`,{credentials:'include'});
+    if(!resp.ok){
+      const d=await resp.json().catch(()=>({}));
+      state.promo=null;fb.style.display='block';fb.style.color='#dc2626';fb.textContent=d.error||'Промокод не найден';btn.disabled=false;btn.textContent='Применить';recalc();return;
+    }
+    const p=await resp.json();
+    state.promo={type:p.discountType,value:p.discountValue,code:p.code};
     fb.style.display='block';fb.style.color='#16a34a';fb.textContent='✓ Применён: '+(p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`);
     btn.textContent='✓ Применён';btn.style.color='#16a34a';
   }catch(e){fb.style.display='block';fb.style.color='#dc2626';fb.textContent='Ошибка проверки';btn.disabled=false;btn.textContent='Применить';}
@@ -1376,8 +1375,13 @@ async function submitOrder(paymentType) {
   // Живая проверка, а не закэшированная переменная currentUser — если сессия
   // истекла/разлогинилась уже после загрузки страницы, submitOrder не должен
   // полагаться на устаревшее значение и создавать заказ без владельца.
-  if(!auth.currentUser){currentUser=null;toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
-  currentUser=auth.currentUser;
+  let liveUser=null;
+  try{
+    const meResp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(meResp.ok) liveUser = await meResp.json();
+  }catch(e){}
+  if(!liveUser){currentUser=null;toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
+  currentUser=liveUser;
   const btnFull=document.getElementById('submitBtn');
   const btnHalf=document.getElementById('submitBtnHalf');
   const isHalf = paymentType === 'partial';
@@ -1404,7 +1408,7 @@ async function submitOrder(paymentType) {
   // ШАГ 2: капча прошла — на всякий случай подчищаем прошлые зависшие
   // заявки этого же юзера (status:-1), чтобы при повторных попытках они
   // не копились в базе, и создаём заказ в Firebase
-  await cleanupStalePending(currentUser.uid);
+  await cleanupStalePending();
   activeBtn.textContent='Сохраняем заявку...';
   const{total,discount}=calcAmounts();const t=TIERS[state.tier];
   const payAmount = isHalf ? Math.ceil(total / 2) : total;
@@ -1416,28 +1420,30 @@ async function submitOrder(paymentType) {
   let favData=null;if(favFile){try{favData=await f2b(favFile);}catch(e){toast('Не удалось прикрепить фавикон','error');}}
   const BUDGET=850*1024;let used=favData?Math.round(favData.length*0.75):0;const attachments=[];
   for(const f of uploadedFiles){try{const d=await f2b(f);const b=Math.round(d.length*0.75);if(used+b>BUDGET){toast(`«${f.name}» не поместился — пришлите в чат поддержки`,'error');continue;}used+=b;attachments.push({fileData:d,fileName:f.name,fileType:f.type});}catch(e){toast(`Не удалось: «${f.name}»`,'error');}}
-  let docRef;
+  let order;
   try{
-    docRef=await addDoc(collection(db,'orders'),{
-      package:t.name,siteType:state.format==='custom'?`Особый случай: ${state.formatNote.trim()}`:FORMAT_LABELS[state.format],
-      siteKind:state.siteType||null,
-      pages:t.pages,totalPrice:total,extras:extrasArr,domainOption:state.extras.domainOpt,
-      domainName:state.domainName||null,
-      promoCode:state.promo?.code||null,discountApplied:discount,
-      description:document.getElementById('briefText').value.trim()||'',
-      goals:state.goals,
-      contentReadiness:state.readiness,
-      references:document.getElementById('refsText').value.trim()||null,
-      launchDate:state.launchDate||null,
-      shopDetails:state.format==='shop'?{payment:state.shopPay,delivery:state.shopDelivery,quantity:state.shopQty.trim()||null}:null,
-      attachments:attachments.length?attachments:null,favicon:favData,
-      clientName:currentUser.displayName||'Пользователь',clientEmail:currentUser.email,
-      uid:currentUser.uid,status:-1,createdAt:serverTimestamp(),
-      paymentType: paymentType,
-      paidAmount: 0,
-      remainingAmount: isHalf ? Math.ceil(total / 2) : 0
+    const resp = await fetch(`${API}/orders`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({
+        package: t.name,
+        siteFormat: state.format==='custom'?`Особый случай: ${state.formatNote.trim()}`:FORMAT_LABELS[state.format],
+        siteType: state.siteType||null,
+        pages: t.pages, totalPrice: total, extras: extrasArr,
+        domainOption: state.extras.domainOpt, domainName: state.domainName||null,
+        promoCode: state.promo?.code||null, discountApplied: discount,
+        description: document.getElementById('briefText').value.trim()||'',
+        goals: state.goals, contentReadiness: state.readiness,
+        referencesText: document.getElementById('refsText').value.trim()||null,
+        launchDate: state.launchDate||null,
+        shopDetails: state.format==='shop'?{payment:state.shopPay,delivery:state.shopDelivery,quantity:state.shopQty.trim()||null}:null,
+        attachments: attachments.length?attachments:null, favicon: favData,
+        paymentType: paymentType, paidAmount: 0,
+        remainingAmount: isHalf ? Math.ceil(total / 2) : 0,
+      }),
     });
-    lastOrderId=docRef.id;
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    order = await resp.json();
+    lastOrderId=order.id;
     lastPaymentType=paymentType;
   }catch(e){
     btnFull.disabled=false; btnHalf.disabled=false;
@@ -1445,17 +1451,15 @@ async function submitOrder(paymentType) {
     toast('Не получилось сохранить. Проверьте соединение.','error'); return;
   }
 
-  // ШАГ 3: заказ создан — редиректим на оплату
+  // ШАГ 3: заказ создан — оплата временно недоступна (платёжный сервис
+  // проверял Firebase-токен, которого больше нет; нужно либо переписать
+  // его под нашу авторизацию, либо собрать оплату прямо в новом бэкенде).
   activeBtn.textContent='Переходим к оплате...';
   try{
-    const idToken=await currentUser.getIdToken();
-    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify({orderId:docRef.id,type:paymentType==='partial'?'partial':'order'})});
-    const data=await resp.json();
-    if(data.paymentUrl){window.location.href=data.paymentUrl;}
-    else throw new Error();
+    throw new Error('Оплата временно недоступна, скоро вернём');
   }catch(e){
-    // Оплата не запустилась — удаляем заказ
-    try{ await deleteDoc(doc(db,'orders',docRef.id)); }catch(_){}
+    // Оплата не запустилась — удаляем черновик
+    try{ await fetch(`${API}/orders/${order.id}`, { method:'DELETE', credentials:'include' }); }catch(_){}
     lastOrderId=null;
     btnFull.disabled=false; btnHalf.disabled=false;
     activeBtn.textContent=isHalf?'Оплатить 50%':'Оплатить';

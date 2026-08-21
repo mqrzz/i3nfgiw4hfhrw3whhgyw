@@ -631,20 +631,32 @@ periodSelectEl.addEventListener('change', ()=>{
   updateSpendCard(latestOrders, currentPeriodDays());
 });
 
-// TODO: подключить реальные данные, когда заказы переедут с Firestore на
-// новый бэкенд (см. schema.sql: таблица orders уже готова, endpoints — нет).
-// До этого момента дашборд показывает честный «0 заказов» — тот же самый
-// путь отрисовки, что видел бы совершенно новый пользователь и раньше.
-function loadOrders(){
-  const orders = [];
+async function loadOrders(){
+  let orders = [];
+  try{
+    const resp = await fetch(`${API}/orders`, { credentials: 'include' });
+    if(resp.ok) orders = await resp.json();
+  }catch(e){ console.error('loadOrders:', e); }
   latestOrders = orders;
 
-  setStat('statTotal', 0);
-  setStat('statActive', 0);
-  setStat('statDone', 0);
+  const active = orders.filter(o=>o.status!==5);
+  const done = orders.filter(o=>o.status===5);
+  setStat('statTotal', orders.length);
+  setStat('statActive', active.length);
+  setStat('statDone', done.length);
 
-  document.getElementById('heroDeltaText').textContent = 'Нет новых за месяц';
-  document.getElementById('heroSpark').setAttribute('points', buildSparkPoints(Array(8).fill(0),120,40));
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const newThisMonth = orders.filter(o=>{ const d=toDate(o.createdAt); return d && d>=monthStart; }).length;
+  document.getElementById('heroDeltaText').textContent = newThisMonth>0 ? `+${newThisMonth} за последний месяц` : 'Нет новых за месяц';
+
+  const weeks = Array(8).fill(0);
+  orders.forEach(o=>{
+    const d=toDate(o.createdAt); if(!d) return;
+    const diffWeeks = Math.floor((now-d)/(7*86400000));
+    if(diffWeeks>=0 && diffWeeks<8) weeks[7-diffWeeks]++;
+  });
+  document.getElementById('heroSpark').setAttribute('points', buildSparkPoints(weeks,120,40));
 
   updateSpendCard(orders, currentPeriodDays());
   renderServiceDonut(orders);
@@ -654,11 +666,15 @@ function loadOrders(){
 
 let latestNotifications = [];
 
-// TODO: то же самое для уведомлений — вернуть реальные данные, когда
-// появится /api/notifications.
-function watchNotifDot(){
-  document.getElementById('notifDot').style.display = 'none';
-  latestNotifications = [];
+async function watchNotifDot(){
+  let notifs = [];
+  try{
+    const resp = await fetch(`${API}/notifications`, { credentials: 'include' });
+    if(resp.ok) notifs = await resp.json();
+  }catch(e){ console.error('watchNotifDot:', e); }
+  latestNotifications = notifs;
+  const hasUnread = notifs.some(n=>!n.read);
+  document.getElementById('notifDot').style.display = hasUnread ? 'block' : 'none';
   renderHeatmap(latestOrders, latestNotifications);
 }
 

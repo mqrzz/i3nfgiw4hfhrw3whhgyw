@@ -871,7 +871,7 @@ window.closeDelivery=function(){document.getElementById('deliveryModal').classLi
 window.printReceipt=function(id){
   const o=allOrders.find(x=>x.id===id);if(!o)return;
   const w=window.open('','_blank','width=600,height=700');
-  const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
+  const date=o.createdAt?new Date(o.createdAt).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
   const extLbls={domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
   const extHtml=(o.extras||[]).length?`<tr><td>Дополнения</td><td>${o.extras.map(e=>esc(extLbls[e]||e)).join(', ')}</td></tr>`:'';
   const isP=o.paymentType==='partial';const pA=o.paidAmount||0;
@@ -890,13 +890,18 @@ function launchConfetti(){
   setTimeout(()=>{wrap.innerHTML='';},5000);
 }
 
-// TODO: подключить реальные заказы, когда orders переедут с Firestore на
-// новый бэкенд (таблица orders в schema.sql уже готова). Realtime-обновления
-// статуса (баннер смены статуса, попап выдачи, авто-предложение отзыва)
-// вернутся вместе с этим — пока показываем честный пустой список.
-function loadOrders(){
-  allOrders=[];
-  renderOrders([]);
+// Realtime-обновления статуса (баннер смены, попап выдачи, авто-предложение
+// отзыва) требуют бэкенда с push/websocket — пока опрашиваем при загрузке
+// страницы, без live-обновлений посреди сессии. Это осознанный компромисс,
+// не баг: раньше это давал бесплатный realtime от Firestore.
+async function loadOrders(){
+  let orders=[];
+  try{
+    const resp = await fetch(`${API}/orders`, { credentials: 'include' });
+    if(resp.ok) orders = await resp.json();
+  }catch(e){ console.error('loadOrders:', e); }
+  allOrders=orders;
+  renderOrders(orders);
 }
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeReview();closeDelivery();closeOrderModal();}});

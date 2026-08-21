@@ -48,12 +48,19 @@
       return new Date(ban.until).toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    // ===== Тех.работы — временно всегда выключены. Флаг тех.работ раньше
-    // жил в Firestore (settings/maintenance) и пока не перенесён на новый
-    // бэкенд — включать здесь нечего, пока не появится соответствующий
-    // эндпоинт и admin-переключатель на сервере.
-    maintOn = false;
-    render();
+    // ===== Тех.работы — управляются файлом-флагом на сервере
+    // (touch/rm .maintenance в папке бэкенда), проверяем через API.
+    (async () => {
+      const cached = readMaintCache();
+      if (cached !== null) { maintOn = cached; render(); return; }
+      try {
+        const resp = await fetch(`${API}/maintenance-status`);
+        const data = resp.ok ? await resp.json() : { enabled: false };
+        maintOn = !!data.enabled;
+        writeMaintCache(maintOn);
+      } catch (e) { maintOn = false; }
+      render();
+    })();
 
     // ===== Бан — только для авторизованных
     try {

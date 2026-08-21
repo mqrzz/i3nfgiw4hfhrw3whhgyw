@@ -264,10 +264,14 @@ function render(){
 }
 
 window.openNotif = async function(id, link){
-  // TODO: подключить реальную отметку "прочитано", когда появится
-  // /api/notifications на новом бэкенде.
   const n = allNotifs.find(x=>x.id===id);
-  if(n) n.read = true;
+  if(n && !n.read){
+    n.read = true;
+    render();
+    try{
+      await fetch(`${API}/notifications/${id}/read`, { method:'PATCH', credentials:'include' });
+    }catch(e){ console.error('openNotif:', e); }
+  }
   if(link) window.location.href = link;
 };
 
@@ -280,10 +284,15 @@ document.getElementById('notifList').addEventListener('click', e=>{
 document.getElementById('markAllBtn').addEventListener('click', async function(){
   const unread = allNotifs.filter(n=>!n.read);
   if(!unread.length) return;
-  // TODO: подключить реальный batch-update, когда появится /api/notifications.
+  this.disabled = true;
   unread.forEach(n=>n.read=true);
   render();
-  toast('Все уведомления прочитаны ✓','success');
+  try{
+    await fetch(`${API}/notifications/read-all`, { method:'PATCH', credentials:'include' });
+    toast('Все уведомления прочитаны ✓','success');
+  }catch(e){
+    toast('Не удалось обновить уведомления','error');
+  }
 });
 
 document.getElementById('notifTabs').addEventListener('click', e=>{
@@ -294,10 +303,14 @@ document.getElementById('notifTabs').addEventListener('click', e=>{
   render();
 });
 
-// TODO: подключить реальные уведомления, когда появится /api/notifications
-// на новом бэкенде (таблица notifications в schema.sql уже готова).
-function loadNotifications(){
-  allNotifs = [];
+async function loadNotifications(){
+  try{
+    const resp = await fetch(`${API}/notifications`, { credentials: 'include' });
+    allNotifs = resp.ok ? await resp.json() : [];
+  }catch(e){
+    console.error('loadNotifications:', e);
+    allNotifs = [];
+  }
   render();
 }
 

@@ -490,14 +490,14 @@ function formatDate(ts) {
   if (d >= yesterday) return 'Вчера ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
   return d.toLocaleDateString('ru', {day:'numeric',month:'short'}) + ' ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
 }
-function statusLabel(s) { return {open:'Открыт','in-progress':'В обработке',resolved:'Решён',closed:'Закрыт'}[s] || s; }
+function statusLabel(s) { return {open:'Открыт',done:'Решён'}[s] || s; }
 // Единая монохромная иконка тикета — без цветовой дифференциации по теме.
 const TICKET_ICON = '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>';
 function hasUnread(ticket) {
   const msgs = ticket._messages || [];
   if (!msgs.length) return false;
   const last = msgs[msgs.length - 1];
-  return last.sender === 'support' && !ticket._read;
+  return last.sender === 'admin' && !ticket._read;
 }
 function orderLabel(o){
   return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (o.siteType||'Сайт');
@@ -609,7 +609,7 @@ function buildChat(msgs) {
   let html = '';
   let lastDate = '';
   msgs.forEach(m => {
-    const d = m.createdAt?.toDate ? m.createdAt.toDate() : new Date();
+    const d = m.createdAt ? new Date(m.createdAt) : new Date();
     const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long'});
     if (dateStr !== lastDate) { html += `<div class="msg-divider">${dateStr}</div>`; lastDate = dateStr; }
     const time = d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
@@ -634,6 +634,7 @@ window.openDrawer = async function(id) {
   if (ticket._read === false) {
     ticket._read = true;
     renderTickets();
+    fetch(`${API}/tickets/${id}/read`, { method: 'PATCH', credentials: 'include' }).catch(() => {});
   }
 
   const linkedOrder = ticket.orderId ? userOrders.find(o=>o.id===ticket.orderId) : null;
@@ -643,11 +644,15 @@ window.openDrawer = async function(id) {
     (linkedOrder ? `<span class="badge tag-order">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : '');
 
   const chatBox = document.getElementById('chatBody');
-  chatBox.innerHTML = buildChat(ticket._messages || []);
-
+  chatBox.innerHTML = '<div class="chat-loading">Загрузка…</div>';
   document.getElementById('chatInput').value = '';
   document.getElementById('drawerOverlay').classList.add('show');
   document.body.style.overflow = 'hidden';
+
+  if (!ticket._messages || !ticket._messages.length) {
+    await loadMessages(ticket);
+  }
+  chatBox.innerHTML = buildChat(ticket._messages || []);
   setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 80);
 };
 
@@ -659,14 +664,51 @@ window.closeDrawer = function() {
 
 window.sendChatDrawer = async function() {
   if (!_activeTicketId) return;
-  // TODO: подключить реальную отправку сообщений, когда чат поддержки переедет на новый бэкенд.
-  toast('Чат временно недоступен, скоро вернём', 'info');
+  const inp = document.getElementById('chatInput');
+  const text = inp?.value.trim();
+  if (!text) return toast('Напишите сообщение', 'error');
+  inp.value = '';
+  try {
+    const resp = await fetch(`${API}/tickets/${_activeTicketId}/messages`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+      body: JSON.stringify({ text }),
+    });
+    if (!resp.ok) throw new Error();
+    const msg = await resp.json();
+    const ticket = allTickets.find(t => t.id === _activeTicketId);
+    if (ticket) {
+      ticket._messages = [...(ticket._messages || []), msg];
+      ticket.status = 'open';
+    }
+    const box = document.getElementById('chatBody');
+    if (box) { box.innerHTML = buildChat(ticket._messages); box.scrollTop = box.scrollHeight; }
+    renderTickets();
+  } catch(e) { toast('Ошибка отправки', 'error'); }
 };
 
 window.attachImgDrawer = async function(fileInput) {
   if (!_activeTicketId) return;
-  // TODO: подключить реальную загрузку вложений, когда чат поддержки переедет на новый бэкенд.
-  toast('Чат временно недоступен, скоро вернём', 'info');
+  const file = fileInput.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) return toast('Только изображения', 'error');
+  const reader = new FileReader();
+  reader.onload = async e => {
+    try {
+      const resp = await fetch(`${API}/tickets/${_activeTicketId}/messages`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({ text: 'Вложение', imageUrl: e.target.result }),
+      });
+      if (!resp.ok) throw new Error();
+      const msg = await resp.json();
+      const ticket = allTickets.find(t => t.id === _activeTicketId);
+      if (ticket) { ticket._messages = [...(ticket._messages || []), msg]; ticket.status = 'open'; }
+      toast('Изображение отправлено ✓', 'success');
+      const box = document.getElementById('chatBody');
+      if (box) { box.innerHTML = buildChat(ticket._messages); box.scrollTop = box.scrollHeight; }
+      renderTickets();
+    } catch(err) { toast('Ошибка', 'error'); }
+  };
+  reader.readAsDataURL(file);
   fileInput.value = '';
 };
 
@@ -693,12 +735,48 @@ document.getElementById('ticketFile').addEventListener('change', function() {
 });
 
 document.getElementById('submitTicketBtn').addEventListener('click', async function() {
+  const topic = document.getElementById('ticketTopic')?.value;
+  const priority = document.getElementById('ticketPriority')?.value;
   const subject = document.getElementById('ticketSubject').value.trim();
   const message = document.getElementById('ticketMessage').value.trim();
   if (!subject) return toast('Введите краткое описание', 'error');
   if (!message) return toast('Напишите сообщение', 'error');
-  // TODO: подключить реальное создание тикета, когда чат поддержки переедет на новый бэкенд.
-  toast('Отправка обращений временно недоступна, скоро вернём', 'info');
+  this.disabled = true; this.textContent = 'Отправка...';
+  const linkedOrder = selectedOrderId ? userOrders.find(o=>o.id===selectedOrderId) : null;
+
+  const doCreate = async (imageUrl) => {
+    try {
+      const resp = await fetch(`${API}/tickets`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+        body: JSON.stringify({
+          topic, priority, subject,
+          message: message || null,
+          imageUrl: imageUrl || null,
+          orderId: selectedOrderId || null,
+          orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
+        }),
+      });
+      if (!resp.ok) { const d = await resp.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
+      const ticket = await resp.json();
+      ticket._messages = [];
+      ticket._read = true;
+      allTickets = [ticket, ...allTickets];
+      document.getElementById('ticketFormOverlay').classList.remove('show');
+      toast('Тикет создан ✓', 'success');
+      renderTickets();
+      // Подгружаем реальные сообщения (включая автоответ, если он придёт от бэкенда)
+      await loadMessages(ticket);
+      renderTickets();
+    } catch(e) { toast(e.message || 'Ошибка', 'error'); }
+    this.disabled = false; this.textContent = 'Отправить';
+  };
+
+  const file = window._pendingFile;
+  if (file && file.type.startsWith('image/')) {
+    const reader = new FileReader();
+    reader.onload = e => doCreate(e.target.result);
+    reader.readAsDataURL(file);
+  } else { await doCreate(null); }
 });
 
 document.getElementById('ticketTabs').addEventListener('click', e => {
@@ -708,14 +786,26 @@ document.getElementById('ticketTabs').addEventListener('click', e => {
   renderTickets();
 });
 
-// TODO: подключить реальный realtime-чат, когда тикеты переедут на новый бэкенд.
-function subscribeMessages(ticketId) { /* пока нечего слушать — тикетов нет */ }
+// Без realtime-подписки (REST, не Firestore) — сообщения подгружаются при
+// открытии конкретного тикета, а не обновляются "вживую" пока диалог открыт.
+async function loadMessages(ticket) {
+  try {
+    const resp = await fetch(`${API}/tickets/${ticket.id}/messages`, { credentials: 'include' });
+    ticket._messages = resp.ok ? await resp.json() : [];
+  } catch(e) {
+    console.error('loadMessages:', e);
+    ticket._messages = [];
+  }
+}
 
-async function loadMessages(ticket) { ticket._messages = []; }
-
-// TODO: подключить реальные заказы, когда orders переедут с Firestore.
 async function loadUserOrders(){
-  userOrders = [];
+  try{
+    const resp = await fetch(`${API}/orders`, { credentials: 'include' });
+    userOrders = resp.ok ? await resp.json() : [];
+  }catch(e){
+    console.error('loadUserOrders:', e);
+    userOrders = [];
+  }
 }
 
 (async function initSupportPage(){
@@ -731,9 +821,16 @@ async function loadUserOrders(){
   document.getElementById('sbContent').style.display = 'block';
   await loadUserOrders();
 
-  // TODO: подключить реальную историю тикетов, когда чат поддержки переедет
-  // на новый бэкенд (таблицы tickets/ticket_messages в schema.sql уже готовы).
-  allTickets = [];
+  try {
+    const resp = await fetch(`${API}/tickets`, { credentials: 'include' });
+    allTickets = resp.ok ? await resp.json() : [];
+  } catch(e) {
+    console.error('initSupportPage tickets:', e);
+    allTickets = [];
+  }
+  // Сообщения подгружаются лениво, при открытии конкретного тикета
+  // (см. openDrawer → loadMessages), чтобы не делать N лишних запросов сразу.
+  allTickets.forEach(t => { t._messages = []; });
   renderTickets();
 
   touchSession();

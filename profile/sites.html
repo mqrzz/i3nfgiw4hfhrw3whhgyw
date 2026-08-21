@@ -317,9 +317,13 @@ function render(orders){
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('sbContent').style.display='block';
 
-  // TODO: подключить реальные завершённые заказы, когда orders переедут
-  // с Firestore на новый бэкенд (таблица orders в schema.sql уже готова).
-  render([]);
+  let orders = [];
+  try{
+    const resp2 = await fetch(`${API}/orders`, { credentials: 'include' });
+    if(resp2.ok) orders = await resp2.json();
+  }catch(e){ console.error('sites orders:', e); }
+  const done = orders.filter(o => o.status === 5);
+  render(done);
 
   touchSession();
 })();

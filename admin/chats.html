@@ -244,9 +244,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
         <div class="ct-actions">
           <select class="status-sel" id="statusSelect" onchange="changeStatus()">
             <option value="open">Открыт</option>
-            <option value="in-progress">В обработке</option>
-            <option value="resolved">Решён</option>
-            <option value="closed">Закрыт</option>
+            <option value="done">Решён</option>
           </select>
           <button class="btn btn-danger btn-sm" onclick="deleteTicket()">Удалить</button>
         </div>
@@ -285,42 +283,27 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, getDocs, getCountFromServer, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
-let allTickets=[], selectedId=null, currentFilter='all', unsubMsgs=null;
+let allTickets=[], selectedId=null, currentFilter='all';
 
-// Домен бэкенда бота — впиши свой (тот же, что уже стоит в admin/orders.html)
-const TG_NOTIFY_URL='https://3ssqztgbot22wsq.vercel.app/api/notify';
+// TODO: push в Telegram — отдельный репозиторий antviz-tgbot, не мигрирован.
+// In-app уведомление отправляется по-настоящему через наш API.
 async function notifyClient(uid,title,text,button){
   if(!uid)return;
-  // если клиент прямо сейчас в чате поддержки — он и так увидит ответ вживую,
-  // дублировать в уведомления и телеграм не нужно. Онлайн считаем только
-  // если запись свежая (<40с) — иначе завис "online:true" из-за резкого
-  // закрытия вкладки будет вечно душить уведомления
   try{
-    const presSnap=await getDoc(doc(db,'presence',uid));
-    if(presSnap.exists()){
-      const d=presSnap.data();
-      const fresh=d.updatedAt&&(Date.now()-d.updatedAt.toMillis()<40000);
-      if(d.online&&fresh)return;
-    }
-  }catch(e){/* не удалось проверить presence — считаем офлайн, шлём как раньше */}
-  await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
-  try{
-    const idToken=await auth.currentUser.getIdToken();
-    const body={uid,title,text};
-    if(button){body.buttonText=button.text;body.buttonUrl=button.url;if(button.webApp)body.buttonWebApp=true;}
-    fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)}).catch(err=>console.error('[TG notify]',err));
-  }catch(e){/* телеграм — не критично, в кабинете уведомление уже есть */}
+    await fetch(`${API}/notifications/broadcast`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ target: uid, title, text }),
+    });
+  }catch(err){console.error('Не удалось уведомить клиента:',err);}
 }
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmtDT(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
-function fmtTime(ts){if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);const now=new Date();if(d>=new Date(now.getFullYear(),now.getMonth(),now.getDate()))return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
-function statusBadge(s){const m={open:['s-open','Открыт'],'in-progress':['s-in-progress','В обработке'],resolved:['s-resolved','Решён'],closed:['s-closed','Закрыт']};const[cls,lbl]=m[s]||['s-closed',s];return`<span class="sbadge ${cls}">${lbl}</span>`;}
+function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function fmtTime(ts){if(!ts)return'';const d=new Date(ts);const now=new Date();if(d>=new Date(now.getFullYear(),now.getMonth(),now.getDate()))return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function statusBadge(s){const m={open:['s-open','Открыт'],done:['s-resolved','Решён']};const[cls,lbl]=m[s]||['s-closed',s];return`<span class="sbadge ${cls}">${lbl}</span>`;}
 function priLabel(p){return p==='high'?'<span class="pri-high">Высокий</span>':p==='medium'?'<span class="pri-medium">Средний</span>':'<span class="pri-low">Низкий</span>';}
 
 window.switchTab=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
@@ -333,7 +316,7 @@ function renderList(){
     if(q)return(t.subject||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.topic||'').toLowerCase().includes(q);
     return true;
   });
-  const open=allTickets.filter(t=>t.status==='open'||t.status==='in-progress').length;
+  const open=allTickets.filter(t=>t.status==='open').length;
   document.getElementById('statOpen').textContent=open;
   document.getElementById('statTotal').textContent=allTickets.length;
   const badge=document.getElementById('navBadgeChats');
@@ -341,7 +324,7 @@ function renderList(){
   const el=document.getElementById('ticketsList');
   if(!list.length){el.innerHTML=`<div class="empty-l">${allTickets.length?'Ничего не найдено':'Тикетов пока нет'}</div>`;return;}
   el.innerHTML=list.map(t=>{
-    const unread=t.status==='open'&&!t._adminRead;
+    const unread=t.status==='open'&&!t.adminRead;
     return`<div class="ti${t.id===selectedId?' sel':''}" onclick="selectTicket('${t.id}')">
       <div class="ti-subj">${unread?'<span class="unread"></span>':''}${esc(t.subject||'Без темы')}${t.orderLabel?`<span class="ti-order-tag">${esc(t.orderLabel)}</span>`:''}</div>
       <div class="ti-meta">${statusBadge(t.status)}<span>·</span><span>${esc(t.userName||'—')}</span>${t.priority?`<span>·</span>${priLabel(t.priority)}`:''}</div>
@@ -350,7 +333,7 @@ function renderList(){
     </div>`;}).join('');
 }
 
-window.selectTicket=function(id){
+window.selectTicket=async function(id){
   selectedId=id;
   const ticket=allTickets.find(t=>t.id===id);if(!ticket)return;
   document.getElementById('noSelection').style.display='none';
@@ -358,17 +341,20 @@ window.selectTicket=function(id){
   document.getElementById('chatSubject').innerHTML=`${esc((`${ticket.topic||''} · ${ticket.subject||''}`).replace(/^ · /,''))}${ticket.orderId?` <a href="/admin/orders?open=${ticket.orderId}" class="ti-order-link" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Заказ')} ↗</a>`:''}`;
   document.getElementById('chatMeta').innerHTML=`<span>${esc(ticket.userName||'—')}</span><span>·</span><span>${esc(ticket.userEmail||'—')}</span><span>·</span><span>${fmtDT(ticket.createdAt)}</span>${ticket.priority?`<span>·</span>${priLabel(ticket.priority)}`:''}`;
   document.getElementById('statusSelect').value=ticket.status||'open';
-  updateDoc(doc(db,'tickets',id),{_adminRead:true}).catch(()=>{});
-  ticket._adminRead=true;renderList();
-  if(unsubMsgs)unsubMsgs();
-  const q=query(collection(db,'tickets',id,'messages'),orderBy('createdAt','asc'));
-  unsubMsgs=onSnapshot(q,snap=>{
-    const msgs=snap.docs.map(d=>({id:d.id,...d.data()}));
+  fetch(`${API}/tickets/${id}/admin-read`, { method:'PATCH', credentials:'include' }).catch(()=>{});
+  ticket.adminRead=true;renderList();
+
+  document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.84rem;padding:32px">Загрузка…</div>';
+  try{
+    const resp = await fetch(`${API}/tickets/${id}/messages`, { credentials:'include' });
+    const msgs = resp.ok ? await resp.json() : [];
     renderChat(msgs);
     const last=msgs[msgs.length-1];
-    if(last&&ticket)ticket._lastMsg=last.text||'';
+    if(last)ticket._lastMsg=last.text||'';
     renderList();
-  });
+  }catch(e){
+    document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.84rem;padding:32px">Не удалось загрузить сообщения</div>';
+  }
 };
 
 function renderChat(msgs){
@@ -376,7 +362,7 @@ function renderChat(msgs){
   if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:.84rem;padding:32px">Нет сообщений</div>';return;}
   let html='',lastDate=null;
   msgs.forEach(m=>{
-    const d=m.createdAt?.toDate?m.createdAt.toDate():new Date(m.createdAt||0);
+    const d=m.createdAt?new Date(m.createdAt):new Date();
     const ds=d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});
     if(lastDate!==ds){html+=`<div class="msg-divider">${ds}</div>`;lastDate=ds;}
     const isUser=m.sender==='user';
@@ -399,10 +385,18 @@ window.sendReply=async function(){
   if(!text)return toast('Напишите сообщение','error');
   inp.value='';inp.style.height='auto';
   try{
-    await addDoc(collection(db,'tickets',selectedId,'messages'),{sender:'support',senderName:'Поддержка',text,imageUrl:null,createdAt:serverTimestamp()});
-    await updateDoc(doc(db,'tickets',selectedId),{updatedAt:serverTimestamp(),_read:false,_adminRead:true});
+    const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ text }),
+    });
+    if(!resp.ok) throw new Error('Ошибка отправки');
+    const msg = await resp.json();
     const t=allTickets.find(x=>x.id===selectedId);
+    if(t){ t._lastMsg=text; t.status='open'; t.adminRead=true; }
+    const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
+    if(msgsResp.ok) renderChat(await msgsResp.json());
     if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
+    renderList();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
@@ -413,11 +407,18 @@ window.sendImg=async function(){
   const reader=new FileReader();
   reader.onload=async e=>{
     try{
-      await addDoc(collection(db,'tickets',selectedId,'messages'),{sender:'support',senderName:'Поддержка',text:'Изображение',imageUrl:e.target.result,createdAt:serverTimestamp()});
-      await updateDoc(doc(db,'tickets',selectedId),{updatedAt:serverTimestamp(),_read:false,_adminRead:true});
+      const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify({ text:'Изображение', imageUrl:e.target.result }),
+      });
+      if(!resp.ok) throw new Error();
       const t=allTickets.find(x=>x.id===selectedId);
+      if(t){ t._lastMsg='Изображение'; t.status='open'; t.adminRead=true; }
+      const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
+      if(msgsResp.ok) renderChat(await msgsResp.json());
       if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
       toast('Изображение отправлено ✓','success');
+      renderList();
     }catch(e){toast('Ошибка','error');}
     inp.value='';
   };
@@ -427,29 +428,38 @@ window.sendImg=async function(){
 window.changeStatus=async function(){
   if(!selectedId)return;
   const val=document.getElementById('statusSelect').value;
-  try{await updateDoc(doc(db,'tickets',selectedId),{status:val,updatedAt:serverTimestamp()});toast('Статус обновлён ✓','success');}
-  catch(e){toast('Ошибка','error');}
+  try{
+    const resp = await fetch(`${API}/tickets/${selectedId}/status`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ status: val }),
+    });
+    if(!resp.ok) throw new Error();
+    const t=allTickets.find(x=>x.id===selectedId); if(t) t.status=val;
+    toast('Статус обновлён ✓','success');renderList();
+  }catch(e){toast('Ошибка','error');}
 };
 
 window.deleteTicket=async function(){
   if(!selectedId||!confirm('Удалить тикет и все сообщения?'))return;
   try{
-    const snap=await getDocs(collection(db,'tickets',selectedId,'messages'));
-    await Promise.all(snap.docs.map(d=>deleteDoc(d.ref)));
-    await deleteDoc(doc(db,'tickets',selectedId));
+    const resp = await fetch(`${API}/tickets/${selectedId}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    allTickets=allTickets.filter(t=>t.id!==selectedId);
     toast('Тикет удалён','info');selectedId=null;
     document.getElementById('chatView').style.display='none';
     document.getElementById('noSelection').style.display='flex';
-    if(unsubMsgs){unsubMsgs();unsubMsgs=null;}
+    renderList();
   }catch(e){toast('Ошибка','error');}
 };
 
 window.openCreateTicket=async function(){
   try{
-    const snap=await getDocs(collection(db,'users'));
+    const resp = await fetch(`${API}/users`, { credentials:'include' });
+    if(!resp.ok) throw new Error();
+    const users = await resp.json();
     const sel=document.getElementById('ticketUser');
     sel.innerHTML='<option value="">Выберите пользователя...</option>';
-    snap.forEach(d=>{const data=d.data();sel.innerHTML+=`<option value="${d.id}">${esc(data.displayName||data.name||d.id)}${data.email?' · '+esc(data.email):''}</option>`;});
+    users.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${esc(u.displayName||u.id)}${u.email?' · '+esc(u.email):''}</option>`;});
     ['ticketTopic','ticketSubject','ticketMessage'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('ticketPriority').value='medium';
     document.getElementById('createTicketModal').classList.add('show');
@@ -467,10 +477,14 @@ window.createTicket=async function(){
   if(!subject)return toast('Введите заголовок','error');
   if(!message)return toast('Введите сообщение','error');
   try{
-    const userDoc=await getDoc(doc(db,'users',uid));const userData=userDoc.data();
-    const ref=await addDoc(collection(db,'tickets'),{uid,userName:userData?.displayName||userData?.name||'Пользователь',userEmail:userData?.email||'—',topic:topic||'Общий вопрос',subject,status:'open',priority,_read:false,_adminRead:true,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
-    await addDoc(collection(db,'tickets',ref.id,'messages'),{sender:'support',senderName:'Поддержка',text:message,imageUrl:null,createdAt:serverTimestamp()});
-    await addDoc(collection(db,'notifications',uid,'items'),{title:'💬 Новый тикет от поддержки',text:`Сообщаем вам, что сотрудник службы поддержки создал тикет «${subject}». Просим вас перейти в раздел "Чат с командой".`,link:'/profile/support',read:false,createdAt:serverTimestamp()});
+    const resp = await fetch(`${API}/tickets/admin/create`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ userId: uid, topic: topic||'Общий вопрос', subject, message, priority }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    const ticket = await resp.json();
+    allTickets=[ticket, ...allTickets];renderList();
+    await notifyClient(uid,'💬 Новый тикет от поддержки',`Сообщаем вам, что сотрудник службы поддержки создал тикет «${subject}». Просим вас перейти в раздел "Чат с командой".`);
     toast('Тикет создан и пользователь уведомлён ✅','success');closeCreateTicket();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
@@ -478,29 +492,51 @@ window.createTicket=async function(){
 window.onKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendReply();}};
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,120)+'px';};
 window.showLightbox=function(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('show');};
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 
-onAuthStateChanged(auth,async user=>{
-  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
-  document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
-  document.getElementById('appWrap').style.display='grid';
-  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
-  const q=query(collection(db,'tickets'),orderBy('createdAt','desc'));
-  onSnapshot(q,async snap=>{
-    const incoming=snap.docs.map(d=>({id:d.id,...d.data()}));
-    incoming.forEach(t=>{const old=allTickets.find(x=>x.id===t.id);t._lastMsg=old?._lastMsg||'';});
+async function loadTicketsList(){
+  try{
+    const resp = await fetch(`${API}/tickets/admin/all`, { credentials:'include' });
+    const incoming = resp.ok ? await resp.json() : [];
+    incoming.forEach(t=>{const old=allTickets.find(x=>x.id===t.id);t._lastMsg=old?._lastMsg;});
     allTickets=incoming;renderList();
-    for(const t of allTickets){
-      if(!t._lastMsg){
-        getDocs(query(collection(db,'tickets',t.id,'messages'),orderBy('createdAt','desc')))
-          .then(s=>{if(s.docs.length)t._lastMsg=s.docs[0].data().text||'';renderList();}).catch(()=>{});
-      }
-    }
-  });
-});
+  }catch(e){ console.error('loadTicketsList:', e); }
+}
+
+(async function initAdminChats(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  document.getElementById('loadingScreen').style.display='none';
+  if(user.role!=='admin'){window.location.href='/';return;}
+  document.getElementById('appWrap').style.display='grid';
+
+  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
+    const n=orders.filter(o=>o.refundStatus==='requested').length;
+    const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+
+  await loadTicketsList();
+  // REST-опрос вместо realtime-подписки — список тикетов и превью
+  // обновляются каждые 15 секунд, пока страница открыта.
+  setInterval(loadTicketsList, 15000);
+  // Пока открыт конкретный диалог — подтягиваем новые сообщения в нём тоже
+  setInterval(async()=>{
+    if(!selectedId)return;
+    try{
+      const resp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
+      if(resp.ok) renderChat(await resp.json());
+    }catch(e){}
+  }, 5000);
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

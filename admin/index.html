@@ -663,10 +663,12 @@ window.generateAccountingCsv=function(){
   document.getElementById('appWrap').style.display='block';
   refreshMaintStatus();
 
-  // Бейдж возвратов — refundStatus ещё не мигрирован (отдельный этап),
-  // пока держим счётчик скрытым, а не показываем неверные данные.
-  const badgeOrders=document.getElementById('navBadgeOrders');
-  if(badgeOrders) badgeOrders.style.display='none';
+  // Бейдж возвратов — считаем по-настоящему через реальные данные
+  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
+    const n=orders.filter(o=>o.refundStatus==='requested').length;
+    const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
 
   window.loadDashboard=async function(){
     const btn=document.getElementById('dashRefreshBtn');

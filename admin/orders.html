@@ -512,9 +512,7 @@ svg{display:block}
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp, deleteDoc, Timestamp, where, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 // status -1 = заказ создан, но оплата ещё не подтверждена вебхуком (не путать с "Новая заявка" = 0)
@@ -542,22 +540,17 @@ const READINESS={ready:'Всё готово',partial:'Частично гото�
 const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Наличными при получении'};
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 
-// Домен бэкенда бота — вписать после деплоя на Vercel (см. README у antviz-tgbot)
-const TG_NOTIFY_URL='https://3ssqztgbot22wsq.vercel.app/api/notify';
-
-// Пишет уведомление в кабинет клиента И дублирует его в Telegram, если он привязан.
-// Используется везде вместо прямого addDoc(collection(db,'notifications',...)).
+// TODO: push в Telegram идёт через отдельный репозиторий antviz-tgbot,
+// который проверяет Firebase ID-токен — пока не мигрирован. In-app
+// уведомление (ниже) отправляется по-настоящему через наш API.
 async function notifyClient(uid,title,text,button){
   if(!uid)return;
-  await addDoc(collection(db,'notifications',uid,'items'),{title,text,read:false,createdAt:serverTimestamp()}).catch(err=>console.error('Не удалось уведомить клиента:',err));
   try{
-    const idToken=await auth.currentUser.getIdToken();
-    const body={uid,title,text};
-    if(button){body.buttonText=button.text;body.buttonUrl=button.url;if(button.webApp)body.buttonWebApp=true;}
-    const r=await fetch(TG_NOTIFY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},body:JSON.stringify(body)});
-    if(!r.ok){const errBody=await r.text().catch(()=>'');console.error('[TG notify] бот ответил ошибкой',r.status,errBody);}
-    else{const j=await r.json().catch(()=>({}));if(j.sent===false)console.warn('[TG notify] клиент не привязал Telegram — это нормально, не ошибка');}
-  }catch(e){console.error('[TG notify] запрос не ушёл (сеть/CORS):',e);}
+    await fetch(`${API}/notifications/broadcast`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ target: uid, title, text }),
+    });
+  }catch(err){console.error('Не удалось уведомить клиента:',err);}
 }
 let allOrders=[],allReviews=[],_cache=[];
 let selOrderId=null,selUid=null;
@@ -565,35 +558,38 @@ let currentTab='active',currentPaid=false;
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 
-// Раньше почти каждая запись в Firestore в этом файле выглядела так:
-// `await updateDoc(...).catch(()=>{}); toast('Сохранено ✓','success');`
-// — то есть тост «сохранено» показывался БЕЗУСЛОВНО, даже если запись
-// реально упала (нет прав, невалидные данные, сеть и т.д.). Визуально
-// галочка/дата применялись на секунду (оптимистичное обновление UI), а
-// потом просто пропадали при следующем onSnapshot — без единого сообщения
-// об ошибке. Из-за этого выглядело как "не работает", хотя реальная причина
-// (скорее всего правила безопасности Firestore, не пускающие поля
-// startedAt/doneAt) оставалась невидимой.
-// safeUpdate() показывает тост только когда запись правда прошла, и
-// показывает настоящую ошибку (err.code), когда нет — так в следующий раз,
-// когда это случится, будет видно, что именно упало.
+// safeUpdate() теперь бьёт в гибкий PATCH /api/orders/:id (белый список
+// полей на бэкенде) вместо прямой записи в Firestore. Показывает тост
+// только когда запись правда прошла, и настоящую ошибку — когда нет.
 async function safeUpdate(orderId,data,successMsg){
   try{
-    await updateDoc(doc(db,'orders',orderId),data);
+    const resp = await fetch(`${API}/orders/${orderId}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify(data),
+    });
+    if(!resp.ok){
+      const d=await resp.json().catch(()=>({}));
+      throw new Error(d.error||'ошибка');
+    }
+    const updated = await resp.json();
+    const idx=allOrders.findIndex(o=>o.id===orderId);
+    if(idx>=0) allOrders[idx]=updated;
     if(successMsg)toast(successMsg,'success');
+    updateStats();renderList();
+    if(selOrderId===orderId) showDetail(updated);
     return true;
   }catch(err){
-    console.error('Firestore updateDoc failed:',err);
-    toast('Не сохранилось ('+(err.code||err.message||'ошибка')+')','error');
+    console.error('Order update failed:',err);
+    toast('Не сохранилось ('+(err.message||'ошибка')+')','error');
     return false;
   }
 }
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmtD(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
-function fmtDT(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function fmtD(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtP(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
 function stars(n){return'★'.repeat(n)+'☆'.repeat(5-n);}
-function tsToInput(ts){if(!ts)return'';const d=ts.toDate?ts.toDate():new Date(ts);return d.toISOString().split('T')[0];}
+function tsToInput(ts){if(!ts)return'';return new Date(ts).toISOString().split('T')[0];}
 
 // ── ИКОНКИ ДЛЯ ПОЛЕЙ ──
 // Единая мини-библиотека иконок, подбираемая по названию лейбла поля.
@@ -825,7 +821,7 @@ function renderPayRow(){
 function renderSupport(o){
   const body=document.getElementById('supBody');const now=new Date();
   if(o.supportActive&&o.supportExpiresAt){
-    const exp=o.supportExpiresAt.toDate();const days=Math.ceil((exp-now)/864e5);
+    const exp=new Date(o.supportExpiresAt);const days=Math.ceil((exp-now)/864e5);
     body.innerHTML=`<div class="sup"><div class="sup-t"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Обслуживание активно</div>
       <div style="font-size:.88rem;color:var(--muted);margin-bottom:16px">Истекает: ${exp.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})} · осталось <strong style="color:${days<3?'var(--red)':'var(--green-d)'}">${days} дн.</strong></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
@@ -932,7 +928,7 @@ window.approveRefund=async()=>{
     field:{label:'Сумма возврата, ₽',type:'number',defaultValue:String(o.totalPrice||''),required:true},
     confirmLabel:'Одобрить',confirmClass:'btn-green',
     onConfirm:async(val)=>{
-      const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:serverTimestamp()},'Возврат одобрен ✓');
+      const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:new Date().toISOString()},'Возврат одобрен ✓');
       if(ok&&o.uid)await notifyClient(o.uid,'✅ Возврат одобрен','Средства поступят на счёт в ближайшее время.',{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});
     }
   });
@@ -946,7 +942,7 @@ window.rejectRefund=async()=>{
     field:{label:'Комментарий для клиента',type:'text',required:true},
     confirmLabel:'Отклонить',confirmClass:'btn-danger',
     onConfirm:async(val)=>{
-      const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:serverTimestamp()},'Возврат отклонён');
+      const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:new Date().toISOString()},'Возврат отклонён');
       if(ok&&o?.uid)await notifyClient(o.uid,'❌ Возврат отклонён',val||'Свяжитесь с поддержкой для уточнения.',{text:'🆘 Поддержка',url:'https://antviz.ru/profile/support.html',webApp:true});
     }
   });
@@ -959,7 +955,7 @@ window.markRefunded=async()=>{
     title:'Деньги отправлены?',sub:'Подтвердите, что средства фактически переведены клиенту — это закроет возврат и отправит клиенту уведомление.',
     confirmLabel:'Подтвердить',confirmClass:'btn-dark',
     onConfirm:async()=>{
-      const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:serverTimestamp()},'Возврат завершён ✓');
+      const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:new Date().toISOString()},'Возврат завершён ✓');
       if(ok&&o?.uid)await notifyClient(o.uid,'💸 Средства возвращены','Возврат по заказу завершён.',{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});
     }
   });
@@ -974,7 +970,7 @@ window.manualRefund=async()=>{
     field:{label:'Причина возврата (для истории)',type:'text'},
     confirmLabel:'Оформить',confirmClass:'btn-dark',
     onConfirm:async(val)=>{
-      await safeUpdate(selOrderId,{refundStatus:'requested',refundReason:val||'Оформлено вручную администратором',refundRequestedAt:serverTimestamp()},'Заявка на возврат создана ✓');
+      await safeUpdate(selOrderId,{refundStatus:'requested',refundComment:val||'Оформлено вручную администратором',refundRequestedAt:new Date().toISOString()},'Заявка на возврат создана ✓');
     }
   });
 };
@@ -985,39 +981,31 @@ window.togglePayment=async()=>{
   currentPaid=!currentPaid;renderPayRow();
   const _o=allOrders.find(x=>x.id===selOrderId);
   const _upd={paid:currentPaid};
-  if(currentPaid&&!_o?.paidAt){_upd.paidAt=serverTimestamp();}
-  if(currentPaid&&_o&&_o.status===6){const _now=Timestamp.now();_upd.status=5;_upd.doneAt=_now;_upd.statusHistory=arrayUnion({status:5,at:_now});renderPipeline(5);}
+  if(currentPaid&&!_o?.paidAt){_upd.paidAt=new Date().toISOString();}
+  if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=new Date().toISOString();renderPipeline(5);}
   const ok=await safeUpdate(selOrderId,_upd,currentPaid?'Оплачен ✓':'Не оплачен');
   if(!ok){currentPaid=prevPaid;renderPayRow();}
 };
 window.setStatus=async s=>{
   if(!selOrderId)return;
-  // Единый клиентский timestamp: arrayUnion() не поддерживает serverTimestamp()
-  // внутри элементов массива (Firestore резолвит его в null), поэтому для
-  // statusHistory берём Timestamp.now() и используем ЕГО ЖЕ значение
-  // для startedAt/doneAt, чтобы даты в статус-панели админки и в истории
-  // трекера у клиента совпадали, а не жили каждая своей жизнью.
-  const now=Timestamp.now();
+  const now=new Date().toISOString();
   const upd={status:s};
   const o=allOrders.find(x=>x.id===selOrderId);
   if(s>=2&&!o?.startedAt)upd.startedAt=now;
   let msg;
-  let histStatus=s;
   if(s===5){
-    // If partial payment and not fully paid, auto-switch to "Ожидает доплаты"
     const isPartial = o?.paymentType==='partial';
     const paidAmt = o?.paidAmount||0;
     const totalPrice = o?.totalPrice||0;
     const fullyPaid = o?.paid || (isPartial && paidAmt>=totalPrice);
-    if(isPartial && !fullyPaid){ upd.status=6; histStatus=6; msg='Предоплата — статус → Ожидает доплаты ✓'; }
+    if(isPartial && !fullyPaid){ upd.status=6; msg='Предоплата — статус → Ожидает доплаты ✓'; }
     else { upd.doneAt=now; msg='Статус → '+S[s]+' ✓'; }
   } else { msg='Статус → '+S[s]+' ✓'; }
-  upd.statusHistory=arrayUnion({status:histStatus,at:now});
   const ok=await safeUpdate(selOrderId,upd,msg);
   if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`,{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});}
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
-window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:Timestamp.fromDate(new Date(val+'T12:00:00'))},'Дата сохранена ✓');};
+window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:new Date(val+'T12:00:00').toISOString()},'Дата сохранена ✓');};
 window.saveSite=async()=>{
   if(!selOrderId)return;
   const domain=document.getElementById('siteDomain').value.trim();
@@ -1025,7 +1013,7 @@ window.saveSite=async()=>{
   const fav=document.getElementById('siteFavicon').value.trim();
   const pages=document.getElementById('sitePages').value.trim();
   const repo=document.getElementById('siteRepo').value.trim();
-  const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages,siteRepo:repo,status:5,doneAt:serverTimestamp()});
+  const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages?Number(pages):null,siteRepo:repo,status:5,doneAt:new Date().toISOString()});
   if(!ok)return;
   if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`,url?{text:'🌐 Открыть сайт',url}:null);
   toast('Сохранено и клиент уведомлён ✓','success');
@@ -1035,21 +1023,21 @@ window.saveBot=async()=>{
   const raw=document.getElementById('botUsername').value.trim();
   const username=raw.replace(/^@/,'').replace(/^https?:\/\/t\.me\//i,'').replace(/^t\.me\//i,'').replace(/\/+$/,'');
   const link=username?'https://t.me/'+username:'';
-  const ok=await safeUpdate(selOrderId,{botUsername:username,botLink:link,status:5,doneAt:serverTimestamp()});
+  const ok=await safeUpdate(selOrderId,{botUsername:username,botLink:link,status:5,doneAt:new Date().toISOString()});
   if(!ok)return;
   if(selUid&&username)await notifyClient(selUid,'🎉 Ваш бот готов!',`Бот готов: @${username}`,link?{text:'🤖 Открыть бота',url:link}:null);
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{
   const exp=new Date(Date.now()+30*864e5);
-  const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:serverTimestamp(),supportExpiresAt:Timestamp.fromDate(exp),supportRequested:false});
+  const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:new Date().toISOString(),supportExpiresAt:exp.toISOString(),supportRequested:false});
   if(!ok)return;
   if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.',{text:'⚙️ Обслуживание',url:'https://antviz.ru/profile/tickets.html',webApp:true});
   toast('Активировано ✓','success');
 };
 window.renewSupport=async orderId=>{
   const exp=new Date(Date.now()+30*864e5);
-  await safeUpdate(orderId,{supportExpiresAt:Timestamp.fromDate(exp)},'Продлено на 30 дней ✓');
+  await safeUpdate(orderId,{supportExpiresAt:exp.toISOString()},'Продлено на 30 дней ✓');
 };
 window.sendPayLink=async(orderId,uid)=>{
   const inp=document.getElementById('payLink_'+orderId)||document.getElementById('payLinkInp');
@@ -1058,14 +1046,14 @@ window.sendPayLink=async(orderId,uid)=>{
   try{
     await notifyClient(uid,'💳 Ссылка на оплату',`Ссылка: ${link}`,{text:'💳 Оплатить',url:link});
     toast('Ссылка отправлена ✓','success');if(inp)inp.value='';
-  }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
+  }catch(err){console.error('notify failed:',err);toast('Не отправилось','error');}
 };
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
   try{
     await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',{text:'⚙️ Продлить',url:'https://antviz.ru/profile/tickets.html',webApp:true});
     toast('Уведомление отправлено ✓','success');
-  }catch(err){console.error('Firestore addDoc failed:',err);toast('Не отправилось ('+(err.code||err.message||'ошибка')+')','error');}
+  }catch(err){console.error('notify failed:',err);toast('Не отправилось','error');}
 };
 window.archiveOrder=async()=>{
   if(!selOrderId)return;
@@ -1077,32 +1065,53 @@ window.archiveOrder=async()=>{
 window.printReceipt=id=>{
   const o=_cache.find(x=>x.id===id);if(!o)return;
   const w=window.open('','_blank','width=600,height=700');
-  const date=o.createdAt?new Date(o.createdAt.seconds*1000).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
+  const date=o.createdAt?new Date(o.createdAt).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
   w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${(()=>{const _ip=o.paymentType==='partial',_pa=o.paidAmount||0,_fp=o.paid||(_ip&&_pa>=(o.totalPrice||0));return _ip&&!_fp?'Предоплата 50%':_fp?'Оплачен полностью':'Не оплачен';})()}</td></tr>${o.paymentType==='partial'?`<tr><td>Оплачено</td><td>${(o.paidAmount||0).toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${o.paid||(o.paidAmount||0)>=(o.totalPrice||0)?'—':(o.remainingAmount||Math.ceil((o.totalPrice||0)/2)).toLocaleString('ru')+' ₽'}</td></tr>`:''}<tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
 };
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 
-onAuthStateChanged(auth,async user=>{
+(async function initAdminOrders(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
+  if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
   document.getElementById('appTopbar').style.display='flex';
-  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
-    allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));_cache=[...allOrders];
+
+  async function loadOrders(){
+    try{
+      const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' });
+      allOrders = resp.ok ? await resp.json() : [];
+    }catch(e){ allOrders=[]; }
+    _cache=[...allOrders];
     updateStats();renderList();
     if(selOrderId){const o=allOrders.find(x=>x.id===selOrderId);if(o)showDetail(o);}
-  });
-  onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')),snap=>{
-    allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
+  async function loadReviews(){
+    try{
+      const resp = await fetch(`${API}/reviews/admin/all`, { credentials:'include' });
+      allReviews = resp.ok ? await resp.json() : [];
+    }catch(e){ allReviews=[]; }
     if(selOrderId){const o=allOrders.find(x=>x.id===selOrderId);if(o)showDetail(o);}
-  });
+  }
+
+  // REST, не realtime — обновляем список при загрузке страницы и после
+  // каждого сохранения (safeUpdate уже правит запись в allOrders на месте).
+  await loadOrders();
+  await loadReviews();
+
   const urlId=new URLSearchParams(location.search).get('id');
   if(urlId)setTimeout(()=>selectOrder(urlId),600);
-});
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

@@ -335,13 +335,11 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, getDocs, doc, setDoc, deleteDoc, serverTimestamp, Timestamp, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
 
 function openPromptModal({icon,iconBg,iconColor,title,sub,confirmLabel,confirmClass,onConfirm}){
   document.getElementById('pmIcon').style.background=iconBg;
@@ -359,15 +357,14 @@ function openPromptModal({icon,iconBg,iconColor,title,sub,confirmLabel,confirmCl
 window.closePromptModal=()=>document.getElementById('pmOv').classList.remove('show');
 const ICO_UNBAN='<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>';
 
-let allUsers=[];        // все пользователи из коллекции users (для поиска по email/имени)
-let allBans=new Map();  // uid -> ban data, живой снапшот коллекции bans
+let allUsers=[];        // все пользователи (для поиска по email/имени)
+let allBans=new Map();  // uid -> ban data
 let selUser=null;       // сейчас выбранный пользователь {id,email,displayName}
 
 function isBanActive(ban){
   if(!ban)return false;
   if(!ban.until)return true; // навсегда
-  const until=ban.until.toDate?ban.until.toDate():new Date(ban.until);
-  return until.getTime()>Date.now();
+  return new Date(ban.until).getTime()>Date.now();
 }
 
 function updateStats(){
@@ -381,12 +378,11 @@ window.renderList=function(){
   const q=(document.getElementById('searchInp').value||'').trim().toLowerCase();
   const list=document.getElementById('orderList');
   if(!q){
-    // без запроса — показываем текущих забаненных, это самое полезное дефолтное состояние
     const banned=[...allBans.entries()].filter(([,b])=>isBanActive(b));
     if(!banned.length){list.innerHTML='<div class="es"><span style="font-size:2rem">✅</span>Сейчас никто не забанен</div>';return;}
     list.innerHTML=banned.map(([uid,b])=>{
       const u=allUsers.find(x=>x.id===uid);
-      const label=u?(u.displayName||u.name||u.email||uid):uid;
+      const label=u?(u.displayName||u.email||uid):uid;
       const email=u?.email||'';
       return `<div class="or ${selUser?.id===uid?'sel':''}" onclick="selectUserById('${uid}')">
         <div class="or-h"><span class="badge" style="background:rgba(232,99,79,.12);color:var(--red)">${b.until?'до '+fmtDate(b.until):'навсегда'}</span></div>
@@ -396,14 +392,14 @@ window.renderList=function(){
     }).join('');
     return;
   }
-  const filtered=allUsers.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.displayName||u.name||'').toLowerCase().includes(q));
+  const filtered=allUsers.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.displayName||'').toLowerCase().includes(q));
   if(!filtered.length){list.innerHTML='<div class="es"><span style="font-size:2rem">🔍</span>Никого не найдено</div>';return;}
   list.innerHTML=filtered.slice(0,50).map(u=>{
     const b=allBans.get(u.id);
     const banned=isBanActive(b);
     return `<div class="or ${selUser?.id===u.id?'sel':''}" onclick="selectUserById('${u.id}')">
       ${banned?'<div class="or-h"><span class="badge" style="background:rgba(232,99,79,.12);color:var(--red)">забанен</span></div>':''}
-      <div class="or-name">${esc(u.displayName||u.name||'Без имени')}</div>
+      <div class="or-name">${esc(u.displayName||'Без имени')}</div>
       <div class="or-email">${esc(u.email||u.id)}</div>
     </div>`;
   }).join('');
@@ -414,7 +410,7 @@ window.selectUserById=function(uid){
   selUser=u;
   document.getElementById('detailEmpty').style.display='none';
   document.getElementById('detailWrap').style.display='block';
-  document.getElementById('dId').textContent=u.displayName||u.name||u.email||uid;
+  document.getElementById('dId').textContent=u.displayName||u.email||uid;
   document.getElementById('dHeroInfo').innerHTML=`
     <div class="hc"><div class="hc-l">Email</div><div class="hc-v">${esc(u.email||'—')}</div></div>
     <div class="hc"><div class="hc-l">UID</div><div class="hc-v" style="font-size:.72rem;opacity:.6">${esc(uid)}</div></div>`;
@@ -433,7 +429,6 @@ window.selectUserById=function(uid){
     curSec.style.display='none';
     document.getElementById('banFormTitle').textContent='Забанить пользователя';
   }
-  // сброс формы
   document.getElementById('banReason').value=active?(ban.reason||''):'';
   document.getElementById('banUntil').value='';
   document.getElementById('banShowBtn').checked=active?(ban.showButton!==false):true;
@@ -454,22 +449,34 @@ window.toggleBanBtnUrl=function(){
   document.getElementById('banBtnUrlRow').style.display=document.getElementById('banShowBtn').checked?'block':'none';
 };
 
+async function loadBans(){
+  try{
+    const resp = await fetch(`${API}/bans`, { credentials:'include' });
+    const list = resp.ok ? await resp.json() : [];
+    allBans = new Map(list.map(b=>[b.userId, b]));
+  }catch(e){ allBans = new Map(); }
+  updateStats();renderList();
+  if(selUser)selectUserById(selUser.id);
+}
+
 window.submitBan=async function(){
   if(!selUser)return;
   const reason=document.getElementById('banReason').value.trim();
   if(!reason){toast('Укажите причину бана','error');return;}
   const untilStr=document.getElementById('banUntil').value;
-  const until=untilStr?Timestamp.fromDate(new Date(untilStr+'T23:59:59')):null;
+  const until=untilStr?new Date(untilStr+'T23:59:59').toISOString():null;
   const showButton=document.getElementById('banShowBtn').checked;
   const btnLabel=document.getElementById('banBtnLabel').value.trim()||'Написать в поддержку';
   const btnUrl=document.getElementById('banBtnUrl').value.trim();
   if(showButton&&!btnUrl){toast('Укажите ссылку для кнопки или выключите её','error');return;}
   try{
-    await setDoc(doc(db,'bans',selUser.id),{
-      reason,until,showButton,btnLabel,btnUrl,
-      bannedAt:serverTimestamp(),bannedBy:auth.currentUser?.email||'admin'
+    const resp = await fetch(`${API}/bans`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ email: selUser.email, reason, until, showButton, btnLabel, btnUrl }),
     });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
     toast('Пользователь забанен ✓','success');
+    await loadBans();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
@@ -481,32 +488,40 @@ window.unbanUser=async function(){
     title:'Снять бан?',sub:'Пользователь сразу получит доступ обратно.',
     confirmLabel:'Разбанить',confirmClass:'btn-green',
     onConfirm:async()=>{
-      try{await deleteDoc(doc(db,'bans',u.id));toast('Разбанен ✓','success');}
-      catch(e){toast('Ошибка: '+e.message,'error');}
+      try{
+        const resp = await fetch(`${API}/bans/${u.id}`, { method:'DELETE', credentials:'include' });
+        if(!resp.ok) throw new Error();
+        toast('Разбанен ✓','success');
+        await loadBans();
+      }
+      catch(e){toast('Ошибка снятия бана','error');}
     }
   });
 };
 
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 
-onAuthStateChanged(auth,async user=>{
+(async function initBansPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
+  if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
   document.getElementById('appTopbar').style.display='flex';
   try{
-    const snap=await getDocs(collection(db,'users'));
-    allUsers=snap.docs.map(d=>({id:d.id,...d.data()}));
-  }catch(e){toast('Не удалось загрузить пользователей: '+e.message,'error');}
-  onSnapshot(collection(db,'bans'),snap=>{
-    allBans=new Map(snap.docs.map(d=>[d.id,d.data()]));
-    updateStats();renderList();
-    if(selUser)selectUserById(selUser.id);
-  });
-});
+    const resp = await fetch(`${API}/users`, { credentials:'include' });
+    allUsers = resp.ok ? await resp.json() : [];
+  }catch(e){toast('Не удалось загрузить пользователей','error');}
+  await loadBans();
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

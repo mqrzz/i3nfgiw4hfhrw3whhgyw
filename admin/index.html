@@ -418,9 +418,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, getDocs, getCountFromServer, addDoc, serverTimestamp, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -434,17 +432,28 @@ const PUSH_API_URL='https://push-1829wjhgeeedht.vercel.app/api/sendPush';
 
 let currentAdminUser=null;
 let maintEnabled=false;
-onSnapshot(doc(db,'settings','maintenance'),snap=>{
-  maintEnabled=snap.exists()&&snap.data().enabled===true;
+async function refreshMaintStatus(){
+  try{
+    const resp = await fetch(`${API}/maintenance-status`);
+    const data = resp.ok ? await resp.json() : { enabled:false };
+    maintEnabled = !!data.enabled;
+  }catch(e){ maintEnabled=false; }
   const btn=document.getElementById('maintBtn');
   const lbl=document.getElementById('maintLabel');
   btn.classList.toggle('on',maintEnabled);
   lbl.textContent=maintEnabled?'Сайт закрыт':'Техработы';
-});
+}
 window.toggleMaintenance=async()=>{
-  const next=!maintEnabled;
-  await setDoc(doc(db,'settings','maintenance'),{enabled:next},{merge:true});
-  toast(next?'Сайт закрыт 🔧':'Сайт открыт ✅',next?'warn':'success');
+  try{
+    const resp = await fetch(`${API}/maintenance-toggle`, { method:'POST', credentials:'include' });
+    const data = await resp.json();
+    maintEnabled = data.enabled;
+    const btn=document.getElementById('maintBtn');
+    const lbl=document.getElementById('maintLabel');
+    btn.classList.toggle('on',maintEnabled);
+    lbl.textContent=maintEnabled?'Сайт закрыт':'Техработы';
+    toast(maintEnabled?'Сайт закрыт 🔧':'Сайт открыт ✅',maintEnabled?'warn':'success');
+  }catch(e){ toast('Не удалось переключить','error'); }
 };
 
 // Пользователь считается удалившим аккаунт, если в его документе стоит
@@ -484,11 +493,12 @@ window.selectNotifTarget=function(id){
 window.filterNotifTarget=function(val){renderUserOptions(val);}
 window.openNotifModal=async()=>{
   try{
-    const snap=await getDocs(collection(db,'users'));
-    _allUsers=snap.docs.filter(d=>!isDeletedAccount(d.data())).map(d=>{
-      const data=d.data();
-      const name=data.displayName||data.name||data.email||d.id;
-      return{id:d.id,name,email:data.email||'',initial:(name||'?').trim().charAt(0)||'?',label:name+' '+(data.email||'')};
+    const resp = await fetch(`${API}/users`, { credentials:'include' });
+    if(!resp.ok) throw new Error();
+    const users = await resp.json();
+    _allUsers=users.map(u=>{
+      const name=u.displayName||u.email||u.id;
+      return{id:u.id,name,email:u.email||'',initial:(name||'?').trim().charAt(0)||'?',label:name+' '+(u.email||'')};
     });
     _notifTarget='all';
     document.getElementById('notifSearch').value='';
@@ -505,15 +515,11 @@ window.closeNotifModal=()=>document.getElementById('notifModal').classList.remov
 // ключом. Идёт независимо от Firestore-канала: если у части получателей
 // push не подключён, они просто не попадут в рассылку по этому каналу,
 // это не ошибка.
+// TODO: push (FCM) идёт через отдельный репозиторий antviz-push-api,
+// который проверяет Firebase ID-токен — пока не мигрирован на новую
+// авторизацию. In-app канал (ниже) работает полностью по-настоящему.
 async function sendPushChannel(target,title,text){
-  const idToken=await currentAdminUser.getIdToken();
-  const res=await fetch(PUSH_API_URL,{
-    method:'POST',
-    headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken},
-    body:JSON.stringify({target,title,text}),
-  });
-  if(!res.ok){const err=await res.json().catch(()=>({}));throw new Error(err.error||'push отправка не удалась');}
-  return res.json();
+  throw new Error('Push-уведомления временно недоступны, скоро вернём');
 }
 
 window.sendNotif=async()=>{
@@ -528,11 +534,11 @@ window.sendNotif=async()=>{
 
   try{
     if(wantInApp){
-      if(target==='all'){
-        await Promise.all(_allUsers.map(u=>addDoc(collection(db,'notifications',u.id,'items'),{title,text,read:false,createdAt:serverTimestamp()})));
-      }else{
-        await addDoc(collection(db,'notifications',target,'items'),{title,text,read:false,createdAt:serverTimestamp()});
-      }
+      const resp = await fetch(`${API}/notifications/broadcast`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify({ target, title, text }),
+      });
+      if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка рассылки'); }
     }
 
     let pushInfo='';
@@ -553,7 +559,10 @@ window.sendNotif=async()=>{
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 
 // ══ ОТЧЁТ ДЛЯ БУХГАЛТЕРИИ ══
 function reportRows(){
@@ -565,24 +574,25 @@ function reportRows(){
   const to=toV?new Date(toV+'T23:59:59'):null;
   const extLbls={domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
   return orders.filter(o=>{
-    if(onlyPaid&&!o.paid)return false;
-    const d=(o.paidAt||o.createdAt);
+    const paid = o.status !== -1;
+    if(onlyPaid&&!paid)return false;
+    const d=o.createdAt;
     if(!d)return!from&&!to;
-    const dd=new Date(d.seconds*1000);
+    const dd=new Date(d);
     if(from&&dd<from)return false;
     if(to&&dd>to)return false;
     return true;
   }).map(o=>{
-    const d=o.paidAt||o.createdAt;
+    const d=o.createdAt;
     return{
       id:o.id.slice(0,8).toUpperCase(),
-      date:d?new Date(d.seconds*1000).toLocaleDateString('ru'):'—',
+      date:d?new Date(d).toLocaleDateString('ru'):'—',
       client:o.clientName||'—',
       tariff:o.package||o.tariff||'—',
       extras:(o.extras||[]).map(e=>extLbls[e]||e).join(', ')||'—',
       amount:o.totalPrice||0,
-      paid:!!o.paid,
-      refunded:o.refundStatus==='refunded'?(o.refundAmount||o.totalPrice||0):0
+      paid:o.status!==-1,
+      refunded:0 // возвраты — отдельный этап, пока не мигрирован
     };
   }).sort((a,b)=>a.date.localeCompare(b.date));
 }
@@ -639,23 +649,35 @@ window.generateAccountingCsv=function(){
   a.click();
 };
 
-onAuthStateChanged(auth,async user=>{
+(async function initAdminIndex(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
+  if(user.role!=='admin'){window.location.href='/';return;}
   currentAdminUser=user;
   document.getElementById('appWrap').style.display='block';
-  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
+  refreshMaintStatus();
+
+  // Бейдж возвратов — refundStatus ещё не мигрирован (отдельный этап),
+  // пока держим счётчик скрытым, а не показываем неверные данные.
+  const badgeOrders=document.getElementById('navBadgeOrders');
+  if(badgeOrders) badgeOrders.style.display='none';
 
   window.loadDashboard=async function(){
     const btn=document.getElementById('dashRefreshBtn');
     if(btn){btn.disabled=true;btn.textContent='Обновление...';}
-    const snap=await getDocs(query(collection(db,'orders'),orderBy('createdAt','desc'))).catch(()=>null);
+    let orders=null;
+    try{
+      const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' });
+      if(resp.ok) orders = await resp.json();
+    }catch(e){ console.error('loadDashboard:', e); }
     if(btn){btn.disabled=false;btn.textContent='Обновить';}
-    if(!snap)return;
-    const orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    if(!orders)return;
     window._dashOrders=orders;
     const done=orders.filter(o=>o.status===5);
     const rev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
@@ -699,17 +721,12 @@ onAuthStateChanged(auth,async user=>{
         <div style="height:5px;background:var(--bg2);border-radius:3px"><div style="height:100%;border-radius:3px;background:var(--green);width:${n/mx*100}%"></div></div>
       </div>`).join('')||'<div style="color:var(--muted);font-size:.82rem">Нет данных</div>';
 
-    const now=new Date();
-    const withSupport=orders.filter(o=>o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>now);
-    document.getElementById('supportStats').innerHTML=withSupport.length?withSupport.slice(0,5).map(o=>{
-      const exp=o.supportExpiresAt.toDate();const days=Math.ceil((exp-now)/864e5);
-      return`<div style="background:var(--bg2);border-radius:14px;padding:11px 14px;margin-bottom:8px">
-        <div style="font-size:.82rem;font-weight:500;margin-bottom:2px">${esc(o.clientName||'—')}</div>
-        <div style="font-size:.72rem;color:${days<3?'var(--red)':'var(--muted)'}">Осталось ${days} дн. · до ${exp.toLocaleDateString('ru',{day:'numeric',month:'short'})}</div>
-      </div>`;}).join(''):'<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Нет активных обслуживаний</div>';
+    // Обслуживание (supportActive/supportExpiresAt) — отдельная фича,
+    // ещё не перенесённая на новый бэкенд, честно показываем "нет данных".
+    document.getElementById('supportStats').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.82rem;padding:12px">Нет активных обслуживаний</div>';
   };
   loadDashboard();
-});
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

@@ -161,15 +161,16 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, getCountFromServer, getDocs, addDoc, deleteDoc, updateDoc, doc, serverTimestamp, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 let allPromos=[], currentFilter='all';
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function fmtDate(ts){if(!ts)return'∞';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+function fmtDate(ts){if(!ts)return'∞';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderPromos();};
 window.openModal=()=>document.getElementById('modal').classList.add('show');
 window.closeModal=()=>document.getElementById('modal').classList.remove('show');
@@ -185,7 +186,7 @@ function renderPromos(){
   if(!list.length){el.innerHTML=`<div class="empty"><span class="empty-icon">🏷</span>Нет промокодов</div>`;return;}
   el.innerHTML=`<div class="promo-grid">${list.map(p=>{
     const now=new Date();
-    const expired=p.expiresAt?.toDate&&p.expiresAt.toDate()<now;
+    const expired=p.expiresAt&&new Date(p.expiresAt)<now;
     const active=p.active&&!expired;
     const disc=p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`;
     return`<div class="pc${active?'':' off'}">
@@ -193,7 +194,7 @@ function renderPromos(){
       <div class="pc-meta">
         <div class="pm"><div class="pm-l">Истекает</div><div class="pm-v${expired?' red':''}">${fmtDate(p.expiresAt)}</div></div>
         <div class="pm"><div class="pm-l">Использований</div><div class="pm-v">${p.usedCount||0}</div></div>
-        <div class="pm"><div class="pm-l">Для кого</div><div class="pm-v">${p.forUid?'Конкретный':'Для всех'}</div></div>
+        <div class="pm"><div class="pm-l">Для кого</div><div class="pm-v">${p.forUserId?'Конкретный':'Для всех'}</div></div>
         <div class="pm"><div class="pm-l">Статус</div><div class="pm-v" style="color:${active?'var(--green-d)':'var(--muted)'}">${active?'Активен':'Отключён'}</div></div>
       </div>
       <div class="pc-actions">
@@ -208,35 +209,64 @@ window.createPromo=async()=>{
   const type=document.getElementById('pType').value;
   const value=+document.getElementById('pValue').value;
   const expires=document.getElementById('pExpires').value;
-  const uid=document.getElementById('pUid').value.trim();
+  const forUserId=document.getElementById('pUid').value.trim();
   if(!code||!value){toast('Заполните код и скидку','error');return;}
   try{
-    const data={code,discountType:type,discountValue:value,active:true,usedCount:0,createdAt:serverTimestamp()};
-    if(expires)data.expiresAt=Timestamp.fromDate(new Date(expires+'T23:59:59'));
-    if(uid)data.forUid=uid;
-    await addDoc(collection(db,'promoCodes'),data);
+    const resp = await fetch(`${API}/promo-codes`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({
+        code, discountType: type, discountValue: value,
+        expiresAt: expires ? new Date(expires+'T23:59:59').toISOString() : null,
+        forUserId: forUserId || null,
+      }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
     toast('Промокод создан ✓','success');closeModal();
     ['pCode','pValue','pExpires','pUid'].forEach(id=>document.getElementById(id).value='');
     await loadPromos();renderPromos();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
-window.deletePromo=async id=>{if(!confirm('Удалить промокод?'))return;await deleteDoc(doc(db,'promoCodes',id));toast('Удалён','info');await loadPromos();renderPromos();};
-window.togglePromo=async(id,active)=>{await updateDoc(doc(db,'promoCodes',id),{active});toast(active?'Активирован ✓':'Отключён',active?'success':'info');await loadPromos();renderPromos();};
+window.deletePromo=async id=>{
+  if(!confirm('Удалить промокод?'))return;
+  try{
+    const resp = await fetch(`${API}/promo-codes/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    toast('Удалён','info');await loadPromos();renderPromos();
+  }catch(e){ toast('Ошибка удаления','error'); }
+};
+window.togglePromo=async(id,active)=>{
+  try{
+    const resp = await fetch(`${API}/promo-codes/${id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ active }),
+    });
+    if(!resp.ok) throw new Error();
+    toast(active?'Активирован ✓':'Отключён',active?'success':'info');await loadPromos();renderPromos();
+  }catch(e){ toast('Ошибка','error'); }
+};
 
 async function loadPromos(){
-  const snap=await getDocs(collection(db,'promoCodes'));
-  allPromos=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  try{
+    const resp = await fetch(`${API}/promo-codes/admin/all`, { credentials:'include' });
+    allPromos = resp.ok ? await resp.json() : [];
+  }catch(e){ allPromos=[]; }
 }
-onAuthStateChanged(auth,async user=>{
+
+(async function initPromosPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
+  if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
-  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
+  const badgeOrders=document.getElementById('navBadgeOrders');
+  if(badgeOrders) badgeOrders.style.display='none'; // возвраты — отдельный этап, ещё не мигрирован
   await loadPromos();renderPromos();
-});
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

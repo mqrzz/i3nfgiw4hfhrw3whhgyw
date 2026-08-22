@@ -213,8 +213,11 @@ window.deleteReview=async id=>{
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
-  const badgeOrders=document.getElementById('navBadgeOrders');
-  if(badgeOrders) badgeOrders.style.display='none'; // возвраты — отдельный этап
+  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
+    const n=orders.filter(o=>o.refundStatus==='requested').length;
+    const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
 
   try{
     const resp = await fetch(`${API}/reviews/admin/all`, { credentials:'include' });

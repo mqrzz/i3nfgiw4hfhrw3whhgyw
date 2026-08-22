@@ -134,16 +134,17 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, onSnapshot, getCountFromServer, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 let allReviews=[], currentFilter='all';
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
-function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
 function stars(n){return'★'.repeat(n)+'☆'.repeat(5-n);}
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderReviews();};
 
 function renderReviews(){
@@ -164,7 +165,7 @@ function renderReviews(){
     <div class="rc${r.hidden?' hidden-card':''}">
       <div class="rc-top">
         <div>
-          <div class="rc-name">${esc(r.clientName||r.authorName||'Аноним')}</div>
+          <div class="rc-name">${esc(r.clientName||'Аноним')}</div>
           <div class="rc-stars">${stars(r.stars||0)}</div>
           <div class="rc-date">${fmtDate(r.createdAt)}</div>
         </div>
@@ -178,21 +179,49 @@ function renderReviews(){
       </div>
     </div>`).join('')}</div>`;
 }
-window.toggleReview=async(id,hidden)=>{await updateDoc(doc(db,'reviews',id),{hidden});toast(hidden?'Скрыт':'Опубликован ✓',hidden?'info':'success');};
-window.deleteReview=async id=>{if(!confirm('Удалить отзыв?'))return;await deleteDoc(doc(db,'reviews',id));toast('Удалён','info');};
+window.toggleReview=async(id,hidden)=>{
+  try{
+    const resp = await fetch(`${API}/reviews/${id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ hidden }),
+    });
+    if(!resp.ok) throw new Error();
+    const r=allReviews.find(x=>x.id===id); if(r) r.hidden=hidden;
+    toast(hidden?'Скрыт':'Опубликован ✓',hidden?'info':'success');
+    renderReviews();
+  }catch(e){ toast('Ошибка','error'); }
+};
+window.deleteReview=async id=>{
+  if(!confirm('Удалить отзыв?'))return;
+  try{
+    const resp = await fetch(`${API}/reviews/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    allReviews=allReviews.filter(r=>r.id!==id);
+    toast('Удалён','info');
+    renderReviews();
+  }catch(e){ toast('Ошибка удаления','error'); }
+};
 
-onAuthStateChanged(auth,async user=>{
+(async function initReviewsPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
+  if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
-  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
-  onSnapshot(query(collection(db,'reviews'),orderBy('createdAt','desc')),snap=>{
-    allReviews=snap.docs.map(d=>({id:d.id,...d.data()}));renderReviews();
-  });
-});
+  const badgeOrders=document.getElementById('navBadgeOrders');
+  if(badgeOrders) badgeOrders.style.display='none'; // возвраты — отдельный этап
+
+  try{
+    const resp = await fetch(`${API}/reviews/admin/all`, { credentials:'include' });
+    allReviews = resp.ok ? await resp.json() : [];
+  }catch(e){ allReviews=[]; }
+  renderReviews();
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

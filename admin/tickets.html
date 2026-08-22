@@ -239,16 +239,14 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <div class="toast" id="toast"></div>
 
 <script type="module">
-import { auth, db, ADMIN_EMAIL } from '../firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { collection, query, where, orderBy, getDocs, getCountFromServer, doc, updateDoc, deleteDoc, addDoc, serverTimestamp, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const API = 'https://antviz.ru/api';
 
 let allTickets=[], allOrders=[], currentFilter='all', expandedIds=new Set();
 const AVATAR_COLORS=['#1ede7b','#3b82f6','#8b5cf6','#f59e0b','#ec4899','#14b8a6','#6366f1'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
-function fmtDT(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
-function toDate(ts){return ts?(ts.toDate?ts.toDate():new Date(ts)):null;}
+function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function toDate(ts){return ts?new Date(ts):null;}
 function timeAgo(ts){
   const d=toDate(ts); if(!d) return '—';
   const diffMs=Date.now()-d.getTime(); const min=Math.floor(diffMs/60000);
@@ -265,7 +263,10 @@ function initials(name){const parts=String(name||'?').trim().split(/\s+/);return
 function avatarColor(seed){let h=0;for(const c of String(seed||''))h=(h*31+c.charCodeAt(0))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
 
 window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTickets();};
-window.doLogout=async()=>{await signOut(auth);window.location.href='/';};
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
 window.toggleTicket=id=>{expandedIds.has(id)?expandedIds.delete(id):expandedIds.add(id);renderTickets();};
 window.applyUrgentFilter=()=>{
   document.getElementById('sortSel').value='urgent';
@@ -288,9 +289,9 @@ function renderTickets(){
   if(q) list=list.filter(t=>(t.title||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.userEmail||'').toLowerCase().includes(q)||(t.orderDomain||'').toLowerCase().includes(q));
 
   list=[...list];
-  if(sort==='urgent') list.sort((a,b)=>(isUrgent(b)-isUrgent(a))||((b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)));
-  else if(sort==='old') list.sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
-  else list.sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  if(sort==='urgent') list.sort((a,b)=>(isUrgent(b)-isUrgent(a))||(new Date(b.createdAt||0)-new Date(a.createdAt||0)));
+  else if(sort==='old') list.sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0));
+  else list.sort((a,b)=>new Date(b.createdAt||0)-new Date(a.createdAt||0));
 
   const open=allTickets.filter(t=>t.status!=='done').length;
   const done=allTickets.filter(t=>t.status==='done').length;
@@ -358,8 +359,8 @@ function renderSupports(){
   const el=document.getElementById('supportsList');
   const now=new Date();
   const active=allOrders.filter(o=>{
-    if(!(o.supportActive===true||o.support===true))return false;
-    if(o.supportExpiresAt){const exp=o.supportExpiresAt.toDate?o.supportExpiresAt.toDate():new Date(o.supportExpiresAt);return exp>now;}
+    if(!(o.supportActive===true))return false;
+    if(o.supportExpiresAt){const exp=new Date(o.supportExpiresAt);return exp>now;}
     return true;
   });
   document.getElementById('statSupports').textContent=active.length;
@@ -367,7 +368,7 @@ function renderSupports(){
   const withMeta=active.map(o=>{
     let days=Infinity,pct=100,expiring=false;
     if(o.supportExpiresAt){
-      const exp=o.supportExpiresAt.toDate?o.supportExpiresAt.toDate():new Date(o.supportExpiresAt);
+      const exp=new Date(o.supportExpiresAt);
       days=Math.ceil((exp-now)/864e5);pct=Math.max(0,Math.min(100,((exp-now)/(30*864e5))*100));expiring=days<3;
     }
     return{o,days,pct,expiring};
@@ -386,58 +387,84 @@ function renderSupports(){
 window.saveReply=async(id,uid,title)=>{
   const val=document.getElementById('tr_'+id)?.value.trim()||'';
   try{
-    await updateDoc(doc(db,'service_tickets',id),{adminReply:val});
-    if(uid&&val)await addDoc(collection(db,'notifications',uid,'items'),{title:'💬 Ответ на заявку',text:`«${title}»: ${val}`,read:false,createdAt:serverTimestamp()}).catch(()=>{});
+    const resp = await fetch(`${API}/service-tickets/${id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ adminReply: val }),
+    });
+    if(!resp.ok) throw new Error();
+    if(uid&&val)await fetch(`${API}/notifications/broadcast`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({target:uid,title:'💬 Ответ на заявку',text:`«${title}»: ${val}`})}).catch(()=>{});
     toast('Ответ сохранён и клиент уведомлён ✓','success');
     await loadTickets();renderTickets();
   }catch(e){toast('Ошибка','error');}
 };
 window.closeTick=async id=>{
-  try{await updateDoc(doc(db,'service_tickets',id),{status:'done'});toast('Закрыта ✓','success');await loadTickets();renderTickets();}
-  catch(e){toast('Ошибка','error');}
+  try{
+    const resp = await fetch(`${API}/service-tickets/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ status:'done' }) });
+    if(!resp.ok) throw new Error();
+    toast('Закрыта ✓','success');await loadTickets();renderTickets();
+  }catch(e){toast('Ошибка','error');}
 };
 window.reopenTick=async id=>{
-  try{await updateDoc(doc(db,'service_tickets',id),{status:'open'});toast('Открыта','info');await loadTickets();renderTickets();}
-  catch(e){toast('Ошибка','error');}
+  try{
+    const resp = await fetch(`${API}/service-tickets/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ status:'open' }) });
+    if(!resp.ok) throw new Error();
+    toast('Открыта','info');await loadTickets();renderTickets();
+  }catch(e){toast('Ошибка','error');}
 };
 window.deleteTick=async id=>{
   if(!confirm('Удалить заявку?'))return;
-  try{await deleteDoc(doc(db,'service_tickets',id));expandedIds.delete(id);toast('Удалена','info');await loadTickets();renderTickets();}
-  catch(e){toast('Ошибка','error');}
+  try{
+    const resp = await fetch(`${API}/service-tickets/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    expandedIds.delete(id);toast('Удалена','info');await loadTickets();renderTickets();
+  }catch(e){toast('Ошибка','error');}
 };
 window.notifyExpiry=async uid=>{
   if(!uid)return;
   try{
-    await addDoc(collection(db,'notifications',uid,'items'),{title:'⚠️ Обслуживание заканчивается',text:'До окончания обслуживания осталось менее 3 дней. Свяжитесь с поддержкой для продления.',read:false,createdAt:serverTimestamp()});
+    const resp = await fetch(`${API}/notifications/broadcast`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ target: uid, title:'⚠️ Обслуживание заканчивается', text:'До окончания обслуживания осталось менее 3 дней. Свяжитесь с поддержкой для продления.' }),
+    });
+    if(!resp.ok) throw new Error();
     toast('Уведомление отправлено ✓','success');
   }catch(e){toast('Ошибка','error');}
 };
 
 async function loadTickets(){
   try{
-    const snap=await getDocs(collection(db,'service_tickets'));
-    allTickets=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>{
+    const resp = await fetch(`${API}/service-tickets/admin/all`, { credentials:'include' });
+    const list = resp.ok ? await resp.json() : [];
+    allTickets=list.sort((a,b)=>{
       if((a.status==='done')!==(b.status==='done'))return a.status==='done'?1:-1;
-      return(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0);
+      return new Date(b.createdAt||0)-new Date(a.createdAt||0);
     });
   }catch(e){console.error(e);}
 }
 
-onAuthStateChanged(auth,async user=>{
+(async function initAdminTickets(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
-  let isAdmin=user.email===ADMIN_EMAIL;
-  try{const t=await user.getIdTokenResult(true);if(t.claims&&t.claims.admin===true)isAdmin=true;}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
-  if(!isAdmin){window.location.href='/';return;}
+  if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='block';
-  getCountFromServer(query(collection(db,'orders'),where('refundStatus','==','requested'))).then(s=>{const n=s.data().count;const b=document.getElementById('navBadgeOrders');if(b){b.style.display=n?'':'none';b.textContent=n;}}).catch(()=>{});
-  await loadTickets();renderTickets();
-  onSnapshot(query(collection(db,'orders'),orderBy('createdAt','desc')),snap=>{
-    allOrders=snap.docs.map(d=>({id:d.id,...d.data()}));
+
+  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
+    const n=orders.filter(o=>o.refundStatus==='requested').length;
+    const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+    allOrders=orders;
     renderSupports();
-  });
+  }).catch(()=>{});
+
+  await loadTickets();renderTickets();
   setInterval(async()=>{await loadTickets();renderTickets();},30000);
-});
+})();
 </script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>

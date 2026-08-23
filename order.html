@@ -1451,12 +1451,21 @@ async function submitOrder(paymentType) {
     toast('Не получилось сохранить. Проверьте соединение.','error'); return;
   }
 
-  // ШАГ 3: заказ создан — оплата временно недоступна (платёжный сервис
-  // проверял Firebase-токен, которого больше нет; нужно либо переписать
-  // его под нашу авторизацию, либо собрать оплату прямо в новом бэкенде).
+  // ШАГ 3: заказ создан — получаем короткоживущий токен и переходим к оплате
   activeBtn.textContent='Переходим к оплате...';
   try{
-    throw new Error('Оплата временно недоступна, скоро вернём');
+    const stResp = await fetch(`${API}/auth/service-token`, { method:'POST', credentials:'include' });
+    if(!stResp.ok) throw new Error('не удалось подтвердить личность');
+    const { token } = await stResp.json();
+
+    const resp=await fetch('https://api-lac-six-78.vercel.app/api/createPayment',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({orderId:order.id,type:paymentType==='partial'?'partial':'order'})
+    });
+    const data=await resp.json();
+    if(data.paymentUrl){window.location.href=data.paymentUrl;}
+    else throw new Error(data.error||'платёж не создан');
   }catch(e){
     // Оплата не запустилась — удаляем черновик
     try{ await fetch(`${API}/orders/${order.id}`, { method:'DELETE', credentials:'include' }); }catch(_){}

@@ -273,13 +273,10 @@
 
 <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 <script type="module">
-  import { auth } from './firebase-config.js';
-  import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-
+  const API = 'https://antviz.ru/api';
   const CHECK_URL = 'https://api-lac-six-78.vercel.app/api/checkPayment';
   const POLL_ATTEMPTS = 8;
   const POLL_DELAY_MS = 1500;
-  const AUTH_TIMEOUT_MS = 5000;
 
   const stLoading = document.getElementById('stLoading');
   const stSuccess = document.getElementById('stSuccess');
@@ -309,22 +306,18 @@
 
   const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-  async function waitForUser() {
-    return new Promise(resolve => {
-      const timer = setTimeout(() => resolve(null), AUTH_TIMEOUT_MS);
-      const unsub = onAuthStateChanged(auth, u => {
-        clearTimeout(timer);
-        unsub();
-        resolve(u);
-      });
-    });
+  async function getServiceToken() {
+    try {
+      const resp = await fetch(`${API}/auth/service-token`, { method: 'POST', credentials: 'include' });
+      if (!resp.ok) return null;
+      const { token } = await resp.json();
+      return token;
+    } catch (e) { return null; }
   }
 
   (async function init() {
     show('loading');
 
-    // Случайный заход без параметров платежа — сразу показываем "не подтверждена",
-    // не дёргая бэкенд.
     const params = new URLSearchParams(location.search);
     const orderId = params.get('orderId');
     const type = params.get('type') || 'order';
@@ -334,16 +327,8 @@
       return;
     }
 
-    const user = await waitForUser();
-    if (!user) {
-      fail('Не удалось подтвердить вход в аккаунт. Зайдите в личный кабинет и проверьте статус оплаты там.');
-      return;
-    }
-
-    let idToken;
-    try {
-      idToken = await user.getIdToken();
-    } catch {
+    const token = await getServiceToken();
+    if (!token) {
       fail('Не удалось подтвердить вход в аккаунт. Зайдите в личный кабинет и проверьте статус оплаты там.');
       return;
     }
@@ -352,14 +337,13 @@
       try {
         const r = await fetch(CHECK_URL, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + idToken },
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
           body: JSON.stringify({ orderId, type, ticketId }),
         });
         if (r.ok) {
           const d = await r.json();
           if (d.paid) { renderSuccess(d); return; }
         } else if (r.status === 403 || r.status === 404) {
-          // Чужой/несуществующий заказ — дальше опрашивать бессмысленно
           fail('Оплата не найдена. Если вы только что оплатили — зайдите в личный кабинет через минуту.');
           return;
         }

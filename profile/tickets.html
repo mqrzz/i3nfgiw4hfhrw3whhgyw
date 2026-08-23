@@ -1007,10 +1007,24 @@ function showActive(){
   photos=[];renderPreviews();loadTickets();
 }
 
-// TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase
-// ID-токен — переедет вместе с остальной оплатой отдельным этапом.
 window.payForSupport=async function(renew){
-  toast('Оплата временно недоступна, скоро вернём','info');
+  const id=renew?pendId:pendBuyId||pendId;if(!id){toast('Не найден заказ','error');return;}if(inFlight)return;
+  const tariff=renew?(sel.supportTariff&&TARIFFS[sel.supportTariff]?sel.supportTariff:'basic'):pendTariff;
+  if(!renew){
+    if(!tariff){toast('Выберите тариф','error');return;}
+    if(!document.getElementById('termsCheckbox').checked){toast('Подтвердите ознакомление с условиями','error');return;}
+  }
+  const price=TARIFFS[tariff].price;
+  inFlight=true;pendId=id;
+  const btn=document.getElementById(renew?'renewBtn':'buyOneBtn');if(btn){btn.disabled=true;setBtnLabel(btn,'Переходим к оплате...');}
+  try{
+    const stResp=await fetch(`${API}/auth/service-token`,{method:'POST',credentials:'include'});
+    if(!stResp.ok)throw new Error();
+    const{token}=await stResp.json();
+    const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({orderId:id,amount:price,type:'support',tariff})});
+    const d=await r.json();if(d.paymentUrl){window.location.href=d.paymentUrl;return;}throw new Error();
+  }
+  catch(e){inFlight=false;if(btn){btn.disabled=false;setBtnLabel(btn,renew?`Продлить · ${price} ₽`:`Подключить за ${price} ₽`);}toast('Не удалось открыть оплату','error');}
 };
 
 function renderRating(t){
@@ -1073,8 +1087,38 @@ if(oDz){
 }
 
 window.submitOnceOff=async function(){
-  // TODO: подключить реальный /api/service-tickets + оплату, когда появится бэкенд.
-  toast('Функция временно недоступна, скоро вернём','info');
+  const title=document.getElementById('oTitle').value.trim();
+  const targetId=pendBuyId||pendId;
+  if(!title){toast('Введите тему заявки','error');return;}
+  if(!targetId){toast('Не найден проект','error');return;}
+  if(inFlight)return;inFlight=true;
+  const btn=document.getElementById('onceSubmitBtn');btn.disabled=true;setBtnLabel(btn,'Оформляем...');
+  try{
+    const o=done.find(x=>x.id===targetId);
+    const createResp=await fetch(`${API}/service-tickets`,{
+      method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',
+      body:JSON.stringify({
+        orderId:targetId,title,description:document.getElementById('oDesc').value.trim()||'',
+        images:oncePhotos.length?oncePhotos:null,
+        orderSiteType:o?.siteType||'',orderTariff:o?.tariff||o?.package||'',orderDomain:o?.siteDomain||'',
+        billing:'once',
+      }),
+    });
+    if(!createResp.ok){const d=await createResp.json().catch(()=>({}));throw new Error(d.error||'Ошибка создания заявки');}
+    const ticket=await createResp.json();
+
+    const stResp=await fetch(`${API}/auth/service-token`,{method:'POST',credentials:'include'});
+    if(!stResp.ok)throw new Error('Не удалось подтвердить личность');
+    const{token}=await stResp.json();
+
+    const r=await fetch(PAY_URL,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({orderId:targetId,ticketId:ticket.id,amount:ONE_OFF_PRICE,type:'ticket_once'})});
+    const d=await r.json();
+    if(d.paymentUrl){window.location.href=d.paymentUrl;return;}
+    throw new Error(d.error||'Не удалось открыть оплату');
+  }catch(e){
+    inFlight=false;btn.disabled=false;setBtnLabel(btn,'Оплатить 350 ₽ и отправить');
+    toast(e.message||'Не удалось оформить заявку','error');
+  }
 };
 
 function setListLoading(on){

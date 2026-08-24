@@ -329,10 +329,26 @@
 
     const token = await getServiceToken();
     if (!token) {
-      fail('Не удалось подтвердить вход в аккаунт. Зайдите в личный кабинет и проверьте статус оплаты там.');
-      return;
+      // ВАЖНО: раньше при любом сбое здесь сразу показывалась пугающая
+      // "Оплата не подтверждена" — хотя причина могла быть во временной
+      // ошибке на сервере (см. requireAuth.js), а не в реальном разлогине
+      // или проблеме с самим платежом. Пробуем ещё раз перед тем как сдаться.
+      await sleep(POLL_DELAY_MS);
+      const retryToken = await getServiceToken();
+      if (!retryToken) {
+        fail('Не удалось подтвердить вход в аккаунт — возможно, временная ошибка сервера. Зайдите в личный кабинет: если вы там залогинены, оплата тоже точно применилась, просто эта страница не смогла её проверить.');
+        return;
+      }
+      return init2(retryToken);
     }
+    return init2(token);
+  })();
 
+  async function init2(token) {
+    const params = new URLSearchParams(location.search);
+    const orderId = params.get('orderId');
+    const type = params.get('type') || 'order';
+    const ticketId = params.get('ticketId');
     for (let attempt = 0; attempt < POLL_ATTEMPTS; attempt++) {
       try {
         const r = await fetch(CHECK_URL, {
@@ -354,7 +370,7 @@
     }
 
     fail('Оплата ещё не подтверждена ЮKассой. Обычно это занимает несколько секунд — зайдите в личный кабинет через минуту.');
-  })();
+  }
 </script>
 <script src="GEOBLOCK.js"></script>
 <script type="module" src="maintenance.js"></script>

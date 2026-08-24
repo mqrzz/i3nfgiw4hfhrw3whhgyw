@@ -19,10 +19,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#101113;
-    --card:#191b1e;
-    --card-elevated:#1e2124;
-    --stroke:#2a2d31;
+    --bg:#0b0c0d;
+    --card:#17181b;
+    --card-elevated:#1f2124;
+    --surface2:#26282c;
+    --stroke:rgba(255,255,255,0.07);
+    --stroke-strong:rgba(255,255,255,0.12);
     --text:#f4f5f6;
     --text-dim:#9a9da2;
     --text-faint:#65686d;
@@ -35,14 +37,19 @@
     --amber-dim:rgba(255,183,77,0.14);
     --red:#ff5c5c;
     --red-dim:rgba(255,92,92,0.14);
-    --shadow:0 12px 30px rgba(0,0,0,0.4);
+    --shadow-sm:0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.22);
+    --shadow-md:0 2px 4px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.38);
+    --shadow-lg:0 8px 16px rgba(0,0,0,0.32), 0 30px 60px rgba(0,0,0,0.5);
+    --spring:cubic-bezier(.32,1.4,.5,1);
     --r64:64px;--r40:40px;--r32:32px;--r24:24px;--r20:20px;--r16:16px;--r14:14px;--r12:12px;
   }
   html[data-theme="light"]{
-    --bg:#f3f4f6;
+    --bg:#eef0f2;
     --card:#ffffff;
-    --card-elevated:#fafbfc;
-    --stroke:#e6e8eb;
+    --card-elevated:#f7f8f9;
+    --surface2:#eef0f2;
+    --stroke:rgba(15,17,20,0.07);
+    --stroke-strong:rgba(15,17,20,0.13);
     --text:#15171a;
     --text-dim:#6b6f76;
     --text-faint:#9a9da2;
@@ -51,7 +58,9 @@
     --blue-dim:rgba(77,159,255,0.12);
     --amber-dim:rgba(230,150,40,0.14);
     --red-dim:rgba(230,60,60,0.10);
-    --shadow:0 12px 30px rgba(20,20,25,0.08);
+    --shadow-sm:0 1px 2px rgba(20,20,25,0.04), 0 2px 6px rgba(20,20,25,0.05);
+    --shadow-md:0 2px 4px rgba(20,20,25,0.04), 0 16px 32px rgba(20,20,25,0.09);
+    --shadow-lg:0 8px 16px rgba(20,20,25,0.06), 0 30px 60px rgba(20,20,25,0.16);
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{background:var(--bg);}
@@ -76,7 +85,8 @@
 
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 4px 8px;gap:10px;}
   .topbar-right{display:flex;gap:10px;}
-  .icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;}
+  .icon-btn{width:46px;height:46px;border-radius:var(--r16);background:var(--card);border:1px solid var(--stroke);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;transition:transform .15s var(--spring),background .15s;}
+  .icon-btn:active{transform:scale(.92);background:var(--surface2);}
   .icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);display:none;}
   .icon-btn svg{width:21px;height:21px;}
   .icon-btn .sun{display:none;}
@@ -87,8 +97,8 @@
   @media (min-width:981px){ #menuBtnMobile{display:none;} }
 
   /* ШАПКА ПРОФИЛЯ */
-  .hero{background:var(--card);border-radius:var(--r32);padding:24px;border:1px solid var(--stroke);display:flex;align-items:center;gap:14px;}
-  .avatar{width:48px;height:48px;border-radius:var(--r16);background:var(--card-elevated);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--green-text);font-size:17px;flex-shrink:0;}
+  .hero{background:var(--card);border-radius:var(--r32);padding:24px;border:1px solid var(--stroke);box-shadow:var(--shadow-md);display:flex;align-items:center;gap:16px;}
+  .avatar{width:52px;height:52px;border-radius:50%;background:var(--surface2);box-shadow:inset 0 0 0 1px var(--stroke-strong);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--text);font-size:18px;flex-shrink:0;}
   .hero-id{flex:1;min-width:0;}
   .hero-title{font-size:19px;font-weight:600;}
   .hero-sub{font-size:13px;color:var(--text-dim);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
@@ -97,9 +107,9 @@
   .section-eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-faint);}
 
   /* КАРТОЧКИ */
-  .card{background:var(--card);border-radius:var(--r24);padding:20px;border:1px solid var(--stroke);}
+  .card{background:var(--card);border-radius:var(--r24);padding:20px;border:1px solid var(--stroke);box-shadow:var(--shadow-sm);}
   .card-head{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
-  .card-icon{width:40px;height:40px;border-radius:var(--r12);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .card-icon{width:40px;height:40px;border-radius:var(--r12);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-dim);}
   .card-icon svg{width:19px;height:19px;}
   .card-title{font-size:15px;font-weight:600;}
   .card-sub{font-size:12px;color:var(--text-dim);margin-top:2px;line-height:1.45;}
@@ -119,22 +129,22 @@
   .field-foot{display:flex;justify-content:flex-end;margin-top:16px;}
 
   /* КНОПКИ */
-  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:var(--r16);font-family:inherit;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:var(--r16);font-family:inherit;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:background .15s,border-color .15s,color .15s,transform .15s var(--spring);white-space:nowrap;}
+  .btn:active{transform:scale(.96);}
   .btn svg{width:15px;height:15px;}
-  .btn-primary{background:var(--green);color:#0d1210;}
+  .btn-primary{background:var(--green);color:#0d1210;box-shadow:var(--shadow-sm);}
   .btn-primary:hover{opacity:.9;}
-  .btn-ghost{background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text);box-shadow:0 1px 0 rgba(0,0,0,0.02);}
-  .btn-ghost:hover{border-color:var(--green);color:var(--green-text);background:var(--green-dim);}
+  .btn-ghost{background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text);}
+  .btn-ghost:hover{background:var(--surface2);border-color:var(--stroke-strong);}
   .btn-danger{background:var(--red-dim);color:var(--red);border:1px solid transparent;}
   .btn-danger:hover{opacity:.85;}
   .btn-danger-solid{background:var(--red);color:#fff;}
   .btn-danger-solid:hover{opacity:.88;}
-  .btn:disabled{opacity:.5;cursor:default;}
+  .btn:disabled{opacity:.5;cursor:default;transform:none;}
 
   /* СПОСОБ ВХОДА */
-  .auth-method-icon{width:44px;height:44px;border-radius:var(--r14);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--card-elevated);border:1px solid var(--stroke);}
+  .auth-method-icon{width:44px;height:44px;border-radius:var(--r14);display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--surface2);color:var(--text-dim);}
   .auth-method-icon svg{width:21px;height:21px;}
-  .auth-method-icon.email svg{stroke:var(--green-text);}
   .auth-method-info{flex:1;}
   .auth-method-label{font-size:11px;color:var(--text-faint);margin-bottom:3px;}
   .auth-method-value{font-size:14px;font-weight:500;}
@@ -143,31 +153,35 @@
 
   .divider-label{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-faint);margin:20px 0 14px;padding-top:20px;border-top:1px solid var(--stroke);font-weight:600;}
 
-  .alert{display:flex;align-items:flex-start;gap:10px;border-radius:var(--r14);padding:13px 16px;font-size:13px;line-height:1.5;}
+  .alert{display:flex;align-items:flex-start;gap:10px;border-radius:var(--r14);padding:13px 16px;font-size:13px;line-height:1.5;background:var(--card-elevated);border:1px solid var(--stroke);border-left:2px solid transparent;color:var(--text-dim);}
   .alert svg{width:16px;height:16px;flex-shrink:0;margin-top:1px;}
-  .alert.warn{background:var(--amber-dim);color:var(--amber);}
-  .alert.good{background:var(--green-dim);color:var(--green-text);}
+  .alert.warn{border-left-color:var(--amber);}
+  .alert.warn svg{color:var(--amber);}
+  .alert.good{border-left-color:var(--green);}
+  .alert.good svg{color:var(--green-text);}
 
   .reset-form{display:none;}
   .reset-form.visible{display:block;}
   .reset-hint{font-size:13px;color:var(--text-dim);margin-bottom:16px;line-height:1.5;}
 
   /* СЕАНСЫ */
-  .sessions-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;}
-  .sessions-list{display:flex;flex-direction:column;gap:10px;}
-  .session-row{display:flex;align-items:center;gap:14px;padding:14px;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r16);flex-wrap:wrap;}
-  .session-icon{width:42px;height:42px;border-radius:var(--r12);background:var(--card);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-dim);}
-  .session-icon svg{width:19px;height:19px;}
+  .sessions-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px;}
+  .sessions-list{display:flex;flex-direction:column;}
+  .session-row{display:flex;align-items:center;gap:14px;padding:14px 2px;border-bottom:1px solid var(--stroke);flex-wrap:wrap;}
+  .session-row:last-child{border-bottom:none;}
+  .session-icon{width:38px;height:38px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-dim);}
+  .session-icon svg{width:17px;height:17px;}
   .session-info{flex:1;min-width:160px;}
   .session-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px;}
   .session-title{font-size:13px;font-weight:500;}
-  .session-current-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--r20);background:var(--green-dim);color:var(--green-text);text-transform:uppercase;letter-spacing:0.03em;}
+  .session-current-badge{font-size:10px;font-weight:600;padding:3px 8px;border-radius:var(--r20);background:var(--surface2);color:var(--text-dim);text-transform:uppercase;letter-spacing:0.03em;}
   .session-meta{font-size:12px;color:var(--text-faint);}
-  .session-end-btn{background:var(--red-dim);color:var(--red);border:none;border-radius:var(--r12);padding:8px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;}
-  .session-end-btn:hover{opacity:.85;}
+  .session-end-btn{background:transparent;color:var(--red);border:1px solid var(--stroke);border-radius:var(--r12);padding:8px 14px;font-family:inherit;font-size:12px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;white-space:nowrap;transition:background .15s,transform .15s var(--spring);}
+  .session-end-btn:hover{background:var(--red-dim);border-color:transparent;}
+  .session-end-btn:active{transform:scale(.95);}
   .session-end-btn svg{width:13px;height:13px;}
   .sessions-empty,.sessions-loading{color:var(--text-faint);font-size:13px;padding:6px 2px;}
-  @media(max-width:560px){.session-row{padding:14px;}.session-end-btn{width:100%;justify-content:center;}}
+  @media(max-width:560px){.session-end-btn{width:100%;justify-content:center;}}
 
   /* ОПАСНАЯ ЗОНА */
   .danger-item{border-bottom:1px solid var(--stroke);}
@@ -177,11 +191,35 @@
   .danger-row p{font-size:12px;color:var(--text-dim);}
 
   /* РАЗВОРАЧИВАЮЩАЯСЯ СЕКЦИЯ УДАЛЕНИЯ */
-  .delete-pop-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.4,0,.2,1);}
+  .delete-pop-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s var(--spring);}
   .delete-pop-wrap.show{grid-template-rows:1fr;}
   .delete-pop{min-height:0;overflow:hidden;}
-  .delete-pop-inner{background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r20);padding:18px;margin-bottom:18px;opacity:0;transform:translateY(-6px);transition:opacity .22s ease .06s,transform .22s ease .06s;}
+  .delete-pop-inner{background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r20);box-shadow:var(--shadow-sm);padding:18px;margin-bottom:18px;opacity:0;transform:translateY(-6px);transition:opacity .22s ease .06s,transform .22s var(--spring) .06s;}
   .delete-pop-wrap.show .delete-pop-inner{opacity:1;transform:translateY(0);}
+
+  /* Удаление аккаунта — настоящий модальный sheet поверх страницы, не аккордеон */
+  .modal-sheet{display:grid;grid-template-rows:0fr;transition:none;}
+  .modal-sheet.show{
+    display:flex;grid-template-rows:none;
+    position:fixed;inset:0;z-index:9800;
+    align-items:flex-end;justify-content:center;
+    padding:0;
+    background:rgba(0,0,0,0.5);
+    -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+    animation:sheetDim .18s ease;
+  }
+  @keyframes sheetDim{from{opacity:0}to{opacity:1}}
+  .modal-sheet .delete-pop{min-height:0;overflow:visible;width:100%;max-width:440px;}
+  .modal-sheet .delete-pop-inner{
+    margin:0 16px 16px;border-radius:var(--r24);box-shadow:var(--shadow-lg);
+    opacity:0;transform:translateY(24px);
+    animation:sheetUp .32s var(--spring) forwards;
+  }
+  @keyframes sheetUp{to{opacity:1;transform:translateY(0)}}
+  @media(min-width:560px){
+    .modal-sheet.show{align-items:center;}
+    .modal-sheet .delete-pop-inner{margin:0;transform:translateY(12px) scale(.97);}
+  }
   .delete-pop-head{display:flex;gap:12px;margin-bottom:14px;}
   .delete-pop-icon{width:36px;height:36px;border-radius:var(--r12);background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .delete-pop-icon svg{width:17px;height:17px;stroke:var(--red);}
@@ -191,11 +229,12 @@
   .delete-pop-btns{display:flex;gap:8px;}
   .delete-pop-btns .btn{flex:1;justify-content:center;padding:9px 12px;font-size:12px;}
 
-  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:11px 20px;border-radius:var(--r16);font-size:13px;font-weight:500;opacity:0;transition:opacity .22s,transform .22s;pointer-events:none;white-space:nowrap;max-width:90vw;}
+  .toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:11px 20px;border-radius:var(--r16);font-size:13px;font-weight:500;opacity:0;box-shadow:var(--shadow-lg);transition:opacity .22s,transform .28s var(--spring);pointer-events:none;white-space:nowrap;max-width:90vw;}
   .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
   .toast.success{background:var(--green);color:#0d1210;}
-  .toast.error{background:var(--card);color:var(--text);border:1px solid var(--stroke);}
-  .toast.info{background:var(--card);color:var(--text);border:1px solid var(--stroke);}
+  .toast.error{background:rgba(23,24,27,0.72);color:var(--text);border:1px solid var(--stroke-strong);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);}
+  .toast.info{background:rgba(23,24,27,0.72);color:var(--text);border:1px solid var(--stroke-strong);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);}
+  html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{background:rgba(255,255,255,0.72);}
 
   @media (min-width:981px){
     .content{max-width:1240px;padding:8px 0 48px;}
@@ -257,7 +296,7 @@
     <!-- ПРОФИЛЬ -->
     <section class="card" id="sec-profile">
       <div class="card-head">
-        <div class="card-icon" style="background:var(--blue-dim);color:var(--blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
         <div>
           <div class="card-title">Профиль</div>
           <div class="card-sub">Видно в кабинете, приходит вместе с заявками</div>
@@ -281,7 +320,7 @@
     <!-- ВХОД И БЕЗОПАСНОСТЬ -->
     <section class="card" id="sec-access">
       <div class="card-head">
-        <div class="card-icon" style="background:var(--green-dim);color:var(--green-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
         <div>
           <div class="card-title">Вход и безопасность</div>
           <div class="card-sub">Способ входа и восстановление пароля</div>
@@ -315,7 +354,7 @@
     <!-- TELEGRAM -->
     <section class="card" id="sec-telegram">
       <div class="card-head">
-        <div class="card-icon" style="background:var(--blue-dim);color:var(--blue);"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/></svg></div>
+        <div class="card-icon"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/></svg></div>
         <div>
           <div class="card-title">Telegram</div>
           <div class="card-sub">Уведомления о заказе и статус — прямо в боте</div>
@@ -343,7 +382,7 @@
     <section class="card" id="sec-sessions">
       <div class="sessions-head-row">
         <div class="card-head" style="margin-bottom:0">
-          <div class="card-icon" style="background:var(--blue-dim);color:var(--blue);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="19" height="13" rx="1.8"/><path d="M8 20.5h8M12 16.5v4" stroke-linecap="round"/></svg></div>
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2.5" y="3.5" width="19" height="13" rx="1.8"/><path d="M8 20.5h8M12 16.5v4" stroke-linecap="round"/></svg></div>
           <div>
             <div class="card-title">Устройства и сеансы</div>
             <div class="card-sub">Где выполнен вход в аккаунт</div>
@@ -378,7 +417,7 @@
           <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить личные данные, обращения, уведомления и историю обслуживания</p></div>
           <button class="btn btn-danger-solid" onclick="toggleDeletePopover()">Удалить</button>
         </div>
-        <div class="delete-pop-wrap" id="deletePopover">
+        <div class="delete-pop-wrap modal-sheet" id="deletePopover">
           <div class="delete-pop">
             <div class="delete-pop-inner">
               <div class="delete-pop-head">
@@ -642,7 +681,9 @@ window.closeDeleteModal=function(){document.getElementById('deletePopover').clas
 document.addEventListener('click',e=>{
   const wrap=document.getElementById('deletePopover');
   const isDeleteBtn=e.target.closest('.btn-danger-solid');
-  if(wrap && !wrap.contains(e.target) && !isDeleteBtn) closeDeleteModal();
+  const clickedBackdrop = e.target===wrap;
+  const clickedOutside = wrap && !wrap.contains(e.target);
+  if(wrap && (clickedBackdrop || clickedOutside) && !isDeleteBtn) closeDeleteModal();
 });
 
 // ── Удаление аккаунта: email-подтверждение → запрос кода → ввод кода ──

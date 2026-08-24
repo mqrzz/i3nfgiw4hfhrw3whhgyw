@@ -580,6 +580,7 @@ let allOrders = [], lastStatuses = {}, reviewOrderId = null, reviewStars = 0, ba
 let isInitialLoad = true;
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
 function fmtDate(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
 function fmtFull(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
@@ -686,7 +687,7 @@ function orderCard(o){
   return`<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaid?1:0}" data-id="${o.id}" style="animation-delay:${allOrders.indexOf(o)*30}ms">
     <button type="button" class="ord-row" onclick="openOrderModal('${o.id}')">
       <div class="ord-cell-main">
-        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${esc(o.siteType||'Сайт')}</span>
+        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${esc(siteTypeLabel(o.siteType)||'Сайт')}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
       </div>
       <div class="ord-cell-status"><span class="ord-tag s${s}"><svg viewBox="0 0 24 24">${STATUS_ICONS[s]}</svg>${STATUS_LABELS[s]}</span></div>
@@ -730,7 +731,7 @@ window.openOrderModal=function(id){
   const payLabel=fullyPaid?'Оплачен':(halfPaid?'Предоплата 50%':'Не оплачен');
   const payChipClass=fullyPaid?'paid-yes':(halfPaid?'paid-half':'paid-no');
 
-  document.getElementById('ordModalTitle').textContent=(o.siteType||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
+  document.getElementById('ordModalTitle').textContent=(siteTypeLabel(o.siteType)||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
   document.getElementById('ordModalPrice').innerHTML=totalPrice?'<small>₽</small>'+totalPrice.toLocaleString('ru'):'';
   document.getElementById('ordModalChips').innerHTML=
     '<span class="ord-chip status s'+s+'">'
@@ -887,7 +888,7 @@ window.printReceipt=function(id){
   const fP=o.paid||(isP&&pA>=(o.totalPrice||0));
   const pSt=fP?'Оплачен полностью':(isP&&pA>0?'Предоплата 50%':'Не оплачен');
   const pRows=isP?`<tr><td>Оплачено</td><td>${pA.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fP?'—':rA.toLocaleString('ru')+' ₽'}</td></tr>`:'';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${esc(o.clientName||'—')}</td></tr><tr><td>Email</td><td>${esc(o.clientEmail||'—')}</td></tr><tr><td>Тип заказа</td><td>${esc(o.siteType||'—')}</td></tr><tr><td>Тариф</td><td>${esc(o.tariff||o.package||'—')}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${esc(o.clientName||'—')}</td></tr><tr><td>Email</td><td>${esc(o.clientEmail||'—')}</td></tr><tr><td>Тип заказа</td><td>${esc(siteTypeLabel(o.siteType)||'—')}</td></tr><tr><td>Тариф</td><td>${esc(o.tariff||o.package||'—')}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
   w.document.write(html);w.document.close();
 };
 

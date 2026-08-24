@@ -422,13 +422,23 @@ function toDate(ts){
   return ts.toDate ? ts.toDate() : new Date(ts);
 }
 
+// Человекочитаемое название типа сайта — в базе хранится техническое
+// значение ('static'/'dynamic' — так называются карточки на странице
+// заказа), раньше оно просто выводилось как есть, отсюда "static"/"dynamic"
+// на экране вместо русских названий.
+function siteTypeLabel(t){
+  if(t==='static') return 'Статический сайт';
+  if(t==='dynamic') return 'Сайт с серверной частью';
+  return t||'';
+}
+
 // Категория услуги для доната — берём РЕАЛЬНОЕ значение поля siteType
 // заказа как есть (это и есть настоящее название типа сайта у клиента).
 // Ключевые слова — только запасной вариант, если siteType пуст.
 // "Другое" — только если вообще ничего не удалось определить.
 const DONUT_PALETTE = ['#1ede7b','#4d9fff','#ffb74d','#a970ff','#ff6fac','#65686d','#ffd75c'];
 function classifyOrder(o, colorFor){
-  let label = (o.siteType && String(o.siteType).trim()) || '';
+  let label = siteTypeLabel(o.siteType) || '';
   if(!label){
     const s = ((o.siteName||'')+' '+(o.siteDomain||'')).toLowerCase();
     if(s.includes('ленд')||s.includes('landing')) label='Лендинг';
@@ -548,7 +558,7 @@ function renderRecentOrders(orders){
     return;
   }
   box.innerHTML = orders.slice(0,4).map(o=>{
-    const name = o.siteName||o.siteDomain||o.siteType||'Заказ';
+    const name = o.siteName||o.siteDomain||siteTypeLabel(o.siteType)||'Заказ';
     const st = o.status ?? 0;
     const cls = badgeClass(st);
     const amount = orderAmount(o);

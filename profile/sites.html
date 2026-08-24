@@ -244,6 +244,7 @@ import { touchSession } from './sessions.js?v=4';
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 
 function siteCard(o){
   // Поля бота (botUsername/botLink) пишет admin-orders.html при доставке заказа
@@ -257,7 +258,12 @@ function siteCard(o){
   const repoHref = o.siteRepo ? (o.siteRepo.match(/^https?:\/\//) ? o.siteRepo : 'https://github.com/'+o.siteRepo.replace(/^\/+/,'')) : null;
   const isBotLike = !!o.botUsername || /бот|bot|telegram|тг[\s-]?бот|миниап|mini\s?app/i.test(o.siteType||'');
 
-  const hasSupport = o.supportActive && o.supportExpiresAt && o.supportExpiresAt.toDate() > new Date();
+  // ВАЖНО: раньше здесь был безусловный o.supportExpiresAt.toDate() —
+  // supportExpiresAt в базе это обычная строка (не Firestore Timestamp),
+  // .toDate() у неё не существует, и JS падал прямо посреди рендера
+  // карточек — вся страница "Мои сайты" зависала на бесконечной загрузке,
+  // потому что скрипт обрывался и не успевал скрыть спиннер.
+  const hasSupport = o.supportActive && o.supportExpiresAt && new Date(o.supportExpiresAt) > new Date();
   const statusPill = hasSupport
     ? `<span class="site-status-pill support">Обслуживание до ${fmtDate(o.supportExpiresAt)}</span>`
     : `<span class="site-status-pill is-live">Запущен</span>`;
@@ -279,7 +285,7 @@ function siteCard(o){
     <div class="site-domain">${esc(o.siteDomain || (o.botUsername ? '@'+o.botUsername : ('№ '+o.id.slice(0,8).toUpperCase())))}</div>
     <div class="site-meta-list">
       <span class="site-meta-chip"><span class="site-meta-ico mic-blue"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="site-meta-text">${fmtDate(o.createdAt)}</span></span>
-      <span class="site-meta-chip"><span class="site-meta-ico mic-green"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span><span class="site-meta-text">${esc(o.siteType||'Проект')} · ${esc(o.tariff||o.package||'')}</span></span>
+      <span class="site-meta-chip"><span class="site-meta-ico mic-green"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span><span class="site-meta-text">${esc(siteTypeLabel(o.siteType)||'Проект')} · ${esc(o.tariff||o.package||'')}</span></span>
       ${pagesCount ? `<span class="site-meta-chip"><span class="site-meta-ico mic-amber"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="site-meta-text">${pagesCount} стр.</span></span>` : ''}
       ${repoHref ? `<a href="${repoHref}" target="_blank" rel="noopener" class="site-meta-chip"><span class="site-meta-ico mic-violet"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span><span class="site-meta-text">Код на GitHub</span></a>` : ''}
     </div>

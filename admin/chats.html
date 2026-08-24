@@ -500,7 +500,11 @@ window.doLogout=async()=>{
 async function loadTicketsList(){
   try{
     const resp = await fetch(`${API}/tickets/admin/all`, { credentials:'include' });
-    const incoming = resp.ok ? await resp.json() : [];
+    // ВАЖНО: не затираем allTickets пустым списком при неудачном запросе —
+    // раньше любая временная ошибка на 15-секундном опросе на секунду
+    // рисовала "тикетов нет", хотя они никуда не девались.
+    if(!resp.ok) return;
+    const incoming = await resp.json();
     incoming.forEach(t=>{const old=allTickets.find(x=>x.id===t.id);t._lastMsg=old?._lastMsg;});
     allTickets=incoming;renderList();
   }catch(e){ console.error('loadTicketsList:', e); }

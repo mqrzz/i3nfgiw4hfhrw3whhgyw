@@ -108,7 +108,7 @@
   @media(max-width:480px){.row2{grid-template-columns:1fr;}}
   .field-label{display:block;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-faint);margin-bottom:7px;font-weight:600;}
   .field-input{width:100%;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r14);padding:12px 14px;color:var(--text);font-family:inherit;font-size:14px;font-weight:400;outline:none;transition:border-color .15s;}
-  .code-boxes{display:flex;gap:8px;justify-content:space-between;margin-top:10px}
+  .code-boxes{display:flex;gap:8px;justify-content:space-between;margin-top:10px;max-width:280px}
   .code-box{width:100%;aspect-ratio:1/1;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:12px;color:var(--text);font-family:inherit;font-size:1.15rem;font-weight:500;text-align:center;outline:none;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
   .code-box::-webkit-outer-spin-button,.code-box::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .code-box:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.12)}
@@ -288,21 +288,27 @@
         </div>
       </div>
       <div id="authMethodRow"><!-- filled by JS --></div>
-      <div class="divider-label">Смена пароля</div>
-      <div class="reset-form" id="resetForm">
-        <p class="reset-hint">Введите текущий и новый пароль.</p>
-        <div style="margin-bottom:16px">
-          <label class="field-label">Текущий пароль</label>
-          <input class="field-input" type="password" id="currentPasswordInput" placeholder="••••••••" autocomplete="current-password">
+      <div class="danger-row" style="margin-top:10px">
+        <div><h4 style="font-size:13px;font-weight:600;margin:0 0 2px">Смена пароля</h4><p style="font-size:12px;color:var(--text-dim);margin:0">Текущий и новый пароль</p></div>
+        <button class="btn btn-ghost" onclick="togglePasswordForm()">Изменить</button>
+      </div>
+      <div class="delete-pop-wrap" id="resetFormWrap">
+        <div class="delete-pop">
+          <div class="delete-pop-inner">
+            <div style="margin-bottom:16px">
+              <label class="field-label">Текущий пароль</label>
+              <input class="field-input" type="password" id="currentPasswordInput" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <div style="margin-bottom:16px">
+              <label class="field-label">Новый пароль</label>
+              <input class="field-input" type="password" id="newPasswordInput" placeholder="Минимум 6 символов" autocomplete="new-password">
+            </div>
+            <div class="delete-pop-btns">
+              <button class="btn btn-ghost" onclick="togglePasswordForm()">Отмена</button>
+              <button class="btn btn-dark" id="changePasswordBtn" onclick="doChangePassword()">Сменить пароль</button>
+            </div>
+          </div>
         </div>
-        <div style="margin-bottom:16px">
-          <label class="field-label">Новый пароль</label>
-          <input class="field-input" type="password" id="newPasswordInput" placeholder="Минимум 6 символов" autocomplete="new-password">
-        </div>
-        <button class="btn btn-ghost" id="changePasswordBtn" onclick="doChangePassword()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Сменить пароль
-        </button>
       </div>
     </section>
 
@@ -507,8 +513,18 @@ function renderAuthMethod(){
       <div class="auth-method-value">Email и пароль</div>
     </div>
     <span class="auth-method-badge">Активен</span>`;
-  document.getElementById('resetForm').classList.add('visible');
 }
+
+window.togglePasswordForm=function(){
+  const wrap=document.getElementById('resetFormWrap');
+  const willShow=!wrap.classList.contains('show');
+  if(willShow){
+    document.getElementById('currentPasswordInput').value='';
+    document.getElementById('newPasswordInput').value='';
+  }
+  wrap.classList.toggle('show',willShow);
+  if(willShow) setTimeout(()=>document.getElementById('currentPasswordInput')?.focus(),300);
+};
 
 function renderSessions(sessions){
   const wrap = document.getElementById('sessionsList');
@@ -591,6 +607,7 @@ window.doChangePassword=async function(){
     toast('Пароль изменён. Остальные устройства разлогинены.','success');
     document.getElementById('currentPasswordInput').value='';
     document.getElementById('newPasswordInput').value='';
+    document.getElementById('resetFormWrap').classList.remove('show');
     loadSessions();
   }catch(e){
     toast(e.message,'error');

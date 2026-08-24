@@ -451,14 +451,36 @@
     });
   }
 
-  // Подписки на бейджи — временно отключены: данные (chats/orders/notifications)
-  // ещё живут на Firestore и не перенесены на новый бэкенд. Когда появится
-  // API для заказов/тикетов/уведомлений — вернуть сюда реальные значения.
-  function watchBadges(user) {
-    setBadge('support', 0, null);
-    setBadge('notif', 0, null);
-    setBadge('orders', 0, null);
+  // Бейджи по реальным данным. "tickets" (заявки на доработку/service_tickets)
+  // оставлен на 0 — в схеме БД у этой таблицы вообще нет поля "прочитано",
+  // считать оттуда нечего, придумывать цифру не буду.
+  async function watchBadges(user) {
     setBadge('tickets', 0, null);
+    try {
+      const [notifResp, ordersResp, chatResp] = await Promise.all([
+        fetch('https://antviz.ru/api/notifications', { credentials: 'include' }),
+        fetch('https://antviz.ru/api/orders', { credentials: 'include' }),
+        fetch('https://antviz.ru/api/tickets', { credentials: 'include' }),
+      ]);
+      if (notifResp.ok) {
+        const notifs = await notifResp.json();
+        setBadge('notif', notifs.filter(n => !n.read).length, null);
+      }
+      if (ordersResp.ok) {
+        const orders = await ordersResp.json();
+        // "Ожидает доплаты" (status 6) — единственное реально требующее
+        // внимания клиента состояние заказа, которое можно однозначно
+        // определить по имеющимся данным.
+        setBadge('orders', orders.filter(o => o.status === 6).length, 'orange');
+      }
+      if (chatResp.ok) {
+        const chats = await chatResp.json();
+        // read у тикета = увидел ли КЛИЕНТ последний ответ (см. tickets.js, toClientTicket)
+        setBadge('support', chats.filter(t => t.read === false).length, null);
+      }
+    } catch (e) {
+      console.error('sidebar.js watchBadges:', e);
+    }
   }
 
   if (document.readyState === 'loading') {

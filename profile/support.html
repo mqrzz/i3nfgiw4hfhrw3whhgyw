@@ -491,6 +491,7 @@ function formatDate(ts) {
   return d.toLocaleDateString('ru', {day:'numeric',month:'short'}) + ' ' + d.toLocaleTimeString('ru', {hour:'2-digit',minute:'2-digit'});
 }
 function statusLabel(s) { return {open:'Открыт',done:'Решён'}[s] || s; }
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 // Единая монохромная иконка тикета — без цветовой дифференциации по теме.
 const TICKET_ICON = '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>';
 function hasUnread(ticket) {
@@ -500,7 +501,7 @@ function hasUnread(ticket) {
   return last.sender === 'admin' && !ticket._read;
 }
 function orderLabel(o){
-  return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (o.siteType||'Сайт');
+  return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (siteTypeLabel(o.siteType)||'Сайт');
 }
 
 // Тот же справочник статусов заказа и те же классы бейджей, что и в profile.html —
@@ -658,13 +659,19 @@ window.openDrawer = async function(id) {
   // Пока диалог открыт — подтягиваем новые сообщения раз в 5 сек, как уже
   // сделано в admin/chats.html. Раньше этого не было вообще: ответ админа
   // появлялся только после закрытия и повторного открытия окна.
+  // ВАЖНО: перерисовываем блок, только если реально пришло что-то новое —
+  // иначе безусловный innerHTML каждые 5 сек визуально "трясёт" чат.
   if (_drawerPollInterval) clearInterval(_drawerPollInterval);
+  let _lastDrawerSig = (ticket._messages||[]).length + ':' + ((ticket._messages||[])[((ticket._messages||[]).length-1)]?.id || '');
   _drawerPollInterval = setInterval(async () => {
     if (!_activeTicketId) return;
     try {
       const resp = await fetch(`${API}/tickets/${_activeTicketId}/messages`, { credentials: 'include' });
       if (!resp.ok) return; // временная ошибка — не затираем открытый чат
       const msgs = await resp.json();
+      const sig = msgs.length + ':' + (msgs[msgs.length-1]?.id || '');
+      if (sig === _lastDrawerSig) return;
+      _lastDrawerSig = sig;
       const t = allTickets.find(x => x.id === _activeTicketId);
       if (t) t._messages = msgs;
       const box = document.getElementById('chatBody');

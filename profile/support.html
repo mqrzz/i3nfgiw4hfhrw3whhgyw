@@ -654,12 +654,36 @@ window.openDrawer = async function(id) {
   }
   chatBox.innerHTML = buildChat(ticket._messages || []);
   setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 80);
+
+  // Пока диалог открыт — подтягиваем новые сообщения раз в 5 сек, как уже
+  // сделано в admin/chats.html. Раньше этого не было вообще: ответ админа
+  // появлялся только после закрытия и повторного открытия окна.
+  if (_drawerPollInterval) clearInterval(_drawerPollInterval);
+  _drawerPollInterval = setInterval(async () => {
+    if (!_activeTicketId) return;
+    try {
+      const resp = await fetch(`${API}/tickets/${_activeTicketId}/messages`, { credentials: 'include' });
+      if (!resp.ok) return; // временная ошибка — не затираем открытый чат
+      const msgs = await resp.json();
+      const t = allTickets.find(x => x.id === _activeTicketId);
+      if (t) t._messages = msgs;
+      const box = document.getElementById('chatBody');
+      if (box) {
+        const wasAtBottom = box.scrollTop + box.clientHeight >= box.scrollHeight - 40;
+        box.innerHTML = buildChat(msgs);
+        if (wasAtBottom) box.scrollTop = box.scrollHeight;
+      }
+    } catch(e) {}
+  }, 5000);
 };
+
+let _drawerPollInterval = null;
 
 window.closeDrawer = function() {
   document.getElementById('drawerOverlay').classList.remove('show');
   document.body.style.overflow = '';
   _activeTicketId = null;
+  if (_drawerPollInterval) { clearInterval(_drawerPollInterval); _drawerPollInterval = null; }
 };
 
 window.sendChatDrawer = async function() {

@@ -387,7 +387,7 @@ window.sendReply=async function(){
   try{
     const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
       method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify({ text }),
+      body: JSON.stringify({ text, asAdmin: true }),
     });
     if(!resp.ok) throw new Error('Ошибка отправки');
     const msg = await resp.json();
@@ -409,7 +409,7 @@ window.sendImg=async function(){
     try{
       const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
         method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-        body: JSON.stringify({ text:'Изображение', imageUrl:e.target.result }),
+        body: JSON.stringify({ text:'Изображение', imageUrl:e.target.result, asAdmin: true }),
       });
       if(!resp.ok) throw new Error();
       const t=allTickets.find(x=>x.id===selectedId);

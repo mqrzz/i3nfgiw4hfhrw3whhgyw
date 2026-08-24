@@ -434,7 +434,12 @@ window.notifyExpiry=async uid=>{
 async function loadTickets(){
   try{
     const resp = await fetch(`${API}/service-tickets/admin/all`, { credentials:'include' });
-    const list = resp.ok ? await resp.json() : [];
+    // ВАЖНО: если запрос не удался (сессия/сеть/БД моргнули) — НЕ затираем
+    // текущий allTickets пустым списком. Раньше любая временная ошибка на
+    // 15-30-секундном опросе рисовала "тикетов нет" на секунду, хотя они
+    // никуда не девались — просто один опрос не удался.
+    if(!resp.ok) return;
+    const list = await resp.json();
     allTickets=list.sort((a,b)=>{
       if((a.status==='done')!==(b.status==='done'))return a.status==='done'?1:-1;
       return new Date(b.createdAt||0)-new Date(a.createdAt||0);

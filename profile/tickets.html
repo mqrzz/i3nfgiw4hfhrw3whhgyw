@@ -811,9 +811,10 @@ let cu=null,orders=[],done=[],active=[],sel=null,pendId=null,pendBuyId=null,pend
 let allTickets=[],curFilter='all',curTab='form';
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3200)}
 function fmt(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
-function olabel(o){return`${esc(o.siteType||'Сайт')} · ${esc(o.tariff||o.package||'—')}`}
+function olabel(o){return`${esc(siteTypeLabel(o.siteType)||'Сайт')} · ${esc(o.tariff||o.package||'—')}`}
 function hide(...ids){ids.forEach(id=>document.getElementById(id).style.display='none')}
 function show(id,d='block'){document.getElementById(id).style.display=d}
 
@@ -872,8 +873,8 @@ function renderSwitcher(){
   if(done.length<2){w.style.display='none';return;}
   w.style.display='flex';
   w.innerHTML=done.map(o=>{
-    const hs=o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date();
-    const dl=hs?Math.ceil((o.supportExpiresAt.toDate()-new Date())/864e5):null;
+    const hs=o.supportActive&&o.supportExpiresAt&&new Date(o.supportExpiresAt)>new Date();
+    const dl=hs?Math.ceil((new Date(o.supportExpiresAt)-new Date())/864e5):null;
     const exp=hs&&dl<=2;
     const dom=o.siteDomain||'№ '+o.id.slice(0,8).toUpperCase();
     const meta=hs?(exp?`Истекает через ${dl} дн.`:`До ${fmt(o.supportExpiresAt)}`):'Обслуживание не подключено';
@@ -922,7 +923,7 @@ window.goStep=function(n){
 
 function renderSiteGrid(){
   document.getElementById('siteGrid').innerHTML=done.map(o=>{
-    const hs=o.supportActive&&o.supportExpiresAt&&o.supportExpiresAt.toDate()>new Date();
+    const hs=o.supportActive&&o.supportExpiresAt&&new Date(o.supportExpiresAt)>new Date();
     const name=o.siteDomain||'№ '+o.id.slice(0,8).toUpperCase();
     return`<button class="site-pick" onclick='pickSite("${o.id}")'>
       <div class="ico-badge sm c-orange"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div>

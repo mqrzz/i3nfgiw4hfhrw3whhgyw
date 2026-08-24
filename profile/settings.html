@@ -108,6 +108,11 @@
   @media(max-width:480px){.row2{grid-template-columns:1fr;}}
   .field-label{display:block;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-faint);margin-bottom:7px;font-weight:600;}
   .field-input{width:100%;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r14);padding:12px 14px;color:var(--text);font-family:inherit;font-size:14px;font-weight:400;outline:none;transition:border-color .15s;}
+  .code-boxes{display:flex;gap:8px;justify-content:space-between;margin-top:10px}
+  .code-box{width:100%;aspect-ratio:1/1;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:12px;color:var(--text);font-family:inherit;font-size:1.15rem;font-weight:500;text-align:center;outline:none;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
+  .code-box::-webkit-outer-spin-button,.code-box::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .code-box:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.12)}
+  .code-box.filled{border-color:var(--green)}
   .field-input:focus{border-color:var(--green);}
   .field-input:disabled{opacity:.55;cursor:default;}
   .field-input::placeholder{color:var(--text-faint);}
@@ -193,7 +198,7 @@
   .toast.info{background:var(--card);color:var(--text);border:1px solid var(--stroke);}
 
   @media (min-width:981px){
-    .content{max-width:1100px;padding:8px 0 48px;}
+    .content{max-width:1240px;padding:8px 0 48px;}
     .hero{padding:42px;}
     .avatar{width:70px;height:70px;font-size:24px;}
     .hero-title{font-size:26px;}
@@ -379,7 +384,8 @@
               </div>
               <input class="field-input" id="deleteConfirmInput" type="email" placeholder="Введите email для подтверждения">
               <div id="deleteCodeRow" style="display:none;margin-top:10px">
-                <input class="field-input" id="deleteCodeInput" type="text" inputmode="numeric" maxlength="6" placeholder="Код из письма">
+                <div class="code-boxes" id="deleteCodeBoxes"></div>
+                <input type="hidden" id="deleteCodeInput">
               </div>
               <div class="delete-pop-btns">
                 <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
@@ -400,6 +406,47 @@
 
 <script type="module">
 const API = 'https://antviz.ru/api';
+
+function setupCodeBoxes(containerId, hiddenInputId, onSubmit){
+  const container = document.getElementById(containerId);
+  const hidden = document.getElementById(hiddenInputId);
+  if(!container || container.dataset.ready) return;
+  container.dataset.ready = '1';
+  const boxes = [];
+  for(let i=0;i<6;i++){
+    const b=document.createElement('input');
+    b.type='text';b.inputMode='numeric';b.maxLength=1;b.className='code-box';
+    b.autocomplete = i===0 ? 'one-time-code' : 'off';
+    container.appendChild(b);boxes.push(b);
+  }
+  function sync(){ hidden.value = boxes.map(b=>b.value).join(''); }
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input', ()=>{
+      b.value = b.value.replace(/\D/g,'').slice(-1);
+      b.classList.toggle('filled', !!b.value);
+      if(b.value && i<5) boxes[i+1].focus();
+      sync();
+      if(boxes.every(x=>x.value)) onSubmit?.();
+    });
+    b.addEventListener('keydown', e=>{
+      if(e.key==='Backspace' && !b.value && i>0) boxes[i-1].focus();
+      if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); }
+      if(e.key==='ArrowLeft' && i>0) boxes[i-1].focus();
+      if(e.key==='ArrowRight' && i<5) boxes[i+1].focus();
+    });
+    b.addEventListener('paste', e=>{
+      e.preventDefault();
+      const text=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      text.split('').forEach((ch,idx)=>{ if(boxes[idx]){boxes[idx].value=ch;boxes[idx].classList.add('filled');} });
+      sync();
+      (boxes[Math.min(text.length,5)])?.focus();
+      if(text.length===6) onSubmit?.();
+    });
+  });
+  container._focusFirst = () => boxes[0]?.focus();
+  container._reset = () => { boxes.forEach(b=>{b.value='';b.classList.remove('filled');}); sync(); };
+}
+setupCodeBoxes('deleteCodeBoxes','deleteCodeInput', ()=>window.confirmDeleteAccount?.());
 
 // Юзернейм бота — заменить после создания в BotFather
 const TG_BOT_USERNAME = 'antviz_bot';
@@ -460,6 +507,7 @@ function renderAuthMethod(){
       <div class="auth-method-value">Email и пароль</div>
     </div>
     <span class="auth-method-badge">Активен</span>`;
+  document.getElementById('resetForm').classList.add('visible');
 }
 
 function renderSessions(sessions){
@@ -562,6 +610,7 @@ window.toggleDeletePopover=function(){
   if(willShow){
     document.getElementById('deleteConfirmInput').value='';
     document.getElementById('deleteCodeInput').value='';
+    document.getElementById('deleteCodeBoxes')._reset?.();
     document.getElementById('deleteCodeRow').style.display='none';
     const cBtn=document.getElementById('deleteConfirmBtn');
     cBtn.textContent='Получить код';cBtn.disabled=false;
@@ -590,6 +639,7 @@ window.requestDeleteCode=async function(){
   try{
     await apiCall('POST', '/auth/send-code', { purpose: 'delete_account' });
     document.getElementById('deleteCodeRow').style.display='block';
+    document.getElementById('deleteCodeBoxes')._focusFirst?.();
     btn.textContent='Подтвердить удаление';
     btn.setAttribute('onclick','confirmDeleteAccount()');
     toast('Код отправлен на почту','success');

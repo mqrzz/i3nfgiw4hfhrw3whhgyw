@@ -585,6 +585,7 @@ async function safeUpdate(orderId,data,successMsg){
   }
 }
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 function fmtD(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtP(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
@@ -728,7 +729,7 @@ function showDetail(o){
   document.getElementById('dPrice').textContent=fmtP(o.totalPrice);
   document.getElementById('dBadge').innerHTML=`<span class="tag ${tc}" style="font-size:.8rem;padding:.35rem 1.1rem">${esc(t)}</span>`;
   document.getElementById('dHeroInfo').innerHTML=
-    heroChip('Формат',esc(o.siteType||'—'))+
+    heroChip('Формат',esc(siteTypeLabel(o.siteType)||'—'))+
     heroChip('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
     heroChip('Создан',fmtD(o.createdAt))+
     heroChip('Клиент',esc(o.clientEmail||'—'));
@@ -761,7 +762,7 @@ function showDetail(o){
   const domOpt=o.domainOption==='new'?'Регистрация на рег.ру':o.domainOption==='own'?'Свой домен':'—';
   const domainDisplay=o.domainName?`<span style="color:var(--green-d);font-weight:600">${esc(o.domainName)}</span>`:domOpt;
   document.getElementById('orderInfo').innerHTML=
-    icCard('Формат',esc(o.siteType||'—'))+
+    icCard('Формат',esc(siteTypeLabel(o.siteType)||'—'))+
     icCard('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
     icCard('Тариф',esc(t))+
     icCard('Страниц',o.pages||'—')+
@@ -1066,7 +1067,7 @@ window.printReceipt=id=>{
   const o=_cache.find(x=>x.id===id);if(!o)return;
   const w=window.open('','_blank','width=600,height=700');
   const date=o.createdAt?new Date(o.createdAt).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${o.siteType||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${(()=>{const _ip=o.paymentType==='partial',_pa=o.paidAmount||0,_fp=o.paid||(_ip&&_pa>=(o.totalPrice||0));return _ip&&!_fp?'Предоплата 50%':_fp?'Оплачен полностью':'Не оплачен';})()}</td></tr>${o.paymentType==='partial'?`<tr><td>Оплачено</td><td>${(o.paidAmount||0).toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${o.paid||(o.paidAmount||0)>=(o.totalPrice||0)?'—':(o.remainingAmount||Math.ceil((o.totalPrice||0)/2)).toLocaleString('ru')+' ₽'}</td></tr>`:''}<tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${siteTypeLabel(o.siteType)||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${(()=>{const _ip=o.paymentType==='partial',_pa=o.paidAmount||0,_fp=o.paid||(_ip&&_pa>=(o.totalPrice||0));return _ip&&!_fp?'Предоплата 50%':_fp?'Оплачен полностью':'Не оплачен';})()}</td></tr>${o.paymentType==='partial'?`<tr><td>Оплачено</td><td>${(o.paidAmount||0).toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${o.paid||(o.paidAmount||0)>=(o.totalPrice||0)?'—':(o.remainingAmount||Math.ceil((o.totalPrice||0)/2)).toLocaleString('ru')+' ₽'}</td></tr>`:''}<tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
 };
 window.doLogout=async()=>{

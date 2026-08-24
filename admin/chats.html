@@ -532,12 +532,23 @@ async function loadTicketsList(){
   // REST-опрос вместо realtime-подписки — список тикетов и превью
   // обновляются каждые 15 секунд, пока страница открыта.
   setInterval(loadTicketsList, 15000);
-  // Пока открыт конкретный диалог — подтягиваем новые сообщения в нём тоже
+  // Пока открыт конкретный диалог — подтягиваем новые сообщения в нём тоже.
+  // ВАЖНО: раньше renderChat() вызывался на каждый опрос безусловно, даже
+  // если сообщения не менялись — это перерисовывало весь блок и визуально
+  // "трясло" чат каждые 5 секунд. Теперь перерисовываем, только если
+  // реально пришло что-то новое (сравниваем количество и id последнего
+  // сообщения).
+  let _lastChatSig = null;
   setInterval(async()=>{
     if(!selectedId)return;
     try{
       const resp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
-      if(resp.ok) renderChat(await resp.json());
+      if(!resp.ok) return;
+      const msgs = await resp.json();
+      const sig = msgs.length + ':' + (msgs[msgs.length-1]?.id || '');
+      if (sig === _lastChatSig) return;
+      _lastChatSig = sig;
+      renderChat(msgs);
     }catch(e){}
   }, 5000);
 })();

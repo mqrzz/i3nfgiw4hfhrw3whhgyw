@@ -416,8 +416,9 @@ body{color:var(--text);font-family:var(--font);font-weight:300;line-height:1.5;-
 <script type="module">
 const API = 'https://antviz.ru/api';
 
-const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово'];
+const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
@@ -560,15 +561,27 @@ function reportRows(){
     return true;
   }).map(o=>{
     const d=o.createdAt;
+    // ВАЖНО: раньше здесь бралась ПОЛНАЯ цена заказа (o.totalPrice) как
+    // "получено", даже если реально оплачена только предоплата 50%
+    // (payment_type='partial'). Теперь берём реально поступившую сумму:
+    // при частичной оплате — paidAmount, иначе — totalPrice как раньше.
+    const isPartial = o.paymentType==='partial';
+    const receivedAmount = isPartial ? Number(o.paidAmount||0) : (o.totalPrice||0);
+    // Возвраты раньше были жёстко захардкожены в 0 с комментарием "не
+    // мигрировано" — на деле refundAmount уже есть и используется в этом
+    // же файле (бейдж заявок на возврат чуть выше). 'refunded' — деньги
+    // реально отправлены обратно (не путать с 'approved' — это только
+    // решение админа, до фактической отправки денег).
+    const refunded = o.refundStatus==='refunded' ? Number(o.refundAmount||0) : 0;
     return{
       id:o.id.slice(0,8).toUpperCase(),
       date:d?new Date(d).toLocaleDateString('ru'):'—',
       client:o.clientName||'—',
       tariff:o.package||o.tariff||'—',
       extras:(o.extras||[]).map(e=>extLbls[e]||e).join(', ')||'—',
-      amount:o.totalPrice||0,
+      amount:receivedAmount,
       paid:o.status!==-1,
-      refunded:0 // возвраты — отдельный этап, пока не мигрирован
+      refunded
     };
   }).sort((a,b)=>a.date.localeCompare(b.date));
 }
@@ -691,7 +704,7 @@ window.generateAccountingCsv=function(){
         <span style="font-weight:500;font-size:.78rem;color:var(--green-d)">${count}</span>
       </div>`):'<div style="text-align:center;color:var(--muted);font-size:.82rem">Нет данных</div>';
 
-    const byType={};orders.forEach(o=>{const t=o.siteType||'Другое';byType[t]=(byType[t]||0)+1;});
+    const byType={};orders.forEach(o=>{const t=siteTypeLabel(o.siteType)||'Другое';byType[t]=(byType[t]||0)+1;});
     const sorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);const mx=sorted[0]?.[1]||1;
     document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
       <div style="margin-bottom:14px">

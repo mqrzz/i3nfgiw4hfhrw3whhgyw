@@ -841,11 +841,22 @@ ${buildMobileSheet()}`;
   }
 
   async function watchBadges(user) {
-    // Бейджи (непрочитанные тикеты/заказы/уведомления) переедут сюда, когда
-    // будет готов бэкенд для orders/tickets/notifications — сейчас эти данные
-    // ещё на Firestore и не перенесены, поэтому временно держим бейджи в 0,
-    // а не показываем ложные/устаревшие числа.
-    applyBadgeData({ support: 0, orders: 0, tickets: 0, notif: 0 });
+    // Бейджи по реальным данным. "tickets" (заявки на доработку/service_tickets)
+    // оставлен на 0 — в схеме БД у этой таблицы нет поля "прочитано".
+    try {
+      const [notifResp, ordersResp, chatResp] = await Promise.all([
+        fetch(`${API}/notifications`, { credentials: 'include' }),
+        fetch(`${API}/orders`, { credentials: 'include' }),
+        fetch(`${API}/tickets`, { credentials: 'include' }),
+      ]);
+      const notif = notifResp.ok ? (await notifResp.json()).filter(n => !n.read).length : 0;
+      const orders = ordersResp.ok ? (await ordersResp.json()).filter(o => o.status === 6).length : 0;
+      const support = chatResp.ok ? (await chatResp.json()).filter(t => t.read === false).length : 0;
+      applyBadgeData({ support, orders, tickets: 0, notif });
+    } catch (e) {
+      console.error('nav.js watchBadges:', e);
+      applyBadgeData({ support: 0, orders: 0, tickets: 0, notif: 0 });
+    }
   }
 
   const API = `${b}api`.startsWith('http') ? `${b}api` : 'https://antviz.ru/api';

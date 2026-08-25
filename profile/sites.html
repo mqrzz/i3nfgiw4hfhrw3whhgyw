@@ -20,7 +20,9 @@
   --bg:#101113;
   --card:#191b1e;
   --card-elevated:#1e2124;
+  --surface2:#26282c;
   --stroke:#2a2d31;
+  --stroke-strong:rgba(255,255,255,0.12);
   --text:#f4f5f6;
   --text-dim:#9a9da2;
   --text-faint:#65686d;
@@ -33,7 +35,11 @@
   --amber-dim:rgba(255,183,77,0.14);
   --violet:#a78bfa;
   --violet-dim:rgba(167,139,250,0.16);
-  --shadow:0 12px 30px rgba(0,0,0,0.4);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.22);
+  --shadow-md:0 2px 4px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.38);
+  --shadow-lg:0 8px 16px rgba(0,0,0,0.32), 0 30px 60px rgba(0,0,0,0.5);
+  --shadow:var(--shadow-md);
+  --spring:cubic-bezier(.32,1.4,.5,1);
   --r64:64px;--r40:40px;--r32:32px;--r24:24px;--r20:20px;--r16:16px;--r14:14px;--r12:12px;
 
   /* алиасы под старые имена — используются далее в этом файле */
@@ -43,14 +49,16 @@
   --accent:var(--green);--accent-h:var(--green);--accent-d:var(--green-text);--accent-wash:var(--green-dim);
   --warn:var(--amber);--warn-wash:var(--amber-dim);
   --dark:var(--card-elevated);--dark2:var(--stroke);
-  --sh1:none;--sh2:none;
+  --sh1:var(--shadow-sm);--sh2:var(--shadow-md);
   --font:'Geologica','Inter','Arial',sans-serif;
 }
 html[data-theme="light"]{
-  --bg:#f3f4f6;
+  --bg:#eef0f2;
   --card:#ffffff;
-  --card-elevated:#fafbfc;
+  --card-elevated:#f7f8f9;
+  --surface2:#eef0f2;
   --stroke:#e6e8eb;
+  --stroke-strong:rgba(15,17,20,0.13);
   --text:#15171a;
   --text-dim:#6b6f76;
   --text-faint:#9a9da2;
@@ -59,7 +67,10 @@ html[data-theme="light"]{
   --blue-dim:rgba(77,159,255,0.12);
   --amber-dim:rgba(230,150,40,0.14);
   --violet:#8b7bf7;--violet-dim:rgba(139,123,247,.12);
-  --shadow:0 12px 30px rgba(20,20,25,0.08);
+  --shadow-sm:0 1px 2px rgba(20,20,25,0.04), 0 2px 6px rgba(20,20,25,0.05);
+  --shadow-md:0 2px 4px rgba(20,20,25,0.04), 0 16px 32px rgba(20,20,25,0.09);
+  --shadow-lg:0 8px 16px rgba(20,20,25,0.06), 0 30px 60px rgba(20,20,25,0.16);
+  --shadow:var(--shadow-md);
 }
 html{scroll-behavior:smooth;overflow-x:hidden}
 body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:400;letter-spacing:-.03em;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .2s ease,color .2s ease}
@@ -77,22 +88,38 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .shell{width:100%;max-width:640px;min-width:0;animation:fadeUp .25s ease}
 @media(min-width:981px){
   .shell{max-width:1240px}
-  .page-hero{padding:38px}
-  .page-hero-title{font-size:29px}
-  .page-hero-sub{font-size:15px}
-  .site-card{padding:32px}
-  .site-favicon-wrap{width:60px;height:60px}
-  .site-favicon-wrap img{width:34px;height:34px}
-  .site-favicon-wrap svg{width:30px;height:30px}
-  .site-domain{font-size:22px;margin-bottom:22px}
-  .site-meta-chip{font-size:14px}
-  .site-meta-ico{width:34px;height:34px}
-  .site-status-pill{font-size:12px;padding:7px 14px}
+  .page-hero{padding:40px}
+  .page-hero-eyebrow{font-size:13px}
+  .page-hero-title{font-size:32px}
+  .page-hero-sub{font-size:16px;margin-top:6px}
+  .btn{font-size:14px;padding:13px 22px}
+  .btn-sm{font-size:13px;padding:11px 18px}
+  .sites-grid{gap:22px}
+  .site-card{padding:34px}
+  .site-card-head{margin-bottom:22px;gap:16px}
+  .site-favicon-wrap{width:64px;height:64px;border-radius:var(--r20)}
+  .site-favicon-wrap img{width:36px;height:36px}
+  .site-favicon-wrap svg{width:32px;height:32px}
+  .site-domain{font-size:24px;margin-bottom:24px}
+  .site-meta-list{gap:13px;margin-bottom:22px}
+  .site-meta-chip{font-size:15px;gap:14px}
+  .site-meta-ico{width:36px;height:36px}
+  .site-meta-ico svg{width:16px;height:16px}
+  .site-status-pill{font-size:12.5px;padding:8px 15px}
+  .support-banner{font-size:14.5px;padding:16px 18px;gap:14px}
+  .support-banner svg{width:18px;height:18px}
+  .site-actions{gap:12px}
+  .empty{padding:110px 16px}
+  .empty-ico-wrap{width:88px;height:88px}
+  .empty-ico-wrap svg{width:42px;height:42px}
+  .empty h3{font-size:20px}
+  .empty p{font-size:14.5px}
 }
 
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 20px 8px;gap:10px}
 .topbar-right{display:flex;gap:10px}
-.icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit}
+.icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;transition:transform .15s var(--spring),background .15s}
+.icon-btn:active{transform:scale(.92);background:var(--surface2)}
 .icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);display:none}
 .icon-btn svg{width:21px;height:21px}
 .icon-btn .sun{display:none}
@@ -102,14 +129,15 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 @media (min-width:981px){ #menuBtnMobile{display:none} }
 
 /* HERO */
-.page-hero{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.page-hero{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:var(--shadow-md)}
 .page-hero-eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px}
 .page-hero-title{font-size:23px;font-weight:600;letter-spacing:-.03em;line-height:1.15;color:var(--text)}
 .page-hero-title em{font-style:normal;color:var(--green-text)}
 .page-hero-sub{color:var(--text-dim);font-size:13px;margin-top:3px}
 
 /* BUTTONS — без nowrap, чтобы длинный текст мог переноситься и не раздвигал грид */
-.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;gap:8px;font-family:var(--font);font-weight:600;text-decoration:none;cursor:pointer;border:none;border-radius:var(--r16);padding:12px 20px;font-size:13px;letter-spacing:-.01em;transition:background .12s,border-color .12s,color .12s,opacity .15s;min-width:0}
+.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;gap:8px;font-family:var(--font);font-weight:600;text-decoration:none;cursor:pointer;border:none;border-radius:var(--r16);padding:12px 20px;font-size:13px;letter-spacing:-.01em;transition:background .12s,border-color .12s,color .12s,opacity .15s,transform .15s var(--spring);min-width:0}
+.btn:active{transform:scale(.96)}
 .btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
 .btn-green{background:var(--green);color:#0d1210}
 .btn-green:hover{opacity:.9}
@@ -125,8 +153,8 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 @media(max-width:860px){.sites-grid{grid-template-columns:1fr}}
 
 /* SITE CARD */
-.site-card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:24px;display:flex;flex-direction:column;min-width:0;animation:rowIn .25s ease both;transition:border-color .15s}
-.site-card:hover{border-color:var(--text-faint)}
+.site-card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:24px;display:flex;flex-direction:column;min-width:0;animation:rowIn .25s ease both;box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s}
+.site-card:hover{border-color:var(--text-faint);box-shadow:var(--shadow-md)}
 
 .site-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
 .site-favicon-wrap{width:52px;height:52px;border-radius:var(--r16);background:linear-gradient(135deg,#4eea94,#149955);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 8px 18px -8px rgba(20,153,85,.4)}

@@ -16,25 +16,6 @@
 </style>
 </head>
 <body>
-<script>
-  // ИСПРАВЛЕНО: раньше эта страница показывала спиннер "Входим в аккаунт…" при КАЖДОМ
-  // открытии кнопки в боте — даже когда сессия уже давно есть, просто потому что Firebase
-  // Auth поднимает сохранённую сессию из IndexedDB асинхронно, и пока это не случится,
-  // страница уже успевает отрисоваться. Теперь при первом успешном входе (и обменом кода,
-  // и когда сессия уже была) мы кладём простой флаг в localStorage — он читается СИНХРОННО,
-  // мгновенно, без ожидания Firebase SDK. Если флаг есть — уходим на кабинет тем же кадром,
-  // спиннер физически не успевает показаться. Если флага нет (первый заход на этом
-  // устройстве/браузере) — работает обычная логика ниже, с обменом кода через сервер.
-  (function(){
-    try{
-      if(localStorage.getItem('tgAuthed') === '1'){
-        const p = new URLSearchParams(location.search);
-        const to = p.get('to') || 'https://antviz.ru/profile.html';
-        location.replace(to);
-      }
-    }catch(e){ /* localStorage недоступен (приватный режим и т.п.) — просто идём обычным путём */ }
-  })();
-</script>
   <div class="box">
     <div class="spin" id="spin"></div>
     <p id="msg">Входим в аккаунт…</p>
@@ -42,21 +23,20 @@
   </div>
 
 <script type="module">
-import { auth } from './firebase-config.js';
-import { onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+// ВАЖНО: раньше эта страница была целиком на Firebase (signInWithCustomToken) —
+// это НЕ создавало cookie-сессию нового бэкенда, и вход по кнопке из бота
+// физически не работал никогда, даже до всех остальных правок в этом чате.
+// Теперь всё просто: одна проверка "уже залогинен?" + один обмен кода на
+// сессию, оба запроса — напрямую на antviz.ru/api (свой же домен, никакого
+// моста через Vercel не нужно, в отличие от оплаты).
 
-const EXCHANGE_URL = 'https://3ssqztgbot22wsq.vercel.app/api/exchange-app-token';
-
+const API = 'https://antviz.ru/api';
 const params = new URLSearchParams(location.search);
 const code = params.get('t');
 const to = params.get('to') || 'https://antviz.ru/profile.html';
 const msgEl = document.getElementById('msg');
 const spinEl = document.getElementById('spin');
 const fallbackEl = document.getElementById('fallback');
-
-function markAuthed(){
-  try{ localStorage.setItem('tgAuthed', '1'); }catch(e){}
-}
 
 function fail(text){
   spinEl.style.display='none';
@@ -65,42 +45,44 @@ function fail(text){
   fallbackEl.innerHTML = `<a class="btn" href="${to}">Открыть кабинет</a>`;
 }
 
-async function exchangeAndSignIn(){
-  if(!code){ fail('Ссылка неполная — откройте кабинет и войдите обычным способом.'); return; }
+async function alreadyLoggedIn(){
   try{
-    const r = await fetch(EXCHANGE_URL, {
+    const r = await fetch(`${API}/auth/me`, { credentials:'include' });
+    return r.ok;
+  }catch(e){ return false; }
+}
+
+async function exchangeCode(){
+  if(!code){ fail('Ссылка неполная — откройте кабинет и войдите обычным способом.'); return false; }
+  try{
+    const r = await fetch(`${API}/auth/bot-login`, {
       method:'POST',
+      credentials:'include',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({ code })
     });
-    if(!r.ok) throw new Error('exchange failed: ' + r.status);
-    const data = await r.json();
-    if(!data.customToken) throw new Error('no customToken');
-    await signInWithCustomToken(auth, data.customToken);
-    markAuthed();
-    window.location.replace(to);
+    if(!r.ok){
+      const d = await r.json().catch(()=>({}));
+      throw new Error(d.error || ('bot-login failed: ' + r.status));
+    }
+    return true;
   }catch(e){
     console.error('tg-enter error:', e);
-    fail('Не получилось войти автоматически — ссылка могла устареть. Откройте кабинет и войдите обычным способом.');
+    return false;
   }
 }
 
-// ГЛАВНОЕ: если в этом Telegram-браузере уже есть действующая сессия (заходили
-// отсюда раньше) — сразу переходим дальше, без единого запроса к серверу.
-// Обмен кода на вход идёт в сеть (Vercel + Firestore + Firebase) только один
-// раз, при самом первом заходе — все следующие нажатия кнопок в боте открывают
-// кабинет мгновенно, локально, без сети.
-let decided = false;
-onAuthStateChanged(auth, user => {
-  if(decided) return;
-  decided = true;
-  if(user){
-    markAuthed();
+(async function init(){
+  if(await alreadyLoggedIn()){
+    window.location.replace(to);
+    return;
+  }
+  if(await exchangeCode()){
     window.location.replace(to);
   }else{
-    exchangeAndSignIn();
+    fail('Не получилось войти автоматически — ссылка могла устареть (действует 3 минуты). Откройте кабинет и войдите обычным способом, либо нажмите кнопку в боте ещё раз.');
   }
-});
+})();
 </script>
 </body>
 </html>

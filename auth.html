@@ -820,6 +820,34 @@
     }
   }
 
+  // ── Привязка Telegram сразу после входа/регистрации, если страница
+  // открыта как Mini App внутри Telegram (кнопка "Ещё нет аккаунта / хочу
+  // через бота" в самом боте открывает именно эту страницу). Раньше этот
+  // вызов нигде не стоял вообще — бот отправлял приветствие с кнопками
+  // только если привязка реально произошла, а её никто не запускал.
+  async function linkTelegramIfInApp(){
+    const tg = window.Telegram?.WebApp;
+    const initData = tg?.initData;
+    if(!initData) return; // открыто в обычном браузере — привязывать нечего
+
+    try{
+      const { token } = await apiPost('/auth/service-token', {});
+      const resp = await fetch('https://3ssqztgbot22wsq.vercel.app/api/link-webapp', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+        body: JSON.stringify({ initData })
+      });
+      if(resp.ok){
+        toast('Аккаунт создан и привязан к Telegram — в боте появились кнопки','success');
+        tg.close?.();
+      }
+    }catch(e){
+      console.error('linkTelegramIfInApp:', e);
+      // Не блокируем вход из-за этого — просто останется непривязанным,
+      // можно привязать вручную в Настройках.
+    }
+  }
+
   async function apiPost(path, body){
     const resp = await fetch(`${API}${path}`, {
       method:'POST',
@@ -927,6 +955,7 @@
     }
     try{
       await apiPost('/auth/login', { email, password: pass });
+      await linkTelegramIfInApp();
       const ref = document.referrer;
       window.location.href = (ref && ref.includes('order')) ? 'order' : 'profile';
     }catch(e){
@@ -1002,6 +1031,7 @@
     setBtnState('registerBtn','Подождите...','Подтвердить',true);
     try{
       await apiPost('/auth/register/verify', { email, code });
+      await linkTelegramIfInApp();
       window.location.href='welcome';
     }catch(e){
       setBtnState('registerBtn','Подождите...','Подтвердить',false);

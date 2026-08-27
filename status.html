@@ -545,7 +545,10 @@
 
   let currentServices = [];
 
-  async function loadStatus(){
+  // silent=true пропускает перерисовку админ-панели — используется для фонового
+  // автообновления раз в минуту, чтобы не затирать форму, если админ прямо сейчас
+  // что-то там заполняет (именно это раньше "само снимало" галочку override).
+  async function loadStatus(silent){
     try{
       const resp = await fetch(`${API_BASE}/status`);
       if(!resp.ok) throw new Error('bad response');
@@ -559,7 +562,7 @@
       renderServices(data.services);
       renderIncidents(data.incidents);
       lastIncidentsForAdmin = data.incidents;
-      renderAdminPanel(); // сервисы могли обновиться — перерисуем форму создания инцидента
+      if(!silent) renderAdminPanel(); // перерисовываем только после явного действия админа, не в фоне
     } catch(err){
       console.error('Не удалось загрузить статус:', err);
       document.querySelector('.status-text h1').textContent = 'Не удалось загрузить статус';
@@ -568,7 +571,7 @@
   }
 
   loadStatus();
-  setInterval(loadStatus, 60 * 1000); // обновляем раз в минуту без перезагрузки страницы
+  setInterval(() => loadStatus(true), 60 * 1000); // фон: только данные, без перерисовки форм админки
 
   // ---- Подписка (реальный POST на сервер) ----
   function openModal(){

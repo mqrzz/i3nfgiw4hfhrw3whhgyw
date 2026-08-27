@@ -661,6 +661,7 @@
           <button class="admin-tab" data-tab="update">Обновить инцидент</button>
           <button class="admin-tab" data-tab="service">Статус сервиса</button>
           <button class="admin-tab" data-tab="sources">Источники проверки</button>
+          <button class="admin-tab" data-tab="delete">Удалить инцидент</button>
         </div>
 
         <form id="admin-incident-form" class="admin-form">
@@ -738,6 +739,14 @@
           <button type="submit" class="admin-submit">Сохранить источник проверки</button>
         </form>
 
+        <form id="admin-delete-form" class="admin-form" style="display:none;">
+          <label>Инцидент</label>
+          <select id="del-incident">
+            ${allIncidentsOptions()}
+          </select>
+          <button type="submit" class="admin-submit" style="background:var(--major);">Удалить безвозвратно</button>
+        </form>
+
         <div id="admin-msg" style="font-size:13px; margin-top:4px;"></div>
       </div>
     `;
@@ -750,6 +759,7 @@
         panel.querySelector('#admin-update-form').style.display = tab.dataset.tab === 'update' ? 'flex' : 'none';
         panel.querySelector('#admin-service-form').style.display = tab.dataset.tab === 'service' ? 'flex' : 'none';
         panel.querySelector('#admin-sources-form').style.display = tab.dataset.tab === 'sources' ? 'flex' : 'none';
+        panel.querySelector('#admin-delete-form').style.display = tab.dataset.tab === 'delete' ? 'flex' : 'none';
       });
     });
 
@@ -860,6 +870,18 @@
         await loadAdminServicesRaw();
       } catch(err){ showMsg(err.message, false); }
     });
+
+    panel.querySelector('#admin-delete-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const incidentId = panel.querySelector('#del-incident').value;
+      if(!incidentId){ showMsg('Нечего удалять.', false); return; }
+      if(!confirm('Удалить инцидент безвозвратно? Отменить будет нельзя.')) return;
+      try{
+        await adminPost(`/status/incidents/${incidentId}`, {}, 'DELETE');
+        showMsg('Инцидент удалён.', true);
+        loadStatus();
+      } catch(err){ showMsg(err.message, false); }
+    });
   }
 
   let lastIncidentsForAdmin = [];
@@ -869,6 +891,12 @@
       .filter(i => i.status !== 'resolved')
       .map(i => `<option value="${i.id}">${esc(i.title)}</option>`)
       .join('') || '<option value="">— все инциденты устранены —</option>';
+  }
+  function allIncidentsOptions(){
+    if(lastIncidentsForAdmin.length === 0) return '<option value="">— нет инцидентов —</option>';
+    return lastIncidentsForAdmin
+      .map(i => `<option value="${i.id}">${esc(i.title)} (${incidentBadgeLabels[i.status] || i.status})</option>`)
+      .join('');
   }
 </script>
 

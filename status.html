@@ -714,6 +714,7 @@
             <input type="checkbox" id="as-override" style="width:auto;">
             Зафиксировать вручную (автопроверка не будет менять статус, пока не снимешь галочку)
           </label>
+          <p style="font-size:12px; color:var(--text-faint); margin-top:2px;" id="as-current-hint"></p>
           <button type="submit" class="admin-submit">Применить</button>
         </form>
 
@@ -810,7 +811,22 @@
       } catch(err){ showMsg(err.message, false); }
     });
 
-    // При выборе сервиса
+    // Подставляем РЕАЛЬНОЕ текущее состояние сервиса при выборе — раньше форма всегда
+    // открывалась с "Работает" + снятой галочкой, из-за чего повторная отправка
+    // случайно стирала ранее включённый manualOverride, даже если его не трогали.
+    const asServiceSelect = panel.querySelector('#as-service');
+    function fillServiceForm(){
+      const s = currentServices.find(x => x.id === asServiceSelect.value);
+      if(!s) return;
+      panel.querySelector('#as-status').value = s.status;
+      panel.querySelector('#as-override').checked = !!s.manualOverride;
+      panel.querySelector('#as-current-hint').textContent =
+        s.manualOverride ? 'Сейчас статус зафиксирован вручную.' : 'Сейчас статус выставляет автопроверка.';
+    }
+    asServiceSelect.addEventListener('change', fillServiceForm);
+    if(currentServices.length) fillServiceForm();
+
+    // При выборе сервиса в «Источниках проверки» — подставляем его текущие значения
     const srcServiceSelect = panel.querySelector('#src-service');
     function fillSourceForm(){
       const s = adminServicesRaw.find(x => x.id === srcServiceSelect.value);

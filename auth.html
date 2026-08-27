@@ -840,11 +840,14 @@
       if(resp.ok){
         toast('Аккаунт создан и привязан к Telegram — в боте появились кнопки','success');
         tg.close?.();
+      }else{
+        const errText = await resp.text().catch(()=> '');
+        console.error('linkTelegramIfInApp: link-webapp вернул', resp.status, errText);
+        toast('Вошли, но привязать Telegram не получилось ('+resp.status+'). Привяжите вручную в Настройках.','error');
       }
     }catch(e){
       console.error('linkTelegramIfInApp:', e);
-      // Не блокируем вход из-за этого — просто останется непривязанным,
-      // можно привязать вручную в Настройках.
+      toast('Вошли, но привязать Telegram не получилось. Привяжите вручную в Настройках.','error');
     }
   }
 

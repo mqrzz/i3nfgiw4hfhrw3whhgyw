@@ -99,7 +99,11 @@
     display:flex; align-items:center; justify-content:space-between;
     gap:20px; flex-wrap:wrap;
     box-shadow:var(--sh1);
+    transition:background .2s, border-color .2s;
   }
+  .status-banner.sev-degraded, .status-banner.sev-maint{ background:rgba(240,180,41,0.10); border-color:rgba(240,180,41,0.35); }
+  .status-banner.sev-partial{ background:rgba(242,146,74,0.10); border-color:rgba(242,146,74,0.35); }
+  .status-banner.sev-major{ background:rgba(229,72,77,0.10); border-color:rgba(229,72,77,0.35); }
   .status-banner-left{display:flex; align-items:center; gap:16px;}
   .pulse{
     position:relative; width:16px; height:16px; flex-shrink:0;
@@ -107,6 +111,9 @@
   .pulse::before, .pulse::after{
     content:''; position:absolute; inset:0; border-radius:50%; background:var(--ok);
   }
+  .pulse.sev-degraded::before, .pulse.sev-maint::before, .pulse.sev-degraded::after, .pulse.sev-maint::after{ background:var(--degraded); }
+  .pulse.sev-partial::before, .pulse.sev-partial::after{ background:var(--partial); }
+  .pulse.sev-major::before, .pulse.sev-major::after{ background:var(--major); }
   .pulse::before{animation:pulse-ring 2.2s cubic-bezier(0.4,0,0.6,1) infinite;}
   .pulse::after{transform:scale(0.55);}
   @keyframes pulse-ring{
@@ -420,6 +427,14 @@
     ok: 'Все системы работают', degraded: 'Наблюдается замедление',
     maint: 'Идут плановые работы', partial: 'Частичный сбой сервисов', major: 'Серьёзные перебои в работе'
   };
+  // Формулировка баннера: если проблема ровно у одного сервиса — называем его прямо,
+  // не пишем "серьёзные перебои" на весь сайт из-за одного упавшего сервиса.
+  function buildOverallLabel(overall, affectedNames){
+    if(overall === 'ok' || affectedNames.length === 0) return overallLabels.ok;
+    if(affectedNames.length === 1) return `Проблема с сервисом «${affectedNames[0]}»`;
+    if(affectedNames.length <= 3) return `Проблемы с сервисами: ${affectedNames.join(', ')}`;
+    return overallLabels[overall] || overallLabels.major;
+  }
   const incidentBadgeLabels = {
     investigating: 'Расследуем', identified: 'Причина найдена',
     monitoring: 'Наблюдаем', resolved: 'Устранено'
@@ -456,7 +471,7 @@
     return days.map((d, idx) => {
       const daysAgo = days.length - 1 - idx;
       let cls = 'ok', tip;
-      if(d.ok === null){ cls = 'ok'; tip = daysAgo === 0 ? 'Сегодня — нет данных' : `${daysAgo} дн. назад — нет данных`; }
+      if(d.ok === null){ cls = 'ok'; tip = daysAgo === 0 ? 'Сегодня — нет автопроверки' : `${daysAgo} дн. назад — нет автопроверки`; }
       else if(d.ok){ tip = daysAgo === 0 ? 'Сегодня — норма' : `${daysAgo} дн. назад — норма`; }
       else { cls = 'major'; tip = daysAgo === 0 ? 'Сегодня — сбой' : `${daysAgo} дн. назад — сбой`; }
       return `<div class="bar ${cls}" data-tip="${esc(tip)}"></div>`;
@@ -469,7 +484,7 @@
     services.forEach(s => {
       const row = document.createElement('div');
       row.className = 'service-row';
-      const uptimeLabel = s.uptimePct === null ? 'нет данных' : `${s.uptimePct}% за 90 дней`;
+      const uptimeLabel = s.uptimePct === null ? 'нет автопроверки (статус только вручную)' : `${s.uptimePct}% за 90 дней`;
       row.innerHTML = `
         <div class="service-top">
           <div class="service-name">${esc(s.name)}</div>
@@ -490,10 +505,10 @@
   }
 
   function fmtDate(iso){
-    return new Date(iso).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+    return new Date(iso).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Moscow' });
   }
   function fmtTime(iso){
-    return new Date(iso).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit' }) + ' MSK';
+    return new Date(iso).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' }) + ' MSK';
   }
 
   function renderIncidents(incidents){
@@ -555,9 +570,13 @@
       const data = await resp.json();
 
       currentServices = data.services;
-      document.querySelector('.status-text h1').textContent = overallLabels[data.overall] || overallLabels.ok;
+      document.querySelector('.status-text h1').textContent = buildOverallLabel(data.overall, data.affectedServiceNames || []);
+      const banner = document.querySelector('.status-banner');
+      const pulse = document.querySelector('.pulse');
+      banner.className = 'status-banner' + (data.overall !== 'ok' ? ` sev-${data.overall}` : '');
+      pulse.className = 'pulse' + (data.overall !== 'ok' ? ` sev-${data.overall}` : '');
       document.getElementById('last-updated').textContent =
-        'Обновлено ' + new Date(data.updatedAt).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'long' });
+        'Обновлено ' + new Date(data.updatedAt).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'long', timeZone: 'Europe/Moscow' }) + ' MSK';
 
       renderServices(data.services);
       renderIncidents(data.incidents);

@@ -5,157 +5,213 @@
 <title>Чаты — Antviz Admin.</title>
 <link rel="icon" href="../img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#f2f4f7;overflow:hidden}
+html,body{height:100%;background:#f6f7fa}
 :root{
-  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;
-  --bg:#fff;--bg2:#f2f4f7;--bg3:#f9fafc;
-  --text:#191b1e;--muted:#707a8a;--border:#dfe3e8;--border2:#cbcdd6;
-  --dark:#191b1e;--dark2:#2b2f33;
-  --red:#e8634f;--warn:#f59e0b;--info:#3b82f6;
+  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;--green-soft2:#d1f5e0;
+  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;
+  --bg:#f6f7fa;--card:#ffffff;--card2:#fbfbfd;
+  --text:#15181d;--muted:#8b93a1;--muted2:#b3b9c4;--line:#eceef2;--line2:#e2e5eb;
+  --dark:#15181d;--dark2:#22262c;
   --font:'Geologica','Inter',sans-serif;
-  --sw:256px;--th:68px;
+  --sw:252px;
+  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:24px;--r-xl:28px;--r-pill:999px;
+  --sh-sm:0 1px 2px rgba(20,23,30,.05),0 1px 1px rgba(20,23,30,.03);
+  --sh-md:0 10px 24px rgba(20,23,30,.07),0 2px 6px rgba(20,23,30,.04);
+  --sh-lg:0 24px 60px rgba(20,23,30,.14),0 8px 20px rgba(20,23,30,.06);
 }
 body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoothing:antialiased}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
 
 .ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 .sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 .lt{font-size:13px;color:rgba(255,255,255,.35)}
 
+.app{display:flex;height:100vh;overflow:hidden}
+
 /* SIDEBAR */
-.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:200}
-.sb-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07)}
-.lm{width:34px;height:34px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.lm svg{width:18px;height:18px;fill:var(--dark)}
-.ln{font-weight:500;font-size:.95rem;color:#fff;letter-spacing:-.02em}
-.lbadge{margin-left:auto;font-size:.58rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;background:rgba(232,99,79,.15);color:var(--red);border:1px solid rgba(232,99,79,.25);padding:.15rem .5rem;border-radius:7px}
-.sb-nav{flex:1;padding:14px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.ns{font-size:.6rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.25);padding:14px 10px 5px;margin-top:6px}
-.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;text-decoration:none;color:rgba(255,255,255,.45);font-size:.85rem;font-weight:300;transition:background .12s,color .12s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
-.ni:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
-.ni.active{background:rgba(30,222,123,.12);color:var(--green)}
-.ni svg{width:16px;height:16px;flex-shrink:0;stroke:currentColor;stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sb{width:var(--sw);flex-shrink:0;background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;z-index:200}
+.sb-logo{padding:22px 18px 18px;display:flex;align-items:center;gap:11px;text-decoration:none}
+.lm{width:36px;height:36px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(30,222,123,.35)}
+.lm svg{width:19px;height:19px;fill:var(--dark)}
+.ln{font-weight:500;font-size:1.05rem;color:var(--text);letter-spacing:-.02em}
+.lbadge{margin-left:auto;font-size:.58rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;background:var(--red-soft);color:var(--red);padding:.18rem .5rem;border-radius:7px}
+.sb-nav{flex:1;padding:8px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.ns{font-size:.6rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted2);padding:16px 10px 6px}
+.ni{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:var(--r-sm);text-decoration:none;color:var(--muted);font-size:.86rem;font-weight:400;transition:background .12s,color .12s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
+.ni:hover{background:var(--bg);color:var(--text)}
+.ni.active{background:var(--green-soft);color:var(--green-d);font-weight:500}
+.ni svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .nb{position:absolute;right:10px;background:var(--red);color:#fff;font-size:.58rem;font-weight:500;min-width:17px;height:17px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;animation:pulse 2s infinite}
-.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-foot{padding:12px;border-top:1px solid var(--line)}
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(10,12,16,.42);z-index:150}
+.sidebar-overlay.show{display:block}
 
-/* TOPBAR */
-.tb{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;z-index:100}
-.tb-l{display:flex;align-items:center;gap:16px}
-.tb-title{font-weight:500;font-size:1rem;letter-spacing:-.02em}
-.tb-stats{display:flex;gap:6px}
-.ts{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:.3rem .85rem;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:5px}
-.ts strong{font-weight:500;color:var(--text)}
-.btn-new{display:inline-flex;align-items:center;gap:7px;background:var(--dark);color:#fff;font-family:var(--font);font-size:.82rem;font-weight:400;padding:.5rem 1.1rem;border-radius:12px;border:none;cursor:pointer;transition:background .15s}
-.btn-new:hover{background:var(--dark2)}
+/* MOBILE TOP BAR */
+.mobile-top{display:none;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0}
+.icon-btn{width:38px;height:38px;border-radius:var(--r-sm);border:none;background:var(--bg);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.icon-btn.round{border-radius:50%}
+.mt-title{font-weight:500;font-size:1rem;letter-spacing:-.02em}
 
-/* SHELL */
-.shell{position:fixed;top:var(--th);left:var(--sw);right:0;bottom:0;display:grid;grid-template-columns:300px 1fr}
+/* MAIN */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.shell{flex:1;min-height:0;display:grid;grid-template-columns:340px 1fr;overflow:hidden}
 
 /* LIST COL */
-.lc{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
-.lc-head{padding:16px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:10px}
-.sb-box{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:.55rem .9rem;transition:border-color .15s}
-.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
-.sb-box svg{width:14px;height:14px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
-.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.84rem;font-weight:300;color:var(--text);width:100%}
-.tab-row{display:flex;gap:4px;flex-wrap:wrap}
-.tab{background:none;border:1.5px solid var(--border);border-radius:9px;padding:.28rem .7rem;font-family:var(--font);font-size:.74rem;font-weight:300;color:var(--muted);cursor:pointer;transition:all .12s}
-.tab:hover{color:var(--text);border-color:var(--border2)}
-.tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
-.tickets-scroll{flex:1;overflow-y:auto}
-.ti{padding:16px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s;position:relative}
-.ti:hover{background:var(--bg2)}
-.ti.sel{background:rgba(30,222,123,.06);border-left:3px solid var(--green)}
-.ti-subj{font-size:.88rem;font-weight:500;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
-.ti-order-tag{font-size:.66rem;font-weight:500;color:var(--info,#3b82f6);background:rgba(59,130,246,.1);padding:.16rem .5rem;border-radius:6px}
-.ti-order-link{font-size:.74rem;font-weight:500;color:var(--green-d,#149955);text-decoration:none;margin-left:8px}
+.lc{border-right:1px solid var(--line);display:flex;flex-direction:column;background:var(--card2);overflow:hidden}
+.lc-head{padding:22px 20px 14px;flex-shrink:0;display:flex;flex-direction:column;gap:14px}
+.lc-head-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.lc-title{font-size:1.2rem;font-weight:500;letter-spacing:-.02em}
+.sb-box{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.6rem .95rem;transition:border-color .15s,box-shadow .15s}
+.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+.sb-box svg{width:15px;height:15px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.85rem;font-weight:300;color:var(--text);width:100%}
+.tab-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.tab-row::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:6px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-pill);padding:.4rem .85rem;font-family:var(--font);font-size:.78rem;font-weight:400;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0}
+.tab:hover{border-color:var(--muted2);color:var(--text)}
+.tab.active{background:var(--green-soft);border-color:var(--green-soft);color:var(--green-d);font-weight:500}
+.tab-count{background:rgba(0,0,0,.06);border-radius:var(--r-pill);padding:.05rem .4rem;font-size:.68rem;font-weight:500}
+.tab.active .tab-count{background:rgba(15,153,80,.15)}
+
+.tickets-scroll{flex:1;overflow-y:auto;padding:4px 14px 18px;display:flex;flex-direction:column;gap:8px}
+.ti{display:flex;gap:12px;background:var(--card);border-radius:var(--r-md);padding:14px;cursor:pointer;box-shadow:var(--sh-sm);transition:box-shadow .15s,transform .15s;animation:fadeIn .25s ease both}
+.ti:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.ti.sel{box-shadow:0 0 0 2px var(--green),var(--sh-md)}
+.ti-avatar{width:38px;height:38px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
+.ti-avatar svg{width:19px;height:19px;stroke:currentColor;stroke-width:1.8;fill:none}
+.ti-body{flex:1;min-width:0}
+.ti-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:3px}
+.ti-subj{font-size:.87rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:6px;min-width:0}
+.ti-subj-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti-order-tag{font-size:.64rem;font-weight:500;color:var(--info);background:var(--info-soft);padding:.14rem .45rem;border-radius:6px;flex-shrink:0}
+.ti-order-link{font-size:.74rem;font-weight:500;color:var(--green-d);text-decoration:none;margin-left:8px}
 .ti-order-link:hover{text-decoration:underline}
-.ti-meta{font-size:.74rem;color:var(--muted);display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px}
-.ti-prev{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ti-time{font-size:.68rem;color:var(--muted);margin-top:3px}
-.unread{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.5s infinite}
-.empty-l{text-align:center;padding:48px 16px;color:var(--muted);font-size:.84rem}
+.ti-prev{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
+.ti-meta{font-size:.72rem;color:var(--muted2);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.unread{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.5s infinite}
+.empty-l{text-align:center;padding:52px 16px;color:var(--muted);font-size:.84rem}
 
 /* CHAT COL */
-.cc{display:flex;flex-direction:column;background:var(--bg3);overflow:hidden}
-.no-sel{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:var(--muted)}
-.no-sel-icon{font-size:3rem;opacity:.3}
+.cc{display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
+.no-sel{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--muted2)}
+.no-sel-icon{width:52px;height:52px;border-radius:50%;background:var(--card);box-shadow:var(--sh-sm);display:flex;align-items:center;justify-content:center;color:var(--muted2)}
+.no-sel-icon svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.6;fill:none}
 
-.chat-topbar{padding:18px 24px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
-.ct-subj{font-weight:500;font-size:1rem;letter-spacing:-.02em;margin-bottom:5px}
-.ct-meta{font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.ct-actions{display:flex;gap:8px;flex-shrink:0;align-items:center}
+.back-btn{display:none;flex-shrink:0}
+.chat-topbar{padding:16px 24px;border-bottom:1px solid var(--line);background:var(--card);flex-shrink:0;display:flex;align-items:center;gap:14px}
+.ct-info{min-width:0;flex:1}
+.ct-subj{font-weight:500;font-size:.96rem;letter-spacing:-.02em;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ct-meta{font-size:.76rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ct-actions{display:flex;gap:8px;flex-shrink:0;align-items:center;position:relative}
 
-.chat-msgs{flex:1;overflow-y:auto;padding:24px 28px;display:flex;flex-direction:column;gap:4px;scroll-behavior:smooth}
-.msg-divider{font-size:.7rem;color:var(--muted);text-align:center;padding:10px 0}
-.msg-wrap{display:flex;flex-direction:column;margin-bottom:2px}
-.msg-label{font-size:.68rem;font-weight:500;margin-bottom:3px;color:var(--muted)}
+.kebab-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border-radius:var(--r-md);box-shadow:var(--sh-lg);padding:14px;width:220px;z-index:60;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s}
+.kebab-menu.show{opacity:1;pointer-events:all;transform:none}
+.kebab-menu .fl{margin-bottom:6px}
+
+.chat-msgs{flex:1;overflow-y:auto;padding:26px 28px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth}
+.msg-divider{font-size:.7rem;color:var(--muted2);text-align:center;padding:10px 0;font-weight:500}
+.msg-wrap{display:flex;flex-direction:column;margin-bottom:4px;animation:fadeIn .2s ease both}
+.msg-label{font-size:.68rem;font-weight:500;margin-bottom:4px;color:var(--muted)}
 .msg-label.sup{color:var(--green-d)}
 .msg-label.usr{text-align:right;color:var(--muted)}
-.msg{padding:12px 16px;border-radius:16px;max-width:72%;font-size:.88rem;line-height:1.55;word-break:break-word}
-.msg.usr{background:#e8f1ff;color:#1a3a6e;align-self:flex-end;border-bottom-right-radius:4px}
-.msg.sup{background:var(--bg);border:1.5px solid var(--border);color:var(--text);align-self:flex-start;border-bottom-left-radius:4px}
-.msg-time{font-size:.65rem;color:var(--muted);display:block;margin-top:5px}
-.msg-img{max-width:220px;border-radius:10px;margin-top:8px;border:1.5px solid var(--border);display:block;cursor:pointer}
+.msg{padding:12px 16px;border-radius:var(--r-md);max-width:70%;font-size:.88rem;line-height:1.55;word-break:break-word;box-shadow:var(--sh-sm)}
+.msg.usr{background:var(--info-soft);color:#1a3a6e;align-self:flex-end;border-bottom-right-radius:6px}
+.msg.sup{background:var(--card);color:var(--text);align-self:flex-start;border-bottom-left-radius:6px}
+.msg-time{font-size:.65rem;color:var(--muted2);display:block;margin-top:6px}
+.msg-img{max-width:220px;border-radius:var(--r-sm);margin-top:8px;display:block;cursor:pointer;box-shadow:var(--sh-sm)}
 
-.chat-inp-area{padding:16px 24px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
-.chat-inp-row{display:flex;gap:8px;align-items:flex-end}
-.chat-ta{flex:1;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:.75rem 1rem;color:var(--text);font-family:var(--font);font-size:.88rem;font-weight:300;outline:none;resize:none;min-height:44px;max-height:120px;line-height:1.5;transition:border-color .15s}
-.chat-ta:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.chat-inp-area{padding:16px 22px 20px;background:var(--card);border-top:1px solid var(--line);flex-shrink:0}
+.chat-inp-row{display:flex;gap:8px;align-items:flex-end;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-lg);padding:6px 6px 6px 16px;transition:border-color .15s,box-shadow .15s}
+.chat-inp-row:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+.chat-ta{flex:1;background:none;border:none;padding:.55rem 0;color:var(--text);font-family:var(--font);font-size:.88rem;font-weight:300;outline:none;resize:none;min-height:22px;max-height:120px;line-height:1.5}
+.send-btn{width:38px;height:38px;border-radius:50%;background:var(--green);border:none;color:var(--dark);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s}
+.send-btn:hover{background:var(--green-h)}
+.send-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2;fill:none}
+.attach-btn{width:38px;height:38px;border-radius:50%;background:none;border:none;color:var(--muted);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s}
+.attach-btn:hover{background:var(--line);color:var(--text)}
+.attach-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none}
 
-/* BADGE/STATUS */
-.sbadge{display:inline-flex;align-items:center;padding:.2rem .6rem;border-radius:8px;font-size:.68rem;font-weight:500;white-space:nowrap}
-.s-open{background:rgba(59,130,246,.1);color:var(--info)}
-.s-in-progress{background:rgba(245,158,11,.1);color:var(--warn)}
-.s-resolved{background:rgba(30,222,123,.12);color:var(--green-d)}
-.s-closed{background:var(--bg2);color:var(--muted)}
+/* BADGES */
+.sbadge{display:inline-flex;align-items:center;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.68rem;font-weight:500;white-space:nowrap;flex-shrink:0}
+.s-open{background:var(--green-soft);color:var(--green-d)}
+.s-in-progress{background:var(--orange-soft);color:var(--orange-d)}
+.s-resolved{background:var(--green-soft);color:var(--green-d)}
+.s-closed{background:var(--line);color:var(--muted)}
 .pri-high{color:var(--red);font-size:.72rem;font-weight:500}
-.pri-medium{color:var(--warn);font-size:.72rem;font-weight:500}
+.pri-medium{color:var(--orange-d);font-size:.72rem;font-weight:500}
 .pri-low{color:var(--muted);font-size:.72rem}
 
 /* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--font);font-weight:500;font-size:.82rem;border:none;border-radius:12px;padding:.5rem 1rem;cursor:pointer;transition:background .1s,transform .1s;text-decoration:none;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.83rem;border:none;border-radius:var(--r-sm);padding:.55rem 1.1rem;cursor:pointer;transition:background .15s,transform .1s,box-shadow .15s;text-decoration:none;white-space:nowrap}
 .btn:hover{transform:translateY(-1px)}
-.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
+.btn-green{background:var(--green);color:var(--dark);box-shadow:0 6px 16px rgba(30,222,123,.3)}.btn-green:hover{background:var(--green-h)}
 .btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:var(--dark2)}
-.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--muted)}.btn-outline:hover{border-color:var(--text);color:var(--text)}
-.btn-danger{background:rgba(232,99,79,.08);color:var(--red);border:1px solid rgba(232,99,79,.2)}.btn-danger:hover{background:rgba(232,99,79,.15)}
-.btn-sm{padding:.38rem .8rem;font-size:.78rem;border-radius:10px}
+.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
+.btn-danger{background:var(--red-soft);color:var(--red)}.btn-danger:hover{background:#fbdbd6}
+.btn-block{width:100%;justify-content:center;padding:.85rem 1rem;font-size:.9rem}
+.btn-sm{padding:.4rem .85rem;font-size:.78rem;border-radius:var(--r-xs)}
 
-.status-sel{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:.38rem .75rem;color:var(--text);font-family:var(--font);font-size:.78rem;outline:none;cursor:pointer;transition:border-color .15s}
+.status-sel{width:100%;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-xs);padding:.5rem .7rem;color:var(--text);font-family:var(--font);font-size:.82rem;outline:none;cursor:pointer;margin-bottom:10px}
 .status-sel:focus{border-color:var(--green)}
 
-/* MODAL */
-.modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--bg);border-radius:28px;padding:32px;width:100%;max-width:500px;box-shadow:0 24px 64px rgba(0,0,0,.15)}
-.modal-title{font-weight:500;font-size:1rem;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.02em}
-.modal-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .15s}
-.modal-close:hover{background:var(--bg2)}
-.fg{margin-bottom:16px}
-.fl{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;font-weight:500}
-.fi,.fta,.fsel{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:.75rem 1rem;color:var(--text);font-family:var(--font);font-size:.88rem;font-weight:300;outline:none;transition:border-color .15s}
-.fi:focus,.fta:focus,.fsel:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
-.fta{resize:vertical;min-height:80px;line-height:1.5}
-.fsel{cursor:pointer}
-.modal-footer{display:flex;gap:8px;margin-top:24px}
-.modal-footer .btn{flex:1;justify-content:center}
+/* CREATE TICKET — FULL PANEL */
+.create-panel{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.create-panel.open{transform:translateX(0)}
+.cp-head{display:flex;align-items:center;gap:14px;padding:18px 24px;background:var(--card);border-bottom:1px solid var(--line);flex-shrink:0}
+.cp-title{font-weight:500;font-size:1.05rem;letter-spacing:-.02em}
+.cp-body{flex:1;overflow-y:auto;padding:32px 20px 120px}
+.cp-form{max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+.fg{display:flex;flex-direction:column;gap:7px}
+.fl{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.fi,.fta,.fsel{width:100%;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.85rem 1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s,box-shadow .15s}
+.fi:focus,.fta:focus,.fsel:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+.fta{resize:vertical;min-height:110px;line-height:1.55}
+.fsel{cursor:pointer;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%238b93a1" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');background-repeat:no-repeat;background-position:right 14px center;background-size:16px}
+.dropzone{border:1.5px dashed var(--line2);border-radius:var(--r-md);padding:28px 16px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.dropzone:hover,.dropzone.drag{border-color:var(--green);background:var(--green-soft)}
+.dropzone svg{width:22px;height:22px;stroke:var(--muted2);stroke-width:1.6;fill:none}
+.dropzone-text{font-size:.82rem}
+.dropzone-sub{font-size:.72rem;color:var(--muted2)}
+.dz-file{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.65rem .9rem;font-size:.82rem}
+.dz-file img{width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.dz-file .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-file .rm{background:none;border:none;color:var(--muted);cursor:pointer;width:24px;height:24px;flex-shrink:0}
+.dz-file .rm svg{width:15px;height:15px;stroke:currentColor;stroke-width:2}
+.cp-foot{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 60%,transparent);padding:20px 20px 24px}
+.cp-foot-inner{max-width:600px;margin:0 auto}
 
 /* LIGHTBOX */
-.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(10,12,16,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .lightbox.show{opacity:1;pointer-events:all}
-.lightbox img{max-width:90vw;max-height:90vh;border-radius:14px;object-fit:contain}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--r-md);object-fit:contain}
 .lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
 
-.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.75rem 1.4rem;border-radius:var(--r-md);font-size:.84rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
 .toast.show{opacity:1;transform:none}
-.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--warn);color:#fff}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--orange);color:#fff}
+
+/* MOBILE */
+@media (max-width:880px){
+  .sb{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);transition:transform .25s;box-shadow:var(--sh-lg)}
+  .sb.open{transform:translateX(0)}
+  .mobile-top{display:flex}
+  .shell{grid-template-columns:1fr}
+  .lc-head-row{display:none}
+  .cc{position:fixed;inset:0;top:0;z-index:60;display:none}
+  .shell.chat-open .cc{display:flex}
+  .shell.chat-open .lc{display:none}
+  .back-btn{display:flex}
+  .msg{max-width:84%}
+  .cp-body{padding:24px 16px 120px}
+}
 </style>
 </head>
 <body>
@@ -167,115 +223,170 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
   <img id="lbImg" src="" alt=""/>
 </div>
 
-<!-- SIDEBAR -->
-<div class="sb">
-  <a href="/admin" class="sb-logo">
-    <div class="lm"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
-    <span class="ln">Antviz</span><span class="lbadge">Admin</span>
-  </a>
-  <nav class="sb-nav">
-    <span class="ns">Основное</span>
-    <a href="/admin" class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Дашборд</a>
-    <a href="/admin/orders" class="ni"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nb" id="navBadgeOrders" style="display:none"></span></a>
-    <span class="ns">Клиенты</span>
-    <a href="/admin/tickets" class="ni"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nb" id="navBadgeTickets" style="display:none"></span></a>
-    <a href="/admin/chats" class="ni active"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чаты<span class="nb" id="navBadgeChats" style="display:none"></span></a>
-    <a href="/admin/bans" class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>Баны</a>
-    <a href="/admin/promos" class="ni"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
-    <span class="ns">Система</span>
-    <a href="/admin/reviews" class="ni"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
-  </nav>
-  <div class="sb-foot">
-    <button class="ni" onclick="doLogout()" style="color:rgba(232,99,79,.8)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
+<div class="app" id="appWrap" style="display:none">
+
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- SIDEBAR -->
+  <div class="sb" id="sidebar">
+    <a href="/admin" class="sb-logo">
+      <div class="lm"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
+      <span class="ln">Antviz</span><span class="lbadge">Admin</span>
+    </a>
+    <nav class="sb-nav">
+      <span class="ns">Основное</span>
+      <a href="/admin" class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Дашборд</a>
+      <a href="/admin/orders" class="ni"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nb" id="navBadgeOrders" style="display:none"></span></a>
+      <span class="ns">Клиенты</span>
+      <a href="/admin/tickets" class="ni"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nb" id="navBadgeTickets" style="display:none"></span></a>
+      <a href="/admin/chats" class="ni active"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чаты<span class="nb" id="navBadgeChats" style="display:none"></span></a>
+      <a href="/admin/bans" class="ni"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/></svg>Баны</a>
+      <a href="/admin/promos" class="ni"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
+      <span class="ns">Система</span>
+      <a href="/admin/reviews" class="ni"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
+    </nav>
+    <div class="sb-foot">
+      <button class="ni" onclick="doLogout()" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- MOBILE TOP BAR -->
+    <div class="mobile-top">
+      <button class="icon-btn" onclick="openSidebar()"><svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <span class="mt-title">Чаты</span>
+      <button class="icon-btn round" style="background:var(--green);color:var(--dark)" onclick="openCreateTicket()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+    </div>
+
+    <!-- SHELL -->
+    <div class="shell" id="shell">
+
+      <!-- LIST -->
+      <div class="lc">
+        <div class="lc-head">
+          <div class="lc-head-row">
+            <span class="lc-title">Чаты</span>
+            <button class="btn btn-green btn-sm" onclick="openCreateTicket()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Создать тикет
+            </button>
+          </div>
+          <div class="sb-box">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="listSearch" placeholder="Поиск по чатам..." oninput="filterList()"/>
+          </div>
+          <div class="tab-row">
+            <button class="tab active" onclick="switchTab('all',this)">Все <span class="tab-count" id="cnt-all">0</span></button>
+            <button class="tab" onclick="switchTab('open',this)">Открытые <span class="tab-count" id="cnt-open">0</span></button>
+            <button class="tab" onclick="switchTab('in-progress',this)">В работе <span class="tab-count" id="cnt-in-progress">0</span></button>
+            <button class="tab" onclick="switchTab('done',this)">Решённые <span class="tab-count" id="cnt-done">0</span></button>
+          </div>
+        </div>
+        <div class="tickets-scroll" id="ticketsList">
+          <div class="empty-l">Загрузка...</div>
+        </div>
+      </div>
+
+      <!-- CHAT -->
+      <div class="cc" id="chatCol">
+        <div class="no-sel" id="noSelection">
+          <div class="no-sel-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <div style="font-weight:500;font-size:.95rem;color:var(--text)">Выберите тикет</div>
+          <div style="font-size:.84rem">Нажмите на тикет слева, чтобы открыть переписку</div>
+        </div>
+
+        <div id="chatView" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+          <div class="chat-topbar">
+            <button class="icon-btn back-btn" onclick="closeChatMobile()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+            <div class="ct-info">
+              <div class="ct-subj" id="chatSubject">—</div>
+              <div class="ct-meta" id="chatMeta"></div>
+            </div>
+            <div class="ct-actions">
+              <span id="chatStatusBadge"></span>
+              <button class="icon-btn" onclick="toggleKebab()"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+              <div class="kebab-menu" id="kebabMenu">
+                <label class="fl">Статус тикета</label>
+                <select class="status-sel" id="statusSelect" onchange="changeStatus()">
+                  <option value="open">Открыт</option>
+                  <option value="done">Решён</option>
+                </select>
+                <button class="btn btn-danger btn-block btn-sm" onclick="deleteTicket()">Удалить тикет</button>
+              </div>
+            </div>
+          </div>
+          <div class="chat-msgs" id="chatMsgs"></div>
+          <div class="chat-inp-area">
+            <div class="chat-inp-row">
+              <label class="attach-btn" title="Прикрепить изображение">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="sendImg()"/>
+              </label>
+              <textarea class="chat-ta" id="chatInp" rows="1" placeholder="Введите сообщение..." onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
+              <button class="send-btn" onclick="sendReply()"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- TOPBAR -->
-<div class="tb">
-  <div class="tb-l">
-    <span class="tb-title">Чаты поддержки</span>
-    <div class="tb-stats">
-      <div class="ts">Открытых: <strong id="statOpen">—</strong></div>
-      <div class="ts">Всего: <strong id="statTotal">—</strong></div>
-    </div>
+<!-- CREATE TICKET — FULL PANEL -->
+<div class="create-panel" id="createTicketPanel">
+  <div class="cp-head">
+    <button class="icon-btn" onclick="closeCreateTicket()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+    <span class="cp-title">Создание тикета</span>
   </div>
-  <button class="btn-new" onclick="openCreateTicket()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Создать тикет
-  </button>
-</div>
-
-<!-- SHELL -->
-<div class="shell" id="appWrap" style="display:none">
-
-  <!-- LIST -->
-  <div class="lc">
-    <div class="lc-head">
-      <div class="sb-box">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input type="text" id="listSearch" placeholder="Поиск тикетов..." oninput="filterList()"/>
+  <div class="cp-body">
+    <div class="cp-form">
+      <div class="fg">
+        <label class="fl">Пользователь</label>
+        <select class="fsel" id="ticketUser"><option value="">Выберите пользователя...</option></select>
       </div>
-      <div class="tab-row">
-        <button class="tab active" onclick="switchTab('all',this)">Все</button>
-        <button class="tab" onclick="switchTab('open',this)">Открытые</button>
-        <button class="tab" onclick="switchTab('in-progress',this)">В работе</button>
-        <button class="tab" onclick="switchTab('resolved',this)">Решённые</button>
+      <div class="fg">
+        <label class="fl">Тема обращения</label>
+        <input class="fi" id="ticketSubject" type="text" placeholder="Кратко опишите проблему..."/>
       </div>
-    </div>
-    <div class="tickets-scroll" id="ticketsList">
-      <div class="empty-l">Загрузка...</div>
-    </div>
-  </div>
-
-  <!-- CHAT -->
-  <div class="cc" id="chatCol">
-    <div class="no-sel" id="noSelection">
-      <div class="no-sel-icon">💬</div>
-      <div style="font-weight:500;font-size:.95rem;color:var(--text)">Выберите тикет</div>
-      <div style="font-size:.84rem">Нажмите на тикет слева</div>
-    </div>
-
-    <div id="chatView" style="display:none;flex:1;flex-direction:column;overflow:hidden">
-      <div class="chat-topbar">
-        <div style="min-width:0">
-          <div class="ct-subj" id="chatSubject">—</div>
-          <div class="ct-meta" id="chatMeta"></div>
-        </div>
-        <div class="ct-actions">
-          <select class="status-sel" id="statusSelect" onchange="changeStatus()">
-            <option value="open">Открыт</option>
-            <option value="done">Решён</option>
-          </select>
-          <button class="btn btn-danger btn-sm" onclick="deleteTicket()">Удалить</button>
-        </div>
+      <div class="fg">
+        <label class="fl">Категория</label>
+        <select class="fsel" id="ticketTopic">
+          <option value="">Выберите категорию</option>
+          <option value="Техническая проблема">Техническая проблема</option>
+          <option value="Вопрос по оплате">Вопрос по оплате</option>
+          <option value="Изменение дизайна">Изменение дизайна</option>
+          <option value="Ошибка на сайте">Ошибка на сайте</option>
+          <option value="Другое">Другое</option>
+        </select>
       </div>
-      <div class="chat-msgs" id="chatMsgs"></div>
-      <div class="chat-inp-area">
-        <div class="chat-inp-row">
-          <textarea class="chat-ta" id="chatInp" rows="1" placeholder="Ответить клиенту..." onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
-          <label class="btn btn-outline btn-sm" style="cursor:pointer" title="Прикрепить изображение">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="sendImg()"/>
-          </label>
-          <button class="btn btn-green btn-sm" onclick="sendReply()">Отправить</button>
+      <div class="fg">
+        <label class="fl">Приоритет</label>
+        <select class="fsel" id="ticketPriority">
+          <option value="low">Низкий</option>
+          <option value="medium" selected>Средний</option>
+          <option value="high">Высокий</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Описание</label>
+        <textarea class="fta" id="ticketMessage" placeholder="Подробно опишите ситуацию..." rows="5"></textarea>
+      </div>
+      <div class="fg">
+        <label class="fl">Вложения <span style="text-transform:none;letter-spacing:0;color:var(--muted2)">(необязательно)</span></label>
+        <div class="dropzone" id="dropzone" onclick="document.getElementById('ticketFile').click()">
+          <svg viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+          <div class="dropzone-text">Загрузить файл или перетащите сюда</div>
+          <div class="dropzone-sub">PNG, JPG до 4 МБ</div>
+          <input type="file" id="ticketFile" accept="image/*" style="display:none" onchange="onTicketFilePicked(this.files[0])"/>
         </div>
+        <div id="ticketFilePreview"></div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- MODAL CREATE -->
-<div class="modal-overlay" id="createTicketModal" onclick="if(event.target===this)closeCreateTicket()">
-  <div class="modal">
-    <div class="modal-title">Создать тикет <button class="modal-close" onclick="closeCreateTicket()">✕</button></div>
-    <div class="fg"><label class="fl">Пользователь</label><select class="fsel" id="ticketUser"><option value="">Выберите пользователя...</option></select></div>
-    <div class="fg"><label class="fl">Тема</label><input class="fi" id="ticketTopic" type="text" placeholder="Например: Техническая проблема"/></div>
-    <div class="fg"><label class="fl">Заголовок</label><input class="fi" id="ticketSubject" type="text" placeholder="Краткий заголовок"/></div>
-    <div class="fg"><label class="fl">Сообщение</label><textarea class="fta" id="ticketMessage" placeholder="Опишите проблему..." rows="4"></textarea></div>
-    <div class="fg"><label class="fl">Приоритет</label><select class="fsel" id="ticketPriority"><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option></select></div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeCreateTicket()">Отмена</button>
-      <button class="btn btn-green" onclick="createTicket()">Создать</button>
+  <div class="cp-foot">
+    <div class="cp-foot-inner">
+      <button class="btn btn-green btn-block" onclick="createTicket()">Создать тикет</button>
     </div>
   </div>
 </div>
@@ -285,10 +396,8 @@ body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoo
 <script type="module">
 const API = 'https://antviz.ru/api';
 
-let allTickets=[], selectedId=null, currentFilter='all';
+let allTickets=[], selectedId=null, currentFilter='all', ticketFileData=null;
 
-// TODO: push в Telegram — отдельный репозиторий antviz-tgbot, не мигрирован.
-// In-app уведомление отправляется по-настоящему через наш API.
 async function notifyClient(uid,title,text,button){
   if(!uid)return;
   try{
@@ -306,8 +415,31 @@ function fmtTime(ts){if(!ts)return'';const d=new Date(ts);const now=new Date();i
 function statusBadge(s){const m={open:['s-open','Открыт'],done:['s-resolved','Решён']};const[cls,lbl]=m[s]||['s-closed',s];return`<span class="sbadge ${cls}">${lbl}</span>`;}
 function priLabel(p){return p==='high'?'<span class="pri-high">Высокий</span>':p==='medium'?'<span class="pri-medium">Средний</span>':'<span class="pri-low">Низкий</span>';}
 
+/* SIDEBAR (mobile) */
+window.openSidebar=()=>{document.getElementById('sidebar').classList.add('open');document.getElementById('sidebarOverlay').classList.add('show');};
+window.closeSidebar=()=>{document.getElementById('sidebar').classList.remove('open');document.getElementById('sidebarOverlay').classList.remove('show');};
+
+/* CHAT MOBILE STACK */
+window.closeChatMobile=()=>{document.getElementById('shell').classList.remove('chat-open');};
+
+/* KEBAB MENU */
+window.toggleKebab=()=>{document.getElementById('kebabMenu').classList.toggle('show');};
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('kebabMenu');
+  if(menu && menu.classList.contains('show') && !menu.contains(e.target) && !e.target.closest('.ct-actions .icon-btn')) menu.classList.remove('show');
+});
+
 window.switchTab=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
 window.filterList=()=>renderList();
+
+function updateTabCounts(){
+  const c={all:allTickets.length,open:0,'in-progress':0,done:0};
+  allTickets.forEach(t=>{ if(c[t.status]!==undefined) c[t.status]++; });
+  document.getElementById('cnt-all').textContent=c.all;
+  document.getElementById('cnt-open').textContent=c.open;
+  document.getElementById('cnt-in-progress').textContent=c['in-progress'];
+  document.getElementById('cnt-done').textContent=c.done;
+}
 
 function renderList(){
   const q=(document.getElementById('listSearch').value||'').toLowerCase();
@@ -317,8 +449,7 @@ function renderList(){
     return true;
   });
   const open=allTickets.filter(t=>t.status==='open').length;
-  document.getElementById('statOpen').textContent=open;
-  document.getElementById('statTotal').textContent=allTickets.length;
+  updateTabCounts();
   const badge=document.getElementById('navBadgeChats');
   badge.style.display=open?'':'none';badge.textContent=open;
   const el=document.getElementById('ticketsList');
@@ -326,21 +457,29 @@ function renderList(){
   el.innerHTML=list.map(t=>{
     const unread=t.status==='open'&&!t.adminRead;
     return`<div class="ti${t.id===selectedId?' sel':''}" onclick="selectTicket('${t.id}')">
-      <div class="ti-subj">${unread?'<span class="unread"></span>':''}${esc(t.subject||'Без темы')}${t.orderLabel?`<span class="ti-order-tag">${esc(t.orderLabel)}</span>`:''}</div>
-      <div class="ti-meta">${statusBadge(t.status)}<span>·</span><span>${esc(t.userName||'—')}</span>${t.priority?`<span>·</span>${priLabel(t.priority)}`:''}</div>
-      ${t._lastMsg?`<div class="ti-prev">${esc(t._lastMsg)}</div>`:''}
-      <div class="ti-time">${fmtDT(t.updatedAt||t.createdAt)}</div>
+      <div class="ti-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+      <div class="ti-body">
+        <div class="ti-top">
+          <div class="ti-subj">${unread?'<span class="unread"></span>':''}<span class="ti-subj-text">${esc(t.subject||'Без темы')}</span></div>
+          ${statusBadge(t.status)}
+        </div>
+        ${t._lastMsg?`<div class="ti-prev">${esc(t._lastMsg)}</div>`:''}
+        <div class="ti-meta">${t.orderLabel?`<span class="ti-order-tag">${esc(t.orderLabel)}</span>`:''}<span>${esc(t.userName||'—')}</span><span>·</span><span>${fmtDT(t.updatedAt||t.createdAt)}</span></div>
+      </div>
     </div>`;}).join('');
 }
 
 window.selectTicket=async function(id){
   selectedId=id;
   const ticket=allTickets.find(t=>t.id===id);if(!ticket)return;
+  document.getElementById('shell').classList.add('chat-open');
   document.getElementById('noSelection').style.display='none';
   const cv=document.getElementById('chatView');cv.style.display='flex';cv.style.flexDirection='column';cv.style.overflow='hidden';cv.style.flex='1';
   document.getElementById('chatSubject').innerHTML=`${esc((`${ticket.topic||''} · ${ticket.subject||''}`).replace(/^ · /,''))}${ticket.orderId?` <a href="/admin/orders?open=${ticket.orderId}" class="ti-order-link" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Заказ')} ↗</a>`:''}`;
   document.getElementById('chatMeta').innerHTML=`<span>${esc(ticket.userName||'—')}</span><span>·</span><span>${esc(ticket.userEmail||'—')}</span><span>·</span><span>${fmtDT(ticket.createdAt)}</span>${ticket.priority?`<span>·</span>${priLabel(ticket.priority)}`:''}`;
   document.getElementById('statusSelect').value=ticket.status||'open';
+  document.getElementById('chatStatusBadge').innerHTML=statusBadge(ticket.status);
+  document.getElementById('kebabMenu').classList.remove('show');
   fetch(`${API}/tickets/${id}/admin-read`, { method:'PATCH', credentials:'include' }).catch(()=>{});
   ticket.adminRead=true;renderList();
 
@@ -434,8 +573,8 @@ window.changeStatus=async function(){
       body: JSON.stringify({ status: val }),
     });
     if(!resp.ok) throw new Error();
-    const t=allTickets.find(x=>x.id===selectedId); if(t) t.status=val;
-    toast('Статус обновлён ✓','success');renderList();
+    const t=allTickets.find(x=>x.id===selectedId); if(t){ t.status=val; document.getElementById('chatStatusBadge').innerHTML=statusBadge(val); }
+    toast('Статус обновлён ✓','success');renderList();document.getElementById('kebabMenu').classList.remove('show');
   }catch(e){toast('Ошибка','error');}
 };
 
@@ -448,10 +587,12 @@ window.deleteTicket=async function(){
     toast('Тикет удалён','info');selectedId=null;
     document.getElementById('chatView').style.display='none';
     document.getElementById('noSelection').style.display='flex';
+    document.getElementById('shell').classList.remove('chat-open');
     renderList();
   }catch(e){toast('Ошибка','error');}
 };
 
+/* CREATE TICKET PANEL */
 window.openCreateTicket=async function(){
   try{
     const resp = await fetch(`${API}/users`, { credentials:'include' });
@@ -462,10 +603,33 @@ window.openCreateTicket=async function(){
     users.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${esc(u.displayName||u.id)}${u.email?' · '+esc(u.email):''}</option>`;});
     ['ticketTopic','ticketSubject','ticketMessage'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('ticketPriority').value='medium';
-    document.getElementById('createTicketModal').classList.add('show');
+    ticketFileData=null;
+    document.getElementById('ticketFilePreview').innerHTML='';
+    document.getElementById('dropzone').style.display='flex';
+    document.getElementById('createTicketPanel').classList.add('open');
   }catch(e){toast('Ошибка загрузки пользователей: '+e.message,'error');}
 };
-window.closeCreateTicket=function(){document.getElementById('createTicketModal').classList.remove('show');};
+window.closeCreateTicket=function(){document.getElementById('createTicketPanel').classList.remove('open');};
+
+window.onTicketFilePicked=function(file){
+  if(!file)return;
+  if(file.size>4*1024*1024){toast('Файл слишком большой (макс. 4 МБ)','error');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    ticketFileData=e.target.result;
+    document.getElementById('dropzone').style.display='none';
+    document.getElementById('ticketFilePreview').innerHTML=`<div class="dz-file"><img src="${ticketFileData}"/><span class="name">${esc(file.name)}</span><button class="rm" type="button" onclick="clearTicketFile()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+  };
+  reader.readAsDataURL(file);
+};
+window.clearTicketFile=function(){ticketFileData=null;document.getElementById('ticketFile').value='';document.getElementById('ticketFilePreview').innerHTML='';document.getElementById('dropzone').style.display='flex';};
+
+const dz=document.getElementById('dropzone');
+if(dz){
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)window.onTicketFilePicked(f);});
+}
 
 window.createTicket=async function(){
   const uid=document.getElementById('ticketUser').value;
@@ -474,8 +638,8 @@ window.createTicket=async function(){
   const message=document.getElementById('ticketMessage').value.trim();
   const priority=document.getElementById('ticketPriority').value;
   if(!uid)return toast('Выберите пользователя','error');
-  if(!subject)return toast('Введите заголовок','error');
-  if(!message)return toast('Введите сообщение','error');
+  if(!subject)return toast('Введите тему обращения','error');
+  if(!message)return toast('Введите описание','error');
   try{
     const resp = await fetch(`${API}/tickets/admin/create`, {
       method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
@@ -483,6 +647,14 @@ window.createTicket=async function(){
     });
     if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
     const ticket = await resp.json();
+    if(ticketFileData){
+      try{
+        await fetch(`${API}/tickets/${ticket.id}/messages`, {
+          method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ text:'Вложение', imageUrl: ticketFileData, asAdmin: true }),
+        });
+      }catch(e){console.error('Не удалось прикрепить файл:',e);}
+    }
     allTickets=[ticket, ...allTickets];renderList();
     await notifyClient(uid,'💬 Новый тикет от поддержки',`Сообщаем вам, что сотрудник службы поддержки создал тикет «${subject}». Просим вас перейти в раздел "Чат с командой".`);
     toast('Тикет создан и пользователь уведомлён ✅','success');closeCreateTicket();
@@ -520,7 +692,7 @@ async function loadTicketsList(){
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
-  document.getElementById('appWrap').style.display='grid';
+  document.getElementById('appWrap').style.display='flex';
 
   fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
     const n=orders.filter(o=>o.refundStatus==='requested').length;

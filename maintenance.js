@@ -115,48 +115,48 @@
         }
         #maint-card {
           position:relative;width:100%;max-width:860px;
-          background:var(--bg,#fff);border:1px solid var(--stroke,#dfe3e8);border-radius:40px;
-          box-shadow:var(--sh2,0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08));
+          background:#fff;border:1px solid #dfe3e8;border-radius:40px;
+          box-shadow:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
           display:flex;overflow:hidden;
         }
         #maint-content {
           flex:1 1 56%;padding:48px 44px 40px;display:flex;flex-direction:column;min-width:0;
         }
         #maint-visual {
-          flex:0 0 42%;background:var(--dark,#191b1e);
+          flex:0 0 42%;background:#191b1e;
           display:flex;align-items:center;justify-content:center;padding:20px;
         }
         #maint-visual svg { width:100%;max-width:220px;height:auto;stroke:#1ede7b;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
         #maint-label {
           display:inline-flex;align-self:flex-start;
-          background:var(--green-dim,#d2f8e5);color:var(--green-text,#149955);
+          background:#d2f8e5;color:#149955;
           font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:20px;
         }
-        #maint-title { font-size:clamp(24px,3vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:var(--text,#191b1e);margin:0 0 24px; }
+        #maint-title { font-size:clamp(24px,3vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:#191b1e;margin:0 0 24px; }
         #maint-title em { font-style:normal;color:#1ede7b; }
         #maint-bullets { display:flex;flex-direction:column;gap:16px;margin-bottom:24px; }
         #maint-bullets .mt-bullet { display:flex;align-items:flex-start;gap:14px; }
         #maint-bullets .mt-bullet-icon {
-          flex:0 0 auto;width:32px;height:32px;border-radius:12px;background:var(--bg3,#f9fafc);
-          border:1px solid var(--stroke,#dfe3e8);display:flex;align-items:center;justify-content:center;margin-top:1px;
+          flex:0 0 auto;width:32px;height:32px;border-radius:12px;background:#f9fafc;
+          border:1px solid #dfe3e8;display:flex;align-items:center;justify-content:center;margin-top:1px;
         }
-        #maint-bullets .mt-bullet-icon svg { width:16px;height:16px;stroke:var(--green-text,#149955);stroke-width:1.8;fill:none; }
-        #maint-bullets .mt-bullet-text { font-size:14px;color:var(--text,#191b1e);font-weight:300;line-height:1.5;letter-spacing:-.01em; }
+        #maint-bullets .mt-bullet-icon svg { width:16px;height:16px;stroke:#149955;stroke-width:1.8;fill:none; }
+        #maint-bullets .mt-bullet-text { font-size:14px;color:#191b1e;font-weight:300;line-height:1.5;letter-spacing:-.01em; }
         #maint-actions { margin-top:auto;display:flex;flex-direction:column;align-items:flex-start;gap:12px; }
         #maint-actions .mt-btn {
           box-sizing:border-box;
           display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
           font-family:inherit;font-weight:500;text-decoration:none;cursor:pointer;border:none;
-          background:var(--dark,#191b1e);color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
+          background:#191b1e;color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
           transition:background .1s,transform .12s;
         }
-        #maint-actions .mt-btn:hover { background:var(--dark2,#2b2f33);transform:translateY(-1px); }
+        #maint-actions .mt-btn:hover { background:#2b2f33;transform:translateY(-1px); }
         #maint-support {
           background:none;border:none;cursor:pointer;font-family:inherit;
-          font-size:13px;font-weight:300;color:var(--text-dim,#707a8a);text-decoration:underline;
+          font-size:13px;font-weight:300;color:#707a8a;text-decoration:underline;
           text-underline-offset:3px;padding:2px;align-self:center;margin:0 auto;
         }
-        #maint-support:hover { color:var(--text,#191b1e); }
+        #maint-support:hover { color:#191b1e; }
         @media(max-width:720px){
           #maint-overlay { padding:16px; }
           #maint-card { flex-direction:column;max-width:440px;width:100%;max-height:90vh;border-radius:32px;overflow-y:auto; }
@@ -227,15 +227,15 @@
           }
           #ban-card {
             position:relative;width:100%;max-width:860px;
-            background:var(--bg,#fff);border:1px solid var(--stroke,#dfe3e8);border-radius:40px;
-            box-shadow:var(--sh2,0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08));
+            background:#fff;border:1px solid #dfe3e8;border-radius:40px;
+            box-shadow:0 8px 20px rgba(0,51,153,.08),0 4px 8px rgba(0,51,153,.08);
             display:flex;overflow:hidden;
           }
           #ban-content {
             flex:1 1 56%;padding:48px 44px 40px;display:flex;flex-direction:column;min-width:0;
           }
           #ban-visual {
-            flex:0 0 42%;background:var(--dark,#191b1e);
+            flex:0 0 42%;background:#191b1e;
             display:flex;align-items:center;justify-content:center;padding:20px;
           }
           #ban-visual svg { width:100%;max-width:220px;height:auto;stroke:#ff6b52;stroke-width:1.3;fill:none;stroke-linecap:round;stroke-linejoin:round; }
@@ -244,19 +244,19 @@
             background:rgba(232,99,79,.12);color:#e8634f;
             font-size:12px;font-weight:500;padding:6px 14px;border-radius:100px;margin-bottom:20px;
           }
-          #ban-title { font-size:clamp(24px,3vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:var(--text,#191b1e);margin:0 0 16px; }
+          #ban-title { font-size:clamp(24px,3vw,30px);font-weight:500;letter-spacing:-.03em;line-height:1.15;color:#191b1e;margin:0 0 16px; }
           #ban-title em { font-style:normal;color:#e8634f; }
-          #ban-text { font-size:15px;color:var(--text-dim,#707a8a);font-weight:300;line-height:1.6;max-width:400px;margin-bottom:20px; }
-          #ban-until { display:inline-flex;align-self:flex-start;align-items:center;gap:7px;font-size:13px;color:var(--text,#191b1e);font-weight:500;margin-bottom:28px;background:rgba(232,99,79,.09);border:1px solid rgba(232,99,79,.22);padding:.5rem 1rem;border-radius:12px; }
+          #ban-text { font-size:15px;color:#707a8a;font-weight:300;line-height:1.6;max-width:400px;margin-bottom:20px; }
+          #ban-until { display:inline-flex;align-self:flex-start;align-items:center;gap:7px;font-size:13px;color:#191b1e;font-weight:500;margin-bottom:28px;background:rgba(232,99,79,.09);border:1px solid rgba(232,99,79,.22);padding:.5rem 1rem;border-radius:12px; }
           #ban-actions { margin-top:auto; }
           #ban-btn {
             box-sizing:border-box;
             display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;
             font-family:inherit;font-weight:500;text-decoration:none;cursor:pointer;border:none;
-            background:var(--dark,#191b1e);color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
+            background:#191b1e;color:#fff;border-radius:12px;padding:15px 26px;font-size:15px;
             transition:background .1s,transform .12s;
           }
-          #ban-btn:hover { background:var(--dark2,#2b2f33);transform:translateY(-1px); }
+          #ban-btn:hover { background:#2b2f33;transform:translateY(-1px); }
           @media(max-width:720px){
             #ban-overlay { padding:16px; }
             #ban-card { flex-direction:column;max-width:440px;width:100%;max-height:90vh;border-radius:32px;overflow-y:auto; }

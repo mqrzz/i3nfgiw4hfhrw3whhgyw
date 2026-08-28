@@ -462,7 +462,7 @@ html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{backg
 @media(max-width:600px){
   .ord-modal-overlay{padding:0}
   .ord-modal{border-radius:0;max-height:100dvh;height:100dvh}
-  .ord-modal-header{border-radius:0}
+  .ord-modal-header{border-radius:var(--r24) var(--r24) 0 0}
   .page-hero{padding:20px}
   .page-hero-title{font-size:18px}
   .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
@@ -667,6 +667,16 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
 function fmtDate(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
+// launchDate приходит из Postgres как "YYYY-MM-DD" ИЛИ как полный ISO-таймстамп ("YYYY-MM-DDT..Z") —
+// раньше слепо клеили 'T12:00:00' сзади, и на ISO-строке получался "...T00:00:00.000ZT12:00:00" → Invalid Date.
+function parseWishDate(v){
+  if(!v)return null;
+  let d;
+  if(v.toDate)d=v.toDate();
+  else if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))d=new Date(v+'T12:00:00');
+  else d=new Date(v);
+  return isNaN(d.getTime())?null:d;
+}
 function fmtFull(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'})}
 function getEstimate(o){
   const status=o.status||0;
@@ -801,6 +811,29 @@ function renderOrders(orders){
   }
 }
 
+// ══ SCROLL LOCK (iOS-safe: overflow:hidden alone doesn't stop background scroll/taps on mobile) ══
+let _scrollLocked=false,_scrollLockY=0;
+function lockScroll(){
+  if(_scrollLocked)return;
+  _scrollLocked=true;
+  _scrollLockY=window.scrollY||document.documentElement.scrollTop||0;
+  document.body.style.position='fixed';
+  document.body.style.top='-'+_scrollLockY+'px';
+  document.body.style.left='0';
+  document.body.style.right='0';
+  document.body.style.width='100%';
+}
+function unlockScroll(){
+  if(!_scrollLocked)return;
+  _scrollLocked=false;
+  document.body.style.position='';
+  document.body.style.top='';
+  document.body.style.left='';
+  document.body.style.right='';
+  document.body.style.width='';
+  window.scrollTo(0,_scrollLockY);
+}
+
 // ══ ORDER MODAL ══
 window.openOrderModal=function(id){
   const o=allOrders.find(x=>x.id===id);
@@ -858,7 +891,8 @@ window.openOrderModal=function(id){
   if(statusComment)leftHtml+=statusComment;
   if(domainBanner)leftHtml+=domainBanner;
   if(estDate){
-    const wishDate=(!estDate.committed&&o.launchDate)?new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):null;
+    const wishDateObj=(!estDate.committed&&o.launchDate)?parseWishDate(o.launchDate):null;
+    const wishDate=wishDateObj?wishDateObj.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):null;
     leftHtml+=`<div class="ord-eta"><div class="ord-eta-ico"><svg viewBox="0 0 24 24">${ICO_CALENDAR}</svg></div><div class="ord-eta-body"><span class="ord-eta-label">${estDate.committed?'Дата готовности':'Ожидаемый срок'}</span><strong style="color:var(--ink);font-weight:500;font-size:.92rem">${estDate.text}</strong>${wishDate?'<span style="font-size:.72rem;color:var(--ink-faint);font-weight:300">Ваше пожелание при заказе: '+wishDate+'</span>':''}</div></div>`;
   }
 
@@ -888,7 +922,7 @@ window.openOrderModal=function(id){
   document.getElementById('ordModalLeft').innerHTML=leftHtml;
   document.getElementById('ordModalRight').innerHTML=rightHtml;
   document.getElementById('ordModalOverlay').classList.add('show');
-  document.body.style.overflow='hidden';
+  lockScroll();
 };
 
 // TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase
@@ -906,7 +940,7 @@ window.payRemaining=async function(orderId){
   }catch(e){toast('Не удалось создать платёж','error');}
 };
 
-window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');document.body.style.overflow='';};
+window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');unlockScroll();};
 window.requestRevision=async function(id){
   // TODO: подключить реальный /api/orders/:id/revision, когда заказы переедут с Firestore.
   toast('Функция временно недоступна, скоро вернём','info');
@@ -918,6 +952,7 @@ window.openRefundModal=function(id){
   document.getElementById('refundReasonSelect').value='Ещё не начали работу';
   document.getElementById('refundComment').value='';
   document.getElementById('refundModal').classList.add('show');
+  lockScroll();
 };
 window.closeRefundModal=function(){document.getElementById('refundModal').classList.remove('show');};
 window.submitRefundRequest=async function(){
@@ -935,10 +970,10 @@ window.openReview=function(id){
   document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
   document.getElementById('reviewText').value='';
   document.getElementById('ordModalOverlay').classList.remove('show');
-  document.body.style.overflow='hidden';
+  lockScroll();
   setTimeout(()=>document.getElementById('reviewModal').classList.add('show'),80);
 };
-window.closeReview=function(){document.getElementById('reviewModal').classList.remove('show');document.body.style.overflow='';};
+window.closeReview=function(){document.getElementById('reviewModal').classList.remove('show');unlockScroll();};
 window.setStar=function(n){reviewStars=n;document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));};
 window.submitReview=async function(){
   if(!reviewStars){toast('Выберите оценку','error');return;}
@@ -956,9 +991,10 @@ function showDeliveryPopup(o){
   link.href=href||'#';link.style.display=href?'':'none';
   document.getElementById('deliveryModalContent').innerHTML=o.siteDomain?'<div class="delivery-inner"><div class="delivery-site-name">'+esc(o.siteDomain)+'</div><div class="delivery-site-url">Готов к работе</div></div>':'';
   document.getElementById('deliveryModal').classList.add('show');
+  lockScroll();
   launchConfetti();
 }
-window.closeDelivery=function(){document.getElementById('deliveryModal').classList.remove('show');};
+window.closeDelivery=function(){document.getElementById('deliveryModal').classList.remove('show');unlockScroll();};
 
 // ══ RECEIPT ══
 window.printReceipt=function(id){

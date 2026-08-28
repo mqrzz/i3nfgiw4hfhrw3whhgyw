@@ -269,7 +269,7 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 .review-cta-sub{font-size:12px;color:var(--text-dim);font-weight:400}
 
 /* ORDER MODAL */
-.ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(10,11,13,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.ord-modal-overlay{position:fixed;inset:0;z-index:9500;background:rgba(10,11,13,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
 .ord-modal-overlay.show{opacity:1;pointer-events:all}
 .ord-modal{background:var(--bg);border:1px solid var(--stroke);border-radius:var(--r32);width:100%;max-width:1200px;max-height:92vh;overflow:hidden;display:flex;flex-direction:column;position:relative;transform:translateY(20px) scale(.98);transition:transform .28s cubic-bezier(.22,1,.36,1)}
 .ord-modal-overlay.show .ord-modal{transform:translateY(0) scale(1)}
@@ -422,7 +422,7 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{background:rgba(255,255,255,0.72)}
 
 /* MODAL shared */
-.modal-overlay{position:fixed;inset:0;z-index:9600;background:rgba(10,11,13,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay{position:fixed;inset:0;z-index:9600;background:rgba(10,11,13,.6);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.show{opacity:1;pointer-events:all}
 .modal{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:36px 32px;width:100%;max-width:420px;transform:translateY(16px) scale(.98);transition:transform .25s cubic-bezier(.22,1,.36,1)}
 .modal-overlay.show .modal{transform:translateY(0) scale(1)}
@@ -834,6 +834,21 @@ function unlockScroll(){
   window.scrollTo(0,_scrollLockY);
 }
 
+// ══ OVERLAY SHOW/HIDE ══
+// iOS Safari иногда продолжает считать fixed-элемент с backdrop-filter "кликабельным"
+// пару кадров после того, как с него сняли класс .show (opacity:0;pointer-events:none) —
+// хит-тест не успевает обновиться. Поэтому после закрытия дополнительно убираем
+// элемент из layout через display:none — тогда никакого невидимого блокирующего слоя не остаётся.
+function showOverlay(el){
+  el.style.display='flex';
+  void el.offsetWidth; // force reflow, иначе классовая transition не сыграет
+  requestAnimationFrame(()=>el.classList.add('show'));
+}
+function hideOverlay(el){
+  el.classList.remove('show');
+  setTimeout(()=>{ if(!el.classList.contains('show')) el.style.display='none'; },260);
+}
+
 // ══ ORDER MODAL ══
 window.openOrderModal=function(id){
   const o=allOrders.find(x=>x.id===id);
@@ -921,7 +936,7 @@ window.openOrderModal=function(id){
   window._modalOrderId=o.id;
   document.getElementById('ordModalLeft').innerHTML=leftHtml;
   document.getElementById('ordModalRight').innerHTML=rightHtml;
-  document.getElementById('ordModalOverlay').classList.add('show');
+  showOverlay(document.getElementById('ordModalOverlay'));
   lockScroll();
 };
 
@@ -940,7 +955,7 @@ window.payRemaining=async function(orderId){
   }catch(e){toast('Не удалось создать платёж','error');}
 };
 
-window.closeOrderModal=function(){document.getElementById('ordModalOverlay').classList.remove('show');unlockScroll();};
+window.closeOrderModal=function(){hideOverlay(document.getElementById('ordModalOverlay'));unlockScroll();};
 window.requestRevision=async function(id){
   // TODO: подключить реальный /api/orders/:id/revision, когда заказы переедут с Firestore.
   toast('Функция временно недоступна, скоро вернём','info');
@@ -951,10 +966,10 @@ window.openRefundModal=function(id){
   window._refundOrderId=id;
   document.getElementById('refundReasonSelect').value='Ещё не начали работу';
   document.getElementById('refundComment').value='';
-  document.getElementById('refundModal').classList.add('show');
+  showOverlay(document.getElementById('refundModal'));
   lockScroll();
 };
-window.closeRefundModal=function(){document.getElementById('refundModal').classList.remove('show');};
+window.closeRefundModal=function(){hideOverlay(document.getElementById('refundModal'));};
 window.submitRefundRequest=async function(){
   const id=window._refundOrderId;if(!id)return;
   const o=allOrders.find(x=>x.id===id);
@@ -969,11 +984,11 @@ window.openReview=function(id){
   reviewOrderId=id;reviewStars=0;
   document.querySelectorAll('.star').forEach(s=>s.classList.remove('on'));
   document.getElementById('reviewText').value='';
-  document.getElementById('ordModalOverlay').classList.remove('show');
+  hideOverlay(document.getElementById('ordModalOverlay'));
   lockScroll();
-  setTimeout(()=>document.getElementById('reviewModal').classList.add('show'),80);
+  setTimeout(()=>showOverlay(document.getElementById('reviewModal')),80);
 };
-window.closeReview=function(){document.getElementById('reviewModal').classList.remove('show');unlockScroll();};
+window.closeReview=function(){hideOverlay(document.getElementById('reviewModal'));unlockScroll();};
 window.setStar=function(n){reviewStars=n;document.querySelectorAll('.star').forEach(s=>s.classList.toggle('on',+s.dataset.v<=n));};
 window.submitReview=async function(){
   if(!reviewStars){toast('Выберите оценку','error');return;}
@@ -990,11 +1005,11 @@ function showDeliveryPopup(o){
   const link=document.getElementById('deliveryLink');
   link.href=href||'#';link.style.display=href?'':'none';
   document.getElementById('deliveryModalContent').innerHTML=o.siteDomain?'<div class="delivery-inner"><div class="delivery-site-name">'+esc(o.siteDomain)+'</div><div class="delivery-site-url">Готов к работе</div></div>':'';
-  document.getElementById('deliveryModal').classList.add('show');
+  showOverlay(document.getElementById('deliveryModal'));
   lockScroll();
   launchConfetti();
 }
-window.closeDelivery=function(){document.getElementById('deliveryModal').classList.remove('show');unlockScroll();};
+window.closeDelivery=function(){hideOverlay(document.getElementById('deliveryModal'));unlockScroll();};
 
 // ══ RECEIPT ══
 window.printReceipt=function(id){

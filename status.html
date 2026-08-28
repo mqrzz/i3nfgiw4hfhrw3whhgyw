@@ -260,6 +260,40 @@
   }
   .admin-submit:hover{background:var(--accent-hover);}
 
+  .admin-svc-row{border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-bottom:10px; background:var(--bg-soft);}
+  .admin-svc-top{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+  .admin-svc-name{font-weight:600; font-size:14px;}
+  .admin-svc-controls{display:flex; align-items:center; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .admin-svc-controls select{width:auto; padding:8px 12px; font-size:13px; background:var(--bg); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-family:var(--font-body);}
+  .admin-svc-controls label{display:flex; align-items:center; gap:6px; font-size:12.5px; color:var(--text-dim); margin:0;}
+  .admin-mini-btn{font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:var(--radius-full); border:1px solid var(--border); background:var(--bg); color:var(--text); cursor:pointer;}
+  .admin-mini-btn:hover{border-color:rgba(128,128,128,0.4);}
+  .admin-mini-btn.primary{background:var(--accent); color:var(--accent-ink); border:none;}
+  .admin-mini-btn.danger{color:var(--major); border-color:rgba(229,72,77,0.3);}
+  .admin-link-toggle{background:none; border:none; color:var(--text-faint); font-size:12px; text-decoration:underline; cursor:pointer; padding:0; margin-top:10px;}
+  .admin-collapse{display:none; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); flex-direction:column; gap:4px;}
+  .admin-collapse.open{display:flex;}
+  .admin-collapse label{font-size:12px; color:var(--text-dim); margin-top:6px; font-weight:500;}
+  .admin-collapse input, .admin-collapse select, .admin-collapse textarea{
+    background:var(--bg); border:1px solid var(--border); color:var(--text); padding:9px 12px;
+    border-radius:var(--radius-sm); font-size:13px; font-family:var(--font-body); resize:vertical;
+  }
+
+  .admin-inc-row{border:1px solid var(--border); border-radius:var(--radius-sm); padding:16px; margin-bottom:10px; background:var(--bg-soft);}
+  .admin-inc-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap;}
+  .admin-inc-title{font-weight:600; font-size:14px;}
+  .admin-inc-meta{font-size:12px; color:var(--text-faint); margin-top:2px;}
+  .admin-inc-actions{display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;}
+  .admin-inc-update-form{display:none; flex-direction:column; gap:4px; margin-top:12px; padding-top:12px; border-top:1px dashed var(--border);}
+  .admin-inc-update-form.open{display:flex;}
+  .admin-inc-update-form label{font-size:12px; color:var(--text-dim); margin-top:4px; font-weight:500;}
+  .admin-inc-update-form select, .admin-inc-update-form textarea{
+    background:var(--bg); border:1px solid var(--border); color:var(--text); padding:9px 12px;
+    border-radius:var(--radius-sm); font-size:13px; font-family:var(--font-body); resize:vertical;
+  }
+  .admin-empty-hint{font-size:13px; color:var(--text-faint); padding:10px 2px;}
+  .admin-section-hint{font-size:12.5px; color:var(--text-faint); margin-bottom:14px; line-height:1.5;}
+
 
   .page-end-spacer{height:56px;}
 
@@ -724,14 +758,22 @@
       <div class="section-label">Управление (видно только админам)</div>
       <div class="admin-card">
         <div class="admin-tabs">
-          <button class="admin-tab active" data-tab="incident">Новый инцидент</button>
-          <button class="admin-tab" data-tab="update">Обновить инцидент</button>
-          <button class="admin-tab" data-tab="service">Статус сервиса</button>
-          <button class="admin-tab" data-tab="sources">Источники проверки</button>
-          <button class="admin-tab" data-tab="delete">Удалить инцидент</button>
+          <button class="admin-tab active" data-tab="services">Сервисы</button>
+          <button class="admin-tab" data-tab="incidents">Инциденты</button>
+          <button class="admin-tab" data-tab="new-incident">+ Новый инцидент</button>
         </div>
 
-        <form id="admin-incident-form" class="admin-form">
+        <div id="admin-tab-services">
+          <p class="admin-section-hint">Статус сервиса и способ его автопроверки — сразу вместе, по каждому сервису. «Настроить проверку» разворачивает URL/тип/заголовки.</p>
+          <div id="admin-services-list"></div>
+        </div>
+
+        <div id="admin-tab-incidents" style="display:none;">
+          <p class="admin-section-hint">Открытые инциденты — сверху. «Обновить» дописывает запись в таймлайн и рассылает подписчикам, «Удалить» стирает инцидент безвозвратно.</p>
+          <div id="admin-incidents-list"></div>
+        </div>
+
+        <form id="admin-incident-form" class="admin-form" style="display:none;">
           <label>Заголовок</label>
           <input type="text" id="ai-title" placeholder="Например: Сбои при оплате" required>
           <label>Сервис (необязательно)</label>
@@ -751,82 +793,18 @@
           <button type="submit" class="admin-submit">Создать инцидент и разослать подписчикам</button>
         </form>
 
-        <form id="admin-update-form" class="admin-form" style="display:none;">
-          <label>Инцидент</label>
-          <select id="au-incident">
-            ${currentIncidentsOptions()}
-          </select>
-          <label>Новый статус</label>
-          <select id="au-status">
-            <option value="investigating">Расследуем</option>
-            <option value="identified">Причина найдена</option>
-            <option value="monitoring">Наблюдаем</option>
-            <option value="resolved">Устранено</option>
-          </select>
-          <label>Сообщение</label>
-          <textarea id="au-message" rows="3" placeholder="Что изменилось" required></textarea>
-          <button type="submit" class="admin-submit">Добавить обновление и разослать</button>
-        </form>
-
-        <form id="admin-service-form" class="admin-form" style="display:none;">
-          <label>Сервис</label>
-          <select id="as-service">
-            ${currentServices.map(s => `<option value="${s.id}">${esc(s.name)} — сейчас: ${statusLabels[s.status] || s.status}</option>`).join('')}
-          </select>
-          <label>Новый статус</label>
-          <select id="as-status">
-            <option value="ok">Работает</option>
-            <option value="degraded">Замедление</option>
-            <option value="partial">Частичный сбой</option>
-            <option value="major">Недоступен</option>
-            <option value="maint">Плановые работы</option>
-          </select>
-          <label style="display:flex; align-items:center; gap:8px; margin-top:4px;">
-            <input type="checkbox" id="as-override" style="width:auto;">
-            Зафиксировать вручную (автопроверка не будет менять статус, пока не снимешь галочку)
-          </label>
-          <p style="font-size:12px; color:var(--text-faint); margin-top:2px;" id="as-current-hint"></p>
-          <button type="submit" class="admin-submit">Применить</button>
-        </form>
-
-        <form id="admin-sources-form" class="admin-form" style="display:none;">
-          <label>Сервис</label>
-          <select id="src-service">
-            ${adminServicesRaw.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('')}
-          </select>
-          <label>Тип проверки</label>
-          <select id="src-type">
-            <option value="http">HTTP GET по адресу</option>
-            <option value="telegram_webhook">Telegram-бот (getWebhookInfo, без URL)</option>
-          </select>
-          <label>URL проверки (для типа «HTTP»)</label>
-          <input type="text" id="src-url" placeholder="https://example.com/api/health">
-          <label>Доп. заголовки JSON (необязательно — например для Vercel Protection Bypass)</label>
-          <textarea id="src-headers" rows="2" placeholder='{"x-vercel-protection-bypass": "..."}'></textarea>
-          <button type="submit" class="admin-submit">Сохранить источник проверки</button>
-        </form>
-
-        <form id="admin-delete-form" class="admin-form" style="display:none;">
-          <label>Инцидент</label>
-          <select id="del-incident">
-            ${allIncidentsOptions()}
-          </select>
-          <button type="submit" class="admin-submit" style="background:var(--major);">Удалить безвозвратно</button>
-        </form>
-
-        <div id="admin-msg" style="font-size:13px; margin-top:4px;"></div>
+        <div id="admin-msg" style="font-size:13px; margin-top:12px;"></div>
       </div>
     `;
 
+    const tabIds = { services: 'admin-tab-services', incidents: 'admin-tab-incidents' };
     panel.querySelectorAll('.admin-tab').forEach(tab => {
       tab.addEventListener('click', () => {
         panel.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
-        panel.querySelector('#admin-incident-form').style.display = tab.dataset.tab === 'incident' ? 'flex' : 'none';
-        panel.querySelector('#admin-update-form').style.display = tab.dataset.tab === 'update' ? 'flex' : 'none';
-        panel.querySelector('#admin-service-form').style.display = tab.dataset.tab === 'service' ? 'flex' : 'none';
-        panel.querySelector('#admin-sources-form').style.display = tab.dataset.tab === 'sources' ? 'flex' : 'none';
-        panel.querySelector('#admin-delete-form').style.display = tab.dataset.tab === 'delete' ? 'flex' : 'none';
+        panel.querySelector('#admin-tab-services').style.display = tab.dataset.tab === 'services' ? 'block' : 'none';
+        panel.querySelector('#admin-tab-incidents').style.display = tab.dataset.tab === 'incidents' ? 'block' : 'none';
+        panel.querySelector('#admin-incident-form').style.display = tab.dataset.tab === 'new-incident' ? 'flex' : 'none';
       });
     });
 
@@ -848,6 +826,7 @@
       return data;
     }
 
+    // ── Новый инцидент ──
     panel.querySelector('#admin-incident-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       try{
@@ -863,108 +842,169 @@
       } catch(err){ showMsg(err.message, false); }
     });
 
-    panel.querySelector('#admin-update-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const incidentId = panel.querySelector('#au-incident').value;
-      if(!incidentId){ showMsg('Нет открытых инцидентов для обновления.', false); return; }
-      try{
-        await adminPost(`/status/incidents/${incidentId}/updates`, {
-          status: panel.querySelector('#au-status').value,
-          message: panel.querySelector('#au-message').value,
+    // ── Вкладка "Сервисы": статус + настройка проверки, единым списком ──
+    const svcList = panel.querySelector('#admin-services-list');
+    svcList.innerHTML = currentServices.map(s => {
+      const raw = adminServicesRaw.find(r => r.id === s.id) || {};
+      return `
+        <div class="admin-svc-row" data-id="${s.id}">
+          <div class="admin-svc-top">
+            <div class="admin-svc-name">${esc(s.name)}</div>
+            <div class="service-status">
+              <span class="status-dot ${s.status}"></span>
+              <span class="status-label ${s.status}">${statusLabels[s.status] || s.status}</span>
+            </div>
+          </div>
+          <div class="admin-svc-controls">
+            <select class="svc-status-select">
+              <option value="ok">Работает</option>
+              <option value="degraded">Замедление</option>
+              <option value="partial">Частичный сбой</option>
+              <option value="major">Недоступен</option>
+              <option value="maint">Плановые работы</option>
+            </select>
+            <label><input type="checkbox" class="svc-override-check" style="width:auto;"> Зафиксировать вручную</label>
+            <button type="button" class="admin-mini-btn primary svc-apply-status">Применить</button>
+          </div>
+          <button type="button" class="admin-link-toggle svc-toggle-config">Настроить проверку ▾</button>
+          <div class="admin-collapse svc-config">
+            <label>Тип проверки</label>
+            <select class="svc-check-type">
+              <option value="http">HTTP GET по адресу</option>
+              <option value="telegram_webhook">Telegram-бот (getWebhookInfo)</option>
+              <option value="github_status">Статус GitHub (githubstatus.com)</option>
+            </select>
+            <label>URL проверки</label>
+            <input type="text" class="svc-check-url" placeholder="https://example.com/api/health">
+            <label>Доп. заголовки JSON (например Vercel Protection Bypass)</label>
+            <textarea class="svc-check-headers" rows="2" placeholder='{"x-vercel-protection-bypass": "..."}'></textarea>
+            <button type="button" class="admin-mini-btn primary" style="margin-top:10px; align-self:flex-start;">Сохранить источник проверки</button>
+          </div>
+        </div>
+      `;
+    }).join('') || '<p class="admin-empty-hint">Сервисов пока нет.</p>';
+
+    svcList.querySelectorAll('.admin-svc-row').forEach(row => {
+      const id = row.dataset.id;
+      const s = currentServices.find(x => x.id === id);
+      const raw = adminServicesRaw.find(x => x.id === id) || {};
+
+      row.querySelector('.svc-status-select').value = s?.status || 'ok';
+      row.querySelector('.svc-override-check').checked = !!s?.manualOverride;
+      row.querySelector('.svc-check-type').value = raw.check_type || 'http';
+      row.querySelector('.svc-check-url').value = raw.check_url || '';
+      row.querySelector('.svc-check-headers').value = raw.check_headers ? JSON.stringify(raw.check_headers) : '';
+
+      row.querySelector('.svc-toggle-config').addEventListener('click', (e) => {
+        const box = row.querySelector('.svc-config');
+        box.classList.toggle('open');
+        e.target.textContent = box.classList.contains('open') ? 'Настроить проверку ▴' : 'Настроить проверку ▾';
+      });
+
+      row.querySelector('.svc-apply-status').addEventListener('click', async () => {
+        try{
+          await adminPost(`/status/services/${id}`, {
+            status: row.querySelector('.svc-status-select').value,
+            manualOverride: row.querySelector('.svc-override-check').checked,
+          }, 'PATCH');
+          showMsg(`Статус «${s.name}» обновлён.`, true);
+          loadStatus();
+        } catch(err){ showMsg(err.message, false); }
+      });
+
+      row.querySelector('.svc-config .admin-mini-btn').addEventListener('click', async () => {
+        let headers = null;
+        const rawHeaders = row.querySelector('.svc-check-headers').value.trim();
+        if(rawHeaders){
+          try{ headers = JSON.parse(rawHeaders); }
+          catch(err){ showMsg('Заголовки должны быть валидным JSON, например {"x-key":"value"}', false); return; }
+        }
+        try{
+          await adminPost(`/status/services/${id}`, {
+            checkType: row.querySelector('.svc-check-type').value,
+            checkUrl: row.querySelector('.svc-check-url').value || null,
+            checkHeaders: headers,
+          }, 'PATCH');
+          showMsg(`Источник проверки «${s.name}» сохранён и перепроверен.`, true);
+          await loadAdminServicesRaw();
+          loadStatus();
+        } catch(err){ showMsg(err.message, false); }
+      });
+    });
+
+    // ── Вкладка "Инциденты": список карточками, действия прямо на карточке ──
+    const incList = panel.querySelector('#admin-incidents-list');
+    const sorted = [...lastIncidentsForAdmin].sort((a, b) => {
+      if((a.status === 'resolved') !== (b.status === 'resolved')) return a.status === 'resolved' ? 1 : -1;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    incList.innerHTML = sorted.map(inc => `
+      <div class="admin-inc-row" data-id="${inc.id}">
+        <div class="admin-inc-top">
+          <div>
+            <div class="admin-inc-title">${esc(inc.title)}${inc.serviceName ? ` — ${esc(inc.serviceName)}` : ''}</div>
+            <div class="admin-inc-meta">${incidentBadgeLabels[inc.status] || inc.status} · ${fmtDate(inc.createdAt)}</div>
+          </div>
+          <div class="incident-badge ${inc.status === 'resolved' ? 'resolved' : (severityBadgeClass[inc.severity] || 'maint')}">${incidentBadgeLabels[inc.status] || inc.status}</div>
+        </div>
+        <div class="admin-inc-actions">
+          ${inc.status !== 'resolved' ? '<button type="button" class="admin-mini-btn primary inc-toggle-update">Добавить обновление</button>' : ''}
+          <button type="button" class="admin-mini-btn danger inc-delete">Удалить</button>
+        </div>
+        <div class="admin-inc-update-form">
+          <label>Новый статус</label>
+          <select class="inc-update-status">
+            <option value="investigating">Расследуем</option>
+            <option value="identified">Причина найдена</option>
+            <option value="monitoring">Наблюдаем</option>
+            <option value="resolved">Устранено</option>
+          </select>
+          <label>Сообщение</label>
+          <textarea class="inc-update-message" rows="2" placeholder="Что изменилось"></textarea>
+          <button type="button" class="admin-mini-btn primary" style="margin-top:10px; align-self:flex-start;">Отправить и разослать</button>
+        </div>
+      </div>
+    `).join('') || '<p class="admin-empty-hint">Инцидентов пока нет.</p>';
+
+    incList.querySelectorAll('.admin-inc-row').forEach(row => {
+      const id = row.dataset.id;
+      const inc = lastIncidentsForAdmin.find(x => x.id === id);
+
+      const toggleBtn = row.querySelector('.inc-toggle-update');
+      if(toggleBtn){
+        toggleBtn.addEventListener('click', () => {
+          row.querySelector('.admin-inc-update-form').classList.toggle('open');
         });
-        showMsg('Обновление добавлено, подписчики уведомлены.', true);
-        e.target.reset();
-        loadStatus();
-      } catch(err){ showMsg(err.message, false); }
-    });
-
-    panel.querySelector('#admin-service-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const serviceId = panel.querySelector('#as-service').value;
-      try{
-        await adminPost(`/status/services/${serviceId}`, {
-          status: panel.querySelector('#as-status').value,
-          manualOverride: panel.querySelector('#as-override').checked,
-        }, 'PATCH');
-        showMsg('Статус сервиса обновлён.', true);
-        loadStatus();
-      } catch(err){ showMsg(err.message, false); }
-    });
-
-    // Подставляем РЕАЛЬНОЕ текущее состояние сервиса при выборе — раньше форма всегда
-    // открывалась с "Работает" + снятой галочкой, из-за чего повторная отправка
-    // случайно стирала ранее включённый manualOverride, даже если его не трогали.
-    const asServiceSelect = panel.querySelector('#as-service');
-    function fillServiceForm(){
-      const s = currentServices.find(x => x.id === asServiceSelect.value);
-      if(!s) return;
-      panel.querySelector('#as-status').value = s.status;
-      panel.querySelector('#as-override').checked = !!s.manualOverride;
-      panel.querySelector('#as-current-hint').textContent =
-        s.manualOverride ? 'Сейчас статус зафиксирован вручную.' : 'Сейчас статус выставляет автопроверка.';
-    }
-    asServiceSelect.addEventListener('change', fillServiceForm);
-    if(currentServices.length) fillServiceForm();
-
-    // При выборе сервиса в «Источниках проверки» — подставляем его текущие значения
-    const srcServiceSelect = panel.querySelector('#src-service');
-    function fillSourceForm(){
-      const s = adminServicesRaw.find(x => x.id === srcServiceSelect.value);
-      if(!s) return;
-      panel.querySelector('#src-type').value = s.check_type || 'http';
-      panel.querySelector('#src-url').value = s.check_url || '';
-      panel.querySelector('#src-headers').value = s.check_headers ? JSON.stringify(s.check_headers) : '';
-    }
-    srcServiceSelect.addEventListener('change', fillSourceForm);
-    if(adminServicesRaw.length) fillSourceForm();
-
-    panel.querySelector('#admin-sources-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const serviceId = srcServiceSelect.value;
-      let headers = null;
-      const rawHeaders = panel.querySelector('#src-headers').value.trim();
-      if(rawHeaders){
-        try{ headers = JSON.parse(rawHeaders); }
-        catch(err){ showMsg('Заголовки должны быть валидным JSON, например {"x-key":"value"}', false); return; }
       }
-      try{
-        await adminPost(`/status/services/${serviceId}`, {
-          checkType: panel.querySelector('#src-type').value,
-          checkUrl: panel.querySelector('#src-url').value || null,
-          checkHeaders: headers,
-        }, 'PATCH');
-        showMsg('Источник проверки сохранён. Изменения подхватятся в следующем цикле (раз в 5 минут).', true);
-        await loadAdminServicesRaw();
-      } catch(err){ showMsg(err.message, false); }
-    });
 
-    panel.querySelector('#admin-delete-form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const incidentId = panel.querySelector('#del-incident').value;
-      if(!incidentId){ showMsg('Нечего удалять.', false); return; }
-      if(!confirm('Удалить инцидент безвозвратно? Отменить будет нельзя.')) return;
-      try{
-        await adminPost(`/status/incidents/${incidentId}`, {}, 'DELETE');
-        showMsg('Инцидент удалён.', true);
-        loadStatus();
-      } catch(err){ showMsg(err.message, false); }
+      const sendBtn = row.querySelector('.admin-inc-update-form .admin-mini-btn');
+      if(sendBtn){
+        sendBtn.addEventListener('click', async () => {
+          const message = row.querySelector('.inc-update-message').value.trim();
+          if(!message){ showMsg('Опиши, что изменилось.', false); return; }
+          try{
+            await adminPost(`/status/incidents/${id}/updates`, {
+              status: row.querySelector('.inc-update-status').value,
+              message,
+            });
+            showMsg(`Обновление по «${inc.title}» отправлено.`, true);
+            loadStatus();
+          } catch(err){ showMsg(err.message, false); }
+        });
+      }
+
+      row.querySelector('.inc-delete').addEventListener('click', async () => {
+        if(!confirm(`Удалить инцидент «${inc.title}» безвозвратно?`)) return;
+        try{
+          await adminPost(`/status/incidents/${id}`, {}, 'DELETE');
+          showMsg('Инцидент удалён.', true);
+          loadStatus();
+        } catch(err){ showMsg(err.message, false); }
+      });
     });
   }
 
   let lastIncidentsForAdmin = [];
-  function currentIncidentsOptions(){
-    if(lastIncidentsForAdmin.length === 0) return '<option value="">— нет инцидентов —</option>';
-    return lastIncidentsForAdmin
-      .filter(i => i.status !== 'resolved')
-      .map(i => `<option value="${i.id}">${esc(i.title)}</option>`)
-      .join('') || '<option value="">— все инциденты устранены —</option>';
-  }
-  function allIncidentsOptions(){
-    if(lastIncidentsForAdmin.length === 0) return '<option value="">— нет инцидентов —</option>';
-    return lastIncidentsForAdmin
-      .map(i => `<option value="${i.id}">${esc(i.title)} (${incidentBadgeLabels[i.status] || i.status})</option>`)
-      .join('');
-  }
 </script>
 
 </body>

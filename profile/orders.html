@@ -364,12 +364,10 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 .pay-gate-title{font-size:14px;font-weight:600;color:var(--green-text);margin-bottom:6px;display:flex;align-items:center;gap:7px}
 .pay-gate-title svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .pay-gate-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px;font-weight:400;line-height:1.5}
-.pay-remaining-banner{background:var(--amber-dim);border:1px solid var(--amber);border-radius:var(--r20);padding:20px 22px}
-.pay-remaining-title{font-size:14px;font-weight:600;color:var(--amber-text);margin-bottom:6px;display:flex;align-items:center;gap:7px}
-.pay-remaining-title svg{width:16px;height:16px;stroke:var(--amber-text);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.pay-remaining-banner{background:var(--card);border:1px solid var(--green);border-radius:var(--r20);padding:20px 22px}
+.pay-remaining-title{font-size:14px;font-weight:600;color:var(--green-text);margin-bottom:6px;display:flex;align-items:center;gap:7px}
+.pay-remaining-title svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .pay-remaining-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px;font-weight:400;line-height:1.5}
-.pay-remaining-banner .btn-remaining-cta{background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text)}
-.pay-remaining-banner .btn-remaining-cta:hover{border-color:var(--amber-text);color:var(--amber-text)}
 
 /* ACTIONS */
 .ord-actions-card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r24);padding:8px;box-shadow:var(--shadow-sm)}
@@ -464,7 +462,7 @@ html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{backg
 @media(max-width:600px){
   .ord-modal-overlay{padding:0}
   .ord-modal{border-radius:0;max-height:100dvh;height:100dvh}
-  .ord-modal-header{border-radius:var(--r24);margin:10px 10px 0;position:sticky;top:10px;z-index:3}
+  .ord-modal-header{border-radius:var(--r24);margin:0;position:fixed;top:10px;left:10px;right:10px;z-index:5}
   .page-hero{padding:20px}
   .page-hero-title{font-size:18px}
   .toolbar{flex-direction:column;align-items:flex-start;gap:10px}
@@ -567,7 +565,7 @@ html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{backg
       <div class="ord-modal-chips" id="ordModalChips"></div>
       <div class="ord-modal-price" id="ordModalPrice"></div>
     </div>
-    <div class="ord-modal-body">
+    <div class="ord-modal-body" id="ordModalBody">
       <div class="ord-modal-left" id="ordModalLeft"></div>
       <div class="ord-modal-right" id="ordModalRight"></div>
     </div>
@@ -918,7 +916,7 @@ window.openOrderModal=function(id){
   if(isPartial&&halfPaid&&(s===5||s===6)){
     rightHtml+='<div class="pay-gate-banner"><div class="pay-gate-title"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Нужна доплата</div><div class="pay-gate-sub">Для получения заказа оплатите оставшиеся '+remainingAmount.toLocaleString('ru')+' ₽</div><button class="btn btn-green" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center">Оплатить '+remainingAmount.toLocaleString('ru')+' ₽ → получить заказ</button></div>';
   }else if(isPartial&&halfPaid){
-    rightHtml+='<div class="pay-remaining-banner"><div class="pay-remaining-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Предоплата получена</div><div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ можно оплатить в любое время.</div><button class="btn btn-remaining-cta" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center;margin-top:4px">Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
+    rightHtml+='<div class="pay-remaining-banner"><div class="pay-remaining-title"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Предоплата получена</div><div class="pay-remaining-sub">Оплачено '+paidAmount.toLocaleString('ru')+' ₽. Остаток '+remainingAmount.toLocaleString('ru')+' ₽ можно оплатить в любое время.</div><button class="btn btn-green" onclick="payRemaining(\''+o.id+'\')" style="width:100%;justify-content:center;margin-top:4px">Доплатить '+remainingAmount.toLocaleString('ru')+' ₽</button></div>';
   }
   if(siteBlock)rightHtml+=siteBlock;
 
@@ -940,6 +938,19 @@ window.openOrderModal=function(id){
   document.getElementById('ordModalRight').innerHTML=rightHtml;
   showOverlay(document.getElementById('ordModalOverlay'));
   lockScroll();
+  // на мобилке шапка вылезла в position:fixed поверх экрана (см. CSS) —
+  // отжимаем тело заказа на её реальную высоту, иначе контент полезет под неё
+  requestAnimationFrame(()=>{
+    const headerEl=document.querySelector('#ordModalOverlay .ord-modal-header');
+    const bodyEl=document.getElementById('ordModalBody');
+    if(headerEl&&bodyEl){
+      if(window.matchMedia('(max-width:600px)').matches){
+        bodyEl.style.paddingTop=(headerEl.offsetHeight+30)+'px';
+      }else{
+        bodyEl.style.paddingTop='';
+      }
+    }
+  });
 };
 
 // TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase

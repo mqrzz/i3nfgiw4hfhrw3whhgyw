@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antviz Status</title>
+<title>Antviz — Статус сервисов</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -73,7 +73,7 @@
     display:flex; align-items:center;
   }
   .logo-mark{
-    height:47px; width:auto; color:var(--text); flex-shrink:0;
+    height:34px; width:auto; color:var(--text); flex-shrink:0;
   }
   .logo-mark svg{height:100%; width:auto; display:block;}
   .theme-toggle{
@@ -343,7 +343,7 @@
     .subscribe-btn{width:100%;}
     .status-banner-left{width:100%;}
     .uptime-bar{gap:1.5px;}
-    .logo-mark{height:38px;}
+    .logo-mark{height:28px;}
   }
 
   @media (max-width:360px){
@@ -383,9 +383,19 @@
     </div>
   </div>
 
+  <div id="active-incidents-section" style="display:none;">
+    <div class="section-label">Сейчас</div>
+    <div id="active-incidents"></div>
+  </div>
+
   <div class="section-label">Сервисы</div>
   <div class="services" id="services">
     <!-- rows injected by JS -->
+  </div>
+
+  <div id="scheduled-incidents-section" style="display:none;">
+    <div class="section-label">Запланировано</div>
+    <div id="scheduled-incidents"></div>
   </div>
 
   <div class="section-label">История инцидентов</div>
@@ -430,12 +440,11 @@
   //      Note: the "Antviz" mark itself is custom-drawn artwork, not set type, so an
   //      exact stylistic match isn't possible — this uses the site's own type system
   //      instead, converted to paths so it's still true vector, not a font dependency.)
-  const LOGO_SVG = `<svg class="nv-logo-mark" viewBox="0 0 3260 600" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"><g transform="translate(0,484) scale(0.1,-0.1)" fill="currentColor"><path d="M13107 4247 c-49 -14 -128 -91 -161 -155 -54 -106 -25 -237 70 -321 92 -81 177 -99 275 -60 164 64 227 226 151 391 -16 35 -40 73 -53 85 -62 56 -197 85 -282 60z"/><path d="M7857 3914 c-4 -4 -7 -505 -7 -1113 0 -1051 1 -1111 19 -1196 20 -93 63 -209 99 -267 11 -18 34 -55 51 -83 112 -186 306 -327 536 -391 l100 -28 444 -4 c277 -2 447 0 453 6 14 14 12 411 -3 428 -9 11 -76 14 -361 14 -322 0 -356 2 -439 21 -154 37 -281 131 -344 254 -77 152 -78 161 -82 788 -3 419 -1 562 8 573 9 12 81 14 430 14 247 0 428 4 443 10 l26 10 0 213 c0 152 -3 216 -12 225 -9 9 -121 12 -444 12 -335 0 -435 3 -441 13 -4 6 -10 122 -13 257 l-5 245 -226 3 c-124 1 -228 -1 -232 -4z"/><path d="M2090 3388 c-19 -5 -63 -15 -97 -22 -34 -7 -119 -42 -190 -76 -115 -57 -137 -73 -223 -156 -90 -88 -105 -109 -164 -234 -11 -25 -27 -52 -33 -61 -7 -8 -20 -38 -29 -65 -54 -169 -64 -279 -64 -696 0 -277 4 -379 15 -450 15 -85 60 -232 85 -275 5 -10 15 -29 20 -43 17 -40 58 -104 105 -164 44 -56 195 -172 283 -217 84 -43 175 -73 266 -89 65 -11 1114 -12 1276 -1 90 6 95 7 98 30 2 13 -6 36 -17 52 -12 15 -21 31 -21 35 0 4 -15 30 -34 58 -18 28 -57 96 -85 151 -29 55 -58 103 -64 107 -7 4 -226 8 -487 8 -439 0 -481 2 -548 20 -168 44 -316 187 -347 332 -4 18 -11 38 -15 43 -17 23 -21 105 -21 443 1 330 3 363 22 432 24 85 39 121 73 168 69 94 122 135 231 179 l70 28 680 0 680 0 5 -1045 c3 -575 6 -1046 8 -1047 1 -2 105 -3 231 -3 195 0 232 2 245 16 14 14 16 143 16 1273 0 964 -3 1260 -12 1269 -15 15 -1903 15 -1958 0z"/><path d="M5310 3390 c-132 -28 -199 -55 -328 -133 -84 -51 -163 -129 -245 -243 -74 -103 -121 -256 -143 -469 -21 -193 -17 -1681 4 -1702 19 -19 445 -19 460 0 8 9 12 275 15 847 3 763 5 840 21 895 35 119 130 236 230 285 124 61 137 62 679 58 l492 -4 63 -28 c124 -54 198 -122 258 -239 47 -89 47 -94 51 -971 2 -582 7 -834 14 -843 16 -18 449 -19 467 -1 9 9 12 208 12 833 0 857 2 815 -40 1021 -28 134 -93 272 -181 383 -80 99 -162 166 -269 217 -41 20 -84 41 -95 47 -11 6 -36 14 -55 18 -19 3 -62 14 -95 23 -52 14 -136 16 -670 15 -335 -1 -626 -5 -645 -9z"/><path d="M9603 3385 c-6 -18 15 -68 106 -245 133 -260 538 -1068 567 -1130 16 -36 61 -126 98 -200 38 -74 77 -153 87 -175 10 -22 60 -128 112 -235 53 -107 127 -262 166 -345 39 -82 79 -166 88 -185 l18 -35 229 -3 c198 -2 231 0 247 14 17 15 67 112 184 359 31 66 61 127 66 135 5 8 18 33 28 55 10 22 42 90 70 150 28 61 56 119 63 130 27 46 148 294 148 303 0 5 25 56 55 113 31 57 69 133 86 169 27 58 140 289 272 555 25 50 68 135 96 190 134 264 181 369 170 382 -9 10 -67 13 -263 13 -138 0 -256 -4 -262 -8 -18 -12 -194 -360 -194 -384 0 -7 -13 -38 -29 -68 -91 -177 -127 -252 -191 -391 -40 -84 -96 -210 -127 -279 -30 -69 -58 -133 -63 -142 -39 -71 -149 -298 -155 -318 -9 -32 -122 -264 -152 -312 -13 -21 -30 -38 -37 -38 -13 0 -124 214 -216 415 -17 39 -71 151 -120 250 -193 395 -241 495 -298 620 -33 72 -71 150 -86 175 -14 25 -30 55 -35 67 -6 12 -33 70 -62 130 -28 59 -69 145 -90 189 -21 45 -46 85 -55 88 -8 3 -128 6 -265 6 -215 0 -250 -2 -256 -15z"/><path d="M12966 3384 c-14 -14 -16 -142 -16 -1265 0 -843 3 -1257 10 -1270 10 -18 23 -19 233 -19 160 0 226 3 235 12 9 9 12 306 12 1275 0 1238 0 1262 -19 1273 -12 6 -104 10 -230 10 -177 0 -212 -2 -225 -16z"/><path d="M14043 3393 c-16 -6 -18 -419 -3 -443 8 -13 101 -16 702 -20 671 -5 693 -6 696 -24 2 -10 -3 -23 -11 -27 -8 -5 -41 -41 -73 -81 -33 -40 -111 -136 -174 -213 -133 -161 -205 -251 -308 -379 -41 -50 -90 -109 -110 -131 -21 -22 -64 -74 -97 -116 -111 -142 -189 -240 -295 -366 -58 -69 -129 -157 -158 -195 -29 -38 -82 -106 -117 -151 -35 -45 -82 -105 -105 -134 l-40 -52 0 -109 c0 -91 3 -111 16 -116 9 -3 536 -6 1173 -6 887 0 1160 3 1169 12 17 17 17 409 0 426 -9 9 -199 12 -795 12 -657 0 -783 2 -783 14 0 7 24 41 53 74 146 169 252 295 309 369 110 142 220 276 269 328 26 28 67 75 91 106 57 75 272 330 337 399 28 30 51 58 51 61 0 10 257 321 322 390 13 14 52 59 85 100 l61 75 0 87 c1 65 -3 90 -14 102 -14 13 -141 15 -1127 14 -612 0 -1118 -3 -1124 -6z"/></g><line x1="1752" y1="90" x2="1830" y2="404" stroke="currentColor" stroke-width="26" stroke-linecap="round"></line><g transform="translate(1890,484) scale(0.19,-0.19)" fill="currentColor"><path d="M813.25 -30Q595.5 -30 429.75 58.875Q264 147.75 171.125 310.875Q78.25 474 78.25 696Q78.25 857.75 132.625 992.125Q187 1126.5 286.375 1224.625Q385.75 1322.75 521.125 1376.375Q656.5 1430 817.75 1430Q993.25 1430 1111.875 1385.75Q1230.5 1341.5 1326.75 1260.5L1161.25 988Q1102.5 1047.75 1020.875 1077.375Q939.25 1107 839.75 1107Q742 1107 665.375 1078.625Q588.75 1050.25 535.5 997.125Q482.25 944 454.25 869.0Q426.25 794 426.25 700.5Q426.25 572.5 476.75 481.625Q527.25 390.75 621.25 342.125Q715.25 293.5 846.25 293.5Q940 293.5 1032.5 322.375Q1125 351.25 1208.25 414.5L1360.25 136Q1263.25 61 1128.125 15.5Q993 -30 813.25 -30Z" transform="translate(0,0)"/>
-<path d="M338.75 0V760H45.25V1020H960.25V760H666.75V0Z" transform="translate(1397,0)"/>
-<path d="M422.5 -30Q321.25 -30 240.25 9.375Q159.25 48.75 111.875 122.25Q64.5 195.75 64.5 298.5Q64.5 386.75 108.25 454.875Q152 523 240.0 566.875Q328 610.75 461.375 626.25Q594.75 641.75 774 625.5L777 422Q681.75 438.75 605.375 439.5Q529 440.25 475.25 426.375Q421.5 412.5 392.75 384.75Q364 357 364 315.75Q364 262.5 404.5 234.75Q445 207 512.75 207Q572.25 207 619.75 227.875Q667.25 248.75 695.375 289.25Q723.5 329.75 723.5 389V621.5Q723.5 676.75 700.75 718.75Q678 760.75 628.375 784.375Q578.75 808 496.5 808Q417.5 808 339.875 784.25Q262.25 760.5 199.5 714L115.75 938.5Q215.25 1001.25 328.25 1030.625Q441.25 1060 549.5 1060Q694 1060 803.625 1014.125Q913.25 968.25 974.875 872.25Q1036.5 776.25 1036.5 626V0H753.5V108Q704.5 41.75 618.5 5.875Q532.5 -30 422.5 -30Z" transform="translate(2403,0)"/>
-<path d="M338.75 0V760H45.25V1020H960.25V760H666.75V0Z" transform="translate(3563,0)"/>
-<path d="M287.75 -447Q217.75 -447 151.0 -432.875Q84.25 -418.75 27.5 -388.5L97.25 -114Q129.5 -131.5 168.875 -141.5Q208.25 -151.5 242.25 -151.5Q297 -151.5 335.625 -128.5Q374.25 -105.5 390.75 -52L406.25 -4L10.25 1020H365.75L591.75 320.5L811.25 1020H1157.75L734.75 -101.5Q683.25 -231.25 614.5 -306.75Q545.75 -382.25 463.0 -414.625Q380.25 -447 287.75 -447Z" transform="translate(4569,0)"/>
-<path d="M620.25 -30Q458 -30 330.375 40.625Q202.75 111.25 129.0 233.375Q55.25 355.5 55.25 510Q55.25 625.75 98.75 724.0Q142.25 822.25 220.875 895.625Q299.5 969 404.75 1009.5Q510 1050 633.25 1050Q748.5 1050 847.5 1018.375Q946.5 986.75 1026.25 924L881.75 680.5Q832.75 725.5 774.375 746.75Q716 768 652.25 768Q567.5 768 506.75 737.75Q446 707.5 413.375 649.875Q380.75 592.25 380.75 510.5Q380.75 389 453.5 320.5Q526.25 252 653.25 252Q724.5 252 788.25 278.5Q852 305 904.75 355.5L1037.75 107.5Q952 43.5 841.625 6.75Q731.25 -30 620.25 -30Z" transform="translate(5733,0)"/></g></svg>`;
+  // Логотип «antviz status» — векторизован напрямую из присланной картинки
+  // (potrace), не имитация шрифтом. Единый вордмарк, currentColor — перекрашивается
+  // вместе с темой.
+  const LOGO_SVG = `<svg viewBox="0 0 1890.960855 208.982914" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-44.092584,525.816524) scale(0.100000,-0.100000)" fill="currentColor" stroke="none"> <path d="M7794 5249 c-42 -12 -101 -79 -110 -124 -20 -106 42 -193 145 -203 29 -2 64 1 81 8 41 17 87 71 101 120 22 74 -19 156 -95 191 -45 20 -74 22 -122 8z"/> <path d="M4480 5090 c-20 -20 -20 -33 -20 -703 0 -451 4 -704 11 -743 26 -142 124 -286 253 -372 140 -94 150 -96 474 -100 209 -2 287 0 298 9 18 15 20 239 2 257 -9 9 -77 12 -245 12 -209 0 -238 2 -287 20 -69 26 -134 83 -171 151 -30 54 -30 54 -30 439 l0 385 284 3 c189 1 289 6 298 13 9 8 13 42 13 124 0 95 -3 114 -18 128 -16 15 -55 17 -298 19 l-279 3 -3 175 c-2 150 -5 177 -19 188 -11 8 -55 12 -130 12 -100 0 -115 -2 -133 -20z"/> <path d="M12155 5084 c-14 -15 -15 -85 -13 -733 3 -716 3 -716 26 -781 63 -175 195 -309 365 -371 57 -21 83 -23 309 -27 298 -4 281 -14 274 146 -2 61 -8 108 -16 117 -10 12 -47 15 -219 15 -234 0 -271 7 -339 66 -22 19 -54 62 -71 96 -31 61 -31 61 -31 438 0 279 3 379 12 388 9 9 90 12 303 12 213 0 294 3 303 12 17 17 17 244 0 255 -7 4 -148 10 -313 13 l-300 5 -5 170 c-3 94 -9 176 -13 183 -6 8 -44 12 -132 12 -100 0 -127 -3 -140 -16z"/> <path d="M15106 5084 c-14 -14 -16 -92 -16 -713 0 -763 -1 -753 60 -876 66 -134 189 -244 331 -296 59 -21 83 -23 310 -27 218 -3 248 -2 263 13 13 13 16 37 16 123 0 59 -5 114 -10 122 -8 12 -49 16 -237 20 -228 5 -228 5 -282 35 -31 17 -71 51 -93 78 -65 83 -68 106 -68 508 0 344 1 359 19 369 12 6 129 10 310 10 277 0 291 1 301 19 16 31 13 213 -4 237 -14 18 -32 19 -313 24 l-298 5 -5 166 c-4 120 -9 171 -19 183 -19 23 -242 24 -265 0z"/> <path d="M933 4719 c-227 -38 -423 -224 -478 -454 -14 -59 -16 -117 -13 -365 3 -315 4 -317 61 -439 29 -63 133 -169 208 -214 129 -76 142 -78 603 -75 376 3 410 4 420 20 8 14 7 23 -3 40 -8 13 -37 64 -64 113 -27 50 -52 92 -54 95 -3 3 -154 7 -336 10 -321 5 -333 6 -374 28 -60 31 -112 87 -140 148 -24 53 -24 56 -21 321 3 268 3 268 30 318 32 62 103 129 166 158 46 21 58 22 460 22 l414 0 1 -621 c2 -509 5 -624 16 -638 19 -23 252 -24 275 0 14 14 16 97 16 764 0 667 -2 750 -16 764 -14 14 -78 16 -567 15 -304 -1 -575 -5 -604 -10z"/> <path d="M2925 4715 c-206 -45 -364 -188 -433 -390 -27 -80 -27 -80 -30 -603 -2 -388 0 -528 9 -538 9 -11 41 -14 133 -14 66 0 128 5 136 10 13 8 16 82 20 532 5 519 5 523 28 565 35 66 79 110 140 140 57 28 57 28 365 31 255 3 317 0 361 -12 71 -21 146 -88 176 -158 23 -53 23 -53 21 -561 -1 -338 2 -514 9 -527 10 -18 22 -20 138 -20 86 0 132 4 140 12 9 9 12 142 12 538 0 579 -1 585 -63 710 -66 133 -224 253 -374 285 -93 20 -699 20 -788 0z"/> <path d="M5606 4714 c-9 -8 -16 -22 -16 -31 0 -8 47 -103 104 -212 57 -108 226 -434 376 -726 150 -291 279 -540 286 -552 14 -22 20 -23 154 -23 134 0 140 1 153 23 8 12 96 184 197 382 100 198 270 527 376 731 107 203 194 378 194 387 0 9 -9 21 -19 27 -29 15 -273 13 -293 -2 -19 -15 -40 -54 -364 -695 -131 -260 -241 -473 -244 -473 -3 0 -56 100 -117 223 -304 600 -477 933 -491 945 -11 8 -57 12 -148 12 -107 0 -136 -3 -148 -16z"/> <path d="M7697 4712 c-16 -17 -17 -85 -17 -768 0 -570 3 -753 12 -762 8 -8 53 -12 138 -12 85 0 130 4 138 12 9 9 12 194 12 770 0 738 0 758 -19 768 -11 5 -71 10 -134 10 -98 0 -116 -3 -130 -18z"/> <path d="M8377 4717 c-15 -11 -17 -28 -15 -137 l3 -125 463 -3 c254 -1 462 -5 462 -8 0 -3 -27 -35 -59 -72 -32 -37 -191 -220 -352 -407 -161 -187 -353 -408 -426 -492 -133 -151 -133 -151 -133 -215 0 -36 5 -69 12 -76 17 -17 1439 -17 1456 0 8 8 12 51 12 128 0 77 -4 120 -12 128 -9 9 -133 12 -496 12 -484 0 -484 0 -455 34 34 42 522 605 766 884 177 204 177 204 177 272 0 58 -3 71 -19 80 -31 16 -1362 14 -1384 -3z"/> <path d="M10811 4719 c-178 -35 -317 -185 -340 -367 -31 -248 76 -434 292 -505 57 -19 88 -20 377 -21 315 -1 315 -1 360 -26 66 -37 92 -87 88 -172 -3 -57 -8 -73 -34 -105 -57 -71 -66 -72 -595 -73 -361 0 -469 -3 -477 -12 -6 -7 -12 -66 -14 -131 -2 -96 0 -119 12 -127 22 -14 975 -13 1042 1 234 49 383 274 348 526 -27 197 -174 358 -360 393 -29 6 -186 10 -349 10 -288 0 -297 1 -336 23 -82 45 -106 158 -52 238 47 70 40 69 558 69 400 1 469 3 487 16 20 14 22 23 22 134 0 108 -2 120 -19 130 -24 12 -945 12 -1010 -1z"/> <path d="M13740 4715 c-217 -44 -392 -207 -459 -429 -19 -62 -21 -93 -21 -360 0 -321 5 -356 61 -468 40 -79 143 -183 225 -225 112 -59 142 -63 525 -63 191 0 354 3 363 6 26 10 19 33 -43 154 l-58 115 -279 5 c-257 5 -283 7 -325 26 -63 30 -116 79 -147 138 -27 51 -27 51 -30 307 -3 242 -2 258 19 314 28 76 88 141 164 176 60 29 60 29 428 29 l367 0 0 -616 c0 -405 4 -622 10 -635 10 -17 22 -19 133 -19 82 0 127 4 135 12 9 9 12 194 12 770 0 758 0 758 -26 768 -41 16 -974 11 -1054 -5z"/> <path d="M18305 4723 c-152 -20 -288 -128 -347 -273 -19 -47 -23 -74 -23 -180 0 -121 1 -127 32 -190 43 -86 84 -135 157 -182 103 -66 123 -69 466 -69 262 0 312 -2 354 -17 162 -56 155 -305 -11 -351 -24 -7 -206 -11 -509 -11 -352 0 -473 -3 -482 -12 -17 -17 -17 -239 0 -256 16 -16 972 -17 1050 -1 177 37 316 178 349 355 45 241 -76 464 -296 546 -56 21 -80 23 -397 28 -320 5 -338 6 -364 26 -82 61 -99 171 -37 244 51 61 39 60 550 64 258 3 475 7 485 11 22 9 28 36 28 143 0 145 49 132 -507 131 -258 -1 -481 -4 -498 -6z"/> <path d="M16246 4701 c-16 -17 -17 -61 -14 -552 3 -531 3 -534 26 -599 53 -145 153 -263 276 -324 109 -54 141 -58 473 -54 278 4 302 5 358 26 171 64 309 208 368 382 21 63 21 82 25 584 3 478 2 520 -14 537 -15 16 -32 19 -129 19 -73 0 -117 -4 -128 -12 -15 -12 -17 -61 -19 -518 -3 -493 -3 -506 -25 -552 -30 -66 -95 -132 -156 -159 -50 -23 -61 -24 -302 -24 -233 0 -253 1 -295 21 -56 26 -104 74 -138 139 -27 50 -27 50 -30 565 -2 467 -4 516 -19 528 -11 8 -55 12 -128 12 -97 0 -114 -3 -129 -19z"/> </g></svg>`;
+
   document.getElementById('logo-mark').innerHTML = LOGO_SVG;
 
   // ---- API ----
@@ -524,12 +533,13 @@
       const row = document.createElement('div');
       row.className = 'service-row';
       const uptimeLabel = s.uptimePct === null ? 'нет автопроверки (статус только вручную)' : `${s.uptimePct}% за 90 дней`;
+      const latencyLabel = s.latencyMs !== null && s.latencyMs !== undefined ? ` · ~${s.latencyMs} мс` : '';
       row.innerHTML = `
         <div class="service-top">
           <div class="service-name">${esc(s.name)}</div>
           <div class="service-status">
             <span class="status-dot ${s.status}"></span>
-            <span class="status-label ${s.status}">${statusLabels[s.status] || s.status}</span>
+            <span class="status-label ${s.status}">${statusLabels[s.status] || s.status}${latencyLabel}</span>
           </div>
         </div>
         <div class="uptime-bar">${buildUptimeBarHtml(s.days)}</div>
@@ -551,35 +561,18 @@
   }
 
   function renderIncidents(incidents){
-    const box = document.getElementById('incidents');
-    const empty = document.getElementById('incidents-empty');
-    box.querySelectorAll('.incident-day').forEach(el => el.remove());
-
-    if(incidents.length === 0){
-      empty.style.display = 'block';
-      return;
-    }
-    empty.style.display = 'none';
-
-    // группируем подряд идущие инциденты одного календарного дня под одним заголовком
-    let lastDay = null, dayWrap = null;
-    incidents.forEach(inc => {
-      const dayKey = fmtDate(inc.createdAt);
-      if(dayKey !== lastDay){
-        dayWrap = document.createElement('div');
-        dayWrap.className = 'incident-day';
-        dayWrap.innerHTML = `<div class="incident-date">${esc(dayKey)}</div>`;
-        box.appendChild(dayWrap);
-        lastDay = dayKey;
-      }
-      const badgeClass = inc.status === 'resolved' ? 'resolved' : (severityBadgeClass[inc.severity] || 'maint');
-      const card = document.createElement('div');
-      card.className = 'incident-card';
-      card.innerHTML = `
+  function buildIncidentCardHtml(inc){
+    const badgeClass = inc.status === 'resolved' ? 'resolved' : (severityBadgeClass[inc.severity] || 'maint');
+    const scheduledNote = inc.group === 'scheduled' && inc.scheduledAt
+      ? `<p style="font-size:12.5px; color:var(--text-faint); margin-top:6px;">Запланировано на ${esc(fmtDate(inc.scheduledAt))}, ${esc(fmtTime(inc.scheduledAt))}</p>`
+      : '';
+    return `
+      <div class="incident-card">
         <div class="incident-header">
           <div class="incident-title">${esc(inc.title)}${inc.serviceName ? ` — ${esc(inc.serviceName)}` : ''}</div>
           <div class="incident-badge ${badgeClass}">${incidentBadgeLabels[inc.status] || inc.status}</div>
         </div>
+        ${scheduledNote}
         <div class="timeline">
           ${inc.updates.slice().reverse().map(u => `
             <div class="timeline-item resolved">
@@ -592,9 +585,47 @@
             </div>
           `).join('')}
         </div>
-      `;
-      dayWrap.appendChild(card);
-    });
+      </div>
+    `;
+  }
+
+  function renderIncidents(incidents){
+    const box = document.getElementById('incidents');
+    const empty = document.getElementById('incidents-empty');
+    box.querySelectorAll('.incident-day').forEach(el => el.remove());
+
+    const active = incidents.filter(i => i.group === 'active');
+    const scheduled = incidents.filter(i => i.group === 'scheduled');
+    const history = incidents.filter(i => i.group === 'history');
+
+    // "Сейчас" — активные проблемы, прямо под баннером, без группировки по дате
+    const activeSection = document.getElementById('active-incidents-section');
+    document.getElementById('active-incidents').innerHTML = active.map(buildIncidentCardHtml).join('');
+    activeSection.style.display = active.length > 0 ? 'block' : 'none';
+
+    // "Запланировано" — будущие технические работы
+    const scheduledSection = document.getElementById('scheduled-incidents-section');
+    document.getElementById('scheduled-incidents').innerHTML = scheduled.map(buildIncidentCardHtml).join('');
+    scheduledSection.style.display = scheduled.length > 0 ? 'block' : 'none';
+
+    // "История" — закрытые, сгруппированы по календарному дню, как раньше
+    if(history.length === 0){
+      empty.style.display = 'block';
+    } else {
+      empty.style.display = 'none';
+      let lastDay = null, dayWrap = null;
+      history.forEach(inc => {
+        const dayKey = fmtDate(inc.createdAt);
+        if(dayKey !== lastDay){
+          dayWrap = document.createElement('div');
+          dayWrap.className = 'incident-day';
+          dayWrap.innerHTML = `<div class="incident-date">${esc(dayKey)}</div>`;
+          box.appendChild(dayWrap);
+          lastDay = dayKey;
+        }
+        dayWrap.insertAdjacentHTML('beforeend', buildIncidentCardHtml(inc));
+      });
+    }
   }
 
   let currentServices = [];
@@ -687,7 +718,7 @@
       document.getElementById('modal-form').classList.add('hidden');
       if(data.alreadySubscribed){
         document.getElementById('modal-success-title').textContent = 'Вы уже подписаны';
-        document.getElementById('modal-success-text').textContent = 'Этот email уже получает уведомления о статусе — проверьте почту.';
+        document.getElementById('modal-success-text').textContent = 'Этот email уже получает уведомления о статусе — письма повторно отправлять не будем.';
       } else {
         document.getElementById('modal-success-title').textContent = 'Готово';
         document.getElementById('modal-success-text').textContent = 'Мы отправим письмо на указанный адрес при изменении статуса.';
@@ -779,6 +810,9 @@
           </select>
           <label>Описание (первая запись в таймлайне)</label>
           <textarea id="ai-message" rows="3" placeholder="Что происходит, что уже делаем" required></textarea>
+          <label>Запланировать на будущее (необязательно)</label>
+          <input type="datetime-local" id="ai-scheduled">
+          <p style="font-size:12px; color:var(--text-faint); margin-top:2px;">Если указать будущую дату — статус сервиса не поменяется сразу, инцидент появится в разделе «Запланировано». Оставь пустым для «происходит прямо сейчас».</p>
           <button type="submit" class="admin-submit">Создать инцидент и разослать подписчикам</button>
         </form>
 
@@ -824,6 +858,7 @@
           serviceId: panel.querySelector('#ai-service').value || null,
           severity: panel.querySelector('#ai-severity').value,
           message: panel.querySelector('#ai-message').value,
+          scheduledAt: panel.querySelector('#ai-scheduled').value ? panel.querySelector('#ai-scheduled').value + ':00+03:00' : null,
         });
         showMsg('Инцидент создан, подписчики уведомлены.', true);
         e.target.reset();

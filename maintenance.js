@@ -71,8 +71,9 @@
     function render() {
       if (!authReady || maintOn === null) return;
 
-      // Тех.работы важнее бана — если сайт лежит для всех, экран бана не нужен
-      if (maintOn) {
+      // Тех.работы важнее бана — если сайт лежит для всех, экран бана не нужен.
+      // Админу оверлей тех.работ не показываем — ему нужно видеть сайт как есть.
+      if (maintOn && !(currentUser && currentUser.role === 'admin')) {
         removeBan();
         renderMaint();
         return;

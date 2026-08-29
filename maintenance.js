@@ -191,6 +191,7 @@
             </div>
             <div id="maint-actions">
               <button class="mt-btn" id="maint-refresh">Обновить страницу</button>
+              <a class="mt-btn" id="maint-status" href="https://antviz.ru/status" target="_blank" rel="noopener" style="background:#fff;color:#191b1e;border:1px solid #dfe3e8;">Посмотреть статус систем</a>
               <a id="maint-support" href="https://t.me/antviz_official" target="_blank" rel="noopener">Поддержка в Telegram</a>
             </div>
           </div>

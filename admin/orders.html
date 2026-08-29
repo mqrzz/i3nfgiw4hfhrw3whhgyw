@@ -2,250 +2,234 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Заказы — Antviz Admin</title>
+<title>Заказы — Antviz Admin.</title>
 <link rel="icon" href="../img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--page);overflow:hidden}
+html,body{height:100%;background:#f3f4f7}
 :root{
-  --green:#1ede7b;--green-h:#1ac16b;--green-d:#149955;--green-light:rgba(30,222,123,.12);
-  --blue:#3b82f6;--blue-light:rgba(59,130,246,.12);
-  --purple:#7c3aed;--purple-light:rgba(124,58,237,.12);
-  --amber:#f59e0b;--amber-d:#b45309;--amber-light:rgba(245,158,11,.12);
-  --red:#e8634f;--red-light:rgba(232,99,79,.1);
-  --page:#f5f6f8;--card:#fff;--border:#e7e9ee;--border2:#d7dbe2;
-  --text:#191b1e;--muted:#70798a;
-  --dark:#191b1e;--dark2:#2b2f33;
+  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;--green-soft2:#d1f5e0;
+  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
+  --bg:#f3f4f7;--card:#ffffff;
+  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
+  --dark:#14171c;
   --font:'Geologica','Inter',sans-serif;
-  --sw:256px;--th:76px;
+  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --sh-sm:0 1px 2px rgba(20,23,30,.04);
+  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
+  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
+  --maxw:1080px;
 }
-body{color:var(--text);font-family:var(--font);font-weight:300;-webkit-font-smoothing:antialiased}
+body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
 @keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
 svg{display:block}
 
-/* LOADING */
 .ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
 .sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 .lt{font-size:13px;color:rgba(255,255,255,.35)}
 
-/* SIDEBAR */
-.sb{position:fixed;top:0;left:0;bottom:0;width:var(--sw);background:var(--dark);display:flex;flex-direction:column;z-index:200}
-.sb-logo{padding:24px 20px 20px;display:flex;align-items:center;gap:12px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.07)}
-.lm{width:34px;height:34px;border-radius:12px;background:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.lm svg{width:18px;height:18px;fill:var(--dark)}
-.ln{font-weight:500;font-size:.95rem;color:#fff;letter-spacing:-.02em}
-.lb{margin-left:auto;font-size:.58rem;font-weight:500;letter-spacing:.07em;text-transform:uppercase;background:rgba(232,99,79,.15);color:#ff8b7a;border:1px solid rgba(232,99,79,.25);padding:.15rem .5rem;border-radius:7px}
-.sb-nav{flex:1;padding:14px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:2px}
-.ns{font-size:.6rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.25);padding:14px 10px 5px;margin-top:6px}
-.ni{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;text-decoration:none;color:rgba(255,255,255,.45);font-size:.85rem;font-weight:300;transition:background .12s,color .12s;cursor:pointer;border:none;background:none;width:100%;font-family:var(--font);position:relative}
-.ni:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85)}
-.ni.active{background:rgba(30,222,123,.13);color:var(--green);font-weight:500}
-.ni.active::before{content:'';position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--green)}
-.ni svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.nb{position:absolute;right:10px;background:var(--red);color:#fff;font-size:.58rem;font-weight:500;min-width:17px;height:17px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px}
-.sb-foot{padding:12px;border-top:1px solid rgba(255,255,255,.07)}
+.app{display:none;height:100vh;overflow:hidden;flex-direction:column;background:var(--bg)}
+.m-trigger{display:none;position:fixed;top:16px;left:16px;z-index:120;width:42px;height:42px;border-radius:var(--r-sm);border:none;background:var(--card);box-shadow:var(--sh-md);color:var(--text);align-items:center;justify-content:center;cursor:pointer}
+.m-trigger svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
 
-/* TOPBAR */
-.tb{position:fixed;top:0;left:var(--sw);right:0;height:var(--th);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 32px;z-index:100;gap:20px}
-.tb-l{display:flex;align-items:center;gap:20px;min-width:0}
-.tb-title{font-weight:600;font-size:1.3rem;letter-spacing:-.03em;flex-shrink:0}
-.tb-stats{display:flex;gap:8px;overflow-x:auto}
-.ts{background:var(--page);border:1px solid var(--border);border-radius:14px;padding:.4rem .6rem .4rem .5rem;font-size:.76rem;color:var(--muted);display:flex;align-items:center;gap:8px;white-space:nowrap}
-.ts-ico{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--accent-bg);color:var(--accent)}
-.ts-ico svg{width:12px;height:12px;stroke:currentColor;stroke-width:2.2;fill:none}
-.ts strong{font-weight:600;color:var(--text);font-size:.86rem}
-.tab-row{display:flex;gap:5px;flex-shrink:0}
-.tab{background:none;border:1.5px solid var(--border);border-radius:12px;padding:.45rem 1rem;font-family:var(--font);font-size:.8rem;font-weight:400;color:var(--muted);cursor:pointer;transition:all .12s}
-.tab:hover{border-color:var(--border2);color:var(--text)}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
+.screen.active{display:flex;animation:fadeUp .22s ease both}
+.screen-stack{position:relative;flex:1;min-height:0}
+
+.icon-btn{width:40px;height:40px;border-radius:var(--r-sm);border:none;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .12s}
+.icon-btn:hover{background:var(--line)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.icon-btn.ghost{background:none}
+.icon-btn.ghost:hover{background:var(--line)}
+.back-label{display:none;font-size:.86rem;font-weight:500;white-space:nowrap}
+
+/* ===== SCREEN 1 — LIST ===== */
+#screenList .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow-y:auto}
+.list-head{padding-top:36px;flex-shrink:0}
+.page-title{font-size:1.7rem;font-weight:500;letter-spacing:-.02em;margin-bottom:18px}
+
+.stat-row{display:flex;gap:10px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px}
+.stat-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:.7rem 1.1rem;flex-shrink:0}
+.stat-chip-ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stat-chip-ic svg{width:14px;height:14px;stroke-width:2;fill:none}
+.stat-chip b{font-size:.98rem;font-weight:600}
+.stat-chip span{font-size:.8rem;color:var(--muted)}
+
+.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap;flex-shrink:0}
+.sb-box{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.75rem 1rem;transition:border-color .15s,box-shadow .15s;flex:1;min-width:220px;max-width:360px}
+.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
+.sb-box svg{width:16px;height:16px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);width:100%}
+.tab-row{display:flex;gap:6px;overflow-x:auto}
+.tab{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-pill);padding:.55rem 1rem;font-family:var(--font);font-size:.83rem;font-weight:400;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0}
+.tab:hover{border-color:var(--muted2);color:var(--text)}
 .tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
 
-/* WORKSPACE: list + detail */
-.ws{display:flex;position:fixed;top:var(--th);left:var(--sw);right:0;bottom:0}
-
-/* COL LIST */
-.cl{width:320px;flex-shrink:0;border-right:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;overflow:hidden}
-.cl-head{padding:16px 14px 12px;border-bottom:1px solid var(--border)}
-.sb-box{display:flex;align-items:center;gap:8px;background:var(--page);border:1.5px solid var(--border);border-radius:14px;padding:.6rem .9rem;transition:border-color .15s}
-.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
-.sb-box svg{width:14px;height:14px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
-.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.84rem;font-weight:300;color:var(--text);width:100%}
-.ol{flex:1;overflow-y:auto;padding:10px}
-.or{display:flex;gap:12px;padding:13px 12px;border-radius:20px;cursor:pointer;transition:background .1s;border:1.5px solid transparent;margin-bottom:6px;animation:fadeIn .15s ease}
-.or:hover{background:var(--page)}
-.or.sel{background:var(--green-light);border-color:rgba(30,222,123,.35)}
-.or-avatar{width:44px;height:44px;border-radius:13px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:1rem;color:#fff;letter-spacing:-.02em}
+.orders-scroll{flex:1;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
+.or{display:flex;gap:16px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both}
+.or:hover{border-color:var(--line2);box-shadow:var(--sh-md);transform:translateY(-1px)}
+.or-avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:600;font-size:.9rem}
 .or-body{flex:1;min-width:0}
-.or-h{display:flex;align-items:center;gap:6px;margin-bottom:3px}
-.or-id{font-size:.68rem;font-weight:500;color:var(--muted);letter-spacing:.02em}
-.or-name{font-size:.92rem;font-weight:500;color:var(--text);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.or-email{font-size:.74rem;color:var(--muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.or-f{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.or-price{font-size:.78rem;font-weight:600;margin-left:auto;color:var(--green-d)}
-.es{padding:48px 20px;text-align:center;color:var(--muted);font-size:.84rem;display:flex;flex-direction:column;gap:10px;align-items:center}
-.es svg{width:40px;height:40px;stroke:var(--border2);stroke-width:1.3}
+.or-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.or-id{font-size:.72rem;color:var(--muted2);font-weight:500}
+.or-name{font-size:.96rem;font-weight:500;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.or-email{font-size:.78rem;color:var(--muted);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.or-f{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.or-price{font-size:.85rem;font-weight:600;margin-left:auto;color:var(--green-d)}
+.empty-l{text-align:center;padding:70px 16px;color:var(--muted);font-size:.9rem}
 
-/* COL DETAIL */
-.cd{flex:1;min-width:0;min-height:0;display:flex;flex-direction:column;overflow:hidden;background:var(--page)}
-.de{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;color:var(--muted)}
-.de-icon{width:56px;height:56px;border-radius:16px;background:var(--card);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center}
-.de-icon svg{width:26px;height:26px;stroke:var(--border2);stroke-width:1.6}
-.dw{flex:1;overflow-y:auto;padding:32px 36px 60px}
-.dw-inner{max-width:1180px;margin:0 auto}
+.badge{display:inline-flex;align-items:center;gap:5px;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.7rem;font-weight:500;white-space:nowrap;flex-shrink:0}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.b-pending{background:var(--line);color:var(--muted)}.b0{background:var(--line);color:var(--muted)}
+.b1{background:var(--orange-soft);color:var(--orange-d)}.b2{background:var(--info-soft);color:var(--info)}
+.b3{background:var(--purple-soft);color:var(--purple)}.b4{background:var(--orange-soft);color:var(--orange-d)}
+.b5{background:var(--green-soft);color:var(--green-d)}.b6{background:var(--orange-soft);color:var(--orange-d)}
+.tag{display:inline-flex;align-items:center;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.72rem;font-weight:500}
+.tag-blue{background:var(--info-soft);color:var(--info)}.tag-green{background:var(--green-soft);color:var(--green-d)}
+.tag-purple{background:var(--purple-soft);color:var(--purple)}.tag-warn{background:var(--orange-soft);color:var(--orange-d)}
+.pay-text{font-size:.76rem;font-weight:500}
 
-/* HERO */
-.hero{background:var(--dark);border-radius:36px;padding:44px 48px;margin-bottom:20px;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-120px;right:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
-.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:8px;position:relative;z-index:1;flex-wrap:wrap}
-.hero-eyebrow{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.12em;color:var(--green);margin-bottom:10px}
-.hero-num{font-size:clamp(1.9rem,3vw,2.6rem);font-weight:600;letter-spacing:-.04em;color:#fff}
-.hero-name{font-size:.95rem;color:rgba(255,255,255,.4);margin-top:6px;font-weight:300}
-.hero-price-wrap{text-align:right}
-.hero-price-l{font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.35);margin-bottom:6px;font-weight:500}
-.hero-price{font-size:clamp(1.7rem,2.6vw,2.3rem);font-weight:600;color:var(--green);letter-spacing:-.03em}
-.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:28px;position:relative;z-index:1}
-@media(max-width:900px){.hero-grid{grid-template-columns:1fr 1fr}}
-.hc{background:rgba(255,255,255,.06);border-radius:18px;padding:16px 18px;display:flex;align-items:center;gap:12px}
-.hc-ico{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--green)}
-.hc-ico svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
-.hc-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.32);margin-bottom:3px;font-weight:500}
-.hc-v{font-size:.92rem;color:rgba(255,255,255,.9);font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ===== SCREEN 2 — DETAIL ===== */
+#screenDetail .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.d-topbar{display:flex;align-items:center;gap:12px;padding:22px 0 14px;flex-shrink:0}
+.d-topbar .grow{flex:1}
+.d-scroll{flex:1;overflow-y:auto;padding-bottom:40px}
 
-/* LAYOUT GRID: pipeline full width, then 2 columns */
-.grid2{display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start}
-@media(max-width:1080px){.grid2{grid-template-columns:1fr}}
-.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.hero{background:var(--dark);border-radius:var(--r-xl);padding:32px 32px 28px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-70px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;position:relative;z-index:1}
+.hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:8px}
+.hero-num{font-size:1.8rem;font-weight:600;letter-spacing:-.03em;color:#fff}
+.hero-name{font-size:.92rem;color:rgba(255,255,255,.4);margin-top:6px}
+.hero-price-l{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.35);margin-bottom:5px;font-weight:500;text-align:right}
+.hero-price{font-size:1.6rem;font-weight:600;color:var(--green);letter-spacing:-.02em;text-align:right}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:22px;position:relative;z-index:1}
+@media(max-width:800px){.hero-grid{grid-template-columns:1fr 1fr}}
+.hc{background:rgba(255,255,255,.06);border-radius:var(--r-sm);padding:12px 14px}
+.hc-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.32);margin-bottom:3px;font-weight:500}
+.hc-v{font-size:.86rem;color:rgba(255,255,255,.9);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* SECTION CARDS */
-.sec{background:var(--card);border:1.5px solid var(--border);border-radius:26px;overflow:hidden}
-.sec-h{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.sec-h-l{display:flex;align-items:center;gap:12px;min-width:0}
-.sec-icon{width:36px;height:36px;border-radius:11px;background:var(--accent-bg,var(--green-light));color:var(--accent,var(--green-d));display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.sec-icon svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.9;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.sec-title{font-weight:600;font-size:1rem;letter-spacing:-.02em;color:var(--text)}
-.sec-b{padding:22px 24px}
-.sec.pipeline-sec{padding-bottom:4px;margin-bottom:20px}
+.sec{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px}
+.sec-h{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.sec-h-l{display:flex;align-items:center;gap:11px;min-width:0}
+.sec-icon{width:34px;height:34px;border-radius:10px;background:var(--accent-bg,var(--green-soft));color:var(--accent,var(--green-d));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-icon svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.9;fill:none}
+.sec-title{font-weight:500;font-size:.95rem;letter-spacing:-.01em}
+.sec-b{padding:20px 22px}
 
-/* STATUS PIPELINE */
-.pipeline{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:6px 4px 8px}
-.step{display:flex;flex-direction:column;align-items:center;gap:10px;flex:1;min-width:100px;cursor:pointer;position:relative;padding-top:2px;background:none;border:none;font-family:var(--font)}
-.step-line{position:absolute;top:21px;left:-50%;width:100%;height:2px;background:var(--border);z-index:0}
+.pipeline{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding:4px 2px 6px}
+.step{display:flex;flex-direction:column;align-items:center;gap:9px;flex:1;min-width:88px;cursor:pointer;position:relative;padding-top:2px;background:none;border:none;font-family:var(--font)}
+.step-line{position:absolute;top:19px;left:-50%;width:100%;height:2px;background:var(--line);z-index:0}
 .step:first-child .step-line{display:none}
 .step.done .step-line{background:var(--green)}
-.step-node{width:42px;height:42px;border-radius:50%;background:var(--card);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;z-index:1;transition:all .15s;color:var(--muted);flex-shrink:0}
-.step-node svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.step-node{width:38px;height:38px;border-radius:50%;background:var(--card);border:2px solid var(--line2);display:flex;align-items:center;justify-content:center;z-index:1;transition:all .15s;color:var(--muted);flex-shrink:0}
+.step-node svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
 .step.done .step-node{background:var(--green);border-color:var(--green);color:var(--dark)}
-.step.cur .step-node{background:var(--dark);border-color:var(--dark);color:var(--green);transform:scale(1.12)}
-.step:hover .step-node{border-color:var(--border2)}
-.step-label{font-size:.72rem;color:var(--muted);text-align:center;font-weight:400;line-height:1.3}
-.step.cur .step-label{color:var(--text);font-weight:600}
+.step.cur .step-node{background:var(--dark);border-color:var(--dark);color:var(--green);transform:scale(1.1)}
+.step-label{font-size:.7rem;color:var(--muted);text-align:center;line-height:1.3}
+.step.cur .step-label{color:var(--text);font-weight:500}
 .step.done .step-label{color:var(--green-d);font-weight:500}
-.pipeline-comment{padding:0 24px 22px}
 
-/* PAY */
-.pay-row{display:flex;align-items:center;gap:14px;padding:18px 20px;border-radius:18px;background:var(--page);cursor:pointer;transition:background .12s;border:1.5px solid var(--border);margin-bottom:14px}
-.pay-row:hover{background:#eef0f3}
-.pay-row.paid{background:var(--green-light);border-color:rgba(30,222,123,.35)}
-.pay-pill{font-size:.75rem;font-weight:600;padding:.35rem 1rem;border-radius:10px;display:inline-flex;align-items:center;gap:6px}
-.pay-pill svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.4;fill:none}
-.pay-yes{background:rgba(30,222,123,.18);color:var(--green-d)}
-.pay-no{background:rgba(232,99,79,.12);color:var(--red)}
-.pay-lbl{font-size:.84rem;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
+@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;min-width:0}
+.col .sec{margin-bottom:16px}
+.col .sec:last-child{margin-bottom:0}
 
-/* INFO GRID (icon cards) */
-.ig{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .ig.single{grid-template-columns:1fr}
-.ic{background:var(--page);border-radius:16px;padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
-.ic-ico{width:30px;height:30px;border-radius:9px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted)}
-.ic-ico svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.9;fill:none}
-.ic-body{min-width:0}
-.ic-l{font-size:.63rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:4px;font-weight:500}
-.ic-v{font-size:.9rem;color:var(--text);font-weight:400;word-break:break-word}
+.ic{background:var(--bg);border-radius:var(--r-sm);padding:12px 14px}
+.ic-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px;font-weight:500}
+.ic-v{font-size:.88rem;color:var(--text);word-break:break-word}
+.ic.highlight{background:var(--green-soft)}
+.ic.highlight .ic-l{color:var(--green-d)}
+.ic.highlight .ic-v{color:var(--green-d);font-weight:500}
 
-/* SITE FIELDS */
-.sf{display:flex;flex-direction:column;gap:14px}
+.sf{display:flex;flex-direction:column;gap:12px}
 .sf-row{display:flex;flex-direction:column;gap:6px}
-.sf-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
-.si{background:var(--page);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%}
-.si:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.sf-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500}
+.si,.textarea{background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.75rem 1rem;font-family:var(--font);font-size:.88rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.si:focus,.textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.1)}
+.textarea{resize:vertical;min-height:70px;line-height:1.5}
 
-/* SUPPORT */
-.sup{background:var(--green-light);border:1.5px solid rgba(30,222,123,.25);border-radius:20px;padding:22px 24px}
-.sup-t{font-weight:600;font-size:.95rem;color:var(--green-d);margin-bottom:10px;display:flex;align-items:center;gap:8px}
-.sup-t svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none}
+.sup-box{background:var(--green-soft);border-radius:var(--r-md);padding:18px 20px}
+.sup-t{font-weight:500;font-size:.9rem;color:var(--green-d);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.sup-t svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none}
 
-/* ATTACH */
 .ag{display:flex;flex-wrap:wrap;gap:10px}
-.at{width:80px;height:80px;object-fit:cover;border-radius:14px;cursor:pointer;transition:opacity .15s;border:1.5px solid var(--border)}
+.at{width:76px;height:76px;object-fit:cover;border-radius:var(--r-sm);cursor:pointer;transition:opacity .15s;border:1.5px solid var(--line)}
 .at:hover{opacity:.75}
 
-/* BADGES */
-.badge{display:inline-flex;align-items:center;gap:5px;padding:.28rem .75rem;border-radius:9px;font-size:.72rem;font-weight:600;white-space:nowrap}
-.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-.b0{background:#eef0f3;color:var(--muted)}.b1{background:var(--amber-light);color:var(--amber-d)}.b2{background:var(--blue-light);color:var(--blue)}.b3{background:var(--purple-light);color:var(--purple)}.b4{background:var(--amber-light);color:var(--amber-d)}.b5{background:var(--green-light);color:var(--green-d)}.b6{background:var(--amber-light);color:var(--amber-d)}.b-pending{background:#eef0f3;color:var(--muted)}
-.tag{display:inline-block;padding:.28rem .75rem;border-radius:50px;font-size:.72rem;font-weight:600}
-.tag-blue{background:var(--blue-light);color:var(--blue)}.tag-green{background:var(--green-light);color:var(--green-d)}.tag-purple{background:var(--purple-light);color:var(--purple)}.tag-warn{background:var(--amber-light);color:var(--amber-d)}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.84rem;border:none;border-radius:12px;padding:.6rem 1.15rem;cursor:pointer;transition:background .1s,transform .1s;text-decoration:none;white-space:nowrap}
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.85rem;border:none;border-radius:var(--r-sm);padding:.7rem 1.2rem;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap}
 .btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;flex-shrink:0}
 .btn:hover{transform:translateY(-1px)}
 .btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
-.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:var(--dark2)}
-.btn-outline{background:transparent;border:1.5px solid var(--dark);color:var(--dark)}.btn-outline:hover{background:var(--dark);color:#fff}
-.btn-danger{background:var(--red-light);color:var(--red);border:1px solid rgba(232,99,79,.25)}.btn-danger:hover{background:rgba(232,99,79,.18)}
-.btn-blue{background:var(--blue-light);color:var(--blue);border:1px solid rgba(59,130,246,.22)}.btn-blue:hover{background:rgba(59,130,246,.2)}
-.btn-warn{background:var(--amber-light);color:var(--amber-d);border:1px solid rgba(245,158,11,.3)}.btn-warn:hover{background:rgba(245,158,11,.22)}
-.btn-warn.active{background:var(--amber);color:#fff;border-color:var(--amber)}
-.btn-sm{padding:.45rem .95rem;font-size:.8rem;border-radius:10px}
-.btn-xs{padding:.3rem .7rem;font-size:.72rem;border-radius:8px}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#2b2f33}
+.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
+.btn-danger{background:var(--red-soft);color:var(--red)}.btn-danger:hover{background:#fbdbd6}
+.btn-warn{background:var(--orange-soft);color:var(--orange-d)}.btn-warn:hover{background:#fce6c0}
+.btn-block{width:100%;justify-content:center}
+.btn-sm{padding:.5rem 1rem;font-size:.8rem}
 
-/* INPUTS */
-.inp,.sel,.textarea{width:100%;background:var(--page);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s}
-.inp:focus,.sel:focus,.textarea:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
-.textarea{resize:vertical;min-height:80px;line-height:1.5}
+.kebab-wrap{position:relative;flex-shrink:0}
+.kebab-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border-radius:var(--r-md);box-shadow:var(--sh-lg);border:1.5px solid var(--line);padding:10px;width:230px;z-index:60;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s;display:flex;flex-direction:column;gap:6px}
+.kebab-menu.show{opacity:1;pointer-events:all;transform:none}
 
-/* LIGHTBOX */
-.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(10,12,16,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .lightbox.show{opacity:1;pointer-events:all}
-.lightbox img{max-width:90vw;max-height:90vh;border-radius:16px;object-fit:contain}
-.lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
-
-/* TOAST */
-.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.7rem 1.4rem;border-radius:16px;font-size:.84rem;font-weight:500;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--r-md);object-fit:contain}
+.lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
 .toast.show{opacity:1;transform:none}
-.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--amber);color:#fff}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--orange);color:#fff}
 
 /* PROMPT MODAL */
-.pm-ov{position:fixed;inset:0;z-index:2000;background:rgba(25,27,30,.55);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:20px}
+.pm-ov{position:fixed;inset:0;z-index:2000;background:rgba(10,12,16,.5);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:20px}
 .pm-ov.show{opacity:1;pointer-events:all}
-.pm-card{background:var(--card);border-radius:28px;padding:28px 28px 24px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.25);transform:translateY(8px) scale(.98);transition:transform .15s}
-.pm-ov.show .pm-card{transform:none}
-.pm-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
-.pm-icon svg{width:20px;height:20px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
-.pm-title{font-weight:600;font-size:1.02rem;letter-spacing:-.02em;color:var(--text);margin-bottom:6px}
-.pm-sub{font-size:.83rem;color:var(--muted);font-weight:300;line-height:1.5;margin-bottom:18px}
-.pm-field{margin-bottom:20px}
-.pm-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;display:block;margin-bottom:8px}
-.pm-input{background:var(--page);border:1.5px solid var(--border);border-radius:14px;padding:.8rem 1.1rem;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%;resize:vertical}
-.pm-input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.08)}
+.pm-card{background:var(--card);border-radius:var(--r-lg);padding:26px 26px 22px;width:100%;max-width:380px;box-shadow:var(--sh-lg)}
+.pm-icon{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.pm-icon svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
+.pm-title{font-weight:500;font-size:1rem;letter-spacing:-.01em;margin-bottom:6px}
+.pm-sub{font-size:.83rem;color:var(--muted);line-height:1.5;margin-bottom:16px}
+.pm-field{margin-bottom:18px}
+.pm-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500;display:block;margin-bottom:7px}
 .pm-actions{display:flex;gap:10px}
 .pm-actions .btn{flex:1;justify-content:center}
+
+@media (max-width:760px){
+  .m-trigger{display:flex}
+  #screenList .inner,#screenDetail .inner{padding:0 16px}
+  .list-head{padding-top:70px}
+  .page-title{font-size:1.4rem}
+  .d-topbar{padding-top:16px}
+  .hero{padding:24px 20px}
+  .grid2{gap:12px}
+  #screenDetail .d-topbar .exit-btn{width:auto;padding:0 16px 0 12px;gap:7px;justify-content:flex-start;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--sh-sm)}
+  .back-label{display:inline}
+}
 </style>
 </head>
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
+
+<button class="m-trigger" id="mTrigger" onclick="window.openMPanel26 && window.openMPanel26()">
+  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
 <div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lb-x" onclick="event.stopPropagation();closeLightbox()">✕</button><img id="lightboxImg" src="" alt=""/></div>
+
 <div class="pm-ov" id="pmOv" onclick="if(event.target===this)closePromptModal()">
-  <div class="pm-card" id="pmCard">
+  <div class="pm-card">
     <div class="pm-icon" id="pmIcon"></div>
     <div class="pm-title" id="pmTitle"></div>
     <div class="pm-sub" id="pmSub"></div>
-    <div class="pm-field" id="pmFieldWrap"><span class="pm-lbl" id="pmLbl"></span><input class="pm-input" id="pmInput"/></div>
+    <div class="pm-field" id="pmFieldWrap"><span class="pm-lbl" id="pmLbl"></span><input class="si" id="pmInput"/></div>
     <div class="pm-actions">
       <button class="btn btn-outline" onclick="closePromptModal()">Отмена</button>
       <button class="btn" id="pmConfirmBtn">Подтвердить</button>
@@ -253,259 +237,219 @@ svg{display:block}
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<div class="sb">
-  <a href="/admin" class="sb-logo">
-    <div class="lm"><svg viewBox="0 0 20 20"><path d="M10 2L3 7v11h5v-5h4v5h5V7L10 2z"/></svg></div>
-    <span class="ln">Antviz</span><span class="lb">Admin</span>
-  </a>
-  <nav class="sb-nav">
-    <span class="ns">Основное</span>
-    <a href="/admin" class="ni"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Дашборд</a>
-    <a href="/admin/orders" class="ni active"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>Заказы<span class="nb" id="navBadgeOrders" style="display:none"></span></a>
-    <span class="ns">Клиенты</span>
-    <a href="/admin/tickets" class="ni"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg>Обслуживание<span class="nb" id="navBadgeTickets" style="display:none"></span></a>
-    <a href="/admin/chats" class="ni"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Чаты<span class="nb" id="navBadgeChats" style="display:none"></span></a>
-    <a href="/admin/promos" class="ni"><svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/></svg>Промокоды</a>
-    <span class="ns">Система</span>
-    <a href="/admin/reviews" class="ni"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Отзывы</a>
-  </nav>
-  <div class="sb-foot">
-    <button class="ni" onclick="doLogout()" style="color:rgba(232,99,79,.8)"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Выйти</button>
-  </div>
-</div>
+<div class="app" id="appWrap">
+  <div class="screen-stack">
 
-<!-- TOPBAR -->
-<div class="tb" id="appTopbar" style="display:none">
-  <div class="tb-l">
-    <span class="tb-title">Заказы</span>
-    <div class="tb-stats">
-      <div class="ts"><span class="ts-ico" style="--accent:var(--muted);--accent-bg:#eef0f3"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></span>Новых: <strong id="tNew">—</strong></div>
-      <div class="ts"><span class="ts-ico" style="--accent:var(--blue);--accent-bg:var(--blue-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></span>В работе: <strong id="tWork">—</strong></div>
-      <div class="ts"><span class="ts-ico" style="--accent:var(--green-d);--accent-bg:var(--green-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span>Готово: <strong id="tDone">—</strong></div>
-      <div class="ts" style="--accent:var(--amber-d);--accent-bg:var(--amber-light)"><span class="ts-ico" style="--accent:var(--amber-d);--accent-bg:var(--amber-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></span>Возвраты: <strong id="tRefunds" style="color:#b45309">—</strong></div>
-      <div class="ts"><span class="ts-ico" style="--accent:var(--purple);--accent-bg:var(--purple-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span>Правки: <strong id="tRevisions" style="color:#4f46e5">—</strong></div>
-    </div>
-  </div>
-  <div class="tab-row">
-    <button class="tab active" onclick="switchTab('active',this)">Активные</button>
-    <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
-    <button class="tab" onclick="switchTab('refunds',this)">Возвраты</button>
-    <button class="tab" onclick="switchTab('revisions',this)">Правки</button>
-    <button class="tab" onclick="switchTab('all',this)">Все</button>
-    <button class="tab" onclick="switchTab('archive',this)">Архив</button>
-  </div>
-</div>
+    <!-- SCREEN 1: LIST -->
+    <div class="screen active" id="screenList">
+      <div class="inner">
+        <div class="list-head">
+          <span class="page-title">Заказы</span>
 
-<!-- WORKSPACE -->
-<div class="ws" id="appWrap" style="display:none">
-
-  <!-- LIST -->
-  <div class="cl">
-    <div class="cl-head">
-      <div class="sb-box">
-        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        <input id="searchInp" type="text" placeholder="Поиск..." oninput="renderList()"/>
-      </div>
-    </div>
-    <div class="ol" id="orderList">
-      <div class="es"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Загрузка...</div>
-    </div>
-  </div>
-
-  <!-- DETAIL -->
-  <div class="cd">
-    <div class="de" id="detailEmpty">
-      <div class="de-icon"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></div>
-      <div style="font-size:.9rem">Выберите заказ слева</div>
-    </div>
-    <div class="dw" id="detailWrap" style="display:none">
-     <div class="dw-inner">
-
-      <!-- HERO -->
-      <div class="hero">
-        <div class="hero-top">
-          <div>
-            <div class="hero-eyebrow">Заказ</div>
-            <div class="hero-num" id="dId">—</div>
-            <div class="hero-name" id="dClientName">—</div>
+          <div class="stat-row">
+            <div class="stat-chip"><div class="stat-chip-ic" style="background:var(--line);color:var(--muted)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div><div><b id="tNew">—</b> <span>новых</span></div></div>
+            <div class="stat-chip"><div class="stat-chip-ic" style="background:var(--info-soft);color:var(--info)"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div><div><b id="tWork">—</b> <span>в работе</span></div></div>
+            <div class="stat-chip"><div class="stat-chip-ic" style="background:var(--green-soft);color:var(--green-d)"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><div><b id="tDone">—</b> <span>готово</span></div></div>
+            <div class="stat-chip"><div class="stat-chip-ic" style="background:var(--orange-soft);color:var(--orange-d)"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div><div><b id="tRefunds">—</b> <span>возвраты</span></div></div>
+            <div class="stat-chip"><div class="stat-chip-ic" style="background:var(--purple-soft);color:var(--purple)"><svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div><div><b id="tRevisions">—</b> <span>правки</span></div></div>
           </div>
-          <div class="hero-price-wrap">
-            <div class="hero-price-l">Сумма заказа</div>
-            <div class="hero-price" id="dPrice">—</div>
-            <div id="dBadge" style="margin-top:10px"></div>
+
+          <div class="ctrl-row">
+            <div class="sb-box">
+              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+              <input id="searchInp" type="text" placeholder="Поиск по имени, email, номеру..." oninput="renderList()"/>
+            </div>
+            <div class="tab-row">
+              <button class="tab active" onclick="switchTab('active',this)">Активные</button>
+              <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
+              <button class="tab" onclick="switchTab('refunds',this)">Возвраты</button>
+              <button class="tab" onclick="switchTab('revisions',this)">Правки</button>
+              <button class="tab" onclick="switchTab('all',this)">Все</button>
+              <button class="tab" onclick="switchTab('archive',this)">Архив</button>
+            </div>
           </div>
         </div>
-        <div class="hero-grid" id="dHeroInfo"></div>
-      </div>
 
-      <!-- STATUS PIPELINE (full width) -->
-      <div class="sec pipeline-sec">
-        <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--blue);--accent-bg:var(--blue-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div><span class="sec-title">Статус заказа</span></div></div>
-        <div class="pipeline" id="pipeline">
-          <button class="step" data-status="0" onclick="setStatus(0)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/></svg></span><span class="step-label">Новая</span></button>
-          <button class="step" data-status="1" onclick="setStatus(1)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span><span class="step-label">Обсуждение</span></button>
-          <button class="step" data-status="2" onclick="setStatus(2)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></span><span class="step-label">В работе</span></button>
-          <button class="step" data-status="3" onclick="setStatus(3)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="step-label">На проверке</span></button>
-          <button class="step" data-status="4" onclick="setStatus(4)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span><span class="step-label">Правки</span></button>
-          <button class="step" data-status="5" onclick="setStatus(5)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-label">Готово</span></button>
-        </div>
-        <div class="pipeline-comment">
-          <textarea class="textarea" id="commentInp" placeholder="Внутренний комментарий..." rows="2"></textarea>
-          <div style="margin-top:10px"><button class="btn btn-dark btn-sm" onclick="saveComment()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Сохранить</button></div>
+        <div class="orders-scroll" id="orderList">
+          <div class="empty-l">Загрузка...</div>
         </div>
       </div>
+    </div>
 
-      <!-- REFUND (full width, conditional) -->
-      <div class="sec" id="refundSec" style="display:none;border-color:rgba(245,158,11,.3);margin-bottom:20px">
-        <div class="sec-h" style="background:var(--amber-light)"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--amber-d);--accent-bg:#fde9c7"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div><span class="sec-title" style="color:var(--amber-d)">Возврат средств</span></div></div>
-        <div class="sec-b" id="refundBody"></div>
-      </div>
+    <!-- SCREEN 2: DETAIL -->
+    <div class="screen" id="screenDetail">
+      <div class="inner">
+        <div class="d-topbar">
+          <button class="icon-btn ghost exit-btn" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span class="back-label">Выйти из заказа</span></button>
+          <span class="grow"></span>
+          <div class="kebab-wrap">
+            <button class="icon-btn ghost" onclick="toggleKebab()"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+            <div class="kebab-menu" id="kebabMenu">
+              <button class="btn btn-outline btn-block btn-sm" onclick="printReceipt(selOrderId)"><svg viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Печать квитанции</button>
+              <button class="btn btn-warn btn-block btn-sm" onclick="manualRefund()"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Возврат вручную</button>
+              <button class="btn btn-danger btn-block btn-sm" id="archiveBtn" onclick="archiveOrder()">В архив</button>
+            </div>
+          </div>
+        </div>
 
-      <!-- REVISION (full width, conditional) -->
-      <div class="sec" id="revisionSec" style="display:none;border-color:rgba(99,102,241,.3);margin-bottom:20px">
-        <div class="sec-h" style="background:var(--purple-light)"><div class="sec-h-l"><div class="sec-icon" style="--accent:#4f46e5;--accent-bg:#e6e5fd"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div><span class="sec-title" style="color:#4f46e5">Запрошены правки</span></div></div>
-        <div class="sec-b" id="revisionBody"></div>
-      </div>
+        <div class="d-scroll">
+          <!-- HERO -->
+          <div class="hero">
+            <div class="hero-top">
+              <div>
+                <div class="hero-eyebrow">Заказ</div>
+                <div class="hero-num" id="dId">—</div>
+                <div class="hero-name" id="dClientName">—</div>
+              </div>
+              <div>
+                <div class="hero-price-l">Сумма заказа</div>
+                <div class="hero-price" id="dPrice">—</div>
+                <div id="dBadge" style="margin-top:8px;text-align:right"></div>
+              </div>
+            </div>
+            <div class="hero-grid" id="dHeroInfo"></div>
+          </div>
 
-      <!-- 2-COLUMN GRID -->
-      <div class="grid2">
-
-        <!-- LEFT: client context -->
-        <div class="col">
+          <!-- PIPELINE -->
           <div class="sec">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--blue);--accent-bg:var(--blue-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="sec-title">Клиент</span></div></div>
-            <div class="sec-b"><div class="ig single" id="clientInfo"></div></div>
-          </div>
-
-          <div class="sec">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--green-d);--accent-bg:var(--green-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div><span class="sec-title">Оплата</span></div></div>
+            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--info);--accent-bg:var(--info-soft)"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></div><span class="sec-title">Статус заказа</span></div></div>
             <div class="sec-b">
-              <div class="pay-row" id="payRow" onclick="togglePayment()">
-                <span class="pay-pill" id="payPill"></span>
-                <span class="pay-lbl" id="payLabel">Нажмите чтобы изменить</span>
+              <div class="pipeline" id="pipeline">
+                <button class="step" data-status="0" onclick="setStatus(0)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/></svg></span><span class="step-label">Новая</span></button>
+                <button class="step" data-status="1" onclick="setStatus(1)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span><span class="step-label">Обсуждение</span></button>
+                <button class="step" data-status="2" onclick="setStatus(2)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg></span><span class="step-label">В работе</span></button>
+                <button class="step" data-status="3" onclick="setStatus(3)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></span><span class="step-label">На проверке</span></button>
+                <button class="step" data-status="4" onclick="setStatus(4)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></span><span class="step-label">Правки</span></button>
+                <button class="step" data-status="5" onclick="setStatus(5)"><span class="step-line"></span><span class="step-node"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></span><span class="step-label">Готово</span></button>
               </div>
-              <div id="partialPayInfo"></div>
-              <div style="display:flex;gap:10px;margin-bottom:10px">
-                <input class="si" id="payLinkInp" type="text" placeholder="Ссылка на оплату..." style="flex:1" autocomplete="off"/>
-                <button class="btn btn-blue btn-sm" onclick="sendPayLink(selOrderId,selUid)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Отправить</button>
+              <div style="margin-top:14px">
+                <textarea class="textarea" id="commentInp" placeholder="Внутренний комментарий..." rows="2"></textarea>
+                <div style="margin-top:10px"><button class="btn btn-dark btn-sm" onclick="saveComment()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Сохранить</button></div>
               </div>
-              <button class="btn btn-warn btn-sm" id="doplataBtn" onclick="setStatus(6)" style="width:100%;justify-content:center"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Отметить «Ожидает доплаты»</button>
             </div>
           </div>
 
-          <div class="sec">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--purple);--accent-bg:var(--purple-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><span class="sec-title">Даты</span></div></div>
-            <div class="sec-b">
-              <div style="display:flex;flex-direction:column;gap:16px">
-                <div style="display:flex;flex-direction:column;gap:8px">
-                  <div class="sf-lbl">Начало работы</div>
-                  <input class="si" type="date" id="dateStarted" onchange="saveDate('startedAt',this.value)"/>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:8px">
-                  <div class="sf-lbl">Дата готовности</div>
-                  <input class="si" type="date" id="dateDone" onchange="saveDate('doneAt',this.value)"/>
+          <!-- REFUND -->
+          <div class="sec" id="refundSec" style="display:none;border-color:#f6d9b3">
+            <div class="sec-h" style="background:var(--orange-soft)"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--orange-d);--accent-bg:#fce6c0"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div><span class="sec-title" style="color:var(--orange-d)">Возврат средств</span></div></div>
+            <div class="sec-b" id="refundBody"></div>
+          </div>
+
+          <!-- REVISION -->
+          <div class="sec" id="revisionSec" style="display:none;border-color:#dcd3fb">
+            <div class="sec-h" style="background:var(--purple-soft)"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--purple);--accent-bg:#e6ddfd"><svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 114 4L7.5 20.5 2 22l1.5-5.5z"/></svg></div><span class="sec-title" style="color:var(--purple)">Запрошены правки</span></div></div>
+            <div class="sec-b" id="revisionBody"></div>
+          </div>
+
+          <!-- 2-COLUMN GRID -->
+          <div class="grid2">
+
+            <!-- LEFT -->
+            <div class="col">
+              <div class="sec">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--info);--accent-bg:var(--info-soft)"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="sec-title">Клиент</span></div></div>
+                <div class="sec-b"><div class="ig single" id="clientInfo"></div></div>
+              </div>
+
+              <div class="sec">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--purple);--accent-bg:var(--purple-soft)"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><span class="sec-title">Даты</span></div></div>
+                <div class="sec-b">
+                  <div id="launchDateBox" style="display:none;margin-bottom:14px"></div>
+                  <div style="display:flex;flex-direction:column;gap:14px">
+                    <div class="sf-row"><div class="sf-lbl">Начало работы</div><input class="si" type="date" id="dateStarted" onchange="saveDate('startedAt',this.value)"/></div>
+                    <div class="sf-row"><div class="sf-lbl">Дата готовности</div><input class="si" type="date" id="dateDone" onchange="saveDate('doneAt',this.value)"/></div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div class="sec">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--green-d);--accent-bg:var(--green-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div><span class="sec-title">Обслуживание</span></div></div>
-            <div class="sec-b" id="supBody"></div>
-          </div>
+              <div class="sec">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--green-d);--accent-bg:var(--green-soft)"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div><span class="sec-title">Обслуживание</span></div></div>
+                <div class="sec-b" id="supBody"></div>
+              </div>
 
-          <div class="sec" id="reviewSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--amber-d);--accent-bg:var(--amber-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="sec-title">Отзыв клиента</span></div></div>
-            <div class="sec-b" id="reviewContent"></div>
-          </div>
-        </div>
-
-        <!-- RIGHT: order details -->
-        <div class="col">
-          <div class="sec">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:#ececee"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8V6a2 2 0 00-2-2H5a2 2 0 00-2 2v2M3 8h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M3 8l2.5-4h13L21 8"/></svg></div><span class="sec-title">Детали заказа</span></div></div>
-            <div class="sec-b"><div class="ig" id="orderInfo"></div></div>
-          </div>
-
-          <div class="sec" id="extrasSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--amber-d);--accent-bg:var(--amber-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><span class="sec-title">Дополнения</span></div></div>
-            <div class="sec-b"><div style="display:flex;gap:8px;flex-wrap:wrap" id="extrasList"></div></div>
-          </div>
-
-          <div class="sec" id="briefSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--purple);--accent-bg:var(--purple-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><span class="sec-title">Бриф клиента</span></div></div>
-            <div class="sec-b">
-              <div class="ig" id="briefGrid" style="margin-bottom:16px"></div>
-              <div id="refsBox" style="font-size:.9rem;line-height:1.7;color:var(--muted);display:none"></div>
-            </div>
-          </div>
-
-          <div class="sec" id="shopSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--blue);--accent-bg:var(--blue-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg></div><span class="sec-title">Интернет-магазин</span></div></div>
-            <div class="sec-b"><div class="ig" id="shopGrid"></div></div>
-          </div>
-
-          <div class="sec" id="descSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:#ececee"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="sec-title">Описание от клиента</span></div></div>
-            <div class="sec-b"><div id="descBox" style="font-size:.9rem;line-height:1.7;color:var(--muted)"></div></div>
-          </div>
-
-          <div class="sec" id="favSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:#ececee"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg></div><span class="sec-title">Favicon</span></div></div>
-            <div class="sec-b"><div class="ag" id="favGrid"></div></div>
-          </div>
-
-          <div class="sec" id="attachSec" style="display:none">
-            <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:#ececee"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div><span class="sec-title">Прикреплённые файлы</span></div></div>
-            <div class="sec-b"><div class="ag" id="attachGrid"></div></div>
-          </div>
-
-          <div class="sec">
-            <div class="sec-h">
-              <div class="sec-h-l"><div class="sec-icon" style="--accent:var(--green-d);--accent-bg:var(--green-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg></div><span class="sec-title">Готовый сайт</span></div>
-              <button class="btn btn-green btn-sm" onclick="saveSite()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Сохранить и уведомить</button>
-            </div>
-            <div class="sec-b">
-              <div class="sf">
-                <div class="sf-row"><div class="sf-lbl">Домен</div><input class="si" id="siteDomain" type="text" placeholder="antviz.ru" autocomplete="off"/></div>
-                <div class="sf-row"><div class="sf-lbl">URL сайта</div><input class="si" id="siteUrl" type="text" placeholder="https://..." autocomplete="off"/></div>
-                <div class="sf-row"><div class="sf-lbl">URL favicon</div><input class="si" id="siteFavicon" type="text" placeholder="https://.../favicon.png" autocomplete="off"/></div>
-                <div class="sf-row"><div class="sf-lbl">Количество страниц</div><input class="si" id="sitePages" type="text" placeholder="5" autocomplete="off"/></div>
-                <div class="sf-row"><div class="sf-lbl">Репозиторий</div><input class="si" id="siteRepo" type="text" name="antviz-repo-url-field" placeholder="https://github.com/owner/repo" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/></div>
+              <div class="sec" id="reviewSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--orange-d);--accent-bg:var(--orange-soft)"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><span class="sec-title">Отзыв клиента</span></div></div>
+                <div class="sec-b" id="reviewContent"></div>
               </div>
             </div>
-          </div>
 
-          <div class="sec">
-            <div class="sec-h">
-              <div class="sec-h-l"><div class="sec-icon" style="--accent:var(--blue);--accent-bg:var(--blue-light)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="sec-title">Готовый бот / миниапп</span></div>
-              <button class="btn btn-blue btn-sm" onclick="saveBot()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Сохранить и уведомить</button>
-            </div>
-            <div class="sec-b">
-              <div class="sf">
-                <div class="sf-row"><div class="sf-lbl">Юзернейм бота (без @)</div><input class="si" id="botUsername" type="text" placeholder="my_shop_bot" autocomplete="off"/></div>
+            <!-- RIGHT -->
+            <div class="col">
+              <div class="sec">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:var(--line)"><svg viewBox="0 0 24 24"><path d="M21 8V6a2 2 0 00-2-2H5a2 2 0 00-2 2v2M3 8h18v10a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M3 8l2.5-4h13L21 8"/></svg></div><span class="sec-title">Детали заказа</span></div></div>
+                <div class="sec-b"><div class="ig" id="orderInfo"></div></div>
               </div>
-              <div style="font-size:.78rem;color:var(--muted);margin-top:10px;line-height:1.5">Ссылка t.me/юзернейм соберётся автоматически. Поле «Репозиторий» — общее, оно в блоке «Готовый сайт» выше, использовать его можно и для кода бота.</div>
+
+              <div class="sec" id="extrasSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--orange-d);--accent-bg:var(--orange-soft)"><svg viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div><span class="sec-title">Дополнения</span></div></div>
+                <div class="sec-b"><div style="display:flex;gap:8px;flex-wrap:wrap" id="extrasList"></div></div>
+              </div>
+
+              <div class="sec" id="briefSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--purple);--accent-bg:var(--purple-soft)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div><span class="sec-title">Бриф клиента</span></div></div>
+                <div class="sec-b">
+                  <div class="ig" id="briefGrid" style="margin-bottom:14px"></div>
+                  <div id="refsBox" style="font-size:.88rem;line-height:1.65;color:var(--muted);display:none"></div>
+                </div>
+              </div>
+
+              <div class="sec" id="shopSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--info);--accent-bg:var(--info-soft)"><svg viewBox="0 0 24 24"><path d="M6 2 3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><path d="M3 6h18M16 10a4 4 0 01-8 0"/></svg></div><span class="sec-title">Интернет-магазин</span></div></div>
+                <div class="sec-b"><div class="ig" id="shopGrid"></div></div>
+              </div>
+
+              <div class="sec" id="descSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:var(--line)"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg></div><span class="sec-title">Описание от клиента</span></div></div>
+                <div class="sec-b"><div id="descBox" style="font-size:.88rem;line-height:1.65;color:var(--muted)"></div></div>
+              </div>
+
+              <div class="sec" id="favSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:var(--line)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg></div><span class="sec-title">Favicon</span></div></div>
+                <div class="sec-b"><div class="ag" id="favGrid"></div></div>
+              </div>
+
+              <div class="sec" id="attachSec" style="display:none">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--dark);--accent-bg:var(--line)"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg></div><span class="sec-title">Прикреплённые файлы</span></div></div>
+                <div class="sec-b"><div class="ag" id="attachGrid"></div></div>
+              </div>
+
+              <!-- SITE DELIVERY — только для сайтов -->
+              <div class="sec" id="siteSec">
+                <div class="sec-h">
+                  <div class="sec-h-l"><div class="sec-icon" style="--accent:var(--green-d);--accent-bg:var(--green-soft)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 010 20 15.3 15.3 0 010-20z"/></svg></div><span class="sec-title">Готовый сайт</span></div>
+                  <button class="btn btn-green btn-sm" onclick="saveSite()"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Сохранить</button>
+                </div>
+                <div class="sec-b">
+                  <div class="sf">
+                    <div class="sf-row"><div class="sf-lbl">Домен</div><input class="si" id="siteDomain" type="text" placeholder="antviz.ru" autocomplete="off"/></div>
+                    <div class="sf-row"><div class="sf-lbl">URL сайта</div><input class="si" id="siteUrl" type="text" placeholder="https://..." autocomplete="off"/></div>
+                    <div class="sf-row"><div class="sf-lbl">URL favicon</div><input class="si" id="siteFavicon" type="text" placeholder="https://.../favicon.png" autocomplete="off"/></div>
+                    <div class="sf-row"><div class="sf-lbl">Количество страниц</div><input class="si" id="sitePages" type="text" placeholder="5" autocomplete="off"/></div>
+                    <div class="sf-row"><div class="sf-lbl">Репозиторий</div><input class="si" id="siteRepo" type="text" placeholder="https://github.com/owner/repo" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- BOT DELIVERY — только для ботов -->
+              <div class="sec" id="botSec" style="display:none">
+                <div class="sec-h">
+                  <div class="sec-h-l"><div class="sec-icon" style="--accent:var(--info);--accent-bg:var(--info-soft)"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><span class="sec-title">Готовый бот / миниапп</span></div>
+                  <button class="btn btn-green btn-sm" onclick="saveBot()"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Сохранить</button>
+                </div>
+                <div class="sec-b">
+                  <div class="sf">
+                    <div class="sf-row"><div class="sf-lbl">Юзернейм бота (без @)</div><input class="si" id="botUsername" type="text" placeholder="my_shop_bot" autocomplete="off"/></div>
+                    <div class="sf-row"><div class="sf-lbl">Репозиторий</div><input class="si" id="botRepo" type="text" placeholder="https://github.com/owner/repo" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/></div>
+                  </div>
+                  <div style="font-size:.78rem;color:var(--muted);margin-top:10px;line-height:1.5">Ссылка t.me/юзернейм соберётся автоматически.</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- DANGER (full width) -->
-      <div class="sec" style="border-color:rgba(232,99,79,.25);margin-top:20px;margin-bottom:40px">
-        <div class="sec-h" style="background:var(--red-light)">
-          <div class="sec-h-l"><div class="sec-icon" style="--accent:var(--red);--accent-bg:#f9dcd6"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div><span class="sec-title" style="color:var(--red)">Управление</span></div>
-        </div>
-        <div class="sec-b" style="display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-danger" id="archiveBtn" onclick="archiveOrder()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>В архив</button>
-          <button class="btn btn-outline" onclick="printReceipt(selOrderId)"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Печать квитанции</button>
-          <button class="btn btn-warn" onclick="manualRefund()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Оформить возврат вручную</button>
-        </div>
-      </div>
-
-     </div>
     </div>
+
   </div>
 </div>
 
@@ -515,10 +459,8 @@ svg{display:block}
 const API = 'https://antviz.ru/api';
 
 const S=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
-// status -1 = заказ создан, но оплата ещё не подтверждена вебхуком (не путать с "Новая заявка" = 0)
 function statusLabel(st){return st===-1?'Ожидает оплаты':(S[st??0]??'—');}
 function statusBadgeClass(st){return st===-1?'b-pending':('b'+(st??0));}
-// Живые формулировки для Telegram-уведомлений при смене статуса (эмодзи + заголовок + фраза-предложение)
 const STATUS_NOTICE={
   '-1':{emoji:'💳',title:'Ждём оплату',text:'Заказ оформлен — осталось оплатить, чтобы мы начали работу.'},
   0:{emoji:'🆕',title:'Заявка принята',text:'Ваша заявка принята в работу, скоро свяжемся для уточнения деталей.'},
@@ -529,10 +471,7 @@ const STATUS_NOTICE={
   5:{emoji:'🎉',title:'Готово!',text:'Заказ готов — загляните в кабинет, чтобы посмотреть результат.'},
   6:{emoji:'💳',title:'Нужна доплата',text:'Пришло время внести доплату по заказу, чтобы двигаться дальше.'}
 };
-function statusNotice(st){
-  const n=STATUS_NOTICE[st]||STATUS_NOTICE[0];
-  return {title:`${n.emoji} ${n.title}`,text:n.text};
-}
+function statusNotice(st){const n=STATUS_NOTICE[st]||STATUS_NOTICE[0];return {title:`${n.emoji} ${n.title}`,text:n.text};}
 const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание',bot_pay:'Оплата в боте',bot_crm:'Интеграция CRM'};
 const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 const GOALS={leads:'Заявки и звонки',sales:'Продажи онлайн',brand:'Имидж / представительство',info:'Информирование'};
@@ -540,37 +479,30 @@ const READINESS={ready:'Всё готово',partial:'Частично гото�
 const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Наличными при получении'};
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 
-// TODO: push в Telegram идёт через отдельный репозиторий antviz-tgbot,
-// который проверяет Firebase ID-токен — пока не мигрирован. In-app
-// уведомление (ниже) отправляется по-настоящему через наш API.
+// Заказ считаем "ботовым", если явно указан тип бота — либо через
+// orderType/siteType, либо (для старых заказов без этого поля) по факту
+// заполненного botUsername при пустых полях сайта. Если бэкенд назовёт
+// это поле иначе — здесь единственное место, которое нужно поправить.
+function isBotOrder(o){
+  return o.orderType==='bot' || o.siteType==='bot' || o.productType==='bot'
+    || (!!( o.botUsername||o.botLink ) && !o.siteDomain && !o.siteUrl && !['static','dynamic'].includes(o.siteType));
+}
+
 async function notifyClient(uid,title,text,button){
   if(!uid)return;
   try{
-    await fetch(`${API}/notifications/broadcast`, {
-      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify({ target: uid, title, text }),
-    });
+    await fetch(`${API}/notifications/broadcast`, { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ target: uid, title, text }) });
   }catch(err){console.error('Не удалось уведомить клиента:',err);}
 }
-let allOrders=[],allReviews=[],_cache=[];
-let selOrderId=null,selUid=null;
-let currentTab='active',currentPaid=false;
+let allOrders=[],allReviews=[];
+let selOrderId=null,selUid=null,currentTab='active';
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 
-// safeUpdate() теперь бьёт в гибкий PATCH /api/orders/:id (белый список
-// полей на бэкенде) вместо прямой записи в Firestore. Показывает тост
-// только когда запись правда прошла, и настоящую ошибку — когда нет.
 async function safeUpdate(orderId,data,successMsg){
   try{
-    const resp = await fetch(`${API}/orders/${orderId}`, {
-      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify(data),
-    });
-    if(!resp.ok){
-      const d=await resp.json().catch(()=>({}));
-      throw new Error(d.error||'ошибка');
-    }
+    const resp = await fetch(`${API}/orders/${orderId}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(data) });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'ошибка'); }
     const updated = await resp.json();
     const idx=allOrders.findIndex(o=>o.id===orderId);
     if(idx>=0) allOrders[idx]=updated;
@@ -592,10 +524,16 @@ function fmtP(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
 function stars(n){return'★'.repeat(n)+'☆'.repeat(5-n);}
 function tsToInput(ts){if(!ts)return'';return new Date(ts).toISOString().split('T')[0];}
 
-// ── ИКОНКИ ДЛЯ ПОЛЕЙ ──
-// Единая мини-библиотека иконок, подбираемая по названию лейбла поля.
-// Так у каждой карточки данных (клиент/заказ/бриф/магазин) есть свой
-// узнаваемый значок вместо голого текста label/value.
+// Оплата теперь ТОЛЬКО отображается — статус выставляется автоматически
+// платёжной системой по вебхуку, вручную админ здесь ничего не трогает.
+function paymentStatus(o){
+  const isPartial=o.paymentType==='partial',paidAmt=o.paidAmount||0;
+  const fullyPaid=o.paid||(isPartial&&paidAmt>=(o.totalPrice||0));
+  if(fullyPaid)return{text:'Оплачен',cls:'tag-green'};
+  if(isPartial)return{text:'Оплачен на 50%',cls:'tag-warn'};
+  return{text:'Не оплачен',cls:''};
+}
+
 const ICONS={
   person:'<path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>',
   mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/>',
@@ -617,11 +555,10 @@ const ICONS={
   dot:'<circle cx="12" cy="12" r="3"/>'
 };
 function iconFor(label){
-  const l=(label||'').toLowerCase();
-  let key='dot';
+  const l=(label||'').toLowerCase();let key='dot';
   if(l.includes('имя')||l.includes('клиент'))key='person';
   else if(l.includes('email'))key='mail';
-  else if(l.includes('сумма')||l.includes('оплач')||l.includes('остаток'))key='money';
+  else if(l.includes('сумма')||l.includes('оплат')||l.includes('остаток'))key='money';
   else if(l.includes('формат'))key='layers';
   else if(l.includes('тип'))key='sliders';
   else if(l.includes('тариф'))key='box';
@@ -632,57 +569,56 @@ function iconFor(label){
   else if(l.includes('цель'))key='target';
   else if(l.includes('готовност'))key='check';
   else if(l.includes('запуск'))key='calendar';
-  else if(l.includes('оплат')&&l.includes('способ'))key='card';
   else if(l.includes('доставк'))key='truck';
   else if(l.includes('товар'))key='bag';
   else if(l.includes('референс'))key='link';
-  return `<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">${ICONS[key]}</svg>`;
+  return `<svg viewBox="0 0 24 24">${ICONS[key]}</svg>`;
 }
-function icCard(label,value){
-  return `<div class="ic"><div class="ic-ico">${iconFor(label)}</div><div class="ic-body"><div class="ic-l">${label}</div><div class="ic-v">${value}</div></div></div>`;
-}
-function heroChip(label,value,green){
-  return `<div class="hc"><div class="hc-ico">${iconFor(label)}</div><div><div class="hc-l">${label}</div><div class="hc-v"${green?' style="color:var(--green);font-weight:600"':''}>${value}</div></div></div>`;
-}
-const AVATAR_COLORS={0:'#8b93a3',1:'#f59e0b',2:'#3b82f6',3:'#7c3aed',4:'#f59e0b',5:'#149955',6:'#f59e0b','-1':'#8b93a3'};
-function initials(name){
-  const n=(name||'').trim();if(!n)return'?';
-  const parts=n.split(/\s+/);
-  return (parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();
-}
+function icCard(label,value,highlight){return `<div class="ic${highlight?' highlight':''}"><div class="ic-l">${label}</div><div class="ic-v">${value}</div></div>`;}
+function heroChip(label,value){return `<div class="hc"><div class="hc-l">${label}</div><div class="hc-v">${value}</div></div>`;}
+const AVATAR_COLORS={0:'#8b93a3',1:'#f59e0b',2:'#3b82f6',3:'#7c3aed',4:'#f59e0b',5:'#0f9950',6:'#f59e0b','-1':'#8b93a3'};
+function initials(name){const n=(name||'').trim();if(!n)return'?';const parts=n.split(/\s+/);return (parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();}
 
 window.openLightbox=s=>{document.getElementById('lightboxImg').src=s;document.getElementById('lightbox').classList.add('show');};
 window.closeLightbox=()=>document.getElementById('lightbox').classList.remove('show');
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
 window.switchTab=(tab,btn)=>{currentTab=tab;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderList();};
 
+window.showScreen=function(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(name==='list'?'screenList':'screenDetail').classList.add('active');
+  document.getElementById('kebabMenu')?.classList.remove('show');
+};
+window.toggleKebab=()=>{document.getElementById('kebabMenu').classList.toggle('show');};
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('kebabMenu');
+  if(menu && menu.classList.contains('show') && !menu.contains(e.target) && !e.target.closest('.kebab-wrap .icon-btn')) menu.classList.remove('show');
+});
+
 function renderList(){
   const el=document.getElementById('orderList');
   const q=(document.getElementById('searchInp')?.value||'').toLowerCase();
   let list;
-  if(currentTab==='archive'){
-    list=allOrders.filter(o=>o.archived);
-  }else{
+  if(currentTab==='archive'){ list=allOrders.filter(o=>o.archived); }
+  else{
     const notArchived=allOrders.filter(o=>!o.archived);
     list=currentTab==='active'?notArchived.filter(o=>o.status<5):currentTab==='done'?notArchived.filter(o=>o.status===5):currentTab==='refunds'?notArchived.filter(o=>o.refundStatus==='requested'):currentTab==='revisions'?notArchived.filter(o=>o.revisionRequested):notArchived;
   }
   if(q)list=list.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q));
-  if(!list.length){el.innerHTML='<div class="es"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Нет заказов</div>';return;}
+  if(!list.length){el.innerHTML='<div class="empty-l">Нет заказов</div>';return;}
   el.innerHTML=list.map(o=>{
     const t=o.package||o.tariff||'—';
     const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
-    const isPartial=o.paymentType==='partial',paidAmt=o.paidAmount||0,fullyPaid=o.paid||(isPartial&&paidAmt>=(o.totalPrice||0));
-    const payTxt=isPartial&&!fullyPaid?'⬡ Предоплата 50%':fullyPaid?'✓ Оплачен':'✕ Не оплачен';
-    const payColor=isPartial&&!fullyPaid?'#b45309':fullyPaid?'var(--green-d)':'var(--red)';
-    return`<div class="or${o.id===selOrderId?' sel':''}" onclick="selectOrder('${o.id}')">
+    const pay=paymentStatus(o);
+    return`<div class="or" onclick="selectOrder('${o.id}')">
       <div class="or-avatar" style="background:${AVATAR_COLORS[o.status??0]||'#8b93a3'}">${initials(o.clientName)}</div>
       <div class="or-body">
-        <div class="or-h"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:var(--amber-light);color:#b45309">Возврат</span>':''}${o.revisionRequested?'<span class="badge" style="background:var(--purple-light);color:#4f46e5">Правки</span>':''}</div>
+        <div class="or-top"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:var(--orange-soft);color:var(--orange-d)">Возврат</span>':''}${o.revisionRequested?'<span class="badge" style="background:var(--purple-soft);color:var(--purple)">Правки</span>':''}</div>
         <div class="or-name">${esc(o.clientName||'—')}</div>
         <div class="or-email">${esc(o.clientEmail||'')}</div>
         <div class="or-f">
           <span class="tag ${tc}">${esc(t)}</span>
-          <span style="font-size:.72rem;font-weight:500;color:${payColor}">${payTxt}</span>
+          <span class="pay-text" style="color:${pay.cls==='tag-green'?'var(--green-d)':pay.cls==='tag-warn'?'var(--orange-d)':'var(--red)'}">${pay.text}</span>
           <span class="or-price">${fmtP(o.totalPrice)}</span>
         </div>
       </div>
@@ -706,7 +642,8 @@ window.selectOrder=id=>{
   selOrderId=id;selUid=null;
   const o=allOrders.find(x=>x.id===id);if(!o)return;
   selUid=o.uid||null;
-  renderList();showDetail(o);
+  showScreen('detail');
+  showDetail(o);
 };
 
 function renderPipeline(status){
@@ -715,38 +652,35 @@ function renderPipeline(status){
     b.classList.toggle('done',s<status);
     b.classList.toggle('cur',s===status);
   });
-  const doplataBtn=document.getElementById('doplataBtn');
-  if(doplataBtn)doplataBtn.classList.toggle('active',status===6);
 }
 
 function showDetail(o){
-  document.getElementById('detailEmpty').style.display='none';
-  document.getElementById('detailWrap').style.display='block';
   const t=o.package||o.tariff||'—';
   const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
   document.getElementById('dId').textContent='№ '+o.id.slice(0,8).toUpperCase();
   document.getElementById('dClientName').textContent=esc(o.clientName||'—');
   document.getElementById('dPrice').textContent=fmtP(o.totalPrice);
-  document.getElementById('dBadge').innerHTML=`<span class="tag ${tc}" style="font-size:.8rem;padding:.35rem 1.1rem">${esc(t)}</span>`;
+  document.getElementById('dBadge').innerHTML=`<span class="tag ${tc}" style="font-size:.78rem;padding:.35rem 1rem">${esc(t)}</span>`;
   document.getElementById('dHeroInfo').innerHTML=
-    heroChip('Формат',esc(siteTypeLabel(o.siteType)||'—'))+
+    heroChip('Формат',esc(siteTypeLabel(o.siteType)||(isBotOrder(o)?'Бот / миниапп':'—')))+
     heroChip('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
     heroChip('Создан',fmtD(o.createdAt))+
     heroChip('Клиент',esc(o.clientEmail||'—'));
   renderPipeline(o.status||0);
-  // Show partial payment info
-  const pInfoEl = document.getElementById('partialPayInfo');
-  if(pInfoEl){
-    if(o.paymentType==='partial'){
-      const pAmt = o.paidAmount||0;
-      const rAmt = o.remainingAmount||Math.ceil((o.totalPrice||0)/2);
-      const fp = o.paid||(pAmt>=(o.totalPrice||0));
-      pInfoEl.style.display='block';
-      pInfoEl.innerHTML='<div style="font-size:.78rem;color:#b45309;background:var(--amber-light);border:1px solid rgba(245,158,11,.3);border-radius:14px;padding:12px 16px;margin-top:2px;margin-bottom:14px"><strong>Предоплата 50%</strong><br>Оплачено: '+(pAmt?pAmt.toLocaleString('ru')+' ₽':'—')+' · Остаток: '+(fp?'полностью оплачен':rAmt.toLocaleString('ru')+' ₽')+'</div>';
-    } else { pInfoEl.style.display='none'; pInfoEl.innerHTML=''; }
-  }
-  const archBtn=document.getElementById('archiveBtn');if(archBtn)archBtn.innerHTML=o.archived?'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Вернуть из архива':'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"/></svg>В архив';
-  currentPaid=o.paid||false;renderPayRow();
+
+  const bot=isBotOrder(o);
+  document.getElementById('siteSec').style.display=bot?'none':'';
+  document.getElementById('botSec').style.display=bot?'':'none';
+
+  // Желаемая дата запуска от клиента — теперь на видном месте в блоке «Даты»,
+  // а не спрятана внутри брифа.
+  const ldBox=document.getElementById('launchDateBox');
+  if(o.launchDate){
+    ldBox.style.display='block';
+    const dateStr=new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});
+    ldBox.innerHTML=icCard('Желаемая дата запуска (от клиента)',esc(dateStr),true);
+  }else{ ldBox.style.display='none'; ldBox.innerHTML=''; }
+
   document.getElementById('commentInp').value=o.statusComment||'';
   document.getElementById('dateStarted').value=tsToInput(o.startedAt);
   document.getElementById('dateDone').value=tsToInput(o.doneAt);
@@ -756,38 +690,43 @@ function showDetail(o){
   document.getElementById('sitePages').value=o.sitePages||'';
   document.getElementById('siteRepo').value=o.siteRepo||'';
   document.getElementById('botUsername').value=o.botUsername||'';
-  document.getElementById('clientInfo').innerHTML=
-    icCard('Имя',esc(o.clientName||'—'))+
-    icCard('Email',esc(o.clientEmail||'—'));
+  document.getElementById('botRepo').value=o.siteRepo||'';
+
+  document.getElementById('clientInfo').innerHTML=icCard('Имя',esc(o.clientName||'—'))+icCard('Email',esc(o.clientEmail||'—'));
+
   const domOpt=o.domainOption==='new'?'Регистрация на рег.ру':o.domainOption==='own'?'Свой домен':'—';
-  const domainDisplay=o.domainName?`<span style="color:var(--green-d);font-weight:600">${esc(o.domainName)}</span>`:domOpt;
+  const domainDisplay=o.domainName?`<span style="color:var(--green-d);font-weight:500">${esc(o.domainName)}</span>`:domOpt;
+  const pay=paymentStatus(o);
   document.getElementById('orderInfo').innerHTML=
-    icCard('Формат',esc(siteTypeLabel(o.siteType)||'—'))+
+    icCard('Формат',esc(siteTypeLabel(o.siteType)||(bot?'Бот / миниапп':'—')))+
     icCard('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
     icCard('Тариф',esc(t))+
     icCard('Страниц',o.pages||'—')+
     icCard('Домен',domainDisplay)+
+    icCard('Оплата',`<span class="tag ${pay.cls}">${pay.text}</span>`)+
     icCard('Промокод',o.promoCode?esc(o.promoCode)+(o.discountApplied?' (-'+fmtP(o.discountApplied)+')':''):'—')+
     icCard('Создан',fmtDT(o.createdAt));
+
   const ea=o.extras||[];const es=document.getElementById('extrasSec');
   if(ea.length){es.style.display='';document.getElementById('extrasList').innerHTML=ea.map(e=>{const l=EX[e]||e;const ec=e==='domain_reg'?'tag-blue':e==='domain_own'?'tag-green':e==='domain'?'tag-blue':e==='support'?'tag-green':e==='seo'?'tag-purple':(e==='bot_pay'||e==='bot_crm')?'tag-purple':'tag-warn';return`<span class="tag ${ec}">${esc(l)}</span>`;}).join('');}else es.style.display='none';
+
   const ds=document.getElementById('descSec');if(o.description){ds.style.display='';document.getElementById('descBox').textContent=o.description;}else ds.style.display='none';
+
   const bs=document.getElementById('briefSec');
   const hasGoals=Array.isArray(o.goals)&&o.goals.length;
   const hasReadiness=!!o.contentReadiness;
-  const hasLaunch=!!o.launchDate;
   const hasRefs=!!o.references;
-  if(hasGoals||hasReadiness||hasLaunch||hasRefs){
+  if(hasGoals||hasReadiness||hasRefs){
     bs.style.display='';
     const cells=[];
     if(hasGoals)cells.push(icCard('Цель сайта'+(o.goals.length>1?' ('+o.goals.length+')':''),`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:2px">${o.goals.map(g=>`<span class="tag tag-purple">${esc(GOALS[g]||g)}</span>`).join('')}</div>`));
     if(hasReadiness)cells.push(icCard('Готовность материалов',esc(READINESS[o.contentReadiness]||o.contentReadiness)));
-    if(hasLaunch)cells.push(icCard('Желаемый запуск',esc(new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}))));
     document.getElementById('briefGrid').innerHTML=cells.join('');
     const refsBox=document.getElementById('refsBox');
     if(hasRefs){refsBox.style.display='block';refsBox.innerHTML=`<div class="ic-l" style="margin-bottom:6px">Референсы</div>${esc(o.references)}`;}
     else{refsBox.style.display='none';refsBox.innerHTML='';}
   }else{bs.style.display='none';}
+
   const shs=document.getElementById('shopSec');
   if(o.shopDetails){
     const sd=o.shopDetails;
@@ -801,91 +740,66 @@ function showDetail(o){
       document.getElementById('shopGrid').innerHTML=cells.join('');
     }else shs.style.display='none';
   }else shs.style.display='none';
+
   const fs=document.getElementById('favSec');if(o.favicon){fs.style.display='';document.getElementById('favGrid').innerHTML=`<img class="at" src="${esc(o.favicon)}" alt="favicon" onclick="openLightbox('${o.favicon.replace(/'/g,"\\'")}')">`;} else fs.style.display='none';
   const as=document.getElementById('attachSec');
-  if(o.attachments?.length){as.style.display='';document.getElementById('attachGrid').innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="at" src="${a.fileData}" alt="${esc(a.fileName||'')}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')">`:` <a class="btn btn-outline btn-xs" href="${a.fileData}" download="${esc(a.fileName||'file')}"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>${esc(a.fileName||'Файл')}</a>`).join('');}else as.style.display='none';
-  renderSupport(o);
-  renderRefund(o);
-  renderRevision(o);
-  const rev=allReviews.find(r=>r.orderId===o.id);const rs=document.getElementById('reviewSec');
-  if(rev){rs.style.display='';document.getElementById('reviewContent').innerHTML=`<div style="background:var(--page);border-radius:18px;padding:20px 22px"><div style="color:var(--amber);margin-bottom:8px;font-size:1.2rem">${stars(rev.stars||0)}</div><div style="font-size:.9rem;color:var(--muted);line-height:1.6">${esc(rev.text||'Без текста')}</div></div>`;}else rs.style.display='none';
-}
+  if(o.attachments?.length){as.style.display='';document.getElementById('attachGrid').innerHTML=o.attachments.map(a=>a.fileType?.startsWith('image/')?`<img class="at" src="${a.fileData}" alt="${esc(a.fileName||'')}" onclick="openLightbox('${a.fileData.replace(/'/g,"\\'")}')">`:` <a class="btn btn-outline btn-sm" href="${a.fileData}" download="${esc(a.fileName||'file')}"><svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>${esc(a.fileName||'Файл')}</a>`).join('');}else as.style.display='none';
 
-function renderPayRow(){
-  const row=document.getElementById('payRow');row.classList.toggle('paid',currentPaid);
-  document.getElementById('payLabel').textContent=currentPaid?'Оплачен — нажмите чтобы изменить':'Не оплачен — нажмите чтобы изменить';
-  const pill=document.getElementById('payPill');
-  pill.className=currentPaid?'pay-pill pay-yes':'pay-pill pay-no';
-  pill.innerHTML=currentPaid?'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>ОПЛАЧЕН':'<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></svg>НЕ ОПЛАЧЕН';
+  renderSupport(o);renderRefund(o);renderRevision(o);
+
+  const rev=allReviews.find(r=>r.orderId===o.id);const rs=document.getElementById('reviewSec');
+  if(rev){rs.style.display='';document.getElementById('reviewContent').innerHTML=`<div style="background:var(--bg);border-radius:var(--r-md);padding:18px 20px"><div style="color:var(--orange);margin-bottom:8px;font-size:1.15rem">${stars(rev.stars||0)}</div><div style="font-size:.88rem;color:var(--muted);line-height:1.6">${esc(rev.text||'Без текста')}</div></div>`;}else rs.style.display='none';
+
+  const archBtn=document.getElementById('archiveBtn');if(archBtn)archBtn.textContent=o.archived?'Вернуть из архива':'В архив';
 }
 
 function renderSupport(o){
   const body=document.getElementById('supBody');const now=new Date();
   if(o.supportActive&&o.supportExpiresAt){
     const exp=new Date(o.supportExpiresAt);const days=Math.ceil((exp-now)/864e5);
-    body.innerHTML=`<div class="sup"><div class="sup-t"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Обслуживание активно</div>
-      <div style="font-size:.88rem;color:var(--muted);margin-bottom:16px">Истекает: ${exp.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})} · осталось <strong style="color:${days<3?'var(--red)':'var(--green-d)'}">${days} дн.</strong></div>
+    body.innerHTML=`<div class="sup-box"><div class="sup-t"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Обслуживание активно</div>
+      <div style="font-size:.86rem;color:var(--muted);margin-bottom:14px">Истекает: ${exp.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})} · осталось <strong style="color:${days<3?'var(--red)':'var(--green-d)'}">${days} дн.</strong></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-green btn-sm" onclick="renewSupport('${o.id}')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Продлить на 30 дней</button>
+        <button class="btn btn-green btn-sm" onclick="renewSupport('${o.id}')"><svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>Продлить на 30 дней</button>
         ${days<3?`<button class="btn btn-outline btn-sm" onclick="sendExpiryNotif('${o.uid||''}')">Уведомить об истечении</button>`:''}
       </div></div>`;
   }else if(o.supportRequested){
-    body.innerHTML=`<div style="background:var(--amber-light);border:1.5px solid rgba(245,158,11,.3);border-radius:20px;padding:22px 24px;margin-bottom:14px">
-      <div style="font-size:.95rem;font-weight:600;color:var(--amber-d);margin-bottom:14px">Клиент запросил обслуживание</div>
-      <button class="btn btn-green btn-sm" onclick="activateSupport('${o.id}','${o.uid||''}')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Активировать</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:8px">
-      <div class="sf-lbl">Ссылка на оплату (500 ₽)</div>
-      <div style="display:flex;gap:10px">
-        <input class="si" id="payLink_${o.id}" type="text" placeholder="https://..." style="flex:1" autocomplete="off"/>
-        <button class="btn btn-blue btn-sm" onclick="sendPayLink('${o.id}','${o.uid||''}')"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg>Отправить</button>
-      </div>
+    body.innerHTML=`<div style="background:var(--orange-soft);border-radius:var(--r-md);padding:18px 20px;margin-bottom:12px">
+      <div style="font-size:.9rem;font-weight:500;color:var(--orange-d);margin-bottom:12px">Клиент запросил обслуживание</div>
+      <button class="btn btn-green btn-sm" onclick="activateSupport('${o.id}','${o.uid||''}')"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Активировать</button>
     </div>`;
   }else{
-    body.innerHTML=`<div style="color:var(--muted);font-size:.9rem">Обслуживание не подключено.</div>`;
+    body.innerHTML=`<div style="color:var(--muted);font-size:.88rem">Обслуживание не подключено.</div>`;
   }
 }
 
 function renderRefund(o){
-  const sec=document.getElementById('refundSec');
-  const body=document.getElementById('refundBody');
-  const st=o.refundStatus;
+  const sec=document.getElementById('refundSec');const body=document.getElementById('refundBody');const st=o.refundStatus;
   if(!st||st==='none'){sec.style.display='none';body.innerHTML='';return;}
   sec.style.display='';
   if(st==='requested'){
-    body.innerHTML=`<div style="font-size:.88rem;color:var(--muted);margin-bottom:14px;line-height:1.6"><strong style="color:var(--text)">Причина клиента:</strong><br>${esc(o.refundReason||'—')}</div>
+    body.innerHTML=`<div style="font-size:.86rem;color:var(--muted);margin-bottom:14px;line-height:1.6"><strong style="color:var(--text)">Причина клиента:</strong><br>${esc(o.refundReason||'—')}</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button class="btn btn-green btn-sm" onclick="approveRefund()"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Одобрить и вернуть</button>
+        <button class="btn btn-green btn-sm" onclick="approveRefund()"><svg viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Одобрить и вернуть</button>
         <button class="btn btn-outline btn-sm" onclick="rejectRefund()">Отклонить</button>
       </div>`;
   }else if(st==='approved'||st==='refunded'){
-    body.innerHTML=`<div style="font-size:.88rem;color:var(--green-d);margin-bottom:10px;font-weight:500">✓ ${st==='refunded'?'Возврат произведён':'Возврат одобрен'}${o.refundAmount?' — '+fmtP(o.refundAmount):''}</div>
-      ${o.refundReason?`<div style="font-size:.85rem;color:var(--muted);margin-bottom:10px">Причина: ${esc(o.refundReason)}</div>`:''}
+    body.innerHTML=`<div style="font-size:.86rem;color:var(--green-d);margin-bottom:10px;font-weight:500">✓ ${st==='refunded'?'Возврат произведён':'Возврат одобрен'}${o.refundAmount?' — '+fmtP(o.refundAmount):''}</div>
+      ${o.refundReason?`<div style="font-size:.84rem;color:var(--muted);margin-bottom:10px">Причина: ${esc(o.refundReason)}</div>`:''}
       ${st==='approved'?'<button class="btn btn-dark btn-sm" onclick="markRefunded()">Отметить «Деньги отправлены»</button>':''}`;
   }else if(st==='rejected'){
-    body.innerHTML=`<div style="font-size:.88rem;color:var(--red);margin-bottom:6px;font-weight:500">✕ Возврат отклонён</div>
-      ${o.refundComment?`<div style="font-size:.85rem;color:var(--muted)">Комментарий: ${esc(o.refundComment)}</div>`:''}`;
+    body.innerHTML=`<div style="font-size:.86rem;color:var(--red);margin-bottom:6px;font-weight:500">✕ Возврат отклонён</div>${o.refundComment?`<div style="font-size:.84rem;color:var(--muted)">Комментарий: ${esc(o.refundComment)}</div>`:''}`;
   }
 }
 
-// Клиент жмёт "Запросить правки" на orders.html (доступно на статусе "На проверке"),
-// пишет order.revisionRequested=true. Раньше это нигде не отображалось в админке —
-// клиент видел "Запрос отправлен ✓", а заявка уходила в никуда. Показываем здесь,
-// пока флаг не снят.
 function renderRevision(o){
-  const sec=document.getElementById('revisionSec');
-  const body=document.getElementById('revisionBody');
+  const sec=document.getElementById('revisionSec');const body=document.getElementById('revisionBody');
   if(!o.revisionRequested){sec.style.display='none';body.innerHTML='';return;}
   sec.style.display='';
-  body.innerHTML=`<div style="font-size:.88rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Клиент запросил правки по заказу — свяжитесь с ним (кнопка «Написать в поддержку» у клиента ведёт в тикеты) и переведите заказ в статус «Правки».</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap">
-      <button class="btn btn-dark btn-sm" onclick="markRevisionHandled()">Взято в работу</button>
-    </div>`;
+  body.innerHTML=`<div style="font-size:.86rem;color:var(--muted);margin-bottom:14px;line-height:1.6">Клиент запросил правки по заказу — свяжитесь с ним и переведите заказ в статус «Правки».</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-dark btn-sm" onclick="markRevisionHandled()">Взято в работу</button></div>`;
 }
-window.markRevisionHandled=async()=>{
-  if(!selOrderId)return;
-  await safeUpdate(selOrderId,{revisionRequested:false},'Отмечено как взято в работу ✓');
-};
+window.markRevisionHandled=async()=>{ if(!selOrderId)return; await safeUpdate(selOrderId,{revisionRequested:false},'Отмечено как взято в работу ✓'); };
 
 function openPromptModal({icon,iconBg,iconColor,title,sub,field,confirmLabel,confirmClass,onConfirm}){
   document.getElementById('pmIcon').style.background=iconBg;
@@ -894,21 +808,14 @@ function openPromptModal({icon,iconBg,iconColor,title,sub,field,confirmLabel,con
   document.getElementById('pmTitle').textContent=title;
   document.getElementById('pmSub').textContent=sub||'';
   const fw=document.getElementById('pmFieldWrap'),inp=document.getElementById('pmInput');
-  if(field){
-    fw.style.display='';
-    document.getElementById('pmLbl').textContent=field.label;
-    inp.type=field.type||'text';
-    inp.placeholder=field.placeholder||'';
-    inp.value=field.defaultValue||'';
-  }else fw.style.display='none';
+  if(field){ fw.style.display=''; document.getElementById('pmLbl').textContent=field.label; inp.type=field.type||'text'; inp.placeholder=field.placeholder||''; inp.value=field.defaultValue||''; }else fw.style.display='none';
   const btn=document.getElementById('pmConfirmBtn');
   btn.className='btn '+(confirmClass||'btn-dark');
   btn.textContent=confirmLabel||'Подтвердить';
   btn.onclick=()=>{
     const val=field?inp.value.trim():true;
     if(field?.required&&!val){inp.focus();inp.style.borderColor='var(--red)';return;}
-    closePromptModal();
-    onConfirm(val);
+    closePromptModal();onConfirm(val);
   };
   document.getElementById('pmOv').classList.add('show');
   if(field)setTimeout(()=>inp.focus(),50);
@@ -921,72 +828,30 @@ const ICO_SEND='<line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 2
 const ICO_REFRESH='<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>';
 
 window.approveRefund=async()=>{
-  if(!selOrderId)return;
-  const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
-  openPromptModal({
-    icon:ICO_CHECK,iconBg:'var(--green-light)',iconColor:'var(--green-d)',
-    title:'Одобрить возврат',sub:'Клиент получит уведомление, что возврат одобрен.',
-    field:{label:'Сумма возврата, ₽',type:'number',defaultValue:String(o.totalPrice||''),required:true},
-    confirmLabel:'Одобрить',confirmClass:'btn-green',
-    onConfirm:async(val)=>{
-      const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:new Date().toISOString()},'Возврат одобрен ✓');
-      if(ok&&o.uid)await notifyClient(o.uid,'✅ Возврат одобрен','Средства поступят на счёт в ближайшее время.',{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});
-    }
-  });
+  if(!selOrderId)return; const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
+  openPromptModal({icon:ICO_CHECK,iconBg:'var(--green-soft)',iconColor:'var(--green-d)',title:'Одобрить возврат',sub:'Клиент получит уведомление, что возврат одобрен.',
+    field:{label:'Сумма возврата, ₽',type:'number',defaultValue:String(o.totalPrice||''),required:true},confirmLabel:'Одобрить',confirmClass:'btn-green',
+    onConfirm:async(val)=>{ const ok=await safeUpdate(selOrderId,{refundStatus:'approved',refundAmount:Number(val)||o.totalPrice||0,refundDecidedAt:new Date().toISOString()},'Возврат одобрен ✓'); if(ok&&o.uid)await notifyClient(o.uid,'✅ Возврат одобрен','Средства поступят на счёт в ближайшее время.',null); }});
 };
 window.rejectRefund=async()=>{
-  if(!selOrderId)return;
-  const o=allOrders.find(x=>x.id===selOrderId);
-  openPromptModal({
-    icon:ICO_X,iconBg:'var(--red-light)',iconColor:'var(--red)',
-    title:'Отклонить возврат',sub:'Комментарий увидит клиент — объясните причину.',
-    field:{label:'Комментарий для клиента',type:'text',required:true},
-    confirmLabel:'Отклонить',confirmClass:'btn-danger',
-    onConfirm:async(val)=>{
-      const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:new Date().toISOString()},'Возврат отклонён');
-      if(ok&&o?.uid)await notifyClient(o.uid,'❌ Возврат отклонён',val||'Свяжитесь с поддержкой для уточнения.',{text:'🆘 Поддержка',url:'https://antviz.ru/profile/support.html',webApp:true});
-    }
-  });
+  if(!selOrderId)return; const o=allOrders.find(x=>x.id===selOrderId);
+  openPromptModal({icon:ICO_X,iconBg:'var(--red-soft)',iconColor:'var(--red)',title:'Отклонить возврат',sub:'Комментарий увидит клиент — объясните причину.',
+    field:{label:'Комментарий для клиента',type:'text',required:true},confirmLabel:'Отклонить',confirmClass:'btn-danger',
+    onConfirm:async(val)=>{ const ok=await safeUpdate(selOrderId,{refundStatus:'rejected',refundComment:val,refundDecidedAt:new Date().toISOString()},'Возврат отклонён'); if(ok&&o?.uid)await notifyClient(o.uid,'❌ Возврат отклонён',val||'Свяжитесь с поддержкой для уточнения.',null); }});
 };
 window.markRefunded=async()=>{
-  if(!selOrderId)return;
-  const o=allOrders.find(x=>x.id===selOrderId);
-  openPromptModal({
-    icon:ICO_SEND,iconBg:'#ececee',iconColor:'var(--dark)',
-    title:'Деньги отправлены?',sub:'Подтвердите, что средства фактически переведены клиенту — это закроет возврат и отправит клиенту уведомление.',
-    confirmLabel:'Подтвердить',confirmClass:'btn-dark',
-    onConfirm:async()=>{
-      const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:new Date().toISOString()},'Возврат завершён ✓');
-      if(ok&&o?.uid)await notifyClient(o.uid,'💸 Средства возвращены','Возврат по заказу завершён.',{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});
-    }
-  });
+  if(!selOrderId)return; const o=allOrders.find(x=>x.id===selOrderId);
+  openPromptModal({icon:ICO_SEND,iconBg:'var(--line)',iconColor:'var(--dark)',title:'Деньги отправлены?',sub:'Подтвердите, что средства фактически переведены клиенту.',confirmLabel:'Подтвердить',confirmClass:'btn-dark',
+    onConfirm:async()=>{ const ok=await safeUpdate(selOrderId,{refundStatus:'refunded',refundedAt:new Date().toISOString()},'Возврат завершён ✓'); if(ok&&o?.uid)await notifyClient(o.uid,'💸 Средства возвращены','Возврат по заказу завершён.',null); }});
 };
 window.manualRefund=async()=>{
-  if(!selOrderId)return;
-  const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
+  if(!selOrderId)return; const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
   if(o.refundStatus&&o.refundStatus!=='none'&&o.refundStatus!=='rejected'){toast('Возврат уже оформляется','info');return;}
-  openPromptModal({
-    icon:ICO_REFRESH,iconBg:'var(--amber-light)',iconColor:'var(--amber)',
-    title:'Оформить возврат вручную',sub:'Для случаев, когда клиент попросил возврат не через форму (например, в чате).',
-    field:{label:'Причина возврата (для истории)',type:'text'},
-    confirmLabel:'Оформить',confirmClass:'btn-dark',
-    onConfirm:async(val)=>{
-      await safeUpdate(selOrderId,{refundStatus:'requested',refundComment:val||'Оформлено вручную администратором',refundRequestedAt:new Date().toISOString()},'Заявка на возврат создана ✓');
-    }
-  });
+  openPromptModal({icon:ICO_REFRESH,iconBg:'var(--orange-soft)',iconColor:'var(--orange)',title:'Оформить возврат вручную',sub:'Для случаев, когда клиент попросил возврат не через форму.',
+    field:{label:'Причина возврата (для истории)',type:'text'},confirmLabel:'Оформить',confirmClass:'btn-dark',
+    onConfirm:async(val)=>{ await safeUpdate(selOrderId,{refundStatus:'requested',refundComment:val||'Оформлено вручную администратором',refundRequestedAt:new Date().toISOString()},'Заявка на возврат создана ✓'); }});
 };
 
-window.togglePayment=async()=>{
-  if(!selOrderId)return;
-  const prevPaid=currentPaid;
-  currentPaid=!currentPaid;renderPayRow();
-  const _o=allOrders.find(x=>x.id===selOrderId);
-  const _upd={paid:currentPaid};
-  if(currentPaid&&!_o?.paidAt){_upd.paidAt=new Date().toISOString();}
-  if(currentPaid&&_o&&_o.status===6){_upd.status=5;_upd.doneAt=new Date().toISOString();renderPipeline(5);}
-  const ok=await safeUpdate(selOrderId,_upd,currentPaid?'Оплачен ✓':'Не оплачен');
-  if(!ok){currentPaid=prevPaid;renderPayRow();}
-};
 window.setStatus=async s=>{
   if(!selOrderId)return;
   const now=new Date().toISOString();
@@ -999,11 +864,11 @@ window.setStatus=async s=>{
     const paidAmt = o?.paidAmount||0;
     const totalPrice = o?.totalPrice||0;
     const fullyPaid = o?.paid || (isPartial && paidAmt>=totalPrice);
-    if(isPartial && !fullyPaid){ upd.status=6; msg='Предоплата — статус → Ожидает доплаты ✓'; }
+    if(isPartial && !fullyPaid){ upd.status=6; msg='Требуется доплата — статус → Ожидает доплаты'; }
     else { upd.doneAt=now; msg='Статус → '+S[s]+' ✓'; }
   } else { msg='Статус → '+S[s]+' ✓'; }
   const ok=await safeUpdate(selOrderId,upd,msg);
-  if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`,{text:'📋 Мои заказы',url:'https://antviz.ru/profile/orders.html',webApp:true});}
+  if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`,null);}
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
 window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:new Date(val+'T12:00:00').toISOString()},'Дата сохранена ✓');};
@@ -1016,97 +881,68 @@ window.saveSite=async()=>{
   const repo=document.getElementById('siteRepo').value.trim();
   const ok=await safeUpdate(selOrderId,{siteDomain:domain,siteUrl:url,siteFaviconUrl:fav,sitePages:pages?Number(pages):null,siteRepo:repo,status:5,doneAt:new Date().toISOString()});
   if(!ok)return;
-  if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`,url?{text:'🌐 Открыть сайт',url}:null);
+  if(selUid&&domain)await notifyClient(selUid,'🎉 Ваш сайт готов!',`Сайт готов: ${domain}${url?' — '+url:''}`,null);
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.saveBot=async()=>{
   if(!selOrderId)return;
   const raw=document.getElementById('botUsername').value.trim();
+  const repo=document.getElementById('botRepo').value.trim();
   const username=raw.replace(/^@/,'').replace(/^https?:\/\/t\.me\//i,'').replace(/^t\.me\//i,'').replace(/\/+$/,'');
   const link=username?'https://t.me/'+username:'';
-  const ok=await safeUpdate(selOrderId,{botUsername:username,botLink:link,status:5,doneAt:new Date().toISOString()});
+  const ok=await safeUpdate(selOrderId,{botUsername:username,botLink:link,siteRepo:repo,status:5,doneAt:new Date().toISOString()});
   if(!ok)return;
-  if(selUid&&username)await notifyClient(selUid,'🎉 Ваш бот готов!',`Бот готов: @${username}`,link?{text:'🤖 Открыть бота',url:link}:null);
+  if(selUid&&username)await notifyClient(selUid,'🎉 Ваш бот готов!',`Бот готов: @${username}`,null);
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{
   const exp=new Date(Date.now()+30*864e5);
   const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:new Date().toISOString(),supportExpiresAt:exp.toISOString(),supportRequested:false});
   if(!ok)return;
-  if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.',{text:'⚙️ Обслуживание',url:'https://antviz.ru/profile/tickets.html',webApp:true});
+  if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.',null);
   toast('Активировано ✓','success');
 };
-window.renewSupport=async orderId=>{
-  const exp=new Date(Date.now()+30*864e5);
-  await safeUpdate(orderId,{supportExpiresAt:exp.toISOString()},'Продлено на 30 дней ✓');
-};
-window.sendPayLink=async(orderId,uid)=>{
-  const inp=document.getElementById('payLink_'+orderId)||document.getElementById('payLinkInp');
-  const link=inp?.value.trim();if(!link){toast('Введите ссылку','error');return;}
-  if(!uid){toast('UID не найден','error');return;}
-  try{
-    await notifyClient(uid,'💳 Ссылка на оплату',`Ссылка: ${link}`,{text:'💳 Оплатить',url:link});
-    toast('Ссылка отправлена ✓','success');if(inp)inp.value='';
-  }catch(err){console.error('notify failed:',err);toast('Не отправилось','error');}
-};
+window.renewSupport=async orderId=>{ const exp=new Date(Date.now()+30*864e5); await safeUpdate(orderId,{supportExpiresAt:exp.toISOString()},'Продлено на 30 дней ✓'); };
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
-  try{
-    await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',{text:'⚙️ Продлить',url:'https://antviz.ru/profile/tickets.html',webApp:true});
-    toast('Уведомление отправлено ✓','success');
-  }catch(err){console.error('notify failed:',err);toast('Не отправилось','error');}
+  try{ await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',null); toast('Уведомление отправлено ✓','success'); }
+  catch(err){console.error('notify failed:',err);toast('Не отправилось','error');}
 };
 window.archiveOrder=async()=>{
-  if(!selOrderId)return;
-  const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
+  if(!selOrderId)return; const o=allOrders.find(x=>x.id===selOrderId);if(!o)return;
   const goingToArchive=!o.archived;
   if(!confirm(goingToArchive?'Архивировать заказ? Он пропадёт из обычных вкладок, но останется во вкладке «Архив».':'Вернуть заказ из архива?'))return;
   await safeUpdate(selOrderId,{archived:goingToArchive},goingToArchive?'В архиве ✓':'Возвращён из архива ✓');
+  document.getElementById('kebabMenu')?.classList.remove('show');
 };
 window.printReceipt=id=>{
-  const o=_cache.find(x=>x.id===id);if(!o)return;
+  const o=allOrders.find(x=>x.id===id);if(!o)return;
   const w=window.open('','_blank','width=600,height=700');
   const date=o.createdAt?new Date(o.createdAt).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${siteTypeLabel(o.siteType)||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${(()=>{const _ip=o.paymentType==='partial',_pa=o.paidAmount||0,_fp=o.paid||(_ip&&_pa>=(o.totalPrice||0));return _ip&&!_fp?'Предоплата 50%':_fp?'Оплачен полностью':'Не оплачен';})()}</td></tr>${o.paymentType==='partial'?`<tr><td>Оплачено</td><td>${(o.paidAmount||0).toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${o.paid||(o.paidAmount||0)>=(o.totalPrice||0)?'—':(o.remainingAmount||Math.ceil((o.totalPrice||0)/2)).toLocaleString('ru')+' ₽'}</td></tr>`:''}<tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
+  const pay=paymentStatus(o);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${siteTypeLabel(o.siteType)||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${pay.text}</td></tr><tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
 };
-window.doLogout=async()=>{
-  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
-  window.location.href='/';
-};
+window.doLogout=async()=>{ try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){} window.location.href='/'; };
 
 (async function initAdminOrders(){
   let user = null;
-  try{
-    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
-    if(resp.ok) user = await resp.json();
-  }catch(e){}
-
+  try{ const resp = await fetch(`${API}/auth/me`, { credentials:'include' }); if(resp.ok) user = await resp.json(); }catch(e){}
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
-  document.getElementById('appTopbar').style.display='flex';
 
   async function loadOrders(){
-    try{
-      const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' });
-      allOrders = resp.ok ? await resp.json() : [];
-    }catch(e){ allOrders=[]; }
-    _cache=[...allOrders];
+    try{ const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' }); allOrders = resp.ok ? await resp.json() : []; }catch(e){ allOrders=[]; }
     updateStats();renderList();
     if(selOrderId){const o=allOrders.find(x=>x.id===selOrderId);if(o)showDetail(o);}
   }
   async function loadReviews(){
-    try{
-      const resp = await fetch(`${API}/reviews/admin/all`, { credentials:'include' });
-      allReviews = resp.ok ? await resp.json() : [];
-    }catch(e){ allReviews=[]; }
+    try{ const resp = await fetch(`${API}/reviews/admin/all`, { credentials:'include' }); allReviews = resp.ok ? await resp.json() : []; }catch(e){ allReviews=[]; }
     if(selOrderId){const o=allOrders.find(x=>x.id===selOrderId);if(o)showDetail(o);}
   }
 
-  // REST, не realtime — обновляем список при загрузке страницы и после
-  // каждого сохранения (safeUpdate уже правит запись в allOrders на месте).
   await loadOrders();
   await loadReviews();
 
@@ -1114,6 +950,7 @@ window.doLogout=async()=>{
   if(urlId)setTimeout(()=>selectOrder(urlId),600);
 })();
 </script>
+<script src="/m-panel26.js"></script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>
 </body>

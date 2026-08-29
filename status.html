@@ -651,22 +651,9 @@
 
   // Тот же принцип, что и на странице входа/регистрации: если сервис проверки капчи
   // недоступен (сеть/таймаут) — не блокируем пользователя, пропускаем без капчи.
-  async function verifySubscribeCaptcha(token){
-    try{
-      const ctrl = new AbortController();
-      const timer = setTimeout(() => ctrl.abort(), 6000);
-      const resp = await fetch('https://cloudflarecaptcha900374938.vercel.app/api/verifyTurnstile', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token }), signal: ctrl.signal
-      });
-      clearTimeout(timer);
-      const data = await resp.json();
-      return { reachable: true, ok: !!data.success };
-    } catch(err){
-      console.warn('Проверка капчи недоступна, пропускаем без блокировки:', err);
-      return { reachable: false, ok: true };
-    }
-  }
+  // Настоящая проверка капчи теперь на бэкенде (см. verifyTurnstile в routes/status.js),
+  // не через сторонний Vercel-прокси — тот был "мягким" (пропускал при недоступности),
+  // а тут капча обязательна: без валидного токена подписка не пройдёт.
 
   async function confirmSubscribe(){
     const emailInput = document.getElementById('sub-email');
@@ -675,30 +662,25 @@
       emailInput.style.borderColor = 'var(--major)';
       return;
     }
+
+    // Без пройденной капчи не отправляем вообще — это реальная блокировка,
+    // не мягкая проверка. Сервер всё равно перепроверит токен ещё раз сам.
+    const cfToken = window.turnstile ? turnstile.getResponse(document.getElementById('turnstile-subscribe')) : null;
+    if(!cfToken){
+      alert('Пройдите проверку капчи');
+      return;
+    }
+
     const btn = document.querySelector('.btn-confirm');
     const originalText = btn.textContent;
     btn.textContent = 'Отправляем…';
     btn.disabled = true;
 
-    if(window.turnstile){
-      const cfToken = turnstile.getResponse(document.getElementById('turnstile-subscribe'));
-      if(cfToken){
-        const v = await verifySubscribeCaptcha(cfToken);
-        if(v.reachable && !v.ok){
-          alert('Проверка капчи не пройдена, попробуйте ещё раз');
-          turnstile.reset(document.getElementById('turnstile-subscribe'));
-          btn.textContent = originalText;
-          btn.disabled = false;
-          return;
-        }
-      }
-    }
-
     try{
       const resp = await fetch(`${API_BASE}/status/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email, cfToken })
       });
       const data = await resp.json();
       if(!resp.ok) throw new Error(data.error || 'Не удалось подписаться');

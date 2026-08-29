@@ -6,26 +6,10 @@
     let currentUser = null, authReady = false;
     let maintOn = null, banData = null, banChecked = false;
 
-    // ===== Кэш в sessionStorage — общий принцип для обеих проверок:
-    // тех.работы почти всегда выключены, бан почти всегда отсутствует,
+    // ===== Кэш в sessionStorage — для бана: он почти всегда отсутствует,
     // незачем дёргать API на каждом переходе между страницами.
-    const MAINT_KEY = 'antviz_maint_status';
-    const MAINT_TTL_OFF = 5 * 60 * 1000;
-    const MAINT_TTL_ON  = 20 * 1000;
-    function readMaintCache() {
-      try {
-        const raw = sessionStorage.getItem(MAINT_KEY);
-        if (!raw) return null;
-        const data = JSON.parse(raw);
-        const ttl = data.on ? MAINT_TTL_ON : MAINT_TTL_OFF;
-        if (Date.now() - data.ts > ttl) return null;
-        return data.on;
-      } catch (e) { return null; }
-    }
-    function writeMaintCache(on) {
-      try { sessionStorage.setItem(MAINT_KEY, JSON.stringify({ on, ts: Date.now() })); } catch (e) {}
-    }
-
+    // Тех.работы НЕ кэшируем — статус должен подхватываться сразу же
+    // при обычной перезагрузке страницы, без ожидания TTL.
     const BAN_KEY = 'antviz_ban_status';
     const BAN_TTL_OFF = 60 * 1000;
     const BAN_TTL_ON  = 15 * 1000;
@@ -51,13 +35,10 @@
     // ===== Тех.работы — управляются файлом-флагом на сервере
     // (touch/rm .maintenance в папке бэкенда), проверяем через API.
     (async () => {
-      const cached = readMaintCache();
-      if (cached !== null) { maintOn = cached; render(); return; }
       try {
         const resp = await fetch(`${API}/maintenance-status`);
         const data = resp.ok ? await resp.json() : { enabled: false };
         maintOn = !!data.enabled;
-        writeMaintCache(maintOn);
       } catch (e) { maintOn = false; }
       render();
     })();

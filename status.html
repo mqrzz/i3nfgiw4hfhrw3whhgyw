@@ -526,7 +526,8 @@
     services.forEach(s => {
       const row = document.createElement('div');
       row.className = 'service-row';
-      const uptimeLabel = s.uptimePct === null ? 'нет автопроверки (статус только вручную)' : `${s.uptimePct}% за 90 дней`;
+      const daysLabel = s.daysWithData >= 90 ? '90 дней' : `${s.daysWithData} ${s.daysWithData === 1 ? 'день' : (s.daysWithData < 5 ? 'дня' : 'дней')}`;
+      const uptimeLabel = s.uptimePct === null ? 'нет автопроверки (статус только вручную)' : `${s.uptimePct}% за ${daysLabel}`;
       const latencyLabel = s.latencyMs !== null && s.latencyMs !== undefined ? ` · ~${s.latencyMs} мс` : '';
       row.innerHTML = `
         <div class="service-top">

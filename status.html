@@ -415,8 +415,8 @@
     </div>
     <div class="modal-success" id="modal-success">
       <div class="check">✓</div>
-      <h2>Готово</h2>
-      <p>Мы отправим письмо на указанный адрес при изменении статуса.</p>
+      <h2 id="modal-success-title">Готово</h2>
+      <p id="modal-success-text">Мы отправим письмо на указанный адрес при изменении статуса.</p>
       <div class="modal-actions">
         <button class="btn-confirm" style="flex:none; width:100%;" onclick="closeModal()">Понятно</button>
       </div>
@@ -547,7 +547,7 @@
     return new Date(iso).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Moscow' });
   }
   function fmtTime(iso){
-    return new Date(iso).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' }) + ' MSK';
+    return new Date(iso).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Moscow' }) + ' MSK (UTC+3)';
   }
 
   function renderIncidents(incidents){
@@ -615,7 +615,7 @@
       banner.className = 'status-banner' + (data.overall !== 'ok' ? ` sev-${data.overall}` : '');
       pulse.className = 'pulse' + (data.overall !== 'ok' ? ` sev-${data.overall}` : '');
       document.getElementById('last-updated').textContent =
-        'Обновлено ' + new Date(data.updatedAt).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'long', timeZone: 'Europe/Moscow' }) + ' MSK';
+        'Обновлено ' + new Date(data.updatedAt).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'long', timeZone: 'Europe/Moscow' }) + ' MSK (UTC+3)';
 
       renderServices(data.services);
       renderIncidents(data.incidents);
@@ -685,6 +685,13 @@
       const data = await resp.json();
       if(!resp.ok) throw new Error(data.error || 'Не удалось подписаться');
       document.getElementById('modal-form').classList.add('hidden');
+      if(data.alreadySubscribed){
+        document.getElementById('modal-success-title').textContent = 'Вы уже подписаны';
+        document.getElementById('modal-success-text').textContent = 'Этот email уже получает уведомления о статусе — письма повторно отправлять не будем.';
+      } else {
+        document.getElementById('modal-success-title').textContent = 'Готово';
+        document.getElementById('modal-success-text').textContent = 'Мы отправим письмо на указанный адрес при изменении статуса.';
+      }
       document.getElementById('modal-success').classList.add('show');
     } catch(err){
       emailInput.style.borderColor = 'var(--major)';

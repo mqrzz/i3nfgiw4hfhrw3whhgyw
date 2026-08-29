@@ -264,6 +264,7 @@
                             <li><a href="${base}order" class="cta">Заказать сайт</a></li>
                             <li><a href="${base}rules">Правила</a></li>
                             <li><a href="${base}profile/support">Поддержка</a></li>
+                            <li><a href="https://antviz.ru/status" target="_blank" rel="noopener">Статус Antviz</a></li>
                         </ul>
                     </div>
                     <div>

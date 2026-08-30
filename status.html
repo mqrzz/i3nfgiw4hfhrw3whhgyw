@@ -685,6 +685,7 @@
   let faviconBaseImg = null;
   let faviconColor = '#1ede7b';
   let faviconBlinkPhase = 0;
+  let faviconRingPhase = 0;
   let faviconTimer = null;
 
   function drawFavicon(){
@@ -695,11 +696,22 @@
     const ctx = canvas.getContext('2d');
     if(img) ctx.drawImage(img, 0, 0, size, size);
 
-    // мигание: прозрачность точки колеблется по синусоиде между ~35% и 100%
+    // мигание точки: прозрачность колеблется по синусоиде между ~35% и 100%
     faviconBlinkPhase += 0.35;
     const alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(faviconBlinkPhase));
 
-    const r = size * 0.26, cx = size - r - 2, cy = size - r - 2;
+    const r = size * 0.22, cx = size - r - 6, cy = size - r - 6;
+
+    // расходящееся кольцо — та же идея, что @keyframes pulse-ring на самой странице:
+    // растёт от точки наружу и одновременно гаснет, затем цикл начинается заново
+    faviconRingPhase = (faviconRingPhase + 0.045) % 1;
+    const ringR = r * (1 + faviconRingPhase * 1.8);
+    const ringAlpha = (1 - faviconRingPhase) * 0.55;
+    ctx.beginPath(); ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+    ctx.strokeStyle = faviconColor; ctx.lineWidth = 2.5;
+    ctx.globalAlpha = ringAlpha; ctx.stroke(); ctx.globalAlpha = 1;
+
+    // белая подложка под точкой, чтобы не сливалась с фоном иконки
     ctx.beginPath(); ctx.arc(cx, cy, r + 3, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
     ctx.globalAlpha = alpha;
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = faviconColor; ctx.fill();

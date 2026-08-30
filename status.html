@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Antviz — Статус сервисов</title>
+<link rel="icon" id="favicon-link" href="img/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -174,6 +175,8 @@
     flex:1 1 0; border-radius:3px; position:relative; cursor:default;
     background:var(--ok); height:100%;
   }
+  .uptime-bar .bar[data-admin-day]{cursor:pointer;}
+  .uptime-bar .bar[data-admin-day]:hover{outline:2px solid var(--text-faint); outline-offset:1px;}
   .uptime-bar .bar.degraded{background:var(--degraded);}
   .uptime-bar .bar.partial{background:var(--partial);}
   .uptime-bar .bar.major{background:var(--major);}
@@ -493,6 +496,27 @@
   document.addEventListener('mouseout', (e) => {
     if(e.target.closest('.bar')) tooltip.classList.remove('show');
   });
+
+  // Клик по дню на полоске аптайма (только для админа) — очистить данные за этот
+  // день, если день покрашен из-за ошибки в настройках мониторинга, а не реального
+  // сбоя. После очистки день станет "нет данных" и снова зелёным.
+  document.addEventListener('click', async (e) => {
+    const bar = e.target.closest('.bar[data-admin-day]');
+    if(!bar) return;
+    const date = bar.getAttribute('data-date');
+    const serviceId = bar.getAttribute('data-service-id');
+    if(!confirm(`Стереть данные проверок за ${date}? День станет "нет данных" (снова зелёный). Отменить нельзя.`)) return;
+    try{
+      const resp = await fetch(`${API_BASE}/status/services/${serviceId}/checks?date=${date}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if(!resp.ok) throw new Error((await resp.json()).error || 'Ошибка');
+      loadStatus();
+    } catch(err){
+      alert('Не удалось очистить день: ' + err.message);
+    }
+  });
   function positionTooltip(bar){
     const rect = bar.getBoundingClientRect();
     const tw = tooltip.offsetWidth || 100;
@@ -507,7 +531,7 @@
     return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function buildUptimeBarHtml(days){
+  function buildUptimeBarHtml(days, serviceId){
     return days.map((d, idx) => {
       const daysAgo = days.length - 1 - idx;
       const when = daysAgo === 0 ? 'Сегодня' : `${daysAgo} дн. назад`;
@@ -516,7 +540,8 @@
       else if(d.status === 'ok'){ cls = 'ok'; tip = `${when} — норма`; }
       else if(d.status === 'degraded'){ cls = 'degraded'; tip = `${when} — частичные сбои`; }
       else { cls = 'major'; tip = `${when} — сбой`; }
-      return `<div class="bar ${cls}" data-tip="${esc(tip)}"></div>`;
+      const adminAttrs = isAdmin ? ` data-admin-day="1" data-service-id="${serviceId}" data-date="${d.date}"` : '';
+      return `<div class="bar ${cls}" data-tip="${esc(tip)}"${adminAttrs}></div>`;
     }).join('');
   }
 
@@ -536,7 +561,7 @@
             <span class="status-label ${s.status}">${statusLabels[s.status] || s.status}${latencyLabel}</span>
           </div>
         </div>
-        <div class="uptime-bar">${buildUptimeBarHtml(s.days)}</div>
+        <div class="uptime-bar">${buildUptimeBarHtml(s.days, s.id)}</div>
         <div class="uptime-meta">
           <span>90 дней назад</span>
           <span>${uptimeLabel}</span>
@@ -638,6 +663,7 @@
       const pulse = document.querySelector('.pulse');
       banner.className = 'status-banner' + (data.overall !== 'ok' ? ` sev-${data.overall}` : '');
       pulse.className = 'pulse' + (data.overall !== 'ok' ? ` sev-${data.overall}` : '');
+      updateFavicon(data.overall);
       document.getElementById('last-updated').textContent =
         'Обновлено ' + new Date(data.updatedAt).toLocaleString('ru-RU', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'long', timeZone: 'Europe/Moscow' }) + ' MSK (UTC+3)';
 
@@ -650,6 +676,57 @@
       document.querySelector('.status-text h1').textContent = 'Не удалось загрузить статус';
       document.getElementById('last-updated').textContent = 'Попробуйте обновить страницу';
     }
+  }
+
+  // Динамический фавикон — рисуем цветную точку поверх твоей иконки (img/favicon.png),
+  // цвет = реальный статус (зелёная точка, если всё ок, иначе цвет проблемы), точка
+  // мигает (плавно гаснет/загорается) — никаких доп. картинок, просто перерисовываем
+  // canvas каждые полсекунды с разной прозрачностью точки.
+  let faviconBaseImg = null;
+  let faviconColor = '#1ede7b';
+  let faviconBlinkPhase = 0;
+  let faviconTimer = null;
+
+  function drawFavicon(){
+    const img = faviconBaseImg;
+    const size = 64;
+    const canvas = document.createElement('canvas');
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    if(img) ctx.drawImage(img, 0, 0, size, size);
+
+    // мигание: прозрачность точки колеблется по синусоиде между ~35% и 100%
+    faviconBlinkPhase += 0.35;
+    const alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(faviconBlinkPhase));
+
+    const r = size * 0.26, cx = size - r - 2, cy = size - r - 2;
+    ctx.beginPath(); ctx.arc(cx, cy, r + 3, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
+    ctx.globalAlpha = alpha;
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = faviconColor; ctx.fill();
+    ctx.globalAlpha = 1;
+
+    document.getElementById('favicon-link').href = canvas.toDataURL('image/png');
+  }
+
+  function updateFavicon(overall){
+    const dotColors = {
+      ok: '#1ede7b', degraded: '#f0b429', maint: '#f0b429',
+      partial: '#f2924a', major: '#e5484d'
+    };
+    faviconColor = dotColors[overall] || dotColors.ok;
+
+    if(faviconBaseImg){ if(!faviconTimer) startFaviconBlink(); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => { faviconBaseImg = img; startFaviconBlink(); };
+    img.onerror = () => { startFaviconBlink(); }; // файла нет/не загрузился — мигаем хотя бы одной точкой
+    img.src = 'img/favicon.png';
+  }
+
+  function startFaviconBlink(){
+    if(faviconTimer) return;
+    drawFavicon();
+    faviconTimer = setInterval(drawFavicon, 120); // ~плавное мигание, не резкое togglе
   }
 
   loadStatus();

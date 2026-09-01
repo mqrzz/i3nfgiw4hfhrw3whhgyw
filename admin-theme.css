@@ -1,0 +1,295 @@
+/* admin-theme.css — общая система дизайна админки Antviz (Vantage-стиль).
+   Подключается на КАЖДОЙ странице /admin/*:
+     <link rel="stylesheet" href="/admin-theme.css">
+   Тут — токены, сброс, и компоненты, которые повторяются на всех страницах
+   (кнопки, бейджи, карточки-секции, модалки, форма списка). Что специфично
+   для конкретной страницы (напр. .pipeline в заказах) — остаётся в её
+   собственном <style>, сюда не выносится.
+   Если меняешь токен (цвет/радиус/тень) — меняешь один раз здесь, а не в
+   семи файлах. */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+html,body{height:100%;background:#f4f4f2}
+
+:root{
+  --bg:#f4f4f2;--card:#ffffff;--card-soft:#ececea;/* card-soft = --bg-card эталона, значение идентично (#ececea) */
+  --ink:#121212;--ink-soft:#6b6b68;--ink-faint:#a2a29e;/* ink-faint — моя добавка для третичного текста, в эталоне такого уровня нет */
+  --line:rgba(18,18,18,.09);--line-strong:rgba(18,18,18,.18);/* line — точное значение эталона; line-strong — моя добавка для hover-состояний */
+  --dark:#1c1c1a;--dark-line:rgba(255,255,255,.1);
+  /* Primary-заливка = 100% чёрный (--ink), НЕ зелёный — исправлено, раньше
+     тут ошибочно стоял яркий бренд-зелёный на всех главных кнопках. */
+  --pill:#121212;--pill-ink:#f4f4f2;
+  /* Зелёный — только статус «оплачено/активно», приглушённый эталонный
+     #1a7f3c (был #1ede7b — фирменный, но слишком яркий для этой системы). */
+  --green:#1a7f3c;--green-soft:#e8f3ec;--green-d:#1a7f3c;
+  /* danger — только текст/обводка, никогда сплошная заливка. */
+  --danger:#b3261e;--danger-soft:rgba(179,38,30,.08);
+  --orange:#f5a623;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
+  /* Geologica — реальный шрифт бренда Antviz, подключён через Google Fonts
+     на каждой странице; ставлю первым, а дальше — ровно тот фолбэк-стек,
+     что в эталоне, на случай если веб-шрифт не загрузился. */
+  --font:'Geologica',-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',Helvetica,Arial,sans-serif;
+  /* Радиусы — каскад эталона 999/20/28. r-sm/r-xs — моя добавка для мелких
+     элементов (плотные инфо-чипы в списках), которых в лендинг-референсе нет. */
+  --r-pill:999px;--r-xl:28px;--r-lg:20px;--r-md:20px;--r-sm:14px;--r-xs:10px;
+  --sh-sm:0 1px 2px rgba(18,18,18,.05);
+  --sh-md:0 10px 34px rgba(18,18,18,.07);
+  --sh-lg:0 30px 60px rgba(18,18,18,.18);
+  --maxw:1080px;
+  /* Брейкпоинт — ТОЛЬКО справочно. CSS-переменные нельзя использовать
+     внутри @media-условий (спека не позволяет), поэтому в реальных
+     @media-запросах везде пишем литерал 860px напрямую, а не var(--bp).
+     Держи это число синхронным, если меняешь его здесь. */
+  --bp-reference:860px;
+}
+
+/* Базовый font-size эталона — 17px. На rem-размеры компонентов это не
+   влияет (rem считается от html, а не от body, а html-размер я не трогаю) —
+   так что плотность админки не страдает, при этом буквальное значение
+   спеки соблюдено. */
+body{color:var(--ink);font-family:var(--font);font-weight:400;font-size:17px;-webkit-font-smoothing:antialiased;line-height:1.45}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:3px}
+svg{display:block}
+
+/* ---------- экран загрузки ---------- */
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.12);border-top-color:var(--pill-ink);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.4)}
+
+/* ---------- каркас страницы: state-machine из экранов ---------- */
+.app{display:none;min-height:100vh;flex-direction:column;background:var(--bg)}
+.screen{position:relative;display:none;flex-direction:column}
+.screen.active{display:flex;animation:fadeUp .22s ease both}
+
+/* ---------- иконка-кнопка (назад/kebab/т.п.) ---------- */
+.icon-btn{width:40px;height:40px;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--card);color:var(--ink);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:border-color .15s,background .15s}
+.icon-btn:hover{border-color:var(--line-strong);background:var(--card-soft)}
+.icon-btn svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none}
+.back-label{display:none;font-size:.85rem;font-weight:600;white-space:nowrap}
+@media(max-width:860px){
+  .exit-btn{width:auto;padding:0 15px 0 12px;gap:7px;justify-content:flex-start;background:var(--card)}
+  .back-label{display:inline}
+}
+
+/* ---------- кнопки ---------- */
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:600;font-size:.84rem;border:none;border-radius:var(--r-pill);padding:.68rem 1.25rem;cursor:pointer;transition:transform .12s,filter .15s,background .15s;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.btn svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.2;fill:none;flex-shrink:0}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--pill);color:var(--pill-ink)}.btn-primary:hover{filter:brightness(1.25)}
+.btn-dark{background:var(--ink);color:#fff}.btn-dark:hover{filter:brightness(1.15)}
+.btn-ghost{background:transparent;border:1.5px solid var(--line-strong);color:var(--ink)}.btn-ghost:hover{background:var(--card-soft)}
+.btn-danger{background:transparent;border:1.5px solid rgba(179,38,30,.25);color:var(--danger)}.btn-danger:hover{background:var(--danger-soft)}
+.btn-warn{background:var(--orange-soft);color:var(--orange-d)}.btn-warn:hover{filter:brightness(.97)}
+.btn-block{width:100%;justify-content:center}
+.btn-sm{padding:.5rem 1.05rem;font-size:.78rem}
+
+/* ---------- бейджи/теги статусов ---------- */
+.badge{display:inline-flex;align-items:center;gap:5px;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.68rem;font-weight:600;white-space:nowrap;flex-shrink:0;border:1px solid var(--line)}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
+.tag{display:inline-flex;align-items:center;padding:.22rem .6rem;border-radius:var(--r-pill);font-size:.7rem;font-weight:600;background:var(--card-soft);color:var(--ink-soft);flex-shrink:0}
+.tag-accent{background:var(--green-soft);color:var(--green-d)}
+
+/* ---------- карточка-секция (повторяется на всех детальных экранах) ---------- */
+.sec{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px;min-width:0}
+.sec-h{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}
+.sec-h-l{display:flex;align-items:center;gap:11px;min-width:0}
+.sec-icon{width:32px;height:32px;border-radius:50%;background:var(--accent-bg,var(--card-soft));color:var(--accent,var(--ink-soft));display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sec-icon svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.9;fill:none}
+.sec-title{font-weight:700;font-size:.92rem;letter-spacing:-.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sec-b{padding:18px 20px;min-width:0}
+
+/* ---------- инфо-плашки внутри секций (.ig — грид из .ic) ---------- */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ig.single{grid-template-columns:1fr}
+.ic{background:var(--card-soft);border-radius:var(--r-sm);padding:11px 13px;min-width:0}
+.ic-l{font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:4px;font-weight:600}
+.ic-v{font-size:.86rem;color:var(--ink);word-break:break-word;overflow-wrap:break-word}
+.ic.highlight{background:var(--green-soft)}
+.ic.highlight .ic-l{color:var(--green-d)}
+.ic.highlight .ic-v{color:var(--green-d);font-weight:700}
+
+/* ---------- форма (инпуты/textarea/лейблы/селект/дропзона) ---------- */
+.sf{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sf-row{display:flex;flex-direction:column;gap:6px;min-width:0}
+.sf-lbl{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);font-weight:600}
+.si,.textarea,.fsel{background:var(--card-soft);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:.7rem .95rem;font-family:var(--font);font-size:.86rem;color:var(--ink);outline:none;transition:border-color .15s;width:100%}
+.si:focus,.textarea:focus,.fsel:focus{border-color:var(--ink)}
+.textarea{resize:vertical;min-height:66px;line-height:1.5}
+.fsel{cursor:pointer;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%236b6b68" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');background-repeat:no-repeat;background-position:right 14px center;background-size:15px;padding-right:38px}
+.dropzone{border:1.5px dashed var(--line-strong);border-radius:var(--r-md);padding:26px 16px;text-align:center;color:var(--ink-soft);cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.dropzone:hover,.dropzone.drag{border-color:var(--ink);background:var(--card-soft)}
+.dropzone svg{width:21px;height:21px;stroke:var(--ink-faint);stroke-width:1.6;fill:none}
+.dropzone-text{font-size:.84rem}
+.dropzone-sub{font-size:.72rem;color:var(--ink-faint)}
+.dz-file{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:.65rem .9rem;font-size:.82rem}
+.dz-file img{width:34px;height:34px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.dz-file .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-file .rm{background:none;border:none;color:var(--ink-soft);cursor:pointer;width:24px;height:24px;flex-shrink:0}
+.dz-file .rm svg{width:15px;height:15px;stroke:currentColor;stroke-width:2}
+
+/* ---------- поиск + вкладки над списком ---------- */
+.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.sb-box{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-pill);padding:.7rem 1.15rem;transition:border-color .15s;flex:1;min-width:220px;max-width:360px}
+.sb-box:focus-within{border-color:var(--ink)}
+.sb-box svg{width:15px;height:15px;stroke:var(--ink-soft);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.88rem;color:var(--ink);width:100%}
+.tab-row{display:flex;gap:6px;overflow-x:auto}
+.tab{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-pill);padding:.55rem 1rem;font-family:var(--font);font-size:.82rem;font-weight:500;color:var(--ink-soft);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.tab:hover{border-color:var(--line-strong);color:var(--ink)}
+.tab.active{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:600}
+
+/* ---------- статистика-чипы вверху списка ---------- */
+.stat-row{display:flex;gap:10px;overflow-x:auto;margin-bottom:18px;padding-bottom:2px}
+.stat-chip{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-pill);padding:.65rem 1.15rem .65rem .7rem;flex-shrink:0}
+.stat-chip-ic{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:var(--card-soft)}
+.stat-chip-ic svg{width:13px;height:13px;stroke-width:2;fill:none;stroke:var(--ink-soft)}
+.stat-chip b{font-size:.95rem;font-weight:700}
+.stat-chip span{font-size:.78rem;color:var(--ink-soft)}
+
+/* ---------- карточка строки списка (заказ/тикет/чат/бан — одна форма) ---------- */
+.list-scroll,.orders-scroll{display:flex;flex-direction:column;gap:8px}
+.li-row{display:flex;gap:14px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:15px 17px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both;min-width:0}
+.li-row:hover{border-color:var(--line-strong);box-shadow:var(--sh-md);transform:translateY(-1px)}
+.li-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-weight:700;font-size:.85rem}
+.li-body{flex:1;min-width:0}
+.li-top{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap;min-width:0}
+.li-id{font-size:.7rem;color:var(--ink-faint);font-weight:600;flex-shrink:0}
+.li-name{font-size:.94rem;font-weight:600;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-sub{font-size:.78rem;color:var(--ink-soft);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.li-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+.li-price{font-size:.86rem;font-weight:700;margin-left:auto;color:var(--ink);flex-shrink:0}
+.empty-l{text-align:center;padding:70px 16px;color:var(--ink-soft);font-size:.9rem}
+
+/* ---------- тёмный hero-блок детального экрана ---------- */
+.hero{background:var(--dark);border-radius:var(--r-xl);padding:30px 30px 26px;margin-bottom:16px;min-width:0}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;min-width:0}
+.hero-left{min-width:0;flex:1 1 220px}
+.hero-eyebrow{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:8px}
+.hero-num{font-size:1.7rem;font-weight:800;letter-spacing:-.03em;color:#fff}
+.hero-name{font-size:.9rem;color:rgba(255,255,255,.5);margin-top:6px;overflow-wrap:break-word;word-break:break-word;max-width:100%}
+.hero-right{flex-shrink:0;min-width:0;max-width:100%}
+.hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:20px}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr 1fr}}
+.hc{background:var(--dark-line);border-radius:var(--r-sm);padding:12px 14px;min-width:0}
+.hc-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,.32);margin-bottom:3px;font-weight:600}
+.hc-v{font-size:.85rem;color:rgba(255,255,255,.92);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ---------- двухколоночная раскладка деталей ---------- */
+.grid2{display:grid;grid-template-columns:360px 1fr;gap:14px;align-items:start;min-width:0}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;min-width:0}
+.col .sec{margin-bottom:14px}
+.col .sec:last-child{margin-bottom:0}
+
+/* ---------- вложения/картинки ---------- */
+.ag{display:flex;flex-wrap:wrap;gap:10px}
+.at{width:72px;height:72px;object-fit:cover;border-radius:var(--r-sm);cursor:pointer;transition:opacity .15s;border:1.5px solid var(--line)}
+.at:hover{opacity:.75}
+
+/* ---------- kebab-меню ---------- */
+.kebab-wrap{position:relative;flex-shrink:0}
+.kebab-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border-radius:var(--r-lg);box-shadow:var(--sh-lg);border:1.5px solid var(--line);padding:10px;width:min(230px,calc(100vw - 48px));z-index:60;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s;display:flex;flex-direction:column;gap:6px}
+.kebab-menu.show{opacity:1;pointer-events:all;transform:none}
+
+/* ---------- обычная модалка-форма (создание промокода, уведомление и т.п.) ---------- */
+.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(18,18,18,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-ov.show{opacity:1;pointer-events:all}
+.modal{background:var(--card);border-radius:var(--r-xl);padding:26px;width:100%;max-width:460px;box-shadow:var(--sh-lg);max-height:90vh;overflow-y:auto}
+.modal-title{font-weight:700;font-size:1.02rem;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em}
+.mc{background:none;border:none;color:var(--ink-soft);cursor:pointer;font-size:1rem;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-xs);transition:background .15s;flex-shrink:0}
+.mc:hover{background:var(--card-soft)}
+.modal-footer{display:flex;gap:8px;margin-top:20px}
+.modal-footer .btn{flex:1;justify-content:center}
+
+/* ---------- лайтбокс ---------- */
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(18,18,18,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.lightbox.show{opacity:1;pointer-events:all}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--r-md);object-fit:contain}
+.lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+
+/* ---------- тост ---------- */
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.75rem 1.4rem;border-radius:var(--r-pill);font-size:.85rem;font-weight:600;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast.show{opacity:1;transform:none}
+.toast.success{background:var(--ink);color:var(--pill-ink)}.toast.error{background:var(--danger);color:#fff}.toast.info{background:var(--ink);color:#fff}.toast.warn{background:var(--orange);color:#1c1c1a}
+
+/* ---------- модалка-подтверждение (prompt modal) ---------- */
+.pm-ov{position:fixed;inset:0;z-index:2000;background:rgba(18,18,18,.5);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:20px}
+.pm-ov.show{opacity:1;pointer-events:all}
+.pm-card{background:var(--card);border-radius:var(--r-xl);padding:26px;width:100%;max-width:380px;box-shadow:var(--sh-lg)}
+.pm-icon{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.pm-icon svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
+.pm-title{font-weight:700;font-size:1rem;letter-spacing:-.01em;margin-bottom:6px}
+.pm-sub{font-size:.83rem;color:var(--ink-soft);line-height:1.5;margin-bottom:16px}
+.pm-field{margin-bottom:18px}
+.pm-lbl{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-soft);font-weight:600;display:block;margin-bottom:7px}
+.pm-actions{display:flex;gap:10px}
+.pm-actions .btn{flex:1;justify-content:center}
+
+/* ---------- каркас экранов список/деталь — одинаковый на каждой странице ---------- */
+#screenList .inner,#screenDetail .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 24px 60px}
+.list-head{padding-top:8px}
+.page-title{font-size:1.9rem;font-weight:800;letter-spacing:-.03em;margin-bottom:20px}
+.d-topbar{display:flex;align-items:center;gap:12px;padding:8px 0 16px}
+.d-topbar .grow{flex:1}
+
+/* ---------- переписка (тикеты/чаты) — значения ровно из эталона §7 .msg ---------- */
+.msgs{display:flex;flex-direction:column;gap:6px;padding:4px 2px 20px;min-width:0}
+.msg-wrap{display:flex;flex-direction:column;margin-bottom:4px;min-width:0}
+.msg-wrap.out{align-items:flex-end}
+.msg-label{font-size:.7rem;font-weight:600;margin-bottom:5px;color:var(--ink-soft)}
+.msg{max-width:78%;padding:13px 16px;border-radius:18px;font-size:.92rem;line-height:1.55;word-break:break-word}
+.msg.in{background:var(--card-soft);align-self:flex-start;border-bottom-left-radius:6px;color:var(--ink)}
+.msg.out{background:var(--ink);color:var(--pill-ink);align-self:flex-end;border-bottom-right-radius:6px}
+.msg-time{font-size:.68rem;opacity:.6;display:block;margin-top:7px}
+.msg-images{display:flex;flex-wrap:wrap;gap:8px;margin-top:9px}
+.msg-img{width:88px;height:88px;border-radius:12px;object-fit:cover;cursor:pointer}
+.msg-divider{font-size:.72rem;color:var(--ink-faint);text-align:center;padding:12px 0 8px;font-weight:600}
+.no-reply-hint{text-align:center;color:var(--ink-soft);font-size:.84rem;padding:14px 0}
+
+/* ---------- composer — textarea заливкой без обводки, радиус 16px (эталон §3 сноска) ---------- */
+.composer{padding:14px 2px 6px;min-width:0}
+.composer-card{background:var(--card-soft);border-radius:16px;overflow:hidden}
+.composer-ta{width:100%;background:none;border:none;outline:none;resize:none;font-family:var(--font);font-size:.92rem;color:var(--ink);padding:16px 18px 8px;min-height:24px;max-height:140px;line-height:1.5}
+.composer-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px 10px}
+.composer-attach{display:flex;align-items:center;justify-content:center;background:var(--card);border:1.5px solid var(--line);color:var(--ink-soft);width:40px;height:40px;border-radius:50%;cursor:pointer;transition:background .15s}
+.composer-attach:hover{background:var(--line)}
+.composer-attach.has-file{background:var(--ink);color:var(--pill-ink);border-color:var(--ink)}
+.composer-send{display:flex;align-items:center;gap:7px;background:var(--pill);color:var(--pill-ink);border:none;border-radius:var(--r-pill);padding:.6rem 1.2rem;font-family:var(--font);font-weight:600;font-size:.85rem;cursor:pointer;transition:filter .15s}
+.composer-send:hover{filter:brightness(1.3)}
+
+/* ---------- статус-пилюля (переключаемая, открыт/закрыт) ---------- */
+.status-pill{display:inline-flex;align-items:center;gap:7px;padding:.5rem .9rem;border-radius:var(--r-pill);font-size:.8rem;font-weight:600;border:1.5px solid var(--line);cursor:pointer;transition:filter .12s;background:var(--card)}
+.status-pill:hover{filter:brightness(.97)}
+.status-pill .dot{width:7px;height:7px;border-radius:50%}
+.status-pill.open{border-color:var(--line-strong);color:var(--ink)}
+.status-pill.open .dot{background:var(--ink)}
+.status-pill.done{background:var(--green-soft);border-color:transparent;color:var(--green-d)}
+.status-pill.done .dot{background:var(--green-d)}
+
+/* ---------- переключатель (чёрный=вкл, серый=выкл) — эталон §7 .switch ---------- */
+.sw{position:relative;display:inline-block;width:46px;height:28px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw-track{position:absolute;top:0;left:0;right:0;bottom:0;background:var(--card-soft);border-radius:999px;transition:.25s;cursor:pointer}
+.sw-track::before{content:'';position:absolute;width:22px;height:22px;left:3px;top:3px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.25s}
+.sw input:checked+.sw-track{background:var(--ink)}
+.sw input:checked+.sw-track::before{transform:translateX(18px)}
+
+/* ---------- чипы (категория/приоритет) — эталон §7 .chip ---------- */
+.chip-row{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:10px 18px;border-radius:999px;border:1.5px solid var(--line);font-weight:600;font-size:.85rem;background:var(--card);color:var(--ink-soft);cursor:pointer;transition:border-color .15s,color .15s}
+.chip.active{border-color:var(--ink);border-width:2px;color:var(--ink)}
+
+/* ---------- общий мобильный брейкпоинт (860px, литералом — см. пояснение
+   про CSS-переменные в @media выше) ---------- */
+@media (max-width:860px){
+  #screenList .inner,#screenDetail .inner{padding:0 16px 40px}
+  .page-title{font-size:1.5rem}
+  .hero{padding:22px 18px}
+  .grid2{gap:12px}
+  .msg{max-width:86%}
+}

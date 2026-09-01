@@ -409,6 +409,7 @@
 
         <div class="alt-methods" id="altMethods">
           <button class="link-btn" onclick="resendCode()" type="button" id="resendBtn">Отправить код ещё раз</button>
+          <button class="link-btn" onclick="usePasskeyForEmailLogin()" type="button" id="usePasskeyLink" style="display:none">Использовать ключ доступа</button>
           <button class="link-btn" onclick="goToStep('totp')" type="button" id="useTotpLink" style="display:none">Ввести код из Authenticator</button>
           <button class="link-btn" onclick="goToStep('recovery')" type="button" id="useRecoveryLink" style="display:none">Использовать резервный код</button>
         </div>
@@ -649,6 +650,36 @@
     }
   };
 
+  window.usePasskeyForEmailLogin = async function(){
+    if(!window.PublicKeyCredential){ toast('Этот браузер не поддерживает ключи доступа','error'); return; }
+    try{
+      const { options, challengeId } = await apiPost('/auth/login/passkey-options', { email: pendingEmail });
+      const publicKey = {
+        ...options,
+        challenge: b64urlToBuf(options.challenge),
+        allowCredentials: (options.allowCredentials||[]).map(c=>({...c, id:b64urlToBuf(c.id)})),
+      };
+      const cred = await navigator.credentials.get({ publicKey });
+      const response = {
+        id: cred.id, rawId: bufToB64url(cred.rawId), type: cred.type,
+        response:{
+          authenticatorData: bufToB64url(cred.response.authenticatorData),
+          clientDataJSON: bufToB64url(cred.response.clientDataJSON),
+          signature: bufToB64url(cred.response.signature),
+          userHandle: cred.response.userHandle ? bufToB64url(cred.response.userHandle) : undefined,
+        },
+        clientExtensionResults: cred.getClientExtensionResults?.() || {},
+      };
+      await apiPost('/auth/passkey/login-verify', { challengeId, response });
+      toast('Вход выполнен','success');
+      await linkTelegramIfInApp();
+      window.location.href = '/profile.html';
+    }catch(e){
+      console.error(e);
+      toast(e.name==='NotAllowedError' ? 'Вход отменён' : (e.message||'Не удалось войти по ключу'), 'error');
+    }
+  };
+
   // ── Логин: шаг 1 → отправка кода ──
   let _loginCaptchaOk = false, _regCaptchaOk = false;
   window.onLoginVerified = async function(token){
@@ -671,6 +702,7 @@
       pendingEmail = email; flow='login';
       document.getElementById('codeEmailLabel').textContent = email;
       document.getElementById('codeTitle').textContent = 'Введите код';
+      document.getElementById('usePasskeyLink').style.display = data.passkeyAvailable ? 'inline' : 'none';
       document.getElementById('useTotpLink').style.display = data.totpAvailable ? 'inline' : 'none';
       document.getElementById('useRecoveryLink').style.display = data.recoveryAvailable ? 'inline' : 'none';
       document.getElementById('useRecoveryLink2').style.display = data.recoveryAvailable ? 'inline' : 'none';
@@ -710,6 +742,7 @@
       pendingEmail = email; flow='register';
       document.getElementById('codeEmailLabel').textContent = email;
       document.getElementById('codeTitle').textContent = 'Подтвердите email';
+      document.getElementById('usePasskeyLink').style.display = 'none';
       document.getElementById('useTotpLink').style.display = 'none';
       document.getElementById('useRecoveryLink').style.display = 'none';
       document.getElementById('useRecoveryLink2').style.display = 'none';

@@ -5,231 +5,169 @@
 <title>Дашборд — Antviz Admin.</title>
 <link rel="icon" href="../img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/admin-theme.css"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#f3f4f7}
-:root{
-  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;
-  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
-  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
-  --bg:#f3f4f7;--card:#ffffff;
-  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
-  --dark:#14171c;
-  --font:'Geologica','Inter',sans-serif;
-  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
-  --sh-sm:0 1px 2px rgba(20,23,30,.04);
-  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
-  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
-  --maxw:1160px;
-}
-body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+/* Тут — только то, что специфично именно для дашборда.
+   Общие токены/кнопки/бейджи/карточки/модалки/форма — в /admin-theme.css. */
 
-.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-.lt{font-size:13px;color:rgba(255,255,255,.35)}
-
-.m-trigger{display:none;position:fixed;top:16px;left:16px;z-index:120;width:42px;height:42px;border-radius:var(--r-sm);border:none;background:var(--card);box-shadow:var(--sh-md);color:var(--text);align-items:center;justify-content:center;cursor:pointer}
-.m-trigger svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
-
-.page{display:none;min-height:100vh;overflow-y:auto}
-.inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:36px 28px 60px}
-
-.hero{background:var(--dark);border-radius:var(--r-xl);padding:32px 36px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-100px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
-.hero-text{position:relative;z-index:1}
-.hero-text h1{font-size:1.6rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
-.hero-text p{font-size:.88rem;color:rgba(255,255,255,.42)}
+.page{padding-top:8px}
 .hero-actions{display:flex;gap:10px;flex-shrink:0;position:relative;z-index:1;flex-wrap:wrap}
 
-.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.85rem;border:none;border-radius:var(--r-sm);padding:.7rem 1.2rem;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap}
-.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;flex-shrink:0}
-.btn:hover{transform:translateY(-1px)}
-.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
-.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#2b2f33}
-.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
-.btn-outline-dark{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.75)}.btn-outline-dark:hover{background:rgba(255,255,255,.14);color:#fff}
-.btn-sm{padding:.5rem 1rem;font-size:.8rem}
-
-.maint-btn{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-sm);padding:.6rem 1.1rem .6rem .7rem;font-family:var(--font);font-size:.83rem;font-weight:300;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
+.maint-btn{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:var(--r-pill);padding:.6rem 1.1rem .6rem .7rem;font-family:var(--font);font-size:.83rem;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
 .maint-btn:hover{background:rgba(255,255,255,.14);color:#fff}
-.maint-btn.on{background:var(--orange-soft);border-color:transparent;color:var(--orange-d)}
+.maint-btn.on{background:rgba(245,166,35,.16);border-color:transparent;color:var(--orange)}
 .maint-track{width:32px;height:18px;border-radius:50px;background:rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:background .2s}
 .maint-track::after{content:'';position:absolute;top:2.5px;left:2.5px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .maint-btn.on .maint-track{background:var(--orange)}
 .maint-btn.on .maint-track::after{transform:translateX(14px)}
+.btn-outline-dark{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.8)}
+.btn-outline-dark:hover{background:rgba(255,255,255,.16);color:#fff}
 
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
-.stat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:20px 22px;transition:box-shadow .15s,transform .15s}
-.stat-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px}
+.stat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;min-width:0}
 .stat-card.dark{background:var(--dark);border-color:var(--dark)}
-.stat-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
-.stat-card.dark .stat-label{color:rgba(255,255,255,.32)}
-.stat-num{font-size:1.9rem;font-weight:600;line-height:1;letter-spacing:-.03em;margin-bottom:5px;color:var(--text)}
+.stat-label{font-size:.66rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:9px}
+.stat-card.dark .stat-label{color:rgba(255,255,255,.35)}
+.stat-num{font-size:1.8rem;font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:5px;color:var(--ink)}
 .stat-card.dark .stat-num{color:#fff}
-.stat-num.green{color:var(--green-d)}.stat-num.glow{color:var(--green)}.stat-num.blue{color:var(--info)}.stat-num.warn{color:var(--orange-d)}
-.stat-sub{font-size:.76rem;color:var(--muted)}
+.stat-sub{font-size:.75rem;color:var(--ink-soft)}
+.stat-card.dark .stat-sub{color:rgba(255,255,255,.3)}
 
-.tariff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.tariff-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;display:flex;align-items:center;gap:14px}
-.tariff-icon{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px}
-.tariff-icon.blue{background:var(--info-soft)}.tariff-icon.green{background:var(--green-soft)}.tariff-icon.purple{background:var(--purple-soft)}
-.tariff-name{font-size:.76rem;color:var(--muted);margin-bottom:3px}
-.tariff-num{font-size:1.4rem;font-weight:600;letter-spacing:-.02em}
+.tariff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.tariff-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:16px 18px;display:flex;align-items:center;gap:14px;min-width:0}
+.tariff-icon{width:38px;height:38px;border-radius:50%;background:var(--card-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px}
+.tariff-name{font-size:.75rem;color:var(--ink-soft);margin-bottom:3px}
+.tariff-num{font-size:1.3rem;font-weight:800;letter-spacing:-.02em}
 
 .grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}}
 
-.sec{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
-.sec-h{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.sec-title{font-weight:500;font-size:.92rem;letter-spacing:-.01em}
-.sec-b{padding:20px 22px}
-.sec-b.no-pad{padding:0}
-
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;padding:11px 22px;text-align:left;border-bottom:1px solid var(--line);background:var(--bg)}
-.tbl td{padding:14px 22px;font-size:.86rem;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl-wrap{width:100%;overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;table-layout:fixed}
+.tbl col.c-order{width:26%}.tbl col.c-client{width:32%}.tbl col.c-tariff{width:16%}.tbl col.c-status{width:16%}.tbl col.c-price{width:10%}
+.tbl th{font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:600;padding:11px 20px;text-align:left;border-bottom:1px solid var(--line);background:var(--card-soft)}
+.tbl td{padding:13px 20px;font-size:.85rem;border-bottom:1px solid var(--line);vertical-align:middle;min-width:0;overflow:hidden}
+.tbl td .tcell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--bg);cursor:pointer}
-.tbl-id{font-size:.74rem;font-weight:500;color:var(--green-d)}
+.tbl tr:hover td{background:var(--card-soft);cursor:pointer}
+.tbl-id{font-size:.72rem;font-weight:700}
 
-.badge{display:inline-flex;align-items:center;gap:5px;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.7rem;font-weight:500;white-space:nowrap}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-.b0{background:var(--line);color:var(--muted)}.b1{background:var(--orange-soft);color:var(--orange-d)}.b2{background:var(--info-soft);color:var(--info)}
-.b3{background:var(--purple-soft);color:var(--purple)}.b4{background:var(--orange-soft);color:var(--orange-d)}.b5{background:var(--green-soft);color:var(--green-d)}
-.tag{display:inline-flex;align-items:center;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.74rem;font-weight:500}
-.tag-blue{background:var(--info-soft);color:var(--info)}.tag-green{background:var(--green-soft);color:var(--green-d)}.tag-purple{background:var(--purple-soft);color:var(--purple)}
+.si{background:var(--card-soft);border:1.5px solid var(--line);border-radius:var(--r-sm);padding:.7rem .95rem;font-family:var(--font);font-size:.85rem;color:var(--ink);outline:none}
+.si:focus{border-color:var(--ink)}
 
-.si{background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.75rem 1rem;font-family:var(--font);font-size:.86rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s}
-.si:focus{border-color:var(--green)}
-
-.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(10,12,16,.5);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-ov.show{opacity:1;pointer-events:all}
-.modal{background:var(--card);border-radius:var(--r-xl);padding:28px;width:100%;max-width:480px;box-shadow:var(--sh-lg)}
-.modal-title{font-weight:500;font-size:1.05rem;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em}
-.mc{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-xs);transition:background .15s}
-.mc:hover{background:var(--bg)}
-.fg{margin-bottom:14px}
-.fl{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px;font-weight:500}
-.fi,.fta{width:100%;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s}
-.fi:focus,.fta:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
-.fta{resize:vertical;min-height:90px;line-height:1.5}
-.recipient-box{border:1.5px solid var(--line2);border-radius:var(--r-md);background:var(--bg);max-height:220px;overflow-y:auto}
+.recipient-box{border:1.5px solid var(--line);border-radius:var(--r-md);background:var(--card-soft);max-height:220px;overflow-y:auto}
 .recipient-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--line)}
 .recipient-item:last-child{border-bottom:none}
 .recipient-item:hover{background:var(--card)}
 .recipient-item.selected{background:var(--green-soft)}
-.recipient-avatar{width:32px;height:32px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:500;flex-shrink:0;text-transform:uppercase}
-.recipient-avatar.all{background:var(--green);color:var(--dark);font-size:.85rem}
+.recipient-avatar{width:32px;height:32px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:700;flex-shrink:0;text-transform:uppercase}
+.recipient-avatar.all{background:var(--pill);color:var(--pill-ink);font-size:.85rem}
 .recipient-text{min-width:0;flex:1}
-.recipient-name{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recipient-email{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipient-name{font-size:.85rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.recipient-email{font-size:.72rem;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .recipient-check{margin-left:auto;color:var(--green-d);flex-shrink:0;opacity:0;font-size:.9rem}
 .recipient-item.selected .recipient-check{opacity:1}
-.recipient-empty{padding:22px 12px;text-align:center;color:var(--muted);font-size:.82rem}
-.modal-footer{display:flex;gap:8px;margin-top:20px}
-.modal-footer .btn{flex:1;justify-content:center}
+.recipient-empty{padding:22px 12px;text-align:center;color:var(--ink-soft);font-size:.82rem}
 
-.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
-.toast.show{opacity:1;transform:none}
-.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--orange);color:#fff}
-
-@media(max-width:760px){
-  .m-trigger{display:flex}
-  .inner{padding:70px 16px 40px}
-  .hero{padding:24px 20px}
-  .hero-text h1{font-size:1.3rem}
-  .grid2{gap:12px}
+@media (max-width:860px){
+  .tariff-row{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
-<button class="m-trigger" id="mTrigger" onclick="window.openMPanel26 && window.openMPanel26()">
-  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-</button>
 
-<div class="page" id="appWrap">
-  <div class="inner">
+<div class="app" id="appWrap" style="display:none">
+  <div class="inner" style="max-width:1160px;width:100%;margin:0 auto;padding:0 24px 60px">
+    <div class="page">
 
-    <div class="hero">
-      <div class="hero-text"><h1>Добро пожаловать, Админ 👋</h1><p>Управляйте заказами, клиентами и настройками сайта</p></div>
-      <div class="hero-actions">
-        <button class="maint-btn" id="maintBtn" onclick="toggleMaintenance()"><div class="maint-track"></div><span id="maintLabel">Техработы</span></button>
-        <button class="btn btn-outline-dark btn-sm" id="dashRefreshBtn" onclick="loadDashboard()">Обновить</button>
-        <a href="/admin/orders" class="btn btn-outline-dark btn-sm">Все заказы →</a>
-        <button class="btn btn-green btn-sm" onclick="openNotifModal()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Уведомление</button>
+      <div class="hero">
+        <div class="hero-top">
+          <div class="hero-left">
+            <div class="hero-num" style="font-size:1.5rem">Добро пожаловать 👋</div>
+            <div class="hero-name">Управляйте заказами, клиентами и настройками сайта</div>
+          </div>
+          <div class="hero-actions">
+            <button class="maint-btn" id="maintBtn" onclick="toggleMaintenance()"><div class="maint-track"></div><span id="maintLabel">Техработы</span></button>
+            <button class="btn btn-outline-dark btn-sm" id="dashRefreshBtn" onclick="loadDashboard()">Обновить</button>
+            <a href="/admin/orders" class="btn btn-outline-dark btn-sm">Все заказы →</a>
+            <button class="btn btn-primary btn-sm" onclick="openNotifModal()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Уведомление</button>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="stat-grid">
-      <div class="stat-card dark"><div class="stat-label">Всего заказов</div><div class="stat-num glow" id="sAll">—</div><div class="stat-sub" style="color:rgba(255,255,255,.3)">за всё время</div></div>
-      <div class="stat-card"><div class="stat-label">Новых</div><div class="stat-num warn" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
-      <div class="stat-card"><div class="stat-label">В работе</div><div class="stat-num blue" id="sWork">—</div><div class="stat-sub">активных</div></div>
-      <div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num green" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
-      <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-num" id="sRev">—</div><div class="stat-sub">по завершённым</div></div>
-      <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
-    </div>
+      <div class="stat-grid">
+        <div class="stat-card dark"><div class="stat-label">Всего заказов</div><div class="stat-num" id="sAll">—</div><div class="stat-sub">за всё время</div></div>
+        <div class="stat-card"><div class="stat-label">Новых</div><div class="stat-num" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
+        <div class="stat-card"><div class="stat-label">В работе</div><div class="stat-num" id="sWork">—</div><div class="stat-sub">активных</div></div>
+        <div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
+        <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-num" id="sRev" style="font-size:1.3rem">—</div><div class="stat-sub">по завершённым</div></div>
+        <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num" id="sAvg" style="font-size:1.3rem">—</div><div class="stat-sub">по завершённым</div></div>
+      </div>
 
-    <div class="tariff-row">
-      <div class="tariff-card"><div class="tariff-icon blue">🚀</div><div><div class="tariff-name">Тариф Старт</div><div class="tariff-num" id="sStart">—</div></div></div>
-      <div class="tariff-card"><div class="tariff-icon green">📈</div><div><div class="tariff-name">Тариф Рост</div><div class="tariff-num" id="sGrowth">—</div></div></div>
-      <div class="tariff-card"><div class="tariff-icon purple">⚡</div><div><div class="tariff-name">Тариф Масштаб</div><div class="tariff-num" id="sScale">—</div></div></div>
-    </div>
+      <div class="tariff-row">
+        <div class="tariff-card"><div class="tariff-icon">🚀</div><div><div class="tariff-name">Тариф Старт</div><div class="tariff-num" id="sStart">—</div></div></div>
+        <div class="tariff-card"><div class="tariff-icon">📈</div><div><div class="tariff-name">Тариф Рост</div><div class="tariff-num" id="sGrowth">—</div></div></div>
+        <div class="tariff-card"><div class="tariff-icon">⚡</div><div><div class="tariff-name">Тариф Масштаб</div><div class="tariff-num" id="sScale">—</div></div></div>
+      </div>
 
-    <div class="grid2">
+      <div class="grid2">
+        <div class="sec">
+          <div class="sec-h"><span class="sec-title">Последние заказы</span><a href="/admin/orders" class="btn btn-ghost btn-sm">Все →</a></div>
+          <div class="sec-b" style="padding:0">
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <colgroup><col class="c-order"><col class="c-client"><col class="c-tariff"><col class="c-status"><col class="c-price"></colgroup>
+                <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
+                <tbody id="recentOrdersBody"><tr><td colspan="5" style="text-align:center;padding:28px;color:var(--ink-soft)">Загрузка...</td></tr></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="sec"><div class="sec-h"><span class="sec-title">Популярные опции</span></div><div class="sec-b" id="popularExtras" style="display:flex;flex-direction:column;gap:8px"><div style="text-align:center;color:var(--ink-soft);font-size:.84rem">Загрузка...</div></div></div>
+          <div class="sec"><div class="sec-h"><span class="sec-title">Активные обслуживания</span></div><div class="sec-b" id="supportStats"></div></div>
+        </div>
+      </div>
+
+      <div class="sec"><div class="sec-h"><span class="sec-title">Типы сайтов</span></div><div class="sec-b" id="typeStats"></div></div>
+
       <div class="sec">
-        <div class="sec-h"><span class="sec-title">Последние заказы</span><a href="/admin/orders" class="btn btn-outline btn-sm">Все →</a></div>
-        <div class="sec-b no-pad">
-          <table class="tbl" id="recentOrders">
-            <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
-            <tbody><tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted)">Загрузка...</td></tr></tbody>
-          </table>
+        <div class="sec-h"><span class="sec-title">Отчёт для бухгалтерии</span></div>
+        <div class="sec-b">
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+            <div><label style="display:block;font-size:.78rem;color:var(--ink-soft);margin-bottom:7px">С даты (оплаты)</label><input type="date" class="si" id="repFrom"/></div>
+            <div><label style="display:block;font-size:.78rem;color:var(--ink-soft);margin-bottom:7px">По дату</label><input type="date" class="si" id="repTo"/></div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--ink-soft);padding-bottom:11px"><input type="checkbox" id="repOnlyPaid" checked/> только оплаченные</label>
+            <button class="btn btn-dark btn-sm" onclick="generateAccountingReport()">Сформировать PDF</button>
+            <button class="btn btn-ghost btn-sm" onclick="generateAccountingCsv()">Экспорт CSV</button>
+          </div>
+          <div style="font-size:.78rem;color:var(--ink-soft);margin-top:12px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
         </div>
       </div>
-      <div>
-        <div class="sec"><div class="sec-h"><span class="sec-title">Популярные опции</span></div><div class="sec-b" id="popularExtras" style="display:flex;flex-direction:column;gap:8px"><div style="text-align:center;color:var(--muted);font-size:.84rem">Загрузка...</div></div></div>
-        <div class="sec"><div class="sec-h"><span class="sec-title">Активные обслуживания</span></div><div class="sec-b" id="supportStats"></div></div>
-      </div>
+
     </div>
-
-    <div class="sec"><div class="sec-h"><span class="sec-title">Типы сайтов</span></div><div class="sec-b" id="typeStats"></div></div>
-
-    <div class="sec">
-      <div class="sec-h"><span class="sec-title">Отчёт для бухгалтерии</span></div>
-      <div class="sec-b">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-          <div><label style="display:block;font-size:.8rem;color:var(--muted);margin-bottom:7px">С даты (оплаты)</label><input type="date" class="si" id="repFrom"/></div>
-          <div><label style="display:block;font-size:.8rem;color:var(--muted);margin-bottom:7px">По дату</label><input type="date" class="si" id="repTo"/></div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);padding-bottom:11px"><input type="checkbox" id="repOnlyPaid" checked/> только оплаченные</label>
-          <button class="btn btn-dark btn-sm" onclick="generateAccountingReport()">Сформировать PDF</button>
-          <button class="btn btn-outline btn-sm" onclick="generateAccountingCsv()">Экспорт CSV</button>
-        </div>
-        <div style="font-size:.8rem;color:var(--muted);margin-top:12px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <div class="modal-ov" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
   <div class="modal">
     <div class="modal-title">Уведомление <button class="mc" onclick="closeNotifModal()">✕</button></div>
-    <div class="fg">
-      <label class="fl">Получатель</label>
-      <input class="fi" id="notifSearch" type="text" placeholder="Поиск по имени или email..." style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/>
-      <div class="recipient-box" id="notifTargetList"></div>
+    <div class="sf">
+      <div class="sf-row">
+        <div class="sf-lbl">Получатель</div>
+        <input class="si" id="notifSearch" type="text" placeholder="Поиск по имени или email..." style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/>
+        <div class="recipient-box" id="notifTargetList"></div>
+      </div>
+      <div class="sf-row"><div class="sf-lbl">Заголовок</div><input class="si" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
+      <div class="sf-row"><div class="sf-lbl">Текст</div><textarea class="textarea" id="notifText" placeholder="Текст..."></textarea></div>
+      <div style="font-size:.8rem;color:var(--ink-soft);background:var(--card-soft);border-radius:var(--r-sm);padding:10px 14px">Придёт в личный кабинет получателя (страница «Уведомления»).</div>
     </div>
-    <div class="fg"><label class="fl">Заголовок</label><input class="fi" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
-    <div class="fg"><label class="fl">Текст</label><textarea class="fta" id="notifText" placeholder="Текст..."></textarea></div>
-    <div class="fg"><div style="font-size:.8rem;color:var(--muted);background:var(--bg);border-radius:var(--r-sm);padding:10px 14px">Придёт в личный кабинет получателя (страница «Уведомления»).</div></div>
     <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeNotifModal()">Отмена</button>
-      <button class="btn btn-green" onclick="sendNotif()">Отправить</button>
+      <button class="btn btn-ghost" onclick="closeNotifModal()">Отмена</button>
+      <button class="btn btn-primary" onclick="sendNotif()">Отправить</button>
     </div>
   </div>
 </div>
@@ -241,18 +179,18 @@ const API = 'https://antviz.ru/api';
 
 const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'Другое';}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
-function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
 
 let currentAdminUser=null;
 let maintEnabled=false;
 async function refreshMaintStatus(){
   try{
-    const resp = await fetch(`${API}/maintenance-status`);
-    const data = resp.ok ? await resp.json() : { enabled:false };
-    maintEnabled = !!data.enabled;
+    const resp=await fetch(`${API}/maintenance-status`);
+    const data=resp.ok?await resp.json():{enabled:false};
+    maintEnabled=!!data.enabled;
   }catch(e){ maintEnabled=false; }
   const btn=document.getElementById('maintBtn');
   const lbl=document.getElementById('maintLabel');
@@ -261,10 +199,10 @@ async function refreshMaintStatus(){
 }
 window.toggleMaintenance=async()=>{
   try{
-    const resp = await fetch(`${API}/maintenance-toggle`, { method:'POST', credentials:'include' });
-    const data = await resp.json();
-    maintEnabled = data.enabled;
-    try{ sessionStorage.setItem('antviz_maint_status', JSON.stringify({ on: maintEnabled, ts: Date.now() })); }catch(e){}
+    const resp=await fetch(`${API}/maintenance-toggle`,{method:'POST',credentials:'include'});
+    const data=await resp.json();
+    maintEnabled=data.enabled;
+    try{ sessionStorage.setItem('antviz_maint_status', JSON.stringify({on:maintEnabled,ts:Date.now()})); }catch(e){}
     const btn=document.getElementById('maintBtn');
     const lbl=document.getElementById('maintLabel');
     btn.classList.toggle('on',maintEnabled);
@@ -296,16 +234,13 @@ function renderUserOptions(filter=''){
   }
   box.innerHTML=html;
 }
-window.selectNotifTarget=function(id){
-  _notifTarget=id;
-  renderUserOptions(document.getElementById('notifSearch').value);
-};
+window.selectNotifTarget=function(id){ _notifTarget=id; renderUserOptions(document.getElementById('notifSearch').value); };
 window.filterNotifTarget=function(val){renderUserOptions(val);}
 window.openNotifModal=async()=>{
   try{
-    const resp = await fetch(`${API}/users`, { credentials:'include' });
+    const resp=await fetch(`${API}/users`,{credentials:'include'});
     if(!resp.ok) throw new Error();
-    const users = await resp.json();
+    const users=await resp.json();
     _allUsers=users.map(u=>{
       const name=u.displayName||u.email||u.id;
       return{id:u.id,name,email:u.email||'',initial:(name||'?').trim().charAt(0)||'?',label:name+' '+(u.email||'')};
@@ -327,23 +262,15 @@ window.sendNotif=async()=>{
   const text=document.getElementById('notifText').value.trim();
   if(!title||!text){toast('Заполните все поля','error');return;}
   if(target==='all'&&!_allUsers.length){toast('Нет активных пользователей','error');return;}
-
   try{
-    const resp = await fetch(`${API}/notifications/broadcast`, {
-      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify({ target, title, text }),
-    });
-    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка рассылки'); }
-
+    const resp=await fetch(`${API}/notifications/broadcast`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({target,title,text})});
+    if(!resp.ok){const d=await resp.json().catch(()=>({}));throw new Error(d.error||'Ошибка рассылки');}
     toast(target==='all'?`Отправлено ${_allUsers.length} пользователям ✓`:`Отправлено ✓`,'success');
     closeNotifModal();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
-window.doLogout=async()=>{
-  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
-  window.location.href='/';
-};
+window.doLogout=async()=>{ try{ await fetch(`${API}/auth/logout`,{method:'POST',credentials:'include'}); }catch(e){} window.location.href='/'; };
 
 function reportRows(){
   const orders=window._dashOrders||[];
@@ -354,7 +281,7 @@ function reportRows(){
   const to=toV?new Date(toV+'T23:59:59'):null;
   const extLbls={domain:'Домен',domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание'};
   return orders.filter(o=>{
-    const paid = o.status !== -1;
+    const paid=o.status!==-1;
     if(onlyPaid&&!paid)return false;
     const d=o.createdAt;
     if(!d)return!from&&!to;
@@ -364,9 +291,9 @@ function reportRows(){
     return true;
   }).map(o=>{
     const d=o.createdAt;
-    const isPartial = o.paymentType==='partial';
-    const receivedAmount = isPartial ? Number(o.paidAmount||0) : (o.totalPrice||0);
-    const refunded = o.refundStatus==='refunded' ? Number(o.refundAmount||0) : 0;
+    const isPartial=o.paymentType==='partial';
+    const receivedAmount=isPartial?Number(o.paidAmount||0):(o.totalPrice||0);
+    const refunded=o.refundStatus==='refunded'?Number(o.refundAmount||0):0;
     return{
       id:o.id.slice(0,8).toUpperCase(),
       date:d?new Date(d).toLocaleDateString('ru'):'—',
@@ -387,30 +314,30 @@ window.generateAccountingReport=function(){
   const from=document.getElementById('repFrom').value||'начало';
   const to=document.getElementById('repTo').value||'сегодня';
   const rowsHtml=rows.map(r=>`<tr>
-    <td>№${r.id}</td><td>${r.date}</td><td>${esc(r.client)}</td><td>${esc(r.tariff)}</td>
+    <td>№${esc(r.id)}</td><td>${esc(r.date)}</td><td>${esc(r.client)}</td><td>${esc(r.tariff)}</td>
     <td>${esc(r.extras)}</td><td>${r.paid?'Оплачен':'Не оплачен'}</td>
     <td style="text-align:right">${r.amount.toLocaleString('ru')} ₽</td>
-    <td style="text-align:right;color:#c0392b">${r.refunded?'−'+r.refunded.toLocaleString('ru')+' ₽':'—'}</td>
+    <td style="text-align:right;color:#b3261e">${r.refunded?'−'+r.refunded.toLocaleString('ru')+' ₽':'—'}</td>
   </tr>`).join('');
   const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Отчёт — Antviz</title>
-  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:920px;margin:40px auto;padding:0 24px;color:#191b1e;font-size:12px;line-height:1.5}
-  .header{margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #191b1e}
-  .logo{font-size:20px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}
-  .subtitle{font-size:11px;color:#707a8a;margin-top:3px}
+  <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:920px;margin:40px auto;padding:0 24px;color:#121212;font-size:12px;line-height:1.5}
+  .header{margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #121212}
+  .logo{font-size:20px;font-weight:800;letter-spacing:-.03em}.logo span{color:#1a7f3c}
+  .subtitle{font-size:11px;color:#6b6b68;margin-top:3px}
   table{width:100%;border-collapse:collapse;margin-top:14px}
-  th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#707a8a;padding:8px 6px;border-bottom:2px solid #191b1e}
+  th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#6b6b68;padding:8px 6px;border-bottom:2px solid #121212}
   td{padding:7px 6px;border-bottom:1px solid #eee;font-size:11.5px}
-  .totals{margin-top:20px;padding-top:14px;border-top:2px solid #191b1e;max-width:320px;margin-left:auto}
+  .totals{margin-top:20px;padding-top:14px;border-top:2px solid #121212;max-width:320px;margin-left:auto}
   .totals div{display:flex;justify-content:space-between;padding:4px 0;font-size:13px}
-  .totals .net{font-weight:700;font-size:15px;padding-top:8px;border-top:1px solid #ccc;margin-top:4px}
-  .footer{margin-top:20px;font-size:10px;color:#aaa}
+  .totals .net{font-weight:800;font-size:15px;padding-top:8px;border-top:1px solid #ccc;margin-top:4px}
+  .footer{margin-top:20px;font-size:10px;color:#a2a29e}
   @media print{body{margin:20px auto}}</style></head><body>
-  <div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Отчёт для бухгалтерии · период: ${from} — ${to}</div></div>
+  <div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Отчёт для бухгалтерии · период: ${esc(from)} — ${esc(to)}</div></div>
   <table><thead><tr><th>Заказ</th><th>Дата</th><th>Клиент</th><th>Тариф</th><th>Допы</th><th>Статус</th><th style="text-align:right">Сумма</th><th style="text-align:right">Возврат</th></tr></thead>
-  <tbody>${rowsHtml||'<tr><td colspan="8" style="text-align:center;padding:20px;color:#aaa">Нет данных за период</td></tr>'}</tbody></table>
+  <tbody>${rowsHtml||'<tr><td colspan="8" style="text-align:center;padding:20px;color:#a2a29e">Нет данных за период</td></tr>'}</tbody></table>
   <div class="totals">
     <div><span>Итого получено</span><strong>${totalIn.toLocaleString('ru')} ₽</strong></div>
-    <div><span>Итого возвращено</span><strong style="color:#c0392b">−${totalOut.toLocaleString('ru')} ₽</strong></div>
+    <div><span>Итого возвращено</span><strong style="color:#b3261e">−${totalOut.toLocaleString('ru')} ₽</strong></div>
     <div class="net"><span>Чистыми</span><span>${(totalIn-totalOut).toLocaleString('ru')} ₽</span></div>
   </div>
   <div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div>
@@ -433,12 +360,8 @@ window.generateAccountingCsv=function(){
 };
 
 (async function initAdminIndex(){
-  let user = null;
-  try{
-    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
-    if(resp.ok) user = await resp.json();
-  }catch(e){}
-
+  let user=null;
+  try{ const resp=await fetch(`${API}/auth/me`,{credentials:'include'}); if(resp.ok) user=await resp.json(); }catch(e){}
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
@@ -446,7 +369,7 @@ window.generateAccountingCsv=function(){
   document.getElementById('appWrap').style.display='block';
   refreshMaintStatus();
 
-  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
+  fetch(`${API}/orders/admin/all`,{credentials:'include'}).then(r=>r.ok?r.json():[]).then(orders=>{
     const n=orders.filter(o=>o.refundStatus==='requested').length;
     const b=document.getElementById('navBadgeOrders');
     if(b){b.style.display=n?'':'none';b.textContent=n;}
@@ -457,9 +380,9 @@ window.generateAccountingCsv=function(){
     if(btn){btn.disabled=true;btn.textContent='Обновление...';}
     let orders=null;
     try{
-      const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' });
-      if(resp.ok) orders = await resp.json();
-    }catch(e){ console.error('loadDashboard:', e); }
+      const resp=await fetch(`${API}/orders/admin/all`,{credentials:'include'});
+      if(resp.ok) orders=await resp.json();
+    }catch(e){ console.error('loadDashboard:',e); }
     if(btn){btn.disabled=false;btn.textContent='Обновить';}
     if(!orders)return;
     window._dashOrders=orders;
@@ -476,36 +399,39 @@ window.generateAccountingCsv=function(){
     document.getElementById('sScale').textContent=orders.filter(o=>o.package==='Масштаб'||o.tariff==='Масштаб').length;
 
     const recent=orders.filter(o=>o.status<5).slice(0,8);
-    const tbody=document.querySelector('#recentOrders tbody');
+    const tbody=document.getElementById('recentOrdersBody');
     tbody.innerHTML=recent.length?recent.map(o=>{
       const tariff=o.package||o.tariff||'—';
-      const cls=tariff==='Старт'?'tag-blue':tariff==='Рост'?'tag-green':'tag-purple';
-      return`<tr onclick="location.href='/admin/orders?id=${o.id}'" style="cursor:pointer">
-        <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.72rem;color:var(--muted);margin-top:3px">${fmtDate(o.createdAt)}</div></td>
-        <td><div style="font-size:.86rem;font-weight:500">${esc(o.clientName||'—')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(o.clientEmail||'—')}</div></td>
-        <td><span class="tag ${cls}">${tariff}</span></td>
-        <td><span class="badge b${o.status||0}">${S_LABELS[o.status||0]}</span></td>
-        <td style="font-weight:600;color:var(--green-d)">${fmtPrice(o.totalPrice)}</td>
-      </tr>`;}).join(''):'<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted)">Нет активных заказов</td></tr>';
+      return`<tr onclick="location.href='/admin/orders?id=${o.id}'">
+        <td><div class="tcell"><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span></div><div class="tcell" style="font-size:.72rem;color:var(--ink-soft);margin-top:2px">${fmtDate(o.createdAt)}</div></td>
+        <td><div class="tcell" style="font-weight:600">${esc(o.clientName||'—')}</div><div class="tcell" style="font-size:.72rem;color:var(--ink-soft)">${esc(o.clientEmail||'—')}</div></td>
+        <td><div class="tcell"><span class="badge" style="border-color:var(--line)">${esc(tariff)}</span></div></td>
+        <td><div class="tcell"><span class="badge" style="border-color:var(--line)">${S_LABELS[o.status||0]}</span></div></td>
+        <td><div class="tcell" style="font-weight:700">${fmtPrice(o.totalPrice)}</div></td>
+      </tr>`;}).join(''):'<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--ink-soft)">Нет активных заказов</td></tr>';
 
     const extrasMap={};
     orders.forEach(o=>{(o.extras||[]).forEach(e=>{const l=e==='domain'?'Домен':e==='support'?'Обслуживание':e==='seo'?'SEO':e==='content'?'Контент':e==='shop'?'Каталог':e==='urgent'?'Срочно':e;extrasMap[l]=(extrasMap[l]||0)+1;});});
     const sortedExtras=Object.entries(extrasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
     document.getElementById('popularExtras').innerHTML=sortedExtras.length?sortedExtras.map(([name,count])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:var(--r-sm)">
-        <span style="font-size:.85rem">${name}</span>
-        <span style="font-weight:600;font-size:.8rem;color:var(--green-d)">${count}</span>
-      </div>`):'<div style="text-align:center;color:var(--muted);font-size:.84rem">Нет данных</div>';
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card-soft);border-radius:var(--r-sm)">
+        <span style="font-size:.85rem">${esc(name)}</span>
+        <span style="font-weight:700;font-size:.8rem">${count}</span>
+      </div>`).join(''):'<div style="text-align:center;color:var(--ink-soft);font-size:.84rem">Нет данных</div>';
 
-    const byType={};orders.forEach(o=>{const t=siteTypeLabel(o.siteType)||'Другое';byType[t]=(byType[t]||0)+1;});
+    const byType={};orders.forEach(o=>{const t=siteTypeLabel(o.siteFormat||o.siteType)||'Другое';byType[t]=(byType[t]||0)+1;});
     const sorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);const mx=sorted[0]?.[1]||1;
     document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
       <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px"><span>${esc(t)}</span><span style="font-weight:600;color:var(--green-d)">${n}</span></div>
-        <div style="height:6px;background:var(--bg);border-radius:3px"><div style="height:100%;border-radius:3px;background:var(--green);width:${n/mx*100}%"></div></div>
-      </div>`).join('')||'<div style="color:var(--muted);font-size:.84rem">Нет данных</div>';
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px"><span>${esc(t)}</span><span style="font-weight:700">${n}</span></div>
+        <div style="height:6px;background:var(--card-soft);border-radius:3px"><div style="height:100%;border-radius:3px;background:var(--ink);width:${n/mx*100}%"></div></div>
+      </div>`).join('')||'<div style="color:var(--ink-soft);font-size:.84rem">Нет данных</div>';
 
-    document.getElementById('supportStats').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.84rem;padding:12px">Нет активных обслуживаний</div>';
+    const now=new Date();
+    const activeSup=orders.filter(o=>o.supportActive===true && (!o.supportExpiresAt || new Date(o.supportExpiresAt)>now));
+    document.getElementById('supportStats').innerHTML=activeSup.length
+      ? `<div style="text-align:center"><div style="font-size:1.8rem;font-weight:800;letter-spacing:-.03em">${activeSup.length}</div><div style="font-size:.82rem;color:var(--ink-soft);margin-top:4px">активных подписок на обслуживание</div></div>`
+      : '<div style="text-align:center;color:var(--ink-soft);font-size:.84rem;padding:12px">Нет активных обслуживаний</div>';
   };
   loadDashboard();
 })();

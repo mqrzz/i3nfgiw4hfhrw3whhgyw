@@ -5,27 +5,210 @@
 <title>Чаты — Antviz Admin.</title>
 <link rel="icon" href="../img/favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="/admin-theme.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
-/* Тут — только то, что специфично именно для страницы чатов.
-   Общие токены/кнопки/бейджи/карточки/модалки/каркас/переписка — в /admin-theme.css. */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f3f4f7}
+:root{
+  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;--green-soft2:#d1f5e0;
+  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;
+  --bg:#f3f4f7;--card:#ffffff;
+  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
+  --dark:#14171c;
+  --font:'Geologica','Inter',sans-serif;
+  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --sh-sm:0 1px 2px rgba(20,23,30,.04);
+  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
+  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
+  --maxw:900px;
+}
+body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
 
-.pri-tag{font-size:.72rem;font-weight:600}
-.pri-high{color:var(--danger)}
-.pri-medium{color:var(--orange-d)}
-.pri-low{color:var(--ink-soft)}
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.35)}
 
-/* ===== SCREEN 3 — CREATE (полноэкранная форма) ===== */
-#screenCreate .inner{max-width:600px;width:100%;margin:0 auto;padding:0 24px 60px}
-.c-body{padding-top:8px}
+.app{display:none;height:100vh;overflow:hidden;flex-direction:column;background:var(--bg)}
+
+/* MOBILE MENU BUTTON — real menu comes later via m-panel26.js */
+.m-trigger{display:none;position:fixed;top:16px;left:16px;z-index:120;width:42px;height:42px;border-radius:var(--r-sm);border:none;background:var(--card);box-shadow:var(--sh-md);color:var(--text);align-items:center;justify-content:center;cursor:pointer}
+.m-trigger svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
+
+/* SCREENS */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
+.screen.active{display:flex;animation:fadeUp .22s ease both}
+.screen-stack{position:relative;flex:1;min-height:0}
+
+.icon-btn{width:40px;height:40px;border-radius:var(--r-sm);border:none;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .12s}
+.icon-btn:hover{background:var(--line)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.icon-btn.ghost{background:none}
+.icon-btn.ghost:hover{background:var(--line)}
+.back-label{display:none;font-size:.86rem;font-weight:500;white-space:nowrap}
+
+/* ===== SCREEN 1 — LIST ===== */
+#screenList .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%}
+.list-head{padding-top:36px;flex-shrink:0}
+.list-head-row{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}
+.page-title{font-size:1.7rem;font-weight:500;letter-spacing:-.02em}
+.sb-box{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1.1rem;margin-bottom:16px;transition:border-color .15s,box-shadow .15s}
+.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
+.sb-box svg{width:17px;height:17px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.95rem;font-weight:300;color:var(--text);width:100%}
+
+.seg{display:inline-flex;background:var(--line);border-radius:var(--r-pill);padding:4px;gap:2px;margin-bottom:20px}
+.seg-btn{border:none;background:none;font-family:var(--font);font-size:.85rem;font-weight:400;color:var(--muted);padding:.55rem 1.15rem;border-radius:var(--r-pill);cursor:pointer;display:flex;align-items:center;gap:7px;transition:background .15s,color .15s}
+.seg-btn.active{background:var(--card);color:var(--text);font-weight:500;box-shadow:var(--sh-sm)}
+.seg-count{font-size:.72rem;background:rgba(0,0,0,.07);padding:.08rem .42rem;border-radius:var(--r-pill)}
+.seg-btn.active .seg-count{background:var(--green-soft);color:var(--green-d)}
+
+.tickets-scroll{flex:1;overflow-y:auto;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
+.ti{display:flex;gap:16px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:18px 20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both}
+.ti:hover{border-color:var(--line2);box-shadow:var(--sh-md);transform:translateY(-1px)}
+.ti-avatar{width:44px;height:44px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
+.ti-avatar svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.7;fill:none}
+.ti-body{flex:1;min-width:0}
+.ti-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:5px}
+.ti-subj{font-size:.98rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px;min-width:0}
+.ti-subj-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ti-order-tag{font-size:.66rem;font-weight:500;color:var(--info);background:var(--info-soft);padding:.16rem .5rem;border-radius:6px;flex-shrink:0}
+.ti-prev{font-size:.84rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
+.ti-meta{font-size:.76rem;color:var(--muted2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.unread{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.5s infinite}
+.empty-l{text-align:center;padding:70px 16px;color:var(--muted);font-size:.9rem}
+
+/* ===== SCREEN 2 — TICKET ===== */
+#screenTicket .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.t-topbar{display:flex;align-items:center;gap:12px;padding:24px 0 16px;flex-shrink:0}
+.t-topbar .grow{flex:1}
+
+.t-info-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;margin-bottom:18px;flex-shrink:0}
+.t-info-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+.t-avatar{width:52px;height:52px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
+.t-avatar svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.6;fill:none}
+.t-who{flex:1;min-width:0}
+.t-subj{font-size:1.15rem;font-weight:500;letter-spacing:-.02em;margin-bottom:4px}
+.t-user-row{font-size:.85rem;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.t-status-toggle{flex-shrink:0}
+.status-pill{display:inline-flex;align-items:center;gap:7px;padding:.5rem .9rem;border-radius:var(--r-pill);font-size:.8rem;font-weight:500;border:none;cursor:pointer;transition:filter .12s}
+.status-pill:hover{filter:brightness(.97)}
+.status-pill .dot{width:7px;height:7px;border-radius:50%}
+.status-pill.open{background:var(--green-soft);color:var(--green-d)}
+.status-pill.open .dot{background:var(--green-d)}
+.status-pill.done{background:var(--line);color:var(--muted)}
+.status-pill.done .dot{background:var(--muted2)}
+.t-info-grid{display:flex;flex-wrap:wrap;gap:10px 28px;border-top:1px solid var(--line);padding-top:14px}
+.t-info-item{display:flex;flex-direction:column;gap:3px}
+.t-info-label{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);font-weight:500}
+.t-info-val{font-size:.85rem;color:var(--text)}
+.t-order-link{color:var(--green-d);text-decoration:none;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.t-order-link:hover{text-decoration:underline}
+.pri-high{color:var(--red);font-weight:500}
+.pri-medium{color:var(--orange-d);font-weight:500}
+.pri-low{color:var(--muted)}
+
+.chat-msgs{flex:1;overflow-y:auto;padding:4px 2px 20px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth;min-height:0}
+.msg-divider{font-size:.72rem;color:var(--muted2);text-align:center;padding:14px 0 10px;font-weight:500}
+.msg-wrap{display:flex;flex-direction:column;margin-bottom:4px;animation:fadeUp .18s ease both}
+.msg-label{font-size:.7rem;font-weight:500;margin-bottom:5px;color:var(--muted)}
+.msg-label.sup{color:var(--green-d)}
+.msg-label.usr{text-align:right;color:var(--muted)}
+.msg{padding:13px 17px;border-radius:var(--r-md);max-width:72%;font-size:.92rem;line-height:1.55;word-break:break-word}
+.msg.usr{background:var(--info-soft);color:#1a3a6e;align-self:flex-end;border-bottom-right-radius:6px}
+.msg.sup{background:var(--card);color:var(--text);align-self:flex-start;border-bottom-left-radius:6px;border:1.5px solid var(--line)}
+.msg-time{font-size:.68rem;color:var(--muted2);display:block;margin-top:7px}
+.msg-img{max-width:240px;border-radius:var(--r-sm);margin-top:9px;display:block;cursor:pointer}
+
+/* COMPOSER — единая карточка вместо серой полосы */
+.composer{flex-shrink:0;padding:14px 2px 22px}
+.composer-card{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-lg);box-shadow:var(--sh-sm);transition:border-color .15s,box-shadow .15s;overflow:hidden}
+.composer-card:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
+.composer-ta{width:100%;background:none;border:none;outline:none;resize:none;font-family:var(--font);font-size:.92rem;font-weight:300;color:var(--text);padding:16px 18px 8px;min-height:24px;max-height:140px;line-height:1.5}
+.composer-toolbar{display:flex;align-items:center;justify-content:space-between;padding:8px 10px 10px 10px}
+.composer-attach{display:flex;align-items:center;justify-content:center;background:var(--bg);border:1.5px solid var(--line2);color:var(--muted);width:40px;height:40px;border-radius:50%;cursor:pointer;transition:background .15s,color .15s,border-color .15s;flex-shrink:0}
+.composer-attach:hover{background:var(--green-soft);color:var(--green-d);border-color:var(--green-soft2)}
+.composer-attach svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}
+.composer-attach.has-file{background:var(--green-soft);color:var(--green-d);border-color:var(--green-soft2)}
+.composer-send{display:flex;align-items:center;gap:7px;background:var(--green);color:var(--dark);border:none;border-radius:var(--r-pill);padding:.55rem 1.15rem;font-family:var(--font);font-weight:500;font-size:.85rem;cursor:pointer;transition:background .15s;flex-shrink:0}
+.composer-send:hover{background:var(--green-h)}
+.composer-send svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.3;fill:none}
+
+/* ===== SCREEN 3 — CREATE ===== */
+#screenCreate .inner{max-width:640px;width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.c-topbar{display:flex;align-items:center;gap:14px;padding:24px 0 8px;flex-shrink:0}
+.c-title{font-size:1.25rem;font-weight:500;letter-spacing:-.02em}
+.c-body{flex:1;overflow-y:auto;padding:20px 2px 24px}
+.c-form{display:flex;flex-direction:column;gap:20px}
+.fg{display:flex;flex-direction:column;gap:8px}
+.fl{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500}
+.fi,.fta,.fsel{width:100%;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.9rem 1.05rem;color:var(--text);font-family:var(--font);font-size:.94rem;font-weight:300;outline:none;transition:border-color .15s,box-shadow .15s}
+.fi:focus,.fta:focus,.fsel:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
+.fta{resize:vertical;min-height:120px;line-height:1.55}
+.fsel{cursor:pointer;appearance:none;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="%23818997" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>');background-repeat:no-repeat;background-position:right 16px center;background-size:16px}
+.dropzone{border:1.5px dashed var(--line2);border-radius:var(--r-md);padding:30px 16px;text-align:center;color:var(--muted);cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;align-items:center;gap:9px}
+.dropzone:hover,.dropzone.drag{border-color:var(--green);background:var(--green-soft)}
+.dropzone svg{width:23px;height:23px;stroke:var(--muted2);stroke-width:1.6;fill:none}
+.dropzone-text{font-size:.86rem}
+.dropzone-sub{font-size:.74rem;color:var(--muted2)}
+.dz-file{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.7rem .95rem;font-size:.85rem}
+.dz-file img{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
+.dz-file .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dz-file .rm{background:none;border:none;color:var(--muted);cursor:pointer;width:24px;height:24px;flex-shrink:0}
+.dz-file .rm svg{width:15px;height:15px;stroke:currentColor;stroke-width:2}
+.c-foot{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 65%,transparent);padding:18px 2px 24px;flex-shrink:0}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;font-family:var(--font);font-weight:500;font-size:.88rem;border:none;border-radius:var(--r-sm);padding:.75rem 1.3rem;cursor:pointer;transition:background .15s,transform .1s,box-shadow .15s;text-decoration:none;white-space:nowrap}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark);box-shadow:0 8px 20px rgba(30,222,123,.28)}.btn-green:hover{background:var(--green-h)}
+.btn-danger{background:var(--red-soft);color:var(--red)}.btn-danger:hover{background:#fbdbd6}
+.btn-block{width:100%;justify-content:center;padding:1rem 1rem;font-size:.94rem}
+
+/* KEBAB */
+.kebab-wrap{position:relative;flex-shrink:0}
+.kebab-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border-radius:var(--r-md);box-shadow:var(--sh-lg);border:1.5px solid var(--line);padding:10px;width:200px;z-index:60;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s}
+.kebab-menu.show{opacity:1;pointer-events:all;transform:none}
+
+/* LIGHTBOX / TOAST */
+.lightbox{position:fixed;inset:0;z-index:1000;background:rgba(10,12,16,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.lightbox.show{opacity:1;pointer-events:all}
+.lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--r-md);object-fit:contain}
+.lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast.show{opacity:1;transform:none}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--orange);color:#fff}
+
+/* MOBILE */
+@media (max-width:760px){
+  .m-trigger{display:flex}
+  #screenList .inner,#screenTicket .inner,#screenCreate .inner{padding:0 16px}
+  .list-head{padding-top:70px}
+  .page-title{font-size:1.4rem}
+  .t-topbar{padding-top:16px}
+  .msg{max-width:86%}
+  .t-info-card{padding:18px}
+  #screenTicket .t-topbar .exit-btn{width:auto;padding:0 16px 0 12px;gap:7px;justify-content:flex-start;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--sh-sm)}
+  .back-label{display:inline}
+}
 </style>
 </head>
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
 
-<div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lb-x" onclick="event.stopPropagation();closeLightbox()">✕</button><img id="lightboxImg" src="" alt=""/></div>
+<button class="m-trigger" id="mTrigger" onclick="window.openMPanel26 && window.openMPanel26()">
+  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+</button>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('show')">
+  <button class="lb-x">✕</button>
+  <img id="lbImg" src="" alt=""/>
+</div>
 
 <div class="app" id="appWrap">
   <div class="screen-stack">
@@ -34,24 +217,23 @@
     <div class="screen active" id="screenList">
       <div class="inner">
         <div class="list-head">
-          <span class="page-title">Чаты</span>
-
-          <div class="ctrl-row">
-            <div class="sb-box">
-              <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-              <input type="text" id="searchInp" placeholder="Поиск по чатам..." oninput="renderList()"/>
-            </div>
-            <div class="tab-row">
-              <button class="tab active" data-f="open" onclick="switchFilter('open',this)">Открытые <span id="cntOpen"></span></button>
-              <button class="tab" data-f="done" onclick="switchFilter('done',this)">Закрытые <span id="cntDone"></span></button>
-            </div>
-            <button class="btn btn-primary" onclick="openCreate()" style="margin-left:auto">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <div class="list-head-row">
+            <span class="page-title">Чаты</span>
+            <button class="btn btn-green" onclick="openCreateTicket()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
               Создать тикет
             </button>
           </div>
+          <div class="sb-box">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="listSearch" placeholder="Поиск по чатам..." oninput="filterList()"/>
+          </div>
+          <div class="seg" id="segRow">
+            <button class="seg-btn active" data-f="open" onclick="switchFilter('open',this)">Открытые <span class="seg-count" id="cnt-open">0</span></button>
+            <button class="seg-btn" data-f="done" onclick="switchFilter('done',this)">Закрытые <span class="seg-count" id="cnt-done">0</span></button>
+          </div>
         </div>
-        <div class="list-scroll" id="ticketsList">
+        <div class="tickets-scroll" id="ticketsList">
           <div class="empty-l">Загрузка...</div>
         </div>
       </div>
@@ -60,45 +242,42 @@
     <!-- SCREEN 2: TICKET -->
     <div class="screen" id="screenTicket">
       <div class="inner">
-        <div class="d-topbar">
-          <button class="icon-btn exit-btn" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span class="back-label">Выйти из чата</span></button>
+        <div class="t-topbar">
+          <button class="icon-btn ghost exit-btn" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span class="back-label">Выйти из чата</span></button>
           <span class="grow"></span>
           <div class="kebab-wrap">
-            <button class="icon-btn" onclick="toggleKebab()"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+            <button class="icon-btn ghost" onclick="toggleKebab()"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
             <div class="kebab-menu" id="kebabMenu">
-              <button class="btn btn-danger btn-block btn-sm" onclick="deleteTicket()">Удалить тикет</button>
+              <button class="btn btn-danger btn-block" onclick="deleteTicket()">Удалить тикет</button>
             </div>
           </div>
         </div>
 
-        <div class="hero">
-          <div class="hero-top">
-            <div class="hero-left">
-              <div class="hero-eyebrow">Тикет</div>
-              <div class="hero-num" id="chatSubject">—</div>
-              <div class="hero-name" id="chatMeta"></div>
+        <div class="t-info-card">
+          <div class="t-info-top">
+            <div class="t-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+            <div class="t-who">
+              <div class="t-subj" id="chatSubject">—</div>
+              <div class="t-user-row" id="chatUserRow"></div>
             </div>
-            <div class="hero-right">
-              <button class="status-pill open" id="statusToggle" onclick="toggleStatus()"><span class="dot"></span><span id="statusLabel">Открыт</span></button>
+            <div class="t-status-toggle">
+              <button class="status-pill open" id="statusToggle" onclick="toggleStatus()"><span class="dot"></span><span id="statusToggleLabel">Открыт</span></button>
             </div>
           </div>
+          <div class="t-info-grid" id="tInfoGrid"></div>
         </div>
 
-        <div class="sec">
-          <div class="sec-b">
-            <div class="msgs" id="chatMsgs"></div>
-            <div class="composer">
-              <div class="composer-card">
-                <textarea class="composer-ta" id="chatInp" rows="1" placeholder="Введите сообщение..." onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
-                <div class="composer-toolbar">
-                  <label class="composer-attach" id="attachBtn" title="Прикрепить изображение">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                    <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="onChatFilePicked()"/>
-                  </label>
-                  <span style="flex:1"></span>
-                  <button class="composer-send" onclick="sendReply()">Отправить<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-                </div>
-              </div>
+        <div class="chat-msgs" id="chatMsgs"></div>
+
+        <div class="composer">
+          <div class="composer-card">
+            <textarea class="composer-ta" id="chatInp" rows="1" placeholder="Введите сообщение..." onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
+            <div class="composer-toolbar">
+              <label class="composer-attach" id="attachBtn" title="Прикрепить изображение">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="onChatFilePicked()"/>
+              </label>
+              <button class="composer-send" onclick="sendReply()">Отправить<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
             </div>
           </div>
         </div>
@@ -108,34 +287,45 @@
     <!-- SCREEN 3: CREATE -->
     <div class="screen" id="screenCreate">
       <div class="inner">
-        <div class="d-topbar">
-          <button class="icon-btn" onclick="closeCreate()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
-          <span style="font-weight:700;font-size:1.05rem;letter-spacing:-.01em">Создание тикета</span>
+        <div class="c-topbar">
+          <button class="icon-btn ghost" onclick="closeCreateTicket()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+          <span class="c-title">Создание тикета</span>
         </div>
         <div class="c-body">
-          <div class="sf">
-            <div class="sf-row"><div class="sf-lbl">Пользователь</div><select class="fsel" id="ticketUser"><option value="">Выберите пользователя...</option></select></div>
-            <div class="sf-row"><div class="sf-lbl">Тема обращения</div><input class="si" id="ticketSubject" type="text" placeholder="Кратко опишите проблему..."/></div>
-            <div class="sf-row">
-              <div class="sf-lbl">Категория</div>
-              <div class="chip-row" id="topicChips">
-                <button class="chip active" data-v="Техническая проблема" onclick="pickChip('topicChips',this)">Техническая проблема</button>
-                <button class="chip" data-v="Вопрос по оплате" onclick="pickChip('topicChips',this)">Оплата</button>
-                <button class="chip" data-v="Изменение дизайна" onclick="pickChip('topicChips',this)">Дизайн</button>
-                <button class="chip" data-v="Другое" onclick="pickChip('topicChips',this)">Другое</button>
-              </div>
+          <div class="c-form">
+            <div class="fg">
+              <label class="fl">Пользователь</label>
+              <select class="fsel" id="ticketUser"><option value="">Выберите пользователя...</option></select>
             </div>
-            <div class="sf-row">
-              <div class="sf-lbl">Приоритет</div>
-              <div class="chip-row" id="priorityChips">
-                <button class="chip" data-v="low" onclick="pickChip('priorityChips',this)">Низкий</button>
-                <button class="chip active" data-v="medium" onclick="pickChip('priorityChips',this)">Средний</button>
-                <button class="chip" data-v="high" onclick="pickChip('priorityChips',this)">Высокий</button>
-              </div>
+            <div class="fg">
+              <label class="fl">Тема обращения</label>
+              <input class="fi" id="ticketSubject" type="text" placeholder="Кратко опишите проблему..."/>
             </div>
-            <div class="sf-row"><div class="sf-lbl">Описание</div><textarea class="textarea" id="ticketMessage" placeholder="Подробно опишите ситуацию..." rows="5"></textarea></div>
-            <div class="sf-row">
-              <div class="sf-lbl">Вложение <span style="text-transform:none;letter-spacing:0;color:var(--ink-faint)">(необязательно)</span></div>
+            <div class="fg">
+              <label class="fl">Категория</label>
+              <select class="fsel" id="ticketTopic">
+                <option value="">Выберите категорию</option>
+                <option value="Техническая проблема">Техническая проблема</option>
+                <option value="Вопрос по оплате">Вопрос по оплате</option>
+                <option value="Изменение дизайна">Изменение дизайна</option>
+                <option value="Ошибка на сайте">Ошибка на сайте</option>
+                <option value="Другое">Другое</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Приоритет</label>
+              <select class="fsel" id="ticketPriority">
+                <option value="low">Низкий</option>
+                <option value="medium" selected>Средний</option>
+                <option value="high">Высокий</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label class="fl">Описание</label>
+              <textarea class="fta" id="ticketMessage" placeholder="Подробно опишите ситуацию..." rows="5"></textarea>
+            </div>
+            <div class="fg">
+              <label class="fl">Вложения <span style="text-transform:none;letter-spacing:0;color:var(--muted2)">(необязательно)</span></label>
               <div class="dropzone" id="dropzone" onclick="document.getElementById('ticketFile').click()">
                 <svg viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
                 <div class="dropzone-text">Загрузить файл или перетащите сюда</div>
@@ -145,7 +335,9 @@
               <div id="ticketFilePreview"></div>
             </div>
           </div>
-          <div style="margin-top:22px"><button class="btn btn-primary btn-block" onclick="createTicket()">Создать тикет</button></div>
+        </div>
+        <div class="c-foot">
+          <button class="btn btn-green btn-block" onclick="createTicket()">Создать тикет</button>
         </div>
       </div>
     </div>
@@ -159,49 +351,56 @@
 const API = 'https://antviz.ru/api';
 
 let allTickets=[], selectedId=null, currentFilter='open', ticketFileData=null;
-const AVATAR_COLORS=['#3b82f6','#7c3aed','#f5a623','#1a7f3c','#b3261e','#121212'];
 
-function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+async function notifyClient(uid,title,text,button){
+  if(!uid)return;
+  try{
+    await fetch(`${API}/notifications/broadcast`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ target: uid, title, text, buttonText: button?.text, buttonUrl: button?.url }),
+    });
+  }catch(err){console.error('Не удалось уведомить клиента:',err);}
+}
+
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtDTFull(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
 function fmtTime(ts){if(!ts)return'';const d=new Date(ts);const now=new Date();if(d>=new Date(now.getFullYear(),now.getMonth(),now.getDate()))return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
-function initials(name){const p=String(name||'?').trim().split(/\s+/);return((p[0]?.[0]||'')+(p[1]?.[0]||'')).toUpperCase()||'?';}
-function avatarColor(seed){let h=0;for(const c of String(seed||''))h=(h*31+c.charCodeAt(0))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
-function priLabel(p){return p==='high'?'<span class="pri-tag pri-high">Высокий</span>':p==='medium'?'<span class="pri-tag pri-medium">Средний</span>':'<span class="pri-tag pri-low">Низкий</span>';}
+function statusLabel(s){return s==='done'?'Закрыт':'Открыт';}
+function priLabel(p){return p==='high'?'<span class="pri-high">Высокий</span>':p==='medium'?'<span class="pri-medium">Средний</span>':'<span class="pri-low">Низкий</span>';}
 
-async function notifyClient(uid,title,text){
-  if(!uid)return;
-  try{ await fetch(`${API}/notifications/broadcast`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({target:uid,title,text})}); }
-  catch(err){console.error('Не удалось уведомить клиента:',err);}
-}
-
+/* ===== ЭКРАНЫ (список / тикет / создание) — единый стейт-машин, без сплит-режима ===== */
 window.showScreen=function(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   const map={list:'screenList',ticket:'screenTicket',create:'screenCreate'};
   document.getElementById(map[name]).classList.add('active');
   document.getElementById('kebabMenu')?.classList.remove('show');
 };
+
 window.toggleKebab=()=>{document.getElementById('kebabMenu').classList.toggle('show');};
 document.addEventListener('click',e=>{
   const menu=document.getElementById('kebabMenu');
   if(menu && menu.classList.contains('show') && !menu.contains(e.target) && !e.target.closest('.kebab-wrap .icon-btn')) menu.classList.remove('show');
 });
-window.pickChip=(rowId,btn)=>{document.querySelectorAll('#'+rowId+' .chip').forEach(c=>c.classList.remove('active'));btn.classList.add('active');};
 
-window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
 window.filterList=()=>renderList();
 
+function updateCounts(){
+  document.getElementById('cnt-open').textContent=allTickets.filter(t=>t.status!=='done').length;
+  document.getElementById('cnt-done').textContent=allTickets.filter(t=>t.status==='done').length;
+}
+
 function renderList(){
-  const q=(document.getElementById('searchInp').value||'').toLowerCase();
+  const q=(document.getElementById('listSearch').value||'').toLowerCase();
   let list=allTickets.filter(t=>{
-    const st=t.status==='done'?'done':'open';
+    const st = t.status==='done' ? 'done' : 'open';
     if(st!==currentFilter)return false;
     if(q)return(t.subject||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.topic||'').toLowerCase().includes(q);
     return true;
   });
-  document.getElementById('cntOpen').textContent=allTickets.filter(t=>t.status!=='done').length;
-  document.getElementById('cntDone').textContent=allTickets.filter(t=>t.status==='done').length;
+  updateCounts();
   const openCount=allTickets.filter(t=>t.status!=='done').length;
   const badge=document.getElementById('navBadgeChats');
   if(badge){badge.style.display=openCount?'':'none';badge.textContent=openCount;}
@@ -209,17 +408,17 @@ function renderList(){
   if(!list.length){el.innerHTML=`<div class="empty-l">${allTickets.length?'Ничего не найдено':'Тикетов пока нет'}</div>`;return;}
   el.innerHTML=list.map(t=>{
     const unread=t.status!=='done'&&!t.adminRead;
-    return`<div class="li-row" onclick="selectTicket('${t.id}')">
-      <div class="li-avatar" style="background:${avatarColor(t.userEmail||t.userName)}">${initials(t.userName)}</div>
-      <div class="li-body">
-        <div class="li-top">
-          <div class="li-name" style="display:flex;align-items:center;gap:7px;min-width:0">${unread?'<span style="width:6px;height:6px;border-radius:50%;background:var(--danger);flex-shrink:0"></span>':''}<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(t.subject||'Без темы')}</span></div>
-          <span class="badge${t.status==='done'?' tag-accent':''}" style="${t.status==='done'?'':'border-color:var(--line)'}">${t.status==='done'?'Закрыт':'Открыт'}</span>
+    return`<div class="ti" onclick="selectTicket('${t.id}')">
+      <div class="ti-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+      <div class="ti-body">
+        <div class="ti-top">
+          <div class="ti-subj">${unread?'<span class="unread"></span>':''}<span class="ti-subj-text">${esc(t.subject||'Без темы')}</span></div>
+          ${t.priority?priLabel(t.priority):''}
         </div>
-        <div class="li-foot">${t.orderLabel?`<span class="badge" style="border-color:transparent;background:var(--info-soft);color:var(--info)">${esc(t.orderLabel)}</span>`:''}<span style="font-size:.76rem;color:var(--ink-soft)">${esc(t.userName||'—')}</span><span style="color:var(--ink-faint)">·</span><span style="font-size:.76rem;color:var(--ink-faint)">${fmtDT(t.updatedAt||t.createdAt)}</span></div>
+        ${t._lastMsg?`<div class="ti-prev">${esc(t._lastMsg)}</div>`:''}
+        <div class="ti-meta">${t.orderLabel?`<span class="ti-order-tag">${esc(t.orderLabel)}</span>`:''}<span>${esc(t.userName||'—')}</span><span>·</span><span>${fmtDT(t.updatedAt||t.createdAt)}</span></div>
       </div>
-    </div>`;
-  }).join('');
+    </div>`;}).join('');
 }
 
 window.selectTicket=async function(id){
@@ -228,36 +427,44 @@ window.selectTicket=async function(id){
   showScreen('ticket');
 
   document.getElementById('chatSubject').textContent=(`${ticket.topic||''} · ${ticket.subject||''}`).replace(/^ · /,'')||'Без темы';
-  document.getElementById('chatMeta').innerHTML=`<span>${esc(ticket.userName||'—')}</span> · <span>${esc(ticket.userEmail||'—')}</span>${ticket.priority?' · '+priLabel(ticket.priority):''}${ticket.orderId?` · <a href="/admin/orders?id=${ticket.orderId}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">${esc(ticket.orderLabel||'заказ')} ↗</a>`:''}`;
-  applyStatus(ticket.status);
-  document.getElementById('kebabMenu')?.classList.remove('show');
+  document.getElementById('chatUserRow').innerHTML=`<span>${esc(ticket.userEmail||'—')}</span>`;
+  applyStatusToggle(ticket.status);
 
-  fetch(`${API}/tickets/${id}/admin-read`,{method:'PATCH',credentials:'include'}).catch(()=>{});
+  const grid=document.getElementById('tInfoGrid');
+  grid.innerHTML=`
+    <div class="t-info-item"><span class="t-info-label">Пользователь</span><span class="t-info-val">${esc(ticket.userName||'—')}</span></div>
+    <div class="t-info-item"><span class="t-info-label">Создан</span><span class="t-info-val">${fmtDT(ticket.createdAt)}</span></div>
+    <div class="t-info-item"><span class="t-info-label">Приоритет</span><span class="t-info-val">${ticket.priority?priLabel(ticket.priority):'—'}</span></div>
+    ${ticket.orderId?`<div class="t-info-item"><span class="t-info-label">Заказ</span><a class="t-info-val t-order-link" href="/admin/orders?open=${ticket.orderId}" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Открыть заказ')} ↗</a></div>`:''}
+  `;
+
+  fetch(`${API}/tickets/${id}/admin-read`, { method:'PATCH', credentials:'include' }).catch(()=>{});
   ticket.adminRead=true;renderList();
 
-  document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--ink-soft);font-size:.86rem;padding:36px">Загрузка…</div>';
+  document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.86rem;padding:36px">Загрузка…</div>';
   try{
-    const resp=await fetch(`${API}/tickets/${id}/messages`,{credentials:'include'});
-    const msgs=resp.ok?await resp.json():[];
+    const resp = await fetch(`${API}/tickets/${id}/messages`, { credentials:'include' });
+    const msgs = resp.ok ? await resp.json() : [];
     renderChat(msgs);
-    if(msgs.length) ticket._lastMsg=msgs[msgs.length-1].text||'';
+    const last=msgs[msgs.length-1];
+    if(last)ticket._lastMsg=last.text||'';
     renderList();
   }catch(e){
-    document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--ink-soft);font-size:.86rem;padding:36px">Не удалось загрузить сообщения</div>';
+    document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.86rem;padding:36px">Не удалось загрузить сообщения</div>';
   }
 };
 
-function applyStatus(status){
+function applyStatusToggle(status){
   const btn=document.getElementById('statusToggle');
   const isDone=status==='done';
   btn.classList.toggle('open',!isDone);
   btn.classList.toggle('done',isDone);
-  document.getElementById('statusLabel').textContent=isDone?'Закрыт':'Открыт';
+  document.getElementById('statusToggleLabel').textContent=statusLabel(status);
 }
 
 function renderChat(msgs){
   const el=document.getElementById('chatMsgs');
-  if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--ink-soft);font-size:.86rem;padding:36px">Нет сообщений</div>';return;}
+  if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--muted);font-size:.86rem;padding:36px">Нет сообщений</div>';return;}
   let html='',lastDate=null;
   msgs.forEach(m=>{
     const d=m.createdAt?new Date(m.createdAt):new Date();
@@ -265,9 +472,9 @@ function renderChat(msgs){
     if(lastDate!==ds){html+=`<div class="msg-divider">${ds}</div>`;lastDate=ds;}
     const isUser=m.sender==='user';
     const tkt=allTickets.find(t=>t.id===selectedId);
-    html+=`<div class="msg-wrap${isUser?'':' out'}">
-      <div class="msg-label"${isUser?'':' style="text-align:right"'}>${isUser?esc(tkt?.userName||'Клиент'):'Поддержка'}</div>
-      <div class="msg ${isUser?'in':'out'}">
+    html+=`<div class="msg-wrap">
+      <div class="msg-label ${isUser?'usr':'sup'}">${isUser?esc(tkt?.userName||'Клиент'):'Поддержка'}</div>
+      <div class="msg ${isUser?'usr':'sup'}">
         ${esc(m.text)}
         ${m.imageUrl?`<img class="msg-img" src="${m.imageUrl}" alt="" onclick="showLightbox('${m.imageUrl}')"/>`:''}
         <span class="msg-time">${fmtTime(m.createdAt)}</span>
@@ -283,13 +490,16 @@ window.sendReply=async function(){
   if(!text)return toast('Напишите сообщение','error');
   inp.value='';inp.style.height='auto';
   try{
-    const resp=await fetch(`${API}/tickets/${selectedId}/messages`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({text,asAdmin:true})});
+    const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ text, asAdmin: true }),
+    });
     if(!resp.ok) throw new Error('Ошибка отправки');
     const t=allTickets.find(x=>x.id===selectedId);
-    if(t){t.status='open';t.adminRead=true;applyStatus('open');}
-    const msgsResp=await fetch(`${API}/tickets/${selectedId}/messages`,{credentials:'include'});
+    if(t){ t._lastMsg=text; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
+    const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
     if(msgsResp.ok) renderChat(await msgsResp.json());
-    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text);
+    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
     renderList();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
@@ -299,6 +509,7 @@ window.onChatFilePicked=function(){
   if(inp.files[0])document.getElementById('attachBtn').classList.add('has-file');
   window.sendImg();
 };
+
 window.sendImg=async function(){
   if(!selectedId)return;
   const inp=document.getElementById('fileInp');const file=inp.files[0];if(!file){document.getElementById('attachBtn').classList.remove('has-file');return;}
@@ -306,13 +517,16 @@ window.sendImg=async function(){
   const reader=new FileReader();
   reader.onload=async e=>{
     try{
-      const resp=await fetch(`${API}/tickets/${selectedId}/messages`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({text:'Изображение',imageUrl:e.target.result,asAdmin:true})});
+      const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify({ text:'Изображение', imageUrl:e.target.result, asAdmin: true }),
+      });
       if(!resp.ok) throw new Error();
       const t=allTickets.find(x=>x.id===selectedId);
-      if(t){t.status='open';t.adminRead=true;applyStatus('open');}
-      const msgsResp=await fetch(`${API}/tickets/${selectedId}/messages`,{credentials:'include'});
+      if(t){ t._lastMsg='Изображение'; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
+      const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
       if(msgsResp.ok) renderChat(await msgsResp.json());
-      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение');
+      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
       toast('Изображение отправлено ✓','success');
       renderList();
     }catch(e){toast('Ошибка','error');}
@@ -323,12 +537,15 @@ window.sendImg=async function(){
 
 window.toggleStatus=async function(){
   if(!selectedId)return;
-  const t=allTickets.find(x=>x.id===selectedId);if(!t)return;
-  const next=t.status==='done'?'open':'done';
+  const t=allTickets.find(x=>x.id===selectedId); if(!t)return;
+  const next = t.status==='done' ? 'open' : 'done';
   try{
-    const resp=await fetch(`${API}/tickets/${selectedId}/status`,{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({status:next})});
+    const resp = await fetch(`${API}/tickets/${selectedId}/status`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ status: next }),
+    });
     if(!resp.ok) throw new Error();
-    t.status=next;applyStatus(next);
+    t.status=next; applyStatusToggle(next);
     toast(next==='done'?'Тикет закрыт ✓':'Тикет снова открыт ✓','success');
     renderList();
   }catch(e){toast('Ошибка','error');}
@@ -337,33 +554,33 @@ window.toggleStatus=async function(){
 window.deleteTicket=async function(){
   if(!selectedId||!confirm('Удалить тикет и все сообщения?'))return;
   try{
-    const resp=await fetch(`${API}/tickets/${selectedId}`,{method:'DELETE',credentials:'include'});
+    const resp = await fetch(`${API}/tickets/${selectedId}`, { method:'DELETE', credentials:'include' });
     if(!resp.ok) throw new Error();
     allTickets=allTickets.filter(t=>t.id!==selectedId);
     toast('Тикет удалён','info');selectedId=null;
-    showScreen('list');renderList();
+    showScreen('list');
+    renderList();
   }catch(e){toast('Ошибка','error');}
 };
 
-window.openCreate=async function(){
+/* CREATE TICKET */
+window.openCreateTicket=async function(){
   showScreen('create');
   try{
-    const resp=await fetch(`${API}/users`,{credentials:'include'});
+    const resp = await fetch(`${API}/users`, { credentials:'include' });
     if(!resp.ok) throw new Error();
-    const users=await resp.json();
+    const users = await resp.json();
     const sel=document.getElementById('ticketUser');
     sel.innerHTML='<option value="">Выберите пользователя...</option>';
     users.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${esc(u.displayName||u.id)}${u.email?' · '+esc(u.email):''}</option>`;});
-    document.getElementById('ticketSubject').value='';
-    document.getElementById('ticketMessage').value='';
-    document.querySelectorAll('#topicChips .chip').forEach((c,i)=>c.classList.toggle('active',i===0));
-    document.querySelectorAll('#priorityChips .chip').forEach(c=>c.classList.toggle('active',c.dataset.v==='medium'));
+    ['ticketTopic','ticketSubject','ticketMessage'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ticketPriority').value='medium';
     ticketFileData=null;
     document.getElementById('ticketFilePreview').innerHTML='';
     document.getElementById('dropzone').style.display='flex';
   }catch(e){toast('Ошибка загрузки пользователей: '+e.message,'error');}
 };
-window.closeCreate=function(){showScreen('list');};
+window.closeCreateTicket=function(){showScreen('list');};
 
 window.onTicketFilePicked=function(file){
   if(!file)return;
@@ -378,36 +595,39 @@ window.onTicketFilePicked=function(file){
 };
 window.clearTicketFile=function(){ticketFileData=null;document.getElementById('ticketFile').value='';document.getElementById('ticketFilePreview').innerHTML='';document.getElementById('dropzone').style.display='flex';};
 
-document.addEventListener('DOMContentLoaded',()=>{
-  const dz=document.getElementById('dropzone');
-  if(dz){
-    ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
-    ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
-    dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)window.onTicketFilePicked(f);});
-  }
-});
+const dz=document.getElementById('dropzone');
+if(dz){
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)window.onTicketFilePicked(f);});
+}
 
 window.createTicket=async function(){
   const uid=document.getElementById('ticketUser').value;
-  const topicBtn=document.querySelector('#topicChips .chip.active');
-  const priBtn=document.querySelector('#priorityChips .chip.active');
-  const topic=topicBtn?topicBtn.dataset.v:'Общий вопрос';
-  const priority=priBtn?priBtn.dataset.v:'medium';
+  const topic=document.getElementById('ticketTopic').value.trim();
   const subject=document.getElementById('ticketSubject').value.trim();
   const message=document.getElementById('ticketMessage').value.trim();
+  const priority=document.getElementById('ticketPriority').value;
   if(!uid)return toast('Выберите пользователя','error');
   if(!subject)return toast('Введите тему обращения','error');
   if(!message)return toast('Введите описание','error');
   try{
-    const resp=await fetch(`${API}/tickets/admin/create`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({userId:uid,topic,subject,message,priority})});
-    if(!resp.ok){const d=await resp.json().catch(()=>({}));throw new Error(d.error||'Ошибка');}
-    const ticket=await resp.json();
+    const resp = await fetch(`${API}/tickets/admin/create`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ userId: uid, topic: topic||'Общий вопрос', subject, message, priority }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    const ticket = await resp.json();
     if(ticketFileData){
-      try{ await fetch(`${API}/tickets/${ticket.id}/messages`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({text:'Вложение',imageUrl:ticketFileData,asAdmin:true})}); }
-      catch(e){console.error('Не удалось прикрепить файл:',e);}
+      try{
+        await fetch(`${API}/tickets/${ticket.id}/messages`, {
+          method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ text:'Вложение', imageUrl: ticketFileData, asAdmin: true }),
+        });
+      }catch(e){console.error('Не удалось прикрепить файл:',e);}
     }
-    allTickets=[ticket,...allTickets];renderList();
-    await notifyClient(uid,'💬 Новый тикет от поддержки',`Сотрудник службы поддержки создал тикет «${subject}». Перейдите в раздел «Чат с командой».`);
+    allTickets=[ticket, ...allTickets];renderList();
+    await notifyClient(uid,'💬 Новый тикет от поддержки',`Сообщаем вам, что сотрудник службы поддержки создал тикет «${subject}». Просим вас перейти в раздел "Чат с командой".`);
     toast('Тикет создан и пользователь уведомлён ✅','success');
     showScreen('list');
   }catch(e){toast('Ошибка: '+e.message,'error');}
@@ -415,51 +635,46 @@ window.createTicket=async function(){
 
 window.onKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendReply();}};
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';};
-window.showLightbox=function(src){document.getElementById('lightboxImg').src=src;document.getElementById('lightbox').classList.add('show');};
-window.closeLightbox=()=>document.getElementById('lightbox').classList.remove('show');
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox();});
-window.doLogout=async()=>{ try{ await fetch(`${API}/auth/logout`,{method:'POST',credentials:'include'}); }catch(e){} window.location.href='/'; };
+window.showLightbox=function(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('show');};
 
 async function loadTicketsList(){
   try{
-    const resp=await fetch(`${API}/tickets/admin/all`,{credentials:'include'});
+    const resp = await fetch(`${API}/tickets/admin/all`, { credentials:'include' });
     if(!resp.ok) return;
-    const incoming=await resp.json();
+    const incoming = await resp.json();
     incoming.forEach(t=>{const old=allTickets.find(x=>x.id===t.id);t._lastMsg=old?._lastMsg;});
     allTickets=incoming;renderList();
-  }catch(e){console.error('loadTicketsList:',e);}
+  }catch(e){ console.error('loadTicketsList:', e); }
 }
 
 (async function initAdminChats(){
-  let user=null;
-  try{ const resp=await fetch(`${API}/auth/me`,{credentials:'include'}); if(resp.ok) user=await resp.json(); }catch(e){}
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
 
-  fetch(`${API}/orders/admin/all`,{credentials:'include'}).then(r=>r.ok?r.json():[]).then(orders=>{
-    const n=orders.filter(o=>o.refundStatus==='requested').length;
-    const b=document.getElementById('navBadgeOrders');
-    if(b){b.style.display=n?'':'none';b.textContent=n;}
-  }).catch(()=>{});
-
   await loadTicketsList();
-  setInterval(loadTicketsList,15000);
+  setInterval(loadTicketsList, 15000);
 
-  let _lastChatSig=null;
+  let _lastChatSig = null;
   setInterval(async()=>{
     if(!selectedId)return;
     try{
-      const resp=await fetch(`${API}/tickets/${selectedId}/messages`,{credentials:'include'});
+      const resp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
       if(!resp.ok) return;
-      const msgs=await resp.json();
-      const sig=msgs.length+':'+(msgs[msgs.length-1]?.id||'');
-      if(sig===_lastChatSig) return;
-      _lastChatSig=sig;
+      const msgs = await resp.json();
+      const sig = msgs.length + ':' + (msgs[msgs.length-1]?.id || '');
+      if (sig === _lastChatSig) return;
+      _lastChatSig = sig;
       renderChat(msgs);
     }catch(e){}
-  },5000);
+  }, 5000);
 })();
 </script>
 <script src="/m-panel26.js"></script>

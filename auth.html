@@ -606,7 +606,15 @@
   };
 
   // ── Яндекс ──
-  window.startYandex = function(){ window.location.href = `${API}/auth/yandex/start`; };
+  window.startYandex = function(){
+    const isRegisterTab = document.getElementById('tabsWrap').classList.contains('reg');
+    if(isRegisterTab && !document.getElementById('r-consent').checked){
+      toast('Сначала отметьте согласие на обработку персональных данных','error');
+      document.getElementById('r-consent').focus();
+      return;
+    }
+    window.location.href = `${API}/auth/yandex/start`;
+  };
 
   // ── Passkey (дискаверабл вход, без email) ──
   function b64urlToBuf(s){

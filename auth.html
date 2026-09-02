@@ -16,12 +16,35 @@
     --pill:      #121212;
     --pill-ink:  #f4f4f2;
     --green:     #1a7f3c;
-    --danger:    #b3261e;
+    --danger:    #e5564a;
     --radius-pill: 999px;
     --radius-lg:   20px;
     --radius-xl:   28px;
     --dark:      #121212;
     --ease: cubic-bezier(0.65,0,0.35,1);
+  }
+  @media(prefers-color-scheme: dark){
+    :root{
+      --bg:        #131313;
+      --bg-card:   #1c1c1c;
+      --card:      #1a1a1a;
+      --ink:       #f2f2f0;
+      --ink-soft:  #9a9a96;
+      --line:      rgba(255,255,255,0.09);
+      --pill:      #f2f2f0;
+      --pill-ink:  #131313;
+      --green:     #35c47a;
+      --danger:    #ff6b60;
+      --dark:      #0a0a0a;
+    }
+    .code-box{ background:#242424; }
+    .code-box.filled{ background:#1a1a1a; }
+    .inp{ background:#242424; }
+    .inp::placeholder{ color:#7a7a76; }
+    .consent-row input[type=checkbox]{ border-color:var(--line); }
+    .side-panel::before{ background-image:
+      linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); }
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -428,7 +451,7 @@
           </button>
         </div>
         <h1 id="codeTitle">Введите код</h1>
-        <p class="code-hint" id="codeHint">Отправили код на <b id="codeEmailLabel"></b></p>
+        <p class="code-hint" id="codeHint">Отправили код на <b id="codeEmailLabel"></b><span id="codeMagicHint" style="display:none"> — там же ссылка для входа в один клик</span></p>
 
         <div class="code-boxes" id="code-boxes"></div>
         <input type="hidden" id="code-value"/>
@@ -765,8 +788,10 @@
       await apiPost('/auth/login/send-code', { email: pendingEmail });
       document.getElementById('codeEmailLabel').textContent = pendingEmail;
       document.getElementById('codeTitle').textContent = 'Введите код';
+      document.getElementById('codeMagicHint').style.display = 'inline';
       document.getElementById('code-boxes')._reset?.();
       goToStep('code');
+      startResendCooldown(60);
     }catch(e){ toast(e.message,'error'); }
     finally{ setBtnState('chooseEmailBtn','Отправляем…','Получить код на почту', false); }
   };
@@ -801,8 +826,10 @@
       pendingEmail = email; flow='register';
       document.getElementById('codeEmailLabel').textContent = email;
       document.getElementById('codeTitle').textContent = 'Подтвердите email';
+      document.getElementById('codeMagicHint').style.display = 'none';
       document.getElementById('code-boxes')._reset?.();
       goToStep('code');
+      startResendCooldown(60);
     }catch(e){ toast(e.message,'error'); }
     finally{ setBtnState('registerBtn','Отправляем код…','Создать аккаунт', false); }
   };
@@ -826,6 +853,25 @@
     finally{ setBtnState('codeSubmitBtn','Проверяем…','Подтвердить', false); }
   };
 
+  let _resendTimer = null;
+  function startResendCooldown(seconds){
+    const btn = document.getElementById('resendBtn');
+    clearInterval(_resendTimer);
+    let left = seconds;
+    btn.disabled = true;
+    btn.dataset.idleText = btn.dataset.idleText || 'Отправить код ещё раз';
+    btn.textContent = `Отправить ещё раз через ${left} сек`;
+    _resendTimer = setInterval(()=>{
+      left -= 1;
+      if(left <= 0){
+        clearInterval(_resendTimer);
+        btn.disabled = false;
+        btn.textContent = btn.dataset.idleText;
+      }else{
+        btn.textContent = `Отправить ещё раз через ${left} сек`;
+      }
+    }, 1000);
+  }
   window.resendCode = async function(){
     const btn = document.getElementById('resendBtn');
     btn.disabled = true;
@@ -833,8 +879,8 @@
       if(flow==='register') await apiPost('/auth/register', { name: document.getElementById('r-name').value.trim(), email: pendingEmail });
       else await apiPost('/auth/login/send-code', { email: pendingEmail });
       toast('Код отправлен повторно','success');
-    }catch(e){ toast(e.message,'error'); }
-    finally{ setTimeout(()=>btn.disabled=false, 20000); }
+      startResendCooldown(60);
+    }catch(e){ toast(e.message,'error'); btn.disabled = false; }
   };
 
   // ── TOTP вместо кода с почты ──
@@ -896,6 +942,20 @@
       state: 'Не удалось подтвердить запрос к Яндексу, попробуйте ещё раз.',
       banned: 'Аккаунт заблокирован.',
       unknown: 'Не удалось войти через Яндекс, попробуйте ещё раз.',
+    };
+    toast(messages[err] || messages.unknown, 'error');
+  })();
+
+  // ── Ошибка возврата по магической ссылке (?magic_error=...) ──
+  (function(){
+    const params = new URLSearchParams(location.search);
+    const err = params.get('magic_error');
+    if(!err) return;
+    const messages = {
+      invalid: 'Ссылка повреждена, попробуйте войти заново.',
+      expired: 'Ссылка уже использована или истекла — запросите код заново.',
+      banned: 'Аккаунт заблокирован.',
+      unknown: 'Не удалось войти по ссылке, попробуйте код из письма.',
     };
     toast(messages[err] || messages.unknown, 'error');
   })();

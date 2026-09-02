@@ -192,18 +192,44 @@
   .danger-row h4{font-size:14px;font-weight:500;margin-bottom:3px;}
   .danger-row p{font-size:12px;color:var(--text-dim);}
 
-  /* РАЗВОРАЧИВАЮЩАЯСЯ СЕКЦИЯ УДАЛЕНИЯ */
-  .delete-pop-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .32s var(--spring);}
-  .delete-pop-wrap.show{grid-template-rows:1fr;}
-  .delete-pop{min-height:0;overflow:hidden;}
-  .delete-pop-inner{background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r20);box-shadow:var(--shadow-sm);padding:18px;margin-bottom:18px;opacity:0;transform:translateY(-6px);transition:opacity .22s ease .06s,transform .22s var(--spring) .06s;}
-  .delete-pop-wrap.show .delete-pop-inner{opacity:1;transform:translateY(0);}
+  /* МОДАЛЬНОЕ ОКНО ПО ЦЕНТРУ (удаление аккаунта, Authenticator, резервный код) */
+  .modal-overlay{
+    position:fixed; inset:0; z-index:300;
+    background:rgba(6,8,7,.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; pointer-events:none; transition:opacity .3s ease;
+  }
+  .modal-overlay.show{ opacity:1; pointer-events:auto; }
+  .modal-box{
+    width:100%; max-width:400px; max-height:88vh; overflow-y:auto;
+    background:var(--card-elevated); border:1px solid var(--stroke); border-radius:var(--r20);
+    box-shadow:0 30px 80px rgba(0,0,0,.45); padding:22px;
+    transform:translateY(16px) scale(.97); opacity:0;
+    transition:transform .4s var(--spring), opacity .25s ease;
+  }
+  .modal-overlay.show .modal-box{ transform:translateY(0) scale(1); opacity:1; }
+  .modal-overlay.nested{ z-index:320; }
+  .security-center-box{ max-width:480px; }
+  .security-center-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+  .security-center-head strong{ font-size:15px; font-weight:700; }
+  .modal-close-btn{
+    width:30px; height:30px; border-radius:50%; border:none; flex-shrink:0;
+    background:var(--surface2); color:var(--text-dim);
+    display:flex; align-items:center; justify-content:center; cursor:pointer;
+    transition:background .2s ease, color .2s ease;
+  }
+  .modal-close-btn:hover{ background:var(--stroke); color:var(--text); }
+  .modal-close-btn svg{ width:15px; height:15px; }
+  @media(max-width:640px){
+    #securityCenterOverlay{ padding:0; }
+    #securityCenterOverlay .modal-box{ max-width:none; width:100%; height:100%; max-height:none; border-radius:0; }
+  }
   .delete-pop-head{display:flex;gap:12px;margin-bottom:14px;}
   .delete-pop-icon{width:36px;height:36px;border-radius:var(--r12);background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
   .delete-pop-icon svg{width:17px;height:17px;stroke:var(--red);}
   .delete-pop-head strong{display:block;font-size:13px;font-weight:600;margin-bottom:3px;}
   .delete-pop-head span{display:block;font-size:12px;color:var(--text-dim);line-height:1.45;}
-  .delete-pop .field-input{margin-bottom:12px;font-size:13px;padding:10px 12px;}
+  .modal-box .field-input{margin-bottom:12px;font-size:13px;padding:10px 12px;}
   .delete-code-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s var(--spring);}
   .delete-code-wrap.show{grid-template-rows:1fr;}
   .delete-code-inner{overflow:hidden;}
@@ -307,88 +333,104 @@
           <div class="card-sub">Способы входа и двухэтапная защита аккаунта</div>
         </div>
       </div>
-
-      <div id="authMethodRow"><!-- filled by JS: email --></div>
-
       <div class="danger-row">
-        <div><h4>Яндекс ID</h4><p id="yandexStatusText">Загрузка…</p></div>
-        <button class="btn btn-ghost" id="yandexActionBtn" onclick="handleYandexAction()">…</button>
-      </div>
-
-      <div class="danger-row">
-        <div><h4>Ключ доступа</h4><p id="passkeyStatusText">Вход по Face ID, Touch ID или Windows Hello — без кода с почты</p></div>
-        <button class="btn btn-ghost" onclick="addPasskey()">Добавить</button>
-      </div>
-      <div id="passkeyList" style="display:flex;flex-direction:column;gap:8px;margin:2px 0 8px"></div>
-
-      <div class="danger-row">
-        <div><h4>Authenticator (2FA)</h4><p id="totpStatusText">Загрузка…</p></div>
-        <button class="btn btn-ghost" id="totpActionBtn" onclick="toggleTotpPanel()">…</button>
-      </div>
-
-      <div class="delete-pop-wrap" id="totpSetupWrap">
-        <div class="delete-pop"><div class="delete-pop-inner">
-          <div class="delete-pop-head">
-            <strong>Подключение Authenticator</strong>
-            <span>Отсканируйте QR в Google Authenticator, Authy или 1Password и введите текущий 6-значный код</span>
-          </div>
-          <div style="display:flex;justify-content:center;margin-bottom:14px">
-            <img id="totpQr" src="" alt="QR-код Authenticator" style="width:170px;height:170px;border-radius:12px;background:#fff;padding:8px"/>
-          </div>
-          <div style="text-align:center;margin-bottom:14px">
-            <div class="field-label" style="margin-bottom:6px">Или введите код вручную</div>
-            <div style="display:inline-flex;align-items:center;gap:8px;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:12px;padding:9px 14px">
-              <span id="totpSecretValue" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:.9rem;letter-spacing:1px">—</span>
-              <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="copyTotpSecret()" type="button">Копировать</button>
-            </div>
-          </div>
-          <div class="code-boxes" id="totpConfirmBoxes"></div>
-          <input type="hidden" id="totpConfirmValue">
-          <div class="delete-pop-btns">
-            <button class="btn btn-ghost" onclick="cancelTotpSetup()">Отмена</button>
-            <button class="btn btn-dark" id="totpConfirmBtn" onclick="confirmTotp()">Подтвердить</button>
-          </div>
-        </div></div>
-      </div>
-
-      <div class="delete-pop-wrap" id="totpDisableWrap">
-        <div class="delete-pop"><div class="delete-pop-inner">
-          <div class="delete-pop-head"><strong>Отключить Authenticator</strong><span>Введите текущий код из приложения. Резервный код при этом тоже аннулируется.</span></div>
-          <div style="margin-bottom:12px"><input class="field-input" id="totpDisableInput" placeholder="6-значный код" inputmode="numeric" maxlength="6"></div>
-          <div class="delete-pop-btns">
-            <button class="btn btn-ghost" onclick="closeTotpDisable()">Отмена</button>
-            <button class="btn btn-danger-solid" onclick="confirmTotpDisable()">Отключить</button>
-          </div>
-        </div></div>
-      </div>
-
-      <div class="danger-row" id="recoveryRow" style="display:none">
-        <div><h4>Резервный код</h4><p id="recoveryStatusText">—</p></div>
-        <button class="btn btn-ghost" onclick="openRecoveryRegen()">Перевыпустить</button>
-      </div>
-
-      <div class="delete-pop-wrap" id="recoveryRegenWrap">
-        <div class="delete-pop"><div class="delete-pop-inner">
-          <div class="delete-pop-head"><strong>Перевыпустить резервный код</strong><span>Старый код перестанет работать. Введите текущий код Authenticator для подтверждения.</span></div>
-          <div style="margin-bottom:12px"><input class="field-input" id="recoveryRegenInput" placeholder="6-значный код" inputmode="numeric" maxlength="6"></div>
-          <div class="delete-pop-btns">
-            <button class="btn btn-ghost" onclick="closeRecoveryRegen()">Отмена</button>
-            <button class="btn btn-dark" onclick="confirmRecoveryRegen()">Перевыпустить</button>
-          </div>
-        </div></div>
-      </div>
-
-      <div class="delete-pop-wrap" id="recoveryRevealWrap">
-        <div class="delete-pop"><div class="delete-pop-inner">
-          <div class="delete-pop-head"><strong>Сохраните резервный код</strong><span>Показывается один раз. Поможет войти, если потеряете доступ и к почте, и к Authenticator.</span></div>
-          <div style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:1.25rem;font-weight:700;text-align:center;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:12px;padding:16px;margin-bottom:12px;letter-spacing:1px" id="recoveryCodeValue">—</div>
-          <div class="delete-pop-btns">
-            <button class="btn btn-ghost" onclick="copyRecoveryCode()">Скопировать</button>
-            <button class="btn btn-dark" onclick="closeRecoveryReveal()">Я сохранил(а)</button>
-          </div>
-        </div></div>
+        <div><h4>Способы входа</h4><p id="securityCountText">Загрузка…</p></div>
+        <button class="btn btn-dark" onclick="openSecurityCenter()">Управлять</button>
       </div>
     </section>
+
+    <!-- ЦЕНТР БЕЗОПАСНОСТИ: на ПК — по центру, на мобильных — во весь экран -->
+    <div class="modal-overlay" id="securityCenterOverlay" onclick="if(event.target===this) closeSecurityCenter()">
+      <div class="modal-box security-center-box">
+        <div class="security-center-head">
+          <strong>Вход и безопасность</strong>
+          <button class="modal-close-btn" onclick="closeSecurityCenter()" aria-label="Закрыть" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        <div id="authMethodRow"><!-- filled by JS: email --></div>
+
+        <div class="danger-row">
+          <div><h4>Яндекс ID</h4><p id="yandexStatusText">Загрузка…</p></div>
+          <button class="btn btn-ghost" id="yandexActionBtn" onclick="handleYandexAction()">…</button>
+        </div>
+
+        <div class="danger-row">
+          <div><h4>Ключ доступа</h4><p id="passkeyStatusText">Вход по Face ID, Touch ID или Windows Hello — без кода с почты</p></div>
+          <button class="btn btn-ghost" onclick="addPasskey()">Добавить</button>
+        </div>
+        <div id="passkeyList" style="display:flex;flex-direction:column;gap:8px;margin:2px 0 8px"></div>
+
+        <div class="danger-row">
+          <div><h4>Authenticator (2FA)</h4><p id="totpStatusText">Загрузка…</p></div>
+          <button class="btn btn-ghost" id="totpActionBtn" onclick="toggleTotpPanel()">…</button>
+        </div>
+
+        <div class="danger-row" id="recoveryRow">
+          <div><h4>Резервный код</h4><p id="recoveryStatusText">Не выпущен</p></div>
+          <button class="btn btn-ghost" id="recoveryActionBtn" onclick="handleRecoveryAction()">Выпустить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nested" id="totpSetupWrap" onclick="if(event.target===this) cancelTotpSetup()">
+      <div class="modal-box">
+        <div class="delete-pop-head">
+          <strong>Подключение Authenticator</strong>
+          <span>Отсканируйте QR в Google Authenticator, Authy или 1Password и введите текущий 6-значный код</span>
+        </div>
+        <div style="display:flex;justify-content:center;margin-bottom:14px">
+          <img id="totpQr" src="" alt="QR-код Authenticator" style="width:170px;height:170px;border-radius:12px;background:#fff;padding:8px"/>
+        </div>
+        <div style="text-align:center;margin-bottom:14px">
+          <div class="field-label" style="margin-bottom:6px">Или введите код вручную</div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--stroke);border-radius:12px;padding:9px 14px">
+            <span id="totpSecretValue" style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:.9rem;letter-spacing:1px">—</span>
+            <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="copyTotpSecret()" type="button">Копировать</button>
+          </div>
+        </div>
+        <div class="code-boxes" id="totpConfirmBoxes"></div>
+        <input type="hidden" id="totpConfirmValue">
+        <div class="delete-pop-btns">
+          <button class="btn btn-ghost" onclick="cancelTotpSetup()">Отмена</button>
+          <button class="btn btn-dark" id="totpConfirmBtn" onclick="confirmTotp()">Подтвердить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nested" id="totpDisableWrap" onclick="if(event.target===this) closeTotpDisable()">
+      <div class="modal-box">
+        <div class="delete-pop-head"><strong>Отключить Authenticator</strong><span>Введите текущий код из приложения. Резервный код при этом остаётся — он теперь не привязан к 2FA.</span></div>
+        <div style="margin-bottom:12px"><input class="field-input" id="totpDisableInput" placeholder="6-значный код" inputmode="numeric" maxlength="6"></div>
+        <div class="delete-pop-btns">
+          <button class="btn btn-ghost" onclick="closeTotpDisable()">Отмена</button>
+          <button class="btn btn-danger-solid" onclick="confirmTotpDisable()">Отключить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nested" id="recoveryRegenWrap" onclick="if(event.target===this) closeRecoveryRegen()">
+      <div class="modal-box">
+        <div class="delete-pop-head"><strong id="recoveryRegenTitle">Перевыпустить резервный код</strong><span>Старый код перестанет работать. Введите текущий код Authenticator для подтверждения — резервный код может обойти саму 2FA, поэтому здесь мы дополнительно проверяем.</span></div>
+        <div style="margin-bottom:12px"><input class="field-input" id="recoveryRegenInput" placeholder="6-значный код" inputmode="numeric" maxlength="6"></div>
+        <div class="delete-pop-btns">
+          <button class="btn btn-ghost" onclick="closeRecoveryRegen()">Отмена</button>
+          <button class="btn btn-dark" onclick="confirmRecoveryRegen()">Перевыпустить</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay nested" id="recoveryRevealWrap">
+      <div class="modal-box">
+        <div class="delete-pop-head"><strong>Сохраните резервный код</strong><span>Показывается один раз. Поможет войти, если потеряете доступ и к почте, и к Authenticator.</span></div>
+        <div style="font-family:'SF Mono',Menlo,Consolas,monospace;font-size:1.25rem;font-weight:700;text-align:center;background:var(--surface2);border:1px solid var(--stroke);border-radius:12px;padding:16px;margin-bottom:12px;letter-spacing:1px" id="recoveryCodeValue">—</div>
+        <div class="delete-pop-btns">
+          <button class="btn btn-ghost" onclick="copyRecoveryCode()">Скопировать</button>
+          <button class="btn btn-dark" onclick="closeRecoveryReveal()">Я сохранил(а)</button>
+        </div>
+      </div>
+    </div>
 
     <!-- TELEGRAM -->
     <section class="card" id="sec-telegram">
@@ -456,29 +498,27 @@
           <div><h4>Удалить аккаунт</h4><p>Безвозвратно удалить личные данные, обращения, уведомления и историю обслуживания</p></div>
           <button class="btn btn-danger-solid" onclick="toggleDeletePopover()">Удалить</button>
         </div>
-        <div class="delete-pop-wrap" id="deletePopover">
-          <div class="delete-pop">
-            <div class="delete-pop-inner">
-              <div class="delete-pop-head">
-                <div class="delete-pop-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linejoin="round"/></svg></div>
-                <div>
-                  <strong>Удалить аккаунт?</strong>
-                  <span>Необратимо — личные данные, переписка, заявки на обслуживание и уведомления будут полностью стёрты. Оформленные (оплаченные) заказы останутся в истории компании обезличенными, без привязки к вам</span>
-                </div>
+        <div class="modal-overlay" id="deletePopover" onclick="if(event.target===this) toggleDeletePopover()">
+          <div class="modal-box">
+            <div class="delete-pop-head">
+              <div class="delete-pop-icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 9v4M12 17h.01" stroke-linecap="round"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" stroke-linejoin="round"/></svg></div>
+              <div>
+                <strong>Удалить аккаунт?</strong>
+                <span>Необратимо — личные данные, переписка, заявки на обслуживание и уведомления будут полностью стёрты. Оформленные (оплаченные) заказы останутся в истории компании обезличенными, без привязки к вам</span>
               </div>
-              <label class="field-label">Подтвердите email</label>
-              <input class="field-input" id="deleteConfirmInput" type="email" placeholder="your@email.com" autocomplete="off">
-              <div class="delete-code-wrap" id="deleteCodeRow">
-                <div class="delete-code-inner">
-                  <label class="field-label" style="margin-top:4px">Код из письма</label>
-                  <div class="code-boxes" id="deleteCodeBoxes"></div>
-                  <input type="hidden" id="deleteCodeInput">
-                </div>
+            </div>
+            <label class="field-label">Подтвердите email</label>
+            <input class="field-input" id="deleteConfirmInput" type="email" placeholder="your@email.com" autocomplete="off">
+            <div class="delete-code-wrap" id="deleteCodeRow">
+              <div class="delete-code-inner">
+                <label class="field-label" style="margin-top:4px">Код из письма</label>
+                <div class="code-boxes" id="deleteCodeBoxes"></div>
+                <input type="hidden" id="deleteCodeInput">
               </div>
-              <div class="delete-pop-btns">
-                <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
-                <button class="btn btn-danger" id="deleteConfirmBtn" onclick="requestDeleteCode()">Получить код</button>
-              </div>
+            </div>
+            <div class="delete-pop-btns">
+              <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
+              <button class="btn btn-danger" id="deleteConfirmBtn" onclick="requestDeleteCode()">Получить код</button>
             </div>
           </div>
         </div>
@@ -642,7 +682,21 @@ async function loadSecurityOverview(){
   renderPasskeyRows();
   renderTotpRow();
   renderRecoveryRow();
+  renderSecuritySummary();
 }
+
+function renderSecuritySummary(){
+  const extras = [
+    security?.yandexLinked,
+    (security?.passkeys||[]).length > 0,
+    security?.totpEnabled,
+  ].filter(Boolean).length;
+  document.getElementById('securityCountText').textContent = extras
+    ? `Email + ещё ${extras} ${extras===1?'способ':'способа'}`
+    : 'Только email — можно добавить ещё';
+}
+window.openSecurityCenter = function(){ document.getElementById('securityCenterOverlay').classList.add('show'); };
+window.closeSecurityCenter = function(){ document.getElementById('securityCenterOverlay').classList.remove('show'); };
 
 // ── Яндекс ──
 function renderYandexRow(){
@@ -659,6 +713,7 @@ window.handleYandexAction = async function(){
       await apiCall('POST', '/auth/yandex/unlink');
       security.yandexLinked = false;
       renderYandexRow();
+      renderSecuritySummary();
       toast('Яндекс отвязан','success');
     }catch(e){ toast(e.message,'error'); }
   }else{
@@ -698,8 +753,7 @@ window.addPasskey = async function(){
       },
       clientExtensionResults: cred.getClientExtensionResults?.() || {},
     };
-    const deviceName = prompt('Название устройства (для себя же)', 'Мой ключ доступа') || 'Ключ доступа';
-    await apiCall('POST', '/auth/passkey/register-verify', { challengeId, response, deviceName });
+    await apiCall('POST', '/auth/passkey/register-verify', { challengeId, response });
     toast('Ключ доступа добавлен','success');
     await loadSecurityOverview();
   }catch(e){
@@ -755,6 +809,7 @@ window.confirmTotp = async function(){
     security.recoveryCodeIssued = true;
     renderTotpRow();
     renderRecoveryRow();
+    renderSecuritySummary();
     showRecoveryCode(data.recoveryCode);
     toast('Authenticator подключён','success');
   }catch(e){ toast(e.message,'error'); }
@@ -768,9 +823,9 @@ window.confirmTotpDisable = async function(){
   try{
     await apiCall('POST', '/auth/totp/disable', { token });
     security.totpEnabled = false;
-    security.recoveryCodeIssued = false;
     renderTotpRow();
     renderRecoveryRow();
+    renderSecuritySummary();
     closeTotpDisable();
     toast('Authenticator отключён','success');
   }catch(e){ toast(e.message,'error'); }
@@ -778,22 +833,39 @@ window.confirmTotpDisable = async function(){
 
 // ── Резервный код ──
 function renderRecoveryRow(){
-  const row = document.getElementById('recoveryRow');
-  row.style.display = security?.totpEnabled ? 'flex' : 'none';
-  document.getElementById('recoveryStatusText').textContent = security?.recoveryCodeIssued ? 'Выпущен, хранится у вас' : 'Не выпущен';
+  const issued = security?.recoveryCodeIssued;
+  document.getElementById('recoveryStatusText').textContent = issued ? 'Выпущен, хранится у вас' : 'Не выпущен';
+  document.getElementById('recoveryActionBtn').textContent = issued ? 'Перевыпустить' : 'Выпустить';
 }
-window.openRecoveryRegen = function(){ document.getElementById('recoveryRegenWrap').classList.add('show'); };
+// Если 2FA включена — просим код (резервный код может её обойти, дополнительно подтверждаем).
+// Если 2FA выключена — выпускаем сразу, без модалки.
+window.handleRecoveryAction = async function(){
+  if(security?.totpEnabled){
+    document.getElementById('recoveryRegenTitle').textContent = security.recoveryCodeIssued ? 'Перевыпустить резервный код' : 'Выпустить резервный код';
+    document.getElementById('recoveryRegenWrap').classList.add('show');
+    return;
+  }
+  const msg = security?.recoveryCodeIssued ? 'Перевыпустить резервный код? Старый перестанет работать.' : 'Выпустить резервный код?';
+  if(!confirm(msg)) return;
+  try{
+    const data = await apiCall('POST', '/auth/recovery-code/issue', {});
+    security.recoveryCodeIssued = true;
+    renderRecoveryRow();
+    showRecoveryCode(data.recoveryCode);
+    toast('Резервный код выпущен','success');
+  }catch(e){ toast(e.message,'error'); }
+};
 window.closeRecoveryRegen = function(){ document.getElementById('recoveryRegenWrap').classList.remove('show'); document.getElementById('recoveryRegenInput').value=''; };
 window.confirmRecoveryRegen = async function(){
   const token = document.getElementById('recoveryRegenInput').value.trim();
   if(!token){ toast('Введите код','error'); return; }
   try{
-    const data = await apiCall('POST', '/auth/totp/recovery-code/regenerate', { token });
+    const data = await apiCall('POST', '/auth/recovery-code/issue', { token });
     closeRecoveryRegen();
     security.recoveryCodeIssued = true;
     renderRecoveryRow();
     showRecoveryCode(data.recoveryCode);
-    toast('Новый резервный код выпущен','success');
+    toast('Резервный код выпущен','success');
   }catch(e){ toast(e.message,'error'); }
 };
 let _recoveryCodeShown = '';

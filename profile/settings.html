@@ -118,11 +118,8 @@
   @media(max-width:480px){.row2{grid-template-columns:1fr;}}
   .field-label{display:block;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-faint);margin-bottom:7px;font-weight:600;}
   .field-input{width:100%;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r14);padding:12px 14px;color:var(--text);font-family:inherit;font-size:14px;font-weight:400;outline:none;transition:border-color .15s;}
-  .code-boxes{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:10px 0 0;}
-  .code-box{width:100%;aspect-ratio:1/1;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:12px;color:var(--text);font-family:inherit;font-size:1.15rem;font-weight:500;text-align:center;outline:none;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
-  .code-box::-webkit-outer-spin-button,.code-box::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  .code-box:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(30,222,123,.12)}
-  .code-box.filled{border-color:var(--green)}
+  .errmsg{ color:var(--red); font-size:13px; margin-top:2px; min-height:1em; }
+  .code-input-single::-webkit-outer-spin-button,.code-input-single::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .field-input:focus{border-color:var(--green);}
   .field-input:disabled{opacity:.55;cursor:default;}
   .field-input::placeholder{color:var(--text-faint);}
@@ -201,35 +198,56 @@
   }
   .modal-overlay.show{ opacity:1; pointer-events:auto; }
   .modal-box{
-    width:100%; max-width:400px; max-height:88vh; overflow-y:auto;
-    background:var(--card-elevated); border:1px solid var(--stroke); border-radius:var(--r20);
-    box-shadow:0 30px 80px rgba(0,0,0,.45); padding:22px;
+    width:100%; max-width:460px; max-height:88vh; overflow-y:auto;
+    background:var(--card-elevated); border:1px solid var(--stroke); border-radius:28px;
+    box-shadow:0 30px 80px rgba(0,0,0,.45); padding:34px;
     transform:translateY(16px) scale(.97); opacity:0;
     transition:transform .4s var(--spring), opacity .25s ease;
   }
   .modal-overlay.show .modal-box{ transform:translateY(0) scale(1); opacity:1; }
   .modal-overlay.nested{ z-index:320; }
-  .security-center-box{ max-width:480px; }
-  .security-center-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
-  .security-center-head strong{ font-size:15px; font-weight:700; }
+  .security-center-box{ max-width:540px; }
+  .security-center-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+  .security-center-head strong{ font-size:23px; font-weight:800; letter-spacing:-0.02em; }
   .modal-close-btn{
-    width:30px; height:30px; border-radius:50%; border:none; flex-shrink:0;
+    width:34px; height:34px; border-radius:50%; border:none; flex-shrink:0;
     background:var(--surface2); color:var(--text-dim);
     display:flex; align-items:center; justify-content:center; cursor:pointer;
     transition:background .2s ease, color .2s ease;
   }
   .modal-close-btn:hover{ background:var(--stroke); color:var(--text); }
-  .modal-close-btn svg{ width:15px; height:15px; }
+  .modal-close-btn svg{ width:16px; height:16px; }
   @media(max-width:640px){
     #securityCenterOverlay{ padding:0; }
     #securityCenterOverlay .modal-box{ max-width:none; width:100%; height:100%; max-height:none; border-radius:0; }
   }
-  .delete-pop-head{display:flex;gap:12px;margin-bottom:14px;}
-  .delete-pop-icon{width:36px;height:36px;border-radius:var(--r12);background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .delete-pop-icon svg{width:17px;height:17px;stroke:var(--red);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
-  .delete-pop-head strong{display:block;font-size:13px;font-weight:600;margin-bottom:3px;}
-  .delete-pop-head span{display:block;font-size:12px;color:var(--text-dim);line-height:1.45;}
-  .modal-box .field-input{margin-bottom:12px;font-size:13px;padding:10px 12px;}
+  .delete-pop-head{display:flex;gap:14px;margin-bottom:18px;}
+  .delete-pop-icon{width:44px;height:44px;border-radius:14px;background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .delete-pop-icon svg{width:21px;height:21px;stroke:var(--red);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .delete-pop-head strong{display:block;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:5px;}
+  .delete-pop-head span{display:block;font-size:15px;color:var(--text-dim);line-height:1.5;}
+
+  /* ЕДИНОЕ ПОЛЕ КОДА — как auth.html: один инпут, не ячейки */
+  .code-input-single{
+    width:100%; text-align:center; font-size:1.6rem; font-weight:700; letter-spacing:6px;
+    background:var(--surface2); border:1.5px solid transparent; border-radius:999px;
+    padding:15px 20px 15px 26px; color:var(--text); font-family:inherit; outline:none;
+    transition:border-color .2s ease, background .2s ease; margin-bottom:6px;
+    -moz-appearance:textfield;
+  }
+  .code-input-single::placeholder{ color:var(--text-faint); letter-spacing:6px; }
+  .code-input-single:focus{ border-color:var(--text); background:var(--card-elevated); }
+  .code-input-single.err{ border-color:var(--red); }
+
+  /* КАПСУЛЫ — только внутри модалок безопасности/удаления (не весь кабинет) */
+  .modal-box .btn{
+    border-radius:999px; padding:15px 22px; font-size:15px; font-weight:700;
+    justify-content:center;
+  }
+  .modal-box .field-input{
+    margin-bottom:14px; font-size:16px; padding:15px 20px; border-radius:999px; background:var(--surface2);
+  }
+  .modal-box .field-label{ font-size:12px; margin-bottom:8px; }
   .delete-code-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s var(--spring);}
   .delete-code-wrap.show{grid-template-rows:1fr;}
   .delete-code-inner{overflow:hidden;}
@@ -266,14 +284,6 @@
     .card-icon svg{width:21px;height:21px;}
     .auth-method-icon{width:48px;height:48px;}
     .auth-method-icon svg{width:23px;height:23px;}
-    .modal-box{padding:28px;max-width:440px;}
-    .security-center-box{max-width:520px;}
-    .security-center-head strong{font-size:17px;}
-    .delete-pop-head strong{font-size:15px;}
-    .delete-pop-head span{font-size:13px;}
-    .delete-pop-icon{width:42px;height:42px;}
-    .delete-pop-icon svg{width:19px;height:19px;}
-    .code-box{font-size:1.3rem;}
   }
 </style>
 </head>
@@ -368,7 +378,7 @@
         <div id="authMethodRow"><!-- filled by JS: email --></div>
 
         <div class="danger-row">
-          <div class="auth-method-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M13.1 6.6h-1.4c-2 0-3 1-3 2.5 0 1.7 1 2.3 2.4 3.2l1.2.8-3.5 5.1M15 6.6v13.2M13.1 6.6H15"/></svg></div>
+          <div class="auth-method-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#FC3F1D"/><path d="M13.1 6.6h-1.4c-2 0-3 1-3 2.5 0 1.7 1 2.3 2.4 3.2l1.2.8-3.5 5.1H6.6l3.1-4.5c-1.8-1.2-2.8-2.4-2.8-4.5 0-2.6 1.9-4.2 4.9-4.2H15v13.2h-1.9V6.6z" fill="#fff"/></svg></div>
           <div class="auth-method-info"><h4>Яндекс ID</h4><p id="yandexStatusText">Загрузка…</p></div>
           <button class="btn btn-ghost" id="yandexActionBtn" onclick="handleYandexAction()">…</button>
         </div>
@@ -410,8 +420,8 @@
             <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="copyTotpSecret()" type="button">Копировать</button>
           </div>
         </div>
-        <div class="code-boxes" id="totpConfirmBoxes"></div>
-        <input type="hidden" id="totpConfirmValue">
+        <input class="code-input-single" id="totpConfirmInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+        <div class="errmsg" id="errTotpConfirm"></div>
         <div class="delete-pop-btns">
           <button class="btn btn-ghost" onclick="cancelTotpSetup()">Отмена</button>
           <button class="btn btn-dark" id="totpConfirmBtn" onclick="confirmTotp()">Подтвердить</button>
@@ -532,8 +542,7 @@
             <div class="delete-code-wrap" id="deleteCodeRow">
               <div class="delete-code-inner">
                 <label class="field-label" style="margin-top:4px">Код из письма</label>
-                <div class="code-boxes" id="deleteCodeBoxes"></div>
-                <input type="hidden" id="deleteCodeInput">
+                <input class="code-input-single" id="deleteCodeInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code">
               </div>
             </div>
             <div class="delete-pop-btns">
@@ -555,46 +564,19 @@
 <script type="module">
 const API = 'https://antviz.ru/api';
 
-function setupCodeBoxes(containerId, hiddenInputId, onSubmit){
-  const container = document.getElementById(containerId);
-  const hidden = document.getElementById(hiddenInputId);
-  if(!container || container.dataset.ready) return;
-  container.dataset.ready = '1';
-  const boxes = [];
-  for(let i=0;i<6;i++){
-    const b=document.createElement('input');
-    b.type='text';b.inputMode='numeric';b.maxLength=1;b.className='code-box';
-    b.autocomplete = i===0 ? 'one-time-code' : 'off';
-    container.appendChild(b);boxes.push(b);
-  }
-  function sync(){ hidden.value = boxes.map(b=>b.value).join(''); }
-  boxes.forEach((b,i)=>{
-    b.addEventListener('input', ()=>{
-      b.value = b.value.replace(/\D/g,'').slice(-1);
-      b.classList.toggle('filled', !!b.value);
-      if(b.value && i<5) boxes[i+1].focus();
-      sync();
-      if(boxes.every(x=>x.value)) onSubmit?.();
-    });
-    b.addEventListener('keydown', e=>{
-      if(e.key==='Backspace' && !b.value && i>0) boxes[i-1].focus();
-      if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); }
-      if(e.key==='ArrowLeft' && i>0) boxes[i-1].focus();
-      if(e.key==='ArrowRight' && i<5) boxes[i+1].focus();
-    });
-    b.addEventListener('paste', e=>{
-      e.preventDefault();
-      const text=(e.clipboardData||window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
-      text.split('').forEach((ch,idx)=>{ if(boxes[idx]){boxes[idx].value=ch;boxes[idx].classList.add('filled');} });
-      sync();
-      (boxes[Math.min(text.length,5)])?.focus();
-      if(text.length===6) onSubmit?.();
-    });
+// Единое поле кода (не по цифре на ячейку): чистим нецифры, автосабмит на 6 знаках, Enter — тоже сабмит
+function setupSingleCodeInput(id, onSubmit){
+  const el = document.getElementById(id);
+  if(!el || el.dataset.ready) return;
+  el.dataset.ready = '1';
+  el.addEventListener('input', ()=>{
+    el.value = el.value.replace(/\D/g,'').slice(0,6);
+    el.classList.remove('err');
+    if(el.value.length===6) onSubmit?.();
   });
-  container._focusFirst = () => boxes[0]?.focus();
-  container._reset = () => { boxes.forEach(b=>{b.value='';b.classList.remove('filled');}); sync(); };
+  el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); } });
 }
-setupCodeBoxes('deleteCodeBoxes','deleteCodeInput', ()=>window.confirmDeleteAccount?.());
+setupSingleCodeInput('deleteCodeInput', ()=>window.confirmDeleteAccount?.());
 
 // Юзернейм бота — заменить после создания в BotFather
 const TG_BOT_USERNAME = 'antviz_bot';
@@ -808,8 +790,10 @@ window.toggleTotpPanel = async function(){
     document.getElementById('totpQr').src = data.qrDataUrl;
     document.getElementById('totpSecretValue').textContent = data.secret.match(/.{1,4}/g).join(' ');
     _totpSecretRaw = data.secret;
-    setupCodeBoxes('totpConfirmBoxes','totpConfirmValue', ()=>window.confirmTotp());
-    document.getElementById('totpConfirmBoxes')._reset?.();
+    setupSingleCodeInput('totpConfirmInput', ()=>window.confirmTotp());
+    document.getElementById('totpConfirmInput').value='';
+    document.getElementById('errTotpConfirm').textContent='';
+    setTimeout(()=>document.getElementById('totpConfirmInput')?.focus(), 300);
   }catch(e){ toast(e.message,'error'); wrap.classList.remove('show'); }
 };
 let _totpSecretRaw = '';
@@ -818,7 +802,7 @@ window.copyTotpSecret = function(){
 };
 window.cancelTotpSetup = function(){ document.getElementById('totpSetupWrap').classList.remove('show'); };
 window.confirmTotp = async function(){
-  const token = document.getElementById('totpConfirmValue').value;
+  const token = document.getElementById('totpConfirmInput').value;
   if(token.length!==6) return;
   const btn = document.getElementById('totpConfirmBtn');
   btn.disabled = true; btn.textContent = 'Проверяем…';
@@ -832,7 +816,11 @@ window.confirmTotp = async function(){
     renderSecuritySummary();
     showRecoveryCode(data.recoveryCode);
     toast('Authenticator подключён','success');
-  }catch(e){ toast(e.message,'error'); }
+  }catch(e){
+    toast(e.message,'error');
+    document.getElementById('errTotpConfirm').textContent = e.message;
+    document.getElementById('totpConfirmInput').classList.add('err');
+  }
   finally{ btn.disabled = false; btn.textContent = 'Подтвердить'; }
 };
 window.openTotpDisable = function(){ document.getElementById('totpDisableWrap').classList.add('show'); };
@@ -981,7 +969,6 @@ window.toggleDeletePopover=function(){
   if(willShow){
     document.getElementById('deleteConfirmInput').value='';
     document.getElementById('deleteCodeInput').value='';
-    document.getElementById('deleteCodeBoxes')._reset?.();
     document.getElementById('deleteCodeRow').classList.remove('show');
     const cBtn=document.getElementById('deleteConfirmBtn');
     cBtn.textContent='Получить код';cBtn.disabled=false;
@@ -1010,7 +997,7 @@ window.requestDeleteCode=async function(){
   try{
     await apiCall('POST', '/auth/send-code', { purpose: 'delete_account' });
     document.getElementById('deleteCodeRow').classList.add('show');
-    setTimeout(()=>document.getElementById('deleteCodeBoxes')._focusFirst?.(), 300);
+    setTimeout(()=>document.getElementById('deleteCodeInput')?.focus(), 300);
     btn.textContent='Подтвердить удаление';
     btn.setAttribute('onclick','confirmDeleteAccount()');
     toast('Код отправлен на почту','success');

@@ -33,11 +33,11 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 .lt{font-size:13px;color:rgba(255,255,255,.35)}
 
-.app{display:none;height:100vh;overflow:hidden;flex-direction:column;background:var(--bg)}
-
-/* MOBILE MENU BUTTON — real menu comes later via m-panel26.js */
-.m-trigger{display:none;position:fixed;top:16px;left:16px;z-index:120;width:42px;height:42px;border-radius:var(--r-sm);border:none;background:var(--card);box-shadow:var(--sh-md);color:var(--text);align-items:center;justify-content:center;cursor:pointer}
-.m-trigger svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
+/* m-panel26.js добавляет body{padding-top:78px} (74px на <640px) под свою
+   плавающую капсулу-меню — вычитаем этот отступ явно, иначе низ каждого
+   экрана уезжает за пределы видимой области. */
+.app{display:none;height:calc(100vh - 78px);overflow:hidden;flex-direction:column;background:var(--bg)}
+@media(max-width:640px){.app{height:calc(100vh - 74px)}}
 
 /* SCREENS */
 .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
@@ -185,9 +185,8 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 
 /* MOBILE */
 @media (max-width:760px){
-  .m-trigger{display:flex}
   #screenList .inner,#screenTicket .inner,#screenCreate .inner{padding:0 16px}
-  .list-head{padding-top:70px}
+  .list-head{padding-top:20px}
   .page-title{font-size:1.4rem}
   .t-topbar{padding-top:16px}
   .msg{max-width:86%}
@@ -200,10 +199,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
-
-<button class="m-trigger" id="mTrigger" onclick="window.openMPanel26 && window.openMPanel26()">
-  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-</button>
 
 <div class="lightbox" id="lightbox" onclick="this.classList.remove('show')">
   <button class="lb-x">✕</button>
@@ -435,7 +430,7 @@ window.selectTicket=async function(id){
     <div class="t-info-item"><span class="t-info-label">Пользователь</span><span class="t-info-val">${esc(ticket.userName||'—')}</span></div>
     <div class="t-info-item"><span class="t-info-label">Создан</span><span class="t-info-val">${fmtDT(ticket.createdAt)}</span></div>
     <div class="t-info-item"><span class="t-info-label">Приоритет</span><span class="t-info-val">${ticket.priority?priLabel(ticket.priority):'—'}</span></div>
-    ${ticket.orderId?`<div class="t-info-item"><span class="t-info-label">Заказ</span><a class="t-info-val t-order-link" href="/admin/orders?open=${ticket.orderId}" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Открыть заказ')} ↗</a></div>`:''}
+    ${ticket.orderId?`<div class="t-info-item"><span class="t-info-label">Заказ</span><a class="t-info-val t-order-link" href="/admin/orders?id=${ticket.orderId}" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Открыть заказ')} ↗</a></div>`:''}
   `;
 
   fetch(`${API}/tickets/${id}/admin-read`, { method:'PATCH', credentials:'include' }).catch(()=>{});
@@ -499,7 +494,7 @@ window.sendReply=async function(){
     if(t){ t._lastMsg=text; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
     const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
     if(msgsResp.ok) renderChat(await msgsResp.json());
-    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
+    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support',webApp:true});
     renderList();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
@@ -526,7 +521,7 @@ window.sendImg=async function(){
       if(t){ t._lastMsg='Изображение'; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
       const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
       if(msgsResp.ok) renderChat(await msgsResp.json());
-      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support.html',webApp:true});
+      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support',webApp:true});
       toast('Изображение отправлено ✓','success');
       renderList();
     }catch(e){toast('Ошибка','error');}

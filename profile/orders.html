@@ -372,6 +372,9 @@ html[data-theme="light"] .icon-btn .sun{display:block}
 /* ACTIONS */
 .ord-actions-card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r24);padding:8px;box-shadow:var(--shadow-sm)}
 .ord-actions-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);padding:14px 14px 8px}
+.ord-pay-row{display:flex;align-items:center;gap:10px;padding:10px 14px;font-size:13px;border-top:1px solid var(--stroke)}
+.ord-pay-row:first-of-type{border-top:none}
+.ord-pay-row>span:last-child{margin-left:auto}
 .ord-actions-list{display:flex;flex-direction:column;gap:2px}
 .ord-action-row{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:14px;width:100%;padding:12px;border-radius:var(--r16);cursor:pointer;font-family:var(--font);color:var(--text);transition:background .15s,transform .15s var(--spring)}
 .ord-action-row:hover{background:var(--card-elevated)}
@@ -664,7 +667,7 @@ let allOrders = [], lastStatuses = {}, reviewOrderId = null, reviewStars = 0, ba
 let isInitialLoad = true;
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
+function orderFormatLabel(o){return o.siteFormat||(o.orderType==='bot'?'Telegram-бот / мини-апп':'Сайт');}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200)}
 function fmtDate(ts){if(!ts)return null;const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
 // launchDate приходит из Postgres как "YYYY-MM-DD" ИЛИ как полный ISO-таймстамп ("YYYY-MM-DDT..Z") —
@@ -690,16 +693,20 @@ function getEstimate(o){
   }
   const extras=o.extras||[];
   const urgent=extras.includes('urgent');
-  const ranges={'Старт':[1,2],'Рост':[2,5],'Масштаб':[5,14]};
+  const ranges={'Старт':[1,2],'Рост':[2,5],'Масштаб':[5,14],'Простой бот':[1,3],'Бот с оплатой':[3,7],'Mini App':[5,10]};
   let[minD,maxD]=ranges[o.package]||[2,7];
-  const type=o.siteType||'';
+  const format=o.siteFormat||'';
   // Серверная часть (бэкенд, интеграции, БД) всегда добавляет времени
-  // независимо от тарифа и формата.
-  if(o.siteKind==='dynamic'){minD+=2;maxD+=5;}
+  // независимо от тарифа и формата. Раньше проверялось несуществующее
+  // поле o.siteKind — реальное поле называется siteType.
+  if(o.siteType==='dynamic'){minD+=2;maxD+=5;}
   // Формат сайта: лендинг — база (без надбавки), дальше сложнее.
-  if(/Интернет-магазин/.test(type)){minD+=3;maxD+=7;}
-  else if(/Многостраничный/.test(type)){minD+=1;maxD+=3;}
-  else if(/Особый случай/.test(type)){minD+=2;maxD+=6;}
+  // Раньше это сравнивалось с o.siteType ('static'/'dynamic'), из-за чего
+  // регулярки по названию формата не совпадали никогда — сравниваем с
+  // реальным полем siteFormat, где и лежит текст формата.
+  if(/Интернет-магазин/.test(format)){minD+=3;maxD+=7;}
+  else if(/Многостраничный/.test(format)){minD+=1;maxD+=3;}
+  else if(/Особый случай/.test(format)){minD+=2;maxD+=6;}
   if(extras.includes('shop')){minD+=2;maxD+=4;}
   if(extras.includes('content')){minD+=1;maxD+=2;}
   if(urgent){const base=o.createdAt?.toDate?o.createdAt.toDate():new Date();const d=new Date(base);d.setDate(d.getDate()+1);return{text:d.toLocaleDateString('ru',{day:'numeric',month:'long'}),committed:false};}
@@ -756,7 +763,7 @@ function buildTracker(o){
 
   const toggle=doneSteps.length?('<button class="trk-toggle" onclick="this.classList.toggle(\'open\');this.nextElementSibling.classList.toggle(\'show\')">Показать историю статусов ('+doneSteps.length+') <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button><div class="trk-history">'+history+'</div>'):'';
 
-  return '<div class="trk-card"><div class="trk-stepper">'+stepper+'</div>'+currentBlock+toggle+'</div>';
+  return '<div class="trk-card" id="trkCard"><div class="trk-stepper">'+stepper+'</div>'+currentBlock+toggle+'</div>';
 }
 
 function buildDomainBanner(o){
@@ -781,7 +788,7 @@ function orderCard(o){
   return`<div class="ord-row-wrap" data-status="${s}" data-paid="${fullyPaid?1:0}" data-id="${o.id}" style="animation-delay:${allOrders.indexOf(o)*30}ms">
     <button type="button" class="ord-row" onclick="openOrderModal('${o.id}')">
       <div class="ord-cell-main">
-        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${esc(siteTypeLabel(o.siteType)||'Сайт')}</span>
+        <span class="ord-num">№ ${o.id.slice(0,8).toUpperCase()} · ${esc(orderFormatLabel(o))}</span>
         <span class="ord-meta">${fmtDate(o.createdAt)||'—'}</span>
       </div>
       <div class="ord-cell-status"><span class="ord-tag s${s}"><svg viewBox="0 0 24 24">${STATUS_ICONS[s]}</svg>${STATUS_LABELS[s]}</span></div>
@@ -863,7 +870,7 @@ window.openOrderModal=function(id){
   const payLabel=fullyPaid?'Оплачен':(halfPaid?'Предоплата 50%':'Не оплачен');
   const payChipClass=fullyPaid?'paid-yes':(halfPaid?'paid-half':'paid-no');
 
-  document.getElementById('ordModalTitle').textContent=(siteTypeLabel(o.siteType)||'Сайт')+' · № '+o.id.slice(0,8).toUpperCase();
+  document.getElementById('ordModalTitle').textContent=orderFormatLabel(o)+' · № '+o.id.slice(0,8).toUpperCase();
   document.getElementById('ordModalPrice').innerHTML=totalPrice?'<small>₽</small>'+totalPrice.toLocaleString('ru'):'';
   document.getElementById('ordModalChips').innerHTML=
     '<span class="ord-chip status s'+s+'">'
@@ -938,6 +945,8 @@ window.openOrderModal=function(id){
   document.getElementById('ordModalRight').innerHTML=rightHtml;
   showOverlay(document.getElementById('ordModalOverlay'));
   lockScroll();
+  loadOrderHistoryForModal(o.id);
+  loadOrderPaymentsForModal(o.id);
   // на мобилке шапка вылезла в position:fixed поверх экрана (см. CSS) —
   // отжимаем тело заказа на её реальную высоту, иначе контент полезет под неё
   requestAnimationFrame(()=>{
@@ -952,6 +961,36 @@ window.openOrderModal=function(id){
     }
   });
 };
+
+// Достаём реальную историю статусов с бэкенда и пересобираем уже готовый
+// трекер (buildTracker) — раньше он был написан под o.statusHistory,
+// которое никто не заполнял после переезда с Firestore, и молча падал
+// на дефолт "без истории".
+async function loadOrderHistoryForModal(orderId){
+  try{
+    const resp=await fetch(`${API}/orders/${orderId}/history`,{credentials:'include'});
+    if(!resp.ok)return;
+    const rows=await resp.json();
+    if(window._modalOrderId!==orderId)return;
+    const o=allOrders.find(x=>x.id===orderId);if(!o)return;
+    o.statusHistory=rows.map(r=>({status:r.status,at:r.changedAt}));
+    const card=document.getElementById('trkCard');
+    if(card)card.outerHTML=buildTracker(o);
+  }catch(e){/* тихо — трекер без истории всё равно рабочий */}
+}
+
+async function loadOrderPaymentsForModal(orderId){
+  try{
+    const resp=await fetch(`${API}/orders/${orderId}/payments`,{credentials:'include'});
+    if(!resp.ok)return;
+    const rows=await resp.json();
+    if(window._modalOrderId!==orderId||!rows.length)return;
+    const TYPE_LABEL={order:'Оплата заказа',partial:'Предоплата',remaining:'Доплата остатка',support:'Обслуживание',ticket_once:'Разовая правка'};
+    const rowsHtml=rows.map(p=>'<div class="ord-pay-row"><span>'+esc(TYPE_LABEL[p.type]||p.type)+'</span><span style="font-weight:500">'+Math.round(p.amount).toLocaleString('ru')+' ₽</span><span style="color:var(--ink-faint);font-size:.72rem">'+fmtFull(p.createdAt)+'</span></div>').join('');
+    const box=document.getElementById('ordModalRight');
+    if(box)box.insertAdjacentHTML('beforeend','<div class="ord-actions-card"><div class="ord-actions-title">История платежей</div>'+rowsHtml+'</div>');
+  }catch(e){/* тихо */}
+}
 
 // TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase
 // ID-токен для проверки личности — переезжает вместе с остальной оплатой,
@@ -1036,7 +1075,7 @@ window.printReceipt=function(id){
   const fP=o.paid||(isP&&pA>=(o.totalPrice||0));
   const pSt=fP?'Оплачен полностью':(isP&&pA>0?'Предоплата 50%':'Не оплачен');
   const pRows=isP?`<tr><td>Оплачено</td><td>${pA.toLocaleString('ru')} ₽</td></tr><tr><td>Остаток</td><td>${fP?'—':rA.toLocaleString('ru')+' ₽'}</td></tr>`:'';
-  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${esc(o.clientName||'—')}</td></tr><tr><td>Email</td><td>${esc(o.clientEmail||'—')}</td></tr><tr><td>Тип заказа</td><td>${esc(siteTypeLabel(o.siteType)||'—')}</td></tr><tr><td>Тариф</td><td>${esc(o.tariff||o.package||'—')}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.header{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em;color:#191b1e}.logo span{color:#1ede7b}.subtitle{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.total td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}@media print{body{margin:24px auto}}</style></head><body><div class="header"><div class="logo">Ant<span>viz</span></div><div class="subtitle">Квитанция по заказу</div></div><table><tr><td>Номер заказа</td><td>№ ${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${esc(o.clientName||'—')}</td></tr><tr><td>Email</td><td>${esc(o.clientEmail||'—')}</td></tr><tr><td>Тип заказа</td><td>${esc(orderFormatLabel(o))}</td></tr><tr><td>Тариф</td><td>${esc(o.tariff||o.package||'—')}</td></tr>${extHtml}<tr><td>Статус оплаты</td><td>${pSt}</td></tr>${pRows}<tr class="total"><td>Итого</td><td>${o.totalPrice?o.totalPrice.toLocaleString('ru')+' ₽':'—'}</td></tr></table><div class="footer">antviz.ru · Сформировано ${new Date().toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}</div><script>window.onload=function(){window.print();};<\/script></body></html>`;
   w.document.write(html);w.document.close();
 };
 

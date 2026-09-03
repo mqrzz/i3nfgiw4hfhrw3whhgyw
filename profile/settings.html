@@ -220,6 +220,14 @@
   @media(max-width:640px){
     #securityCenterOverlay{ padding:0; }
     #securityCenterOverlay .modal-box{ max-width:none; width:100%; height:100%; max-height:none; border-radius:0; }
+    .modal-box{ padding:24px; }
+    .security-center-head strong{ font-size:19px; }
+    .delete-pop-head strong{ font-size:17px; }
+    .delete-pop-head span{ font-size:13px; }
+    .delete-pop-icon{ width:38px; height:38px; }
+    .delete-pop-icon svg{ width:18px; height:18px; }
+    .code-input-single{ font-size:1.3rem; letter-spacing:4px; padding:13px 16px 13px 20px; }
+    .modal-box .btn{ padding:14px 18px; font-size:15px; }
   }
   .delete-pop-head{display:flex;gap:14px;margin-bottom:18px;}
   .delete-pop-icon{width:44px;height:44px;border-radius:14px;background:var(--red-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -241,7 +249,7 @@
 
   /* КАПСУЛЫ — только внутри модалок безопасности/удаления (не весь кабинет) */
   .modal-box .btn{
-    border-radius:999px; padding:15px 22px; font-size:15px; font-weight:700;
+    border-radius:999px; padding:16px 22px; font-size:17px; font-weight:700;
     justify-content:center;
   }
   .modal-box .field-input{
@@ -350,6 +358,7 @@
       </div>
     </section>
 
+
     <!-- ВХОД И БЕЗОПАСНОСТЬ -->
     <section class="card" id="sec-access">
       <div class="card-head">
@@ -432,7 +441,7 @@
     <div class="modal-overlay nested" id="totpDisableWrap" onclick="if(event.target===this) closeTotpDisable()">
       <div class="modal-box">
         <div class="delete-pop-head"><strong>Отключить Authenticator</strong><span>Введите текущий код из приложения. Резервный код при этом остаётся — он теперь не привязан к 2FA.</span></div>
-        <div style="margin-bottom:12px"><input class="field-input" id="totpDisableInput" placeholder="6-значный код" inputmode="numeric" maxlength="6"></div>
+        <input class="code-input-single" id="totpDisableInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="margin-bottom:14px">
         <div class="delete-pop-btns">
           <button class="btn btn-ghost" onclick="closeTotpDisable()">Отмена</button>
           <button class="btn btn-danger-solid" onclick="confirmTotpDisable()">Отключить</button>
@@ -443,7 +452,7 @@
     <div class="modal-overlay nested" id="recoveryRegenWrap" onclick="if(event.target===this) closeRecoveryRegen()">
       <div class="modal-box">
         <div class="delete-pop-head"><strong id="recoveryRegenTitle">Перевыпустить резервный код</strong><span>Старый код перестанет работать. Введите текущий код Authenticator для подтверждения — резервный код может обойти саму 2FA, поэтому здесь мы дополнительно проверяем.</span></div>
-        <div style="margin-bottom:12px"><input class="field-input" id="recoveryRegenInput" placeholder="6-значный код" inputmode="numeric" maxlength="6"></div>
+        <input class="code-input-single" id="recoveryRegenInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="margin-bottom:14px">
         <div class="delete-pop-btns">
           <button class="btn btn-ghost" onclick="closeRecoveryRegen()">Отмена</button>
           <button class="btn btn-dark" onclick="confirmRecoveryRegen()">Перевыпустить</button>
@@ -547,7 +556,7 @@
             </div>
             <div class="delete-pop-btns">
               <button class="btn btn-ghost" onclick="toggleDeletePopover()">Отмена</button>
-              <button class="btn btn-danger" id="deleteConfirmBtn" onclick="requestDeleteCode()">Получить код</button>
+              <button class="btn btn-dark" id="deleteConfirmBtn" onclick="requestDeleteCode()">Получить код</button>
             </div>
           </div>
         </div>
@@ -577,6 +586,8 @@ function setupSingleCodeInput(id, onSubmit){
   el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); } });
 }
 setupSingleCodeInput('deleteCodeInput', ()=>window.confirmDeleteAccount?.());
+setupSingleCodeInput('totpDisableInput', ()=>window.confirmTotpDisable?.());
+setupSingleCodeInput('recoveryRegenInput', ()=>window.confirmRecoveryRegen?.());
 
 // Юзернейм бота — заменить после создания в BotFather
 const TG_BOT_USERNAME = 'antviz_bot';
@@ -972,6 +983,7 @@ window.toggleDeletePopover=function(){
     document.getElementById('deleteCodeRow').classList.remove('show');
     const cBtn=document.getElementById('deleteConfirmBtn');
     cBtn.textContent='Получить код';cBtn.disabled=false;
+    cBtn.className='btn btn-dark';
     cBtn.setAttribute('onclick','requestDeleteCode()');
     pop.classList.add('show');
     setTimeout(()=>document.getElementById('deleteConfirmInput').focus(),150);
@@ -999,6 +1011,7 @@ window.requestDeleteCode=async function(){
     document.getElementById('deleteCodeRow').classList.add('show');
     setTimeout(()=>document.getElementById('deleteCodeInput')?.focus(), 300);
     btn.textContent='Подтвердить удаление';
+    btn.className='btn btn-danger-solid';
     btn.setAttribute('onclick','confirmDeleteAccount()');
     toast('Код отправлен на почту','success');
   }catch(e){

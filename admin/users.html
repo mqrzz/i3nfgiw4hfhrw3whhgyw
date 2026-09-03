@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Клиенты — Antviz Admin.</title>
+<link rel="icon" href="../img/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f3f4f7}
+:root{
+  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;
+  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
+  --bg:#f3f4f7;--card:#ffffff;
+  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
+  --dark:#14171c;
+  --font:'Geologica','Inter',sans-serif;
+  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --sh-sm:0 1px 2px rgba(20,23,30,.04);
+  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
+  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
+  --maxw:820px;
+}
+body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.35)}
+
+/* m-panel26.js добавляет body{padding-top:78px} (74px на <640px) под свою
+   плавающую капсулу-меню — вычитаем этот отступ явно, иначе низ каждого
+   экрана уезжает за пределы видимой области. */
+.app{display:none;height:calc(100vh - 78px);overflow:hidden;flex-direction:column;background:var(--bg)}
+@media(max-width:640px){.app{height:calc(100vh - 74px)}}
+
+.screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
+.screen.active{display:flex;animation:fadeUp .22s ease both}
+.screen-stack{position:relative;flex:1;min-height:0}
+
+.icon-btn{width:40px;height:40px;border-radius:var(--r-sm);border:none;background:var(--card);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:background .12s}
+.icon-btn:hover{background:var(--line)}
+.icon-btn svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none}
+.icon-btn.ghost{background:none}
+.icon-btn.ghost:hover{background:var(--line)}
+.back-label{display:none;font-size:.86rem;font-weight:500;white-space:nowrap}
+
+/* SCREEN 1 — LIST */
+#screenList .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow-y:auto}
+.list-head{padding-top:36px;flex-shrink:0}
+.page-title{font-size:1.7rem;font-weight:500;letter-spacing:-.02em;margin-bottom:6px}
+.page-sub{font-size:.86rem;color:var(--muted);margin-bottom:18px}
+.page-sub strong{color:var(--text);font-weight:600}
+
+.sb-box{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1.1rem;margin-bottom:18px;transition:border-color .15s,box-shadow .15s}
+.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
+.sb-box svg{width:17px;height:17px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.95rem;font-weight:300;color:var(--text);width:100%}
+
+.list-scroll{flex:1;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
+.or{display:flex;gap:16px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both}
+.or:hover{border-color:var(--line2);box-shadow:var(--sh-md);transform:translateY(-1px)}
+.or-avatar{width:42px;height:42px;border-radius:50%;background:var(--bg);color:var(--muted2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.8rem;font-weight:500}
+.or-avatar svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none}
+.or-body{flex:1;min-width:0}
+.or-top{display:flex;align-items:center;gap:8px;margin-bottom:2px}
+.or-name{font-size:.94rem;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.or-email{font-size:.8rem;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:6px}
+.or-stats{display:flex;gap:14px;font-size:.76rem;color:var(--muted2)}
+.or-stats strong{color:var(--text);font-weight:500}
+.empty-l{text-align:center;padding:64px 16px;color:var(--muted);font-size:.9rem;display:flex;flex-direction:column;gap:10px;align-items:center}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.7rem;font-weight:500;white-space:nowrap;flex-shrink:0}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.b-banned{background:var(--red-soft);color:var(--red)}
+.b-active{background:var(--green-soft);color:var(--green-d)}
+.b-tg{background:var(--info-soft);color:var(--info)}
+
+/* SCREEN 2 — DETAIL */
+#screenDetail .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+.d-topbar{display:flex;align-items:center;gap:12px;padding:22px 0 14px;flex-shrink:0}
+.d-scroll{flex:1;overflow-y:auto;padding-bottom:40px}
+
+.hero{background:var(--dark);border-radius:var(--r-xl);padding:30px 32px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px;position:relative;z-index:1}
+.hero-eyebrow{font-size:.7rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:8px}
+.hero-num{font-size:1.4rem;font-weight:500;letter-spacing:-.02em;color:#fff}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;position:relative;z-index:1}
+.hc{background:rgba(255,255,255,.06);border-radius:var(--r-sm);padding:14px 16px}
+.hc-l{font-size:.64rem;text-transform:uppercase;letter-spacing:.07em;color:rgba(255,255,255,.32);margin-bottom:4px;font-weight:500}
+.hc-v{font-size:.9rem;color:rgba(255,255,255,.9);word-break:break-all}
+
+.sec{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden}
+.sec-h{padding:18px 22px;border-bottom:1px solid var(--line)}
+.sec-title{font-weight:500;font-size:.95rem;letter-spacing:-.01em}
+.sec-b{padding:20px 22px}
+
+.sf{display:flex;flex-direction:column;gap:14px}
+.sf-row{display:flex;flex-direction:column;gap:7px}
+.sf-lbl{font-size:.65rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:500}
+.sf-val{font-size:.9rem}
+.si{background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1rem;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.si:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
+
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.85rem;border:none;border-radius:var(--r-sm);padding:.7rem 1.2rem;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap}
+.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;flex-shrink:0}
+.btn:hover{transform:translateY(-1px)}
+.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
+.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#2b2f33}
+.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
+.btn-danger{background:var(--red-soft);color:var(--red)}.btn-danger:hover{background:#fbdbd6}
+.btn-sm{padding:.5rem 1rem;font-size:.8rem}
+.btn-block{width:100%;justify-content:center}
+
+.duration-row{display:flex;gap:8px;flex-wrap:wrap}
+.sw{position:relative;display:inline-block;width:42px;height:24px;flex-shrink:0}
+.sw input{opacity:0;width:0;height:0}
+.sw-track{position:absolute;inset:0;background:var(--line2);border-radius:999px;cursor:pointer;transition:background .15s}
+.sw-track::before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw input:checked+.sw-track{background:var(--green)}
+.sw input:checked+.sw-track::before{transform:translateX(18px)}
+
+.pm-ov{position:fixed;inset:0;z-index:2000;background:rgba(10,12,16,.5);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .15s;padding:20px}
+.pm-ov.show{opacity:1;pointer-events:all}
+.pm-card{background:var(--card);border-radius:var(--r-lg);padding:26px 26px 22px;width:100%;max-width:380px;box-shadow:var(--sh-lg)}
+.pm-icon{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.pm-icon svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
+.pm-title{font-weight:500;font-size:1rem;letter-spacing:-.01em;margin-bottom:6px}
+.pm-sub{font-size:.83rem;color:var(--muted);line-height:1.5;margin-bottom:18px}
+.pm-actions{display:flex;gap:10px}
+.pm-actions .btn{flex:1;justify-content:center}
+
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast.show{opacity:1;transform:none}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}
+
+@media(max-width:760px){
+  #screenList .inner,#screenDetail .inner{padding:0 16px}
+  .list-head{padding-top:20px}
+  .page-title{font-size:1.4rem}
+  .d-topbar{padding-top:16px}
+  .hero{padding:24px 20px}
+  .hero-grid{grid-template-columns:1fr}
+  #screenDetail .d-topbar .exit-btn{width:auto;padding:0 16px 0 12px;gap:7px;justify-content:flex-start;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--sh-sm)}
+  .back-label{display:inline}
+}
+</style>
+</head>
+<body>
+
+<div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
+
+<div class="pm-ov" id="pmOv" onclick="if(event.target===this)closePromptModal()">
+  <div class="pm-card">
+    <div class="pm-icon" id="pmIcon"></div>
+    <div class="pm-title" id="pmTitle"></div>
+    <div class="pm-sub" id="pmSub"></div>
+    <div class="pm-actions">
+      <button class="btn btn-outline" onclick="closePromptModal()">Отмена</button>
+      <button class="btn" id="pmConfirmBtn">Подтвердить</button>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="appWrap">
+  <div class="screen-stack">
+
+    <!-- SCREEN 1: LIST -->
+    <div class="screen active" id="screenList">
+      <div class="inner">
+        <div class="list-head">
+          <span class="page-title">Клиенты</span>
+          <div class="page-sub">Всего: <strong id="tTotal">—</strong> · забанено: <strong id="tBanned" style="color:var(--red)">—</strong></div>
+          <div class="sb-box">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input type="text" id="searchInp" placeholder="Поиск по имени или email..." oninput="renderList()"/>
+          </div>
+        </div>
+        <div class="list-scroll" id="userList">
+          <div class="empty-l">Загрузка...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCREEN 2: DETAIL -->
+    <div class="screen" id="screenDetail">
+      <div class="inner">
+        <div class="d-topbar">
+          <button class="icon-btn ghost exit-btn" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg><span class="back-label">Выйти</span></button>
+        </div>
+
+        <div class="d-scroll">
+          <div class="hero">
+            <div class="hero-top">
+              <div><div class="hero-eyebrow">Клиент</div><div class="hero-num" id="dId">—</div></div>
+              <div id="dBadge"></div>
+            </div>
+            <div class="hero-grid" id="dHeroInfo"></div>
+          </div>
+
+          <div class="sec">
+            <div class="sec-h"><span class="sec-title">Статистика</span></div>
+            <div class="sec-b"><div class="hero-grid" id="dStatsInfo" style="grid-template-columns:1fr 1fr 1fr"></div></div>
+          </div>
+
+          <div class="sec" id="curBanSec" style="display:none;border-color:#f6cbc2">
+            <div class="sec-h" style="background:var(--red-soft)"><span class="sec-title" style="color:var(--red)">Активный бан</span></div>
+            <div class="sec-b">
+              <div class="sf" id="curBanInfo"></div>
+              <div style="margin-top:16px"><button class="btn btn-green" onclick="unbanUser()"><svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/></svg>Разбанить</button></div>
+            </div>
+          </div>
+
+          <div class="sec" id="banFormSec">
+            <div class="sec-h"><span class="sec-title" id="banFormTitle">Забанить пользователя</span></div>
+            <div class="sec-b">
+              <div class="sf">
+                <div class="sf-row"><div class="sf-lbl">Причина</div><input class="si" id="banReason" type="text" placeholder="Например: спам в чате поддержки"/></div>
+                <div class="sf-row">
+                  <div class="sf-lbl">Срок</div>
+                  <div class="duration-row">
+                    <button class="btn btn-outline btn-sm" onclick="setBanDuration(1)">1 день</button>
+                    <button class="btn btn-outline btn-sm" onclick="setBanDuration(3)">3 дня</button>
+                    <button class="btn btn-outline btn-sm" onclick="setBanDuration(7)">7 дней</button>
+                    <button class="btn btn-outline btn-sm" onclick="setBanDuration(30)">30 дней</button>
+                    <button class="btn btn-outline btn-sm" onclick="setBanDuration(null)">Навсегда</button>
+                  </div>
+                </div>
+                <div class="sf-row"><div class="sf-lbl">Забанен до</div><input class="si" id="banUntil" type="date"/><span style="font-size:.76rem;color:var(--muted);margin-top:4px;display:block" id="banUntilHint">Пусто = навсегда</span></div>
+                <div class="sf-row" style="flex-direction:row;align-items:center;justify-content:space-between">
+                  <div class="sf-lbl" style="margin:0">Показывать кнопку на экране бана</div>
+                  <label class="sw"><input type="checkbox" id="banShowBtn" checked onchange="toggleBanBtnUrl()"/><span class="sw-track"></span></label>
+                </div>
+                <div class="sf-row" id="banBtnUrlRow">
+                  <div class="sf-lbl">Текст и ссылка кнопки</div>
+                  <input class="si" id="banBtnLabel" type="text" placeholder="Написать в поддержку" style="margin-bottom:8px"/>
+                  <input class="si" id="banBtnUrl" type="text" placeholder="https://t.me/antviz_support"/>
+                </div>
+              </div>
+              <div style="margin-top:18px"><button class="btn btn-danger btn-block" onclick="submitBan()">Забанить</button></div>
+            </div>
+          </div>
+
+          <div class="sec">
+            <div class="sec-h"><span class="sec-title">Заказы клиента</span></div>
+            <div class="sec-b no-pad" id="userOrdersSec"><div style="padding:20px 22px;color:var(--muted);font-size:.86rem">Загрузка...</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const API = 'https://antviz.ru/api';
+
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function fmtP(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'0 ₽';}
+function initials(name){return(name||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();}
+
+window.showScreen=function(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(name==='list'?'screenList':'screenDetail').classList.add('active');
+};
+
+function openPromptModal({icon,iconBg,iconColor,title,sub,confirmLabel,confirmClass,onConfirm}){
+  document.getElementById('pmIcon').style.background=iconBg;
+  document.getElementById('pmIcon').style.color=iconColor;
+  document.getElementById('pmIcon').innerHTML='<svg viewBox="0 0 24 24">'+icon+'</svg>';
+  document.getElementById('pmTitle').textContent=title;
+  document.getElementById('pmSub').textContent=sub||'';
+  const btn=document.getElementById('pmConfirmBtn');
+  btn.className='btn '+(confirmClass||'btn-dark');
+  btn.textContent=confirmLabel||'Подтвердить';
+  btn.onclick=()=>{closePromptModal();onConfirm();};
+  document.getElementById('pmOv').classList.add('show');
+}
+window.closePromptModal=()=>document.getElementById('pmOv').classList.remove('show');
+const ICO_UNBAN='<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="M22 4 12 14.01l-3-3"/>';
+
+let allUsers=[], allOrders=[], allBans=new Map(), selUser=null;
+
+function isBanActive(ban){
+  if(!ban)return false;
+  if(!ban.until)return true;
+  return new Date(ban.until).getTime()>Date.now();
+}
+
+function updateStats(){
+  document.getElementById('tTotal').textContent=allUsers.length;
+  let banned=0; allBans.forEach(b=>{if(isBanActive(b))banned++;});
+  document.getElementById('tBanned').textContent=banned;
+}
+
+window.renderList=function(){
+  const q=(document.getElementById('searchInp').value||'').trim().toLowerCase();
+  const list=document.getElementById('userList');
+  let users=allUsers;
+  if(q)users=users.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.displayName||'').toLowerCase().includes(q));
+  if(!users.length){list.innerHTML='<div class="empty-l">Никого не найдено</div>';return;}
+  list.innerHTML=users.map(u=>{
+    const ban=allBans.get(u.id);
+    const banned=isBanActive(ban);
+    return `<div class="or" onclick="selectUserById('${u.id}')">
+      <div class="or-avatar">${esc(initials(u.displayName||u.email))}</div>
+      <div class="or-body">
+        <div class="or-top">${banned?'<span class="badge b-banned">забанен</span>':''}${u.telegramLinked?'<span class="badge b-tg">Telegram</span>':''}</div>
+        <div class="or-name">${esc(u.displayName||'Без имени')}</div>
+        <div class="or-email">${esc(u.email||u.id)}</div>
+        <div class="or-stats"><span><strong>${u.ordersCount||0}</strong> заказ.</span><span><strong>${fmtP(u.totalSpent)}</strong></span></div>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+window.selectUserById=function(uid){
+  const u=allUsers.find(x=>x.id===uid)||{id:uid,email:uid,displayName:''};
+  selUser=u;
+  showScreen('detail');
+  document.getElementById('dId').textContent=u.displayName||u.email||uid;
+  document.getElementById('dHeroInfo').innerHTML=`
+    <div class="hc"><div class="hc-l">Email</div><div class="hc-v">${esc(u.email||'—')}</div></div>
+    <div class="hc"><div class="hc-l">Регистрация</div><div class="hc-v">${fmtDate(u.createdAt)}</div></div>`;
+  document.getElementById('dStatsInfo').innerHTML=`
+    <div class="hc" style="background:var(--bg)"><div class="hc-l" style="color:var(--muted)">Заказов</div><div class="hc-v" style="color:var(--text)">${u.ordersCount||0}</div></div>
+    <div class="hc" style="background:var(--bg)"><div class="hc-l" style="color:var(--muted)">Потрачено</div><div class="hc-v" style="color:var(--green-d);font-weight:500">${fmtP(u.totalSpent)}</div></div>
+    <div class="hc" style="background:var(--bg)"><div class="hc-l" style="color:var(--muted)">Последний заказ</div><div class="hc-v" style="color:var(--text)">${u.lastOrderAt?fmtDate(u.lastOrderAt):'—'}</div></div>`;
+  const ban=allBans.get(uid);
+  const active=isBanActive(ban);
+  document.getElementById('dBadge').innerHTML=active?'<span class="badge b-banned">🚫 Забанен</span>':'<span class="badge b-active">Активен</span>';
+  const curSec=document.getElementById('curBanSec');
+  if(active){
+    curSec.style.display='block';
+    document.getElementById('curBanInfo').innerHTML=`
+      <div class="sf-row"><div class="sf-lbl">Причина</div><div class="sf-val">${esc(ban.reason||'—')}</div></div>
+      <div class="sf-row"><div class="sf-lbl">Срок</div><div class="sf-val">${ban.until?('до '+fmtDate(ban.until)):'навсегда'}</div></div>
+      <div class="sf-row"><div class="sf-lbl">Кто забанил</div><div class="sf-val">${esc(ban.bannedBy||'—')}</div></div>`;
+    document.getElementById('banFormTitle').textContent='Изменить бан';
+  }else{
+    curSec.style.display='none';
+    document.getElementById('banFormTitle').textContent='Забанить пользователя';
+  }
+  document.getElementById('banReason').value=active?(ban.reason||''):'';
+  document.getElementById('banUntil').value='';
+  document.getElementById('banShowBtn').checked=active?(ban.showButton!==false):true;
+  document.getElementById('banBtnLabel').value=active?(ban.btnLabel||'Написать в поддержку'):'Написать в поддержку';
+  document.getElementById('banBtnUrl').value=active?(ban.btnUrl||''):'';
+  toggleBanBtnUrl();
+
+  const userOrders=allOrders.filter(o=>o.uid===uid);
+  const oSec=document.getElementById('userOrdersSec');
+  if(!userOrders.length){oSec.innerHTML='<div style="padding:20px 22px;color:var(--muted);font-size:.86rem">Заказов пока нет</div>';}
+  else{
+    oSec.innerHTML=userOrders.map(o=>`<a href="/admin/orders?id=${o.id}" style="display:flex;align-items:center;gap:10px;padding:14px 22px;text-decoration:none;color:var(--text);border-top:1px solid var(--line)">
+      <span style="font-size:.82rem;font-weight:500">№${o.id.slice(0,7).toUpperCase()}</span>
+      <span style="font-size:.78rem;color:var(--muted)">${esc(o.package||'—')}</span>
+      <span style="margin-left:auto;font-size:.82rem;font-weight:500;color:var(--green-d)">${fmtP(o.totalPrice)}</span>
+    </a>`).join('');
+  }
+};
+
+window.setBanDuration=function(days){
+  const inp=document.getElementById('banUntil');
+  if(days===null){inp.value='';document.getElementById('banUntilHint').textContent='Навсегда — до ручного разбана';return;}
+  const d=new Date();d.setDate(d.getDate()+days);
+  inp.value=d.toISOString().split('T')[0];
+  document.getElementById('banUntilHint').textContent='Пусто = навсегда';
+};
+
+window.toggleBanBtnUrl=function(){
+  document.getElementById('banBtnUrlRow').style.display=document.getElementById('banShowBtn').checked?'block':'none';
+};
+
+async function loadBans(){
+  try{
+    const resp = await fetch(`${API}/bans`, { credentials:'include' });
+    const list = resp.ok ? await resp.json() : [];
+    allBans = new Map(list.map(b=>[b.userId, b]));
+  }catch(e){ allBans = new Map(); }
+  updateStats();renderList();
+  if(selUser)selectUserById(selUser.id);
+}
+
+window.submitBan=async function(){
+  if(!selUser)return;
+  const reason=document.getElementById('banReason').value.trim();
+  if(!reason){toast('Укажите причину бана','error');return;}
+  const untilStr=document.getElementById('banUntil').value;
+  const until=untilStr?new Date(untilStr+'T23:59:59').toISOString():null;
+  const showButton=document.getElementById('banShowBtn').checked;
+  const btnLabel=document.getElementById('banBtnLabel').value.trim()||'Написать в поддержку';
+  const btnUrl=document.getElementById('banBtnUrl').value.trim();
+  if(showButton&&!btnUrl){toast('Укажите ссылку для кнопки или выключите её','error');return;}
+  try{
+    const resp = await fetch(`${API}/bans`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ email: selUser.email, reason, until, showButton, btnLabel, btnUrl }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    toast('Пользователь забанен ✓','success');
+    await loadBans();
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.unbanUser=async function(){
+  if(!selUser)return;
+  const u=selUser;
+  openPromptModal({
+    icon:ICO_UNBAN,iconBg:'var(--green-soft)',iconColor:'var(--green-d)',
+    title:'Снять бан?',sub:'Пользователь сразу получит доступ обратно.',
+    confirmLabel:'Разбанить',confirmClass:'btn-green',
+    onConfirm:async()=>{
+      try{
+        const resp = await fetch(`${API}/bans/${u.id}`, { method:'DELETE', credentials:'include' });
+        if(!resp.ok) throw new Error();
+        toast('Разбанен ✓','success');
+        await loadBans();
+      }
+      catch(e){toast('Ошибка снятия бана','error');}
+    }
+  });
+};
+
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
+
+(async function initUsersPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  document.getElementById('loadingScreen').style.display='none';
+  if(user.role!=='admin'){window.location.href='/';return;}
+  document.getElementById('appWrap').style.display='flex';
+  try{
+    const resp = await fetch(`${API}/users/admin/all`, { credentials:'include' });
+    allUsers = resp.ok ? await resp.json() : [];
+  }catch(e){toast('Не удалось загрузить пользователей','error');}
+  try{
+    const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' });
+    allOrders = resp.ok ? await resp.json() : [];
+    const n=allOrders.filter(o=>o.refundStatus==='requested').length;
+    const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }catch(e){ allOrders=[]; }
+  await loadBans();
+})();
+</script>
+<script src="/m-panel26.js"></script>
+<script src="../GEOBLOCK.js"></script>
+<script src="../maintenance.js"></script>
+</body>
+</html>

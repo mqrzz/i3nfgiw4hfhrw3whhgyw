@@ -33,9 +33,13 @@ svg{display:block}
 .sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 .lt{font-size:13px;color:rgba(255,255,255,.35)}
 
-.app{display:none;height:100vh;overflow:hidden;flex-direction:column;background:var(--bg)}
-.m-trigger{display:none;position:fixed;top:16px;left:16px;z-index:120;width:42px;height:42px;border-radius:var(--r-sm);border:none;background:var(--card);box-shadow:var(--sh-md);color:var(--text);align-items:center;justify-content:center;cursor:pointer}
-.m-trigger svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
+/* m-panel26.js добавляет body{padding-top:78px} (74px на <640px) под свою
+   плавающую капсулу-меню. Этот app-шелл — свой полноэкранный 100vh контейнер
+   с внутренними экранами, поэтому вычитаем этот отступ явно, иначе низ
+   каждого экрана уезжает за пределы видимой области и появляется лишний
+   скролл всей страницы поверх внутреннего скролла .d-scroll/.orders-scroll. */
+.app{display:none;height:calc(100vh - 78px);overflow:hidden;flex-direction:column;background:var(--bg)}
+@media(max-width:640px){.app{height:calc(100vh - 74px)}}
 
 .screen{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--bg)}
 .screen.active{display:flex;animation:fadeUp .22s ease both}
@@ -65,6 +69,25 @@ svg{display:block}
 .sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
 .sb-box svg{width:16px;height:16px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
 .sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);width:100%}
+.copy-id-btn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;margin-left:8px;border:none;border-radius:8px;background:var(--card);color:var(--muted);cursor:pointer;vertical-align:middle}
+.copy-id-btn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+.copy-id-btn:hover{background:var(--line);color:var(--text)}
+.ic-link{color:var(--text);text-decoration:underline;text-decoration-color:var(--line2)}
+.ic-link:hover{color:var(--green-d)}
+.status-history{display:flex;flex-direction:column;gap:2px}
+.sh-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:.82rem}
+.sh-row:last-child{border-bottom:none}
+.sh-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.sh-status{font-weight:500;color:var(--text)}
+.sh-by{color:var(--muted);font-size:.78rem}
+.sh-date{margin-left:auto;color:var(--muted);font-size:.78rem;white-space:nowrap}
+.pay-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:.85rem}
+.pay-row:last-child{border-bottom:none}
+.pay-type{font-weight:500;color:var(--text)}
+.pay-amt{color:var(--green-d);font-weight:500}
+.pay-date{margin-left:auto;color:var(--muted);font-size:.78rem;white-space:nowrap}
+.sort-sel{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.7rem .9rem;font-family:var(--font);font-size:.83rem;font-weight:400;color:var(--text);cursor:pointer;outline:none;flex-shrink:0}
+.sort-sel:focus{border-color:var(--green)}
 .tab-row{display:flex;gap:6px;overflow-x:auto}
 .tab{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-pill);padding:.55rem 1rem;font-family:var(--font);font-size:.83rem;font-weight:400;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap;flex-shrink:0}
 .tab:hover{border-color:var(--muted2);color:var(--text)}
@@ -202,9 +225,8 @@ svg{display:block}
 .pm-actions .btn{flex:1;justify-content:center}
 
 @media (max-width:760px){
-  .m-trigger{display:flex}
   #screenList .inner,#screenDetail .inner{padding:0 16px}
-  .list-head{padding-top:70px}
+  .list-head{padding-top:20px}
   .page-title{font-size:1.4rem}
   .d-topbar{padding-top:16px}
   .hero{padding:24px 20px}
@@ -217,10 +239,6 @@ svg{display:block}
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
-
-<button class="m-trigger" id="mTrigger" onclick="window.openMPanel26 && window.openMPanel26()">
-  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-</button>
 
 <div class="lightbox" id="lightbox" onclick="closeLightbox()"><button class="lb-x" onclick="event.stopPropagation();closeLightbox()">✕</button><img id="lightboxImg" src="" alt=""/></div>
 
@@ -244,7 +262,10 @@ svg{display:block}
     <div class="screen active" id="screenList">
       <div class="inner">
         <div class="list-head">
-          <span class="page-title">Заказы</span>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px">
+            <span class="page-title" style="margin-bottom:0">Заказы</span>
+            <button class="btn btn-outline btn-sm" onclick="exportOrdersCsv()"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Экспорт CSV</button>
+          </div>
 
           <div class="stat-row">
             <div class="stat-chip"><div class="stat-chip-ic" style="background:var(--line);color:var(--muted)"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></svg></div><div><b id="tNew">—</b> <span>новых</span></div></div>
@@ -259,6 +280,17 @@ svg{display:block}
               <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
               <input id="searchInp" type="text" placeholder="Поиск по имени, email, номеру..." oninput="renderList()"/>
             </div>
+            <select class="sort-sel" id="sortSel" onchange="renderList()">
+              <option value="date_desc">Сначала новые</option>
+              <option value="date_asc">Сначала старые</option>
+              <option value="price_desc">Сумма: по убыванию</option>
+              <option value="price_asc">Сумма: по возрастанию</option>
+            </select>
+            <select class="sort-sel" id="typeSel" onchange="renderList()">
+              <option value="all">Сайты и боты</option>
+              <option value="site">Только сайты</option>
+              <option value="bot">Только боты</option>
+            </select>
             <div class="tab-row">
               <button class="tab active" onclick="switchTab('active',this)">Активные</button>
               <button class="tab" onclick="switchTab('done',this)">Завершённые</button>
@@ -326,6 +358,17 @@ svg{display:block}
                 <textarea class="textarea" id="commentInp" placeholder="Внутренний комментарий..." rows="2"></textarea>
                 <div style="margin-top:10px"><button class="btn btn-dark btn-sm" onclick="saveComment()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Сохранить</button></div>
               </div>
+              <div id="statusHistoryBox" style="margin-top:16px"></div>
+            </div>
+          </div>
+
+          <!-- ADMIN NOTES (внутренние, клиенту не видны) -->
+          <div class="sec" style="border-color:#e3c9f5">
+            <div class="sec-h" style="background:#f6ecfd"><div class="sec-h-l"><div class="sec-icon" style="--accent:#9333ea;--accent-bg:#f0dffd"><svg viewBox="0 0 24 24"><path d="M17.5 21H6.5a2 2 0 01-2-2V5a2 2 0 012-2h7l6 6v10a2 2 0 01-2 2z"/><path d="M14 3v6h6"/></svg></div><span class="sec-title" style="color:#9333ea">Внутренние заметки</span></div></div>
+            <div class="sec-b">
+              <div style="font-size:.78rem;color:var(--muted);margin-bottom:10px">Видно только вам, клиент этого не увидит — в отличие от комментария к статусу выше.</div>
+              <textarea class="textarea" id="adminNotesInp" placeholder="Например: проблемный клиент, звонить после 18:00..." rows="3"></textarea>
+              <div style="margin-top:10px"><button class="btn btn-outline btn-sm" onclick="saveAdminNotes()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/></svg>Сохранить заметку</button></div>
             </div>
           </div>
 
@@ -365,6 +408,11 @@ svg{display:block}
               <div class="sec">
                 <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--green-d);--accent-bg:var(--green-soft)"><svg viewBox="0 0 24 24"><path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/></svg></div><span class="sec-title">Обслуживание</span></div></div>
                 <div class="sec-b" id="supBody"></div>
+              </div>
+
+              <div class="sec">
+                <div class="sec-h"><div class="sec-h-l"><div class="sec-icon" style="--accent:var(--info);--accent-bg:var(--info-soft)"><svg viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg></div><span class="sec-title">История платежей</span></div></div>
+                <div class="sec-b" id="paymentsBody"><div class="ic-l">Загрузка...</div></div>
               </div>
 
               <div class="sec" id="reviewSec" style="display:none">
@@ -473,19 +521,26 @@ const STATUS_NOTICE={
 };
 function statusNotice(st){const n=STATUS_NOTICE[st]||STATUS_NOTICE[0];return {title:`${n.emoji} ${n.title}`,text:n.text};}
 const EX={domain_reg:'Домен (рег.ру)',domain_own:'Свой домен',domain:'Домен',seo:'SEO',content:'Контент',shop:'Каталог',urgent:'Срочно',support:'Обслуживание',bot_pay:'Оплата в боте',bot_crm:'Интеграция CRM'};
-const SITE_KIND={static:'Статический',dynamic:'С серверной частью / динамический'};
 const GOALS={leads:'Заявки и звонки',sales:'Продажи онлайн',brand:'Имидж / представительство',info:'Информирование'};
 const READINESS={ready:'Всё готово',partial:'Частично готово',none:'Ничего нет — с нуля'};
 const SHOPPAY={online:'Картой онлайн',sbp:'СБП',cash:'Наличными при получении'};
 const SHOPDELIVERY={courier:'Курьером',pickup:'Самовывоз',post:'Почта / ТК',none:'Доставка не нужна'};
 
-// Заказ считаем "ботовым", если явно указан тип бота — либо через
-// orderType/siteType, либо (для старых заказов без этого поля) по факту
-// заполненного botUsername при пустых полях сайта. Если бэкенд назовёт
-// это поле иначе — здесь единственное место, которое нужно поправить.
+// Заказ считаем "ботовым" по реальному полю order_type, которое теперь
+// заполняется на бэкенде явно при создании заказа. Фолбэк на старую
+// эвристику оставлен только для заказов, оформленных ДО этого фикса
+// (бэкенд сам бэкафиллит их при миграции, но на всякий случай).
 function isBotOrder(o){
-  return o.orderType==='bot' || o.siteType==='bot' || o.productType==='bot'
+  return o.orderType==='bot'
     || (!!( o.botUsername||o.botLink ) && !o.siteDomain && !o.siteUrl && !['static','dynamic'].includes(o.siteType));
+}
+const TARIFF_COLOR={'Старт':'tag-blue','Рост':'tag-green','Масштаб':'tag-purple','Простой бот':'tag-blue','Бот с оплатой':'tag-green','Mini App':'tag-purple'};
+function tariffClass(name){return TARIFF_COLOR[name]||'';}
+// Формат заказа для отображения: реальный siteFormat, если он есть
+// (Лендинг-визитка / Интернет-магазин / Telegram-бот / мини-апп и т.д.),
+// иначе краткая метка по типу — раньше это поле не показывалось вообще.
+function formatLabel(o){
+  return o.siteFormat || (isBotOrder(o)?'Telegram-бот / мини-апп':'—');
 }
 
 async function notifyClient(uid,title,text,button){
@@ -498,6 +553,42 @@ let allOrders=[],allReviews=[];
 let selOrderId=null,selUid=null,currentTab='active';
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function copyOrderId(id){navigator.clipboard.writeText(id).then(()=>toast('Номер заказа скопирован','success')).catch(()=>toast('Не удалось скопировать','error'));}
+
+// Экспортируем ровно то, что сейчас видно на экране — с учётом активного
+// таба, поиска, фильтра по типу и сортировки, а не весь список заказов
+// вслепую. CSV с ; как разделитель и BOM — так Excel на русской локали
+// сразу читает кириллицу и даты корректно, без ручного импорта.
+function csvEscape(v){
+  const s=String(v??'');
+  return /[;"\n]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+}
+window.exportOrdersCsv=function(){
+  const list=getFilteredSortedOrders();
+  if(!list.length){toast('Нечего экспортировать — список пуст','error');return;}
+  const headers=['Номер','Дата создания','Клиент','Email','Тип','Формат','Тариф','Сумма','Оплачено','Статус','Домен'];
+  const rows=list.map(o=>[
+    o.id.slice(0,8).toUpperCase(),
+    fmtDT(o.createdAt),
+    o.clientName||'',
+    o.clientEmail||'',
+    isBotOrder(o)?'Бот':'Сайт',
+    formatLabel(o),
+    o.package||o.tariff||'',
+    o.totalPrice||0,
+    paymentStatus(o).text,
+    statusLabel(o.status),
+    o.siteDomain||'',
+  ]);
+  const csv='\uFEFF'+[headers,...rows].map(r=>r.map(csvEscape).join(';')).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='antviz-orders-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast(`Экспортировано заказов: ${list.length}`,'success');
+};
 
 async function safeUpdate(orderId,data,successMsg){
   try{
@@ -517,7 +608,6 @@ async function safeUpdate(orderId,data,successMsg){
   }
 }
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
 function fmtD(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtP(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
@@ -595,8 +685,7 @@ document.addEventListener('click',e=>{
   if(menu && menu.classList.contains('show') && !menu.contains(e.target) && !e.target.closest('.kebab-wrap .icon-btn')) menu.classList.remove('show');
 });
 
-function renderList(){
-  const el=document.getElementById('orderList');
+function getFilteredSortedOrders(){
   const q=(document.getElementById('searchInp')?.value||'').toLowerCase();
   let list;
   if(currentTab==='archive'){ list=allOrders.filter(o=>o.archived); }
@@ -605,19 +694,34 @@ function renderList(){
     list=currentTab==='active'?notArchived.filter(o=>o.status<5):currentTab==='done'?notArchived.filter(o=>o.status===5):currentTab==='refunds'?notArchived.filter(o=>o.refundStatus==='requested'):currentTab==='revisions'?notArchived.filter(o=>o.revisionRequested):notArchived;
   }
   if(q)list=list.filter(o=>(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)||o.id.toLowerCase().includes(q));
+  const typeF=document.getElementById('typeSel')?.value||'all';
+  if(typeF!=='all')list=list.filter(o=>(isBotOrder(o)?'bot':'site')===typeF);
+  const sortV=document.getElementById('sortSel')?.value||'date_desc';
+  list=[...list].sort((a,b)=>{
+    if(sortV==='price_desc')return(b.totalPrice||0)-(a.totalPrice||0);
+    if(sortV==='price_asc')return(a.totalPrice||0)-(b.totalPrice||0);
+    const da=new Date(a.createdAt||0).getTime(),db=new Date(b.createdAt||0).getTime();
+    return sortV==='date_asc'?da-db:db-da;
+  });
+  return list;
+}
+
+function renderList(){
+  const el=document.getElementById('orderList');
+  const list=getFilteredSortedOrders();
   if(!list.length){el.innerHTML='<div class="empty-l">Нет заказов</div>';return;}
   el.innerHTML=list.map(o=>{
     const t=o.package||o.tariff||'—';
-    const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
+    const bot=isBotOrder(o);
     const pay=paymentStatus(o);
     return`<div class="or" onclick="selectOrder('${o.id}')">
       <div class="or-avatar" style="background:${AVATAR_COLORS[o.status??0]||'#8b93a3'}">${initials(o.clientName)}</div>
       <div class="or-body">
-        <div class="or-top"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${o.refundStatus==='requested'?'<span class="badge" style="background:var(--orange-soft);color:var(--orange-d)">Возврат</span>':''}${o.revisionRequested?'<span class="badge" style="background:var(--purple-soft);color:var(--purple)">Правки</span>':''}</div>
+        <div class="or-top"><span class="or-id">№${o.id.slice(0,7).toUpperCase()}</span><span class="badge ${statusBadgeClass(o.status)}">${statusLabel(o.status)}</span>${bot?'<span class="badge" style="background:var(--info-soft);color:var(--info)">Бот</span>':''}${o.refundStatus==='requested'?'<span class="badge" style="background:var(--orange-soft);color:var(--orange-d)">Возврат</span>':''}${o.revisionRequested?'<span class="badge" style="background:var(--purple-soft);color:var(--purple)">Правки</span>':''}</div>
         <div class="or-name">${esc(o.clientName||'—')}</div>
         <div class="or-email">${esc(o.clientEmail||'')}</div>
         <div class="or-f">
-          <span class="tag ${tc}">${esc(t)}</span>
+          <span class="tag ${tariffClass(t)}">${esc(t)}</span>
           <span class="pay-text" style="color:${pay.cls==='tag-green'?'var(--green-d)':pay.cls==='tag-warn'?'var(--orange-d)':'var(--red)'}">${pay.text}</span>
           <span class="or-price">${fmtP(o.totalPrice)}</span>
         </div>
@@ -644,7 +748,38 @@ window.selectOrder=id=>{
   selUid=o.uid||null;
   showScreen('detail');
   showDetail(o);
+  document.getElementById('paymentsBody').innerHTML='<div class="ic-l">Загрузка...</div>';
+  document.getElementById('statusHistoryBox').innerHTML='';
+  loadStatusHistory(id);
+  loadPayments(id);
 };
+
+async function loadStatusHistory(orderId){
+  const box=document.getElementById('statusHistoryBox');
+  try{
+    const resp=await fetch(`${API}/orders/${orderId}/history`,{credentials:'include'});
+    if(!resp.ok)throw new Error();
+    const rows=await resp.json();
+    if(orderId!==selOrderId)return;
+    if(!rows.length){box.innerHTML='';return;}
+    box.innerHTML=`<div class="ic-l" style="margin-bottom:8px">История статусов</div><div class="status-history">`+
+      rows.map(r=>`<div class="sh-row"><span class="sh-dot"></span><span class="sh-status">${esc(statusLabel(r.status))}</span><span class="sh-by">${r.changedBy?esc(r.changedBy):'система'}</span><span class="sh-date">${fmtDT(r.changedAt)}</span></div>`).join('')+
+      `</div>`;
+  }catch(e){ if(orderId===selOrderId) box.innerHTML=''; }
+}
+
+async function loadPayments(orderId){
+  const box=document.getElementById('paymentsBody');
+  try{
+    const resp=await fetch(`${API}/orders/${orderId}/payments`,{credentials:'include'});
+    if(!resp.ok)throw new Error();
+    const rows=await resp.json();
+    if(orderId!==selOrderId)return;
+    if(!rows.length){box.innerHTML='<div class="ic-l">Платежей пока нет</div>';return;}
+    const TYPE_LABEL={order:'Оплата заказа',partial:'Частичная оплата',remaining:'Доплата остатка',support:'Обслуживание',ticket_once:'Разовая правка'};
+    box.innerHTML=rows.map(p=>`<div class="pay-row"><span class="pay-type">${esc(TYPE_LABEL[p.type]||p.type)}</span><span class="pay-amt">${fmtP(p.amount)}</span><span class="pay-date">${fmtDT(p.createdAt)}</span></div>`).join('');
+  }catch(e){ if(orderId===selOrderId) box.innerHTML='<div class="ic-l">Не удалось загрузить</div>'; }
+}
 
 function renderPipeline(status){
   document.querySelectorAll('.step').forEach(b=>{
@@ -656,14 +791,15 @@ function renderPipeline(status){
 
 function showDetail(o){
   const t=o.package||o.tariff||'—';
-  const tc=t==='Старт'?'tag-blue':t==='Рост'?'tag-green':t==='Масштаб'?'tag-purple':'';
-  document.getElementById('dId').textContent='№ '+o.id.slice(0,8).toUpperCase();
+  const tc=tariffClass(t);
+  document.getElementById('dId').innerHTML=`№ ${esc(o.id.slice(0,8).toUpperCase())} <button class="copy-id-btn" title="Скопировать номер заказа" onclick="copyOrderId('${o.id}')"><svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>`;
   document.getElementById('dClientName').textContent=esc(o.clientName||'—');
   document.getElementById('dPrice').textContent=fmtP(o.totalPrice);
   document.getElementById('dBadge').innerHTML=`<span class="tag ${tc}" style="font-size:.78rem;padding:.35rem 1rem">${esc(t)}</span>`;
+  const pay=paymentStatus(o);
   document.getElementById('dHeroInfo').innerHTML=
-    heroChip('Формат',esc(siteTypeLabel(o.siteType)||(isBotOrder(o)?'Бот / миниапп':'—')))+
-    heroChip('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
+    heroChip('Формат',esc(formatLabel(o)))+
+    heroChip('Оплата',`<span class="tag ${pay.cls}">${pay.text}</span>`)+
     heroChip('Создан',fmtD(o.createdAt))+
     heroChip('Клиент',esc(o.clientEmail||'—'));
   renderPipeline(o.status||0);
@@ -682,6 +818,7 @@ function showDetail(o){
   }else{ ldBox.style.display='none'; ldBox.innerHTML=''; }
 
   document.getElementById('commentInp').value=o.statusComment||'';
+  document.getElementById('adminNotesInp').value=o.adminNotes||'';
   document.getElementById('dateStarted').value=tsToInput(o.startedAt);
   document.getElementById('dateDone').value=tsToInput(o.doneAt);
   document.getElementById('siteDomain').value=o.siteDomain||'';
@@ -692,14 +829,12 @@ function showDetail(o){
   document.getElementById('botUsername').value=o.botUsername||'';
   document.getElementById('botRepo').value=o.siteRepo||'';
 
-  document.getElementById('clientInfo').innerHTML=icCard('Имя',esc(o.clientName||'—'))+icCard('Email',esc(o.clientEmail||'—'));
+  document.getElementById('clientInfo').innerHTML=icCard('Имя',esc(o.clientName||'—'))+icCard('Email',`<a href="mailto:${esc(o.clientEmail||'')}" class="ic-link">${esc(o.clientEmail||'—')}</a>`);
 
   const domOpt=o.domainOption==='new'?'Регистрация на рег.ру':o.domainOption==='own'?'Свой домен':'—';
   const domainDisplay=o.domainName?`<span style="color:var(--green-d);font-weight:500">${esc(o.domainName)}</span>`:domOpt;
-  const pay=paymentStatus(o);
   document.getElementById('orderInfo').innerHTML=
-    icCard('Формат',esc(siteTypeLabel(o.siteType)||(bot?'Бот / миниапп':'—')))+
-    icCard('Тип',esc(SITE_KIND[o.siteKind]||o.siteKind||'—'))+
+    icCard('Формат',esc(formatLabel(o)))+
     icCard('Тариф',esc(t))+
     icCard('Страниц',o.pages||'—')+
     icCard('Домен',domainDisplay)+
@@ -871,6 +1006,7 @@ window.setStatus=async s=>{
   if(ok&&o?.uid){const n=statusNotice(upd.status);await notifyClient(o.uid,n.title,`№${selOrderId.slice(0,7).toUpperCase()} — ${n.text}`,null);}
 };
 window.saveComment=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{statusComment:document.getElementById('commentInp').value.trim()},'Сохранено ✓');};
+window.saveAdminNotes=async()=>{if(!selOrderId)return;await safeUpdate(selOrderId,{adminNotes:document.getElementById('adminNotesInp').value.trim()},'Заметка сохранена ✓');};
 window.saveDate=async(field,val)=>{if(!selOrderId||!val)return;await safeUpdate(selOrderId,{[field]:new Date(val+'T12:00:00').toISOString()},'Дата сохранена ✓');};
 window.saveSite=async()=>{
   if(!selOrderId)return;
@@ -920,7 +1056,7 @@ window.printReceipt=id=>{
   const w=window.open('','_blank','width=600,height=700');
   const date=o.createdAt?new Date(o.createdAt).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'}):'—';
   const pay=paymentStatus(o);
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Тип</td><td>${siteTypeLabel(o.siteType)||'—'}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${pay.text}</td></tr><tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Квитанция — Antviz</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;max-width:480px;margin:48px auto;padding:0 24px;color:#191b1e;font-size:13px;line-height:1.6}.hdr{margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #191b1e}.logo{font-size:22px;font-weight:600;letter-spacing:-.03em}.logo span{color:#1ede7b}.sub{font-size:11px;color:#707a8a;margin-top:3px;text-transform:uppercase;letter-spacing:.06em}table{width:100%;border-collapse:collapse;margin-top:16px}td{padding:8px 0;border-bottom:1px solid #f0f0f0;font-size:13px}td:first-child{color:#707a8a}td:last-child{text-align:right;font-weight:500}.tot td{font-size:15px;font-weight:700;border-bottom:none;padding-top:14px;border-top:2px solid #191b1e}.ftr{margin-top:24px;padding-top:16px;border-top:1px solid #eee;font-size:11px;color:#aaa}</style></head><body><div class="hdr"><div class="logo">Ant<span>viz</span></div><div class="sub">Квитанция по заказу</div></div><table><tr><td>№</td><td>${o.id.slice(0,8).toUpperCase()}</td></tr><tr><td>Дата</td><td>${date}</td></tr><tr><td>Клиент</td><td>${o.clientName||'—'}</td></tr><tr><td>Email</td><td>${o.clientEmail||'—'}</td></tr><tr><td>Формат</td><td>${formatLabel(o)}</td></tr><tr><td>Тариф</td><td>${o.package||o.tariff||'—'}</td></tr><tr><td>Оплата</td><td>${pay.text}</td></tr><tr class="tot"><td>Итого</td><td>${fmtP(o.totalPrice)}</td></tr></table><div class="ftr">antviz.ru · ${date}</div><script>window.onload=()=>window.print();<\/script></body></html>`);
   w.document.close();
 };
 window.doLogout=async()=>{ try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){} window.location.href='/'; };

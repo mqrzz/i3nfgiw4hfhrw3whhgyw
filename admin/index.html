@@ -32,8 +32,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
 .lt{font-size:13px;color:rgba(255,255,255,.35)}
 
-.m-trigger{display:none;position:fixed;top:16px;left:16px;z-index:120;width:42px;height:42px;border-radius:var(--r-sm);border:none;background:var(--card);box-shadow:var(--sh-md);color:var(--text);align-items:center;justify-content:center;cursor:pointer}
-.m-trigger svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none}
 
 .page{display:none;min-height:100vh;overflow-y:auto}
 .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:36px 28px 60px}
@@ -138,7 +136,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--orange);color:#fff}
 
 @media(max-width:760px){
-  .m-trigger{display:flex}
   .inner{padding:70px 16px 40px}
   .hero{padding:24px 20px}
   .hero-text h1{font-size:1.3rem}
@@ -149,10 +146,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 <body>
 
 <div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
-<button class="m-trigger" id="mTrigger" onclick="window.openMPanel26 && window.openMPanel26()">
-  <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-</button>
-
 <div class="page" id="appWrap">
   <div class="inner">
 
@@ -175,11 +168,8 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
       <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
     </div>
 
-    <div class="tariff-row">
-      <div class="tariff-card"><div class="tariff-icon blue">🚀</div><div><div class="tariff-name">Тариф Старт</div><div class="tariff-num" id="sStart">—</div></div></div>
-      <div class="tariff-card"><div class="tariff-icon green">📈</div><div><div class="tariff-name">Тариф Рост</div><div class="tariff-num" id="sGrowth">—</div></div></div>
-      <div class="tariff-card"><div class="tariff-icon purple">⚡</div><div><div class="tariff-name">Тариф Масштаб</div><div class="tariff-num" id="sScale">—</div></div></div>
-    </div>
+    <div class="tariff-row" id="tariffRowSite"></div>
+    <div class="tariff-row" id="tariffRowBot" style="margin-top:12px"></div>
 
     <div class="grid2">
       <div class="sec">
@@ -471,15 +461,22 @@ window.generateAccountingCsv=function(){
     document.getElementById('sDone').textContent=done.length;
     document.getElementById('sRev').textContent=fmtPrice(rev);
     document.getElementById('sAvg').textContent=done.length?fmtPrice(Math.round(rev/done.length)):'—';
-    document.getElementById('sStart').textContent=orders.filter(o=>o.package==='Старт'||o.tariff==='Старт').length;
-    document.getElementById('sGrowth').textContent=orders.filter(o=>o.package==='Рост'||o.tariff==='Рост').length;
-    document.getElementById('sScale').textContent=orders.filter(o=>o.package==='Масштаб'||o.tariff==='Масштаб').length;
+
+    const SITE_TARIFFS=[['Старт','🚀','blue'],['Рост','📈','green'],['Масштаб','⚡','purple']];
+    const BOT_TARIFFS=[['Простой бот','🤖','blue'],['Бот с оплатой','💳','green'],['Mini App','📱','purple']];
+    const buildTariffRow=(list)=>list.map(([name,icon,color])=>{
+      const n=orders.filter(o=>(o.package||o.tariff)===name).length;
+      return `<div class="tariff-card"><div class="tariff-icon ${color}">${icon}</div><div><div class="tariff-name">Тариф ${esc(name)}</div><div class="tariff-num">${n}</div></div></div>`;
+    }).join('');
+    document.getElementById('tariffRowSite').innerHTML=buildTariffRow(SITE_TARIFFS);
+    document.getElementById('tariffRowBot').innerHTML=buildTariffRow(BOT_TARIFFS);
 
     const recent=orders.filter(o=>o.status<5).slice(0,8);
     const tbody=document.querySelector('#recentOrders tbody');
+    const TARIFF_COLOR={'Старт':'tag-blue','Рост':'tag-green','Масштаб':'tag-purple','Простой бот':'tag-blue','Бот с оплатой':'tag-green','Mini App':'tag-purple'};
     tbody.innerHTML=recent.length?recent.map(o=>{
       const tariff=o.package||o.tariff||'—';
-      const cls=tariff==='Старт'?'tag-blue':tariff==='Рост'?'tag-green':'tag-purple';
+      const cls=TARIFF_COLOR[tariff]||'';
       return`<tr onclick="location.href='/admin/orders?id=${o.id}'" style="cursor:pointer">
         <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.72rem;color:var(--muted);margin-top:3px">${fmtDate(o.createdAt)}</div></td>
         <td><div style="font-size:.86rem;font-weight:500">${esc(o.clientName||'—')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(o.clientEmail||'—')}</div></td>

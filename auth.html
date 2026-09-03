@@ -328,9 +328,10 @@
   }
 
   .cf-turnstile{ margin:.4rem 0 .2rem; display:flex; justify-content:center; }
+  body.auth-checking{ visibility:hidden; }
 </style>
 </head>
-<body>
+<body class="auth-checking">
 
 <script src="/GEOBLOCK.js"></script>
 
@@ -518,6 +519,19 @@
 <script type="module">
   const API = 'https://antviz.ru/api';
   const pageWrap = document.getElementById('pageWrap');
+
+  // ── Уже залогинен? Проверяем куку сессии до показа формы входа,
+  // чтобы не мигать формой у тех, кто и так внутри аккаунта.
+  (async function checkExistingSession(){
+    try{
+      const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+      if(resp.ok){
+        window.location.replace('/profile.html');
+        return; // страница уже уходит, дальше ничего не рисуем
+      }
+    }catch(e){ /* сеть недоступна — просто показываем форму входа как обычно */ }
+    document.body.classList.remove('auth-checking');
+  })();
 
   function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
 

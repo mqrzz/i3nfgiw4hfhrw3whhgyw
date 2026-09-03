@@ -14,7 +14,7 @@
     {href:'/admin/orders', label:'Заказы', badge:'navBadgeOrders', icon:'orders'},
     {href:'/admin/tickets', label:'Обслуживание', badge:'navBadgeTickets', icon:'tickets'},
     {href:'/admin/chats', label:'Чаты', badge:'navBadgeChats', icon:'chats'},
-    {href:'/admin/bans', label:'Баны', badge:null, icon:'bans'},
+    {href:'/admin/users', label:'Клиенты', badge:null, icon:'users'},
     {href:'/admin/promos', label:'Промокоды', badge:null, icon:'promos'},
     {href:'/admin/reviews', label:'Отзывы', badge:null, icon:'reviews'}
   ];
@@ -24,7 +24,7 @@
     orders:'<path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/>',
     tickets:'<path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/>',
     chats:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
-    bans:'<circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/>',
+    users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
     promos:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/>',
     reviews:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
     logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',

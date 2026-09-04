@@ -140,7 +140,20 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
   .hero{padding:24px 20px}
   .hero-text h1{font-size:1.3rem}
   .grid2{gap:12px}
+  .live-strip{flex-wrap:wrap}
 }
+
+.live-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:12px 18px;margin-bottom:20px}
+.live-dot-wrap{display:flex;align-items:center;gap:8px;padding-right:8px;border-right:1px solid var(--line);flex-shrink:0}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:liveDotPulse 2s ease-in-out infinite}
+@keyframes liveDotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(30,222,123,.4)}50%{opacity:.7;box-shadow:0 0 0 4px rgba(30,222,123,0)}}
+.live-label{font-size:.76rem;color:var(--muted);white-space:nowrap}
+.live-chip{display:flex;align-items:center;gap:7px;padding:.4rem .9rem;border-radius:var(--r-pill);background:var(--bg);text-decoration:none;color:var(--text);font-size:.82rem;transition:background .15s,transform .12s}
+.live-chip:hover{background:var(--line);transform:translateY(-1px)}
+.live-chip-n{font-weight:600;font-size:.9rem;color:var(--muted2);min-width:14px;text-align:center}
+.live-chip.has-new .live-chip-n{color:var(--green-d)}
+.live-chip.flash{animation:liveFlash .9s ease}
+@keyframes liveFlash{0%{background:var(--green-soft)}100%{background:var(--bg)}}
 </style>
 </head>
 <body>
@@ -153,10 +166,16 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
       <div class="hero-text"><h1>Добро пожаловать, Админ 👋</h1><p>Управляйте заказами, клиентами и настройками сайта</p></div>
       <div class="hero-actions">
         <button class="maint-btn" id="maintBtn" onclick="toggleMaintenance()"><div class="maint-track"></div><span id="maintLabel">Техработы</span></button>
-        <button class="btn btn-outline-dark btn-sm" id="dashRefreshBtn" onclick="loadDashboard()">Обновить</button>
         <a href="/admin/orders" class="btn btn-outline-dark btn-sm">Все заказы →</a>
         <button class="btn btn-green btn-sm" onclick="openNotifModal()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Уведомление</button>
       </div>
+    </div>
+
+    <div class="live-strip" id="liveStrip">
+      <div class="live-dot-wrap"><span class="live-dot"></span><span class="live-label">Обновляется само<span id="liveAgo"></span></span></div>
+      <a href="/admin/orders" class="live-chip" id="liveNewOrders"><span class="live-chip-n">—</span><span>новых заказов</span></a>
+      <a href="/admin/chats" class="live-chip" id="liveUnreadChats"><span class="live-chip-n">—</span><span>непрочитанных в чате</span></a>
+      <a href="/admin/tickets" class="live-chip" id="liveOpenTickets"><span class="live-chip-n">—</span><span>открытых заявок</span></a>
     </div>
 
     <div class="stat-grid">
@@ -231,7 +250,7 @@ const API = 'https://antviz.ru/api';
 
 const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
+function formatLabel(o){return o.siteFormat||(o.orderType==='bot'?'Telegram-бот / мини-апп':'—');}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function fmtDate(ts){if(!ts)return '—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 function fmtPrice(n){return n?Math.round(n).toLocaleString('ru')+' ₽':'—';}
@@ -422,6 +441,65 @@ window.generateAccountingCsv=function(){
   a.click();
 };
 
+// ── Живая полоса "Что нового" ──────────────────────────────────────────
+// Опрашивает заказы/чат/заявки на обслуживание в фоне без участия
+// админа — ручную кнопку "Обновить" убрали специально по просьбе,
+// вместо неё это работает само по расписанию.
+const LIVE_POLL_MS = 20000;
+let liveLastCounts = { orders:null, chats:null, tickets:null };
+let liveLastFetchAt = null;
+
+function liveFlashIfGrew(el, prevVal, newVal){
+  el.querySelector('.live-chip-n').textContent = newVal;
+  el.classList.toggle('has-new', newVal > 0);
+  if (prevVal !== null && newVal > prevVal) {
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  }
+}
+
+async function pollLiveStrip(){
+  try{
+    const [ordersResp, chatsResp, ticketsResp] = await Promise.all([
+      fetch(`${API}/orders/admin/all`, { credentials:'include' }),
+      fetch(`${API}/tickets/admin/all`, { credentials:'include' }),
+      fetch(`${API}/service-tickets/admin/all`, { credentials:'include' }),
+    ]);
+    const orders = ordersResp.ok ? await ordersResp.json() : null;
+    const chats = chatsResp.ok ? await chatsResp.json() : null;
+    const tickets = ticketsResp.ok ? await ticketsResp.json() : null;
+
+    if (orders){
+      const n = orders.filter(o=>(o.status||0)===0).length;
+      liveFlashIfGrew(document.getElementById('liveNewOrders'), liveLastCounts.orders, n);
+      liveLastCounts.orders = n;
+      const rn = orders.filter(o=>o.refundStatus==='requested').length;
+      const b = document.getElementById('navBadgeOrders');
+      if (b){ b.style.display = rn?'':'none'; b.textContent = rn; }
+      window._dashOrders = orders;
+      renderDashboardStats(orders);
+    }
+    if (chats){
+      const n = chats.filter(t=>!t.adminRead).length;
+      liveFlashIfGrew(document.getElementById('liveUnreadChats'), liveLastCounts.chats, n);
+      liveLastCounts.chats = n;
+    }
+    if (tickets){
+      const n = tickets.filter(t=>t.status==='open').length;
+      liveFlashIfGrew(document.getElementById('liveOpenTickets'), liveLastCounts.tickets, n);
+      liveLastCounts.tickets = n;
+    }
+    liveLastFetchAt = Date.now();
+    updateLiveAgoLabel();
+  }catch(e){ console.error('pollLiveStrip:', e); }
+}
+
+function updateLiveAgoLabel(){
+  const el = document.getElementById('liveAgo');
+  if (!el || !liveLastFetchAt) return;
+  const secs = Math.round((Date.now()-liveLastFetchAt)/1000);
+  el.textContent = secs < 5 ? ' · сейчас' : ` · ${secs} сек назад`;
+}
+
 (async function initAdminIndex(){
   let user = null;
   try{
@@ -436,22 +514,17 @@ window.generateAccountingCsv=function(){
   document.getElementById('appWrap').style.display='block';
   refreshMaintStatus();
 
-  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
-    const n=orders.filter(o=>o.refundStatus==='requested').length;
-    const b=document.getElementById('navBadgeOrders');
-    if(b){b.style.display=n?'':'none';b.textContent=n;}
-  }).catch(()=>{});
-
-  window.loadDashboard=async function(){
-    const btn=document.getElementById('dashRefreshBtn');
-    if(btn){btn.disabled=true;btn.textContent='Обновление...';}
+  window.loadDashboard = async function(){
     let orders=null;
     try{
       const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' });
       if(resp.ok) orders = await resp.json();
     }catch(e){ console.error('loadDashboard:', e); }
-    if(btn){btn.disabled=false;btn.textContent='Обновить';}
     if(!orders)return;
+    renderDashboardStats(orders);
+  };
+
+  window.renderDashboardStats = function(orders){
     window._dashOrders=orders;
     const done=orders.filter(o=>o.status===5);
     const rev=done.reduce((s,o)=>s+(o.totalPrice||0),0);
@@ -494,7 +567,7 @@ window.generateAccountingCsv=function(){
         <span style="font-weight:600;font-size:.8rem;color:var(--green-d)">${count}</span>
       </div>`):'<div style="text-align:center;color:var(--muted);font-size:.84rem">Нет данных</div>';
 
-    const byType={};orders.forEach(o=>{const t=siteTypeLabel(o.siteType)||'Другое';byType[t]=(byType[t]||0)+1;});
+    const byType={};orders.forEach(o=>{const t=formatLabel(o)||'Другое';byType[t]=(byType[t]||0)+1;});
     const sorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);const mx=sorted[0]?.[1]||1;
     document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
       <div style="margin-bottom:14px">
@@ -505,6 +578,9 @@ window.generateAccountingCsv=function(){
     document.getElementById('supportStats').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.84rem;padding:12px">Нет активных обслуживаний</div>';
   };
   loadDashboard();
+  pollLiveStrip();
+  setInterval(pollLiveStrip, LIVE_POLL_MS);
+  setInterval(updateLiveAgoLabel, 5000);
 })();
 </script>
 <script src="/m-panel26.js"></script>

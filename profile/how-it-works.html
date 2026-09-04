@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antviz — Как устроен вход</title>
+<style>
+  :root{
+    --bg:        #f4f4f2;
+    --bg-card:   #ececea;
+    --card:      #ffffff;
+    --ink:       #121212;
+    --ink-soft:  #6b6b68;
+    --line:      rgba(18,18,18,0.09);
+    --pill:      #121212;
+    --pill-ink:  #f4f4f2;
+    --green:     #1a7f3c;
+    --danger:    #b3261e;
+    --radius-pill: 999px;
+    --radius-lg:   20px;
+    --radius-xl:   28px;
+    --ease: cubic-bezier(0.65,0,0.35,1);
+  }
+  @media(prefers-color-scheme: dark){
+    :root{
+      --bg:#131313; --bg-card:#1c1c1c; --card:#1a1a1a; --ink:#f2f2f0; --ink-soft:#9a9a96;
+      --line:rgba(255,255,255,.09); --pill:#f2f2f0; --pill-ink:#131313; --green:#35c47a; --danger:#ff6b60;
+    }
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased; font-size:17px; line-height:1.5;
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2.5rem 1.5rem;
+  }
+  @media(prefers-reduced-motion:reduce){ *{transition-duration:.01ms !important; animation-duration:.01ms !important;} }
+
+  .card{
+    position:relative; background:var(--card); border:1px solid var(--line); border-radius:var(--radius-xl);
+    padding:2.4rem 2.4rem 2rem; width:100%; max-width:560px; min-height:520px;
+    display:flex; flex-direction:column;
+    box-shadow:0 24px 60px rgba(18,18,18,.07);
+  }
+  @media(max-width:640px){ .card{ padding:1.7rem 1.4rem 1.5rem; min-height:0; } body{ padding:1.6rem .9rem; } }
+
+  .progress-row{ display:flex; gap:6px; margin-bottom:1.6rem; }
+  .progress-dot{ flex:1; height:4px; border-radius:99px; background:var(--line); overflow:hidden; }
+  .progress-dot i{ display:block; height:100%; width:0%; background:var(--ink); border-radius:99px; transition:width .22s var(--ease); }
+  .progress-dot.done i{ width:100%; }
+  .progress-dot.active i{ width:100%; }
+
+  .slide-stage{ position:relative; flex:1; }
+  .slide{ display:none; }
+  .slide.active{ display:block; animation:slideIn .22s var(--ease); }
+  @keyframes slideIn{ from{opacity:0; transform:translateX(16px);} to{opacity:1; transform:translateX(0);} }
+  .slide.back.active{ animation:slideInBack .22s var(--ease); }
+  @keyframes slideInBack{ from{opacity:0; transform:translateX(-16px);} to{opacity:1; transform:translateX(0);} }
+
+  .slide-icon{
+    width:56px; height:56px; border-radius:16px; background:var(--bg-card);
+    display:flex; align-items:center; justify-content:center; margin-bottom:1.2rem; color:var(--ink);
+  }
+  .slide-icon svg{ width:28px; height:28px; }
+  .slide-icon.yandex{ background:none; }
+
+  .slide h1{ font-size:1.55rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:.6rem; }
+  .slide .lead{ color:var(--ink-soft); font-size:1rem; margin-bottom:1.3rem; }
+
+  .bullet-list{ display:flex; flex-direction:column; gap:10px; margin-bottom:.4rem; }
+  .bullet{ display:flex; gap:12px; align-items:flex-start; }
+  .bullet-dot{
+    width:26px; height:26px; border-radius:50%; background:var(--bg-card); flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; margin-top:1px;
+  }
+  .bullet-dot svg{ width:15px; height:15px; }
+  .bullet-text b{ display:block; font-size:.95rem; font-weight:700; margin-bottom:1px; }
+  .bullet-text span{ display:block; font-size:.88rem; color:var(--ink-soft); line-height:1.45; }
+
+  .scenario-card{
+    background:var(--bg-card); border-radius:var(--radius-lg); padding:1.1rem 1.2rem; margin-bottom:.7rem;
+  }
+  .scenario-card .q{ font-size:.9rem; font-weight:700; margin-bottom:5px; display:flex; gap:8px; }
+  .scenario-card .q span.mark{
+    flex-shrink:0; width:20px; height:20px; border-radius:50%; background:var(--card); color:var(--ink-soft);
+    font-size:.75rem; font-weight:800; display:flex; align-items:center; justify-content:center;
+  }
+  .scenario-card .a{ font-size:.87rem; color:var(--ink-soft); line-height:1.5; padding-left:28px; }
+  .scenario-card .a b{ color:var(--ink); font-weight:600; }
+
+  .nav-row{ display:flex; gap:10px; margin-top:1.6rem; }
+  .btn-main{
+    flex:1; background:var(--pill); color:var(--pill-ink); border:none; border-radius:var(--radius-pill);
+    padding:15px 20px; font-size:1rem; font-weight:700; cursor:pointer; transition:opacity .2s ease, transform .15s ease;
+  }
+  .btn-main:hover{ opacity:.9; }
+  .btn-main:active{ transform:scale(.98); }
+  .btn-back{
+    background:var(--card); color:var(--ink); border:1.5px solid var(--line); border-radius:var(--radius-pill);
+    padding:15px 20px; font-size:1rem; font-weight:600; cursor:pointer; transition:border-color .2s ease;
+  }
+  .btn-back:hover{ border-color:rgba(18,18,18,.3); }
+  .btn-back:disabled{ display:none; }
+  .btn-back svg{ width:18px; height:18px; display:block; }
+
+  .skip-link{ text-align:center; margin-top:1rem; }
+  .skip-link a{
+    color:var(--ink-soft); font-size:.85rem; text-decoration:none; border-bottom:1px solid transparent;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .skip-link a:hover{ color:var(--ink); border-color:var(--ink); }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="progress-row" id="progressRow"></div>
+
+    <div class="slide-stage" id="stage">
+
+      <!-- 1. Обзор -->
+      <div class="slide active" data-slide="0">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h1>Как устроен вход в Antviz</h1>
+        <p class="lead">Без пароля. Основа — email, а дальше вы сами решаете, что добавить: Яндекс, ключ доступа или Authenticator. Ничего из этого не обязательно, кроме email.</p>
+        <div class="bullet-list">
+          <div class="bullet">
+            <div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l4 4L19 7"/></svg></div>
+            <div class="bullet-text"><b>Регистрация — только email или Яндекс</b><span>Пароль нигде не спрашивают, ни при регистрации, ни потом</span></div>
+          </div>
+          <div class="bullet">
+            <div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l4 4L19 7"/></svg></div>
+            <div class="bullet-text"><b>Остальное — по желанию</b><span>Ключ доступа и Authenticator подключаются позже, в Настройках → Безопасность</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Email -->
+      <div class="slide" data-slide="1">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <h1>Email — основа всего</h1>
+        <p class="lead">Единственный способ, который есть всегда и который нельзя отключить. Всё остальное — надстройки поверх него.</p>
+        <div class="bullet-list">
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
+            <div class="bullet-text"><b>Регистрация</b><span>Указываете email — приходит код, вводите его — аккаунт создан</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></div>
+            <div class="bullet-text"><b>Вход</b><span>Тот же принцип: email → код → внутри. Плюс в письме есть ссылка «войти одним кликом», код вводить не обязательно</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-5.5 8.28"/></svg></div>
+            <div class="bullet-text"><b>Это ваш идентификатор</b><span>Именно по email система понимает, что все ваши способы входа — один и тот же аккаунт</span></div></div>
+        </div>
+      </div>
+
+      <!-- 3. Яндекс -->
+      <div class="slide" data-slide="2">
+        <div class="slide-icon yandex"><svg viewBox="0 0 24 24" width="56" height="56"><circle cx="12" cy="12" r="11" fill="#FC3F1D"/><path d="M13.1 6.6h-1.4c-2 0-3 1-3 2.5 0 1.7 1 2.3 2.4 3.2l1.2.8-3.5 5.1H6.6l3.1-4.5c-1.8-1.2-2.8-2.4-2.8-4.5 0-2.6 1.9-4.2 4.9-4.2H15v13.2h-1.9V6.6z" fill="#fff"/></svg></div>
+        <h1>Яндекс ID</h1>
+        <p class="lead">Вход в один клик через Яндекс — без email и кода вообще, если Яндекс уже открыт в браузере.</p>
+        <div class="bullet-list">
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg></div>
+            <div class="bullet-text"><b>Можно с самого начала</b><span>«Продолжить с Яндекс ID» прямо на экране регистрации — аккаунт создастся сразу</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
+            <div class="bullet-text"><b>Можно подключить позже</b><span>Если уже зарегистрированы через email — в Настройках → Безопасность есть кнопка «Подключить Яндекс»</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 9v3a6 6 0 0 0 6 6h3"/></svg></div>
+            <div class="bullet-text"><b>Один аккаунт, не два</b><span>Antviz связывает Яндекс с тем же аккаунтом по email — дубликата не будет (подробнее — на слайде про сценарии)</span></div></div>
+        </div>
+      </div>
+
+      <!-- 4. Passkey -->
+      <div class="slide" data-slide="3">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg></div>
+        <h1>Ключ доступа (Passkey)</h1>
+        <p class="lead">Face ID, Touch ID или Windows Hello вместо email и кода. Самый быстрый способ, но привязан к конкретному устройству.</p>
+        <div class="bullet-list">
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            <div class="bullet-text"><b>Только из настроек</b><span>Подключается после регистрации, в Безопасности — «Добавить ключ доступа»</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M13 2L3 14h7l-1 8 11-14h-8l1-6z"/></svg></div>
+            <div class="bullet-text"><b>Вход без email</b><span>Кнопка на экране входа сама предлагает сохранённый ключ — печатать вообще ничего не нужно</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg></div>
+            <div class="bullet-text"><b>Один ключ — одно устройство</b><span>На новом телефоне или в другом браузере его не будет — там нужен email или Яндекс, а потом можно добавить ключ и туда тоже</span></div></div>
+        </div>
+      </div>
+
+      <!-- 5. Authenticator -->
+      <div class="slide" data-slide="4">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <h1>Authenticator (2FA)</h1>
+        <p class="lead">Google Authenticator, Authy или похожее приложение с 6-значным кодом. Дополнительная защита — и запасной способ входа.</p>
+        <div class="bullet-list">
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg></div>
+            <div class="bullet-text"><b>Подключается по QR</b><span>В Настройках → Безопасность — сканируете код приложением, вводите первый код для подтверждения</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div class="bullet-text"><b>Можно войти и без почты</b><span>На экране входа после email появится кнопка «Код из Authenticator» — если нет доступа к письму, но телефон с приложением при себе</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="12"/><path d="M18.36 6.64a9 9 0 1 1-12.73 0"/></svg></div>
+            <div class="bullet-text"><b>Отключить можно в любой момент</b><span>Резервный код при этом не теряется — он теперь независим от Authenticator</span></div></div>
+        </div>
+      </div>
+
+      <!-- 6. Резервный код -->
+      <div class="slide" data-slide="5">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h4"/></svg></div>
+        <h1>Резервный код</h1>
+        <p class="lead">Один код на крайний случай — если разом нет доступа и к почте, и к телефону.</p>
+        <div class="bullet-list">
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+            <div class="bullet-text"><b>Выпускается в настройках</b><span>Не привязан к Authenticator — можно получить в любой момент, даже без включённой 2FA</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9a3 3 0 0 1 0 6v3a2 2 0 0 0 2 2h3a3 3 0 0 1 6 0h3a2 2 0 0 0 2-2v-3a3 3 0 0 1 0-6V6a2 2 0 0 0-2-2h-3a3 3 0 0 1-6 0H4a2 2 0 0 0-2 2z"/></svg></div>
+            <div class="bullet-text"><b>Одноразовый</b><span>После использования сгорает — систему стоит зайти в Настройки и выпустить новый</span></div></div>
+          <div class="bullet"><div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="bullet-text"><b>Храните отдельно от телефона</b><span>Смысл в том, чтобы он помог, даже если телефон потерян вместе с почтой и Authenticator</span></div></div>
+        </div>
+      </div>
+
+      <!-- 7. Сценарии -->
+      <div class="slide" data-slide="6">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4"/><path d="M12 17h.01"/></svg></div>
+        <h1>Частые ситуации</h1>
+        <p class="lead" style="margin-bottom:1rem">Как это работает на практике:</p>
+
+        <div class="scenario-card">
+          <div class="q"><span class="mark">?</span>Зарегистрировался через email, потом подключил Яндекс — это два аккаунта?</div>
+          <div class="a">Нет. <b>Один и тот же аккаунт</b> — Яндекс просто привязывается к нему по совпадению email. После этого можно входить и email-кодом, и через Яндекс — оба ведут в один и тот же профиль.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="q"><span class="mark">?</span>Зарегистрировался сразу через Яндекс — email вообще есть?</div>
+          <div class="a">Да, Antviz забирает email из вашего Яндекс-аккаунта при первой регистрации и сохраняет его как основной — вход email-кодом будет работать точно так же, как если бы вы регистрировались им с самого начала.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="q"><span class="mark">?</span>Потерял доступ к почте — что делать?</div>
+          <div class="a">Если подключён <b>Authenticator</b> — входите кодом из приложения. Если и его нет — <b>резервным кодом</b>, если он был выпущен. Если ничего из этого нет — только через поддержку.</div>
+        </div>
+        <div class="scenario-card">
+          <div class="q"><span class="mark">?</span>Ключ доступа настроен на телефоне — на компьютере он появится сам?</div>
+          <div class="a">Нет, ключ привязан к конкретному устройству/браузеру. На новом устройстве входите email-кодом или Яндексом, а затем можно добавить туда ещё один ключ.</div>
+        </div>
+      </div>
+
+      <!-- 8. Готово -->
+      <div class="slide" data-slide="7">
+        <div class="slide-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <h1>Готово</h1>
+        <p class="lead">Email работает всегда и его хватит для входа. Если хотите быстрее и надёжнее — вот с чего начать в Настройках → Безопасность:</p>
+        <div class="bullet-list">
+          <div class="bullet">
+            <div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg></div>
+            <div class="bullet-text"><b>Добавить ключ доступа</b><span>Самый быстрый вход, займёт 10 секунд — Face ID, Touch ID или Windows Hello</span></div>
+          </div>
+          <div class="bullet">
+            <div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="bullet-text"><b>Включить Authenticator</b><span>Если аккаунт важен — доп. защита плюс запасной способ входа без почты</span></div>
+          </div>
+          <div class="bullet">
+            <div class="bullet-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="11" fill="#FC3F1D" stroke="none"/><path d="M13.1 6.6h-1.4c-2 0-3 1-3 2.5 0 1.7 1 2.3 2.4 3.2l1.2.8-3.5 5.1H6.6l3.1-4.5c-1.8-1.2-2.8-2.4-2.8-4.5 0-2.6 1.9-4.2 4.9-4.2H15v13.2h-1.9V6.6z" fill="#fff" stroke="none"/></svg></div>
+            <div class="bullet-text"><b>Подключить Яндекс</b><span>Ничего не мешает сделать это позже — привяжется к этому же аккаунту</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-back" id="backBtn" onclick="prevSlide()" aria-label="Назад">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <button class="btn-main" id="nextBtn" onclick="nextSlide()">Продолжить</button>
+    </div>
+    <div class="skip-link"><a href="/profile.html" id="skipLink">Пропустить</a></div>
+  </div>
+
+<script>
+  const TOTAL = document.querySelectorAll('.slide').length;
+  let current = 0;
+
+  // Откуда открыли и какую версию гайда пометить просмотренной — приходит из
+  // settings.html (или welcome.html), чтобы после финиша вернуть человека туда же.
+  const params = new URLSearchParams(location.search);
+  const guideVersion = params.get('v') || '1';
+  const returnTo = params.get('back') ? decodeURIComponent(params.get('back')) : '/profile.html';
+  document.getElementById('skipLink').href = returnTo;
+
+  function markGuideSeen(){
+    try{ localStorage.setItem('antviz_auth_guide_seen', guideVersion); }catch(e){}
+  }
+  document.getElementById('skipLink').addEventListener('click', markGuideSeen);
+
+  const progressRow = document.getElementById('progressRow');
+  for(let i=0;i<TOTAL;i++){
+    const d = document.createElement('div');
+    d.className = 'progress-dot';
+    d.innerHTML = '<i></i>';
+    progressRow.appendChild(d);
+  }
+  const dots = progressRow.querySelectorAll('.progress-dot');
+
+  function render(direction){
+    document.querySelectorAll('.slide').forEach(s=>{
+      s.classList.remove('active','back');
+    });
+    const el = document.querySelector(`.slide[data-slide="${current}"]`);
+    el.classList.add('active');
+    if(direction==='back') el.classList.add('back');
+
+    dots.forEach((d,i)=>{
+      d.classList.toggle('done', i < current);
+      d.classList.toggle('active', i === current);
+    });
+
+    document.getElementById('backBtn').disabled = current === 0;
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.textContent = current === TOTAL-1 ? 'Перейти в кабинет' : 'Продолжить';
+  }
+
+  function nextSlide(){
+    if(current === TOTAL-1){ markGuideSeen(); window.location.href = returnTo; return; }
+    current++;
+    render('forward');
+  }
+  function prevSlide(){
+    if(current === 0) return;
+    current--;
+    render('back');
+  }
+
+  render('forward');
+</script>
+
+</body>
+</html>

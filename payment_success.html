@@ -227,7 +227,7 @@
     <div id="stLoading">
       <div class="icon-wrap"><div class="icon-circle" style="background:var(--bg2);animation:none"><div style="width:32px;height:32px;border:2.5px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .65s linear infinite"></div></div></div>
       <h1 class="success-title" style="animation:none">Проверяем оплату...</h1>
-      <p class="success-desc" style="animation:none;margin-bottom:0">Секунду, проверяем статус заказа</p>
+      <p class="success-desc" style="animation:none;margin-bottom:0">Обычно занимает несколько секунд, иногда до минуты</p>
     </div>
 
     <div id="stSuccess" style="display:none">
@@ -275,8 +275,12 @@
 <script type="module">
   const API = 'https://antviz.ru/api';
   const CHECK_URL = 'https://api-lac-six-78.vercel.app/api/checkPayment';
-  const POLL_ATTEMPTS = 8;
-  const POLL_DELAY_MS = 1500;
+  // ЮKасса шлёт вебхук не мгновенно — обычно за несколько секунд, но иногда
+  // дольше. Раньше здесь ждали всего 8×1.5с=12 секунд, из-за чего страница
+  // объявляла "оплата не подтверждена" даже когда платёж дальше проходил
+  // успешно (просто чуть позже, чем сдавалась эта страница).
+  const POLL_ATTEMPTS = 24;
+  const POLL_DELAY_MS = 2500;
 
   const stLoading = document.getElementById('stLoading');
   const stSuccess = document.getElementById('stSuccess');
@@ -369,7 +373,7 @@
       if (attempt < POLL_ATTEMPTS - 1) await sleep(POLL_DELAY_MS);
     }
 
-    fail('Оплата ещё не подтверждена ЮKассой. Обычно это занимает несколько секунд — зайдите в личный кабинет через минуту.');
+    fail('ЮKасса ещё не прислала подтверждение — иногда это занимает больше минуты. Оплата, скорее всего, уже прошла: проверьте письмо на почте или откройте заказ в личном кабинете.');
   }
 </script>
 <script src="GEOBLOCK.js"></script>

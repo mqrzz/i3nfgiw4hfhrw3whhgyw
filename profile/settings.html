@@ -191,7 +191,7 @@
 
   /* МОДАЛЬНОЕ ОКНО ПО ЦЕНТРУ (удаление аккаунта, Authenticator, резервный код) */
   .modal-overlay{
-    position:fixed; inset:0; z-index:30000;
+    position:fixed; inset:0; z-index:300;
     background:rgba(6,8,7,.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
     display:flex; align-items:center; justify-content:center; padding:20px;
     opacity:0; pointer-events:none; transition:opacity .3s ease;
@@ -205,7 +205,7 @@
     transition:transform .4s var(--spring), opacity .25s ease;
   }
   .modal-overlay.show .modal-box{ transform:translateY(0) scale(1); opacity:1; }
-  .modal-overlay.nested{ z-index:32000; }
+  .modal-overlay.nested{ z-index:320; }
   .security-center-box{ max-width:540px; }
   .security-center-head{ display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
   .security-center-head strong{ font-size:23px; font-weight:800; letter-spacing:-0.02em; }
@@ -1047,6 +1047,17 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape') closeDeleteModal();
 
   if(!user){ window.location.href='../auth'; return; }
   currentUser = user;
+
+  // Показать гайд «Как устроен вход», если человек ещё не видел ТЕКУЩУЮ версию.
+  // AUTH_GUIDE_VERSION поднимаете на 1 при любом значимом изменении в способах
+  // входа — тогда гайд покажется снова даже тем, кто уже смотрел старую версию.
+  const AUTH_GUIDE_VERSION = '1';
+  const seenGuideVersion = localStorage.getItem('antviz_auth_guide_seen');
+  if(seenGuideVersion !== AUTH_GUIDE_VERSION){
+    const back = encodeURIComponent('/profile/settings.html');
+    window.location.replace(`/profile/how-it-works.html?v=${AUTH_GUIDE_VERSION}&back=${back}`);
+    return;
+  }
 
   document.getElementById('settingName').value = user.displayName || '';
   document.getElementById('settingEmail').value = user.email || '';

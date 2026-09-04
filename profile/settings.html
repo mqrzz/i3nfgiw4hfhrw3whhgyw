@@ -119,7 +119,6 @@
   .field-label{display:block;font-size:11px;letter-spacing:0.05em;text-transform:uppercase;color:var(--text-faint);margin-bottom:7px;font-weight:600;}
   .field-input{width:100%;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r14);padding:12px 14px;color:var(--text);font-family:inherit;font-size:14px;font-weight:400;outline:none;transition:border-color .15s;}
   .errmsg{ color:var(--red); font-size:13px; margin-top:2px; min-height:1em; }
-  .code-input-single::-webkit-outer-spin-button,.code-input-single::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
   .field-input:focus{border-color:var(--green);}
   .field-input:disabled{opacity:.55;cursor:default;}
   .field-input::placeholder{color:var(--text-faint);}
@@ -226,7 +225,7 @@
     .delete-pop-head span{ font-size:13px; }
     .delete-pop-icon{ width:38px; height:38px; }
     .delete-pop-icon svg{ width:18px; height:18px; }
-    .code-input-single{ font-size:1.3rem; letter-spacing:4px; padding:13px 16px 13px 20px; }
+    .code-box{ width:40px; height:50px; font-size:1.15rem; }
     .modal-box .btn{ padding:14px 18px; font-size:15px; }
   }
   .delete-pop-head{display:flex;gap:14px;margin-bottom:18px;}
@@ -235,21 +234,25 @@
   .delete-pop-head strong{display:block;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:5px;}
   .delete-pop-head span{display:block;font-size:15px;color:var(--text-dim);line-height:1.5;}
 
-  /* ЕДИНОЕ ПОЛЕ КОДА — как auth.html: один инпут, не ячейки */
-  .code-input-single{
-    width:100%; text-align:center; font-size:1.6rem; font-weight:700; letter-spacing:6px;
-    background:var(--surface2); border:1.5px solid transparent; border-radius:999px;
-    padding:15px 20px 15px 26px; color:var(--text); font-family:inherit; outline:none;
-    transition:border-color .2s ease, background .2s ease; margin-bottom:6px;
+  /* ЯЧЕЙКИ КОДА — 1-в-1 с auth.html (.code-boxes/.code-box), только цвета из тёмной палитры */
+  .code-boxes{ display:flex; gap:8px; justify-content:center; margin-bottom:6px; }
+  .code-box{
+    width:44px; height:54px;
+    text-align:center;
+    font-size:1.3rem; font-weight:700;
+    background:var(--surface2); border:1.5px solid transparent;
+    border-radius:14px; color:var(--text); font-family:inherit;
+    outline:none;
+    transition:border-color .2s ease, background .2s ease;
     -moz-appearance:textfield;
   }
-  .code-input-single::placeholder{ color:var(--text-faint); letter-spacing:6px; }
-  .code-input-single:focus{ border-color:var(--text); background:var(--card-elevated); }
-  .code-input-single.err{ border-color:var(--red); }
+  .code-box::-webkit-outer-spin-button,.code-box::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .code-box.filled{ background:var(--card-elevated); border-color:var(--text); }
+  .code-box.err{ border-color:var(--red); }
 
   /* КАПСУЛЫ — только внутри модалок безопасности/удаления (не весь кабинет) */
   .modal-box .btn{
-    border-radius:999px; padding:16px 22px; font-size:17px; font-weight:700;
+    border-radius:999px; padding:16px 20px; font-size:17px; font-weight:700;
     justify-content:center;
   }
   .modal-box .field-input{
@@ -429,7 +432,8 @@
             <button class="btn btn-ghost" style="padding:5px 10px;font-size:11px" onclick="copyTotpSecret()" type="button">Копировать</button>
           </div>
         </div>
-        <input class="code-input-single" id="totpConfirmInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+        <div class="code-boxes" id="totpConfirmBoxes"></div>
+        <input type="hidden" id="totpConfirmValue">
         <div class="errmsg" id="errTotpConfirm"></div>
         <div class="delete-pop-btns">
           <button class="btn btn-ghost" onclick="cancelTotpSetup()">Отмена</button>
@@ -441,7 +445,8 @@
     <div class="modal-overlay nested" id="totpDisableWrap" onclick="if(event.target===this) closeTotpDisable()">
       <div class="modal-box">
         <div class="delete-pop-head"><strong>Отключить Authenticator</strong><span>Введите текущий код из приложения. Резервный код при этом остаётся — он теперь не привязан к 2FA.</span></div>
-        <input class="code-input-single" id="totpDisableInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="margin-bottom:14px">
+        <div class="code-boxes" id="totpDisableBoxes"></div>
+        <input type="hidden" id="totpDisableInput">
         <div class="delete-pop-btns">
           <button class="btn btn-ghost" onclick="closeTotpDisable()">Отмена</button>
           <button class="btn btn-danger-solid" onclick="confirmTotpDisable()">Отключить</button>
@@ -452,7 +457,8 @@
     <div class="modal-overlay nested" id="recoveryRegenWrap" onclick="if(event.target===this) closeRecoveryRegen()">
       <div class="modal-box">
         <div class="delete-pop-head"><strong id="recoveryRegenTitle">Перевыпустить резервный код</strong><span>Старый код перестанет работать. Введите текущий код Authenticator для подтверждения — резервный код может обойти саму 2FA, поэтому здесь мы дополнительно проверяем.</span></div>
-        <input class="code-input-single" id="recoveryRegenInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code" style="margin-bottom:14px">
+        <div class="code-boxes" id="recoveryRegenBoxes"></div>
+        <input type="hidden" id="recoveryRegenInput">
         <div class="delete-pop-btns">
           <button class="btn btn-ghost" onclick="closeRecoveryRegen()">Отмена</button>
           <button class="btn btn-dark" onclick="confirmRecoveryRegen()">Перевыпустить</button>
@@ -551,7 +557,8 @@
             <div class="delete-code-wrap" id="deleteCodeRow">
               <div class="delete-code-inner">
                 <label class="field-label" style="margin-top:4px">Код из письма</label>
-                <input class="code-input-single" id="deleteCodeInput" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="000000" autocomplete="one-time-code">
+                <div class="code-boxes" id="deleteCodeBoxes"></div>
+                <input type="hidden" id="deleteCodeInput">
               </div>
             </div>
             <div class="delete-pop-btns">
@@ -573,21 +580,51 @@
 <script type="module">
 const API = 'https://antviz.ru/api';
 
-// Единое поле кода (не по цифре на ячейку): чистим нецифры, автосабмит на 6 знаках, Enter — тоже сабмит
-function setupSingleCodeInput(id, onSubmit){
-  const el = document.getElementById(id);
-  if(!el || el.dataset.ready) return;
-  el.dataset.ready = '1';
-  el.addEventListener('input', ()=>{
-    el.value = el.value.replace(/\D/g,'').slice(0,6);
-    el.classList.remove('err');
-    if(el.value.length===6) onSubmit?.();
+// Ячейки кода — 1-в-1 с auth.html: по цифре на поле, автопереход, backspace, paste, стрелки
+function setupCodeBoxes(containerId, hiddenInputId, onSubmit){
+  const container = document.getElementById(containerId);
+  const hidden = document.getElementById(hiddenInputId);
+  if(!container || container.dataset.ready) return;
+  container.dataset.ready = '1';
+  const boxes = [];
+  for(let i=0;i<6;i++){
+    const b = document.createElement('input');
+    b.type='text'; b.inputMode='numeric'; b.maxLength=1; b.className='code-box';
+    b.autocomplete = i===0 ? 'one-time-code' : 'off';
+    container.appendChild(b); boxes.push(b);
+  }
+  function sync(){ hidden.value = boxes.map(b=>b.value).join(''); }
+  boxes.forEach((b,i)=>{
+    b.addEventListener('input', ()=>{
+      b.value = b.value.replace(/\D/g,'').slice(-1);
+      b.classList.toggle('filled', !!b.value);
+      b.classList.remove('err');
+      if(b.value && i<5) boxes[i+1].focus();
+      sync();
+      if(boxes.every(x=>x.value)) onSubmit?.();
+    });
+    b.addEventListener('keydown', e=>{
+      if(e.key==='Backspace' && !b.value && i>0){ boxes[i-1].focus(); }
+      if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); }
+      if(e.key==='ArrowLeft' && i>0) boxes[i-1].focus();
+      if(e.key==='ArrowRight' && i<5) boxes[i+1].focus();
+    });
+    b.addEventListener('paste', e=>{
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+      text.split('').forEach((ch,idx)=>{ if(boxes[idx]){ boxes[idx].value=ch; boxes[idx].classList.add('filled'); } });
+      sync();
+      boxes[Math.min(text.length,5)]?.focus();
+      if(text.length===6) onSubmit?.();
+    });
   });
-  el.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); onSubmit?.(); } });
+  container._focusFirst = () => boxes[0]?.focus();
+  container._reset = () => { boxes.forEach(b=>{b.value='';b.classList.remove('filled','err');}); sync(); boxes[0]?.focus(); };
+  container._markErr = () => boxes.forEach(b=>b.classList.add('err'));
 }
-setupSingleCodeInput('deleteCodeInput', ()=>window.confirmDeleteAccount?.());
-setupSingleCodeInput('totpDisableInput', ()=>window.confirmTotpDisable?.());
-setupSingleCodeInput('recoveryRegenInput', ()=>window.confirmRecoveryRegen?.());
+setupCodeBoxes('deleteCodeBoxes','deleteCodeInput', ()=>window.confirmDeleteAccount?.());
+setupCodeBoxes('totpDisableBoxes','totpDisableInput', ()=>window.confirmTotpDisable?.());
+setupCodeBoxes('recoveryRegenBoxes','recoveryRegenInput', ()=>window.confirmRecoveryRegen?.());
 
 // Юзернейм бота — заменить после создания в BotFather
 const TG_BOT_USERNAME = 'antviz_bot';
@@ -801,10 +838,9 @@ window.toggleTotpPanel = async function(){
     document.getElementById('totpQr').src = data.qrDataUrl;
     document.getElementById('totpSecretValue').textContent = data.secret.match(/.{1,4}/g).join(' ');
     _totpSecretRaw = data.secret;
-    setupSingleCodeInput('totpConfirmInput', ()=>window.confirmTotp());
-    document.getElementById('totpConfirmInput').value='';
+    setupCodeBoxes('totpConfirmBoxes','totpConfirmValue', ()=>window.confirmTotp());
+    document.getElementById('totpConfirmBoxes')._reset?.();
     document.getElementById('errTotpConfirm').textContent='';
-    setTimeout(()=>document.getElementById('totpConfirmInput')?.focus(), 300);
   }catch(e){ toast(e.message,'error'); wrap.classList.remove('show'); }
 };
 let _totpSecretRaw = '';
@@ -813,7 +849,7 @@ window.copyTotpSecret = function(){
 };
 window.cancelTotpSetup = function(){ document.getElementById('totpSetupWrap').classList.remove('show'); };
 window.confirmTotp = async function(){
-  const token = document.getElementById('totpConfirmInput').value;
+  const token = document.getElementById('totpConfirmValue').value;
   if(token.length!==6) return;
   const btn = document.getElementById('totpConfirmBtn');
   btn.disabled = true; btn.textContent = 'Проверяем…';
@@ -830,12 +866,12 @@ window.confirmTotp = async function(){
   }catch(e){
     toast(e.message,'error');
     document.getElementById('errTotpConfirm').textContent = e.message;
-    document.getElementById('totpConfirmInput').classList.add('err');
+    document.getElementById('totpConfirmBoxes')._markErr?.();
   }
   finally{ btn.disabled = false; btn.textContent = 'Подтвердить'; }
 };
-window.openTotpDisable = function(){ document.getElementById('totpDisableWrap').classList.add('show'); };
-window.closeTotpDisable = function(){ document.getElementById('totpDisableWrap').classList.remove('show'); document.getElementById('totpDisableInput').value=''; };
+window.openTotpDisable = function(){ document.getElementById('totpDisableWrap').classList.add('show'); document.getElementById('totpDisableBoxes')._reset?.(); };
+window.closeTotpDisable = function(){ document.getElementById('totpDisableWrap').classList.remove('show'); document.getElementById('totpDisableBoxes')._reset?.(); };
 window.confirmTotpDisable = async function(){
   const token = document.getElementById('totpDisableInput').value.trim();
   if(!token){ toast('Введите код','error'); return; }
@@ -847,9 +883,8 @@ window.confirmTotpDisable = async function(){
     renderSecuritySummary();
     closeTotpDisable();
     toast('Authenticator отключён','success');
-  }catch(e){ toast(e.message,'error'); }
+  }catch(e){ toast(e.message,'error'); document.getElementById('totpDisableBoxes')._markErr?.(); }
 };
-
 // ── Резервный код ──
 function renderRecoveryRow(){
   const issued = security?.recoveryCodeIssued;
@@ -862,6 +897,7 @@ window.handleRecoveryAction = async function(){
   if(security?.totpEnabled){
     document.getElementById('recoveryRegenTitle').textContent = security.recoveryCodeIssued ? 'Перевыпустить резервный код' : 'Выпустить резервный код';
     document.getElementById('recoveryRegenWrap').classList.add('show');
+    document.getElementById('recoveryRegenBoxes')._reset?.();
     return;
   }
   const msg = security?.recoveryCodeIssued ? 'Перевыпустить резервный код? Старый перестанет работать.' : 'Выпустить резервный код?';
@@ -874,7 +910,7 @@ window.handleRecoveryAction = async function(){
     toast('Резервный код выпущен','success');
   }catch(e){ toast(e.message,'error'); }
 };
-window.closeRecoveryRegen = function(){ document.getElementById('recoveryRegenWrap').classList.remove('show'); document.getElementById('recoveryRegenInput').value=''; };
+window.closeRecoveryRegen = function(){ document.getElementById('recoveryRegenWrap').classList.remove('show'); document.getElementById('recoveryRegenBoxes')._reset?.(); };
 window.confirmRecoveryRegen = async function(){
   const token = document.getElementById('recoveryRegenInput').value.trim();
   if(!token){ toast('Введите код','error'); return; }
@@ -885,7 +921,7 @@ window.confirmRecoveryRegen = async function(){
     renderRecoveryRow();
     showRecoveryCode(data.recoveryCode);
     toast('Резервный код выпущен','success');
-  }catch(e){ toast(e.message,'error'); }
+  }catch(e){ toast(e.message,'error'); document.getElementById('recoveryRegenBoxes')._markErr?.(); }
 };
 let _recoveryCodeShown = '';
 function showRecoveryCode(code){
@@ -979,7 +1015,7 @@ window.toggleDeletePopover=function(){
   const willShow=!pop.classList.contains('show');
   if(willShow){
     document.getElementById('deleteConfirmInput').value='';
-    document.getElementById('deleteCodeInput').value='';
+    document.getElementById('deleteCodeBoxes')._reset?.();
     document.getElementById('deleteCodeRow').classList.remove('show');
     const cBtn=document.getElementById('deleteConfirmBtn');
     cBtn.textContent='Получить код';cBtn.disabled=false;
@@ -1009,7 +1045,7 @@ window.requestDeleteCode=async function(){
   try{
     await apiCall('POST', '/auth/send-code', { purpose: 'delete_account' });
     document.getElementById('deleteCodeRow').classList.add('show');
-    setTimeout(()=>document.getElementById('deleteCodeInput')?.focus(), 300);
+    setTimeout(()=>document.getElementById('deleteCodeBoxes')._focusFirst?.(), 300);
     btn.textContent='Подтвердить удаление';
     btn.className='btn btn-danger-solid';
     btn.setAttribute('onclick','confirmDeleteAccount()');
@@ -1032,6 +1068,7 @@ window.confirmDeleteAccount=async function(){
     window.location.href='../auth';
   }catch(e){
     toast(e.message,'error');
+    document.getElementById('deleteCodeBoxes')._markErr?.();
     btn.textContent='Подтвердить удаление';btn.disabled=false;
   }
 };

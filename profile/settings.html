@@ -259,6 +259,8 @@
     margin-bottom:14px; font-size:16px; padding:15px 20px; border-radius:999px; background:var(--surface2);
   }
   .modal-box .field-label{ font-size:12px; margin-bottom:8px; }
+  .passkey-row{ background:var(--surface2); border:1px solid var(--stroke); border-radius:16px; padding:12px 16px; margin-bottom:8px; }
+  .passkey-row .btn{ padding:9px 16px; font-size:14px; }
   .delete-code-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .38s var(--spring);}
   .delete-code-wrap.show{grid-template-rows:1fr;}
   .delete-code-inner{overflow:hidden;}
@@ -779,9 +781,9 @@ function renderPasskeyRows(){
     ? `Подключено ключей: ${passkeys.length}`
     : 'Вход по Face ID, Touch ID или Windows Hello — без кода с почты';
   list.innerHTML = passkeys.map(p => `
-    <div class="danger-row" style="padding:10px 12px;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:12px">
-      <div><h4 style="font-size:13px;margin:0 0 2px">${p.device_name || 'Ключ доступа'}</h4><p style="font-size:11px;color:var(--text-dim);margin:0">Добавлен ${new Date(p.created_at).toLocaleDateString('ru-RU')}</p></div>
-      <button class="btn btn-ghost" style="padding:6px 12px;font-size:12px" onclick="removePasskey('${p.id}')">Удалить</button>
+    <div class="danger-row passkey-row">
+      <div><h4>${p.device_name || 'Ключ доступа'}</h4><p>Добавлен ${new Date(p.created_at).toLocaleDateString('ru-RU')}</p></div>
+      <button class="btn btn-ghost" onclick="removePasskey('${p.id}')">Удалить</button>
     </div>`).join('');
 }
 window.addPasskey = async function(){

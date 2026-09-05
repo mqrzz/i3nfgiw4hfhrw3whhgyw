@@ -16,7 +16,9 @@
     {href:'/admin/chats', label:'Чаты', badge:'navBadgeChats', icon:'chats'},
     {href:'/admin/users', label:'Клиенты', badge:null, icon:'users'},
     {href:'/admin/promos', label:'Промокоды', badge:null, icon:'promos'},
-    {href:'/admin/reviews', label:'Отзывы', badge:null, icon:'reviews'}
+    {href:'/admin/reviews', label:'Отзывы', badge:null, icon:'reviews'},
+    {href:'/admin/enterprise', label:'Крупные проекты', badge:'navBadgeEnterprise', icon:'enterprise'},
+    {href:'/admin/system', label:'Система', badge:null, icon:'system'}
   ];
 
   var ICONS = {
@@ -27,6 +29,8 @@
     users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
     promos:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/>',
     reviews:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+    enterprise:'<rect x="3" y="7" width="18" height="14" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/><path d="M3 12h18"/>',
+    system:'<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>',
     logout:'<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/>',
     chevron:'<polyline points="6 9 12 15 18 9"/>'
   };

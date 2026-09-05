@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Система — Antviz Admin</title>
+<link rel="icon" href="../img/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f3f4f7}
+:root{
+  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;
+  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
+  --bg:#f3f4f7;--card:#ffffff;
+  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
+  --dark:#14171c;
+  --font:'Geologica','Inter',sans-serif;
+  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
+  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
+  --maxw:1160px;
+}
+body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.35)}
+
+.page{display:none;min-height:100vh;overflow-y:auto}
+.inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:36px 28px 60px}
+
+.hero{background:var(--dark);border-radius:var(--r-xl);padding:32px 36px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
+.hero-text{position:relative;z-index:1}
+.hero-text h1{font-size:1.6rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
+.hero-text p{font-size:.88rem;color:rgba(255,255,255,.42)}
+.hero-btn{position:relative;z-index:1}
+
+.section-label{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:28px 0 12px}
+.section-label:first-child{margin-top:0}
+
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:8px}
+.stat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;transition:box-shadow .15s,transform .15s}
+.stat-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.stat-label{font-size:.66rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:9px}
+.stat-num{font-size:1.7rem;font-weight:600;line-height:1;letter-spacing:-.03em;margin-bottom:5px;color:var(--text)}
+.stat-num.warn{color:var(--orange-d)}.stat-num.danger{color:var(--red)}.stat-num.ok{color:var(--green-d)}
+.stat-sub{font-size:.74rem;color:var(--muted)}
+.bar-track{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:10px}
+.bar-fill{height:100%;border-radius:99px;background:var(--green);transition:width .4s}
+.bar-fill.warn{background:var(--orange)}.bar-fill.danger{background:var(--red)}
+
+.charts-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:8px}
+@media(max-width:900px){.charts-grid{grid-template-columns:1fr}}
+.sec{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
+.sec-h{padding:16px 20px;border-bottom:1px solid var(--line);font-weight:500;font-size:.9rem;letter-spacing:-.01em}
+.sec-b{padding:18px 20px}
+.chart-box{position:relative;height:220px}
+
+.danger-zone{border:1.5px dashed var(--red);border-radius:var(--r-lg);background:var(--red-soft);padding:20px 22px;margin-bottom:14px}
+.danger-zone h2{font-size:1.05rem;font-weight:500;color:var(--red);letter-spacing:-.01em;margin-bottom:4px}
+.danger-zone>p{font-size:.85rem;color:#a83f2f;margin-bottom:18px}
+
+.dz-block{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px 18px;margin-bottom:12px}
+.dz-block:last-child{margin-bottom:0}
+.dz-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.dz-title{font-weight:500;font-size:.92rem}
+.sb-box{display:flex;align-items:center;gap:9px;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.6rem .9rem;transition:border-color .15s;flex:1;min-width:200px;max-width:340px}
+.sb-box:focus-within{border-color:var(--green)}
+.sb-box svg{width:15px;height:15px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
+.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.85rem;font-weight:300;color:var(--text);width:100%}
+.dz-list{max-height:280px;overflow-y:auto;border-top:1px solid var(--line);margin-top:6px}
+.dz-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);font-size:.83rem}
+.dz-row:last-child{border-bottom:none}
+.dz-row-main{min-width:0;flex:1}
+.dz-row-main b{font-weight:500}
+.dz-row-sub{color:var(--muted);font-size:.75rem;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dz-empty{padding:20px 4px;text-align:center;color:var(--muted);font-size:.83rem}
+
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.85rem;border:none;border-radius:var(--r-sm);padding:.7rem 1.2rem;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.btn:hover{transform:translateY(-1px)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#d1523f}
+.btn-sm{padding:.42rem .85rem;font-size:.78rem}
+.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
+
+.badge{display:inline-flex;align-items:center;gap:5px;padding:.2rem .6rem;border-radius:var(--r-pill);font-size:.68rem;font-weight:500;white-space:nowrap;flex-shrink:0}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.b-images{background:var(--purple-soft);color:var(--purple)}
+
+.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
+.toast.show{opacity:1;transform:none}
+.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}
+
+@media(max-width:760px){
+  .inner{padding:70px 16px 40px}
+  .hero{padding:24px 20px}
+  .hero-text h1{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+
+<div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
+<div class="page" id="appWrap">
+  <div class="inner">
+    <div class="hero">
+      <div class="hero-text"><h1>Система</h1><p>Ресурсы сервера, статистика сервиса и управление данными</p></div>
+      <button class="btn btn-outline hero-btn" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18);color:#fff" onclick="window.reloadAll()">Обновить</button>
+    </div>
+
+    <div class="section-label">Сервер</div>
+    <div class="stat-grid" id="serverStats"></div>
+
+    <div class="section-label">Сервис</div>
+    <div class="charts-grid">
+      <div class="sec">
+        <div class="sec-h">Выручка за 6 месяцев</div>
+        <div class="sec-b"><div class="chart-box"><canvas id="revenueChart"></canvas></div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">Заказы по статусу</div>
+        <div class="sec-b"><div class="chart-box"><canvas id="ordersChart"></canvas></div></div>
+      </div>
+    </div>
+    <div class="charts-grid">
+      <div class="sec">
+        <div class="sec-h">Новые пользователи</div>
+        <div class="sec-b"><div class="chart-box"><canvas id="usersChart"></canvas></div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-h">Поддержка и обслуживание</div>
+        <div class="sec-b" id="ticketStatsBox"></div>
+      </div>
+    </div>
+
+    <div class="danger-zone">
+      <h2>Опасная зона</h2>
+      <p>Удаление здесь необратимо и происходит сразу — без черновиков и корзины. Дважды проверяйте, что удаляете нужную запись.</p>
+
+      <div class="dz-block">
+        <div class="dz-head">
+          <span class="dz-title">Пользователи</span>
+          <div class="sb-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Поиск по email или имени..." id="userSearch" oninput="window.renderUsers()"/></div>
+        </div>
+        <div class="dz-list" id="userList"></div>
+      </div>
+
+      <div class="dz-block">
+        <div class="dz-head">
+          <span class="dz-title">Заказы</span>
+          <div class="sb-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Поиск по ID, имени или email..." id="orderSearch" oninput="window.renderOrders()"/></div>
+        </div>
+        <div class="dz-list" id="orderList"></div>
+      </div>
+
+      <div class="dz-block">
+        <div class="dz-head">
+          <span class="dz-title">Чаты поддержки <span style="font-weight:300;color:var(--muted);font-size:.78rem">(сообщения и фото удаляются вместе с чатом)</span></span>
+          <div class="sb-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Поиск по теме или email..." id="ticketSearch" oninput="window.renderTickets()"/></div>
+        </div>
+        <div class="dz-list" id="ticketList"></div>
+      </div>
+
+      <div class="dz-block">
+        <div class="dz-head">
+          <span class="dz-title">Заявки на обслуживание</span>
+          <div class="sb-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Поиск по названию или email..." id="serviceSearch" oninput="window.renderService()"/></div>
+        </div>
+        <div class="dz-list" id="serviceList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const API = 'https://antviz.ru/api';
+
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtBytes(b){if(!b&&b!==0)return'—';const gb=b/1024/1024/1024;return gb>=1?gb.toFixed(1)+' ГБ':(b/1024/1024).toFixed(0)+' МБ';}
+function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
+const ORDER_STATUS_LABEL={'-1':'Ждёт оплаты',0:'Оплачен',1:'В работе',2:'Правки',3:'Тестирование',4:'Готово',5:'Сдан',6:'Завершён'};
+
+let allUsers=[], allOrders=[], allTickets=[], allService=[];
+let charts={};
+
+function renderServerStats(server){
+  const el = document.getElementById('serverStats');
+  const memPct = server.memory.usedPercent;
+  const diskPct = server.disk ? server.disk.usedPercent : null;
+  const memClass = memPct>85?'danger':(memPct>65?'warn':'ok');
+  const diskClass = diskPct==null?'':(diskPct>85?'danger':(diskPct>65?'warn':'ok'));
+  el.innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Память (RAM)</div>
+      <div class="stat-num ${memClass}">${memPct}%</div>
+      <div class="stat-sub">${fmtBytes(server.memory.usedBytes)} из ${fmtBytes(server.memory.totalBytes)}</div>
+      <div class="bar-track"><div class="bar-fill ${memClass==='ok'?'':memClass}" style="width:${memPct}%"></div></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Диск</div>
+      <div class="stat-num ${diskClass||''}">${diskPct!=null?diskPct+'%':'н/д'}</div>
+      <div class="stat-sub">${server.disk?fmtBytes(server.disk.usedBytes)+' из '+fmtBytes(server.disk.totalBytes):'Недоступно на этой системе'}</div>
+      ${diskPct!=null?`<div class="bar-track"><div class="bar-fill ${diskClass==='ok'?'':diskClass}" style="width:${diskPct}%"></div></div>`:''}
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Аптайм сервера</div>
+      <div class="stat-num">${server.uptimeLabel}</div>
+      <div class="stat-sub">Загрузка (1/5/15 мин): ${server.loadavg.map(n=>n.toFixed(2)).join(' / ')}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Платформа</div>
+      <div class="stat-num" style="font-size:1.1rem">${esc(server.nodeVersion)}</div>
+      <div class="stat-sub">${esc(server.platform)} · ${server.cpus} CPU</div>
+    </div>
+  `;
+}
+
+function renderTicketStats(business){
+  const t = Object.fromEntries((business.ticketsByStatus||[]).map(r=>[r.status,r.n]));
+  const s = Object.fromEntries((business.serviceTicketsByStatus||[]).map(r=>[r.status,r.n]));
+  const e = Object.fromEntries((business.enterpriseByStatus||[]).map(r=>[r.status,r.n]));
+  document.getElementById('ticketStatsBox').innerHTML = `
+    <div class="stat-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+      <div class="stat-card"><div class="stat-label">Открытые чаты</div><div class="stat-num warn">${t.open||0}</div><div class="stat-sub">Закрыто: ${t.done||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Заявки на обслуживание</div><div class="stat-num warn">${s.open||0}</div><div class="stat-sub">Закрыто: ${s.done||0}</div></div>
+      <div class="stat-card"><div class="stat-label">Крупные проекты</div><div class="stat-num warn">${e.new||0}</div><div class="stat-sub">Новых заявок</div></div>
+    </div>
+  `;
+}
+
+function renderCharts(business){
+  const months = business.revenueByMonth.map(r=>r.month);
+  const revenue = business.revenueByMonth.map(r=>r.revenue);
+  const usersMonths = business.newUsersByMonth.map(r=>r.month);
+  const usersCounts = business.newUsersByMonth.map(r=>r.n);
+  const statusRows = business.ordersByStatus || [];
+
+  Object.values(charts).forEach(c=>c && c.destroy());
+
+  charts.revenue = new Chart(document.getElementById('revenueChart'), {
+    type:'bar',
+    data:{ labels:months, datasets:[{ label:'Выручка, ₽', data:revenue, backgroundColor:'#1ede7b', borderRadius:8 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+  });
+
+  charts.orders = new Chart(document.getElementById('ordersChart'), {
+    type:'doughnut',
+    data:{
+      labels: statusRows.map(r=>ORDER_STATUS_LABEL[r.status]||('Статус '+r.status)),
+      datasets:[{ data: statusRows.map(r=>r.n), backgroundColor:['#3b82f6','#7c3aed','#f59e0b','#1ede7b','#0fc7c0','#e8634f','#818997'] }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:10,font:{size:10}}}} }
+  });
+
+  charts.users = new Chart(document.getElementById('usersChart'), {
+    type:'line',
+    data:{ labels:usersMonths, datasets:[{ label:'Новые пользователи', data:usersCounts, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,.12)', fill:true, tension:.35 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true}} }
+  });
+}
+
+// ── Опасная зона: поиск + удаление ──
+window.renderUsers = () => {
+  const q = (document.getElementById('userSearch').value||'').toLowerCase();
+  const list = q ? allUsers.filter(u=>(u.email||'').toLowerCase().includes(q)||(u.displayName||'').toLowerCase().includes(q)) : allUsers.slice(0,30);
+  const el = document.getElementById('userList');
+  if(!list.length){ el.innerHTML = `<div class="dz-empty">Никого не найдено</div>`; return; }
+  el.innerHTML = list.map(u=>`
+    <div class="dz-row">
+      <div class="dz-row-main"><b>${esc(u.displayName||u.email)}</b><div class="dz-row-sub">${esc(u.email)} · ${u.role==='admin'?'админ':'клиент'} · с ${fmtDate(u.createdAt)}</div></div>
+      <button class="btn btn-danger btn-sm" onclick="window.deleteUser('${u.id}')">Удалить</button>
+    </div>`).join('');
+};
+window.deleteUser = async (id) => {
+  if(!confirm('Удалить пользователя и ВСЕ его данные (заказы, тикеты, сессии) без возможности восстановления?')) return;
+  try{
+    const resp = await fetch(`${API}/users/${id}`, { method:'DELETE', credentials:'include' });
+    const data = await resp.json().catch(()=>({}));
+    if(!resp.ok) throw new Error(data.error||'Ошибка');
+    toast('Пользователь удалён','info');
+    allUsers = allUsers.filter(u=>u.id!==id);
+    window.renderUsers();
+  }catch(e){ toast(e.message||'Ошибка удаления','error'); }
+};
+
+window.renderOrders = () => {
+  const q = (document.getElementById('orderSearch').value||'').toLowerCase();
+  const list = q ? allOrders.filter(o=>(o.id||'').toLowerCase().includes(q)||(o.clientName||'').toLowerCase().includes(q)||(o.clientEmail||'').toLowerCase().includes(q)) : allOrders.slice(0,30);
+  const el = document.getElementById('orderList');
+  if(!list.length){ el.innerHTML = `<div class="dz-empty">Ничего не найдено</div>`; return; }
+  el.innerHTML = list.map(o=>`
+    <div class="dz-row">
+      <div class="dz-row-main"><b>${esc(o.clientName||o.clientEmail)}</b><div class="dz-row-sub">#${(o.id||'').slice(0,8)} · ${esc(o.package||'')} · ${ORDER_STATUS_LABEL[o.status]||o.status} · ${fmtDate(o.createdAt)}</div></div>
+      <button class="btn btn-danger btn-sm" onclick="window.deleteOrder('${o.id}')">Удалить</button>
+    </div>`).join('');
+};
+window.deleteOrder = async (id) => {
+  if(!confirm('Удалить заказ без возможности восстановления?')) return;
+  try{
+    const resp = await fetch(`${API}/orders/admin/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    toast('Заказ удалён','info');
+    allOrders = allOrders.filter(o=>o.id!==id);
+    window.renderOrders();
+  }catch(e){ toast('Ошибка удаления','error'); }
+};
+
+window.renderTickets = () => {
+  const q = (document.getElementById('ticketSearch').value||'').toLowerCase();
+  const list = q ? allTickets.filter(t=>(t.subject||'').toLowerCase().includes(q)||(t.userEmail||'').toLowerCase().includes(q)) : allTickets.slice(0,30);
+  const el = document.getElementById('ticketList');
+  if(!list.length){ el.innerHTML = `<div class="dz-empty">Ничего не найдено</div>`; return; }
+  el.innerHTML = list.map(t=>`
+    <div class="dz-row">
+      <div class="dz-row-main"><b>${esc(t.subject||'Без темы')}</b><div class="dz-row-sub">${esc(t.userEmail)} · ${t.status==='open'?'открыт':'закрыт'} · ${fmtDate(t.updatedAt)}</div></div>
+      <button class="btn btn-danger btn-sm" onclick="window.deleteTicket('${t.id}')">Удалить</button>
+    </div>`).join('');
+};
+window.deleteTicket = async (id) => {
+  if(!confirm('Удалить чат вместе со всеми сообщениями и фото без возможности восстановления?')) return;
+  try{
+    const resp = await fetch(`${API}/tickets/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    toast('Чат удалён','info');
+    allTickets = allTickets.filter(t=>t.id!==id);
+    window.renderTickets();
+  }catch(e){ toast('Ошибка удаления','error'); }
+};
+
+window.renderService = () => {
+  const q = (document.getElementById('serviceSearch').value||'').toLowerCase();
+  const list = q ? allService.filter(s=>(s.title||'').toLowerCase().includes(q)||(s.userEmail||'').toLowerCase().includes(q)) : allService.slice(0,30);
+  const el = document.getElementById('serviceList');
+  if(!list.length){ el.innerHTML = `<div class="dz-empty">Ничего не найдено</div>`; return; }
+  el.innerHTML = list.map(s=>`
+    <div class="dz-row">
+      <div class="dz-row-main"><b>${esc(s.title||'Без названия')}</b><div class="dz-row-sub">${esc(s.userEmail)} · ${s.status==='open'?'открыта':'закрыта'} · ${fmtDate(s.createdAt)}</div></div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${(s.images&&s.images.length)?`<span class="badge b-images">фото: ${s.images.length}</span>`:''}
+        <button class="btn btn-danger btn-sm" onclick="window.deleteService('${s.id}')">Удалить</button>
+      </div>
+    </div>`).join('');
+};
+window.deleteService = async (id) => {
+  if(!confirm('Удалить заявку на обслуживание без возможности восстановления?')) return;
+  try{
+    const resp = await fetch(`${API}/service-tickets/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    toast('Заявка удалена','info');
+    allService = allService.filter(s=>s.id!==id);
+    window.renderService();
+  }catch(e){ toast('Ошибка удаления','error'); }
+};
+
+async function loadAll(){
+  const [statsResp, usersResp, ordersResp, ticketsResp, serviceResp] = await Promise.all([
+    fetch(`${API}/system/stats`, { credentials:'include' }),
+    fetch(`${API}/users/admin/all`, { credentials:'include' }),
+    fetch(`${API}/orders/admin/all`, { credentials:'include' }),
+    fetch(`${API}/tickets/admin/all`, { credentials:'include' }),
+    fetch(`${API}/service-tickets/admin/all`, { credentials:'include' }),
+  ]);
+  const stats = statsResp.ok ? await statsResp.json() : null;
+  allUsers = usersResp.ok ? await usersResp.json() : [];
+  allOrders = ordersResp.ok ? await ordersResp.json() : [];
+  allTickets = ticketsResp.ok ? await ticketsResp.json() : [];
+  allService = serviceResp.ok ? await serviceResp.json() : [];
+
+  if(stats){
+    renderServerStats(stats.server);
+    renderTicketStats(stats.business);
+    renderCharts(stats.business);
+  }
+  window.renderUsers(); window.renderOrders(); window.renderTickets(); window.renderService();
+}
+window.reloadAll = () => loadAll().then(()=>toast('Обновлено','success')).catch(()=>toast('Ошибка обновления','error'));
+
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
+
+(async function initPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  document.getElementById('loadingScreen').style.display='none';
+  if(user.role!=='admin'){window.location.href='/';return;}
+  document.getElementById('appWrap').style.display='block';
+
+  try{ await loadAll(); }catch(e){ console.error('system.html load error:', e); toast('Не удалось загрузить данные','error'); }
+})();
+</script>
+<script src="/m-panel26.js"></script>
+<script src="../GEOBLOCK.js"></script>
+<script src="../maintenance.js"></script>
+</body>
+</html>

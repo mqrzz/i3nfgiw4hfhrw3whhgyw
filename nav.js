@@ -123,7 +123,7 @@
       display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; flex-shrink:0;
     }
     .an-menu-btn span{
-      position:absolute; width:20px; height:1.5px; background:var(--an-ink); border-radius:2px;
+      position:absolute; width:20px; height:2px; background:var(--an-ink); border-radius:2px;
       transition: transform .55s cubic-bezier(0.65,0,0.35,1), opacity .4s ease, top .55s cubic-bezier(0.65,0,0.35,1);
     }
     .an-menu-btn span:nth-child(1){ top:16px; }

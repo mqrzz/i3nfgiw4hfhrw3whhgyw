@@ -196,9 +196,17 @@
         }
     `;
     
-    // Автоматический расчёт пути для корректных ссылок
-    const depth = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
-    const base = depth > 0 ? '../' : '';
+    // Расчёт пути для корректных ссылок.
+    // Если скрипт подключён с явным data-depth — используем его (нужно для
+    // страниц-«индексов» папки типа /order/index.html: URL "/order" по числу
+    // слэшей неотличим от страницы верхнего уровня типа "/rules", поэтому
+    // автоматическая эвристика по window.location.pathname для них ошибается
+    // на единицу). Без data-depth — как раньше, считаем по количеству слэшей.
+    const explicitDepth = document.currentScript && document.currentScript.dataset.depth;
+    const depth = explicitDepth !== undefined
+      ? parseInt(explicitDepth, 10)
+      : (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
+    const base = depth > 0 ? '../'.repeat(depth) : '';
     
     // HTML структура подвала
     const footerHTML = `

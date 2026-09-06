@@ -70,11 +70,23 @@
 
     .an-nav-wrap, .an-nav-wrap *{ box-sizing:border-box; }
 
+    /* Убирает "неоновую"/цветную окантовку у жирного белого текста на
+       тёмном фоне (артефакт субпиксельного антиалиасинга шрифтов) —
+       применяем ко всему виджету, а не только к кнопке. */
+    .an-nav-wrap, .an-nav-wrap *{
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      text-rendering:optimizeLegibility;
+    }
+
     .an-nav-wrap{
       /* Не sticky/fixed — обычный блок в потоке документа, уезжает
-         вместе со страницей при скролле, а не остаётся наверху. */
+         вместе со страницей при скролле, а не остаётся наверху. Отступ
+         сведён к минимуму: если сверху всё равно большой зазор — он
+         приходит не от этого скрипта, а от верстки самой страницы
+         (например, padding-top на body/первой секции). */
       position: static;
-      margin-top: 18px;
+      margin-top: 8px;
       display:flex; justify-content:center; padding: 0 16px;
       font-family: 'Geologica', -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
     }
@@ -153,7 +165,12 @@
 
     .an-pill-btn{
       display:inline-block; background:var(--an-pill); color:var(--an-pill-ink); text-decoration:none;
-      padding: 13px 24px; border-radius:var(--an-radius-pill); font-weight:600; font-size:1.02rem; border:none; cursor:pointer;
+      padding: 13px 24px; border-radius:var(--an-radius-pill); font-weight:500; font-size:1.02rem; border:none; cursor:pointer;
+      /* белый жирный текст на чёрном фоне даёт цветную ("неоновую") окантовку
+         из-за субпиксельного антиалиасинга шрифта — форсируем отдельный
+         композитный слой и серое сглаживание, чтобы её убрать */
+      transform: translateZ(0);
+      -webkit-font-smoothing: antialiased;
     }
 
     /* ── унификация высоты всех верхнеуровневых пунктов десктоп-меню,
@@ -173,8 +190,11 @@
 
     .an-drop-menu{
       position:absolute; top: calc(100% + 18px); left:50%; transform: translateX(-50%) translateY(-8px);
-      min-width:220px; background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+      min-width:220px;
+      /* Сплошной непрозрачный фон вместо blur+rgba — backdrop-filter не
+         везде рендерится корректно (зависит от браузера/композитинга
+         страницы), из-за чего текст страницы просвечивал сквозь панель. */
+      background: #fdfdfc;
       border:1px solid rgba(255,255,255,0.7); border-radius:18px; box-shadow: 0 20px 44px rgba(18,18,18,0.14);
       padding:8px; opacity:0; visibility:hidden; pointer-events:none;
       transition: opacity .22s ease, transform .22s cubic-bezier(0.65,0,0.35,1), visibility .22s; z-index:50;
@@ -213,8 +233,8 @@
 
     .an-user-dd{
       position:absolute; top: calc(100% + 18px); right:0; transform: translateY(-8px);
-      min-width:240px; background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(20px) saturate(160%); -webkit-backdrop-filter: blur(20px) saturate(160%);
+      min-width:240px;
+      background: #fdfdfc;
       border:1px solid rgba(255,255,255,0.7); border-radius:18px; box-shadow: 0 20px 44px rgba(18,18,18,0.14);
       padding:8px; opacity:0; visibility:hidden; pointer-events:none;
       transition: opacity .22s ease, transform .22s cubic-bezier(0.65,0,0.35,1), visibility .22s; z-index:50;

@@ -90,7 +90,7 @@
       left: 50%;
       transform: translateX(-50%);
       z-index: 9000;
-      width: calc(100% - 32px);
+      width: calc(100% - 24px);
       max-width: var(--an-maxw);
       font-family: 'Geologica', -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
     }
@@ -106,11 +106,9 @@
       overflow:hidden;
       transition: border-radius .6s cubic-bezier(0.65,0,0.35,1), background .3s ease;
     }
-    /* Когда открыт мобильный аккордеон — сплошной непрозрачный фон
-       вместо полупрозрачного (капсула теперь fixed и не толкает контент
-       страницы, поэтому сквозь прозрачность стало видно текст под
-       меню). Только это и добавлено, остальной дизайн капсулы не тронут. */
-    .an-nav-shell.open{ border-radius: 30px; background:#fdfdfc; }
+    /* Только форма (скругление) меняется при открытии — фон капсулы/шапки
+       остаётся тем же полупрозрачным, что и в закрытом виде. */
+    .an-nav-shell.open{ border-radius: 30px; }
 
     .an-nav-header{
       display:flex; align-items:center; justify-content:space-between;
@@ -136,9 +134,11 @@
     .an-nav-shell.open .an-menu-btn span:nth-child(3){ top:22px; transform: rotate(-45deg); }
 
     /* ── мобильная выезжающая панель (аккордеон внутри капсулы — как
-       было) ── */
+       было). Свой сплошной фон — только у самого блока пунктов, шапка
+       (лого/бургер) не задевается и остаётся полупрозрачной. ── */
     .an-nav-mobile{
       max-height:0; opacity:0; overflow:hidden; padding: 0 22px;
+      background:#fdfdfc;
       transition: max-height .65s cubic-bezier(0.65,0,0.35,1), opacity .5s ease .05s, padding .65s cubic-bezier(0.65,0,0.35,1);
     }
     .an-nav-mobile.open{ max-height:80vh; opacity:1; padding: 4px 22px 22px; overflow-y:auto; }

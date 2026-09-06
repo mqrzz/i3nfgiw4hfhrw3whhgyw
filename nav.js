@@ -139,6 +139,9 @@
     .an-nav-mobile{
       max-height:0; opacity:0; overflow:hidden; padding: 0 22px;
       background:#fdfdfc;
+      /* скругление снизу — под форму капсулы (30px, как у .an-nav-shell.open),
+         иначе блок торчит плоским прямоугольником внутри округлой капсулы */
+      border-radius: 0 0 30px 30px;
       transition: max-height .65s cubic-bezier(0.65,0,0.35,1), opacity .5s ease .05s, padding .65s cubic-bezier(0.65,0,0.35,1);
     }
     .an-nav-mobile.open{ max-height:80vh; opacity:1; padding: 4px 22px 22px; overflow-y:auto; }

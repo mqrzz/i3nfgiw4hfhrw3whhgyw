@@ -133,18 +133,21 @@
     .an-nav-shell.open .an-menu-btn span:nth-child(2){ opacity:0; }
     .an-nav-shell.open .an-menu-btn span:nth-child(3){ top:22px; transform: rotate(-45deg); }
 
-    /* ── мобильная выезжающая панель (аккордеон внутри капсулы — как
-       было). Свой сплошной фон — только у самого блока пунктов, шапка
-       (лого/бургер) не задевается и остаётся полупрозрачной. ── */
+    /* ── мобильная выезжающая панель (аккордеон внутри капсулы).
+       Полностью скруглённая карточка в стиле самой капсулы (та же
+       полупрозрачность + блюр), с небольшим отступом от шапки и краёв —
+       а не плоский белый прямоугольник впритык. ── */
     .an-nav-mobile{
-      max-height:0; opacity:0; overflow:hidden; padding: 0 22px;
-      background:#fdfdfc;
-      /* скругление снизу — под форму капсулы (30px, как у .an-nav-shell.open),
-         иначе блок торчит плоским прямоугольником внутри округлой капсулы */
-      border-radius: 0 0 30px 30px;
-      transition: max-height .65s cubic-bezier(0.65,0,0.35,1), opacity .5s ease .05s, padding .65s cubic-bezier(0.65,0,0.35,1);
+      max-height:0; opacity:0; overflow:hidden;
+      margin: 0 8px; padding: 0 14px;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(20px) saturate(160%);
+      -webkit-backdrop-filter: blur(20px) saturate(160%);
+      border-radius: 24px;
+      transition: max-height .65s cubic-bezier(0.65,0,0.35,1), opacity .5s ease .05s,
+                  padding .65s cubic-bezier(0.65,0,0.35,1), margin .65s cubic-bezier(0.65,0,0.35,1);
     }
-    .an-nav-mobile.open{ max-height:80vh; opacity:1; padding: 4px 22px 22px; overflow-y:auto; }
+    .an-nav-mobile.open{ max-height:80vh; opacity:1; padding: 16px 14px; margin: 8px 8px 12px; overflow-y:auto; }
     .an-nav-mobile a, .an-nav-mobile button.an-mlink{
       display:block; width:100%; text-align:left; background:none; border:none; cursor:pointer;
       color:var(--an-ink); text-decoration:none; font-family:inherit;

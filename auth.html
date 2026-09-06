@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Antviz — Вход и регистрация</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="canonical" href="https://antviz.ru/auth">
+<link rel="icon" href="/img/favicon.png" type="image/png">
+<script src="https://telegram.org/js/telegram-web-app.js" defer></script>
 <style>
   :root{
     --bg:        #f4f4f2;
@@ -22,29 +24,6 @@
     --radius-xl:   28px;
     --dark:      #121212;
     --ease: cubic-bezier(0.65,0,0.35,1);
-  }
-  @media(prefers-color-scheme: dark){
-    :root{
-      --bg:        #131313;
-      --bg-card:   #1c1c1c;
-      --card:      #1a1a1a;
-      --ink:       #f2f2f0;
-      --ink-soft:  #9a9a96;
-      --line:      rgba(255,255,255,0.09);
-      --pill:      #f2f2f0;
-      --pill-ink:  #131313;
-      --green:     #35c47a;
-      --danger:    #ff6b60;
-      --dark:      #0a0a0a;
-    }
-    .code-box{ background:#242424; }
-    .code-box.filled{ background:#1a1a1a; }
-    .inp{ background:#242424; }
-    .inp::placeholder{ color:#7a7a76; }
-    .consent-row input[type=checkbox]{ border-color:var(--line); }
-    .side-panel::before{ background-image:
-      linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px); }
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -522,14 +501,20 @@
 
   // ── Уже залогинен? Проверяем куку сессии до показа формы входа,
   // чтобы не мигать формой у тех, кто и так внутри аккаунта.
+  // На медленной сети (мобильный интернет) этот запрос может подвиснуть —
+  // тогда форма всё равно должна появиться, а не держать пустой экран
+  // бесконечно, поэтому ждём не дольше 2.5с.
   (async function checkExistingSession(){
     try{
-      const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+      const ctrl = new AbortController();
+      const timer = setTimeout(()=>ctrl.abort(), 2500);
+      const resp = await fetch(`${API}/auth/me`, { credentials:'include', signal: ctrl.signal });
+      clearTimeout(timer);
       if(resp.ok){
         window.location.replace('/profile.html');
         return; // страница уже уходит, дальше ничего не рисуем
       }
-    }catch(e){ /* сеть недоступна — просто показываем форму входа как обычно */ }
+    }catch(e){ /* сеть недоступна или не успели за отведённое время — просто показываем форму входа */ }
     document.body.classList.remove('auth-checking');
   })();
 
@@ -975,7 +960,6 @@
   })();
 </script>
 
-<script src="../GEOBLOCK.js"></script>
-<script type="module" src="maintenance.js"></script>
+<script type="module" src="/maintenance.js"></script>
 </body>
 </html>

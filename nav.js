@@ -80,14 +80,18 @@
     }
 
     .an-nav-wrap{
-      /* Не sticky/fixed — обычный блок в потоке документа, уезжает
-         вместе со страницей при скролле, а не остаётся наверху. Отступ
-         сведён к минимуму: если сверху всё равно большой зазор — он
-         приходит не от этого скрипта, а от верстки самой страницы
-         (например, padding-top на body/первой секции). */
-      position: static;
-      margin-top: 8px;
-      display:flex; justify-content:center; padding: 0 16px;
+      /* Как в оригинальном nav.js: position:fixed — капсула всегда
+         остаётся видна и "едет" вместе со скроллом, а не уезжает и не
+         лежит в потоке документа. Центрирование через left:50% +
+         translateX, а не flex, потому что сам wrap теперь и есть
+         фиксированный элемент. */
+      position: fixed;
+      top: 18px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 9000;
+      width: calc(100% - 32px);
+      max-width: var(--an-maxw);
       font-family: 'Geologica', -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
     }
 
@@ -100,9 +104,13 @@
       border-radius: var(--an-radius-pill);
       box-shadow: 0 10px 34px rgba(18,18,18,0.07);
       overflow:hidden;
-      transition: border-radius .6s cubic-bezier(0.65,0,0.35,1);
+      transition: border-radius .6s cubic-bezier(0.65,0,0.35,1), background .3s ease;
     }
-    .an-nav-shell.open{ border-radius: 30px; }
+    /* Когда открыт мобильный аккордеон — сплошной непрозрачный фон
+       вместо полупрозрачного (капсула теперь fixed и не толкает контент
+       страницы, поэтому сквозь прозрачность стало видно текст под
+       меню). Только это и добавлено, остальной дизайн капсулы не тронут. */
+    .an-nav-shell.open{ border-radius: 30px; background:#fdfdfc; }
 
     .an-nav-header{
       display:flex; align-items:center; justify-content:space-between;
@@ -127,7 +135,8 @@
     .an-nav-shell.open .an-menu-btn span:nth-child(2){ opacity:0; }
     .an-nav-shell.open .an-menu-btn span:nth-child(3){ top:22px; transform: rotate(-45deg); }
 
-    /* ── мобильная выезжающая панель ── */
+    /* ── мобильная выезжающая панель (аккордеон внутри капсулы — как
+       было) ── */
     .an-nav-mobile{
       max-height:0; opacity:0; overflow:hidden; padding: 0 22px;
       transition: max-height .65s cubic-bezier(0.65,0,0.35,1), opacity .5s ease .05s, padding .65s cubic-bezier(0.65,0,0.35,1);
@@ -319,27 +328,28 @@
         </button>
       </div>
     </div>
+  </div>
 
-    <div class="an-nav-mobile" id="anNavMobile">
-      <div class="an-mobile-user" id="anMobileUser" style="display:none">
-        <span class="an-avatar" id="anMobileAvatar"></span>
-        <div>
-          <div class="an-mobile-user-name" id="anMobileUserName">—</div>
-          <div class="an-mobile-user-email" id="anMobileUserEmail">—</div>
-        </div>
+  <div class="an-nav-mobile" id="anNavMobile">
+    <div class="an-mobile-user" id="anMobileUser" style="display:none">
+      <span class="an-avatar" id="anMobileAvatar"></span>
+      <div>
+        <div class="an-mobile-user-name" id="anMobileUserName">—</div>
+        <div class="an-mobile-user-email" id="anMobileUserEmail">—</div>
       </div>
-
-      ${NAV_DROPDOWNS.map(buildMobileGroup).join('')}
-
-      <a href="/auth" id="anMobileAuthLink">Войти</a>
-
-      <div class="an-mobile-section" id="anMobileAccountSection" style="display:none">Аккаунт</div>
-      <a class="an-sub" href="/orders" id="anMobileOrdersLink" style="display:none">Мои заказы</a>
-      <a class="an-sub" href="/profile" id="anMobileProfileLink" style="display:none">Профиль</a>
-      <button type="button" class="an-mlink an-sub an-mobile-signout" id="anMobileSignOut" style="display:none">Выйти</button>
-
-      <a href="${CTA.href}" class="an-nav-cta-mobile">${CTA.label}</a>
     </div>
+
+    ${NAV_DROPDOWNS.map(buildMobileGroup).join('')}
+
+    <a href="/auth" id="anMobileAuthLink">Войти</a>
+
+    <div class="an-mobile-section" id="anMobileAccountSection" style="display:none">Аккаунт</div>
+    <a class="an-sub" href="/orders" id="anMobileOrdersLink" style="display:none">Мои заказы</a>
+    <a class="an-sub" href="/profile" id="anMobileProfileLink" style="display:none">Профиль</a>
+    <button type="button" class="an-mlink an-sub an-mobile-signout" id="anMobileSignOut" style="display:none">Выйти</button>
+
+    <a href="${CTA.href}" class="an-nav-cta-mobile">${CTA.label}</a>
+  </div>
   </div>
 </div>`;
 
@@ -347,6 +357,14 @@
   const style = document.createElement('style');
   style.textContent = CSS;
   document.head.appendChild(style);
+
+  // Компенсация отступа страницы под фиксированную капсулу — как в
+  // оригинальном nav.js (bodyPad): сама капсула не занимает место в
+  // потоке документа (position:fixed), поэтому странице нужен небольшой
+  // отступ сверху, иначе контент полезет под неё.
+  const bodyPad = document.createElement('style');
+  bodyPad.textContent = 'body{padding-top:16px;} @media(max-width:768px){body{padding-top:14px;}}';
+  document.head.appendChild(bodyPad);
 
   document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
 

@@ -319,7 +319,7 @@
               <div class="an-dd-head-name" id="anDdHeadName">—</div>
               <div class="an-dd-head-email" id="anDdHeadEmail">—</div>
             </div>
-            <a href="/orders" class="an-dd-item">Мои заказы</a>
+            <a href="/profile/orders" class="an-dd-item">Мои заказы</a>
             <a href="/profile" class="an-dd-item">Профиль</a>
             <div class="an-drop-sep"></div>
             <button class="an-dd-item danger" id="anSignOut" type="button">Выйти</button>

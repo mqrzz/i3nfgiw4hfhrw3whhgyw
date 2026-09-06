@@ -71,9 +71,12 @@
     .an-nav-wrap, .an-nav-wrap *{ box-sizing:border-box; }
 
     .an-nav-wrap{
-      position: sticky; top: 18px; z-index: 9000;
+      /* Не sticky/fixed — обычный блок в потоке документа, уезжает
+         вместе со страницей при скролле, а не остаётся наверху. */
+      position: static;
+      margin-top: 18px;
       display:flex; justify-content:center; padding: 0 16px;
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+      font-family: 'Geologica', -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
     }
 
     .an-nav-shell{
@@ -129,7 +132,10 @@
       font-size:0.8rem; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;
       color:var(--an-ink-soft); padding: 16px 2px 4px; border-top:none;
     }
-    .an-nav-mobile a.an-sub{ font-size:1.1rem; font-weight:500; padding:10px 2px; border-top:none; }
+    /* .an-sub — второстепенные пункты (Мои заказы / Профиль / Выйти),
+       заметно меньше основных разделов (Услуги/О сервисе/Блог), чтобы
+       не выглядели гигантскими рядом с обычной кнопкой "Выйти". */
+    .an-nav-mobile a.an-sub, .an-nav-mobile button.an-sub{ font-size:1.1rem; font-weight:500; padding:10px 2px; border-top:none; }
     .an-nav-cta-mobile{
       margin-top:14px; text-align:center !important; background:var(--an-pill) !important; color:var(--an-pill-ink) !important;
       border-radius:var(--an-radius-pill); padding:16px !important; font-size:1.05rem !important; font-weight:600 !important; border-top:none !important;
@@ -138,7 +144,7 @@
     .an-mobile-user .an-avatar{ width:44px; height:44px; font-size:15px; }
     .an-mobile-user-name{ font-size:1.05rem; font-weight:600; }
     .an-mobile-user-email{ font-size:0.85rem; color:var(--an-ink-soft); font-weight:400; }
-    .an-mobile-signout{ font-size:1.1rem !important; font-weight:500 !important; color:#c23; }
+    .an-mobile-signout{ color:#c23; }
 
     .an-nav-desktop{ display:none; }
 
@@ -306,8 +312,11 @@
       ${NAV_DROPDOWNS.map(buildMobileGroup).join('')}
 
       <a href="/auth" id="anMobileAuthLink">Войти</a>
-      <a href="/orders" id="anMobileOrdersLink" style="display:none">Мои заказы</a>
-      <button type="button" class="an-mlink an-mobile-signout" id="anMobileSignOut" style="display:none">Выйти</button>
+
+      <div class="an-mobile-section" id="anMobileAccountSection" style="display:none">Аккаунт</div>
+      <a class="an-sub" href="/orders" id="anMobileOrdersLink" style="display:none">Мои заказы</a>
+      <a class="an-sub" href="/profile" id="anMobileProfileLink" style="display:none">Профиль</a>
+      <button type="button" class="an-mlink an-sub an-mobile-signout" id="anMobileSignOut" style="display:none">Выйти</button>
 
       <a href="${CTA.href}" class="an-nav-cta-mobile">${CTA.label}</a>
     </div>
@@ -395,7 +404,9 @@
 
     document.getElementById('anMobileUser').style.display = 'none';
     document.getElementById('anMobileAuthLink').style.display = 'block';
+    document.getElementById('anMobileAccountSection').style.display = 'none';
     document.getElementById('anMobileOrdersLink').style.display = 'none';
+    document.getElementById('anMobileProfileLink').style.display = 'none';
     document.getElementById('anMobileSignOut').style.display = 'none';
   }
 
@@ -420,7 +431,9 @@
     document.getElementById('anMobileUserName').textContent = name;
     document.getElementById('anMobileUserEmail').textContent = user.email || '';
     document.getElementById('anMobileAuthLink').style.display = 'none';
+    document.getElementById('anMobileAccountSection').style.display = 'block';
     document.getElementById('anMobileOrdersLink').style.display = 'block';
+    document.getElementById('anMobileProfileLink').style.display = 'block';
     document.getElementById('anMobileSignOut').style.display = 'block';
   }
 

@@ -89,9 +89,32 @@ export function endSessionIconSVG(){
  * Пока profile.html, tickets.html, sites.html, notifications.html, orders.html,
  * support.html не переведены с Firebase Auth на новый API (это следующий шаг),
  * они по-прежнему импортируют эти два имени. Сервер теперь сам отслеживает
- * активность сеанса при каждом запросе к API, поэтому обе функции — no-op,
- * оставлены только чтобы не ломать импорт на страницах, ещё не переписанных.
+ * активность сеанса при каждом запросе к API, поэтому touchSession() — no-op,
+ * оставлена только чтобы не ломать импорт на страницах, ещё не переписанных.
  * Удалить, когда все 6 страниц будут переведены на requireAuth() через API.
  */
 export async function touchSession(){ /* сервер сам отслеживает last_active_at при каждом запросе к API */ }
-export function watchSessionRevocation(){ return () => {}; }
+
+/* ───────────────────── Разлог при завершении сеанса с другого устройства ─────────────────────
+ * Раньше (на Firestore) это был realtime onSnapshot — обрыв сессии на другом
+ * устройстве кидал пользователя обратно на /auth.html мгновенно, без каких-либо
+ * действий с его стороны. У нового REST-API нет push-канала до браузера, поэтому
+ * здесь — пуллинг: раз в intervalMs дёргаем /auth/me (он уже требует валидную,
+ * не отозванную сессию), и если сервер ответил 401 — сессию отозвали (кнопкой
+ * "Завершить сеанс" с другого устройства/вкладки, или админ забанил) — зовём
+ * onRevoked(). Не мгновенно, как раньше, но без него страница держала
+ * пользователя залогиненным визуально до следующего его собственного клика.
+ */
+export function watchSessionRevocation(onRevoked, intervalMs = 20000){
+  if (typeof onRevoked !== 'function') return () => {};
+  const timer = setInterval(async () => {
+    try{
+      const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+      if (resp.status === 401){
+        clearInterval(timer);
+        onRevoked();
+      }
+    }catch(e){ /* сеть недоступна — не считаем это разлогином, ждём следующего тика */ }
+  }, intervalMs);
+  return () => clearInterval(timer);
+}

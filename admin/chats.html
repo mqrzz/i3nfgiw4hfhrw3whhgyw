@@ -654,6 +654,12 @@ async function loadTicketsList(){
   if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
 
+  fetch(`${API}/enterprise/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(apps=>{
+    const n=apps.filter(a=>a.status==='new').length;
+    const b=document.getElementById('navBadgeEnterprise');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+
   await loadTicketsList();
   setInterval(loadTicketsList, 15000);
 

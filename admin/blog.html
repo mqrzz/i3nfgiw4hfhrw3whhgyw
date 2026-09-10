@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Блог — Antviz Admin</title>
+<link rel="icon" href="../img/favicon.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:#f3f4f7}
+:root{
+  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;
+  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
+  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;
+  --bg:#f3f4f7;--card:#ffffff;
+  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
+  --dark:#14171c;
+  --font:'Geologica','Inter',sans-serif;
+  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
+  --maxw:1160px;
+}
+body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
+@keyframes spin{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+
+.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.lt{font-size:13px;color:rgba(255,255,255,.35)}
+
+.page{display:none;min-height:100vh;overflow-y:auto}
+.inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:36px 28px 60px}
+
+.hero{background:var(--dark);border-radius:var(--r-xl);padding:32px 36px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-100px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
+.hero-text{position:relative;z-index:1}
+.hero-text h1{font-size:1.6rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
+.hero-text p{font-size:.88rem;color:rgba(255,255,255,.42)}
+.build-badge{position:relative;z-index:1;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--r-pill);padding:9px 16px;font-size:.82rem;color:rgba(255,255,255,.7)}
+.build-dot{width:7px;height:7px;border-radius:50%;background:var(--muted2)}
+.build-dot.ok{background:var(--green)}.build-dot.busy{background:var(--orange);animation:pulse 1.2s infinite}
+.build-dot.fail{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.build-badge a{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,.3)}
+
+.tabs{display:flex;gap:6px;margin-bottom:20px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{padding:11px 4px;margin-right:22px;font-size:.88rem;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s,border-color .15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-color:var(--green)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.86rem;border:none;border-radius:var(--r-sm);padding:10px 18px;cursor:pointer;transition:opacity .15s,transform .1s}
+.btn:hover{opacity:.88}.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--dark);color:#fff}
+.btn-green{background:var(--green);color:#0e1512}
+.btn-ghost{background:var(--card);color:var(--text);border:1.5px solid var(--line)}
+.btn-danger{background:var(--red-soft);color:var(--red)}
+.btn-sm{padding:7px 13px;font-size:.8rem}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.section-head h2{font-size:1.15rem;font-weight:500;letter-spacing:-.01em}
+
+.a-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.a-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;cursor:pointer;transition:box-shadow .15s,transform .15s}
+.a-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.a-card .tag{display:inline-block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--green-d);background:var(--green-soft);padding:3px 9px;border-radius:7px;margin-bottom:9px}
+.a-card h3{font-size:.98rem;font-weight:500;letter-spacing:-.01em;margin-bottom:5px;line-height:1.3}
+.a-card .meta{font-size:.76rem;color:var(--muted)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+
+.editor-overlay{position:fixed;inset:0;background:rgba(20,23,30,.5);backdrop-filter:blur(3px);z-index:8000;display:none;align-items:flex-start;justify-content:center;padding:4vh 16px 16px;overflow-y:auto}
+.editor-overlay.open{display:flex}
+.editor-modal{width:100%;max-width:760px;background:var(--card);border-radius:var(--r-xl);overflow:hidden}
+.editor-head{display:flex;align-items:center;justify-content:space-between;padding:20px 26px;border-bottom:1px solid var(--line);gap:16px}
+.editor-head h3{font-size:1.05rem;font-weight:500}
+.editor-close{width:34px;height:34px;border-radius:50%;border:none;background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.editor-body{padding:22px 26px;display:flex;flex-direction:column;gap:16px;max-height:70vh;overflow-y:auto}
+.field label{display:block;font-size:.8rem;font-weight:500;color:var(--muted);margin-bottom:7px}
+.field input,.field select,.field textarea{width:100%;border:1.5px solid var(--line);border-radius:var(--r-sm);padding:11px 13px;font-family:var(--font);font-size:.9rem;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--green)}
+.field textarea{resize:vertical;font-family:'SF Mono',Consolas,monospace;font-size:.82rem;line-height:1.6}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.editor-foot{display:flex;justify-content:space-between;align-items:center;padding:16px 26px;border-top:1px solid var(--line);gap:12px}
+.hint{font-size:.76rem;color:var(--muted2)}
+
+.cfg-list{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.cfg-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:12px 14px}
+.cfg-row input{flex:1;border:none;background:transparent;font-family:var(--font);font-size:.88rem;outline:none}
+.cfg-row .rm{width:28px;height:28px;border-radius:50%;border:none;background:var(--red-soft);color:var(--red);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:13px 22px;border-radius:var(--r-md);font-size:.86rem;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9999}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green-d)}.toast.error{background:var(--red)}
+</style>
+</head>
+<body>
+
+<div class="ls" id="loadingScreen"><div class="sp"></div><div class="lt">Загрузка…</div></div>
+
+<div class="page" id="page">
+  <div class="inner">
+
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Блог</h1>
+        <p>Статьи, рубрики и главная страница blog.antviz.ru</p>
+      </div>
+      <div class="build-badge" id="buildBadge">
+        <span class="build-dot" id="buildDot"></span>
+        <span id="buildText">Проверка сборки…</span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-tab="articles">Статьи</div>
+      <div class="tab" data-tab="categories">Рубрики</div>
+      <div class="tab" data-tab="homepage">Главная</div>
+    </div>
+
+    <!-- ══ СТАТЬИ ══ -->
+    <div class="tab-panel active" id="panel-articles">
+      <div class="section-head">
+        <h2>Все статьи</h2>
+        <button class="btn btn-green" onclick="openArticleEditor(null)">+ Новая статья</button>
+      </div>
+      <div class="a-grid" id="articlesGrid"></div>
+    </div>
+
+    <!-- ══ РУБРИКИ ══ -->
+    <div class="tab-panel" id="panel-categories">
+      <div class="section-head">
+        <h2>Рубрики</h2>
+        <button class="btn btn-ghost btn-sm" onclick="addCategoryRow()">+ Добавить рубрику</button>
+      </div>
+      <div class="cfg-list" id="categoriesList"></div>
+      <button class="btn btn-primary" onclick="saveCategories()">Сохранить рубрики</button>
+    </div>
+
+    <!-- ══ ГЛАВНАЯ ══ -->
+    <div class="tab-panel" id="panel-homepage">
+      <div class="section-head">
+        <h2>«Скоро в блоге» на главной</h2>
+        <button class="btn btn-ghost btn-sm" onclick="addTopicRow()">+ Добавить тему</button>
+      </div>
+      <div class="cfg-list" id="topicsList"></div>
+      <button class="btn btn-primary" onclick="saveHomepage()">Сохранить главную</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ РЕДАКТОР СТАТЬИ ══ -->
+<div class="editor-overlay" id="editorOverlay">
+  <div class="editor-modal">
+    <div class="editor-head">
+      <h3 id="editorTitle">Новая статья</h3>
+      <button class="editor-close" onclick="closeArticleEditor()">✕</button>
+    </div>
+    <div class="editor-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Заголовок</label>
+          <input type="text" id="fTitle" placeholder="Например: Веб-шрифты: как не терять скорость">
+        </div>
+        <div class="field">
+          <label>Рубрика</label>
+          <select id="fCategory"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label>URL статьи (slug) — латиницей, без пробелов</label>
+        <input type="text" id="fSlug" placeholder="veb-shrifty-kak-ne-teryat-skorost">
+      </div>
+      <div class="field">
+        <label>Краткое описание (для превью и соцсетей)</label>
+        <textarea id="fExcerpt" rows="2"></textarea>
+      </div>
+      <div class="field">
+        <label>Текст статьи (Markdown)</label>
+        <textarea id="fBody" rows="16" placeholder="## Заголовок раздела&#10;&#10;Текст статьи в Markdown..."></textarea>
+      </div>
+      <div class="hint" id="editorHint"></div>
+    </div>
+    <div class="editor-foot">
+      <button class="btn btn-danger" id="deleteBtn" onclick="deleteArticle()" style="display:none">Удалить статью</button>
+      <div style="margin-left:auto;display:flex;gap:10px">
+        <button class="btn btn-ghost" onclick="closeArticleEditor()">Отмена</button>
+        <button class="btn btn-green" id="saveBtn" onclick="saveArticle()">Сохранить и опубликовать</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const API = 'https://antviz.ru/api';
+
+function toast(m, t = 'info') {
+  const el = document.getElementById('toast');
+  el.textContent = m;
+  el.className = `toast ${t} show`;
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.className = 'toast'; }, 3600);
+}
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+
+let categories = [];
+let articlesIndex = []; // [{slug, title, category, date, excerpt, sha}]
+let currentEditingSlug = null;
+let currentEditingSha = null;
+
+// ── Простой парсер/сериализатор frontmatter (без внешних библиотек) ──
+function parseFrontmatter(raw) {
+  const m = raw.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!m) return { data: {}, body: raw };
+  const data = {};
+  m[1].split('\n').forEach(line => {
+    const idx = line.indexOf(':');
+    if (idx === -1) return;
+    const key = line.slice(0, idx).trim();
+    let val = line.slice(idx + 1).trim();
+    if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    data[key] = val;
+  });
+  return { data, body: m[2] };
+}
+function buildFrontmatter(data, body) {
+  const lines = Object.entries(data).map(([k, v]) => `${k}: "${String(v).replace(/"/g, '\\"')}"`);
+  return `---\n${lines.join('\n')}\n---\n\n${body.trim()}\n`;
+}
+
+// ── API-обёртки ──
+async function ghList(dir) {
+  const r = await fetch(`${API}/blog-cms/list?dir=${encodeURIComponent(dir)}`, { credentials: 'include' });
+  if (!r.ok) throw new Error((await r.json()).error || 'Ошибка списка файлов');
+  return r.json();
+}
+async function ghGet(path) {
+  const r = await fetch(`${API}/blog-cms/content?path=${encodeURIComponent(path)}`, { credentials: 'include' });
+  if (!r.ok) { if (r.status === 404) return null; throw new Error((await r.json()).error || 'Ошибка чтения файла'); }
+  return r.json();
+}
+async function ghPut(path, content, sha, message) {
+  const r = await fetch(`${API}/blog-cms/content`, {
+    method: 'PUT', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, content, sha, message }),
+  });
+  if (!r.ok) throw new Error((await r.json()).error || 'Ошибка сохранения');
+  return r.json();
+}
+async function ghDelete(path, sha, message) {
+  const r = await fetch(`${API}/blog-cms/content`, {
+    method: 'DELETE', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path, sha, message }),
+  });
+  if (!r.ok) throw new Error((await r.json()).error || 'Ошибка удаления');
+  return r.json();
+}
+
+// ── Загрузка статей ──
+async function loadArticles() {
+  const files = await ghList('content/articles');
+  const grid = document.getElementById('articlesGrid');
+  if (!files.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">Пока нет ни одной статьи в /content/articles — нажми «Новая статья»</div>`;
+    articlesIndex = [];
+    return;
+  }
+  const items = await Promise.all(files.filter(f => f.name.endsWith('.md')).map(async f => {
+    const file = await ghGet(f.path);
+    const { data } = parseFrontmatter(file.content);
+    return { slug: f.name.replace(/\.md$/, ''), path: f.path, sha: file.sha, ...data };
+  }));
+  articlesIndex = items;
+  items.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  grid.innerHTML = items.map(a => `
+    <div class="a-card" onclick="openArticleEditor('${esc(a.slug)}')">
+      <span class="tag">${esc(a.category || 'Без рубрики')}</span>
+      <h3>${esc(a.title || a.slug)}</h3>
+      <div class="meta">${esc(a.date || '')} · /articles/${esc(a.slug)}</div>
+    </div>
+  `).join('');
+}
+
+// ── Редактор статьи ──
+window.openArticleEditor = async function (slug) {
+  document.getElementById('editorOverlay').classList.add('open');
+  document.getElementById('editorHint').textContent = '';
+  const delBtn = document.getElementById('deleteBtn');
+
+  if (!slug) {
+    currentEditingSlug = null; currentEditingSha = null;
+    document.getElementById('editorTitle').textContent = 'Новая статья';
+    document.getElementById('fTitle').value = '';
+    document.getElementById('fSlug').value = '';
+    document.getElementById('fSlug').disabled = false;
+    document.getElementById('fExcerpt').value = '';
+    document.getElementById('fBody').value = '';
+    delBtn.style.display = 'none';
+    return;
+  }
+
+  const item = articlesIndex.find(a => a.slug === slug);
+  const file = await ghGet(`content/articles/${slug}.md`);
+  const { data, body } = parseFrontmatter(file.content);
+  currentEditingSlug = slug; currentEditingSha = file.sha;
+  document.getElementById('editorTitle').textContent = data.title || slug;
+  document.getElementById('fTitle').value = data.title || '';
+  document.getElementById('fSlug').value = slug;
+  document.getElementById('fSlug').disabled = true; // slug — это имя файла, менять после публикации нельзя
+  document.getElementById('fCategory').value = data.category || '';
+  document.getElementById('fExcerpt').value = data.excerpt || '';
+  document.getElementById('fBody').value = body.trim();
+  delBtn.style.display = 'inline-flex';
+};
+window.closeArticleEditor = function () {
+  document.getElementById('editorOverlay').classList.remove('open');
+};
+
+window.saveArticle = async function () {
+  const title = document.getElementById('fTitle').value.trim();
+  let slug = document.getElementById('fSlug').value.trim();
+  const category = document.getElementById('fCategory').value;
+  const excerpt = document.getElementById('fExcerpt').value.trim();
+  const body = document.getElementById('fBody').value;
+
+  if (!title) return toast('Укажи заголовок', 'error');
+  if (!slug) {
+    slug = title.toLowerCase().replace(/[^a-zа-яё0-9]+/gi, '-').replace(/^-+|-+$/g, '');
+  }
+  if (!/^[a-z0-9-]+$/.test(slug)) return toast('Slug — только латиница, цифры и дефисы', 'error');
+
+  const today = new Date().toISOString().slice(0, 10);
+  const frontmatterData = {
+    title, category, excerpt,
+    date: currentEditingSlug ? (articlesIndex.find(a => a.slug === currentEditingSlug)?.date || today) : today,
+  };
+  const raw = buildFrontmatter(frontmatterData, body);
+
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true; btn.textContent = 'Сохраняю…';
+  try {
+    await ghPut(
+      `content/articles/${slug}.md`,
+      raw,
+      currentEditingSlug ? currentEditingSha : undefined,
+      currentEditingSlug ? `Обновление статьи: ${title}` : `Новая статья: ${title}`
+    );
+    toast('Сохранено — сборка запустится автоматически', 'success');
+    closeArticleEditor();
+    await loadArticles();
+    checkBuildStatus();
+  } catch (err) {
+    toast(err.message, 'error');
+  } finally {
+    btn.disabled = false; btn.textContent = 'Сохранить и опубликовать';
+  }
+};
+
+window.deleteArticle = async function () {
+  if (!currentEditingSlug) return;
+  if (!confirm(`Удалить статью «${document.getElementById('fTitle').value}»? Это необратимо.`)) return;
+  try {
+    await ghDelete(`content/articles/${currentEditingSlug}.md`, currentEditingSha, `Удаление статьи: ${currentEditingSlug}`);
+    toast('Статья удалена', 'success');
+    closeArticleEditor();
+    await loadArticles();
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+};
+
+// ── Рубрики ──
+async function loadCategories() {
+  const file = await ghGet('content/config/categories.json');
+  categories = file ? JSON.parse(file.content) : [];
+  renderCategories();
+  const select = document.getElementById('fCategory');
+  select.innerHTML = categories.map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join('');
+}
+function renderCategories() {
+  document.getElementById('categoriesList').innerHTML = categories.map((c, i) => `
+    <div class="cfg-row">
+      <input value="${esc(c)}" oninput="categories[${i}]=this.value">
+      <button class="rm" onclick="categories.splice(${i},1);renderCategoriesFromWindow()">✕</button>
+    </div>
+  `).join('');
+}
+window.categories = categories;
+window.renderCategoriesFromWindow = renderCategories;
+window.addCategoryRow = function () { categories.push(''); renderCategories(); };
+window.saveCategories = async function () {
+  const clean = categories.map(c => c.trim()).filter(Boolean);
+  try {
+    const file = await ghGet('content/config/categories.json');
+    await ghPut('content/config/categories.json', JSON.stringify(clean, null, 2), file?.sha, 'Обновление списка рубрик');
+    toast('Рубрики сохранены', 'success');
+    checkBuildStatus();
+  } catch (err) { toast(err.message, 'error'); }
+};
+
+// ── Главная / "Скоро в блоге" ──
+let topics = [];
+async function loadHomepage() {
+  const file = await ghGet('content/config/homepage.json');
+  const parsed = file ? JSON.parse(file.content) : { upcomingTopics: [] };
+  topics = parsed.upcomingTopics || [];
+  renderTopics();
+}
+function renderTopics() {
+  document.getElementById('topicsList').innerHTML = topics.map((t, i) => `
+    <div class="cfg-row" style="flex-direction:column;align-items:stretch;gap:8px">
+      <input placeholder="Заголовок темы" value="${esc(t.title || '')}" oninput="topics[${i}].title=this.value">
+      <input placeholder="Короткое описание" value="${esc(t.desc || '')}" oninput="topics[${i}].desc=this.value">
+      <button class="btn btn-ghost btn-sm" style="align-self:flex-end" onclick="topics.splice(${i},1);renderTopicsFromWindow()">Убрать тему</button>
+    </div>
+  `).join('');
+}
+window.topics = topics;
+window.renderTopicsFromWindow = renderTopics;
+window.addTopicRow = function () { topics.push({ title: '', desc: '' }); renderTopics(); };
+window.saveHomepage = async function () {
+  try {
+    const file = await ghGet('content/config/homepage.json');
+    const data = { upcomingTopics: topics.filter(t => t.title.trim()) };
+    await ghPut('content/config/homepage.json', JSON.stringify(data, null, 2), file?.sha, 'Обновление главной страницы блога');
+    toast('Главная сохранена', 'success');
+    checkBuildStatus();
+  } catch (err) { toast(err.message, 'error'); }
+};
+
+// ── Статус последней сборки ──
+async function checkBuildStatus() {
+  const dot = document.getElementById('buildDot');
+  const text = document.getElementById('buildText');
+  try {
+    const r = await fetch(`${API}/blog-cms/build-status`, { credentials: 'include' });
+    const j = await r.json();
+    if (j.status === 'none') { text.textContent = 'Сборок ещё не было'; return; }
+    if (j.status !== 'completed') {
+      dot.className = 'build-dot busy'; text.innerHTML = `<a href="${j.url}" target="_blank">Сборка выполняется…</a>`;
+    } else if (j.conclusion === 'success') {
+      dot.className = 'build-dot ok'; text.innerHTML = `<a href="${j.url}" target="_blank">Сайт обновлён</a>`;
+    } else {
+      dot.className = 'build-dot fail'; text.innerHTML = `<a href="${j.url}" target="_blank">Сборка упала — открыть лог</a>`;
+    }
+  } catch { text.textContent = 'Не удалось проверить статус'; }
+}
+
+// ── Табы ──
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById(`panel-${tab.dataset.tab}`).classList.add('active');
+  });
+});
+
+// ── Авторизация + инициализация (тот же паттерн, что в остальной админке) ──
+(async function init() {
+  let user = null;
+  try {
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if (resp.ok) user = (await resp.json()).user;
+  } catch {}
+  if (!user) { document.getElementById('loadingScreen').style.display = 'none'; window.location.href = '/'; return; }
+  if (user.role !== 'admin') { window.location.href = '/'; return; }
+
+  try {
+    await loadCategories();
+    await loadArticles();
+    await loadHomepage();
+    checkBuildStatus();
+  } catch (err) {
+    toast(err.message, 'error');
+  }
+
+  document.getElementById('loadingScreen').style.display = 'none';
+  document.getElementById('page').style.display = 'block';
+})();
+</script>
+</body>
+</html>

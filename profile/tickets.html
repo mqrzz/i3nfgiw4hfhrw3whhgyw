@@ -887,7 +887,7 @@ html[data-theme="light"] .toast.error{background:rgba(255,255,255,0.72)}
 
 <script type="module">
 const API='https://antviz.ru/api';
-import{touchSession}from'./sessions.js?v=4';
+import{touchSession,watchSessionRevocation}from'./sessions.js?v=4';
 
 const PAY_URL='https://api-lac-six-78.vercel.app/api/createPayment';
 // ВАЖНО: цены/лимиты ниже — источник истины только на фронте для отображения.
@@ -918,10 +918,11 @@ function isUnseen(t){if(!t.adminReply)return false;const m=getSeenMap();return m
 
 function ticketStatus(t){
   if(t.status==='done')return'done';
+  if(t.status==='awaiting_payment')return'awaiting_payment';
   if(t.status==='in_progress'||t.status==='progress')return'progress';
   return'open';
 }
-const STATUS_LABEL={open:'Открыта',progress:'В работе',done:'Решена'};
+const STATUS_LABEL={open:'Открыта',progress:'В работе',done:'Решена',awaiting_payment:'Ожидает оплаты'};
 
 window.switchTab=function(tab){
   curTab=tab;
@@ -1332,6 +1333,7 @@ window.submitTicket=async function(){
   document.getElementById('sbContent').style.display='block';
   await init(u);
   touchSession();
+  watchSessionRevocation(() => { window.location.href = '/auth.html'; });
 })();
 </script>
 <script>

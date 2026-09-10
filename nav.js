@@ -350,7 +350,7 @@
     <a href="/auth" id="anMobileAuthLink">Войти</a>
 
     <div class="an-mobile-section" id="anMobileAccountSection" style="display:none">Аккаунт</div>
-    <a class="an-sub" href="/orders" id="anMobileOrdersLink" style="display:none">Мои заказы</a>
+    <a class="an-sub" href="/profile/orders" id="anMobileOrdersLink" style="display:none">Мои заказы</a>
     <a class="an-sub" href="/profile" id="anMobileProfileLink" style="display:none">Профиль</a>
     <button type="button" class="an-mlink an-sub an-mobile-signout" id="anMobileSignOut" style="display:none">Выйти</button>
 

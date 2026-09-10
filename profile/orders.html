@@ -633,7 +633,7 @@ html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{backg
 
 <script type="module">
 const API = 'https://antviz.ru/api';
-import { touchSession } from './sessions.js?v=4';
+import { touchSession, watchSessionRevocation } from './sessions.js?v=4';
 
 const STATUS_LABELS = ['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 const STATUS_ICONS = [
@@ -992,9 +992,10 @@ async function loadOrderPaymentsForModal(orderId){
   }catch(e){/* тихо */}
 }
 
-// TODO: платёжный бэкенд (createPayment.js на Vercel) всё ещё ждёт Firebase
-// ID-токен для проверки личности — переезжает вместе с остальной оплатой,
-// когда до этого дойдём (отдельный репозиторий, который скинешь позже).
+// Доплата остатка — через service-token (см. /api/auth/service-token) и
+// платёжную функцию на Vercel (createPayment.js), которая сама проверяет
+// токен и пересчитывает сумму на сервере. Комментарий про Firebase был
+// устаревшим — оплата уже полностью переехала на Node/Postgres.
 window.payRemaining=async function(orderId){
   try{
     const stResp=await fetch(`${API}/auth/service-token`,{method:'POST',credentials:'include'});
@@ -1009,8 +1010,16 @@ window.payRemaining=async function(orderId){
 
 window.closeOrderModal=function(){hideOverlay(document.getElementById('ordModalOverlay'));unlockScroll();};
 window.requestRevision=async function(id){
-  // TODO: подключить реальный /api/orders/:id/revision, когда заказы переедут с Firestore.
-  toast('Функция временно недоступна, скоро вернём','info');
+  const comment=prompt('Что нужно поправить? (можно оставить пустым)','');
+  if(comment===null)return; // нажали "Отмена"
+  try{
+    const resp=await fetch(`${API}/orders/${id}/revision`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({comment:comment.trim()||undefined})});
+    const d=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(d.error||'Не удалось отправить запрос');
+    toast('Заявка на правки отправлена ✓','success');
+    closeOrderModal();
+    await loadOrders();
+  }catch(e){toast(e.message||'Не удалось отправить запрос','error');}
 };
 
 // ══ REFUND ══
@@ -1026,9 +1035,16 @@ window.submitRefundRequest=async function(){
   const id=window._refundOrderId;if(!id)return;
   const o=allOrders.find(x=>x.id===id);
   if(!o||(o.status||0)>=2){toast('Возврат уже недоступен для этого заказа','error');closeRefundModal();return;}
-  // TODO: подключить реальный /api/orders/:id/refund, когда заказы переедут с Firestore.
-  toast('Функция временно недоступна, скоро вернём','info');
-  closeRefundModal();
+  const reason=document.getElementById('refundReasonSelect').value;
+  const comment=document.getElementById('refundComment').value.trim();
+  try{
+    const resp=await fetch(`${API}/orders/${id}/refund`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({reason,comment:comment||undefined})});
+    const d=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(d.error||'Не удалось отправить заявку');
+    toast('Заявка на возврат отправлена ✓','success');
+    closeRefundModal();
+    await loadOrders();
+  }catch(e){toast(e.message||'Не удалось отправить заявку','error');}
 };
 
 // ══ REVIEW ══
@@ -1045,9 +1061,15 @@ window.setStar=function(n){reviewStars=n;document.querySelectorAll('.star').forE
 window.submitReview=async function(){
   if(!reviewStars){toast('Выберите оценку','error');return;}
   if(!currentUser||!reviewOrderId)return;
-  // TODO: подключить реальный /api/reviews, когда заказы переедут с Firestore.
-  toast('Функция временно недоступна, скоро вернём','info');
-  closeReview();
+  const text=document.getElementById('reviewText').value.trim();
+  try{
+    const resp=await fetch(`${API}/reviews`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({orderId:reviewOrderId,stars:reviewStars,text:text||undefined})});
+    const d=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(d.error||'Не удалось отправить отзыв');
+    toast('Спасибо за отзыв! ✓','success');
+    closeReview();
+    await loadOrders();
+  }catch(e){toast(e.message||'Не удалось отправить отзыв','error');}
 };
 
 // ══ DELIVERY ══
@@ -1116,6 +1138,7 @@ document.getElementById('ordModalOverlay').addEventListener('click',e=>{if(e.tar
   document.getElementById('sbContent').style.display='block';
   loadOrders();
   touchSession();
+  watchSessionRevocation(() => { window.location.href = '/auth.html'; });
 })();
 </script>
 

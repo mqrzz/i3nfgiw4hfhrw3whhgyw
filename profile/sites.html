@@ -267,7 +267,7 @@ a.site-meta-chip:hover .site-meta-ico{border-color:var(--violet)}
 
 <script type="module">
 const API = 'https://antviz.ru/api';
-import { touchSession } from './sessions.js?v=4';
+import { touchSession, watchSessionRevocation } from './sessions.js?v=4';
 
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
@@ -359,6 +359,7 @@ function render(orders){
   render(done);
 
   touchSession();
+  watchSessionRevocation(() => { window.location.href = '/auth.html'; });
 })();
 </script>
 

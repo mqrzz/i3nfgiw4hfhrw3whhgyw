@@ -112,6 +112,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .b-open{background:var(--info-soft);color:var(--info)}
 .b-done{background:var(--green-soft);color:var(--green-d)}
 .b-urgent{background:var(--red-soft);color:var(--red)}
+.b-unpaid{background:var(--orange-soft);color:var(--orange-d)}
 
 /* ===== SCREEN 2 — TICKET DETAIL ===== */
 #screenTicket .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
@@ -329,7 +330,7 @@ function timeAgo(ts){
   return days+' дн назад';
 }
 function hoursSince(ts){const d=toDate(ts); if(!d) return 0; return(Date.now()-d.getTime())/36e5;}
-function isUrgent(t){return t.status!=='done' && !t.adminReply && hoursSince(t.createdAt)>24;}
+function isUrgent(t){return t.status!=='done' && t.status!=='awaiting_payment' && !t.adminReply && hoursSince(t.createdAt)>24;}
 function initials(name){const parts=String(name||'?').trim().split(/\s+/);return((parts[0]?.[0]||'')+(parts[1]?.[0]||'')).toUpperCase()||'?';}
 function avatarColor(seed){let h=0;for(const c of String(seed||''))h=(h*31+c.charCodeAt(0))>>>0;return AVATAR_COLORS[h%AVATAR_COLORS.length];}
 
@@ -393,7 +394,7 @@ function renderTickets(){
       <div class="ti-body">
         <div class="ti-top">
           <div class="ti-subj">${t.adminReply?'<span class="answered-dot" title="Есть ответ"></span>':''}<span class="ti-subj-text">${esc(t.title||'Без темы')}</span></div>
-          ${urgent?'<span class="badge b-urgent">Срочно</span>':`<span class="badge ${t.status==='done'?'b-done':'b-open'}">${t.status==='done'?'Закрыта':'Открыта'}</span>`}
+          ${urgent?'<span class="badge b-urgent">Срочно</span>':t.status==='awaiting_payment'?'<span class="badge b-unpaid">Не оплачено</span>':`<span class="badge ${t.status==='done'?'b-done':'b-open'}">${t.status==='done'?'Закрыта':'Открыта'}</span>`}
         </div>
         ${t.description?`<div class="ti-prev">${esc(t.description)}</div>`:''}
         <div class="ti-meta"><span>${esc(t.userName||'—')}</span><span>·</span><span>${esc(t.userEmail||'—')}</span><span>·</span><span>${timeAgo(t.createdAt)}</span></div>
@@ -417,8 +418,14 @@ window.openTicket=function(id){
   const orderBlock = t.orderId
     ? `<div class="t-info-item"><span class="t-info-label">Заказ</span><a class="t-info-val t-order-link" href="/admin/orders?id=${t.orderId}" target="_blank" rel="noopener">${esc(t.orderDomain||'№ '+t.orderId.slice(0,8).toUpperCase())}${t.orderSiteType?' · '+esc(t.orderSiteType):''} ↗</a></div>`
     : `<div class="t-info-item"><span class="t-info-label">Заказ</span><span class="t-info-val t-no-order">⚠ Не привязан</span></div>`;
+  const billingLabel = t.billing==='subscription' ? 'По подписке (ТО)' : t.billing==='once' ? 'Разовая оплата' : '—';
+  const paidBlock = t.billing==='once'
+    ? `<div class="t-info-item"><span class="t-info-label">Оплата</span><span class="t-info-val" style="color:${t.paid?'var(--green-d)':'var(--orange-d)'}">${t.paid?'Оплачено ✓'+(t.paidAt?' · '+fmtDT(t.paidAt):''):'Не оплачено'}</span></div>`
+    : '';
   document.getElementById('tInfoGrid').innerHTML=`
     <div class="t-info-item"><span class="t-info-label">Создана</span><span class="t-info-val">${fmtDT(t.createdAt)}</span></div>
+    <div class="t-info-item"><span class="t-info-label">Тип оплаты</span><span class="t-info-val">${billingLabel}</span></div>
+    ${paidBlock}
     ${orderBlock}
   `;
 
@@ -563,6 +570,12 @@ async function loadTickets(){
     if(b){b.style.display=n?'':'none';b.textContent=n;}
     allOrders=orders;
     renderSupports();
+  }).catch(()=>{});
+
+  fetch(`${API}/enterprise/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(apps=>{
+    const n=apps.filter(a=>a.status==='new').length;
+    const b=document.getElementById('navBadgeEnterprise');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
   }).catch(()=>{});
 
   await loadTickets();renderTickets();

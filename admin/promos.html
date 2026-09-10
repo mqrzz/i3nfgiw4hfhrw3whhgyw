@@ -138,7 +138,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
       <div class="fg"><label class="fl">Размер скидки</label><input class="fi" id="pValue" type="number" placeholder="20" min="1"/></div>
       <div class="fg"><label class="fl">Срок действия</label><input class="fi" id="pExpires" type="date"/></div>
     </div>
-    <div class="fg"><label class="fl">Для конкретного пользователя (UID)</label><input class="fi" id="pUid" type="text" placeholder="UID или оставьте пустым — для всех"/></div>
+    <div class="frow">
+      <div class="fg"><label class="fl">Лимит использований</label><input class="fi" id="pLimit" type="number" placeholder="Без лимита" min="1"/></div>
+      <div class="fg"><label class="fl">Для конкретного пользователя (UID)</label><input class="fi" id="pUid" type="text" placeholder="UID или оставьте пустым — для всех"/></div>
+    </div>
     <div class="mf"><button class="btn btn-outline" onclick="closeModal()">Отмена</button><button class="btn btn-green" onclick="createPromo()">Создать</button></div>
   </div>
 </div>
@@ -168,13 +171,14 @@ function renderPromos(){
   el.innerHTML=`<div class="promo-grid">${list.map(p=>{
     const now=new Date();
     const expired=p.expiresAt&&new Date(p.expiresAt)<now;
-    const active=p.active&&!expired;
+    const limitReached=p.usageLimit!=null&&(p.usedCount||0)>=p.usageLimit;
+    const active=p.active&&!expired&&!limitReached;
     const disc=p.discountType==='percent'?`-${p.discountValue}%`:`-${p.discountValue} ₽`;
     return`<div class="pc${active?'':' off'}">
       <div class="pc-top"><span class="pc-code">${esc(p.code)}</span><span class="pc-disc">${disc}</span></div>
       <div class="pc-meta">
         <div class="pm"><div class="pm-l">Истекает</div><div class="pm-v${expired?' red':''}">${fmtDate(p.expiresAt)}</div></div>
-        <div class="pm"><div class="pm-l">Использований</div><div class="pm-v">${p.usedCount||0}</div></div>
+        <div class="pm"><div class="pm-l">Использований</div><div class="pm-v${limitReached?' red':''}">${p.usedCount||0}${p.usageLimit?` / ${p.usageLimit}`:''}</div></div>
         <div class="pm"><div class="pm-l">Для кого</div><div class="pm-v">${p.forUserId?'Конкретный':'Для всех'}</div></div>
         <div class="pm"><div class="pm-l">Статус</div><div class="pm-v" style="color:${active?'var(--green-d)':'var(--muted)'}">${active?'Активен':'Отключён'}</div></div>
       </div>
@@ -190,6 +194,7 @@ window.createPromo=async()=>{
   const type=document.getElementById('pType').value;
   const value=+document.getElementById('pValue').value;
   const expires=document.getElementById('pExpires').value;
+  const limit=document.getElementById('pLimit').value.trim();
   const forUserId=document.getElementById('pUid').value.trim();
   if(!code||!value){toast('Заполните код и скидку','error');return;}
   try{
@@ -198,12 +203,13 @@ window.createPromo=async()=>{
       body: JSON.stringify({
         code, discountType: type, discountValue: value,
         expiresAt: expires ? new Date(expires+'T23:59:59').toISOString() : null,
+        usageLimit: limit ? +limit : null,
         forUserId: forUserId || null,
       }),
     });
     if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
     toast('Промокод создан ✓','success');closeModal();
-    ['pCode','pValue','pExpires','pUid'].forEach(id=>document.getElementById(id).value='');
+    ['pCode','pValue','pExpires','pLimit','pUid'].forEach(id=>document.getElementById(id).value='');
     await loadPromos();renderPromos();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
@@ -252,6 +258,11 @@ window.doLogout=async()=>{
   fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
     const n=orders.filter(o=>o.refundStatus==='requested').length;
     const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+  fetch(`${API}/enterprise/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(apps=>{
+    const n=apps.filter(a=>a.status==='new').length;
+    const b=document.getElementById('navBadgeEnterprise');
     if(b){b.style.display=n?'':'none';b.textContent=n;}
   }).catch(()=>{});
   await loadPromos();renderPromos();

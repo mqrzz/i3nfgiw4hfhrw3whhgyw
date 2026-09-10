@@ -459,14 +459,22 @@ function liveFlashIfGrew(el, prevVal, newVal){
 
 async function pollLiveStrip(){
   try{
-    const [ordersResp, chatsResp, ticketsResp] = await Promise.all([
+    const [ordersResp, chatsResp, ticketsResp, enterpriseResp] = await Promise.all([
       fetch(`${API}/orders/admin/all`, { credentials:'include' }),
       fetch(`${API}/tickets/admin/all`, { credentials:'include' }),
       fetch(`${API}/service-tickets/admin/all`, { credentials:'include' }),
+      fetch(`${API}/enterprise/admin/all`, { credentials:'include' }),
     ]);
     const orders = ordersResp.ok ? await ordersResp.json() : null;
     const chats = chatsResp.ok ? await chatsResp.json() : null;
     const tickets = ticketsResp.ok ? await ticketsResp.json() : null;
+    const enterpriseApps = enterpriseResp.ok ? await enterpriseResp.json() : null;
+
+    if (enterpriseApps){
+      const en = enterpriseApps.filter(a=>a.status==='new').length;
+      const eb = document.getElementById('navBadgeEnterprise');
+      if (eb){ eb.style.display = en?'':'none'; eb.textContent = en; }
+    }
 
     if (orders){
       const n = orders.filter(o=>(o.status||0)===0).length;

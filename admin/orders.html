@@ -1069,6 +1069,12 @@ window.doLogout=async()=>{ try{ await fetch(`${API}/auth/logout`, { method:'POST
   if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
 
+  fetch(`${API}/enterprise/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(apps=>{
+    const n=apps.filter(a=>a.status==='new').length;
+    const b=document.getElementById('navBadgeEnterprise');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+
   async function loadOrders(){
     try{ const resp = await fetch(`${API}/orders/admin/all`, { credentials:'include' }); allOrders = resp.ok ? await resp.json() : []; }catch(e){ allOrders=[]; }
     updateStats();renderList();

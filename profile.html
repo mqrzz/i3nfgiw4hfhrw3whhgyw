@@ -403,7 +403,7 @@ function setStat(id,val){
 
 <script type="module">
 const API = 'https://antviz.ru/api';
-import { touchSession } from './profile/sessions.js';
+import { touchSession, watchSessionRevocation } from './profile/sessions.js';
 
 const FULL_LABEL=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
 
@@ -727,6 +727,7 @@ async function watchNotifDot(){
   loadOrders();
   watchNotifDot();
   touchSession();
+  watchSessionRevocation(() => { window.location.href = '/auth.html'; });
 })();
 </script>
 </div><!-- /sbContent -->

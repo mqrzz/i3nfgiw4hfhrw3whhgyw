@@ -156,6 +156,12 @@
   .field-textarea{ resize:vertical; min-height:100px; line-height:1.6; }
   .field-row{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
   @media(max-width:560px){ .field-row{ grid-template-columns:1fr; } }
+  .phone-field-row{ display:flex; gap:10px; }
+  .phone-code-select{ flex:0 0 118px; width:118px; padding-left:12px; padding-right:6px; cursor:pointer; appearance:none; -webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b7b6b2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat:no-repeat; background-position:right 10px center; background-size:16px; }
+  .phone-number-input{ flex:1; min-width:0; }
+  @media(max-width:480px){ .phone-code-select{ flex-basis:96px; width:96px; font-size:0.88rem; padding-left:8px; background-position:right 6px center; } }
 
   .tool-row{ display:flex; gap:12px; flex-wrap:wrap; }
   .tool-row.three .tool-card{ flex:1 1 30%; }
@@ -318,7 +324,17 @@
 
       <div class="field">
         <label class="field-label" for="fPhone">Телефон <span style="font-weight:400">(необязательно)</span></label>
-        <input class="field-input" id="fPhone" type="tel" placeholder="+7 900 000-00-00">
+        <div class="phone-field-row">
+          <select class="field-input phone-code-select" id="fPhoneCode">
+            <option value="+7" selected>🇷🇺 +7</option>
+            <option value="+375">🇧🇾 +375</option>
+            <option value="+380">🇺🇦 +380</option>
+            <option value="+374">🇦🇲 +374</option>
+            <option value="+994">🇦🇿 +994</option>
+            <option value="">🌍 Другой</option>
+          </select>
+          <input class="field-input phone-number-input" id="fPhone" type="tel" inputmode="tel" placeholder="900 000-00-00">
+        </div>
       </div>
 
       <div class="field">
@@ -462,6 +478,11 @@ async function verifyCaptcha(token){
   }
 }
 
+document.getElementById('fPhoneCode').addEventListener('change', (e)=>{
+  const phoneInput = document.getElementById('fPhone');
+  phoneInput.placeholder = e.target.value ? '900 000-00-00' : '+998 90 123-45-67';
+});
+
 document.getElementById('entForm').addEventListener('submit', async (e)=>{
   e.preventDefault();
   const btn = document.getElementById('entSubmitBtn');
@@ -469,11 +490,20 @@ document.getElementById('entForm').addEventListener('submit', async (e)=>{
   const name = document.getElementById('fName').value.trim();
   const telegramUsername = document.getElementById('fTg').value.trim();
   const email = document.getElementById('fEmail').value.trim();
+  const phoneCode = document.getElementById('fPhoneCode').value;
+  const phoneNumRaw = document.getElementById('fPhone').value.trim();
+  const phone = phoneNumRaw ? (phoneCode ? `${phoneCode} ${phoneNumRaw}` : phoneNumRaw) : '';
   const description = document.getElementById('fDesc').value.trim();
   if(!name || !telegramUsername || !email || !description){
     toast('Заполните имя, Telegram, email и описание проекта','error');
     return;
   }
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const PHONE_RE = /^\+?[\d\s\-()]{10,20}$/;
+  const TG_RE = /^@?[a-zA-Z]\w{4,31}$/;
+  if(!EMAIL_RE.test(email)){ toast('Проверьте email — похоже, в нём опечатка','error'); return; }
+  if(!TG_RE.test(telegramUsername)){ toast('Telegram: только буквы, цифры и подчёркивания, 5–32 символа (например, @ivanov)','error'); return; }
+  if(phone && !PHONE_RE.test(phone)){ toast('Проверьте номер телефона','error'); return; }
 
   const cap = await verifyCaptcha(entCaptchaToken);
   if(cap.reachable && !cap.ok){
@@ -492,7 +522,7 @@ document.getElementById('entForm').addEventListener('submit', async (e)=>{
       body: JSON.stringify({
         name, company: document.getElementById('fCompany').value.trim() || null,
         telegramUsername, email,
-        phone: document.getElementById('fPhone').value.trim() || null,
+        phone: phone || null,
         projectType: document.getElementById('fType').value.trim() || null,
         description,
         ownServer: state.ownServer,

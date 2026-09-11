@@ -831,7 +831,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
         <div class="filezone" id="filesZone">
           <input type="file" id="fFiles" multiple accept="image/*,.pdf,.zip,.rar,.doc,.docx,.psd,.fig" style="display:none"/>
           <div class="filezone-ico c-purple"><svg viewBox="0 0 24 24"><path d="m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"/></svg></div>
-          <div class="filezone-text"><strong>Нажмите или перетащите</strong> файлы · до 10 МБ каждый</div>
+          <div class="filezone-text"><strong>Нажмите или перетащите</strong> файлы · до 8 файлов, до 8 МБ каждый</div>
         </div>
         <div class="chips" id="fileChips"></div>
       </div>
@@ -966,6 +966,13 @@ const API = 'https://antviz.ru/api';
 
 let currentUser=null,agreed=false,favFile=null,uploadedFiles=[];
 const FORMAT_LABELS={landing:'Лендинг-визитка',multipage:'Многостраничный сайт',shop:'Интернет-магазин',custom:'Особый случай',bot:'Telegram-бот / мини-апп'};
+// ⚠️ ЦЕНЫ ЗАДУБЛИРОВАНЫ в трёх местах (три разных деплоя, общий модуль
+// сюда напрямую не подключить): здесь, в mqrz/api/pricing.js (TIER_PRICES/
+// EXTRA_PRICES) и в servvv/routes/payments.js (recalcOrderTotal). Изменил
+// цену тут — обязательно поменяй и в тех двух файлах, иначе клиент увидит
+// одну сумму на форме, а спишется другая (сервер всегда пересчитывает сам,
+// он тут финальный источник правды, но расхождение с тем, что показано
+// на экране — плохой UX и путаница в статистике).
 const TIERS={
   start:{name:'Старт',base:2900,pages:1,meta:'1 страница · 1–2 дня'},
   growth:{name:'Рост',base:5900,pages:5,meta:'до 5 страниц · 2–5 дней'},
@@ -1312,11 +1319,17 @@ document.getElementById('fFiles').addEventListener('change',async e=>{
   await handleFiles(Array.from(e.target.files));
   e.target.value='';
 });
+const MAX_FILES=8;
+const MAX_IMAGE_BYTES=2.5*1024*1024;   // после сжатия
+const MAX_OTHER_BYTES=8*1024*1024;     // pdf/zip/rar/doc/docx/psd/fig — без сжатия
+const MAX_TOTAL_BYTES=20*1024*1024;    // суммарно по всем файлам (страхуемся от лимита тела запроса на бэкенде)
 async function handleFiles(files){
   for(const f of files){
     if(uploadedFiles.find(u=>u.name===f.name))continue;
-    if(f.type&&f.type.startsWith('image/')){try{const d=await compressImg(f,1600,.72,'image/jpeg');if(d.length*0.75>900*1024){toast(f.name+': слишком тяжёлый','error');continue;}uploadedFiles.push({name:f.name,type:'image/jpeg',size:Math.round(d.length*0.75),dataUrl:d});}catch(err){toast('Не удалось: '+f.name,'error');}}
-    else{if(f.size>700*1024){toast(f.name+': больше 700 КБ — пришлите в чат поддержки','error');continue;}uploadedFiles.push(f);}
+    if(uploadedFiles.length>=MAX_FILES){toast('Максимум '+MAX_FILES+' файлов — остальное пришлите в чат поддержки','error');break;}
+    const totalSoFar=uploadedFiles.reduce((s,u)=>s+(u.size||0),0);
+    if(f.type&&f.type.startsWith('image/')){try{const d=await compressImg(f,1600,.72,'image/jpeg');const size=Math.round(d.length*0.75);if(size>MAX_IMAGE_BYTES){toast(f.name+': слишком тяжёлый даже после сжатия','error');continue;}if(totalSoFar+size>MAX_TOTAL_BYTES){toast('Суммарный размер файлов больше 20 МБ — пришлите остальное в чат поддержки','error');continue;}uploadedFiles.push({name:f.name,type:'image/jpeg',size,dataUrl:d});}catch(err){toast('Не удалось: '+f.name,'error');}}
+    else{if(f.size>MAX_OTHER_BYTES){toast(f.name+': больше 8 МБ — пришлите в чат поддержки','error');continue;}if(totalSoFar+f.size>MAX_TOTAL_BYTES){toast('Суммарный размер файлов больше 20 МБ — пришлите остальное в чат поддержки','error');continue;}uploadedFiles.push(f);}
   }
   renderChips();
 }
@@ -1437,7 +1450,7 @@ async function submitOrder(paymentType) {
   if(state.extras.content)extrasArr.push('content');if(state.extras.shop)extrasArr.push('shop');if(state.extras.urgent)extrasArr.push('urgent');
   if(state.extras.botPay)extrasArr.push('bot_pay');if(state.extras.botCrm)extrasArr.push('bot_crm');
   let favData=null;if(favFile){try{favData=await f2b(favFile);}catch(e){toast('Не удалось прикрепить фавикон','error');}}
-  const BUDGET=850*1024;let used=favData?Math.round(favData.length*0.75):0;const attachments=[];
+  const BUDGET=MAX_TOTAL_BYTES;let used=favData?Math.round(favData.length*0.75):0;const attachments=[];
   for(const f of uploadedFiles){try{const d=await f2b(f);const b=Math.round(d.length*0.75);if(used+b>BUDGET){toast(`«${f.name}» не поместился — пришлите в чат поддержки`,'error');continue;}used+=b;attachments.push({fileData:d,fileName:f.name,fileType:f.type});}catch(e){toast(`Не удалось: «${f.name}»`,'error');}}
   let order;
   try{

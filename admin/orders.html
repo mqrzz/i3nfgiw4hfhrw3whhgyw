@@ -665,6 +665,16 @@ function iconFor(label){
   return `<svg viewBox="0 0 24 24">${ICONS[key]}</svg>`;
 }
 function icCard(label,value,highlight){return `<div class="ic${highlight?' highlight':''}"><div class="ic-l">${label}</div><div class="ic-v">${value}</div></div>`;}
+// launchDate приходит из Postgres как "YYYY-MM-DD" ИЛИ как полный ISO-таймстамп
+// ("YYYY-MM-DDT..Z") — раньше здесь слепо клеили 'T12:00:00' сзади, и на
+// ISO-строке получалось "...T00:00:00.000ZT12:00:00" → Invalid Date.
+function parseWishDate(v){
+  if(!v)return null;
+  let d;
+  if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))d=new Date(v+'T12:00:00');
+  else d=new Date(v);
+  return isNaN(d.getTime())?null:d;
+}
 function heroChip(label,value){return `<div class="hc"><div class="hc-l">${label}</div><div class="hc-v">${value}</div></div>`;}
 const AVATAR_COLORS={0:'#8b93a3',1:'#f59e0b',2:'#3b82f6',3:'#7c3aed',4:'#f59e0b',5:'#0f9950',6:'#f59e0b','-1':'#8b93a3'};
 function initials(name){const n=(name||'').trim();if(!n)return'?';const parts=n.split(/\s+/);return (parts[0][0]+(parts[1]?parts[1][0]:'')).toUpperCase();}
@@ -811,9 +821,10 @@ function showDetail(o){
   // Желаемая дата запуска от клиента — теперь на видном месте в блоке «Даты»,
   // а не спрятана внутри брифа.
   const ldBox=document.getElementById('launchDateBox');
-  if(o.launchDate){
+  const wishDate=parseWishDate(o.launchDate);
+  if(wishDate){
     ldBox.style.display='block';
-    const dateStr=new Date(o.launchDate+'T12:00:00').toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});
+    const dateStr=wishDate.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});
     ldBox.innerHTML=icCard('Желаемая дата запуска (от клиента)',esc(dateStr),true);
   }else{ ldBox.style.display='none'; ldBox.innerHTML=''; }
 

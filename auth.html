@@ -633,14 +633,43 @@
   let flow = 'login'; // 'login' | 'register'
   let pendingEmail = '';
 
+  // Раньше .steps-stage мгновенно меняла высоту (display:none → block),
+  // и карточка, центрированная через align-items:center, резко прыгала
+  // на новую позицию в момент переключения шага — особенно заметно на
+  // ПК, где панель слева ещё едет 0.6s, а высота уже скакнула. Плавно
+  // анимируем саму высоту контейнера шагов (FLIP: замеряем высоту до,
+  // применяем смену шага, замеряем высоту после, анимируем от старой к новой).
+  function animateStageHeight(applyChange){
+    const stage = document.querySelector('.steps-stage');
+    if(!stage){ applyChange(); return; }
+    const oldH = stage.offsetHeight;
+    applyChange();
+    const newH = stage.scrollHeight;
+    stage.style.transition = 'none';
+    stage.style.overflow = 'hidden';
+    stage.style.height = oldH + 'px';
+    void stage.offsetHeight; // форсируем reflow, чтобы браузер зафиксировал стартовую высоту
+    stage.style.transition = 'height .45s var(--ease)';
+    stage.style.height = newH + 'px';
+    const cleanup = () => {
+      stage.style.transition = '';
+      stage.style.height = '';
+      stage.style.overflow = '';
+      stage.removeEventListener('transitionend', cleanup);
+    };
+    stage.addEventListener('transitionend', cleanup);
+  }
+
   window.goToStep = function(step, opts){
-    if(!(opts && opts.replace) && currentStep !== step) stepHistory.push(currentStep);
-    document.querySelectorAll('.step-view').forEach(el=>el.classList.remove('active','back'));
-    const el = document.getElementById('step-'+step);
-    el.classList.add('active');
-    currentStep = step;
-    if(step === 'identify'){ pageWrap.classList.remove('focused'); }
-    else{ pageWrap.classList.add('focused'); }
+    animateStageHeight(() => {
+      if(!(opts && opts.replace) && currentStep !== step) stepHistory.push(currentStep);
+      document.querySelectorAll('.step-view').forEach(el=>el.classList.remove('active','back'));
+      const el = document.getElementById('step-'+step);
+      el.classList.add('active');
+      currentStep = step;
+      if(step === 'identify'){ pageWrap.classList.remove('focused'); }
+      else{ pageWrap.classList.add('focused'); }
+    });
     if(step==='code') setTimeout(()=>document.getElementById('code-boxes')._focusFirst?.(),300);
     if(step==='totp') setTimeout(()=>document.getElementById('totp-boxes')._focusFirst?.(),300);
     if(step==='recovery') setTimeout(()=>document.getElementById('recovery-input')?.focus(),300);
@@ -651,12 +680,14 @@
     goToStep(prev, { replace:true });
   };
   window.goToIdentify = function(){
-    document.querySelectorAll('.step-view').forEach(el=>el.classList.remove('active'));
-    const el = document.getElementById('step-identify');
-    el.classList.add('active','back');
-    pageWrap.classList.remove('focused');
-    currentStep='identify';
-    stepHistory = [];
+    animateStageHeight(() => {
+      document.querySelectorAll('.step-view').forEach(el=>el.classList.remove('active'));
+      const el = document.getElementById('step-identify');
+      el.classList.add('active','back');
+      pageWrap.classList.remove('focused');
+      currentStep='identify';
+      stepHistory = [];
+    });
   };
 
   // ── Яндекс ──

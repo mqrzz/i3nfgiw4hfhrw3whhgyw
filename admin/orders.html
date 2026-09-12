@@ -1043,13 +1043,31 @@ window.saveBot=async()=>{
   toast('Сохранено и клиент уведомлён ✓','success');
 };
 window.activateSupport=async(orderId,uid)=>{
+  // Раньше писало напрямую в orders.support_active/support_expires_at,
+  // мимо service_subscriptions — теперь через общий эндпоинт, который
+  // реально заводит подписку (без него лимит заявок на сервере её не видел).
+  try{
+    const resp=await fetch(`${API}/subscriptions/${orderId}/admin-grant`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({})});
+    if(!resp.ok){const d=await resp.json().catch(()=>({}));throw new Error(d.error||'ошибка');}
+  }catch(e){toast(e.message||'Не удалось активировать','error');return;}
+  const idx=allOrders.findIndex(o=>o.id===orderId);
   const exp=new Date(Date.now()+30*864e5);
-  const ok=await safeUpdate(orderId,{supportActive:true,supportStartedAt:new Date().toISOString(),supportExpiresAt:exp.toISOString(),supportRequested:false});
-  if(!ok)return;
+  if(idx>=0)allOrders[idx]={...allOrders[idx],supportActive:true,supportStartedAt:new Date().toISOString(),supportExpiresAt:exp.toISOString(),supportRequested:false};
+  updateStats();renderList();if(selOrderId===orderId)renderSupport(allOrders[idx]);
   if(uid)await notifyClient(uid,'✅ Обслуживание активировано','Обслуживание подключено на 30 дней.',null);
   toast('Активировано ✓','success');
 };
-window.renewSupport=async orderId=>{ const exp=new Date(Date.now()+30*864e5); await safeUpdate(orderId,{supportExpiresAt:exp.toISOString()},'Продлено на 30 дней ✓'); };
+window.renewSupport=async orderId=>{
+  try{
+    const resp=await fetch(`${API}/subscriptions/${orderId}/admin-grant`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({})});
+    if(!resp.ok){const d=await resp.json().catch(()=>({}));throw new Error(d.error||'ошибка');}
+    const sub=await resp.json();
+    const idx=allOrders.findIndex(o=>o.id===orderId);
+    if(idx>=0)allOrders[idx]={...allOrders[idx],supportExpiresAt:sub.periodEnd};
+    updateStats();renderList();if(selOrderId===orderId)renderSupport(allOrders[idx]);
+    toast('Продлено на 30 дней ✓','success');
+  }catch(e){toast(e.message||'Не удалось продлить','error');}
+};
 window.sendExpiryNotif=async uid=>{
   if(!uid)return;
   try{ await notifyClient(uid,'⚠️ Истекает обслуживание','Свяжитесь с поддержкой для продления.',null); toast('Уведомление отправлено ✓','success'); }

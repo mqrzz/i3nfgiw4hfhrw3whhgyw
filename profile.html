@@ -142,6 +142,10 @@
   .empty-row svg{width:16px;height:16px;flex-shrink:0;}
 
   .heatmap{margin-top:14px;}
+  .dot-new{background:var(--text-faint)}
+  .dot-progress{background:var(--amber)}
+  .dot-done{background:var(--green)}
+  .dot-declined{background:var(--red)}
   .heatmap-rows{display:flex;flex-direction:column;gap:4px;}
   .heatmap-row{display:flex;align-items:center;gap:4px;}
   .heatmap-day{font-size:10px;color:var(--text-faint);width:20px;}
@@ -350,6 +354,11 @@
         <div class="heatmap-rows" id="heatmap"></div>
         <div class="heatmap-axis"><span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>23:00</span></div>
       </div>
+    </div>
+
+    <div class="section-head" id="enterpriseSectionHead" style="display:none"><div class="section-title">Заявка на крупный проект</div></div>
+    <div class="card" id="enterpriseCard" style="display:none">
+      <div id="enterpriseCardBody"></div>
     </div>
 
     <div class="section-head">
@@ -703,6 +712,38 @@ async function watchNotifDot(){
   renderHeatmap(latestOrders, latestNotifications);
 }
 
+// П.7: статус заявки на крупный проект (enterprise_applications), если она
+// у пользователя есть — раньше такой заявки в личном кабинете вообще не
+// было видно, узнать статус можно было только перепиской. Показываем самую
+// свежую (обычно она и единственная), не выдумываем шаги сверх тех, что
+// реально умеет проставлять админка (new/in_progress/done/declined).
+const ENTERPRISE_STATUS = {
+  new:         { label: 'Заявка получена', sub: 'Рассмотрим и свяжемся в Telegram или на почту в ближайшее время.', dot: 'dot-new' },
+  in_progress: { label: 'В работе', sub: 'Мы уже обсуждаем детали проекта — ждите сообщения от команды.', dot: 'dot-progress' },
+  done:        { label: 'Завершено', sub: 'Проект принят в работу как отдельная договорённость.', dot: 'dot-done' },
+  declined:    { label: 'Не подошло по формату', sub: 'Похоже, что проект не подошёл под крупный формат — напишите нам, если хотите уточнить детали.', dot: 'dot-declined' },
+};
+async function loadEnterpriseStatus(){
+  try{
+    const resp = await fetch(`${API}/enterprise/mine`, { credentials: 'include' });
+    if(!resp.ok) return;
+    const apps = await resp.json();
+    if(!apps.length) return;
+    const a = apps[0];
+    const st = ENTERPRISE_STATUS[a.status] || ENTERPRISE_STATUS.new;
+    document.getElementById('enterpriseSectionHead').style.display='flex';
+    document.getElementById('enterpriseCard').style.display='block';
+    document.getElementById('enterpriseCardBody').innerHTML = `
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 4px">
+        <span class="status-dot ${st.dot}" style="width:10px;height:10px;border-radius:50%;flex-shrink:0"></span>
+        <div style="min-width:0">
+          <div style="font-weight:500;color:var(--text)">${st.label}</div>
+          <div style="font-size:13px;color:var(--text-dim);margin-top:3px">${st.sub}</div>
+        </div>
+      </div>`;
+  }catch(e){ console.warn('loadEnterpriseStatus:', e); }
+}
+
 (async function initProfile(){
   let user = null;
   try{
@@ -725,6 +766,7 @@ async function watchNotifDot(){
   document.getElementById('loadingScreen').style.display='none';
   document.getElementById('cabinet').style.display='block';
   loadOrders();
+  loadEnterpriseStatus();
   watchNotifDot();
   touchSession();
   watchSessionRevocation(() => { window.location.href = '/auth.html'; });

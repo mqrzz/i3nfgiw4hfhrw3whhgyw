@@ -966,13 +966,14 @@ const API = 'https://antviz.ru/api';
 
 let currentUser=null,agreed=false,favFile=null,uploadedFiles=[];
 const FORMAT_LABELS={landing:'Лендинг-визитка',multipage:'Многостраничный сайт',shop:'Интернет-магазин',custom:'Особый случай',bot:'Telegram-бот / мини-апп'};
-// ⚠️ ЦЕНЫ ЗАДУБЛИРОВАНЫ в трёх местах (три разных деплоя, общий модуль
-// сюда напрямую не подключить): здесь, в mqrz/api/pricing.js (TIER_PRICES/
-// EXTRA_PRICES) и в servvv/routes/payments.js (recalcOrderTotal). Изменил
-// цену тут — обязательно поменяй и в тех двух файлах, иначе клиент увидит
-// одну сумму на форме, а спишется другая (сервер всегда пересчитывает сам,
-// он тут финальный источник правды, но расхождение с тем, что показано
-// на экране — плохой UX и путаница в статистике).
+// Цифры ниже — только ДЕФОЛТ на случай, если GET /api/pricing недоступен
+// (fail-open, чтобы форма заказа не легла из-за временной проблемы с бэком).
+// В норме сразу после загрузки страницы (см. loadCanonicalPricing() ниже)
+// base/EXTRA_PRICES перезаписываются актуальными цифрами с сервера —
+// того же самого источника, который использует createPayment.js при
+// списании. Раньше эти цены были захардкожены НЕЗАВИСИМО ещё в двух местах
+// (mqrz/api/pricing.js и servv/utils/pricing.js), и именно рассинхрон между
+// тремя копиями был причиной расхождения "показано одно — списано другое".
 const TIERS={
   start:{name:'Старт',base:2900,pages:1,meta:'1 страница · 1–2 дня'},
   growth:{name:'Рост',base:5900,pages:5,meta:'до 5 страниц · 2–5 дней'},
@@ -981,6 +982,27 @@ const TIERS={
   bot_pro:{name:'Бот с оплатой',base:9900,pages:null,meta:'Приём платежей и интеграции · 4–7 дней'},
   bot_miniapp:{name:'Mini App',base:16900,pages:null,meta:'Веб-интерфейс внутри Telegram · 7–14 дней'}
 };
+const EXTRA_PRICES={content:2000,shop:4900,botPay:3000,botCrm:2500}; // тоже дефолт, перезаписывается с сервера
+
+async function loadCanonicalPricing(){
+  try{
+    const r=await fetch(`${API}/pricing`);
+    if(!r.ok)return;
+    const p=await r.json();
+    for(const key of Object.keys(TIERS)){
+      const serverPrice=p.tierPrices?.[TIERS[key].name];
+      if(typeof serverPrice==='number')TIERS[key].base=serverPrice;
+    }
+    if(p.extraPrices){
+      if(typeof p.extraPrices.content==='number')EXTRA_PRICES.content=p.extraPrices.content;
+      if(typeof p.extraPrices.shop==='number')EXTRA_PRICES.shop=p.extraPrices.shop;
+      if(typeof p.extraPrices.bot_pay==='number')EXTRA_PRICES.botPay=p.extraPrices.bot_pay;
+      if(typeof p.extraPrices.bot_crm==='number')EXTRA_PRICES.botCrm=p.extraPrices.bot_crm;
+    }
+  }catch(e){
+    console.warn('Не удалось получить актуальные цены, используем дефолт:',e);
+  }
+}
 let state={track:null,format:null,formatNote:'',siteType:null,tier:null,extras:{domain:false,domainOpt:'new',urgent:false,content:false,shop:false,botPay:false,botCrm:false},domainName:'',promo:null,goals:[],readiness:null,references:'',launchDate:'',shopPay:[],shopDelivery:[],shopQty:''};
 const fmt=n=>Math.round(n).toLocaleString('ru');
 function escH(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -1020,6 +1042,7 @@ async function cleanupStalePending(){
 }
 
 (async function initOrderPage(){
+  loadCanonicalPricing(); // не блокируем инициализацию — обновит TIERS/EXTRA_PRICES, когда придёт
   let user = null;
   try{
     const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
@@ -1350,10 +1373,10 @@ function calcAmounts(){
   const rows=[{label:t.name,amount:t.base}];let running=t.base;
   if(state.extras.domain&&state.extras.domainOpt==='new'){rows.push({label:'Домен (покупка на рег.ру)',amount:0,free:true,note:'оплачивается отдельно'});}
   else if(state.extras.domain&&state.extras.domainOpt==='own'){rows.push({label:'Подключение домена'+(state.domainName?' ('+state.domainName+')':''),amount:0,free:true});}
-  if(state.extras.content){running+=2000;rows.push({label:'Наполнение контентом',amount:2000});}
-  if(state.extras.shop){running+=4900;rows.push({label:'Каталог и корзина',amount:4900});}
-  if(state.extras.botPay){running+=3000;rows.push({label:'Приём оплаты в боте',amount:3000});}
-  if(state.extras.botCrm){running+=2500;rows.push({label:'Интеграция с CRM/Таблицами',amount:2500});}
+  if(state.extras.content){running+=EXTRA_PRICES.content;rows.push({label:'Наполнение контентом',amount:EXTRA_PRICES.content});}
+  if(state.extras.shop){running+=EXTRA_PRICES.shop;rows.push({label:'Каталог и корзина',amount:EXTRA_PRICES.shop});}
+  if(state.extras.botPay){running+=EXTRA_PRICES.botPay;rows.push({label:'Приём оплаты в боте',amount:EXTRA_PRICES.botPay});}
+  if(state.extras.botCrm){running+=EXTRA_PRICES.botCrm;rows.push({label:'Интеграция с CRM/Таблицами',amount:EXTRA_PRICES.botCrm});}
   if(state.extras.urgent){const u=Math.round(running*0.3);running+=u;rows.push({label:'Срочный запуск',amount:u});}
   const discount=state.promo?(state.promo.type==='percent'?Math.round(running*state.promo.value/100):Math.min(state.promo.value,running)):0;
   return{rows,subtotal:running,discount,total:running-discount};
@@ -1414,6 +1437,9 @@ async function submitOrder(paymentType) {
   }catch(e){}
   if(!liveUser){currentUser=null;toast('Нужно войти в аккаунт','error');setTimeout(()=>window.location.href='auth',1200);return;}
   currentUser=liveUser;
+  // На случай, если форма открыта давно и цены на сервере успели измениться —
+  // подтягиваем актуальные ещё раз прямо перед созданием заказа.
+  await loadCanonicalPricing();
   const btnFull=document.getElementById('submitBtn');
   const btnHalf=document.getElementById('submitBtnHalf');
   const isHalf = paymentType === 'partial';

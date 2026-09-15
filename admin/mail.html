@@ -57,6 +57,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
 .sb-box svg{width:17px;height:17px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
 .sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.95rem;font-weight:300;color:var(--text);width:100%}
+.filter-tabs{display:flex;gap:8px;margin-bottom:16px}
+.filter-tab{background:var(--card);border:1.5px solid var(--line2);color:var(--muted);font-family:var(--font);font-size:.82rem;font-weight:500;padding:.5rem 1rem;border-radius:var(--r-pill);cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.filter-tab:hover{border-color:var(--line);color:var(--text)}
+.filter-tab.active{background:var(--dark);border-color:var(--dark);color:#fff}
 
 .threads-scroll{flex:1;overflow-y:auto;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
 .ti{display:flex;gap:16px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:18px 20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both}
@@ -98,6 +102,9 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .att-chip{display:flex;align-items:center;gap:7px;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.4rem .7rem;font-size:.78rem;color:var(--text);text-decoration:none;max-width:220px}
 .att-chip svg{width:14px;height:14px;stroke:var(--muted);flex-shrink:0}
 .att-chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.att-img-grid{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
+.att-img-wrap{display:block;width:120px;height:120px;border-radius:var(--r-sm);overflow:hidden;border:1.5px solid var(--line2);flex-shrink:0}
+.att-img{width:100%;height:100%;object-fit:cover;display:block}
 
 /* COMPOSER */
 .composer{flex-shrink:0;padding:10px 2px 22px}
@@ -212,6 +219,11 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
           <div class="sb-box">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             <input type="text" id="listSearch" placeholder="Поиск по почте..." oninput="renderThreads()"/>
+          </div>
+          <div class="filter-tabs" id="filterTabs">
+            <button class="filter-tab active" data-f="all" onclick="setDirFilter('all')">Все</button>
+            <button class="filter-tab" data-f="in" onclick="setDirFilter('in')">Входящие</button>
+            <button class="filter-tab" data-f="out" onclick="setDirFilter('out')">Отправленные</button>
           </div>
         </div>
         <div class="threads-scroll" id="threadsList">
@@ -334,6 +346,7 @@ const API = 'https://antviz.ru/api';
 let allThreads=[], selectedKey=null, allUsers=[], allTemplates=[];
 let editingTemplateId=null;
 let files={reply:[], compose:[]};
+let dirFilter='all';
 const MAX_FILE_BYTES = 8*1024*1024;
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
@@ -356,10 +369,17 @@ document.addEventListener('click',e=>{
 
 window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,180)+'px';};
 
+window.setDirFilter=function(f){
+  dirFilter=f;
+  document.querySelectorAll('#filterTabs .filter-tab').forEach(b=>b.classList.toggle('active', b.dataset.f===f));
+  renderThreads();
+};
+
 /* ===== СПИСОК ТРЕДОВ ===== */
 function renderThreads(){
   const q=(document.getElementById('listSearch').value||'').toLowerCase();
   let list=allThreads;
+  if(dirFilter!=='all')list=list.filter(t=>t.lastDirection===dirFilter);
   if(q)list=list.filter(t=>(t.contactName||'').toLowerCase().includes(q)||(t.contactEmail||'').toLowerCase().includes(q)||(t.lastSubject||'').toLowerCase().includes(q));
   const badge=document.getElementById('navBadgeMail');
   const totalUnread=allThreads.reduce((s,t)=>s+(t.unreadCount||0),0);
@@ -420,7 +440,11 @@ function renderMailMsgs(msgs){
   const el=document.getElementById('mailMsgs');
   if(!msgs.length){el.innerHTML='<div class="empty-l">Пока нет писем</div>';return;}
   el.innerHTML=msgs.map(m=>{
-    const atts=(m.attachments||[]).map(a=>`<a class="att-chip" href="${esc(a.data)}" download="${esc(a.name)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg><span>${esc(a.name)} · ${fmtSize(a.size)}</span></a>`).join('');
+    const allAtts=m.attachments||[];
+    const images=allAtts.filter(a=>(a.type||'').startsWith('image/'));
+    const files=allAtts.filter(a=>!(a.type||'').startsWith('image/'));
+    const imgGrid=images.length?`<div class="att-img-grid">${images.map(a=>`<a href="${esc(a.data)}" target="_blank" rel="noopener" class="att-img-wrap" title="${esc(a.name)}"><img class="att-img" src="${esc(a.data)}" alt="${esc(a.name)}"/></a>`).join('')}</div>`:'';
+    const atts=files.map(a=>`<a class="att-chip" href="${esc(a.data)}" download="${esc(a.name)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg><span>${esc(a.name)} · ${fmtSize(a.size)}</span></a>`).join('');
     const bodyBlock = m.bodyHtml
       ? `<iframe class="mm-frame" sandbox="" srcdoc="${esc(m.bodyHtml)}"></iframe>`
       : `<div class="mm-text">${esc(m.bodyText||'(пусто)')}</div>`;
@@ -431,6 +455,7 @@ function renderMailMsgs(msgs){
       </div>
       ${m.subject?`<div class="mm-subj">${esc(m.subject)}</div>`:''}
       ${bodyBlock}
+      ${imgGrid}
       ${atts?`<div class="mm-atts">${atts}</div>`:''}
     </div>`;
   }).join('');

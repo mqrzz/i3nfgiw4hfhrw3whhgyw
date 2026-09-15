@@ -19,6 +19,7 @@
     {href:'/admin/promos', label:'Промокоды', badge:null, icon:'promos'},
     {href:'/admin/reviews', label:'Отзывы', badge:null, icon:'reviews'},
     {href:'/admin/enterprise', label:'Крупные проекты', badge:'navBadgeEnterprise', icon:'enterprise'},
+    {href:'/admin/blog', label:'Блог', badge:null, icon:'blog'},
     {href:'/admin/system', label:'Система', badge:null, icon:'system'}
   ];
 
@@ -28,6 +29,7 @@
     tickets:'<path d="M2 9a3 3 0 010-6h20a3 3 0 010 6"/><path d="M2 15a3 3 0 000 6h20a3 3 0 000-6"/><path d="M6 12h12"/>',
     chats:'<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>',
     mail:'<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 8.97 6.19a2 2 0 0 0 2.06 0L22 7"/>',
+    blog:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>',
     users:'<path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/>',
     promos:'<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><circle cx="7" cy="7" r="1.5" fill="currentColor" stroke="none"/>',
     reviews:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',

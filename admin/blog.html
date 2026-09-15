@@ -468,7 +468,7 @@ document.querySelectorAll('.tab').forEach(tab => {
   let user = null;
   try {
     const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
-    if (resp.ok) user = (await resp.json()).user;
+    if (resp.ok) user = await resp.json();
   } catch {}
   if (!user) { document.getElementById('loadingScreen').style.display = 'none'; window.location.href = '/'; return; }
   if (user.role !== 'admin') { window.location.href = '/'; return; }

@@ -47,10 +47,19 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .btn-danger{background:var(--red-soft);color:var(--red)}.btn-danger:hover{background:#fbdbd6}
 .btn-block{width:100%;justify-content:center;padding:1rem 1rem;font-size:.94rem}
 .btn:disabled{opacity:.5;cursor:default;transform:none}
+.btn-sm{padding:.5rem .9rem;font-size:.8rem}
+
+/* ===== SECTION SWITCHER ===== */
+.section-switch{display:flex;gap:8px;padding-top:36px;margin-bottom:18px;flex-wrap:wrap}
+@media(max-width:760px){.section-switch{padding-top:20px}}
+.section-tab{background:var(--card);border:1.5px solid var(--line2);color:var(--muted);font-family:var(--font);font-size:.88rem;font-weight:500;padding:.6rem 1.1rem;border-radius:var(--r-pill);cursor:pointer;transition:background .15s,color .15s,border-color .15s;display:flex;align-items:center;gap:7px}
+.section-tab svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
+.section-tab:hover{border-color:var(--line);color:var(--text)}
+.section-tab.active{background:var(--dark);border-color:var(--dark);color:#fff}
 
 /* ===== LIST ===== */
-#screenList .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%}
-.list-head{padding-top:36px;flex-shrink:0}
+.screen .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%}
+.list-head{flex-shrink:0}
 .list-head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .page-title{font-size:1.7rem;font-weight:500;letter-spacing:-.02em}
 .sb-box{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1.1rem;margin-bottom:14px;transition:border-color .15s,box-shadow .15s}
@@ -62,7 +71,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .filter-tab:hover{border-color:var(--line);color:var(--text)}
 .filter-tab.active{background:var(--dark);border-color:var(--dark);color:#fff}
 
-.articles-scroll{flex:1;overflow-y:auto;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
+.items-scroll{flex:1;overflow-y:auto;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
 .ai{display:flex;gap:16px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px 20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .18s ease both}
 .ai:hover{border-color:var(--line2);box-shadow:var(--sh-md);transform:translateY(-1px)}
 .ai-ico{width:42px;height:42px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
@@ -73,11 +82,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .ai-draft{font-size:.68rem;font-weight:600;color:var(--orange-d);background:var(--orange-soft);padding:.15rem .5rem;border-radius:6px;flex-shrink:0}
 .ai-desc{font-size:.83rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
 .ai-meta{font-size:.75rem;color:var(--muted2);display:flex;gap:8px;align-items:center}
-.ai-actions{display:flex;gap:6px;flex-shrink:0}
 .empty-l{text-align:center;padding:70px 16px;color:var(--muted);font-size:.9rem}
 
-/* ===== EDITOR ===== */
-#screenEditor .inner{max-width:760px;width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
+/* ===== EDITOR (общий для статей/новостей) ===== */
+#screenEditor .inner{max-width:760px}
 .e-topbar{display:flex;align-items:center;gap:14px;padding:24px 0 8px;flex-shrink:0}
 .e-title{font-size:1.25rem;font-weight:500;letter-spacing:-.02em;flex:1}
 .e-body{flex:1;overflow-y:auto;padding:16px 2px 24px}
@@ -117,7 +125,57 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .e-foot{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 65%,transparent);padding:16px 2px 22px;flex-shrink:0;display:flex;gap:10px}
 .e-foot .btn{flex:1}
 
-/* MODAL */
+.charcount{font-size:.7rem;color:var(--muted2);text-transform:none;letter-spacing:0;font-weight:400}
+.charcount.warn{color:var(--orange-d)}
+.charcount.ok{color:var(--green-d)}
+
+.live-preview{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px;display:flex;gap:14px;align-items:flex-start}
+.live-preview .lp-ico{width:38px;height:38px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
+.live-preview .lp-ico svg{width:17px;height:17px;stroke:currentColor;stroke-width:1.8;fill:none}
+.live-preview .lp-body{flex:1;min-width:0}
+.live-preview .lp-tag{font-size:.68rem;font-weight:600;color:var(--green-d);background:var(--green-soft);padding:.12rem .5rem;border-radius:6px;display:inline-block;margin-bottom:6px}
+.live-preview h4{font-size:.98rem;font-weight:500;margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.live-preview p{font-size:.82rem;color:var(--muted);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.status-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.7rem 1rem;font-size:.83rem}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-dot.ok{background:var(--green)}.status-dot.building{background:var(--orange)}.status-dot.err{background:var(--red)}.status-dot.unknown{background:var(--muted2)}
+.status-row a{margin-left:auto;color:var(--green-d);text-decoration:none;font-weight:500;display:flex;align-items:center;gap:5px}
+.status-row a svg{width:13px;height:13px;stroke:currentColor;stroke-width:2}
+
+.check-item{display:flex;align-items:center;gap:8px;font-size:.83rem}
+.check-item .dot{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.check-item .dot.ok{background:var(--green-soft);color:var(--green-d)}
+.check-item .dot.warn{background:var(--orange-soft);color:var(--orange-d)}
+.check-item .dot svg{width:10px;height:10px;stroke:currentColor;stroke-width:3}
+.check-item.ok span{color:var(--text)}
+.check-item.warn span{color:var(--muted)}
+
+/* ===== UPDATES (таймлайн) ===== */
+.upd-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:18px 20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .18s ease both}
+.upd-card:hover{border-color:var(--line2);box-shadow:var(--sh-md);transform:translateY(-1px)}
+.upd-top{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.upd-version{font-weight:500;font-size:1rem}
+.upd-badge{font-size:.68rem;font-weight:600;color:var(--green-d);background:var(--green-soft);padding:.15rem .5rem;border-radius:6px}
+.upd-major{font-size:.68rem;font-weight:600;color:var(--orange-d);background:var(--orange-soft);padding:.15rem .5rem;border-radius:6px}
+.upd-date{font-size:.78rem;color:var(--muted2);margin-left:auto}
+.upd-items{font-size:.83rem;color:var(--muted);display:flex;flex-direction:column;gap:3px}
+.upd-item-row{display:flex;gap:8px;align-items:baseline}
+.kind-tag{font-size:.68rem;font-weight:600;padding:.05rem .4rem;border-radius:5px;flex-shrink:0}
+.kind-tag.add{color:var(--green-d);background:var(--green-soft)}
+.kind-tag.fix{color:#3b82f6;background:#eaf2fe}
+.kind-tag.change{color:var(--orange-d);background:var(--orange-soft)}
+
+.item-repeater{display:flex;flex-direction:column;gap:10px}
+.item-row{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:14px;display:flex;flex-direction:column;gap:10px}
+.item-row-top{display:flex;gap:8px;align-items:center}
+.item-row-top select{flex-shrink:0;width:auto;padding:.5rem .7rem}
+.item-row-top .fi{flex:1}
+.item-row-remove{background:none;border:none;color:var(--muted);cursor:pointer;width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:var(--r-xs)}
+.item-row-remove:hover{background:var(--red-soft);color:var(--red)}
+.item-row-remove svg{width:16px;height:16px;stroke:currentColor;stroke-width:2}
+.add-item-btn{align-self:flex-start}
+
 .modal-bg{position:fixed;inset:0;z-index:800;background:rgba(15,17,20,.5);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .18s}
 .modal-bg.show{opacity:1;pointer-events:all}
 .modal{background:var(--card);border-radius:var(--r-lg);box-shadow:var(--sh-lg);width:100%;max-width:440px;padding:26px}
@@ -131,8 +189,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}
 
 @media(max-width:760px){
-  #screenList .inner,#screenEditor .inner{padding:0 16px}
-  .list-head{padding-top:20px}
+  .screen .inner{padding:0 16px}
   .page-title{font-size:1.4rem}
 }
 </style>
@@ -144,20 +201,31 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 <div class="app" id="appWrap">
   <div class="screen-stack">
 
-    <!-- LIST -->
+    <!-- LIST (статьи / новости) -->
     <div class="screen active" id="screenList">
       <div class="inner">
+        <div class="section-switch" id="sectionSwitch">
+          <button class="section-tab active" data-s="articles" onclick="switchSection('articles')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M15 3v18"/></svg>Статьи
+          </button>
+          <button class="section-tab" data-s="news" onclick="switchSection('news')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Новости
+          </button>
+          <button class="section-tab" data-s="updates" onclick="switchSection('updates')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Обновления
+          </button>
+        </div>
         <div class="list-head">
           <div class="list-head-row">
-            <span class="page-title">Блог</span>
-            <button class="btn btn-green" onclick="openNew()">
+            <span class="page-title" id="pageTitle">Статьи</span>
+            <button class="btn btn-green" id="newBtn" onclick="openNew()">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Новая статья
+              <span id="newBtnLabel">Новая статья</span>
             </button>
           </div>
-          <div class="sb-box">
+          <div class="sb-box" id="searchBox">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-            <input type="text" id="listSearch" placeholder="Поиск по статьям..." oninput="renderList()"/>
+            <input type="text" id="listSearch" placeholder="Поиск..." oninput="renderList()"/>
           </div>
           <div class="filter-tabs" id="filterTabs">
             <button class="filter-tab active" data-f="all" onclick="setFilter('all')">Все</button>
@@ -165,43 +233,44 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
             <button class="filter-tab" data-f="draft" onclick="setFilter('draft')">Черновики</button>
           </div>
         </div>
-        <div class="articles-scroll" id="articlesList">
+        <div class="items-scroll" id="itemsList">
           <div class="empty-l">Загрузка...</div>
         </div>
       </div>
     </div>
 
-    <!-- EDITOR -->
+    <!-- EDITOR: статья/новость -->
     <div class="screen" id="screenEditor">
       <div class="inner">
         <div class="e-topbar">
           <button class="icon-btn ghost" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
           <span class="e-title" id="editorTitle">Новая статья</span>
         </div>
+        <div class="status-row" id="statusRow" style="display:none;flex-shrink:0;margin-bottom:14px">
+          <span class="status-dot unknown" id="statusDot"></span>
+          <span id="statusText">Проверка сборки...</span>
+          <a href="#" id="openOnSiteLink" target="_blank" rel="noopener">Открыть на сайте <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/></svg></a>
+        </div>
         <div class="e-body">
           <div class="e-form">
-
             <div class="fg" id="cloneFromGroup" style="display:none">
               <label class="fl">Клонировать структуру из</label>
               <select class="fsel" id="fCloneFrom"></select>
-              <span class="fhint">Новая статья возьмёт вёрстку (hero/TL;DR/TOC/FAQ) существующей статьи как каркас — дизайн не придётся собирать с нуля. Текст внутри меняешь сама/сам.</span>
+              <span class="fhint">Новый материал возьмёт вёрстку существующего как каркас. Текст внутри меняешь сама/сам.</span>
             </div>
-
             <div class="fg">
-              <label class="fl">Заголовок</label>
-              <input class="fi" id="fTitle" placeholder="Заголовок статьи" oninput="onTitleInput()"/>
+              <label class="fl">Заголовок <span class="charcount" id="titleCount">0</span></label>
+              <input class="fi" id="fTitle" placeholder="Заголовок" oninput="onTitleInput()"/>
             </div>
-
             <div class="fg" id="slugGroup">
               <label class="fl">Адрес (slug)</label>
               <input class="fi" id="fSlug" placeholder="avtomaticheski-iz-zagolovka"/>
-              <span class="fhint" id="slugHint">blog.antviz.ru/articles/...</span>
+              <span class="fhint" id="slugHint">blog.antviz.ru/...</span>
             </div>
-
             <div class="frow">
               <div class="fg">
                 <label class="fl">Категория</label>
-                <input class="fi" id="fCategory" placeholder="Например: SEO" list="categoriesList"/>
+                <input class="fi" id="fCategory" placeholder="Например: SEO" list="categoriesList" oninput="updateLivePreview()"/>
                 <datalist id="categoriesList"></datalist>
               </div>
               <div class="fg">
@@ -209,37 +278,42 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
                 <input class="fi" type="date" id="fDate"/>
               </div>
             </div>
-
             <div class="fg">
-              <label class="fl">Meta-описание (SEO, до ~160 симв.)</label>
-              <textarea class="fta" id="fDescription" rows="2" placeholder="Показывается в поиске и при шеринге"></textarea>
+              <label class="fl">Meta-описание (SEO) <span class="charcount" id="descCount">0 / 120–160</span></label>
+              <textarea class="fta" id="fDescription" rows="2" placeholder="Показывается в поиске и при шеринге" oninput="updateCounters()"></textarea>
             </div>
-
             <div class="fg">
-              <label class="fl">Экскерпт для карточек</label>
-              <textarea class="fta" id="fExcerpt" rows="2" placeholder="Короткий тизер — показывается на карточке статьи"></textarea>
+              <label class="fl">Экскерпт для карточек <span class="charcount" id="excerptCount">0</span></label>
+              <textarea class="fta" id="fExcerpt" rows="2" placeholder="Короткий тизер на карточке" oninput="updateLivePreview()"></textarea>
             </div>
-
             <div class="fg">
               <label class="fl">Обложка (OG-картинка)</label>
               <div class="cover-row">
                 <div class="cover-preview" id="coverPreview">нет картинки</div>
                 <div class="cover-fields">
-                  <input class="fi" id="fOgImage" placeholder="https://blog.antviz.ru/img/og/..." oninput="updateCoverPreview()"/>
-                  <label class="btn btn-ghost" style="cursor:pointer">
-                    Загрузить файл
+                  <input class="fi" id="fOgImage" placeholder="https://blog.antviz.ru/img/og/..." oninput="updateCoverPreview();updateChecklist()"/>
+                  <label class="btn btn-ghost" style="cursor:pointer">Загрузить файл
                     <input type="file" id="coverFileInp" accept="image/*" style="display:none" onchange="onCoverFilePicked(this.files)"/>
                   </label>
                   <span class="fhint">Рекомендуемый размер 1200×630</span>
                 </div>
               </div>
             </div>
-
             <div class="fg">
               <label class="fl">Иконка карточки</label>
               <div class="icon-grid" id="iconGrid"></div>
             </div>
-
+            <div class="fg">
+              <label class="fl">Превью карточки</label>
+              <div class="live-preview">
+                <div class="lp-ico" id="lpIco"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M15 3v18"/></svg></div>
+                <div class="lp-body">
+                  <span class="lp-tag" id="lpTag">Категория</span>
+                  <h4 id="lpTitle">Заголовок статьи</h4>
+                  <p id="lpExcerpt">Здесь появится экскерпт — так карточка будет выглядеть на сайте.</p>
+                </div>
+              </div>
+            </div>
             <div class="toggle-row">
               <div>
                 <div class="lbl">Черновик</div>
@@ -247,18 +321,90 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
               </div>
               <label class="switch"><input type="checkbox" id="fDraft"/><span class="switch-track"></span></label>
             </div>
-
             <div class="fg">
-              <label class="fl">Тело статьи (HTML) <span id="readingTimeLabel" style="text-transform:none;letter-spacing:0;color:var(--muted2)"></span></label>
-              <textarea class="fta code" id="fBody" placeholder="Сырой HTML: hero, TL;DR, оглавление, секции, FAQ..." oninput="updateReadingTime()"></textarea>
-              <span class="fhint">Это всё, что между хлебными крошками и кнопкой «наверх» — стили и остальные скрипты статьи не трогаются.</span>
+              <label class="fl">Тело (HTML) <span id="readingTimeLabel" style="text-transform:none;letter-spacing:0;color:var(--muted2)"></span></label>
+              <textarea class="fta code" id="fBody" placeholder="Сырой HTML..." oninput="updateReadingTime()"></textarea>
+              <span class="fhint">Это всё, что между хлебными крошками и подключением футера — стили и остальные скрипты не трогаются.</span>
             </div>
-
+            <div class="fg" id="checklistGroup" style="display:none">
+              <label class="fl">Перед публикацией</label>
+              <div id="checklist" style="display:flex;flex-direction:column;gap:6px"></div>
+            </div>
           </div>
         </div>
         <div class="e-foot">
           <button class="btn btn-danger" id="deleteBtn" onclick="confirmDelete()" style="display:none;flex:0">Удалить</button>
+          <button class="btn btn-ghost" id="duplicateBtn" onclick="duplicateItem()" style="display:none;flex:0">Дублировать</button>
           <button class="btn btn-green" id="saveBtn" onclick="saveArticle()">Сохранить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIST: обновления -->
+    <div class="screen" id="screenUpdatesList">
+      <div class="inner">
+        <div class="section-switch">
+          <button class="section-tab" data-s="articles" onclick="switchSection('articles')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M15 3v18"/></svg>Статьи
+          </button>
+          <button class="section-tab" data-s="news" onclick="switchSection('news')">
+            <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>Новости
+          </button>
+          <button class="section-tab active" data-s="updates" onclick="switchSection('updates')">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Обновления
+          </button>
+        </div>
+        <div class="list-head">
+          <div class="list-head-row">
+            <span class="page-title">Обновления</span>
+            <button class="btn btn-green" onclick="openNewUpdate()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:15px;height:15px"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Новая запись
+            </button>
+          </div>
+          <span class="fhint" style="margin-bottom:16px;display:block">На сайте показываются только 3 последних записи — старые автоматически уходят из ленты (но не удаляются отсюда полностью).</span>
+        </div>
+        <div class="items-scroll" id="updatesListEl">
+          <div class="empty-l">Загрузка...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDITOR: обновление -->
+    <div class="screen" id="screenUpdateEditor">
+      <div class="inner">
+        <div class="e-topbar">
+          <button class="icon-btn ghost" onclick="showScreen('updatesList')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg></button>
+          <span class="e-title">Новая запись в обновлениях</span>
+        </div>
+        <div class="e-body">
+          <div class="e-form">
+            <div class="frow">
+              <div class="fg">
+                <label class="fl">Версия</label>
+                <input class="fi" id="uVersion" placeholder="v1.3.0"/>
+              </div>
+              <div class="fg">
+                <label class="fl">Дата</label>
+                <input class="fi" type="date" id="uDate"/>
+              </div>
+            </div>
+            <div class="toggle-row">
+              <div>
+                <div class="lbl">Крупный релиз</div>
+                <div class="sub">Визуально выделяется в таймлайне (редизайн, новый раздел и т.п.)</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="uMajor"/><span class="switch-track"></span></label>
+            </div>
+            <div class="fg">
+              <label class="fl">Пункты изменений</label>
+              <div class="item-repeater" id="itemRepeater"></div>
+              <button class="btn btn-ghost btn-sm add-item-btn" onclick="addItemRow()">+ Добавить пункт</button>
+            </div>
+          </div>
+        </div>
+        <div class="e-foot">
+          <button class="btn btn-green" id="saveUpdateBtn" onclick="saveUpdate()">Сохранить</button>
         </div>
       </div>
     </div>
@@ -268,8 +414,8 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 
 <div class="modal-bg" id="deleteModalBg" onclick="if(event.target===this)closeDeleteModal()">
   <div class="modal">
-    <h3>Удалить статью?</h3>
-    <p>Файл статьи и все упоминания о ней (карточки, sitemap, RSS) будут удалены из репозитория. Действие необратимо.</p>
+    <h3 id="deleteModalTitle">Удалить?</h3>
+    <p id="deleteModalText">Файл и все упоминания о нём будут удалены из репозитория. Действие необратимо.</p>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeDeleteModal()">Отмена</button>
       <button class="btn btn-danger" onclick="doDelete()">Удалить</button>
@@ -281,8 +427,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 
 <script type="module">
 const API = 'https://antviz.ru/api';
+const SECTION_LABELS = { articles:{title:'Статьи', newBtn:'Новая статья', search:'Поиск по статьям...'}, news:{title:'Новости', newBtn:'Новая новость', search:'Поиск по новостям...'} };
 
-let allArticles = [], statusFilter = 'all', icons = [], editingSlug = null, selectedIcon = 'grid';
+let currentSection='articles', allItems=[], statusFilter='all', icons=[], editingSlug=null, selectedIcon='grid';
+let updatesList=[], editingVersion=null, itemRows=[];
 
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
@@ -294,50 +442,59 @@ function slugify(s){
 
 window.showScreen=function(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(name==='list'?'screenList':'screenEditor').classList.add('active');
+  const map={list:'screenList',editor:'screenEditor',updatesList:'screenUpdatesList',updateEditor:'screenUpdateEditor'};
+  document.getElementById(map[name]).classList.add('active');
 };
 
-/* ===== СПИСОК ===== */
+window.switchSection=function(s){
+  if(s==='updates'){
+    document.querySelectorAll('.section-tab').forEach(b=>b.classList.toggle('active', b.dataset.s==='updates'));
+    showScreen('updatesList');
+    loadUpdates();
+    return;
+  }
+  currentSection=s;
+  document.querySelectorAll('.section-tab').forEach(b=>b.classList.toggle('active', b.dataset.s===s));
+  document.getElementById('pageTitle').textContent=SECTION_LABELS[s].title;
+  document.getElementById('newBtnLabel').textContent=SECTION_LABELS[s].newBtn;
+  document.getElementById('listSearch').placeholder=SECTION_LABELS[s].search;
+  showScreen('list');
+  loadItems();
+};
+
 window.setFilter=function(f){
   statusFilter=f;
   document.querySelectorAll('#filterTabs .filter-tab').forEach(b=>b.classList.toggle('active', b.dataset.f===f));
   renderList();
 };
-
 window.renderList=function(){
   const q=(document.getElementById('listSearch').value||'').toLowerCase();
-  let list=allArticles;
+  let list=allItems;
   if(statusFilter==='published')list=list.filter(a=>!a.draft);
   if(statusFilter==='draft')list=list.filter(a=>a.draft);
   if(q)list=list.filter(a=>(a.title||'').toLowerCase().includes(q)||(a.category||'').toLowerCase().includes(q));
-  const el=document.getElementById('articlesList');
-  if(!list.length){el.innerHTML=`<div class="empty-l">${allArticles.length?'Ничего не найдено':'Статей пока нет'}</div>`;return;}
+  const el=document.getElementById('itemsList');
+  if(!list.length){el.innerHTML=`<div class="empty-l">${allItems.length?'Ничего не найдено':'Пока пусто'}</div>`;return;}
   el.innerHTML=list.map(a=>`
     <div class="ai" onclick="openEdit('${esc(a.slug)}')">
       <div class="ai-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 3v18M15 3v18"/></svg></div>
       <div class="ai-body">
-        <div class="ai-top">
-          <span class="ai-title">${esc(a.title)}</span>
-          ${a.draft?'<span class="ai-draft">Черновик</span>':''}
-        </div>
+        <div class="ai-top"><span class="ai-title">${esc(a.title)}</span>${a.draft?'<span class="ai-draft">Черновик</span>':''}</div>
         <div class="ai-desc">${esc(a.description||'')}</div>
         <div class="ai-meta"><span>${esc(a.category||'—')}</span><span>·</span><span>${fmtDate(a.publishedDate)}</span></div>
       </div>
-    </div>
-  `).join('');
+    </div>`).join('');
 };
-
-async function loadArticles(){
+async function loadItems(){
   try{
-    const resp=await fetch(`${API}/blog-cms/articles`,{credentials:'include'});
-    if(!resp.ok){ const d=await resp.json().catch(()=>({})); toast(d.error||'Не удалось загрузить статьи','error'); return; }
-    allArticles=await resp.json();
-    const cats=[...new Set(allArticles.map(a=>a.category).filter(Boolean))];
+    const resp=await fetch(`${API}/blog-cms/${currentSection}`,{credentials:'include'});
+    if(!resp.ok){const d=await resp.json().catch(()=>({}));toast(d.error||'Не удалось загрузить','error');return;}
+    allItems=await resp.json();
+    const cats=[...new Set(allItems.map(a=>a.category).filter(Boolean))];
     document.getElementById('categoriesList').innerHTML=cats.map(c=>`<option value="${esc(c)}">`).join('');
     renderList();
   }catch(e){toast('Ошибка сети: '+e.message,'error');}
 }
-
 async function loadIcons(){
   try{
     const resp=await fetch(`${API}/blog-cms/icons`,{credentials:'include'});
@@ -348,13 +505,144 @@ async function loadIcons(){
 window.selectIcon=function(key){
   selectedIcon=key;
   document.querySelectorAll('.icon-opt').forEach(el=>el.classList.toggle('sel', el.dataset.key===key));
+  const opt=document.querySelector(`.icon-opt[data-key="${key}"]`);
+  if(opt) document.getElementById('lpIco').innerHTML=opt.innerHTML;
 };
 
-/* ===== РЕДАКТОР ===== */
+/* ===== СЧЁТЧИКИ СИМВОЛОВ + ЖИВОЕ ПРЕВЬЮ КАРТОЧКИ ===== */
+window.updateCounters=function(){
+  const title=document.getElementById('fTitle').value;
+  const desc=document.getElementById('fDescription').value;
+  const excerpt=document.getElementById('fExcerpt').value;
+  document.getElementById('titleCount').textContent=title.length+' / ~60';
+  document.getElementById('titleCount').className='charcount '+(title.length>70?'warn':title.length>=20?'ok':'');
+  const dc=document.getElementById('descCount');
+  dc.textContent=desc.length+' / 120–160';
+  dc.className='charcount '+(desc.length>0 && (desc.length<80||desc.length>170)?'warn':desc.length>=120&&desc.length<=160?'ok':'');
+  document.getElementById('excerptCount').textContent=excerpt.length+' симв.';
+  updateLivePreview();
+};
+window.updateLivePreview=function(){
+  document.getElementById('lpTag').textContent=document.getElementById('fCategory').value.trim()||'Категория';
+  document.getElementById('lpTitle').textContent=document.getElementById('fTitle').value.trim()||'Заголовок статьи';
+  document.getElementById('lpExcerpt').textContent=document.getElementById('fExcerpt').value.trim()||'Здесь появится экскерпт — так карточка будет выглядеть на сайте.';
+  updateChecklist();
+};
+window.updateChecklist=function(){
+  const title=document.getElementById('fTitle').value.trim();
+  const desc=document.getElementById('fDescription').value.trim();
+  const excerpt=document.getElementById('fExcerpt').value.trim();
+  const ogImage=document.getElementById('fOgImage').value.trim();
+  const category=document.getElementById('fCategory').value.trim();
+  const checks=[
+    {ok:title.length>=15&&title.length<=70, label:'Заголовок подходящей длины (15–70 символов)'},
+    {ok:desc.length>=80&&desc.length<=170, label:'Meta-описание нормальной длины для поиска (80–170 символов)'},
+    {ok:!!excerpt, label:'Есть экскерпт для карточки'},
+    {ok:!!ogImage, label:'Есть обложка (OG-картинка)'},
+    {ok:!!category, label:'Указана категория'},
+  ];
+  document.getElementById('checklistGroup').style.display=title||desc||excerpt?'':'none';
+  document.getElementById('checklist').innerHTML=checks.map(c=>`
+    <div class="check-item ${c.ok?'ok':'warn'}">
+      <span class="dot ${c.ok?'ok':'warn'}">${c.ok?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="20 6 9 17 4 12"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}</span>
+      <span>${c.label}</span>
+    </div>`).join('');
+};
+
+/* ===== ДУБЛИРОВАНИЕ ===== */
+window.duplicateItem=function(){
+  if(!editingSlug)return;
+  const dupTitle=document.getElementById('fTitle').value+' (копия)';
+  const dupData={
+    title:dupTitle, category:document.getElementById('fCategory').value, description:document.getElementById('fDescription').value,
+    excerpt:document.getElementById('fExcerpt').value, ogImage:document.getElementById('fOgImage').value,
+    bodyHtml:document.getElementById('fBody').value, icon:selectedIcon, cloneFromSlug:editingSlug,
+  };
+  editingSlug=null;
+  document.getElementById('editorTitle').textContent='Новая статья (копия)';
+  document.getElementById('deleteBtn').style.display='none';
+  document.getElementById('duplicateBtn').style.display='none';
+  document.getElementById('cloneFromGroup').style.display='none'; // структура уже известна — копируем ту же самую
+  document.getElementById('slugGroup').style.display='';
+  document.getElementById('fTitle').value=dupData.title;
+  document.getElementById('fSlug').value=slugify(dupData.title);
+  document.getElementById('fSlug').dataset.touched='';
+  document.getElementById('fCategory').value=dupData.category;
+  document.getElementById('fDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('fDescription').value=dupData.description;
+  document.getElementById('fExcerpt').value=dupData.excerpt;
+  document.getElementById('fOgImage').value=dupData.ogImage;
+  document.getElementById('fBody').value=dupData.bodyHtml;
+  document.getElementById('fDraft').checked=true; // копию безопаснее начинать как черновик
+  selectIcon(dupData.icon);
+  window._duplicateCloneFrom=dupData.cloneFromSlug; // используем как cloneFrom при сохранении, форму клонирования не показываем
+  updateCoverPreview(); updateReadingTime(); updateCounters();
+  document.getElementById('statusRow').style.display='none';
+  toast('Копия готова к правкам — не забудь поменять адрес (slug)','info');
+};
+
+/* ===== СТАТУС СБОРКИ + ССЫЛКА НА САЙТ ===== */
+async function loadBuildStatus(slug){
+  const row=document.getElementById('statusRow');
+  if(!slug){row.style.display='none';return;}
+  row.style.display='flex';
+  const dot=document.getElementById('statusDot');
+  const text=document.getElementById('statusText');
+  const link=document.getElementById('openOnSiteLink');
+  link.href=`https://blog.antviz.ru/${currentSection}/${slug}`;
+  dot.className='status-dot unknown'; text.textContent='Проверка сборки...';
+  try{
+    const resp=await fetch(`${API}/blog-cms/build-status`,{credentials:'include'});
+    const d=await resp.json();
+    if(d.status==='built'){dot.className='status-dot ok';text.textContent='Сайт обновлён';}
+    else if(d.status==='building'){dot.className='status-dot building';text.textContent='Собирается на GitHub Pages...';}
+    else if(d.status==='errored'){dot.className='status-dot err';text.textContent='Ошибка сборки: '+(d.error||'см. GitHub Actions');}
+    else{dot.className='status-dot unknown';text.textContent='Статус сборки неизвестен';}
+  }catch(e){dot.className='status-dot unknown';text.textContent='Не удалось проверить статус';}
+}
+
+/* ===== АВТОСОХРАНЕНИЕ ЧЕРНОВИКА В БРАУЗЕРЕ (на случай закрытия вкладки) ===== */
+function autosaveKey(){return `blogAutosave:${currentSection}:${editingSlug||'new'}`;}
+function collectAutosave(){
+  return {
+    title:document.getElementById('fTitle').value, category:document.getElementById('fCategory').value,
+    description:document.getElementById('fDescription').value, excerpt:document.getElementById('fExcerpt').value,
+    ogImage:document.getElementById('fOgImage').value, bodyHtml:document.getElementById('fBody').value,
+    icon:selectedIcon, savedAt:Date.now(),
+  };
+}
+function scheduleAutosave(){
+  clearTimeout(window._autosaveT);
+  window._autosaveT=setTimeout(()=>{
+    try{localStorage.setItem(autosaveKey(), JSON.stringify(collectAutosave()));}catch(e){}
+  }, 800);
+}
+function checkAutosave(){
+  let saved=null;
+  try{saved=JSON.parse(localStorage.getItem(autosaveKey())||'null');}catch(e){}
+  if(!saved) return;
+  const minutesAgo=Math.round((Date.now()-saved.savedAt)/60000);
+  if(!confirm(`Нашёл несохранённый черновик (${minutesAgo} мин назад). Восстановить его?`))return;
+  document.getElementById('fTitle').value=saved.title||'';
+  document.getElementById('fCategory').value=saved.category||'';
+  document.getElementById('fDescription').value=saved.description||'';
+  document.getElementById('fExcerpt').value=saved.excerpt||'';
+  document.getElementById('fOgImage').value=saved.ogImage||'';
+  document.getElementById('fBody').value=saved.bodyHtml||'';
+  if(saved.icon)selectIcon(saved.icon);
+  updateCoverPreview(); updateReadingTime(); updateCounters();
+}
+function clearAutosave(){try{localStorage.removeItem(autosaveKey());}catch(e){}}
+document.addEventListener('input',(e)=>{
+  if(e.target && e.target.closest && e.target.closest('#screenEditor .e-form')) scheduleAutosave();
+});
+
 window.openNew=async function(){
   editingSlug=null;
-  document.getElementById('editorTitle').textContent='Новая статья';
+  document.getElementById('editorTitle').textContent=currentSection==='news'?'Новая новость':'Новая статья';
   document.getElementById('deleteBtn').style.display='none';
+  document.getElementById('duplicateBtn').style.display='none';
+  window._duplicateCloneFrom=null;
   document.getElementById('cloneFromGroup').style.display='';
   document.getElementById('slugGroup').style.display='';
   document.getElementById('fTitle').value='';
@@ -370,35 +658,35 @@ window.openNew=async function(){
   selectIcon('grid');
   updateCoverPreview();
   updateReadingTime();
-
-  // список для клонирования
+  updateCounters();
+  document.getElementById('statusRow').style.display='none';
   try{
-    const resp=await fetch(`${API}/blog-cms/articles-for-clone`,{credentials:'include'});
+    const resp=await fetch(`${API}/blog-cms/${currentSection}/for-clone`,{credentials:'include'});
     const list=resp.ok?await resp.json():[];
     document.getElementById('fCloneFrom').innerHTML=list.map(a=>`<option value="${esc(a.slug)}">${esc(a.title)}</option>`).join('');
   }catch(e){}
-
   showScreen('editor');
+  checkAutosave();
 };
-
 window.onTitleInput=function(){
   const slugEl=document.getElementById('fSlug');
   if(!slugEl.dataset.touched) slugEl.value=slugify(document.getElementById('fTitle').value);
+  updateCounters();
 };
 document.addEventListener('input',(e)=>{ if(e.target && e.target.id==='fSlug') e.target.dataset.touched='1'; });
 
 window.openEdit=async function(slug){
   editingSlug=slug;
-  document.getElementById('editorTitle').textContent='Редактирование статьи';
+  document.getElementById('editorTitle').textContent='Редактирование';
   document.getElementById('deleteBtn').style.display='';
+  document.getElementById('duplicateBtn').style.display='';
   document.getElementById('cloneFromGroup').style.display='none';
   document.getElementById('slugGroup').style.display='none';
   showScreen('editor');
   document.getElementById('fTitle').value='Загрузка...';
-
   try{
-    const resp=await fetch(`${API}/blog-cms/articles/${encodeURIComponent(slug)}`,{credentials:'include'});
-    if(!resp.ok){ const d=await resp.json().catch(()=>({})); toast(d.error||'Не удалось загрузить статью','error'); showScreen('list'); return; }
+    const resp=await fetch(`${API}/blog-cms/${currentSection}/${encodeURIComponent(slug)}`,{credentials:'include'});
+    if(!resp.ok){const d=await resp.json().catch(()=>({}));toast(d.error||'Не удалось загрузить','error');showScreen('list');return;}
     const a=await resp.json();
     document.getElementById('fTitle').value=a.title||'';
     document.getElementById('fSlug').value=a.slug;
@@ -409,45 +697,40 @@ window.openEdit=async function(slug){
     document.getElementById('fOgImage').value=a.ogImage||'';
     document.getElementById('fBody').value=a.bodyHtml||'';
     document.getElementById('fDraft').checked=!!a.draft;
-    selectIcon('grid'); // иконку текущей карточки не разбираем обратно — просто дефолт, можно сменить
+    selectIcon(a.icon||'grid');
     updateCoverPreview();
     updateReadingTime();
+    updateCounters();
+    if(!a.draft) loadBuildStatus(slug); else document.getElementById('statusRow').style.display='none';
+    checkAutosave();
   }catch(e){toast('Ошибка сети: '+e.message,'error');}
 };
-
 window.updateCoverPreview=function(){
   const url=document.getElementById('fOgImage').value.trim();
   const el=document.getElementById('coverPreview');
-  if(url){ el.style.backgroundImage=`url('${url}')`; el.textContent=''; }
-  else{ el.style.backgroundImage='none'; el.textContent='нет картинки'; }
+  if(url){el.style.backgroundImage=`url('${url}')`;el.textContent='';}else{el.style.backgroundImage='none';el.textContent='нет картинки';}
 };
-
 window.onCoverFilePicked=async function(files){
-  const file=files[0]; if(!file) return;
+  const file=files[0]; if(!file)return;
   if(file.size>8*1024*1024){toast('Файл слишком большой (макс. 8 МБ)','error');return;}
   const reader=new FileReader();
   reader.onload=async(e)=>{
     try{
-      const resp=await fetch(`${API}/blog-cms/image`,{
-        method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',
-        body:JSON.stringify({fileName:file.name,base64:e.target.result,folder:'og'}),
-      });
+      const resp=await fetch(`${API}/blog-cms/image`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({fileName:file.name,base64:e.target.result,folder:'og'})});
       const d=await resp.json();
-      if(!resp.ok) throw new Error(d.error||'Ошибка загрузки');
+      if(!resp.ok)throw new Error(d.error||'Ошибка загрузки');
       document.getElementById('fOgImage').value=d.url;
       updateCoverPreview();
+      updateChecklist();
       toast('Картинка загружена ✅','success');
     }catch(err){toast('Ошибка: '+err.message,'error');}
   };
   reader.readAsDataURL(file);
 };
-
 window.updateReadingTime=function(){
   const words=document.getElementById('fBody').value.replace(/<[^>]+>/g,' ').split(/\s+/).filter(Boolean).length;
-  const mins=Math.max(1,Math.round(words/200));
-  document.getElementById('readingTimeLabel').textContent=`· ~${mins} мин чтения`;
+  document.getElementById('readingTimeLabel').textContent=`· ~${Math.max(1,Math.round(words/200))} мин чтения`;
 };
-
 window.saveArticle=async function(){
   const title=document.getElementById('fTitle').value.trim();
   const category=document.getElementById('fCategory').value.trim();
@@ -456,73 +739,156 @@ window.saveArticle=async function(){
   if(!title)return toast('Укажите заголовок','error');
   if(!category)return toast('Укажите категорию','error');
   if(!publishedDate)return toast('Укажите дату публикации','error');
-  if(!bodyHtml.trim())return toast('Тело статьи не может быть пустым','error');
-
-  const payload={
-    title, category, publishedDate, bodyHtml,
-    description:document.getElementById('fDescription').value.trim(),
-    excerpt:document.getElementById('fExcerpt').value.trim(),
-    ogImage:document.getElementById('fOgImage').value.trim(),
-    icon:selectedIcon,
-    draft:document.getElementById('fDraft').checked,
-  };
-
+  if(!bodyHtml.trim())return toast('Тело не может быть пустым','error');
+  const payload={title,category,publishedDate,bodyHtml,description:document.getElementById('fDescription').value.trim(),excerpt:document.getElementById('fExcerpt').value.trim(),ogImage:document.getElementById('fOgImage').value.trim(),icon:selectedIcon,draft:document.getElementById('fDraft').checked};
   const saveBtn=document.getElementById('saveBtn');
   saveBtn.disabled=true; saveBtn.textContent='Сохраняю...';
   try{
     let resp;
     if(editingSlug){
-      resp=await fetch(`${API}/blog-cms/articles/${encodeURIComponent(editingSlug)}`,{
-        method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(payload),
-      });
+      resp=await fetch(`${API}/blog-cms/${currentSection}/${encodeURIComponent(editingSlug)}`,{method:'PUT',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify(payload)});
     }else{
       const slug=document.getElementById('fSlug').value.trim()||slugify(title);
-      const cloneFrom=document.getElementById('fCloneFrom').value;
-      if(!cloneFrom){toast('Нечего клонировать — выбери статью-каркас','error');saveBtn.disabled=false;saveBtn.textContent='Сохранить';return;}
-      resp=await fetch(`${API}/blog-cms/articles`,{
-        method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({...payload,slug,cloneFrom}),
-      });
+      const cloneFrom=window._duplicateCloneFrom||document.getElementById('fCloneFrom').value;
+      if(!cloneFrom){toast('Выбери материал-каркас для клонирования','error');saveBtn.disabled=false;saveBtn.textContent='Сохранить';return;}
+      resp=await fetch(`${API}/blog-cms/${currentSection}`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({...payload,slug,cloneFrom})});
     }
     const d=await resp.json();
-    if(!resp.ok) throw new Error(d.error||'Ошибка сохранения');
+    if(!resp.ok)throw new Error(d.error||'Ошибка сохранения');
+    clearAutosave();
     toast('Сохранено ✅','success');
-    await loadArticles();
+    await loadItems();
     showScreen('list');
-  }catch(e){
-    toast('Ошибка: '+e.message,'error');
-  }finally{
-    saveBtn.disabled=false; saveBtn.textContent='Сохранить';
-  }
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+  finally{saveBtn.disabled=false;saveBtn.textContent='Сохранить';}
 };
 
-window.confirmDelete=function(){document.getElementById('deleteModalBg').classList.add('show');};
+let deleteMode='article';
+window.confirmDelete=function(){
+  deleteMode='article';
+  document.getElementById('deleteModalTitle').textContent='Удалить материал?';
+  document.getElementById('deleteModalText').textContent='Файл и все упоминания о нём (карточки, sitemap, RSS) будут удалены из репозитория. Действие необратимо.';
+  document.getElementById('deleteModalBg').classList.add('show');
+};
 window.closeDeleteModal=function(){document.getElementById('deleteModalBg').classList.remove('show');};
 window.doDelete=async function(){
-  if(!editingSlug)return;
   try{
-    const resp=await fetch(`${API}/blog-cms/articles/${encodeURIComponent(editingSlug)}`,{method:'DELETE',credentials:'include'});
+    let resp;
+    if(deleteMode==='update'){
+      resp=await fetch(`${API}/blog-cms/updates/${encodeURIComponent(editingVersion)}`,{method:'DELETE',credentials:'include'});
+    }else{
+      if(!editingSlug)return;
+      resp=await fetch(`${API}/blog-cms/${currentSection}/${encodeURIComponent(editingSlug)}`,{method:'DELETE',credentials:'include'});
+    }
     const d=await resp.json();
-    if(!resp.ok) throw new Error(d.error||'Ошибка удаления');
+    if(!resp.ok)throw new Error(d.error||'Ошибка удаления');
     closeDeleteModal();
-    toast('Статья удалена','success');
-    await loadArticles();
-    showScreen('list');
+    toast('Удалено','success');
+    if(deleteMode==='update'){await loadUpdates();showScreen('updatesList');}
+    else{await loadItems();showScreen('list');}
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
 
-/* ===== ИНИЦИАЛИЗАЦИЯ ===== */
+async function loadUpdates(){
+  try{
+    const resp=await fetch(`${API}/blog-cms/updates/list`,{credentials:'include'});
+    if(!resp.ok){const d=await resp.json().catch(()=>({}));toast(d.error||'Не удалось загрузить','error');return;}
+    updatesList=await resp.json();
+    renderUpdatesList();
+  }catch(e){toast('Ошибка сети: '+e.message,'error');}
+}
+function renderUpdatesList(){
+  const el=document.getElementById('updatesListEl');
+  if(!updatesList.length){el.innerHTML='<div class="empty-l">Записей пока нет</div>';return;}
+  const kindLabel={add:'Добавлено',fix:'Исправлено',change:'Изменено'};
+  el.innerHTML=updatesList.map(u=>`
+    <div class="upd-card" onclick="openEditUpdate('${esc(u.version)}')">
+      <div class="upd-top">
+        <span class="upd-version">${esc(u.version)}</span>
+        ${u.fresh?'<span class="upd-badge">Свежее</span>':''}
+        ${u.major?'<span class="upd-major">Крупный релиз</span>':''}
+        <span class="upd-date">${esc(u.date)}</span>
+      </div>
+      <div class="upd-items">
+        ${u.items.slice(0,3).map(it=>`<div class="upd-item-row"><span class="kind-tag ${it.kind}">${kindLabel[it.kind]||it.kind}</span><span>${esc(it.title)}</span></div>`).join('')}
+        ${u.items.length>3?`<div style="color:var(--muted2)">и ещё ${u.items.length-3}...</div>`:''}
+      </div>
+    </div>`).join('');
+}
+window.openNewUpdate=function(){
+  editingVersion=null;
+  document.querySelector('#screenUpdateEditor .e-title').textContent='Новая запись в обновлениях';
+  document.getElementById('uVersion').value='';
+  document.getElementById('uDate').value=new Date().toISOString().slice(0,10);
+  document.getElementById('uMajor').checked=false;
+  itemRows=[{kind:'add',title:'',description:''}];
+  renderItemRows();
+  showScreen('updateEditor');
+};
+window.openEditUpdate=function(version){
+  const u=updatesList.find(x=>x.version===version);
+  if(!u)return;
+  editingVersion=version;
+  document.querySelector('#screenUpdateEditor .e-title').textContent='Запись '+version+' (правки создадут её заново с этими данными)';
+  document.getElementById('uVersion').value=u.version;
+  document.getElementById('uDate').value='';
+  document.getElementById('uMajor').checked=u.major;
+  itemRows=u.items.map(it=>({...it}));
+  renderItemRows();
+  showScreen('updateEditor');
+};
+function renderItemRows(){
+  const el=document.getElementById('itemRepeater');
+  el.innerHTML=itemRows.map((it,i)=>`
+    <div class="item-row">
+      <div class="item-row-top">
+        <select class="fsel" onchange="itemRows[${i}].kind=this.value">
+          <option value="add" ${it.kind==='add'?'selected':''}>Добавлено</option>
+          <option value="fix" ${it.kind==='fix'?'selected':''}>Исправлено</option>
+          <option value="change" ${it.kind==='change'?'selected':''}>Изменено</option>
+        </select>
+        <input class="fi" placeholder="Короткий заголовок пункта" value="${esc(it.title)}" oninput="itemRows[${i}].title=this.value"/>
+        <button class="item-row-remove" onclick="removeItemRow(${i})"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <textarea class="fta" rows="2" placeholder="Описание" oninput="itemRows[${i}].description=this.value">${esc(it.description)}</textarea>
+    </div>`).join('');
+}
+window.addItemRow=function(){itemRows.push({kind:'add',title:'',description:''});renderItemRows();};
+window.removeItemRow=function(i){itemRows.splice(i,1);renderItemRows();};
+
+window.saveUpdate=async function(){
+  const version=document.getElementById('uVersion').value.trim();
+  const date=document.getElementById('uDate').value;
+  const major=document.getElementById('uMajor').checked;
+  if(!version)return toast('Укажите версию','error');
+  if(editingVersion===null && !date)return toast('Укажите дату','error');
+  if(!itemRows.length || itemRows.some(it=>!it.title.trim()))return toast('У каждого пункта должен быть заголовок','error');
+
+  const btn=document.getElementById('saveUpdateBtn');
+  btn.disabled=true; btn.textContent='Сохраняю...';
+  try{
+    if(editingVersion){
+      await fetch(`${API}/blog-cms/updates/${encodeURIComponent(editingVersion)}`,{method:'DELETE',credentials:'include'});
+    }
+    const resp=await fetch(`${API}/blog-cms/updates`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({version,date:date||new Date().toISOString().slice(0,10),major,items:itemRows})});
+    const d=await resp.json();
+    if(!resp.ok)throw new Error(d.error||'Ошибка сохранения');
+    toast('Сохранено ✅','success');
+    await loadUpdates();
+    showScreen('updatesList');
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='Сохранить';}
+};
+
 (async function initBlogAdmin(){
   let user=null;
-  try{
-    const resp=await fetch(`${API}/auth/me`,{credentials:'include'});
-    if(resp.ok)user=await resp.json();
-  }catch(e){}
+  try{const resp=await fetch(`${API}/auth/me`,{credentials:'include'});if(resp.ok)user=await resp.json();}catch(e){}
   document.getElementById('loadingScreen').style.display='none';
   if(!user){window.location.href='/';return;}
   if(user.role!=='admin'){window.location.href='/';return;}
   document.getElementById('appWrap').style.display='flex';
   loadIcons();
-  await loadArticles();
+  await loadItems();
 })();
 </script>
 <script src="/m-panel26.js"></script>

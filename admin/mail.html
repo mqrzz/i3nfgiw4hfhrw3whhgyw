@@ -17,13 +17,13 @@ html,body{height:100%;background:#f3f4f7}
   --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
   --dark:#14171c;
   --font:'Geologica','Inter',sans-serif;
-  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
+  --r-xs:12px;--r-sm:14px;--r-md:16px;--r-lg:20px;--r-xl:24px;--r-2xl:32px;--r-pill:999px;
   --sh-sm:0 1px 2px rgba(20,23,30,.04);
   --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
   --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
-  --maxw:960px;
+  --maxw:980px;
 }
-body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
+body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;letter-spacing:-.01em;-webkit-font-smoothing:antialiased}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -50,8 +50,13 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 /* ===== SCREEN 1 — LIST ===== */
 #screenList .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%}
 .list-head{padding-top:36px;flex-shrink:0}
-.list-head-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-.page-title{font-size:1.7rem;font-weight:500;letter-spacing:-.02em}
+.list-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.list-head-titles{display:flex;flex-direction:column;gap:4px}
+.page-title{font-size:1.9rem;font-weight:500;letter-spacing:-.03em}
+.page-sub{font-size:.86rem;color:var(--muted);font-weight:400}
+.page-sub b{color:var(--text);font-weight:500}
+.page-sub .dot{color:var(--muted2)}
+.page-sub .unread-hint{color:var(--red)}
 .head-actions{display:flex;gap:10px}
 .sb-box{display:flex;align-items:center;gap:10px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1.1rem;margin-bottom:16px;transition:border-color .15s,box-shadow .15s}
 .sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
@@ -62,41 +67,49 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .filter-tab:hover{border-color:var(--line);color:var(--text)}
 .filter-tab.active{background:var(--dark);border-color:var(--dark);color:#fff}
 
-.threads-scroll{flex:1;overflow-y:auto;padding:2px 2px 32px;display:flex;flex-direction:column;gap:10px}
-.ti{display:flex;gap:16px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:18px 20px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both}
+.threads-scroll{flex:1;overflow-y:auto;padding:2px 2px 32px;display:flex;flex-direction:column;gap:8px}
+.ti{display:flex;gap:14px;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-md);padding:16px 18px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .12s;animation:fadeUp .2s ease both;position:relative}
 .ti:hover{border-color:var(--line2);box-shadow:var(--sh-md);transform:translateY(-1px)}
-.ti-avatar{width:44px;height:44px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
-.ti-avatar svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.7;fill:none}
+.ti.is-unread{border-color:var(--dark)}
+.ti-avatar{width:42px;height:42px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.8rem;font-weight:500;letter-spacing:0}
+.ti.is-unread .ti-avatar{background:var(--green);color:var(--green-d)}
 .ti-body{flex:1;min-width:0}
-.ti-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:5px}
-.ti-subj{font-size:.98rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px;min-width:0}
+.ti-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:4px}
+.ti-subj{font-size:.96rem;font-weight:500;color:var(--text);display:flex;align-items:center;gap:8px;min-width:0}
 .ti-subj-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ti-prev{font-size:.84rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
-.ti-meta{font-size:.76rem;color:var(--muted2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.ti-out-tag{font-size:.66rem;font-weight:500;color:var(--muted);background:var(--line);padding:.16rem .5rem;border-radius:6px;flex-shrink:0}
+.ti-prev{font-size:.85rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:9px;line-height:1.4}
+.ti-prev b{color:var(--text);font-weight:500}
+.ti-meta{font-size:.75rem;color:var(--muted2);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ti-out-tag{font-size:.66rem;font-weight:500;color:var(--muted);background:var(--bg);padding:.16rem .55rem;border-radius:6px;flex-shrink:0}
 .unread{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.5s infinite}
 .empty-l{text-align:center;padding:70px 16px;color:var(--muted);font-size:.9rem}
+.empty-l svg{width:32px;height:32px;stroke:var(--muted2);stroke-width:1.4;fill:none;margin-bottom:10px}
 
 /* ===== SCREEN 2 — THREAD ===== */
 #screenThread .inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:0 28px;display:flex;flex-direction:column;height:100%;overflow:hidden}
 .t-topbar{display:flex;align-items:center;gap:12px;padding:24px 0 16px;flex-shrink:0}
 .t-topbar .grow{flex:1}
 .t-info-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 24px;margin-bottom:14px;flex-shrink:0;display:flex;align-items:center;gap:16px}
-.t-avatar{width:48px;height:48px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--muted2)}
-.t-avatar svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.6;fill:none}
+.t-avatar{width:48px;height:48px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.92rem;font-weight:500}
 .t-who{flex:1;min-width:0}
-.t-subj{font-size:1.1rem;font-weight:500;letter-spacing:-.02em;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.t-subj{font-size:1.12rem;font-weight:500;letter-spacing:-.02em;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .t-user-row{font-size:.85rem;color:var(--muted)}
+.t-count{font-size:.76rem;color:var(--muted2);flex-shrink:0;white-space:nowrap}
 
 .mail-msgs{flex:1;overflow-y:auto;padding:4px 2px 20px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.day-sep{display:flex;align-items:center;gap:12px;margin:6px 0 -2px;color:var(--muted2);font-size:.74rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
+.day-sep::before,.day-sep::after{content:'';flex:1;height:1px;background:var(--line)}
 .mm{border-radius:var(--r-md);border:1.5px solid var(--line);background:var(--card);animation:fadeUp .18s ease both;overflow:hidden}
 .mm.out{border-color:var(--green-soft2);background:var(--green-soft)}
-.mm-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.mm-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid var(--line)}
 .mm.out .mm-head{border-bottom-color:var(--green-soft2)}
-.mm-from{font-size:.86rem;font-weight:500;color:var(--text)}
-.mm-time{font-size:.74rem;color:var(--muted2);white-space:nowrap}
+.mm-avatar{width:26px;height:26px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.66rem;font-weight:500}
+.mm.out .mm-avatar{background:var(--green);color:var(--green-d)}
+.mm-headtext{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.mm-from{font-size:.86rem;font-weight:500;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.mm-time{font-size:.74rem;color:var(--muted2);white-space:nowrap;margin-left:auto;flex-shrink:0}
 .mm-subj{font-size:.78rem;color:var(--muted);padding:8px 16px 0}
-.mm-frame{width:100%;height:260px;border:none;background:#fff;display:block}
+.mm-frame{width:100%;min-height:60px;border:none;background:#fff;display:block}
 .mm-text{padding:14px 16px;font-size:.9rem;line-height:1.6;white-space:pre-wrap;word-break:break-word}
 .mm-atts{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 14px}
 .att-chip{display:flex;align-items:center;gap:7px;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.4rem .7rem;font-size:.78rem;color:var(--text);text-decoration:none;max-width:220px}
@@ -108,7 +121,8 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 
 /* COMPOSER */
 .composer{flex-shrink:0;padding:10px 2px 22px}
-.composer-card{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-lg);box-shadow:var(--sh-sm);transition:border-color .15s,box-shadow .15s;overflow:hidden}
+.composer-label{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:500;padding:0 4px 8px}
+.composer-card{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-lg);box-shadow:var(--sh-md);transition:border-color .15s,box-shadow .15s;overflow:hidden}
 .composer-card:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
 .composer-top{display:flex;gap:10px;padding:12px 14px 0}
 .composer-subj{flex:1;background:var(--bg);border:1px solid var(--line2);border-radius:var(--r-xs);padding:.5rem .8rem;font-family:var(--font);font-size:.82rem;color:var(--text);outline:none}
@@ -188,7 +202,6 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
   .t-info-card{padding:14px 16px}
   #screenThread .t-topbar .exit-btn{width:auto;padding:0 16px 0 12px;gap:7px;justify-content:flex-start;border-radius:var(--r-pill);background:var(--card);box-shadow:var(--sh-sm)}
   .back-label{display:inline}
-  .mm-frame{height:200px}
 }
 </style>
 </head>
@@ -204,7 +217,10 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
       <div class="inner">
         <div class="list-head">
           <div class="list-head-row">
-            <span class="page-title">Почта</span>
+            <div class="list-head-titles">
+              <span class="page-title">Почта</span>
+              <span class="page-sub" id="listSubtitle">Загрузка…</span>
+            </div>
             <div class="head-actions">
               <button class="btn btn-ghost" onclick="openTemplates()">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:15px;height:15px"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
@@ -247,16 +263,18 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
         </div>
 
         <div class="t-info-card">
-          <div class="t-avatar"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 8.97 6.19a2 2 0 0 0 2.06 0L22 7"/></svg></div>
+          <div class="t-avatar" id="threadAvatar">—</div>
           <div class="t-who">
             <div class="t-subj" id="threadName">—</div>
             <div class="t-user-row" id="threadEmail"></div>
           </div>
+          <div class="t-count" id="threadCount"></div>
         </div>
 
         <div class="mail-msgs" id="mailMsgs"></div>
 
         <div class="composer">
+          <div class="composer-label">Ответ</div>
           <div class="composer-card">
             <div class="composer-top">
               <input class="composer-subj" id="replySubject" placeholder="Тема письма"/>
@@ -353,6 +371,24 @@ function toast(m,t='info'){const el=document.getElementById('toast');el.textCont
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
 function fmtSize(b){if(!b)return'';if(b<1024)return b+' Б';if(b<1024*1024)return Math.round(b/1024)+' КБ';return (b/1024/1024).toFixed(1)+' МБ';}
+function initials(nameOrEmail){
+  const s=String(nameOrEmail||'').trim();
+  if(!s)return'?';
+  const namePart=s.includes('@')?s.split('@')[0]:s;
+  const parts=namePart.split(/[\s._-]+/).filter(Boolean);
+  if(!parts.length)return'?';
+  if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
+}
+function dayLabel(ts){
+  if(!ts)return'';
+  const d=new Date(ts),now=new Date();
+  const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+  if(sameDay(d,now))return'Сегодня';
+  const y=new Date(now);y.setDate(y.getDate()-1);
+  if(sameDay(d,y))return'Вчера';
+  return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:d.getFullYear()!==now.getFullYear()?'numeric':undefined});
+}
 
 window.showScreen=function(name){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
@@ -384,21 +420,33 @@ function renderThreads(){
   const badge=document.getElementById('navBadgeMail');
   const totalUnread=allThreads.reduce((s,t)=>s+(t.unreadCount||0),0);
   if(badge){badge.style.display=totalUnread?'':'none';badge.textContent=totalUnread;}
+  const sub=document.getElementById('listSubtitle');
+  if(sub){
+    sub.innerHTML=allThreads.length
+      ? `<b>${allThreads.length}</b> ${plural(allThreads.length,'переписка','переписки','переписок')}${totalUnread?` <span class="dot">·</span> <span class="unread-hint">${totalUnread} непрочитан${totalUnread===1?'а':'о'}</span>`:''}`
+      : 'Пока нет ни одного письма';
+  }
   const el=document.getElementById('threadsList');
-  if(!list.length){el.innerHTML=`<div class="empty-l">${allThreads.length?'Ничего не найдено':'Писем пока нет'}</div>`;return;}
+  if(!list.length){el.innerHTML=`<div class="empty-l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 8.97 6.19a2 2 0 0 0 2.06 0L22 7"/></svg><div>${allThreads.length?'Ничего не найдено':'Писем пока нет'}</div></div>`;return;}
   el.innerHTML=list.map(t=>{
     const unread=t.unreadCount>0;
-    return`<div class="ti" onclick="selectThread('${esc(t.threadKey)}')">
-      <div class="ti-avatar"><svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 8.97 6.19a2 2 0 0 0 2.06 0L22 7"/></svg></div>
+    return`<div class="ti${unread?' is-unread':''}" onclick="selectThread('${esc(t.threadKey)}')">
+      <div class="ti-avatar">${esc(initials(t.contactName||t.contactEmail))}</div>
       <div class="ti-body">
         <div class="ti-top">
           <div class="ti-subj">${unread?'<span class="unread"></span>':''}<span class="ti-subj-text">${esc(t.contactName||t.contactEmail||'—')}</span></div>
           ${t.lastDirection==='out'?'<span class="ti-out-tag">Отправлено</span>':''}
         </div>
-        <div class="ti-prev">${esc(t.lastSubject||'')} ${t.preview?'— '+esc(t.preview):''}</div>
+        <div class="ti-prev">${t.lastSubject?`<b>${esc(t.lastSubject)}</b>`:''}${t.preview?' — '+esc(t.preview):(t.lastSubject?'':'(пусто)')}</div>
         <div class="ti-meta"><span>${esc(t.contactEmail||'')}</span><span>·</span><span>${fmtDT(t.lastAt)}</span></div>
       </div>
     </div>`;}).join('');
+}
+function plural(n,one,few,many){
+  const n10=n%10,n100=n%100;
+  if(n10===1&&n100!==11)return one;
+  if(n10>=2&&n10<=4&&(n100<10||n100>=20))return few;
+  return many;
 }
 
 async function loadThreads(){
@@ -417,6 +465,8 @@ window.selectThread=async function(key){
   showScreen('thread');
   document.getElementById('threadName').textContent=(t&&t.contactName)||key;
   document.getElementById('threadEmail').textContent=(t&&t.contactEmail)||key;
+  document.getElementById('threadAvatar').textContent=initials((t&&(t.contactName||t.contactEmail))||key);
+  document.getElementById('threadCount').textContent='';
   document.getElementById('replySubject').value='';
   document.getElementById('replyBody').value='';
   files.reply=[];renderFiles('reply');
@@ -426,6 +476,7 @@ window.selectThread=async function(key){
     const resp=await fetch(`${API}/inbound-email/threads/${encodeURIComponent(key)}`,{credentials:'include'});
     const msgs=resp.ok?await resp.json():[];
     renderMailMsgs(msgs);
+    document.getElementById('threadCount').textContent=msgs.length?`${msgs.length} ${plural(msgs.length,'письмо','письма','писем')}`:'';
     if(msgs.length){
       const last=msgs[msgs.length-1];
       document.getElementById('replySubject').value = last.subject && !/^re:/i.test(last.subject) ? `Re: ${last.subject}` : (last.subject||'');
@@ -439,28 +490,65 @@ window.selectThread=async function(key){
 function renderMailMsgs(msgs){
   const el=document.getElementById('mailMsgs');
   if(!msgs.length){el.innerHTML='<div class="empty-l">Пока нет писем</div>';return;}
-  el.innerHTML=msgs.map(m=>{
+  let lastDay=null,html='';
+  msgs.forEach(m=>{
+    const dl=dayLabel(m.createdAt);
+    if(dl&&dl!==lastDay){html+=`<div class="day-sep">${esc(dl)}</div>`;lastDay=dl;}
     const allAtts=m.attachments||[];
     const images=allAtts.filter(a=>(a.type||'').startsWith('image/'));
     const files=allAtts.filter(a=>!(a.type||'').startsWith('image/'));
     const imgGrid=images.length?`<div class="att-img-grid">${images.map(a=>`<a href="${esc(a.data)}" target="_blank" rel="noopener" class="att-img-wrap" title="${esc(a.name)}"><img class="att-img" src="${esc(a.data)}" alt="${esc(a.name)}"/></a>`).join('')}</div>`:'';
     const atts=files.map(a=>`<a class="att-chip" href="${esc(a.data)}" download="${esc(a.name)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg><span>${esc(a.name)} · ${fmtSize(a.size)}</span></a>`).join('');
+    // sandbox="allow-same-origin" (без allow-scripts) — скрипты в письме не выполняются,
+    // но родительская страница может измерить высоту содержимого и растянуть iframe под него.
+    // Раньше высота была жёстко зафиксирована (260px), и если письмо было длинным, у iframe
+    // появлялся СВОЙ скролл внутри — колесо мыши "залипало" в нём и не долистывало переписку.
+    // Теперь скролл только один — у всего списка сообщений.
     const bodyBlock = m.bodyHtml
-      ? `<iframe class="mm-frame" sandbox="" srcdoc="${esc(m.bodyHtml)}"></iframe>`
+      ? `<iframe class="mm-frame" sandbox="allow-same-origin" onload="resizeMailFrame(this)" srcdoc="${esc(m.bodyHtml)}"></iframe>`
       : `<div class="mm-text">${esc(m.bodyText||'(пусто)')}</div>`;
-    return `<div class="mm ${m.direction}">
+    const who=m.direction==='in'?esc(m.fromName||m.fromEmail):'Вы → '+esc(m.toEmail);
+    const av=initials(m.direction==='in'?(m.fromName||m.fromEmail):m.toEmail);
+    html+=`<div class="mm ${m.direction}">
       <div class="mm-head">
-        <span class="mm-from">${m.direction==='in'?esc(m.fromName||m.fromEmail):'Вы → '+esc(m.toEmail)}</span>
-        <span class="mm-time">${fmtDT(m.createdAt)}</span>
+        <div class="mm-avatar">${esc(av)}</div>
+        <div class="mm-headtext">
+          <span class="mm-from" title="${esc(m.direction==='in'?(m.fromEmail||''):(m.toEmail||''))}">${who}</span>
+          <span class="mm-time">${fmtDT(m.createdAt)}</span>
+        </div>
       </div>
       ${m.subject?`<div class="mm-subj">${esc(m.subject)}</div>`:''}
       ${bodyBlock}
       ${imgGrid}
       ${atts?`<div class="mm-atts">${atts}</div>`:''}
     </div>`;
-  }).join('');
+  });
+  el.innerHTML=html;
   el.scrollTop=el.scrollHeight;
 }
+
+window.resizeMailFrame=function(frame){
+  try{
+    const doc=frame.contentDocument;
+    if(!doc||!doc.documentElement)return;
+    const setH=()=>{
+      const h=Math.max(doc.documentElement.scrollHeight,doc.body?doc.body.scrollHeight:0);
+      frame.style.height=(h+2)+'px';
+    };
+    setH();
+    // картинки внутри письма часто догружаются позже и меняют высоту — досчитываем после загрузки
+    const imgs=doc.querySelectorAll('img');
+    let pending=imgs.length;
+    if(pending){
+      imgs.forEach(img=>{
+        if(img.complete){pending--;return;}
+        img.addEventListener('load',()=>{setH();},{once:true});
+        img.addEventListener('error',()=>{setH();},{once:true});
+      });
+    }
+    setTimeout(setH,300);
+  }catch(e){/* игнорируем — на крайний случай останется мин. высота */}
+};
 
 window.deleteThread=async function(){
   if(!selectedKey)return;
@@ -665,6 +753,7 @@ async function loadUsers(){
       if(sig===_lastThreadSig)return;
       _lastThreadSig=sig;
       renderMailMsgs(msgs);
+      document.getElementById('threadCount').textContent=msgs.length?`${msgs.length} ${plural(msgs.length,'письмо','письма','писем')}`:'';
     }catch(e){}
   }, 8000);
 })();

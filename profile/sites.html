@@ -215,10 +215,51 @@ a.site-meta-chip:hover .site-meta-ico{border-color:var(--violet)}
   .site-favicon-wrap img{width:26px;height:26px}
 }
 #sbContent{padding-bottom:80px}
-  </style>
+  
+/* Правила ПК-блока выше стояли ДО базовых стилей и перебивались ими — поднимаем в конец */
+@media(min-width:981px){
+  .btn{font-size:14px;padding:13px 22px}
+  .btn-sm{font-size:13px;padding:11px 18px}
+  .sites-grid{gap:22px}
+  .site-card{padding:34px}
+  .site-card-head{margin-bottom:22px;gap:16px}
+  .site-favicon-wrap{width:64px;height:64px;border-radius:var(--r20)}
+  .site-favicon-wrap img{width:36px;height:36px}
+  .site-favicon-wrap svg{width:32px;height:32px}
+  .site-domain{font-size:24px;margin-bottom:24px}
+  .site-meta-list{gap:13px;margin-bottom:22px}
+  .site-meta-chip{font-size:15px;gap:14px}
+  .site-meta-ico{width:36px;height:36px}
+  .site-meta-ico svg{width:16px;height:16px}
+  .site-status-pill{font-size:12.5px;padding:8px 15px}
+  .support-banner{font-size:14.5px;padding:16px 18px;gap:14px}
+  .support-banner svg{width:18px;height:18px}
+  .site-actions{gap:12px}
+  .empty{padding:110px 16px}
+  .empty-ico-wrap{width:88px;height:88px}
+  .empty-ico-wrap svg{width:42px;height:42px}
+  .empty h3{font-size:20px}
+  .empty p{font-size:14.5px}
+}
+/* ===== ПК: шапка, статистика, фильтры и крупные карточки проектов ===== */
+.sites-tools{display:none}
+.site-status-pill.warn{background:var(--amber-dim);color:var(--amber)}
+@media(min-width:981px){
+  .sites-tools{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .sites-tools .cab-tabs{flex-shrink:0}
+  .sites-grid{grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:24px}
+  .site-card{padding:32px}
+  .site-favicon-wrap{background:var(--text);box-shadow:none;width:60px;height:60px}
+  .site-favicon-wrap svg{stroke:var(--green)}
+  .site-domain{font-size:23px;margin-bottom:22px}
+  .site-actions .btn{font-size:14px;padding:13px 18px}
+  #sbContent{padding-bottom:0}
+}
+</style>
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=2">
 </head>
 <body>
-<script src="../sidebar.js" data-page="sites"></script>
+<script src="/profile/assets/sidebar.js" data-page="sites"></script>
 
 <div class="loading-screen" id="loadingScreen">
   <div class="spinner"></div>
@@ -246,7 +287,33 @@ a.site-meta-chip:hover .site-meta-ico{border-color:var(--violet)}
     </div>
   </div>
 
-  <div class="page-hero">
+  <div class="pg-head">
+    <div class="pg-head-main">
+      <h1 class="pg-title">Мои <em>проекты</em></h1>
+      <p class="pg-sub">Запущенные сайты и боты: ссылка, срок обслуживания и быстрые действия.</p>
+    </div>
+    <div class="pg-actions">
+      <a href="../order" class="cab-btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Новый заказ</a>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>Проектов</div><div class="stat-value" id="stSites">—</div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>С обслуживанием</div><div class="stat-value" id="stSup">—</div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Истекает за 7 дней</div><div class="stat-value" id="stExp">—</div></div>
+    <div class="stat is-accent"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M12 8v4"/><path d="M12 16h.01"/><circle cx="12" cy="12" r="10"/></svg>Без обслуживания</div><div class="stat-value" id="stNoSup">—</div></div>
+  </div>
+
+  <div class="sites-tools">
+    <div class="cab-tabs" id="siteTabs">
+      <button class="cab-tab is-active" data-f="all">Все</button>
+      <button class="cab-tab" data-f="sup">С обслуживанием</button>
+      <button class="cab-tab" data-f="nosup">Без обслуживания</button>
+    </div>
+    <div class="cab-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="siteSearch" placeholder="Поиск по домену" autocomplete="off"></div>
+  </div>
+
+  <div class="page-hero mob-only">
     <div>
       <div class="page-hero-eyebrow">Личный кабинет</div>
       <div class="page-hero-title">Мои <em>проекты</em></div>
@@ -291,8 +358,11 @@ function siteCard(o){
   // карточек — вся страница "Мои сайты" зависала на бесконечной загрузке,
   // потому что скрипт обрывался и не успевал скрыть спиннер.
   const hasSupport = o.supportActive && o.supportExpiresAt && new Date(o.supportExpiresAt) > new Date();
+  const daysLeft = hasSupport ? Math.ceil((new Date(o.supportExpiresAt) - new Date()) / 86400000) : null;
   const statusPill = hasSupport
-    ? `<span class="site-status-pill support">Обслуживание до ${fmtDate(o.supportExpiresAt)}</span>`
+    ? (daysLeft <= 7
+        ? `<span class="site-status-pill warn">Осталось ${daysLeft} дн.</span>`
+        : `<span class="site-status-pill support">Обслуживание до ${fmtDate(o.supportExpiresAt)}</span>`)
     : `<span class="site-status-pill is-live">Запущен</span>`;
 
   const supportBanner = hasSupport
@@ -320,6 +390,7 @@ function siteCard(o){
     <div class="site-actions">
       ${href ? `<a href="${href}" target="_blank" rel="noopener" class="btn btn-green btn-sm"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть</a>` : ''}
       <a href="tickets?order=${o.id}" class="btn btn-outline btn-sm">${hasSupport ? 'Заявка на правки' : 'Подключить обслуживание'}</a>
+      <a href="support?order=${o.id}" class="btn btn-outline btn-sm">Вопрос по проекту</a>
     </div>
   </div>`;
 }
@@ -338,6 +409,34 @@ function render(orders){
   el.innerHTML = orders.map(siteCard).join('');
 }
 
+let allSites = [], siteFilter = 'all', siteQuery = '';
+const isSup = o => !!(o.supportActive && o.supportExpiresAt && new Date(o.supportExpiresAt) > new Date());
+function siteName(o){ return (o.siteDomain || (o.botUsername ? '@'+o.botUsername : ('№ '+o.id.slice(0,8).toUpperCase()))); }
+function renderSiteStats(){
+  const set=(id,v)=>{const n=document.getElementById(id);if(n)n.textContent=v;};
+  const sup = allSites.filter(isSup);
+  set('stSites', allSites.length);
+  set('stSup', sup.length);
+  set('stExp', sup.filter(o => (new Date(o.supportExpiresAt) - new Date()) / 86400000 <= 7).length);
+  set('stNoSup', allSites.length - sup.length);
+}
+function applySites(){
+  let list = allSites.filter(o => siteFilter === 'all' || (siteFilter === 'sup' ? isSup(o) : !isSup(o)));
+  if (siteQuery) list = list.filter(o => siteName(o).toLowerCase().includes(siteQuery));
+  if (!list.length && allSites.length) {
+    document.getElementById('sitesGrid').innerHTML = '<div class="empty" style="grid-column:1/-1"><h3>Ничего не найдено</h3><p>Попробуйте другой фильтр или запрос</p></div>';
+    return;
+  }
+  render(list);
+}
+document.getElementById('siteTabs')?.addEventListener('click', e => {
+  const b = e.target.closest('.cab-tab'); if (!b) return;
+  siteFilter = b.dataset.f;
+  document.querySelectorAll('#siteTabs .cab-tab').forEach(x => x.classList.toggle('is-active', x === b));
+  applySites();
+});
+document.getElementById('siteSearch')?.addEventListener('input', e => { siteQuery = e.target.value.trim().toLowerCase(); applySites(); });
+
 (async function initSites(){
   let user = null;
   try{
@@ -355,8 +454,9 @@ function render(orders){
     const resp2 = await fetch(`${API}/orders`, { credentials: 'include' });
     if(resp2.ok) orders = await resp2.json();
   }catch(e){ console.error('sites orders:', e); }
-  const done = orders.filter(o => o.status === 5);
-  render(done);
+  allSites = orders.filter(o => o.status === 5);
+  renderSiteStats();
+  applySites();
 
   touchSession();
   watchSessionRevocation(() => { window.location.href = '/auth.html'; });

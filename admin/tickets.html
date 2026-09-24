@@ -474,7 +474,7 @@ window.saveReply=async function(){
     const resp = await fetch(`${API}/service-tickets/${selectedId}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ adminReply: val }) });
     if(!resp.ok) throw new Error();
     t.adminReply=val;
-    if(t.uid&&val)await fetch(`${API}/notifications/broadcast`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({target:t.uid,title:'💬 Ответ на заявку',text:`«${t.title||''}»: ${val}`})}).catch(()=>{});
+    if(t.uid&&val)await fetch(`${API}/notifications/broadcast`,{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({target:t.uid,type:'service',title:'💬 Ответ на заявку',text:`«${t.title||''}»: ${val}`})}).catch(()=>{});
     toast('Ответ сохранён и клиент уведомлён ✓','success');
     window.openTicket(selectedId);
     renderTickets();
@@ -498,7 +498,7 @@ window.notifyExpiry=async uid=>{
   try{
     const resp = await fetch(`${API}/notifications/broadcast`, {
       method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify({ target: uid, title:'⚠️ Обслуживание заканчивается', text:'До окончания обслуживания осталось менее 3 дней. Свяжитесь с поддержкой для продления.' }),
+      body: JSON.stringify({ target: uid, type:'service', title:'⚠️ Обслуживание заканчивается', text:'До окончания обслуживания осталось менее 3 дней. Свяжитесь с поддержкой для продления.' }),
     });
     if(!resp.ok) throw new Error();
     toast('Уведомление отправлено ✓','success');

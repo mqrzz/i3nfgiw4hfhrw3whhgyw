@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Новый тикет — Antviz</title>
+<link rel="icon" href="../img/favicon.png" type="image/png"/>
+<script>
+  try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+  // Создание тикета отдельной страницей — только для ПК. На телефоне работает форма-модалка на странице «Чат с командой».
+  if (!window.matchMedia('(min-width:981px)').matches) {
+    var q = new URLSearchParams(location.search); var o = q.get('order');
+    location.replace('support' + (o ? '?order=' + encodeURIComponent(o) : ''));
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=2">
+<style>
+  .nt-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+  .nt-full{grid-column:1 / -1}
+  .nt-card{padding:36px}
+  .nt-seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r16);padding:5px}
+  .nt-seg button{border:none;background:transparent;color:var(--text-dim);font-size:15px;font-weight:500;padding:11px 8px;border-radius:var(--r12);cursor:pointer;transition:background .15s,color .15s}
+  .nt-seg button:hover{color:var(--text)}
+  .nt-seg button.is-active{background:var(--text);color:var(--bg)}
+  .nt-seg button.is-active[data-p="high"]{background:var(--red);color:#fff}
+  .nt-drop{border:1.5px dashed var(--stroke-strong);border-radius:var(--r24);padding:28px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;cursor:pointer;background:var(--card-elevated);transition:border-color .15s,background .15s}
+  .nt-drop:hover,.nt-drop.is-over{border-color:var(--green);background:var(--green-dim)}
+  .nt-drop svg{width:26px;height:26px;stroke:var(--text-dim);stroke-width:1.7;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .nt-drop b{font-size:15.5px;font-weight:500}
+  .nt-drop span{font-size:13.5px;color:var(--text-faint)}
+  .nt-files{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+  .nt-file{display:flex;align-items:center;gap:14px;padding:11px 14px;border:1px solid var(--stroke);border-radius:var(--r16);background:var(--card-elevated)}
+  .nt-thumb{width:44px;height:44px;border-radius:var(--r12);background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--text-dim)}
+  .nt-thumb img{width:100%;height:100%;object-fit:cover}
+  .nt-thumb svg{width:20px;height:20px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .nt-file-info{flex:1;min-width:0}
+  .nt-file-name{font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nt-file-size{font-size:12.5px;color:var(--text-faint);margin-top:2px}
+  .nt-x{width:34px;height:34px;border-radius:var(--r12);border:none;background:transparent;color:var(--text-faint);cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .nt-x:hover{background:var(--red-dim);color:var(--red)}
+  .nt-x svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+  .nt-tips{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .nt-tips li{display:flex;gap:12px;font-size:14.5px;line-height:1.5;color:var(--text-dim)}
+  .nt-tips li::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);margin-top:8px;flex-shrink:0}
+  .nt-sim{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+  .nt-sim a{display:block;padding:12px 14px;border:1px solid var(--stroke);border-radius:var(--r16);background:var(--card-elevated);text-decoration:none;color:var(--text)}
+  .nt-sim a:hover{border-color:var(--text-faint)}
+  .nt-sim b{display:block;font-size:14.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nt-sim span{display:block;font-size:12.5px;color:var(--text-faint);margin-top:3px}
+  .nt-count{font-size:12.5px;color:var(--text-faint);text-align:right;margin-top:6px}
+  @media (max-width:980px){ .nt-card{padding:20px} .nt-grid{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<script src="/profile/assets/sidebar.js" data-page="support" data-back="/profile/support" data-back-label="К тикетам" data-title="Новый тикет"></script>
+
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+
+<div id="sbContent" style="display:none">
+<div class="cab-page">
+
+  <div class="pg-head">
+    <div class="pg-head-main">
+      <h1 class="pg-title">Новый тикет</h1>
+      <p class="pg-sub">Опишите вопрос — ответим в чате и пришлём уведомление. Чем больше деталей и вложений, тем быстрее решим.</p>
+    </div>
+  </div>
+
+  <div class="cab-split">
+    <form class="cab-card nt-card" id="ntForm" novalidate>
+      <div class="nt-grid">
+        <div class="cab-field">
+          <label class="cab-label" for="ntTopic">Тема обращения</label>
+          <select class="cab-select" id="ntTopic">
+            <option value="Техническая проблема">Техническая проблема</option>
+            <option value="Вопрос по оплате">Вопрос по оплате</option>
+            <option value="Правки по проекту">Правки по проекту</option>
+            <option value="Идея / предложение">Идея / предложение</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
+        <div class="cab-field">
+          <span class="cab-label">Приоритет</span>
+          <div class="nt-seg" id="ntPrio">
+            <button type="button" data-p="low">Низкий</button>
+            <button type="button" data-p="medium" class="is-active">Средний</button>
+            <button type="button" data-p="high">Высокий</button>
+          </div>
+        </div>
+
+        <div class="cab-field nt-full">
+          <label class="cab-label" for="ntOrder">Заказ <span style="text-transform:none;letter-spacing:0;font-weight:400">— необязательно</span></label>
+          <select class="cab-select" id="ntOrder"><option value="">Не привязывать к заказу</option></select>
+        </div>
+
+        <div class="cab-field nt-full">
+          <label class="cab-label" for="ntSubject">Кратко о вопросе</label>
+          <input class="cab-input" id="ntSubject" type="text" maxlength="140" placeholder="Например: не открывается страница «Контакты»" autocomplete="off">
+        </div>
+
+        <div class="cab-field nt-full">
+          <label class="cab-label" for="ntMessage">Подробности</label>
+          <textarea class="cab-textarea" id="ntMessage" placeholder="Что случилось, что ожидали увидеть, на каком адресе и в каком браузере"></textarea>
+        </div>
+
+        <div class="cab-field nt-full">
+          <span class="cab-label">Вложения</span>
+          <div class="nt-drop" id="ntDrop" tabindex="0" role="button" aria-label="Добавить файлы">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+            <b>Перетащите файлы сюда или нажмите, чтобы выбрать</b>
+            <span>Скриншоты можно вставить из буфера (Ctrl+V). Изображения, PDF, ZIP, документы Office, TXT — до 5 файлов, каждый до 8 МБ</span>
+            <input type="file" id="ntFile" multiple style="display:none">
+          </div>
+          <div class="nt-files" id="ntFiles"></div>
+        </div>
+      </div>
+
+      <div class="cab-formbar">
+        <a class="cab-btn ghost" href="support">Отмена</a>
+        <button type="submit" class="cab-btn primary" id="ntSubmit">Отправить тикет</button>
+      </div>
+    </form>
+
+    <aside class="cab-aside">
+      <div class="cab-card" id="ntHint"></div>
+      <div class="cab-card" id="ntSimilar" style="display:none">
+        <div class="cab-card-title">Возможно, вы уже писали об этом</div>
+        <div class="nt-sim" id="ntSimilarList"></div>
+      </div>
+    </aside>
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { touchSession } from './sessions.js?v=4';
+import { ACCEPT, MAX_FILES, prepareFile, attachmentPayload, fmtSize } from '/profile/assets/cabinet-attach.js?v=1';
+
+const API = 'https://antviz.ru/api';
+let userOrders = [];
+let allTickets = [];
+let files = [];        // подготовленные вложения
+let priority = 'medium';
+let sending = false;
+
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, type='info'){ const t=$('toast'); t.textContent=msg; t.className=`toast ${type} show`; clearTimeout(t._h); t._h=setTimeout(()=>t.className='toast',3200); }
+function siteTypeLabel(t){ if(t==='static')return 'Статический сайт'; if(t==='dynamic')return 'Сайт с серверной частью'; return t||''; }
+function orderLabel(o){ return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (siteTypeLabel(o.siteType)||'Сайт'); }
+
+// ── Подсказки по теме ──
+const HINTS = {
+  'Техническая проблема': { title:'Как решить быстрее', tips:['Опишите, что делали и что пошло не так','Приложите скриншот или запись экрана с ошибкой','Укажите адрес страницы и браузер'] },
+  'Вопрос по оплате':     { title:'По оплате', tips:['Выберите заказ, по которому вопрос','Если платили сами — приложите чек или скриншот платежа','Квитанции по всем платежам уже собраны в разделе «Платежи»'], cta:{label:'Открыть платежи', href:'payments'} },
+  'Правки по проекту':    { title:'Правки по проекту', tips:['Напишите, что и на какой странице нужно изменить','Приложите макет, текст или пример, если есть','Заявки на правки удобнее оформлять в «Обслуживании» — там учитывается подписка и лимит'], cta:{label:'Перейти в обслуживание', href:'tickets'} },
+  'Идея / предложение':   { title:'Идея или предложение', tips:['Расскажите, какую задачу хотите решить','Что сейчас неудобно и как это должно работать','Пример из другого сервиса поможет нам понять идею'] },
+  'Другое':               { title:'Другой вопрос', tips:['Опишите вопрос как можно подробнее','Если он про конкретный заказ — выберите его в поле выше'] },
+};
+function renderHint(){
+  const h = HINTS[$('ntTopic').value] || HINTS['Другое'];
+  $('ntHint').innerHTML = `<div class="cab-eyebrow" style="margin-bottom:10px">Подсказка</div>
+    <div class="cab-card-title">${esc(h.title)}</div>
+    <ul class="nt-tips">${h.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>
+    ${h.cta ? `<a class="cab-btn ghost sm" href="${h.cta.href}" style="margin-top:20px">${esc(h.cta.label)}</a>` : ''}`;
+}
+
+// ── Похожие тикеты (по словам из заголовка) ──
+function renderSimilar(){
+  const words = $('ntSubject').value.toLowerCase().split(/[^a-zа-яё0-9]+/i).filter(w => w.length > 3);
+  const box = $('ntSimilar');
+  if (!words.length) { box.style.display = 'none'; return; }
+  const scored = allTickets.map(t => {
+    const hay = ((t.subject||'') + ' ' + (t.topic||'')).toLowerCase();
+    return { t, sc: words.filter(w => hay.includes(w.slice(0, Math.max(4, w.length - 2)))).length };
+  }).filter(x => x.sc > 0).sort((a,b) => b.sc - a.sc).slice(0, 3);
+  if (!scored.length) { box.style.display = 'none'; return; }
+  $('ntSimilarList').innerHTML = scored.map(({t}) => `<a href="support-chat?id=${encodeURIComponent(t.id)}"><b>${esc(t.subject || t.topic)}</b><span>${t.status==='done'?'Решён':'Открыт'} · ${esc(t.topic||'')}</span></a>`).join('');
+  box.style.display = 'block';
+}
+
+// ── Вложения ──
+const ICON_FILE = '<svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>';
+function renderFiles(){
+  $('ntFiles').innerHTML = files.map((f,i) => `<div class="nt-file">
+    <div class="nt-thumb">${f.kind==='image' ? `<img src="${f.dataUrl}" alt="">` : ICON_FILE}</div>
+    <div class="nt-file-info"><div class="nt-file-name">${esc(f.name)}</div><div class="nt-file-size">${fmtSize(f.size)}</div></div>
+    <button type="button" class="nt-x" data-rm="${i}" aria-label="Убрать"><svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>
+  </div>`).join('');
+}
+async function addFiles(list){
+  for (const file of Array.from(list)) {
+    if (files.length >= MAX_FILES) { toast(`Не больше ${MAX_FILES} файлов`, 'error'); break; }
+    try { files.push(await prepareFile(file)); } catch(e) { toast(e.message, 'error'); }
+  }
+  renderFiles();
+}
+$('ntFile').setAttribute('accept', ACCEPT);
+$('ntDrop').addEventListener('click', () => $('ntFile').click());
+$('ntDrop').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('ntFile').click(); } });
+$('ntFile').addEventListener('change', e => { addFiles(e.target.files); e.target.value = ''; });
+['dragenter','dragover'].forEach(ev => $('ntDrop').addEventListener(ev, e => { e.preventDefault(); $('ntDrop').classList.add('is-over'); }));
+['dragleave','drop'].forEach(ev => $('ntDrop').addEventListener(ev, e => { e.preventDefault(); $('ntDrop').classList.remove('is-over'); }));
+$('ntDrop').addEventListener('drop', e => { if (e.dataTransfer?.files?.length) addFiles(e.dataTransfer.files); });
+$('ntFiles').addEventListener('click', e => { const b = e.target.closest('[data-rm]'); if (b) { files.splice(+b.dataset.rm, 1); renderFiles(); } });
+document.addEventListener('paste', e => {
+  const imgs = Array.from(e.clipboardData?.files || []).filter(f => f.type.startsWith('image/'));
+  if (imgs.length) { e.preventDefault(); addFiles(imgs); }
+});
+
+// ── Форма ──
+$('ntPrio').addEventListener('click', e => {
+  const b = e.target.closest('button[data-p]'); if (!b) return;
+  priority = b.dataset.p;
+  $('ntPrio').querySelectorAll('button').forEach(x => x.classList.toggle('is-active', x === b));
+});
+$('ntTopic').addEventListener('change', renderHint);
+$('ntSubject').addEventListener('input', renderSimilar);
+
+async function api(method, path, body){
+  const r = await fetch(API + path, { method, credentials:'include', headers: body ? {'Content-Type':'application/json'} : undefined, body: body ? JSON.stringify(body) : undefined });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Ошибка запроса');
+  return d;
+}
+
+$('ntForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (sending) return;
+  const subject = $('ntSubject').value.trim();
+  const message = $('ntMessage').value.trim();
+  if (!subject) { $('ntSubject').focus(); return toast('Введите краткое описание', 'error'); }
+  if (!message && !files.length) { $('ntMessage').focus(); return toast('Напишите сообщение или приложите файл', 'error'); }
+
+  sending = true;
+  const btn = $('ntSubmit'); btn.disabled = true; btn.textContent = 'Отправка…';
+  const orderId = $('ntOrder').value || null;
+  const linked = orderId ? userOrders.find(o => o.id === orderId) : null;
+  // Первое вложение уходит вместе с тикетом (картинка приоритетнее), остальные — следующими сообщениями
+  const order = [...files].sort((a, b) => (a.kind === 'image' ? 0 : 1) - (b.kind === 'image' ? 0 : 1));
+  const [first, ...rest] = order;
+  try {
+    const ticket = await api('POST', '/tickets', {
+      topic: $('ntTopic').value, priority, subject, message: message || null,
+      orderId, orderLabel: linked ? orderLabel(linked) : null,
+      ...attachmentPayload(first),
+    });
+    for (let i = 0; i < rest.length; i++) {
+      btn.textContent = `Загрузка вложений ${i + 1}/${rest.length}…`;
+      try { await api('POST', `/tickets/${ticket.id}/messages`, attachmentPayload(rest[i])); }
+      catch (err) { toast(`Не удалось отправить «${rest[i].name}»: ${err.message}`, 'error'); }
+    }
+    window.location.href = 'support-chat?id=' + encodeURIComponent(ticket.id);
+  } catch (err) {
+    toast(err.message || 'Не удалось создать тикет', 'error');
+    sending = false; btn.disabled = false; btn.textContent = 'Отправить тикет';
+  }
+});
+
+// ── Старт ──
+(async function init(){
+  let user = null;
+  try { const r = await fetch(`${API}/auth/me`, { credentials:'include' }); if (r.ok) user = await r.json(); } catch(e) {}
+  if (!user) { window.location.href = '../auth'; return; }
+  $('loadingScreen').style.display = 'none';
+  $('sbContent').style.display = 'block';
+
+  const [oRes, tRes] = await Promise.all([
+    fetch(`${API}/orders`, { credentials:'include' }).catch(() => null),
+    fetch(`${API}/tickets`, { credentials:'include' }).catch(() => null),
+  ]);
+  userOrders = oRes && oRes.ok ? await oRes.json() : [];
+  allTickets = tRes && tRes.ok ? await tRes.json() : [];
+  $('ntOrder').innerHTML = '<option value="">Не привязывать к заказу</option>' + userOrders.map(o => `<option value="${esc(o.id)}">${esc(orderLabel(o))}</option>`).join('');
+
+  const q = new URLSearchParams(location.search);
+  const topic = q.get('topic'); if (topic && HINTS[topic]) $('ntTopic').value = topic;
+  const ord = q.get('order'); if (ord && userOrders.some(o => o.id === ord)) $('ntOrder').value = ord;
+  renderHint();
+  touchSession();
+})();
+</script>
+
+<script src="../GEOBLOCK.js"></script>
+<script type="module" src="../maintenance.js"></script>
+</body>
+</html>

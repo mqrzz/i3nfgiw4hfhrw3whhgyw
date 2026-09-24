@@ -1,0 +1,52 @@
+/* ==========================================================================
+   cabinet-base.css — токены, сброс и базовые элементы (спиннер, тосты).
+   Подключается ТОЛЬКО на новых страницах кабинета (support-new, support-chat,
+   payments), у которых нет своего inline-CSS. Старые страницы держат эти же
+   значения у себя — поэтому сюда их не тянем, чтобы не менять их вид.
+   ========================================================================== */
+
+/* ---------- 1. Токены и база ---------- */
+:root{
+  --bg:#101113; --card:#191b1e; --card-elevated:#1e2124; --surface2:#26282c; --stroke:#2a2d31; --stroke-strong:rgba(255,255,255,0.12);
+  --text:#f4f5f6; --text-dim:#9a9da2; --text-faint:#65686d;
+  --green:#1ede7b; --green-dim:rgba(30,222,123,0.14); --green-text:#1ede7b;
+  --blue:#4d9fff; --blue-dim:rgba(77,159,255,0.14);
+  --amber:#ffb74d; --amber-dim:rgba(255,183,77,0.14);
+  --red:#ff5c5c; --red-dim:rgba(255,92,92,0.14);
+  --violet:#a78bfa; --violet-dim:rgba(167,139,250,0.16);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.22);
+  --shadow-md:0 2px 4px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.38);
+  --shadow-lg:0 8px 16px rgba(0,0,0,0.32), 0 30px 60px rgba(0,0,0,0.5);
+  --shadow:var(--shadow-md);
+  --spring:cubic-bezier(.32,1.4,.5,1);
+  --r64:64px;--r40:40px;--r32:32px;--r24:24px;--r20:20px;--r16:16px;--r14:14px;--r12:12px;
+  --cab-max:1480px;
+}
+html[data-theme="light"]{
+  --bg:#eef0f2; --card:#ffffff; --card-elevated:#f7f8f9; --surface2:#eef0f2; --stroke:#e6e8eb; --stroke-strong:rgba(15,17,20,0.13);
+  --text:#15171a; --text-dim:#6b6f76; --text-faint:#9a9da2;
+  --green-dim:rgba(18,184,102,0.12); --green-text:#0fa860;
+  --blue-dim:rgba(77,159,255,0.12);
+  --amber-dim:rgba(230,150,40,0.14);
+  --red-dim:rgba(230,60,60,0.10);
+  --violet-dim:rgba(124,92,230,0.12);
+  --shadow-sm:0 1px 2px rgba(20,20,25,0.04), 0 2px 6px rgba(20,20,25,0.05);
+  --shadow-md:0 2px 4px rgba(20,20,25,0.04), 0 16px 32px rgba(20,20,25,0.09);
+  --shadow-lg:0 8px 16px rgba(20,20,25,0.06), 0 30px 60px rgba(20,20,25,0.16);
+  --shadow:var(--shadow-md);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg)}
+body{color:var(--text);font-family:'Geologica',sans-serif;letter-spacing:-0.03em;font-weight:400;transition:background .2s ease,color .2s ease;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;letter-spacing:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes cabFadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center}
+.spinner{width:26px;height:26px;border:2px solid var(--stroke);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(10px);z-index:9700;padding:.7rem 1.5rem;border-radius:var(--r16);font-size:14px;font-weight:500;opacity:0;box-shadow:var(--shadow-lg);transition:opacity .22s,transform .22s;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:var(--green);color:#0d1210}
+.toast.error,.toast.info{background:rgba(23,24,27,0.78);color:var(--text);border:1px solid var(--stroke-strong);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%)}
+html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{background:rgba(255,255,255,0.8)}
+

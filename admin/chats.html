@@ -123,6 +123,9 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .msg.sup{background:var(--card);color:var(--text);align-self:flex-start;border-bottom-left-radius:6px;border:1.5px solid var(--line)}
 .msg-time{font-size:.68rem;color:var(--muted2);display:block;margin-top:7px}
 .msg-img{max-width:240px;border-radius:var(--r-sm);margin-top:9px;display:block;cursor:pointer}
+.msg-file{display:flex;align-items:center;gap:9px;margin-top:9px;padding:9px 12px;border-radius:var(--r-sm);background:rgba(0,0,0,.05);color:inherit;text-decoration:none;font-size:.82rem;font-weight:500}
+.msg-file:hover{background:rgba(0,0,0,.09)}
+.msg-file small{display:block;font-weight:400;opacity:.65;font-size:.72rem}
 
 /* COMPOSER — единая карточка вместо серой полосы */
 .composer{flex-shrink:0;padding:14px 2px 22px}
@@ -352,7 +355,7 @@ async function notifyClient(uid,title,text,button){
   try{
     await fetch(`${API}/notifications/broadcast`, {
       method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
-      body: JSON.stringify({ target: uid, title, text, buttonText: button?.text, buttonUrl: button?.url }),
+      body: JSON.stringify({ target: uid, title, text, type: 'support', buttonText: button?.text, buttonUrl: button?.url }),
     });
   }catch(err){console.error('Не удалось уведомить клиента:',err);}
 }
@@ -430,6 +433,7 @@ window.selectTicket=async function(id){
     <div class="t-info-item"><span class="t-info-label">Пользователь</span><span class="t-info-val">${esc(ticket.userName||'—')}</span></div>
     <div class="t-info-item"><span class="t-info-label">Создан</span><span class="t-info-val">${fmtDT(ticket.createdAt)}</span></div>
     <div class="t-info-item"><span class="t-info-label">Приоритет</span><span class="t-info-val">${ticket.priority?priLabel(ticket.priority):'—'}</span></div>
+    ${ticket.rating?`<div class="t-info-item"><span class="t-info-label">Оценка клиента</span><span class="t-info-val">${'★'.repeat(ticket.rating)}${'☆'.repeat(5-ticket.rating)}${ticket.ratingComment?` · ${esc(ticket.ratingComment)}`:''}</span></div>`:''}
     ${ticket.orderId?`<div class="t-info-item"><span class="t-info-label">Заказ</span><a class="t-info-val t-order-link" href="/admin/orders?id=${ticket.orderId}" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Открыть заказ')} ↗</a></div>`:''}
   `;
 
@@ -471,7 +475,8 @@ function renderChat(msgs){
       <div class="msg-label ${isUser?'usr':'sup'}">${isUser?esc(tkt?.userName||'Клиент'):'Поддержка'}</div>
       <div class="msg ${isUser?'usr':'sup'}">
         ${esc(m.text)}
-        ${m.imageUrl?`<img class="msg-img" src="${m.imageUrl}" alt="" onclick="showLightbox('${m.imageUrl}')"/>`:''}
+        ${m.imageUrl?`<img class="msg-img" src="${esc(m.imageUrl)}" alt="" onclick="showLightbox(this.src)"/>`:''}
+        ${m.file?`<a class="msg-file" href="${API}/tickets/${selectedId}/messages/${m.id}/file" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>${esc(m.file.name)}<small>${m.file.size?Math.max(1,Math.round(m.file.size/1024))+' КБ':''}</small></span></a>`:''}
         <span class="msg-time">${fmtTime(m.createdAt)}</span>
       </div>
     </div>`;
@@ -494,7 +499,7 @@ window.sendReply=async function(){
     if(t){ t._lastMsg=text; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
     const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
     if(msgsResp.ok) renderChat(await msgsResp.json());
-    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support',webApp:true});
+    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support-chat?id='+selectedId,webApp:true});
     renderList();
   }catch(e){toast('Ошибка: '+e.message,'error');}
 };
@@ -521,7 +526,7 @@ window.sendImg=async function(){
       if(t){ t._lastMsg='Изображение'; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
       const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
       if(msgsResp.ok) renderChat(await msgsResp.json());
-      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support',webApp:true});
+      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support-chat?id='+selectedId,webApp:true});
       toast('Изображение отправлено ✓','success');
       renderList();
     }catch(e){toast('Ошибка','error');}

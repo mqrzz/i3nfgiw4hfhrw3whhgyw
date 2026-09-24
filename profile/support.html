@@ -82,12 +82,6 @@
   @media (min-width:981px){
     /* Список тикетов — узкая колонка вместо растянутой на 1240px,
        см. тот же приём в notifications.html/sites.html. */
-    .content{max-width:820px;}
-    .hero{padding:42px;}
-    .hero-title{font-size:26px;}
-    .hero-sub{font-size:15px;margin-top:6px;}
-    .unread-pip{min-width:24px;height:24px;font-size:13px;}
-    .new-ticket-btn{font-size:14px;padding:13px 20px;}
     .toolbar{padding:0 6px;}
     .tabs{padding:5px;gap:3px;}
     .tab{font-size:14px;padding:10px 18px;}
@@ -192,6 +186,7 @@
   .chat-msg .msg-time{display:block;font-size:12px;margin-top:4px;opacity:.65;}
   .chat-msg .msg-img{max-width:200px;border-radius:10px;margin-top:6px;display:block;cursor:zoom-in;transition:opacity .15s;}
   .chat-msg .msg-img:hover{opacity:.9;}
+  .chat-msg .msg-file{display:block;margin-top:6px;padding:8px 10px;border-radius:10px;background:rgba(127,127,127,.15);color:inherit;text-decoration:none;font-size:13px;word-break:break-all;}
 
   /* ===== лайтбокс для просмотра вложений ===== */
   .lightbox-overlay{position:fixed;inset:0;z-index:9800;background:rgba(8,9,10,.88);display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .2s;}
@@ -295,10 +290,45 @@
   .toast.info{background:rgba(23,24,27,0.72);color:var(--text);border:1px solid var(--stroke-strong);-webkit-backdrop-filter:blur(16px) saturate(180%);backdrop-filter:blur(16px) saturate(180%);}
   html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{background:rgba(255,255,255,0.72);}
   #sbContent{padding-bottom:60px;}
+
+  /* ===== ПК: список тикетов на всю ширину + боковая колонка ===== */
+  .ticket-order-cell{display:none}
+  .ticket-preview-order{display:none}
+  .ticket-stars{font-size:13px;color:var(--amber);letter-spacing:1px;white-space:nowrap}
+  .sup-topic{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--r16);border:1px solid var(--stroke);background:var(--card-elevated);color:var(--text);text-decoration:none;font-size:15px;font-weight:500;transition:border-color .15s}
+  .sup-topic:hover{border-color:var(--text-faint)}
+  .sup-topic svg{width:18px;height:18px;stroke:var(--text-dim);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+  .sup-topic .go{margin-left:auto;width:16px;height:16px;stroke:var(--text-faint)}
+  .sup-topics{display:flex;flex-direction:column;gap:10px}
+  .sup-note{font-size:14.5px;color:var(--text-dim);line-height:1.55}
+  .sup-note b{color:var(--text);font-weight:500}
+  @media (min-width:981px){
+    .toolbar{padding:0;margin-bottom:20px;gap:16px}
+    .tabs{padding:5px;gap:3px}
+    .tab{font-size:15px;padding:11px 20px}
+    .card{padding:6px 32px;border-radius:var(--r32)}
+    .ticket-row{padding:22px 4px;gap:20px}
+    .ticket-icon{width:54px;height:54px;border-radius:var(--r16)}
+    .ticket-icon svg{width:23px;height:23px}
+    .ticket-subject{font-size:17px}
+    .ticket-subject .badge.tag-order{display:none}
+    .ticket-preview{font-size:14.5px;margin-top:5px}
+    .ticket-preview-order{display:inline;color:var(--text-dim)}
+    .cab-split{grid-template-columns:minmax(0,1fr) 340px}
+    .ticket-right{flex-direction:row;align-items:center;gap:22px}
+    .ticket-date{width:104px;text-align:right;font-size:14px}
+    .badge{font-size:13px;padding:6px 13px}
+    .ticket-chevron{width:19px;height:19px}
+    .empty-state{padding:110px 16px}
+    .empty-state h3{font-size:21px}
+    .empty-state p{font-size:15.5px}
+    .sup-main .search-box{display:block}
+  }
 </style>
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=2">
 </head>
 <body>
-<script src="../sidebar.js" data-page="support"></script>
+<script src="/profile/assets/sidebar.js" data-page="support"></script>
 
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
@@ -325,7 +355,7 @@
       </div>
     </div>
 
-    <div class="hero">
+    <div class="hero mob-only">
       <div>
         <div class="hero-title">Поддержка <span class="unread-pip" id="headerUnread" style="display:none">0</span></div>
         <div class="hero-sub">Вопросы, идеи, сообщения об ошибках — поддержка на связи</div>
@@ -336,22 +366,57 @@
       </button>
     </div>
 
-    <div class="toolbar">
-      <div class="filters">
-        <div class="tabs" id="ticketTabs">
-          <button class="tab is-active" data-filter="all">Все</button>
-          <button class="tab" data-filter="open">Открытые</button>
-          <button class="tab" data-filter="in-progress">В обработке</button>
-          <button class="tab" data-filter="resolved">Решённые</button>
-        </div>
+    <div class="pg-head">
+      <div class="pg-head-main">
+        <h1 class="pg-title">Чат с командой <span class="pg-pip" id="headerUnreadPc" style="display:none">0</span></h1>
+        <p class="pg-sub">Вопросы, идеи, сообщения об ошибках — поддержка на связи. Ответ приходит в чат и уведомлением.</p>
       </div>
-      <span class="count-label" id="ticketCount"></span>
+      <div class="pg-actions">
+        <button class="cab-btn primary" id="newTicketBtnPc"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Новый тикет</button>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="ticket-list-inner" id="ticketsList">
-        <div style="padding:32px;color:var(--text-faint);font-size:13px;text-align:center">Загрузка...</div>
+    <div class="stat-strip">
+      <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Всего тикетов</div><div class="stat-value" id="statTotal">0</div></div>
+      <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Открытые</div><div class="stat-value" id="statOpen">0</div></div>
+      <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M21.801 10A10 10 0 1 1 17 3.335"/><path d="m9 11 3 3L22 4"/></svg>Решённые</div><div class="stat-value" id="statDone">0</div></div>
+      <div class="stat is-accent"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>Новых ответов</div><div class="stat-value" id="statUnread">0</div></div>
+    </div>
+
+    <div class="cab-split">
+      <div class="sup-main">
+        <div class="toolbar">
+          <div class="filters">
+            <div class="tabs" id="ticketTabs">
+              <button class="tab is-active" data-filter="all">Все</button>
+              <button class="tab" data-filter="open">Открытые</button>
+              <button class="tab" data-filter="done">Решённые</button>
+            </div>
+          </div>
+          <div class="cab-toolbar-right">
+            <div class="cab-search pc-only"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="ticketSearch" placeholder="Поиск по темам и заказам" autocomplete="off"></div>
+            <span class="count-label" id="ticketCount"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="ticket-list-inner" id="ticketsList">
+            <div style="padding:32px;color:var(--text-faint);font-size:13px;text-align:center">Загрузка...</div>
+          </div>
+        </div>
       </div>
+
+      <aside class="cab-aside">
+        <div class="cab-card">
+          <div class="cab-card-head" style="margin-bottom:16px"><div><div class="cab-card-title">Быстрое обращение</div><div class="cab-card-sub">Выберите тему — форма откроется с ней</div></div></div>
+          <div class="sup-topics"><a class="sup-topic" href="support-new?topic=Техническая%20проблема"><svg viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>Техническая проблема<svg class="go" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a><a class="sup-topic" href="support-new?topic=Вопрос%20по%20оплате"><svg viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>Вопрос по оплате<svg class="go" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a><a class="sup-topic" href="support-new?topic=Правки%20по%20проекту"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>Правки по проекту<svg class="go" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a><a class="sup-topic" href="support-new?topic=Идея%20%2F%20предложение"><svg viewBox="0 0 24 24"><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>Идея или предложение<svg class="go" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></svg></a></div>
+        </div>
+        <div class="cab-card">
+          <div class="cab-card-title" style="margin-bottom:10px">Правки по сайту?</div>
+          <p class="sup-note">Заявки на правки и доработки готового проекта удобнее оформлять в разделе <b>«Обслуживание»</b> — там учитывается подписка и лимит заявок.</p>
+          <a class="cab-btn ghost sm" href="tickets" style="margin-top:16px">Открыть обслуживание</a>
+        </div>
+      </aside>
     </div>
 
   </div>
@@ -527,10 +592,9 @@ function siteTypeLabel(t){if(t==='static')return'Статический сайт
 // Единая монохромная иконка тикета — без цветовой дифференциации по теме.
 const TICKET_ICON = '<path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>';
 function hasUnread(ticket) {
-  const msgs = ticket._messages || [];
-  if (!msgs.length) return false;
-  const last = msgs[msgs.length - 1];
-  return last.sender === 'admin' && !ticket._read;
+  // read у тикета = увидел ли КЛИЕНТ последний ответ (см. routes/tickets.js). Раньше проверялись
+  // _messages/_read, которые на старте всегда пусты, — из-за этого «непрочитанное» не показывалось.
+  return ticket.read === false;
 }
 function orderLabel(o){
   return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (siteTypeLabel(o.siteType)||'Сайт');
@@ -588,44 +652,58 @@ window.selectOrder = function(id){
   });
 };
 
+function isPc() { return window.matchMedia('(min-width:981px)').matches; }
+
 function renderTickets() {
   const el = document.getElementById('ticketsList');
-  const statusFilter = document.querySelector('.tab.is-active')?.dataset.filter || 'all';
+  const statusFilter = document.querySelector('#ticketTabs .tab.is-active')?.dataset.filter || 'all';
+  const q = (document.getElementById('ticketSearch')?.value || '').trim().toLowerCase();
   let filtered = allTickets.filter(t => statusFilter === 'all' || t.status === statusFilter);
+  if (q) filtered = filtered.filter(t => [t.subject, t.topic, t.orderLabel].join(' ').toLowerCase().includes(q));
   filtered.sort((a, b) => {
     const au = hasUnread(a) ? 1 : 0, bu = hasUnread(b) ? 1 : 0;
     if (au !== bu) return bu - au;
-    const at = a.updatedAt?.seconds || a.createdAt?.seconds || 0;
-    const bt = b.updatedAt?.seconds || b.createdAt?.seconds || 0;
+    const at = new Date(a.updatedAt || a.createdAt || 0).getTime();
+    const bt = new Date(b.updatedAt || b.createdAt || 0).getTime();
     return bt - at;
   });
 
   const unreadCount = allTickets.filter(t => hasUnread(t)).length;
-  const headerBadge = document.getElementById('headerUnread');
-  if (headerBadge) { headerBadge.textContent = unreadCount; headerBadge.style.display = unreadCount ? 'inline-flex' : 'none'; }
+  ['headerUnread', 'headerUnreadPc'].forEach(id => {
+    const badge = document.getElementById(id);
+    if (badge) { badge.textContent = unreadCount; badge.style.display = unreadCount ? 'inline-flex' : 'none'; }
+  });
+  const setText = (id, v) => { const n = document.getElementById(id); if (n) n.textContent = v; };
+  setText('statTotal', allTickets.length);
+  setText('statOpen', allTickets.filter(t => t.status !== 'done').length);
+  setText('statDone', allTickets.filter(t => t.status === 'done').length);
+  setText('statUnread', unreadCount);
   const countEl = document.getElementById('ticketCount');
   if (countEl) countEl.textContent = filtered.length ? `${filtered.length} тикет${filtered.length===1?'':(filtered.length>=2&&filtered.length<=4?'а':'ов')}` : '';
 
   if (!filtered.length) {
-    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><h3>Тикетов нет</h3><p>Напишите — поможем с любым вопросом</p><button class="new-ticket-btn" style="margin:0 auto" onclick="document.getElementById('newTicketBtn').click()">Создать тикет</button></div>`;
+    const searching = !!q || statusFilter !== 'all';
+    el.innerHTML = `<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><h3>${searching ? 'Ничего не найдено' : 'Тикетов нет'}</h3><p>${searching ? 'Попробуйте другой фильтр или запрос' : 'Напишите — поможем с любым вопросом'}</p>${searching ? '' : '<button class="new-ticket-btn" style="margin:0 auto" onclick="startNewTicket()">Новый тикет</button>'}</div>`;
     return;
   }
   el.innerHTML = filtered.map((t, i) => {
     const unread = hasUnread(t);
-    const msgs = t._messages || [];
-    const lastMsg = msgs[msgs.length - 1];
-    const preview = lastMsg ? esc((lastMsg.text && lastMsg.text !== 'Вложение') ? lastMsg.text : (lastMsg.imageUrl ? 'Изображение' : '')).slice(0, 70) : '';
+    const preview = esc(t.topic || '');
     const linkedOrder = t.orderId ? userOrders.find(o=>o.id===t.orderId) : null;
+    const orderName = linkedOrder ? (linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase())) : (t.orderLabel || '');
+    const orderBadge = orderName ? `<span class="badge tag-order">${esc(orderName)}</span>` : '';
+    const stars = t.rating ? `<span class="ticket-stars" title="Ваша оценка">${'★'.repeat(t.rating)}</span>` : '';
     return `<button class="ticket-row" style="animation-delay:${Math.min(i,8)*25}ms" onclick="openDrawer('${t.id}')">
       <div class="ticket-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${TICKET_ICON}</svg>${unread ? '<span class="unread-dot"></span>' : ''}</div>
       <div class="ticket-mid">
         <div class="ticket-subject${unread?' unread':''}">
           ${esc(t.subject || t.topic || 'Тикет')}
-          ${linkedOrder ? `<span class="badge tag-order">${esc(linkedOrder.siteDomain || ('№ '+linkedOrder.id.slice(0,8).toUpperCase()))}</span>` : ''}
+          ${orderBadge}
         </div>
-        <div class="ticket-preview">${preview || esc(t.topic || '')}</div>
+        <div class="ticket-preview">${preview}${orderName ? `<span class="ticket-preview-order"> · ${esc(orderName)}</span>` : ''}</div>
       </div>
       <div class="ticket-right">
+        ${stars}
         <span class="badge ${t.status}">${statusLabel(t.status)}</span>
         <span class="ticket-date">${formatDate(t.updatedAt || t.createdAt)}</span>
       </div>
@@ -652,6 +730,7 @@ function buildChat(msgs) {
       <div class="chat-msg ${cls}">
         ${m.imageUrl ? `<img class="msg-img" src="${esc(m.imageUrl)}" alt="Вложение" onclick="openLightbox('${esc(m.imageUrl)}')"/>` : ''}
         ${m.text && m.text !== 'Вложение' ? esc(m.text).replace(/\n/g,'<br>') : ''}
+        ${m.file ? `<a class="msg-file" href="${API}/tickets/${encodeURIComponent(_activeTicketId)}/messages/${encodeURIComponent(m.id)}/file" target="_blank" rel="noopener">📎 ${esc(m.file.name)}</a>` : ''}
         <span class="msg-time">${time}</span>
       </div>
     </div>`;
@@ -660,12 +739,14 @@ function buildChat(msgs) {
 }
 
 window.openDrawer = async function(id) {
+  // ПК: чат — отдельная страница (три колонки), выезжающая панель остаётся только на мобильных
+  if (isPc()) { window.location.href = 'support-chat?id=' + encodeURIComponent(id); return; }
   const ticket = allTickets.find(t => t.id === id);
   if (!ticket) return;
   _activeTicketId = id;
 
-  if (ticket._read === false) {
-    ticket._read = true;
+  if (ticket.read === false) {
+    ticket.read = true;
     renderTickets();
     fetch(`${API}/tickets/${id}/read`, { method: 'PATCH', credentials: 'include' }).catch(() => {});
   }
@@ -785,7 +866,15 @@ function openModal() {
   renderOrderPicker();
 }
 
-document.getElementById('newTicketBtn').addEventListener('click', openModal);
+window.startNewTicket = function(orderId){
+  // ПК: создание тикета — отдельная страница, модалка остаётся для мобильных
+  if (isPc()) { window.location.href = 'support-new' + (orderId ? '?order=' + encodeURIComponent(orderId) : ''); return; }
+  openModal();
+  if (orderId) setTimeout(() => window.selectOrder(orderId), 50);
+};
+document.getElementById('newTicketBtn').addEventListener('click', () => startNewTicket());
+document.getElementById('newTicketBtnPc')?.addEventListener('click', () => startNewTicket());
+document.getElementById('ticketSearch')?.addEventListener('input', renderTickets);
 document.getElementById('cancelTicketBtn').addEventListener('click', () => document.getElementById('ticketFormOverlay').classList.remove('show'));
 
 document.getElementById('ticketFile').addEventListener('change', function() {
@@ -822,7 +911,7 @@ document.getElementById('submitTicketBtn').addEventListener('click', async funct
       if (!resp.ok) { const d = await resp.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
       const ticket = await resp.json();
       ticket._messages = [];
-      ticket._read = true;
+      ticket.read = true;
       allTickets = [ticket, ...allTickets];
       document.getElementById('ticketFormOverlay').classList.remove('show');
       toast('Тикет создан ✓', 'success');
@@ -845,7 +934,7 @@ document.getElementById('submitTicketBtn').addEventListener('click', async funct
 document.getElementById('ticketTabs').addEventListener('click', e => {
   const btn = e.target.closest('.tab');
   if (!btn) return;
-  document.querySelectorAll('.tab').forEach(b => b.classList.toggle('is-active', b === btn));
+  document.querySelectorAll('#ticketTabs .tab').forEach(b => b.classList.toggle('is-active', b === btn));
   renderTickets();
 });
 
@@ -898,14 +987,12 @@ async function loadUserOrders(){
 
   touchSession();
 
-  // Если пришли по ссылке с конкретным заказом — сразу открываем форму создания
-  // тикета с этим заказом предвыбранным
+  // Deep-link'и: ?id=<тикет> (из уведомления) и ?order=<заказ> (из «Мои проекты»)
   const params = new URLSearchParams(window.location.search);
+  const openId = params.get('id');
+  if (openId && allTickets.some(t => t.id === openId)) { window.openDrawer(openId); return; }
   const preOrderId = params.get('order');
-  if (preOrderId && userOrders.some(o => o.id === preOrderId)) {
-    openModal();
-    setTimeout(() => window.selectOrder(preOrderId), 50);
-  }
+  if (preOrderId && userOrders.some(o => o.id === preOrderId)) window.startNewTicket(preOrderId);
 })();
 </script>
 

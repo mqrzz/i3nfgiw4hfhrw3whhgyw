@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Платежи — Antviz</title>
+<link rel="icon" href="../img/favicon.png" type="image/png"/>
+<script>
+  try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=2">
+<style>
+  .mob-top{display:flex;align-items:center;justify-content:space-between;padding:4px 0 18px}
+  .mob-top h1{font-size:26px;font-weight:600;letter-spacing:-.04em}
+  .mob-top .ib{width:42px;height:42px;border-radius:14px;border:1px solid var(--stroke);background:var(--card-elevated);color:var(--text-dim);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .mob-top .ib svg{width:19px;height:19px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  .mob-top .sun{display:none}
+  html[data-theme="light"] .mob-top .moon{display:none}
+  html[data-theme="light"] .mob-top .sun{display:block}
+
+  .pay-tools{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+  .pay-tools-r{display:flex;align-items:center;gap:12px}
+
+  .pay-table{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);box-shadow:var(--shadow-sm);padding:6px 32px}
+  .pay-row{display:grid;grid-template-columns:130px minmax(0,1fr) 170px 140px 150px;align-items:center;gap:18px;padding:20px 0;border-bottom:1px solid var(--stroke)}
+  .pay-row:last-child{border-bottom:none}
+  .pay-row.is-head{padding:18px 0 14px;font-size:12.5px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint)}
+  .pay-date{font-size:15px;color:var(--text-dim)}
+  .pay-order b{display:block;font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pay-order span{display:block;font-size:13.5px;color:var(--text-faint);margin-top:3px}
+  .pay-sum{font-size:18px;font-weight:600;letter-spacing:-.03em;text-align:right}
+  .pay-act{display:flex;justify-content:flex-end}
+  .pay-type{display:flex}
+  .pay-num{font-size:12.5px;color:var(--text-faint);margin-top:3px;font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:0}
+
+  .due-list{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .due-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 18px;border:1px solid var(--stroke);border-radius:var(--r20);background:var(--card-elevated);text-decoration:none;color:var(--text)}
+  .due-item:hover{border-color:var(--text-faint)}
+  .due-item b{display:block;font-size:15.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .due-item span{display:block;font-size:13px;color:var(--text-faint);margin-top:3px}
+  .due-item .amt{font-size:17px;font-weight:600;white-space:nowrap}
+
+  .pay-empty{padding:70px 16px}
+  .stat-value.stat-date{font-size:28px;line-height:1.15}
+  .cab-split{display:block}
+  #payAside{position:static;display:none;margin-bottom:28px}
+  #payAside .due-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}
+
+  @media (min-width:981px){ .mob-top{display:none} }
+  @media (max-width:980px){
+    .stat-strip{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+    .stat{padding:16px 18px;border-radius:var(--r24);border:1px solid var(--stroke);background:var(--card);display:flex;flex-direction:column;gap:6px}
+    .stat-label{font-size:13px;color:var(--text-dim)} .stat-label svg{display:none}
+    .stat-value{font-size:22px;font-weight:600;letter-spacing:-.04em}
+    .stat-value.stat-date{font-size:17px;line-height:1.3}
+    .stat-note{display:none}
+    .stat.is-accent{background:var(--text)} .stat.is-accent .stat-label{color:color-mix(in srgb,var(--bg) 60%,transparent)} .stat.is-accent .stat-value{color:var(--bg)}
+    #payAside{margin-bottom:20px}
+    #payAside .due-list{grid-template-columns:1fr}
+    .cab-aside .cab-card{padding:20px}
+    .pay-table{padding:4px 16px;border-radius:var(--r24)}
+    .pay-row{grid-template-columns:1fr auto;gap:6px 12px;padding:16px 0}
+    .pay-row.is-head{display:none}
+    .pay-date{grid-column:1;font-size:13px}
+    .pay-order{grid-column:1;grid-row:2}
+    .pay-type{grid-column:1;grid-row:3}
+    .pay-sum{grid-column:2;grid-row:1 / 3;align-self:start;font-size:17px}
+    .pay-act{grid-column:2;grid-row:3}
+    .pay-hide-m{display:none}
+    .pay-tools-r .cab-search{display:none}
+  }
+
+@media (min-width:981px) and (max-width:1200px){
+  .pay-table{padding:6px 20px}
+  .pay-row{grid-template-columns:96px minmax(0,1fr) 130px 110px 130px;gap:12px}
+  .pay-row .cab-btn{padding:10px 12px;font-size:13px}
+}
+</style>
+</head>
+<body>
+<script src="/profile/assets/sidebar.js" data-page="payments"></script>
+
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+
+<div id="sbContent" style="display:none">
+<div class="cab-page">
+
+  <div class="mob-top">
+    <h1>Платежи</h1>
+    <button class="ib" data-theme-toggle aria-label="Сменить тему">
+      <svg class="moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+    </button>
+  </div>
+
+  <div class="pg-head">
+    <div class="pg-head-main">
+      <h1 class="pg-title">Платежи и документы</h1>
+      <p class="pg-sub">Все оплаты по вашим заказам в одном месте. Подтверждение оплаты можно распечатать или сохранить в PDF.</p>
+    </div>
+    <div class="pg-actions">
+      <button class="cab-btn ghost" id="payCsv"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>Скачать CSV</button>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat is-accent"><div class="stat-label"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h3"/></svg>Оплачено всего</div><div class="stat-value" id="stTotal">—</div><div class="stat-note" id="stTotalNote"></div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Платежей</div><div class="stat-value" id="stCount">—</div><div class="stat-note">за всё время</div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Последний платёж</div><div class="stat-value stat-date" id="stLast">—</div><div class="stat-note" id="stLastNote"></div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/></svg>Ждёт оплаты</div><div class="stat-value" id="stDue">—</div><div class="stat-note" id="stDueNote"></div></div>
+  </div>
+
+    <aside class="cab-aside" id="payAside" style="display:none">
+      <div class="cab-card">
+        <div class="cab-card-head" style="margin-bottom:8px"><div><div class="cab-card-title">Ожидают оплаты</div><div class="cab-card-sub">Заказы с неоплаченной суммой</div></div></div>
+        <div class="due-list" id="dueList"></div>
+      </div>
+    </aside>
+  <div class="cab-split">
+    <div>
+      <div class="pay-tools">
+        <div class="cab-tabs" id="payTabs">
+          <button class="cab-tab is-active" data-f="all">Все</button>
+          <button class="cab-tab" data-f="order">Заказы</button>
+          <button class="cab-tab" data-f="extra">Доплаты</button>
+          <button class="cab-tab" data-f="support">Обслуживание</button>
+        </div>
+        <div class="pay-tools-r">
+          <div class="cab-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="paySearch" placeholder="Поиск по заказу" autocomplete="off"></div>
+          <span class="cab-count" id="payCount"></span>
+        </div>
+      </div>
+      <div class="pay-table" id="payTable"><div style="padding:40px;text-align:center;color:var(--text-faint)">Загрузка…</div></div>
+    </div>
+
+  </div>
+
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { touchSession } from './sessions.js?v=4';
+
+const API = 'https://antviz.ru/api';
+const $ = id => document.getElementById(id);
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function toast(msg, type='info'){ const t=$('toast'); t.textContent=msg; t.className=`toast ${type} show`; clearTimeout(t._h); t._h=setTimeout(()=>t.className='toast',3200); }
+const rub = n => Number(n || 0).toLocaleString('ru') + ' ₽';
+const shortId = id => String(id || '').slice(0, 8).toUpperCase();
+
+let payments = [], orders = [];
+let filter = 'all', query = '';
+
+const TYPE = {
+  order:       { label: 'Оплата заказа',   cls: 'green',  group: 'order'   },
+  partial:     { label: 'Предоплата 50%',  cls: 'blue',   group: 'order'   },
+  remaining:   { label: 'Доплата',         cls: 'violet', group: 'extra'   },
+  ticket_once: { label: 'Разовая заявка',  cls: 'amber',  group: 'support' },
+  support:     { label: 'Обслуживание',    cls: 'amber',  group: 'support' },
+};
+const typeInfo = t => TYPE[t] || { label: 'Платёж', cls: '', group: 'order' };
+function orderName(p){ return p.orderDomain || ('Заказ № ' + shortId(p.orderId)); }
+function fmtDate(ts){ return new Date(ts).toLocaleDateString('ru', { day:'numeric', month:'short', year:'numeric' }); }
+function fmtDateTime(ts){ return new Date(ts).toLocaleString('ru', { day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }); }
+
+function amountDue(o){
+  if (o.paid || o.status < 0) return 0;
+  if (o.remainingAmount > 0) return o.remainingAmount;
+  if (o.paymentType === 'partial') return Math.max(0, (o.totalPrice || 0) - (o.paidAmount || 0));
+  return o.totalPrice || 0;
+}
+
+function renderStats(){
+  const total = payments.reduce((s, p) => s + p.amount, 0);
+  $('stTotal').textContent = rub(total);
+  $('stTotalNote').textContent = payments.length ? `по ${new Set(payments.map(p => p.orderId)).size} заказ(ам)` : 'платежей пока нет';
+  $('stCount').textContent = payments.length;
+  const last = payments[0];
+  $('stLast').textContent = last ? fmtDate(last.createdAt) : '—';
+  $('stLastNote').textContent = last ? `${rub(last.amount)} · ${orderName(last)}` : '';
+  const due = orders.map(o => ({ o, d: amountDue(o) })).filter(x => x.d > 0);
+  const dueSum = due.reduce((s, x) => s + x.d, 0);
+  $('stDue').textContent = dueSum ? rub(dueSum) : '0 ₽';
+  $('stDueNote').textContent = due.length ? `заказов: ${due.length}` : 'всё оплачено';
+  $('payAside').style.display = due.length ? 'block' : 'none';
+  $('dueList').innerHTML = due.map(({ o, d }) => `<a class="due-item" href="orders?id=${encodeURIComponent(o.id)}"><div style="min-width:0"><b>${esc(o.siteDomain || 'Заказ № ' + shortId(o.id))}</b><span>${esc(o.package || '')}${o.paymentType === 'partial' && o.paidAmount ? ' · внесена предоплата' : ''}</span></div><div class="amt">${rub(d)}</div></a>`).join('');
+}
+
+function filtered(){
+  return payments.filter(p => (filter === 'all' || typeInfo(p.type).group === filter) &&
+    (!query || (orderName(p) + ' ' + (p.orderPackage || '') + ' ' + typeInfo(p.type).label).toLowerCase().includes(query)));
+}
+
+function renderTable(){
+  const list = filtered();
+  $('payCount').textContent = list.length ? `${list.length} из ${payments.length}` : '';
+  if (!list.length) {
+    $('payTable').innerHTML = `<div class="cab-empty pay-empty"><svg viewBox="0 0 24 24"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M2.5 10h19M6.5 15h3"/></svg><h3>${payments.length ? 'Ничего не найдено' : 'Платежей пока нет'}</h3><p>${payments.length ? 'Попробуйте другой фильтр или запрос.' : 'Когда вы оплатите заказ, платёж и подтверждение появятся здесь.'}</p></div>`;
+    return;
+  }
+  $('payTable').innerHTML = `<div class="pay-row is-head"><span>Дата</span><span>Заказ</span><span>Вид платежа</span><span style="text-align:right">Сумма</span><span></span></div>` +
+    list.map(p => { const ti = typeInfo(p.type); return `<div class="pay-row">
+      <div class="pay-date">${fmtDate(p.createdAt)}</div>
+      <div class="pay-order"><b>${esc(orderName(p))}</b><span>${esc(p.orderPackage || '')}</span><div class="pay-num pay-hide-m">№ ${esc(shortId(p.paymentId))}</div></div>
+      <div class="pay-type"><span class="cab-badge ${ti.cls}">${ti.label}</span></div>
+      <div class="pay-sum">${rub(p.amount)}</div>
+      <div class="pay-act"><button class="cab-btn ghost sm" data-receipt="${esc(p.paymentId)}">Подтверждение</button></div>
+    </div>`; }).join('');
+}
+
+// ── Подтверждение оплаты: печатная страница (можно сохранить в PDF из диалога печати) ──
+function openReceipt(id){
+  const p = payments.find(x => x.paymentId === id); if (!p) return;
+  const ti = typeInfo(p.type);
+  const w = window.open('', '_blank', 'width=640,height=760');
+  if (!w) return toast('Разрешите всплывающие окна, чтобы открыть подтверждение', 'error');
+  const row = (k, v) => `<tr><td>${k}</td><td>${v}</td></tr>`;
+  w.document.write(`<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>Подтверждение оплаты № ${esc(shortId(p.paymentId))} — Antviz</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;max-width:520px;margin:48px auto;padding:0 24px;color:#191b1e}
+.logo{font-size:26px;font-weight:700;letter-spacing:-.04em;margin-bottom:4px}.sub{font-size:13px;color:#6b6f76;margin-bottom:32px}
+h1{font-size:20px;font-weight:600;margin-bottom:6px}.amount{font-size:40px;font-weight:700;letter-spacing:-.04em;margin:18px 0 26px}
+table{width:100%;border-collapse:collapse}td{padding:12px 0;border-bottom:1px solid #e6e8eb;font-size:14px;vertical-align:top}td:first-child{color:#6b6f76;width:42%}td:last-child{font-weight:500;text-align:right;word-break:break-all}
+.note{margin-top:28px;font-size:12px;color:#9a9da2;line-height:1.6}
+.btn{margin-top:26px;padding:12px 22px;border:none;border-radius:12px;background:#1ede7b;color:#0d1210;font-weight:600;font-size:14px;cursor:pointer}
+@media print{.btn{display:none}body{margin:24px auto}}</style></head><body>
+<div class="logo">antviz</div><div class="sub">antviz.ru</div>
+<h1>Подтверждение оплаты</h1>
+<div class="amount">${rub(p.amount)}</div>
+<table>
+${row('Номер платежа', esc(shortId(p.paymentId)))}
+${row('Дата и время', esc(fmtDateTime(p.createdAt)))}
+${row('Вид платежа', ti.label)}
+${row('Заказ', esc(orderName(p)))}
+${p.orderPackage ? row('Тариф', esc(p.orderPackage)) : ''}
+${row('Идентификатор платежа', esc(p.paymentId))}
+</table>
+<div class="note">Документ подтверждает факт поступления платежа по заказу и не является кассовым чеком. Кассовый чек отправляется платёжным сервисом на e-mail, указанный при оплате.</div>
+<button class="btn" onclick="window.print()">Распечатать / сохранить в PDF</button>
+</body></html>`);
+  w.document.close();
+}
+
+function exportCsv(){
+  const list = filtered();
+  if (!list.length) return toast('Нечего экспортировать', 'info');
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const lines = [['Дата','Заказ','Тариф','Вид платежа','Сумма, ₽','Номер платежа'].map(q).join(';')];
+  list.forEach(p => lines.push([fmtDateTime(p.createdAt), orderName(p), p.orderPackage || '', typeInfo(p.type).label, p.amount, p.paymentId].map(q).join(';')));
+  const blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'antviz-platezhi.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+$('payTabs').addEventListener('click', e => {
+  const b = e.target.closest('.cab-tab'); if (!b) return;
+  filter = b.dataset.f;
+  $('payTabs').querySelectorAll('.cab-tab').forEach(x => x.classList.toggle('is-active', x === b));
+  renderTable();
+});
+$('paySearch').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); renderTable(); });
+$('payTable').addEventListener('click', e => { const b = e.target.closest('[data-receipt]'); if (b) openReceipt(b.dataset.receipt); });
+$('payCsv').addEventListener('click', exportCsv);
+
+(async function init(){
+  let user = null;
+  try { const r = await fetch(`${API}/auth/me`, { credentials:'include' }); if (r.ok) user = await r.json(); } catch(e) {}
+  if (!user) { window.location.href = '../auth'; return; }
+  $('loadingScreen').style.display = 'none';
+  $('sbContent').style.display = 'block';
+
+  const [pRes, oRes] = await Promise.all([
+    fetch(`${API}/payments/mine`, { credentials:'include' }).catch(() => null),
+    fetch(`${API}/orders`, { credentials:'include' }).catch(() => null),
+  ]);
+  payments = pRes && pRes.ok ? await pRes.json() : [];
+  orders = oRes && oRes.ok ? await oRes.json() : [];
+  renderStats(); renderTable();
+  touchSession();
+})();
+</script>
+
+<script src="../GEOBLOCK.js"></script>
+<script type="module" src="../maintenance.js"></script>
+</body>
+</html>

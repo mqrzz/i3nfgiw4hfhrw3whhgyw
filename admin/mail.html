@@ -97,6 +97,9 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 .t-count{font-size:.76rem;color:var(--muted2);flex-shrink:0;white-space:nowrap}
 
 .mail-msgs{flex:1;overflow-y:auto;padding:4px 2px 20px;display:flex;flex-direction:column;gap:14px;min-height:0}
+.load-older-btn{align-self:center;margin:4px 0 8px;padding:9px 18px;border-radius:var(--r-pill);border:1.5px solid var(--line);background:var(--card);color:var(--muted);font-size:.82rem;font-weight:500;cursor:pointer;transition:border-color .15s,color .15s}
+.load-older-btn:hover:not(:disabled){border-color:var(--dark);color:var(--text)}
+.load-older-btn:disabled{opacity:.6;cursor:default}
 .day-sep{display:flex;align-items:center;gap:12px;margin:6px 0 -2px;color:var(--muted2);font-size:.74rem;font-weight:500;text-transform:uppercase;letter-spacing:.06em}
 .day-sep::before,.day-sep::after{content:'';flex:1;height:1px;background:var(--line)}
 .mm{border-radius:var(--r-md);border:1.5px solid var(--line);background:var(--card);animation:fadeUp .18s ease both;overflow:hidden}
@@ -459,8 +462,15 @@ async function loadThreads(){
 }
 
 /* ===== ТРЕД (ПЕРЕПИСКА) ===== */
+// Состояние открытого треда: страницы догружаются кнопкой «показать старые»,
+// а не одним запросом на всю историю (см. изменения в бэкенде).
+let threadMsgs=[];      // сообщения, уже отрисованные, в хронологическом порядке
+let threadHasMore=false;
+let loadingOlder=false;
+
 window.selectThread=async function(key){
   selectedKey=key;
+  threadMsgs=[]; threadHasMore=false; loadingOlder=false;
   const t=allThreads.find(x=>x.threadKey===key);
   showScreen('thread');
   document.getElementById('threadName').textContent=(t&&t.contactName)||key;
@@ -473,12 +483,13 @@ window.selectThread=async function(key){
 
   document.getElementById('mailMsgs').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.86rem;padding:36px">Загрузка…</div>';
   try{
-    const resp=await fetch(`${API}/inbound-email/threads/${encodeURIComponent(key)}`,{credentials:'include'});
-    const msgs=resp.ok?await resp.json():[];
-    renderMailMsgs(msgs);
-    document.getElementById('threadCount').textContent=msgs.length?`${msgs.length} ${plural(msgs.length,'письмо','письма','писем')}`:'';
-    if(msgs.length){
-      const last=msgs[msgs.length-1];
+    const resp=await fetch(`${API}/inbound-email/threads/${encodeURIComponent(key)}?limit=30`,{credentials:'include'});
+    const data=resp.ok?await resp.json():{messages:[],hasMore:false};
+    threadMsgs=data.messages||[]; threadHasMore=!!data.hasMore;
+    renderMailMsgs({scrollToBottom:true});
+    updateThreadCount();
+    if(threadMsgs.length){
+      const last=threadMsgs[threadMsgs.length-1];
       document.getElementById('replySubject').value = last.subject && !/^re:/i.test(last.subject) ? `Re: ${last.subject}` : (last.subject||'');
     }
     if(t){t.unreadCount=0;renderThreads();}
@@ -487,18 +498,58 @@ window.selectThread=async function(key){
   }
 };
 
-function renderMailMsgs(msgs){
+function updateThreadCount(){
+  const n=threadMsgs.length;
+  document.getElementById('threadCount').textContent=n?`${threadHasMore?'от ':''}${n}${threadHasMore?'+':''} ${plural(n,'письмо','письма','писем')}`:'';
+}
+
+// «Показать более старые» — подгружает следующую страницу НАЗАД по времени и удерживает
+// то же место в прокрутке (иначе список прыгнет наверх/вниз при подстановке).
+window.loadOlderMessages=async function(){
+  if(loadingOlder||!threadHasMore||!threadMsgs.length)return;
+  loadingOlder=true;
   const el=document.getElementById('mailMsgs');
-  if(!msgs.length){el.innerHTML='<div class="empty-l">Пока нет писем</div>';return;}
+  const prevHeight=el.scrollHeight, prevTop=el.scrollTop;
+  try{
+    const before=encodeURIComponent(threadMsgs[0].createdAt);
+    const resp=await fetch(`${API}/inbound-email/threads/${encodeURIComponent(selectedKey)}?limit=30&before=${before}`,{credentials:'include'});
+    if(!resp.ok)throw new Error('http '+resp.status);
+    const data=await resp.json();
+    threadMsgs=[...(data.messages||[]),...threadMsgs];
+    threadHasMore=!!data.hasMore;
+    renderMailMsgs();
+    updateThreadCount();
+    el.scrollTop=prevTop+(el.scrollHeight-prevHeight);
+  }catch(e){
+    toast('Не удалось загрузить более старые письма','error');
+  }
+  loadingOlder=false;
+};
+
+function attUrl(threadKey,messageId,idx){
+  return `${API}/inbound-email/threads/${encodeURIComponent(threadKey)}/messages/${encodeURIComponent(messageId)}/attachments/${idx}`;
+}
+
+// opts.scrollToBottom — только при первом открытии треда; при подгрузке старых (loadOlderMessages)
+// и при новых письмах из опроса (poll) скролл выставляется отдельно, руками, под свой случай.
+function renderMailMsgs(opts){
+  opts=opts||{};
+  const el=document.getElementById('mailMsgs');
+  if(!threadMsgs.length){el.innerHTML='<div class="empty-l">Пока нет писем</div>';return;}
   let lastDay=null,html='';
-  msgs.forEach(m=>{
+  const moreBtn=threadHasMore
+    ? `<button type="button" class="load-older-btn" onclick="loadOlderMessages()" ${loadingOlder?'disabled':''}>${loadingOlder?'Загрузка…':'Показать более старые письма'}</button>`
+    : '';
+  threadMsgs.forEach(m=>{
     const dl=dayLabel(m.createdAt);
     if(dl&&dl!==lastDay){html+=`<div class="day-sep">${esc(dl)}</div>`;lastDay=dl;}
+    // Вложения теперь без base64 в самом ответе (см. бэкенд) — картинки и файлы подгружаются
+    // браузером лениво по прямой ссылке на байты, а не лежат целиком в JSON списка писем.
     const allAtts=m.attachments||[];
     const images=allAtts.filter(a=>(a.type||'').startsWith('image/'));
     const files=allAtts.filter(a=>!(a.type||'').startsWith('image/'));
-    const imgGrid=images.length?`<div class="att-img-grid">${images.map(a=>`<a href="${esc(a.data)}" target="_blank" rel="noopener" class="att-img-wrap" title="${esc(a.name)}"><img class="att-img" src="${esc(a.data)}" alt="${esc(a.name)}"/></a>`).join('')}</div>`:'';
-    const atts=files.map(a=>`<a class="att-chip" href="${esc(a.data)}" download="${esc(a.name)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg><span>${esc(a.name)} · ${fmtSize(a.size)}</span></a>`).join('');
+    const imgGrid=images.length?`<div class="att-img-grid">${images.map(a=>{const u=attUrl(m.threadKey,m.id,a.index);return `<a href="${u}" target="_blank" rel="noopener" class="att-img-wrap" title="${esc(a.name)}"><img class="att-img" src="${u}" alt="${esc(a.name)}" loading="lazy"/></a>`;}).join('')}</div>`:'';
+    const atts=files.map(a=>`<a class="att-chip" href="${attUrl(m.threadKey,m.id,a.index)}" download="${esc(a.name)}"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M21.44 11.05l-9.19 9.19a5 5 0 01-7.07-7.07l9.19-9.19a3.5 3.5 0 014.95 4.95l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg><span>${esc(a.name)} · ${fmtSize(a.size)}</span></a>`).join('');
     // sandbox="allow-same-origin" (без allow-scripts) — скрипты в письме не выполняются,
     // но родительская страница может измерить высоту содержимого и растянуть iframe под него.
     // Раньше высота была жёстко зафиксирована (260px), и если письмо было длинным, у iframe
@@ -509,7 +560,7 @@ function renderMailMsgs(msgs){
       : `<div class="mm-text">${esc(m.bodyText||'(пусто)')}</div>`;
     const who=m.direction==='in'?esc(m.fromName||m.fromEmail):'Вы → '+esc(m.toEmail);
     const av=initials(m.direction==='in'?(m.fromName||m.fromEmail):m.toEmail);
-    html+=`<div class="mm ${m.direction}">
+    html+=`<div class="mm ${m.direction}" data-mid="${esc(m.id)}">
       <div class="mm-head">
         <div class="mm-avatar">${esc(av)}</div>
         <div class="mm-headtext">
@@ -523,8 +574,8 @@ function renderMailMsgs(msgs){
       ${atts?`<div class="mm-atts">${atts}</div>`:''}
     </div>`;
   });
-  el.innerHTML=html;
-  el.scrollTop=el.scrollHeight;
+  el.innerHTML=moreBtn+html;
+  if(opts.scrollToBottom)el.scrollTop=el.scrollHeight;
 }
 
 window.resizeMailFrame=function(frame){
@@ -742,18 +793,23 @@ async function loadUsers(){
   loadTemplates();
   setInterval(loadThreads, 15000);
 
-  let _lastThreadSig=null;
   setInterval(async()=>{
-    if(!selectedKey)return;
+    if(!selectedKey||loadingOlder)return;
     try{
-      const resp=await fetch(`${API}/inbound-email/threads/${encodeURIComponent(selectedKey)}`,{credentials:'include'});
+      // Опрашиваем только последнюю страницу, а не весь тред целиком (см. изменения в бэкенде) —
+      // и добавляем в DOM только реально новые письма, не трогая уже открытые старые.
+      const resp=await fetch(`${API}/inbound-email/threads/${encodeURIComponent(selectedKey)}?limit=20`,{credentials:'include'});
       if(!resp.ok)return;
-      const msgs=await resp.json();
-      const sig=msgs.length+':'+(msgs[msgs.length-1]?.id||'');
-      if(sig===_lastThreadSig)return;
-      _lastThreadSig=sig;
-      renderMailMsgs(msgs);
-      document.getElementById('threadCount').textContent=msgs.length?`${msgs.length} ${plural(msgs.length,'письмо','письма','писем')}`:'';
+      const data=await resp.json();
+      const known=new Set(threadMsgs.map(m=>m.id));
+      const fresh=(data.messages||[]).filter(m=>!known.has(m.id));
+      if(!fresh.length)return;
+      const el=document.getElementById('mailMsgs');
+      const wasBottom=el.scrollHeight-el.scrollTop-el.clientHeight<80;
+      threadMsgs=[...threadMsgs,...fresh];
+      renderMailMsgs();
+      updateThreadCount();
+      if(wasBottom)el.scrollTop=el.scrollHeight; // иначе, если читаете старые письма, не дёргаем вниз
     }catch(e){}
   }, 8000);
 })();

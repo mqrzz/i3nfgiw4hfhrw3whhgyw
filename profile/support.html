@@ -261,8 +261,14 @@
   .file-dropzone-ico svg{width:15px;height:15px;}
   .file-dropzone-text{font-size:12.5px;color:var(--text-dim);}
   .file-dropzone-text strong{color:var(--text);font-weight:500;}
-  .file-preview{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);margin-top:6px;}
-  .file-preview .remove-file{cursor:pointer;color:var(--red);}
+  .file-preview{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .file-chip{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--stroke);border-radius:var(--r12);background:var(--card-elevated);font-size:12px;color:var(--text-dim);}
+  .file-chip-thumb{width:28px;height:28px;border-radius:8px;background:var(--surface2);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;color:var(--text-dim);}
+  .file-chip-thumb img{width:100%;height:100%;object-fit:cover;}
+  .file-chip-thumb svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round;}
+  .file-chip-name{flex:1;min-width:0;color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .file-chip-size{color:var(--text-faint);flex-shrink:0;}
+  .file-preview .remove-file{cursor:pointer;color:var(--red);flex-shrink:0;padding:2px;}
   .form-actions{display:flex;gap:10px;margin-top:auto;padding-top:6px;}
   .btn-outline,.btn-green2{flex:1;padding:12px;border-radius:var(--r16);font-size:13.5px;font-weight:600;font-family:inherit;cursor:pointer;text-align:center;border:1px solid var(--stroke);background:transparent;color:var(--text-dim);transition:background .15s,border-color .15s,color .15s,transform .15s var(--spring);}
   .btn-outline:active,.btn-green2:active{transform:scale(.97);}
@@ -499,12 +505,12 @@
           <textarea id="ticketMessage" placeholder="Опишите подробнее…"></textarea>
         </div>
         <div class="fgroup">
-          <label>Скриншот (необязательно)</label>
+          <label>Файлы (необязательно)</label>
           <label class="file-dropzone" for="ticketFile">
             <span class="file-dropzone-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="14" rx="3"/><circle cx="12" cy="13" r="3.5"/><path d="M8 6l1.5-2h5L16 6"/></svg></span>
-            <span class="file-dropzone-text"><strong>Нажмите</strong>, чтобы прикрепить скриншот</span>
+            <span class="file-dropzone-text"><strong>Нажмите</strong>, чтобы прикрепить файлы — до 5, каждый до 8 МБ</span>
           </label>
-          <input type="file" id="ticketFile" accept="image/*" style="display:none"/>
+          <input type="file" id="ticketFile" accept="image/*" multiple style="display:none"/>
           <div class="file-preview" id="filePreview"></div>
         </div>
         <div class="form-actions">
@@ -515,6 +521,16 @@
     </div>
   </div>
 </div>
+
+<script type="module">
+// Основной скрипт этой страницы — обычный (не module), т.к. onclick="..." в разметке
+// и функции в нём завязаны на глобальный window. Этот блок — просто мостик:
+// подтягивает общий модуль вложений (тот же, что и на ПК-странице support-new.html)
+// и кладёт нужное на window, чтобы обычный скрипт мог этим пользоваться.
+import { ACCEPT, MAX_FILES, prepareFile, attachmentPayload, fmtSize } from '/profile/assets/cabinet-attach.js?v=1';
+window.__attach = { ACCEPT, MAX_FILES, prepareFile, attachmentPayload, fmtSize };
+document.getElementById('ticketFile').setAttribute('accept', ACCEPT);
+</script>
 
 <script>
 document.getElementById('drawerOverlay').addEventListener('click', e => {
@@ -861,8 +877,8 @@ function openModal() {
   document.getElementById('ticketSubject').value = '';
   document.getElementById('ticketMessage').value = '';
   document.getElementById('ticketFile').value = '';
+  window._pendingFiles = [];
   document.getElementById('filePreview').innerHTML = '';
-  window._pendingFile = null;
   renderOrderPicker();
 }
 
@@ -877,13 +893,28 @@ document.getElementById('newTicketBtnPc')?.addEventListener('click', () => start
 document.getElementById('ticketSearch')?.addEventListener('input', renderTickets);
 document.getElementById('cancelTicketBtn').addEventListener('click', () => document.getElementById('ticketFormOverlay').classList.remove('show'));
 
-document.getElementById('ticketFile').addEventListener('change', function() {
-  const file = this.files[0];
+window._pendingFiles = [];
+function renderTicketFilePreview(){
   const preview = document.getElementById('filePreview');
-  if (file) {
-    window._pendingFile = file;
-    preview.innerHTML = `<span>${esc(file.name)}</span> <span class="remove-file" onclick="document.getElementById('ticketFile').value='';document.getElementById('filePreview').innerHTML='';window._pendingFile=null;">✕</span>`;
-  } else { preview.innerHTML = ''; window._pendingFile = null; }
+  preview.innerHTML = window._pendingFiles.map((f, i) => `<div class="file-chip">
+    <span class="file-chip-thumb">${f.kind==='image' ? `<img src="${f.dataUrl}" alt="">` : '<svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>'}</span>
+    <span class="file-chip-name">${esc(f.name)}</span>
+    <span class="file-chip-size">${window.__attach.fmtSize(f.size)}</span>
+    <span class="remove-file" data-rm="${i}">✕</span>
+  </div>`).join('');
+}
+document.getElementById('filePreview').addEventListener('click', e => {
+  const b = e.target.closest('[data-rm]');
+  if (b) { window._pendingFiles.splice(+b.dataset.rm, 1); renderTicketFilePreview(); }
+});
+document.getElementById('ticketFile').addEventListener('change', async function() {
+  const { MAX_FILES, prepareFile } = window.__attach;
+  for (const file of Array.from(this.files)) {
+    if (window._pendingFiles.length >= MAX_FILES) { toast(`Не больше ${MAX_FILES} файлов`, 'error'); break; }
+    try { window._pendingFiles.push(await prepareFile(file)); } catch(e) { toast(e.message, 'error'); }
+  }
+  this.value = '';
+  renderTicketFilePreview();
 });
 
 document.getElementById('submitTicketBtn').addEventListener('click', async function() {
@@ -892,43 +923,44 @@ document.getElementById('submitTicketBtn').addEventListener('click', async funct
   const subject = document.getElementById('ticketSubject').value.trim();
   const message = document.getElementById('ticketMessage').value.trim();
   if (!subject) return toast('Введите краткое описание', 'error');
-  if (!message) return toast('Напишите сообщение', 'error');
+  if (!message && !window._pendingFiles.length) return toast('Напишите сообщение или приложите файл', 'error');
   this.disabled = true; this.textContent = 'Отправка...';
   const linkedOrder = selectedOrderId ? userOrders.find(o=>o.id===selectedOrderId) : null;
 
-  const doCreate = async (imageUrl) => {
-    try {
-      const resp = await fetch(`${API}/tickets`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-        body: JSON.stringify({
-          topic, priority, subject,
-          message: message || null,
-          imageUrl: imageUrl || null,
-          orderId: selectedOrderId || null,
-          orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
-        }),
-      });
-      if (!resp.ok) { const d = await resp.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
-      const ticket = await resp.json();
-      ticket._messages = [];
-      ticket.read = true;
-      allTickets = [ticket, ...allTickets];
-      document.getElementById('ticketFormOverlay').classList.remove('show');
-      toast('Тикет создан ✓', 'success');
-      renderTickets();
-      // Подгружаем реальные сообщения (включая автоответ, если он придёт от бэкенда)
-      await loadMessages(ticket);
-      renderTickets();
-    } catch(e) { toast(e.message || 'Ошибка', 'error'); }
-    this.disabled = false; this.textContent = 'Отправить';
-  };
+  const { attachmentPayload } = window.__attach;
+  // Как и на ПК: если вложений несколько, картинка (если есть) уходит вместе с созданием
+  // тикета, а всё остальное — следующими сообщениями сразу после.
+  const ordered = [...window._pendingFiles].sort((a, b) => (a.kind === 'image' ? 0 : 1) - (b.kind === 'image' ? 0 : 1));
+  const [first, ...rest] = ordered;
 
-  const file = window._pendingFile;
-  if (file && file.type.startsWith('image/')) {
-    const reader = new FileReader();
-    reader.onload = e => doCreate(e.target.result);
-    reader.readAsDataURL(file);
-  } else { await doCreate(null); }
+  try {
+    const resp = await fetch(`${API}/tickets`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
+      body: JSON.stringify({
+        topic, priority, subject,
+        message: message || null,
+        orderId: selectedOrderId || null,
+        orderLabel: linkedOrder ? orderLabel(linkedOrder) : null,
+        ...attachmentPayload(first),
+      }),
+    });
+    if (!resp.ok) { const d = await resp.json().catch(()=>({})); throw new Error(d.error || 'Ошибка'); }
+    const ticket = await resp.json();
+    for (const att of rest) {
+      try { await fetch(`${API}/tickets/${ticket.id}/messages`, { method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify(attachmentPayload(att)) }); }
+      catch(e) { toast(`Не удалось отправить «${att.name}»`, 'error'); }
+    }
+    ticket._messages = [];
+    ticket.read = true;
+    allTickets = [ticket, ...allTickets];
+    document.getElementById('ticketFormOverlay').classList.remove('show');
+    toast('Тикет создан ✓', 'success');
+    renderTickets();
+    // Подгружаем реальные сообщения (включая автоответ, если он придёт от бэкенда, и все вложения)
+    await loadMessages(ticket);
+    renderTickets();
+  } catch(e) { toast(e.message || 'Ошибка', 'error'); }
+  this.disabled = false; this.textContent = 'Отправить';
 });
 
 document.getElementById('ticketTabs').addEventListener('click', e => {

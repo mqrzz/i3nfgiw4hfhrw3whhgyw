@@ -1,148 +1,82 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Промокоды — Antviz Admin.</title>
+<title>Промокоды — Antviz Admin</title>
 <link rel="icon" href="../img/favicon.png"/>
+<script>
+  try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
+<link rel="stylesheet" href="/profile/assets/admin-extra.css?v=1">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#f3f4f7}
-:root{
-  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;
-  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
-  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
-  --bg:#f3f4f7;--card:#ffffff;
-  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
-  --dark:#14171c;
-  --font:'Geologica','Inter',sans-serif;
-  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
-  --sh-sm:0 1px 2px rgba(20,23,30,.04);
-  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
-  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
-  --maxw:1080px;
-}
-body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
-
-.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-.lt{font-size:13px;color:rgba(255,255,255,.35)}
-
-
-.page{display:none;min-height:100vh;overflow-y:auto}
-.inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:36px 28px 60px}
-
-.hero{background:var(--dark);border-radius:var(--r-xl);padding:32px 36px;margin-bottom:22px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-100px;right:-60px;width:260px;height:260px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
-.hero-text{position:relative;z-index:1}
-.hero-text h1{font-size:1.6rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
-.hero-text p{font-size:.88rem;color:rgba(255,255,255,.42)}
-
-.ctrl-row{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
-.sb-box{display:flex;align-items:center;gap:9px;background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.75rem 1rem;transition:border-color .15s,box-shadow .15s;flex:1;min-width:220px;max-width:380px}
-.sb-box:focus-within{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
-.sb-box svg{width:16px;height:16px;stroke:var(--muted);flex-shrink:0;stroke-width:2;fill:none}
-.sb-box input{background:none;border:none;outline:none;font-family:var(--font);font-size:.9rem;font-weight:300;color:var(--text);width:100%}
-.tab-row{display:flex;gap:6px}
-.tab{background:var(--card);border:1.5px solid var(--line2);border-radius:var(--r-pill);padding:.55rem 1rem;font-family:var(--font);font-size:.83rem;font-weight:400;color:var(--muted);cursor:pointer;transition:all .12s;white-space:nowrap}
-.tab:hover{border-color:var(--muted2);color:var(--text)}
-.tab.active{background:var(--dark);border-color:var(--dark);color:#fff;font-weight:500}
-
-.promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
-.pc{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;transition:border-color .15s,box-shadow .15s;animation:fadeUp .2s ease both}
-.pc:hover{border-color:var(--line2);box-shadow:var(--sh-md)}
-.pc.off{opacity:.55;border-style:dashed}
-.pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
-.pc-code{font-size:1.3rem;font-weight:600;color:var(--green-d);letter-spacing:.03em}
-.pc-disc{font-size:.76rem;font-weight:500;padding:.3rem .8rem;border-radius:var(--r-pill);background:var(--purple-soft);color:var(--purple);white-space:nowrap}
-.pc-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
-.pm{background:var(--bg);border-radius:var(--r-sm);padding:11px 14px}
-.pm-l{font-size:.62rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:4px;font-weight:500}
-.pm-v{font-size:.86rem;color:var(--text)}
-.pm-v.red{color:var(--red)}
-.pc-actions{display:flex;gap:8px}
-
-.empty{padding:64px 24px;text-align:center;color:var(--muted);font-size:.9rem}
-
-.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.85rem;border:none;border-radius:var(--r-sm);padding:.7rem 1.2rem;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap}
-.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.2;fill:none;flex-shrink:0}
-.btn:hover{transform:translateY(-1px)}
-.btn-green{background:var(--green);color:var(--dark);box-shadow:0 8px 20px rgba(30,222,123,.28)}.btn-green:hover{background:var(--green-h)}
-.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#2b2f33}
-.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
-.btn-danger{background:var(--red-soft);color:var(--red)}.btn-danger:hover{background:#fbdbd6}
-.btn-sm{padding:.5rem 1rem;font-size:.8rem}
-
-.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(10,12,16,.5);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-ov.show{opacity:1;pointer-events:all}
-.modal{background:var(--card);border-radius:var(--r-xl);padding:28px;width:100%;max-width:460px;box-shadow:var(--sh-lg)}
-.modal-title{font-weight:500;font-size:1.05rem;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em}
-.mc{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-xs);transition:background .15s}
-.mc:hover{background:var(--bg)}
-.fg{margin-bottom:14px}
-.fl{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px;font-weight:500}
-.fi,.fsel{width:100%;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s}
-.fi:focus,.fsel:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
-.fsel{cursor:pointer}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.mf{display:flex;gap:8px;margin-top:22px}
-.mf .btn{flex:1;justify-content:center}
-
-.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
-.toast.show{opacity:1;transform:none}
-.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}
-
-@media(max-width:760px){
-  .inner{padding:70px 16px 40px}
-  .hero{padding:24px 20px}
-  .hero-text h1{font-size:1.3rem}
-  .frow{grid-template-columns:1fr}
-}
+  .promo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .pc{background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r24);padding:22px 24px;transition:border-color .15s;animation:cabFadeUp .2s ease both}
+  .pc:hover{border-color:var(--stroke-strong)}
+  .pc.off{opacity:.55;border-style:dashed}
+  .pc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+  .pc-code{font-size:20px;font-weight:600;color:var(--green-text);letter-spacing:.03em}
+  .pc-disc{font-size:12.5px;font-weight:500;padding:.3rem .8rem;border-radius:99px;background:var(--violet-dim);color:var(--violet);white-space:nowrap}
+  .pc-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px}
+  .pc-actions{display:flex;gap:8px}
 </style>
 </head>
 <body>
 
-<div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
-<div class="page" id="appWrap">
-  <div class="inner">
-    <div class="hero">
-      <div class="hero-text"><h1>Промокоды</h1><p>Активных сейчас: <strong id="activeCount" style="color:var(--green)">—</strong></p></div>
-      <button class="btn btn-green" onclick="openModal()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Создать промокод</button>
-    </div>
-
-    <div class="ctrl-row">
-      <div class="sb-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" placeholder="Поиск по коду..." id="searchInp" oninput="renderPromos()"/></div>
-      <div class="tab-row">
-        <button class="tab active" onclick="switchFilter('all',this)">Все</button>
-        <button class="tab" onclick="switchFilter('active',this)">Активные</button>
-        <button class="tab" onclick="switchFilter('disabled',this)">Отключённые</button>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+<div id="sbContent" style="display:none">
+  <div class="shell">
+    <div class="cab-page">
+      <div class="pg-head">
+        <div class="pg-head-main">
+          <div class="pg-title">Промокоды</div>
+          <div class="pg-sub">Активных сейчас: <b id="activeCount" style="color:var(--green-text)">—</b></div>
+        </div>
+        <div class="pg-actions">
+          <button class="cab-btn primary" onclick="openModal()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Создать промокод</button>
+        </div>
       </div>
-    </div>
 
-    <div id="promosList"><div class="empty">Загрузка...</div></div>
+      <div class="cab-toolbar">
+        <div class="cab-search">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" placeholder="Поиск по коду…" id="searchInp" oninput="renderPromos()"/>
+        </div>
+        <div class="cab-tabs" id="tabRow">
+          <button class="cab-tab is-active" onclick="switchFilter('all',this)">Все</button>
+          <button class="cab-tab" onclick="switchFilter('active',this)">Активные</button>
+          <button class="cab-tab" onclick="switchFilter('disabled',this)">Отключённые</button>
+        </div>
+      </div>
+
+      <div id="promosList"><div class="cab-empty"><h3>Загрузка…</h3></div></div>
+    </div>
   </div>
 </div>
 
-<div class="modal-ov" id="modal" onclick="if(event.target===this)closeModal()">
-  <div class="modal">
-    <div class="modal-title">Новый промокод <button class="mc" onclick="closeModal()">✕</button></div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Код</label><input class="fi" id="pCode" type="text" placeholder="SALE20" oninput="this.value=this.value.toUpperCase()"/></div>
-      <div class="fg"><label class="fl">Тип скидки</label><select class="fsel" id="pType"><option value="percent">Процент (%)</option><option value="fixed">Фиксированная (₽)</option></select></div>
+<div class="cab-modal-overlay" id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="cab-modal">
+    <h3 style="margin-bottom:20px">Новый промокод</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="cab-field"><label class="cab-label">Код</label><input class="cab-input" id="pCode" type="text" placeholder="SALE20" oninput="this.value=this.value.toUpperCase()"/></div>
+      <div class="cab-field"><label class="cab-label">Тип скидки</label><select class="cab-select" id="pType"><option value="percent">Процент (%)</option><option value="fixed">Фиксированная (₽)</option></select></div>
     </div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Размер скидки</label><input class="fi" id="pValue" type="number" placeholder="20" min="1"/></div>
-      <div class="fg"><label class="fl">Срок действия</label><input class="fi" id="pExpires" type="date"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <div class="cab-field"><label class="cab-label">Размер скидки</label><input class="cab-input" id="pValue" type="number" placeholder="20" min="1"/></div>
+      <div class="cab-field"><label class="cab-label">Срок действия</label><input class="cab-input" id="pExpires" type="date"/></div>
     </div>
-    <div class="frow">
-      <div class="fg"><label class="fl">Лимит использований</label><input class="fi" id="pLimit" type="number" placeholder="Без лимита" min="1"/></div>
-      <div class="fg"><label class="fl">Для конкретного пользователя (UID)</label><input class="fi" id="pUid" type="text" placeholder="UID или оставьте пустым — для всех"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <div class="cab-field"><label class="cab-label">Лимит использований</label><input class="cab-input" id="pLimit" type="number" placeholder="Без лимита" min="1"/></div>
+      <div class="cab-field"><label class="cab-label">Для UID (необязательно)</label><input class="cab-input" id="pUid" type="text" placeholder="Пусто — для всех"/></div>
     </div>
-    <div class="mf"><button class="btn btn-outline" onclick="closeModal()">Отмена</button><button class="btn btn-green" onclick="createPromo()">Создать</button></div>
+    <div class="cab-modal-actions" style="margin-top:22px">
+      <button class="cab-btn ghost" onclick="closeModal()">Отмена</button>
+      <button class="cab-btn primary" onclick="createPromo()">Создать</button>
+    </div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -155,7 +89,7 @@ function toast(m,t='info'){const el=document.getElementById('toast');el.textCont
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function fmtDate(ts){if(!ts)return'∞';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'});}
 
-window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderPromos();};
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('#tabRow .cab-tab').forEach(b=>b.classList.remove('is-active'));btn.classList.add('is-active');renderPromos();};
 window.openModal=()=>document.getElementById('modal').classList.add('show');
 window.closeModal=()=>document.getElementById('modal').classList.remove('show');
 
@@ -167,7 +101,7 @@ function renderPromos(){
   else if(currentFilter==='disabled') list=list.filter(p=>!p.active);
   if(q) list=list.filter(p=>(p.code||'').toLowerCase().includes(q));
   document.getElementById('activeCount').textContent=allPromos.filter(p=>p.active).length;
-  if(!list.length){el.innerHTML=`<div class="empty">Нет промокодов</div>`;return;}
+  if(!list.length){el.innerHTML=`<div class="cab-empty"><h3>Нет промокодов</h3></div>`;return;}
   el.innerHTML=`<div class="promo-grid">${list.map(p=>{
     const now=new Date();
     const expired=p.expiresAt&&new Date(p.expiresAt)<now;
@@ -177,14 +111,14 @@ function renderPromos(){
     return`<div class="pc${active?'':' off'}">
       <div class="pc-top"><span class="pc-code">${esc(p.code)}</span><span class="pc-disc">${disc}</span></div>
       <div class="pc-meta">
-        <div class="pm"><div class="pm-l">Истекает</div><div class="pm-v${expired?' red':''}">${fmtDate(p.expiresAt)}</div></div>
-        <div class="pm"><div class="pm-l">Использований</div><div class="pm-v${limitReached?' red':''}">${p.usedCount||0}${p.usageLimit?` / ${p.usageLimit}`:''}</div></div>
-        <div class="pm"><div class="pm-l">Для кого</div><div class="pm-v">${p.forUserId?'Конкретный':'Для всех'}</div></div>
-        <div class="pm"><div class="pm-l">Статус</div><div class="pm-v" style="color:${active?'var(--green-d)':'var(--muted)'}">${active?'Активен':'Отключён'}</div></div>
+        <div class="dk"><div class="dk-l">Истекает</div><div class="dk-v" style="${expired?'color:var(--red)':''}">${fmtDate(p.expiresAt)}</div></div>
+        <div class="dk"><div class="dk-l">Использований</div><div class="dk-v" style="${limitReached?'color:var(--red)':''}">${p.usedCount||0}${p.usageLimit?` / ${p.usageLimit}`:''}</div></div>
+        <div class="dk"><div class="dk-l">Для кого</div><div class="dk-v">${p.forUserId?'Конкретный':'Для всех'}</div></div>
+        <div class="dk"><div class="dk-l">Статус</div><div class="dk-v" style="color:${active?'var(--green-text)':'var(--text-faint)'}">${active?'Активен':'Отключён'}</div></div>
       </div>
       <div class="pc-actions">
-        <button class="btn btn-${active?'outline':'dark'} btn-sm" onclick="togglePromo('${p.id}',${!p.active})">${p.active?'Отключить':'Включить'}</button>
-        <button class="btn btn-danger btn-sm" onclick="deletePromo('${p.id}')">Удалить</button>
+        <button class="cab-btn ${active?'ghost':'dark'} sm" onclick="togglePromo('${p.id}',${!p.active})">${p.active?'Отключить':'Включить'}</button>
+        <button class="cab-btn danger sm" onclick="deletePromo('${p.id}')">Удалить</button>
       </div>
     </div>`;}).join('')}</div>`;
 }
@@ -254,7 +188,7 @@ window.doLogout=async()=>{
   if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
-  document.getElementById('appWrap').style.display='block';
+  document.getElementById('sbContent').style.display='block';
   fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
     const n=orders.filter(o=>o.refundStatus==='requested').length;
     const b=document.getElementById('navBadgeOrders');
@@ -268,7 +202,7 @@ window.doLogout=async()=>{
   await loadPromos();renderPromos();
 })();
 </script>
-<script src="/m-panel26.js"></script>
+<script src="/profile/assets/admin-shell.js" data-page="promos" data-title="Промокоды"></script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>
 </body>

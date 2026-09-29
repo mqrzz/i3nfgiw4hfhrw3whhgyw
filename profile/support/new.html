@@ -4,20 +4,15 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Новый тикет — Antviz</title>
-<link rel="icon" href="../img/favicon.png" type="image/png"/>
+<link rel="icon" href="/img/favicon.png" type="image/png"/>
 <script>
   try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
-  // Создание тикета отдельной страницей — только для ПК. На телефоне работает форма-модалка на странице «Чат с командой».
-  if (!window.matchMedia('(min-width:981px)').matches) {
-    var q = new URLSearchParams(location.search); var o = q.get('order');
-    location.replace('support' + (o ? '?order=' + encodeURIComponent(o) : ''));
-  }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
-<link rel="stylesheet" href="/profile/assets/cabinet.css?v=2">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
 <style>
   .nt-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}
   .nt-full{grid-column:1 / -1}
@@ -56,7 +51,7 @@
 </style>
 </head>
 <body>
-<script src="/profile/assets/sidebar.js" data-page="support" data-back="/profile/support" data-back-label="К тикетам" data-title="Новый тикет"></script>
+<script src="/profile/assets/sidebar.js" data-page="support" data-back="/profile/support/" data-back-label="К тикетам" data-title="Новый тикет"></script>
 
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
@@ -120,7 +115,7 @@
       </div>
 
       <div class="cab-formbar">
-        <a class="cab-btn ghost" href="support">Отмена</a>
+        <a class="cab-btn ghost" href="/profile/support/">Отмена</a>
         <button type="submit" class="cab-btn primary" id="ntSubmit">Отправить тикет</button>
       </div>
     </form>
@@ -182,7 +177,7 @@ function renderSimilar(){
     return { t, sc: words.filter(w => hay.includes(w.slice(0, Math.max(4, w.length - 2)))).length };
   }).filter(x => x.sc > 0).sort((a,b) => b.sc - a.sc).slice(0, 3);
   if (!scored.length) { box.style.display = 'none'; return; }
-  $('ntSimilarList').innerHTML = scored.map(({t}) => `<a href="support-chat?id=${encodeURIComponent(t.id)}"><b>${esc(t.subject || t.topic)}</b><span>${t.status==='done'?'Решён':'Открыт'} · ${esc(t.topic||'')}</span></a>`).join('');
+  $('ntSimilarList').innerHTML = scored.map(({t}) => `<a href="/profile/support/chat?id=${encodeURIComponent(t.id)}"><b>${esc(t.subject || t.topic)}</b><span>${t.status==='done'?'Решён':'Открыт'} · ${esc(t.topic||'')}</span></a>`).join('');
   box.style.display = 'block';
 }
 
@@ -257,7 +252,7 @@ $('ntForm').addEventListener('submit', async e => {
       try { await api('POST', `/tickets/${ticket.id}/messages`, attachmentPayload(rest[i])); }
       catch (err) { toast(`Не удалось отправить «${rest[i].name}»: ${err.message}`, 'error'); }
     }
-    window.location.href = 'support-chat?id=' + encodeURIComponent(ticket.id);
+    window.location.href = '/profile/support/chat?id=' + encodeURIComponent(ticket.id);
   } catch (err) {
     toast(err.message || 'Не удалось создать тикет', 'error');
     sending = false; btn.disabled = false; btn.textContent = 'Отправить тикет';
@@ -268,7 +263,7 @@ $('ntForm').addEventListener('submit', async e => {
 (async function init(){
   let user = null;
   try { const r = await fetch(`${API}/auth/me`, { credentials:'include' }); if (r.ok) user = await r.json(); } catch(e) {}
-  if (!user) { window.location.href = '../auth'; return; }
+  if (!user) { window.location.href = '/auth'; return; }
   $('loadingScreen').style.display = 'none';
   $('sbContent').style.display = 'block';
 
@@ -288,7 +283,7 @@ $('ntForm').addEventListener('submit', async e => {
 })();
 </script>
 
-<script src="../GEOBLOCK.js"></script>
-<script type="module" src="../maintenance.js"></script>
+<script src="/GEOBLOCK.js"></script>
+<script type="module" src="/maintenance.js"></script>
 </body>
 </html>

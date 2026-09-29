@@ -1,244 +1,167 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
 <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>Дашборд — Antviz Admin.</title>
+<title>Дашборд — Antviz Admin</title>
 <link rel="icon" href="../img/favicon.png"/>
+<script>
+  try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
+<link rel="stylesheet" href="/profile/assets/admin-extra.css?v=1">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:#f3f4f7}
-:root{
-  --green:#1ede7b;--green-h:#17c96a;--green-d:#0f9950;--green-soft:#e5faee;
-  --orange:#f59e0b;--orange-d:#b8720a;--orange-soft:#fef2e0;
-  --red:#e8634f;--red-soft:#fdeae7;--info:#3b82f6;--info-soft:#eaf2fe;--purple:#7c3aed;--purple-soft:#f0eafd;
-  --bg:#f3f4f7;--card:#ffffff;
-  --text:#14171c;--muted:#818997;--muted2:#aeb4bf;--line:#e6e8ec;--line2:#dcdfe4;
-  --dark:#14171c;
-  --font:'Geologica','Inter',sans-serif;
-  --r-xs:10px;--r-sm:14px;--r-md:18px;--r-lg:22px;--r-xl:28px;--r-pill:999px;
-  --sh-sm:0 1px 2px rgba(20,23,30,.04);
-  --sh-md:0 12px 28px rgba(20,23,30,.09),0 2px 8px rgba(20,23,30,.05);
-  --sh-lg:0 28px 64px rgba(20,23,30,.16),0 8px 20px rgba(20,23,30,.07);
-  --maxw:1160px;
-}
-body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;-webkit-font-smoothing:antialiased}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+  .dash-hero{background:var(--text);border-radius:var(--r32);padding:32px 36px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+  .dash-hero::before{content:'';position:absolute;top:-100px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.18),transparent 70%);pointer-events:none}
+  .dash-hero-text{position:relative;z-index:1}
+  .dash-hero-text h1{font-size:1.6rem;font-weight:500;color:var(--bg);letter-spacing:-.02em;margin-bottom:6px}
+  .dash-hero-text p{font-size:14px;color:rgba(255,255,255,.45)}
+  .dash-hero-actions{display:flex;gap:10px;flex-shrink:0;position:relative;z-index:1;flex-wrap:wrap;align-items:center}
+  .maint-btn{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:var(--r14);padding:.6rem 1.1rem .6rem .7rem;font-family:inherit;font-size:13.5px;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
+  .maint-btn:hover{background:rgba(255,255,255,.14);color:#fff}
+  .maint-btn.on{background:var(--amber-dim);border-color:transparent;color:var(--amber)}
+  .maint-track{width:32px;height:18px;border-radius:50px;background:rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:background .2s}
+  .maint-track::after{content:'';position:absolute;top:2.5px;left:2.5px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s}
+  .maint-btn.on .maint-track{background:var(--amber)}
+  .maint-btn.on .maint-track::after{transform:translateX(14px)}
 
-.ls{position:fixed;inset:0;z-index:9000;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px}
-.sp{width:26px;height:26px;border:2px solid rgba(255,255,255,.1);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
-.lt{font-size:13px;color:rgba(255,255,255,.35)}
+  .live-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r24);padding:12px 18px;margin-bottom:20px}
+  .live-dot-wrap{display:flex;align-items:center;gap:8px;padding-right:8px;border-right:1px solid var(--stroke);flex-shrink:0}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:liveDotPulse 2s ease-in-out infinite}
+  @keyframes liveDotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(30,222,123,.4)}50%{opacity:.7;box-shadow:0 0 0 4px rgba(30,222,123,0)}}
+  .live-label{font-size:12.5px;color:var(--text-faint);white-space:nowrap}
+  .live-chip{display:flex;align-items:center;gap:7px;padding:.4rem .9rem;border-radius:99px;background:var(--card-elevated);text-decoration:none;color:var(--text);font-size:13.5px;transition:background .15s}
+  .live-chip:hover{background:var(--stroke)}
+  .live-chip-n{font-weight:600;font-size:15px;color:var(--text-faint);min-width:14px;text-align:center}
+  .live-chip.has-new .live-chip-n{color:var(--green-text)}
+  .live-chip.flash{animation:liveFlash .9s ease}
+  @keyframes liveFlash{0%{background:var(--green-dim)}100%{background:var(--card-elevated)}}
 
+  .adm-stat-card.dark{background:var(--text);border-color:var(--text)}
+  .adm-stat-card.dark .adm-stat-label{color:rgba(255,255,255,.4)}
+  .adm-stat-num.blue{color:var(--blue)}
+  .tariff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+  .tariff-card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r24);padding:18px 20px;display:flex;align-items:center;gap:14px}
+  .tariff-icon{width:42px;height:42px;border-radius:var(--r14);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px}
+  .tariff-icon.blue{background:var(--blue-dim)}.tariff-icon.green{background:var(--green-dim)}.tariff-icon.violet{background:var(--violet-dim)}
+  .tariff-name{font-size:12.5px;color:var(--text-faint);margin-bottom:3px}
+  .tariff-num{font-size:1.4rem;font-weight:600;letter-spacing:-.02em}
+  .tbl-id{font-size:12.5px;font-weight:500;color:var(--green-text)}
+  #recentOrders tbody tr:hover td{background:var(--card-elevated)}
+  .grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px;margin-bottom:14px}
+  .grid2>div{min-width:0}
+  .dash-sec{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);overflow:hidden;margin-bottom:14px}
+  .dash-sec-h{padding:18px 22px;border-bottom:1px solid var(--stroke);display:flex;align-items:center;justify-content:space-between;gap:12px;font-weight:500;font-size:15px}
+  .dash-sec-b{padding:20px 22px}
+  .dash-sec-b.no-pad{padding:0}
+  .rep-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+  .rep-row .cab-field{min-width:170px}
+  @media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  @media(max-width:760px){.tariff-row{grid-template-columns:1fr}.dash-hero{padding:24px 20px}}
 
-.page{display:none;min-height:100vh;overflow-y:auto}
-.inner{max-width:var(--maxw);width:100%;margin:0 auto;padding:36px 28px 60px}
-
-.hero{background:var(--dark);border-radius:var(--r-xl);padding:32px 36px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
-.hero::before{content:'';position:absolute;top:-100px;right:-60px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(30,222,123,.16),transparent 70%);pointer-events:none}
-.hero-text{position:relative;z-index:1}
-.hero-text h1{font-size:1.6rem;font-weight:500;color:#fff;letter-spacing:-.02em;margin-bottom:6px}
-.hero-text p{font-size:.88rem;color:rgba(255,255,255,.42)}
-.hero-actions{display:flex;gap:10px;flex-shrink:0;position:relative;z-index:1;flex-wrap:wrap}
-
-.btn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font);font-weight:500;font-size:.85rem;border:none;border-radius:var(--r-sm);padding:.7rem 1.2rem;cursor:pointer;transition:background .15s,transform .1s;text-decoration:none;white-space:nowrap}
-.btn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.1;fill:none;flex-shrink:0}
-.btn:hover{transform:translateY(-1px)}
-.btn-green{background:var(--green);color:var(--dark)}.btn-green:hover{background:var(--green-h)}
-.btn-dark{background:var(--dark);color:#fff}.btn-dark:hover{background:#2b2f33}
-.btn-outline{background:var(--card);border:1.5px solid var(--line2);color:var(--muted)}.btn-outline:hover{border-color:var(--muted2);color:var(--text)}
-.btn-outline-dark{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.75)}.btn-outline-dark:hover{background:rgba(255,255,255,.14);color:#fff}
-.btn-sm{padding:.5rem 1rem;font-size:.8rem}
-
-.maint-btn{display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:var(--r-sm);padding:.6rem 1.1rem .6rem .7rem;font-family:var(--font);font-size:.83rem;font-weight:300;color:rgba(255,255,255,.7);cursor:pointer;transition:all .2s}
-.maint-btn:hover{background:rgba(255,255,255,.14);color:#fff}
-.maint-btn.on{background:var(--orange-soft);border-color:transparent;color:var(--orange-d)}
-.maint-track{width:32px;height:18px;border-radius:50px;background:rgba(255,255,255,.2);position:relative;flex-shrink:0;transition:background .2s}
-.maint-track::after{content:'';position:absolute;top:2.5px;left:2.5px;width:13px;height:13px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.maint-btn.on .maint-track{background:var(--orange)}
-.maint-btn.on .maint-track::after{transform:translateX(14px)}
-
-.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
-.stat-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:20px 22px;transition:box-shadow .15s,transform .15s}
-.stat-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
-.stat-card.dark{background:var(--dark);border-color:var(--dark)}
-.stat-label{font-size:.68rem;font-weight:500;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px}
-.stat-card.dark .stat-label{color:rgba(255,255,255,.32)}
-.stat-num{font-size:1.9rem;font-weight:600;line-height:1;letter-spacing:-.03em;margin-bottom:5px;color:var(--text)}
-.stat-card.dark .stat-num{color:#fff}
-.stat-num.green{color:var(--green-d)}.stat-num.glow{color:var(--green)}.stat-num.blue{color:var(--info)}.stat-num.warn{color:var(--orange-d)}
-.stat-sub{font-size:.76rem;color:var(--muted)}
-
-.tariff-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
-.tariff-card{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:18px 20px;display:flex;align-items:center;gap:14px}
-.tariff-icon{width:42px;height:42px;border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px}
-.tariff-icon.blue{background:var(--info-soft)}.tariff-icon.green{background:var(--green-soft)}.tariff-icon.purple{background:var(--purple-soft)}
-.tariff-name{font-size:.76rem;color:var(--muted);margin-bottom:3px}
-.tariff-num{font-size:1.4rem;font-weight:600;letter-spacing:-.02em}
-
-.grid2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}
-@media(max-width:900px){.grid2{grid-template-columns:1fr}}
-
-.sec{background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);overflow:hidden;margin-bottom:14px}
-.sec-h{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.sec-title{font-weight:500;font-size:.92rem;letter-spacing:-.01em}
-.sec-b{padding:20px 22px}
-.sec-b.no-pad{padding:0}
-
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{font-size:.65rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:500;padding:11px 22px;text-align:left;border-bottom:1px solid var(--line);background:var(--bg)}
-.tbl td{padding:14px 22px;font-size:.86rem;border-bottom:1px solid var(--line);vertical-align:middle}
-.tbl tr:last-child td{border-bottom:none}
-.tbl tr:hover td{background:var(--bg);cursor:pointer}
-.tbl-id{font-size:.74rem;font-weight:500;color:var(--green-d)}
-
-.badge{display:inline-flex;align-items:center;gap:5px;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.7rem;font-weight:500;white-space:nowrap}
-.badge::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
-.b0{background:var(--line);color:var(--muted)}.b1{background:var(--orange-soft);color:var(--orange-d)}.b2{background:var(--info-soft);color:var(--info)}
-.b3{background:var(--purple-soft);color:var(--purple)}.b4{background:var(--orange-soft);color:var(--orange-d)}.b5{background:var(--green-soft);color:var(--green-d)}
-.tag{display:inline-flex;align-items:center;padding:.24rem .65rem;border-radius:var(--r-pill);font-size:.74rem;font-weight:500}
-.tag-blue{background:var(--info-soft);color:var(--info)}.tag-green{background:var(--green-soft);color:var(--green-d)}.tag-purple{background:var(--purple-soft);color:var(--purple)}
-
-.si{background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.75rem 1rem;font-family:var(--font);font-size:.86rem;font-weight:300;color:var(--text);outline:none;transition:border-color .15s}
-.si:focus{border-color:var(--green)}
-
-.modal-ov{position:fixed;inset:0;z-index:500;background:rgba(10,12,16,.5);backdrop-filter:blur(3px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
-.modal-ov.show{opacity:1;pointer-events:all}
-.modal{background:var(--card);border-radius:var(--r-xl);padding:28px;width:100%;max-width:480px;box-shadow:var(--sh-lg)}
-.modal-title{font-weight:500;font-size:1.05rem;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;letter-spacing:-.01em}
-.mc{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:var(--r-xs);transition:background .15s}
-.mc:hover{background:var(--bg)}
-.fg{margin-bottom:14px}
-.fl{display:block;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px;font-weight:500}
-.fi,.fta{width:100%;background:var(--bg);border:1.5px solid var(--line2);border-radius:var(--r-sm);padding:.8rem 1rem;color:var(--text);font-family:var(--font);font-size:.9rem;font-weight:300;outline:none;transition:border-color .15s}
-.fi:focus,.fta:focus{border-color:var(--green);box-shadow:0 0 0 4px rgba(30,222,123,.1)}
-.fta{resize:vertical;min-height:90px;line-height:1.5}
-.recipient-box{border:1.5px solid var(--line2);border-radius:var(--r-md);background:var(--bg);max-height:220px;overflow-y:auto}
-.recipient-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .12s;border-bottom:1px solid var(--line)}
-.recipient-item:last-child{border-bottom:none}
-.recipient-item:hover{background:var(--card)}
-.recipient-item.selected{background:var(--green-soft)}
-.recipient-avatar{width:32px;height:32px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.74rem;font-weight:500;flex-shrink:0;text-transform:uppercase}
-.recipient-avatar.all{background:var(--green);color:var(--dark);font-size:.85rem}
-.recipient-text{min-width:0;flex:1}
-.recipient-name{font-size:.85rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recipient-email{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.recipient-check{margin-left:auto;color:var(--green-d);flex-shrink:0;opacity:0;font-size:.9rem}
-.recipient-item.selected .recipient-check{opacity:1}
-.recipient-empty{padding:22px 12px;text-align:center;color:var(--muted);font-size:.82rem}
-.modal-footer{display:flex;gap:8px;margin-top:20px}
-.modal-footer .btn{flex:1;justify-content:center}
-
-.toast{position:fixed;bottom:28px;right:28px;z-index:900;padding:.8rem 1.5rem;border-radius:var(--r-md);font-size:.86rem;font-weight:500;opacity:0;box-shadow:var(--sh-lg);transition:opacity .2s,transform .2s;pointer-events:none;transform:translateY(8px)}
-.toast.show{opacity:1;transform:none}
-.toast.success{background:var(--green);color:#0d3320}.toast.error{background:var(--red);color:#fff}.toast.info{background:var(--dark);color:#fff}.toast.warn{background:var(--orange);color:#fff}
-
-@media(max-width:760px){
-  .inner{padding:70px 16px 40px}
-  .hero{padding:24px 20px}
-  .hero-text h1{font-size:1.3rem}
-  .grid2{gap:12px}
-  .live-strip{flex-wrap:wrap}
-}
-
-.live-strip{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line);border-radius:var(--r-lg);padding:12px 18px;margin-bottom:20px}
-.live-dot-wrap{display:flex;align-items:center;gap:8px;padding-right:8px;border-right:1px solid var(--line);flex-shrink:0}
-.live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);flex-shrink:0;animation:liveDotPulse 2s ease-in-out infinite}
-@keyframes liveDotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(30,222,123,.4)}50%{opacity:.7;box-shadow:0 0 0 4px rgba(30,222,123,0)}}
-.live-label{font-size:.76rem;color:var(--muted);white-space:nowrap}
-.live-chip{display:flex;align-items:center;gap:7px;padding:.4rem .9rem;border-radius:var(--r-pill);background:var(--bg);text-decoration:none;color:var(--text);font-size:.82rem;transition:background .15s,transform .12s}
-.live-chip:hover{background:var(--line);transform:translateY(-1px)}
-.live-chip-n{font-weight:600;font-size:.9rem;color:var(--muted2);min-width:14px;text-align:center}
-.live-chip.has-new .live-chip-n{color:var(--green-d)}
-.live-chip.flash{animation:liveFlash .9s ease}
-@keyframes liveFlash{0%{background:var(--green-soft)}100%{background:var(--bg)}}
+  .recipient-box{border:1px solid var(--stroke);border-radius:var(--r16);background:var(--card-elevated);max-height:220px;overflow-y:auto}
+  .recipient-item{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;border-bottom:1px solid var(--stroke)}
+  .recipient-item:last-child{border-bottom:none}
+  .recipient-item:hover{background:var(--card)}
+  .recipient-item.selected{background:var(--green-dim)}
+  .recipient-avatar{width:32px;height:32px;border-radius:50%;background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;flex-shrink:0;text-transform:uppercase}
+  .recipient-avatar.all{background:var(--green);color:#0d1210;font-size:14px}
+  .recipient-text{min-width:0;flex:1}
+  .recipient-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .recipient-email{font-size:12px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .recipient-check{margin-left:auto;color:var(--green-text);flex-shrink:0;opacity:0}
+  .recipient-item.selected .recipient-check{opacity:1}
+  .recipient-empty{padding:22px 12px;text-align:center;color:var(--text-faint);font-size:13.5px}
 </style>
 </head>
 <body>
 
-<div class="ls" id="loadingScreen"><div class="sp"></div><span class="lt">Загрузка...</span></div>
-<div class="page" id="appWrap">
-  <div class="inner">
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+<div id="sbContent" style="display:none">
+  <div class="shell">
+    <div class="cab-page">
 
-    <div class="hero">
-      <div class="hero-text"><h1>Добро пожаловать, Админ 👋</h1><p>Управляйте заказами, клиентами и настройками сайта</p></div>
-      <div class="hero-actions">
-        <button class="maint-btn" id="maintBtn" onclick="toggleMaintenance()"><div class="maint-track"></div><span id="maintLabel">Техработы</span></button>
-        <a href="/admin/orders" class="btn btn-outline-dark btn-sm">Все заказы →</a>
-        <button class="btn btn-green btn-sm" onclick="openNotifModal()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Уведомление</button>
-      </div>
-    </div>
-
-    <div class="live-strip" id="liveStrip">
-      <div class="live-dot-wrap"><span class="live-dot"></span><span class="live-label">Обновляется само<span id="liveAgo"></span></span></div>
-      <a href="/admin/orders" class="live-chip" id="liveNewOrders"><span class="live-chip-n">—</span><span>новых заказов</span></a>
-      <a href="/admin/chats" class="live-chip" id="liveUnreadChats"><span class="live-chip-n">—</span><span>непрочитанных в чате</span></a>
-      <a href="/admin/tickets" class="live-chip" id="liveOpenTickets"><span class="live-chip-n">—</span><span>открытых заявок</span></a>
-    </div>
-
-    <div class="stat-grid">
-      <div class="stat-card dark"><div class="stat-label">Всего заказов</div><div class="stat-num glow" id="sAll">—</div><div class="stat-sub" style="color:rgba(255,255,255,.3)">за всё время</div></div>
-      <div class="stat-card"><div class="stat-label">Новых</div><div class="stat-num warn" id="sNew">—</div><div class="stat-sub">ожидают ответа</div></div>
-      <div class="stat-card"><div class="stat-label">В работе</div><div class="stat-num blue" id="sWork">—</div><div class="stat-sub">активных</div></div>
-      <div class="stat-card"><div class="stat-label">Готово</div><div class="stat-num green" id="sDone">—</div><div class="stat-sub">завершённых</div></div>
-      <div class="stat-card"><div class="stat-label">Выручка</div><div class="stat-num" id="sRev">—</div><div class="stat-sub">по завершённым</div></div>
-      <div class="stat-card"><div class="stat-label">Средний чек</div><div class="stat-num blue" id="sAvg">—</div><div class="stat-sub">по завершённым</div></div>
-    </div>
-
-    <div class="tariff-row" id="tariffRowSite"></div>
-    <div class="tariff-row" id="tariffRowBot" style="margin-top:12px"></div>
-
-    <div class="grid2">
-      <div class="sec">
-        <div class="sec-h"><span class="sec-title">Последние заказы</span><a href="/admin/orders" class="btn btn-outline btn-sm">Все →</a></div>
-        <div class="sec-b no-pad">
-          <table class="tbl" id="recentOrders">
-            <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
-            <tbody><tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted)">Загрузка...</td></tr></tbody>
-          </table>
+      <div class="dash-hero">
+        <div class="dash-hero-text"><h1>Добро пожаловать, Админ 👋</h1><p>Управляйте заказами, клиентами и настройками сайта</p></div>
+        <div class="dash-hero-actions">
+          <button class="maint-btn" id="maintBtn" onclick="toggleMaintenance()"><div class="maint-track"></div><span id="maintLabel">Техработы</span></button>
+          <a href="/admin/orders" class="cab-btn ghost sm" style="color:#fff;border-color:rgba(255,255,255,.2)">Все заказы →</a>
+          <button class="cab-btn primary sm" onclick="openNotifModal()"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>Уведомление</button>
         </div>
       </div>
-      <div>
-        <div class="sec"><div class="sec-h"><span class="sec-title">Популярные опции</span></div><div class="sec-b" id="popularExtras" style="display:flex;flex-direction:column;gap:8px"><div style="text-align:center;color:var(--muted);font-size:.84rem">Загрузка...</div></div></div>
-        <div class="sec"><div class="sec-h"><span class="sec-title">Активные обслуживания</span></div><div class="sec-b" id="supportStats"></div></div>
+
+      <div class="live-strip" id="liveStrip">
+        <div class="live-dot-wrap"><span class="live-dot"></span><span class="live-label">Обновляется само<span id="liveAgo"></span></span></div>
+        <a href="/admin/orders" class="live-chip" id="liveNewOrders"><span class="live-chip-n">—</span><span>новых заказов</span></a>
+        <a href="/admin/chats" class="live-chip" id="liveUnreadChats"><span class="live-chip-n">—</span><span>непрочитанных в чате</span></a>
+        <a href="/admin/tickets" class="live-chip" id="liveOpenTickets"><span class="live-chip-n">—</span><span>открытых заявок</span></a>
       </div>
-    </div>
 
-    <div class="sec"><div class="sec-h"><span class="sec-title">Типы сайтов</span></div><div class="sec-b" id="typeStats"></div></div>
+      <div class="adm-stat-grid" style="margin-bottom:16px">
+        <div class="adm-stat-card dark"><div class="adm-stat-label">Всего заказов</div><div class="adm-stat-num" style="color:var(--green)" id="sAll">—</div><div class="adm-stat-sub" style="color:rgba(255,255,255,.35)">за всё время</div></div>
+        <div class="adm-stat-card"><div class="adm-stat-label">Новых</div><div class="adm-stat-num warn" id="sNew">—</div><div class="adm-stat-sub">ожидают ответа</div></div>
+        <div class="adm-stat-card"><div class="adm-stat-label">В работе</div><div class="adm-stat-num blue" id="sWork">—</div><div class="adm-stat-sub">активных</div></div>
+        <div class="adm-stat-card"><div class="adm-stat-label">Готово</div><div class="adm-stat-num ok" id="sDone">—</div><div class="adm-stat-sub">завершённых</div></div>
+        <div class="adm-stat-card"><div class="adm-stat-label">Выручка</div><div class="adm-stat-num" id="sRev">—</div><div class="adm-stat-sub">по завершённым</div></div>
+        <div class="adm-stat-card"><div class="adm-stat-label">Средний чек</div><div class="adm-stat-num blue" id="sAvg">—</div><div class="adm-stat-sub">по завершённым</div></div>
+      </div>
 
-    <div class="sec">
-      <div class="sec-h"><span class="sec-title">Отчёт для бухгалтерии</span></div>
-      <div class="sec-b">
-        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-          <div><label style="display:block;font-size:.8rem;color:var(--muted);margin-bottom:7px">С даты (оплаты)</label><input type="date" class="si" id="repFrom"/></div>
-          <div><label style="display:block;font-size:.8rem;color:var(--muted);margin-bottom:7px">По дату</label><input type="date" class="si" id="repTo"/></div>
-          <label style="display:flex;align-items:center;gap:8px;font-size:.86rem;color:var(--muted);padding-bottom:11px"><input type="checkbox" id="repOnlyPaid" checked/> только оплаченные</label>
-          <button class="btn btn-dark btn-sm" onclick="generateAccountingReport()">Сформировать PDF</button>
-          <button class="btn btn-outline btn-sm" onclick="generateAccountingCsv()">Экспорт CSV</button>
+      <div class="tariff-row" id="tariffRowSite"></div>
+      <div class="tariff-row" id="tariffRowBot"></div>
+
+      <div class="grid2">
+        <div class="dash-sec">
+          <div class="dash-sec-h"><span>Последние заказы</span><a href="/admin/orders" class="cab-btn ghost sm">Все →</a></div>
+          <div class="dash-sec-b no-pad adm-table-scroll">
+            <table class="adm-table" id="recentOrders">
+              <thead><tr><th>Заказ</th><th>Клиент</th><th>Тариф</th><th>Статус</th><th>Сумма</th></tr></thead>
+              <tbody><tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text-faint)">Загрузка…</td></tr></tbody>
+            </table>
+          </div>
         </div>
-        <div style="font-size:.8rem;color:var(--muted);margin-top:12px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
+        <div>
+          <div class="dash-sec"><div class="dash-sec-h">Популярные опции</div><div class="dash-sec-b" id="popularExtras" style="display:flex;flex-direction:column;gap:8px"><div style="text-align:center;color:var(--text-faint);font-size:13.5px">Загрузка…</div></div></div>
+          <div class="dash-sec"><div class="dash-sec-h">Активные обслуживания</div><div class="dash-sec-b" id="supportStats"></div></div>
+        </div>
       </div>
-    </div>
 
+      <div class="dash-sec"><div class="dash-sec-h">Типы сайтов</div><div class="dash-sec-b" id="typeStats"></div></div>
+
+      <div class="dash-sec">
+        <div class="dash-sec-h">Отчёт для бухгалтерии</div>
+        <div class="dash-sec-b">
+          <div class="rep-row">
+            <div class="cab-field"><label class="cab-label">С даты (оплаты)</label><input type="date" class="cab-input" id="repFrom"/></div>
+            <div class="cab-field"><label class="cab-label">По дату</label><input type="date" class="cab-input" id="repTo"/></div>
+            <label style="display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text-dim);padding-bottom:12px"><input type="checkbox" id="repOnlyPaid" checked/> только оплаченные</label>
+            <button class="cab-btn dark sm" onclick="generateAccountingReport()">Сформировать PDF</button>
+            <button class="cab-btn ghost sm" onclick="generateAccountingCsv()">Экспорт CSV</button>
+          </div>
+          <div style="font-size:13px;color:var(--text-faint);margin-top:12px">Отчёт открывается в новой вкладке — сохраните его как PDF через печать браузера (Ctrl/⌘+P).</div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </div>
 
-<div class="modal-ov" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
-  <div class="modal">
-    <div class="modal-title">Уведомление <button class="mc" onclick="closeNotifModal()">✕</button></div>
-    <div class="fg">
-      <label class="fl">Получатель</label>
-      <input class="fi" id="notifSearch" type="text" placeholder="Поиск по имени или email..." style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/>
+<div class="cab-modal-overlay" id="notifModal" onclick="if(event.target===this)closeNotifModal()">
+  <div class="cab-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px"><h3 style="margin:0">Уведомление</h3><button class="cab-btn ghost sm" style="padding:8px" onclick="closeNotifModal()">✕</button></div>
+    <div class="cab-field" style="margin-bottom:14px">
+      <label class="cab-label">Получатель</label>
+      <input class="cab-input" id="notifSearch" type="text" placeholder="Поиск по имени или email…" style="margin-bottom:8px" oninput="filterNotifTarget(this.value)"/>
       <div class="recipient-box" id="notifTargetList"></div>
     </div>
-    <div class="fg"><label class="fl">Заголовок</label><input class="fi" id="notifTitle" type="text" placeholder="Заголовок уведомления..."/></div>
-    <div class="fg"><label class="fl">Текст</label><textarea class="fta" id="notifText" placeholder="Текст..."></textarea></div>
-    <div class="fg"><div style="font-size:.8rem;color:var(--muted);background:var(--bg);border-radius:var(--r-sm);padding:10px 14px">Придёт в личный кабинет получателя (страница «Уведомления»).</div></div>
-    <div class="modal-footer">
-      <button class="btn btn-outline" onclick="closeNotifModal()">Отмена</button>
-      <button class="btn btn-green" onclick="sendNotif()">Отправить</button>
+    <div class="cab-field" style="margin-bottom:14px"><label class="cab-label">Заголовок</label><input class="cab-input" id="notifTitle" type="text" placeholder="Заголовок уведомления…"/></div>
+    <div class="cab-field" style="margin-bottom:14px"><label class="cab-label">Текст</label><textarea class="cab-textarea" id="notifText" placeholder="Текст…"></textarea></div>
+    <div style="font-size:13px;color:var(--text-dim);background:var(--card-elevated);border-radius:var(--r14);padding:10px 14px;margin-bottom:6px">Придёт в личный кабинет получателя (страница «Уведомления»).</div>
+    <div class="cab-modal-actions" style="margin-top:18px">
+      <button class="cab-btn ghost" onclick="closeNotifModal()">Отмена</button>
+      <button class="cab-btn primary" onclick="sendNotif()">Отправить</button>
     </div>
   </div>
 </div>
@@ -249,6 +172,7 @@ body{color:var(--text);font-family:var(--font);font-weight:300;font-size:15.5px;
 const API = 'https://antviz.ru/api';
 
 const S_LABELS=['Новая заявка','Обсуждение','В работе','На проверке','Правки','Готово','Ожидает доплаты'];
+const S_BADGE=['','amber','blue','violet','amber','green','amber'];
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function formatLabel(o){return o.siteFormat||(o.orderType==='bot'?'Telegram-бот / мини-апп':'—');}
 function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
@@ -519,7 +443,7 @@ function updateLiveAgoLabel(){
   document.getElementById('loadingScreen').style.display='none';
   if(user.role!=='admin'){window.location.href='/';return;}
   currentAdminUser=user;
-  document.getElementById('appWrap').style.display='block';
+  document.getElementById('sbContent').style.display='block';
   refreshMaintStatus();
 
   window.loadDashboard = async function(){
@@ -547,43 +471,43 @@ function updateLiveAgoLabel(){
     const BOT_TARIFFS=[['Простой бот','🤖','blue'],['Бот с оплатой','💳','green'],['Mini App','📱','purple']];
     const buildTariffRow=(list)=>list.map(([name,icon,color])=>{
       const n=orders.filter(o=>(o.package||o.tariff)===name).length;
-      return `<div class="tariff-card"><div class="tariff-icon ${color}">${icon}</div><div><div class="tariff-name">Тариф ${esc(name)}</div><div class="tariff-num">${n}</div></div></div>`;
+      return `<div class="tariff-card"><div class="tariff-icon ${color=='purple'?'violet':color}">${icon}</div><div><div class="tariff-name">Тариф ${esc(name)}</div><div class="tariff-num">${n}</div></div></div>`;
     }).join('');
     document.getElementById('tariffRowSite').innerHTML=buildTariffRow(SITE_TARIFFS);
     document.getElementById('tariffRowBot').innerHTML=buildTariffRow(BOT_TARIFFS);
 
     const recent=orders.filter(o=>o.status<5).slice(0,8);
     const tbody=document.querySelector('#recentOrders tbody');
-    const TARIFF_COLOR={'Старт':'tag-blue','Рост':'tag-green','Масштаб':'tag-purple','Простой бот':'tag-blue','Бот с оплатой':'tag-green','Mini App':'tag-purple'};
+    const TARIFF_COLOR={'Старт':'blue','Рост':'green','Масштаб':'violet','Простой бот':'blue','Бот с оплатой':'green','Mini App':'violet'};
     tbody.innerHTML=recent.length?recent.map(o=>{
       const tariff=o.package||o.tariff||'—';
       const cls=TARIFF_COLOR[tariff]||'';
       return`<tr onclick="location.href='/admin/orders?id=${o.id}'" style="cursor:pointer">
-        <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.72rem;color:var(--muted);margin-top:3px">${fmtDate(o.createdAt)}</div></td>
-        <td><div style="font-size:.86rem;font-weight:500">${esc(o.clientName||'—')}</div><div style="font-size:.72rem;color:var(--muted)">${esc(o.clientEmail||'—')}</div></td>
-        <td><span class="tag ${cls}">${tariff}</span></td>
-        <td><span class="badge b${o.status||0}">${S_LABELS[o.status||0]}</span></td>
-        <td style="font-weight:600;color:var(--green-d)">${fmtPrice(o.totalPrice)}</td>
-      </tr>`;}).join(''):'<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--muted)">Нет активных заказов</td></tr>';
+        <td><span class="tbl-id">№${o.id.slice(0,7).toUpperCase()}</span><div style="font-size:.72rem;color:var(--text-faint);margin-top:3px">${fmtDate(o.createdAt)}</div></td>
+        <td><div style="font-size:.86rem;font-weight:500">${esc(o.clientName||'—')}</div><div style="font-size:.72rem;color:var(--text-faint)">${esc(o.clientEmail||'—')}</div></td>
+        <td><span class="cab-badge ${cls}">${tariff}</span></td>
+        <td><span class="cab-badge ${S_BADGE[o.status||0]}">${S_LABELS[o.status||0]}</span></td>
+        <td style="font-weight:600;color:var(--green-text)">${fmtPrice(o.totalPrice)}</td>
+      </tr>`;}).join(''):'<tr><td colspan="5" style="text-align:center;padding:28px;color:var(--text-faint)">Нет активных заказов</td></tr>';
 
     const extrasMap={};
     orders.forEach(o=>{(o.extras||[]).forEach(e=>{const l=e==='domain'?'Домен':e==='support'?'Обслуживание':e==='seo'?'SEO':e==='content'?'Контент':e==='shop'?'Каталог':e==='urgent'?'Срочно':e;extrasMap[l]=(extrasMap[l]||0)+1;});});
     const sortedExtras=Object.entries(extrasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
     document.getElementById('popularExtras').innerHTML=sortedExtras.length?sortedExtras.map(([name,count])=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--bg);border-radius:var(--r-sm)">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:var(--card-elevated);border-radius:var(--r14)">
         <span style="font-size:.85rem">${name}</span>
-        <span style="font-weight:600;font-size:.8rem;color:var(--green-d)">${count}</span>
-      </div>`):'<div style="text-align:center;color:var(--muted);font-size:.84rem">Нет данных</div>';
+        <span style="font-weight:600;font-size:.8rem;color:var(--green-text)">${count}</span>
+      </div>`):'<div style="text-align:center;color:var(--text-faint);font-size:.84rem">Нет данных</div>';
 
     const byType={};orders.forEach(o=>{const t=formatLabel(o)||'Другое';byType[t]=(byType[t]||0)+1;});
     const sorted=Object.entries(byType).sort((a,b)=>b[1]-a[1]);const mx=sorted[0]?.[1]||1;
     document.getElementById('typeStats').innerHTML=sorted.map(([t,n])=>`
       <div style="margin-bottom:14px">
-        <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px"><span>${esc(t)}</span><span style="font-weight:600;color:var(--green-d)">${n}</span></div>
-        <div style="height:6px;background:var(--bg);border-radius:3px"><div style="height:100%;border-radius:3px;background:var(--green);width:${n/mx*100}%"></div></div>
-      </div>`).join('')||'<div style="color:var(--muted);font-size:.84rem">Нет данных</div>';
+        <div style="display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:6px"><span>${esc(t)}</span><span style="font-weight:600;color:var(--green-text)">${n}</span></div>
+        <div style="height:6px;background:var(--card-elevated);border-radius:3px"><div style="height:100%;border-radius:3px;background:var(--green);width:${n/mx*100}%"></div></div>
+      </div>`).join('')||'<div style="color:var(--text-faint);font-size:.84rem">Нет данных</div>';
 
-    document.getElementById('supportStats').innerHTML='<div style="text-align:center;color:var(--muted);font-size:.84rem;padding:12px">Нет активных обслуживаний</div>';
+    document.getElementById('supportStats').innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:.84rem;padding:12px">Нет активных обслуживаний</div>';
   };
   loadDashboard();
   pollLiveStrip();
@@ -591,7 +515,7 @@ function updateLiveAgoLabel(){
   setInterval(updateLiveAgoLabel, 5000);
 })();
 </script>
-<script src="/m-panel26.js"></script>
+<script src="/profile/assets/admin-shell.js" data-page="index" data-title="Дашборд"></script>
 <script src="../GEOBLOCK.js"></script>
 <script src="../maintenance.js"></script>
 </body>

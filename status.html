@@ -855,6 +855,13 @@
       if(isAdmin){
         await loadAdminServicesRaw();
         renderAdminPanel();
+        // Раньше панель управления стояла последней в DOM — после всей истории
+        // инцидентов, и до неё приходилось листать всю страницу. Переносим её
+        // сразу под hero-баннер, ещё до списка сервисов — админка теперь видна
+        // без скролла.
+        const panel = document.getElementById('admin-panel');
+        const hero = document.querySelector('.hero');
+        if(panel && hero) hero.insertAdjacentElement('afterend', panel);
         // Если /api/status успел отрисоваться РАНЬШЕ, чем подтвердилось админство —
         // полоски аптайма отрисовались ещё без кликабельных админ-дней. Перерисовываем
         // список сервисов той же (уже загруженной) датой, без нового запроса на сервер.
@@ -894,7 +901,7 @@
         </div>
 
         <div id="admin-tab-incidents" style="display:none;">
-          <p class="admin-section-hint">Открытые инциденты — сверху. «Обновить» дописывает запись в таймлайн и рассылает подписчикам, «Удалить» стирает инцидент безвозвратно.</p>
+          <p class="admin-section-hint">Открытые инциденты — сверху. «Обновить» дописывает запись в таймлайн и рассылает подписчикам. «Исправить» правит заголовок/текст задним числом БЕЗ рассылки (например, пометить как ложное срабатывание). «Удалить» стирает инцидент безвозвратно.</p>
           <div id="admin-incidents-list"></div>
         </div>
 
@@ -1149,6 +1156,7 @@
         </div>
         <div class="admin-inc-actions">
           ${inc.status !== 'resolved' ? '<button type="button" class="admin-mini-btn primary inc-toggle-update">Добавить обновление</button>' : ''}
+          <button type="button" class="admin-mini-btn inc-toggle-edit">Исправить текст</button>
           <button type="button" class="admin-mini-btn danger inc-delete">Удалить</button>
         </div>
         <div class="admin-inc-update-form">
@@ -1163,6 +1171,21 @@
           <textarea class="inc-update-message" rows="2" placeholder="Что изменилось"></textarea>
           <button type="button" class="admin-mini-btn primary" style="margin-top:10px; align-self:flex-start;">Отправить и разослать</button>
         </div>
+        <div class="admin-inc-update-form admin-inc-edit-form">
+          <p style="font-size:12px; color:var(--text-faint); margin-top:0;">Правка задним числом — подписчикам НЕ уходит новое уведомление.</p>
+          <label>Заголовок</label>
+          <input type="text" class="inc-edit-title" value="${esc(inc.title)}">
+          <label>Серьёзность</label>
+          <select class="inc-edit-severity">
+            <option value="degraded">Замедление</option>
+            <option value="partial">Частичный сбой</option>
+            <option value="major">Серьёзный сбой</option>
+            <option value="maint">Плановые работы</option>
+          </select>
+          <label>Исходное описание (первая запись таймлайна)</label>
+          <textarea class="inc-edit-message" rows="3">${esc((inc.updates && inc.updates[0] && inc.updates[0].message) || '')}</textarea>
+          <button type="button" class="admin-mini-btn primary inc-edit-save" style="margin-top:10px; align-self:flex-start;">Сохранить без рассылки</button>
+        </div>
       </div>
     `).join('') || '<p class="admin-empty-hint">Инцидентов пока нет.</p>';
 
@@ -1170,10 +1193,41 @@
       const id = row.dataset.id;
       const inc = lastIncidentsForAdmin.find(x => x.id === id);
 
+      const editSeveritySelect = row.querySelector('.inc-edit-severity');
+      if(editSeveritySelect) editSeveritySelect.value = inc.severity;
+
       const toggleBtn = row.querySelector('.inc-toggle-update');
       if(toggleBtn){
         toggleBtn.addEventListener('click', () => {
-          row.querySelector('.admin-inc-update-form').classList.toggle('open');
+          row.querySelector('.admin-inc-edit-form').classList.remove('open');
+          row.querySelector('.admin-inc-update-form:not(.admin-inc-edit-form)').classList.toggle('open');
+        });
+      }
+
+      const toggleEditBtn = row.querySelector('.inc-toggle-edit');
+      if(toggleEditBtn){
+        toggleEditBtn.addEventListener('click', () => {
+          const updateForm = row.querySelector('.admin-inc-update-form:not(.admin-inc-edit-form)');
+          if(updateForm) updateForm.classList.remove('open');
+          row.querySelector('.admin-inc-edit-form').classList.toggle('open');
+        });
+      }
+
+      const editSaveBtn = row.querySelector('.inc-edit-save');
+      if(editSaveBtn){
+        editSaveBtn.addEventListener('click', async () => {
+          const title = row.querySelector('.inc-edit-title').value.trim();
+          const message = row.querySelector('.inc-edit-message').value.trim();
+          if(!title){ showMsg('Заголовок не может быть пустым.', false); return; }
+          try{
+            await adminPost(`/status/incidents/${id}`, {
+              title,
+              severity: row.querySelector('.inc-edit-severity').value,
+              message,
+            }, 'PATCH');
+            showMsg(`«${title}» исправлен.`, true);
+            loadStatus();
+          } catch(err){ showMsg(err.message, false); }
         });
       }
 

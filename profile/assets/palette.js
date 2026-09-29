@@ -35,7 +35,7 @@
     { t: 'Мои заказы',       s: 'Статусы, оплата, история',          href: '/profile/orders',        k: 'заказы orders история статус' },
     { t: 'Платежи',          s: 'Платежи и документы',               href: '/profile/payments',      k: 'платежи оплата квитанции чеки документы деньги' },
     { t: 'Мои проекты',      s: 'Готовые сайты и боты',              href: '/profile/sites',         k: 'проекты сайты sites боты' },
-    { t: 'Чат с командой',   s: 'Тикеты и переписка с поддержкой',   href: '/profile/support',       k: 'поддержка чат тикеты support помощь' },
+    { t: 'Чат с командой',   s: 'Тикеты и переписка с поддержкой',   href: '/profile/support/',       k: 'поддержка чат тикеты support помощь' },
     { t: 'Обслуживание',     s: 'Подписка и заявки на правки',       href: '/profile/tickets',       k: 'обслуживание подписка правки заявки доработки' },
     { t: 'Уведомления',      s: 'События по заказам и поддержке',    href: '/profile/notifications', k: 'уведомления колокольчик' },
     { t: 'Настройки',        s: 'Профиль, безопасность, каналы',     href: '/profile/settings',      k: 'настройки безопасность пароль 2fa telegram сеансы' },
@@ -143,7 +143,7 @@
   function actions() {
     const list = [
       { g: 'Действия', t: 'Новый заказ', s: 'Оформить проект', ico: 'plus', k: 'новый заказ оформить создать', run: () => go('/order') },
-      { g: 'Действия', t: 'Новый тикет', s: 'Написать в поддержку', ico: 'plus', k: 'новый тикет написать поддержка вопрос обращение', run: () => go('/profile/support-new') },
+      { g: 'Действия', t: 'Новый тикет', s: 'Написать в поддержку', ico: 'plus', k: 'новый тикет написать поддержка вопрос обращение', run: () => go('/profile/support/new') },
       { g: 'Действия', t: 'Сменить тему', s: 'Светлая / тёмная', ico: 'theme', k: 'тема темная светлая оформление', run: () => {
         const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
         const next = cur === 'light' ? 'dark' : 'light';
@@ -183,7 +183,7 @@
         all.push({
           g: 'Тикеты', t: t.subject || t.topic || 'Тикет', s: [t.topic, t.status === 'done' ? 'Решён' : 'Открыт', t.orderLabel].filter(Boolean).join(' · '),
           ico: 'ticket', k: [t.subject, t.topic, t.orderLabel].join(' '),
-          run: () => go('/profile/support-chat?id=' + encodeURIComponent(t.id)),
+          run: () => go('/profile/support/chat?id=' + encodeURIComponent(t.id)),
         });
       });
       data.services.forEach(t => {

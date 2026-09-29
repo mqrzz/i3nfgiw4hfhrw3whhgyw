@@ -4,20 +4,15 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Чат с командой — Antviz</title>
-<link rel="icon" href="../img/favicon.png" type="image/png"/>
+<link rel="icon" href="/img/favicon.png" type="image/png"/>
 <script>
   try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
-  // Полноэкранный чат — только для ПК. На телефоне тикет открывается выезжающей панелью на странице «Чат с командой».
-  if (!window.matchMedia('(min-width:981px)').matches) {
-    var q = new URLSearchParams(location.search); var i = q.get('id');
-    location.replace('support' + (i ? '?id=' + encodeURIComponent(i) : ''));
-  }
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
-<link rel="stylesheet" href="/profile/assets/cabinet.css?v=2">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
 <style>
   /* #sbContent .cab-page в cabinet.css задаёт padding-bottom:40px с более высокой
      специфичностью (там есть #id) — просто "body .cab-page{...}" её не перебивает.
@@ -100,6 +95,9 @@
   .ch-rated button{border:none;background:none;color:var(--text-dim);text-decoration:underline;cursor:pointer;font-size:13.5px}
 
   .ch-compose{padding:14px 20px 20px;border-top:1px solid var(--stroke)}
+  .ch-closed-banner{padding:18px 20px 22px;border-top:1px solid var(--stroke);text-align:center}
+  .ch-closed-banner .ch-closed-title{font-size:14.5px;font-weight:500;margin-bottom:4px}
+  .ch-closed-banner p{font-size:13px;color:var(--text-dim,var(--muted));margin-bottom:12px}
   .ch-pending{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
   .ch-pend{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 10px;border:1px solid var(--stroke);border-radius:var(--r12);background:var(--card-elevated);font-size:13px;max-width:240px}
   .ch-pend img{width:26px;height:26px;border-radius:7px;object-fit:cover}
@@ -151,13 +149,31 @@
     .ch-info-btn,.ch-info-close{display:none}
   }
 
+  /* ── мобильная раскладка ──
+     Раньше на телефоне этот файл вообще не открывался — сразу редиректил
+     обратно на список (см. снятый выше скрипт), а чат жил в отдельной
+     выезжающей панели на profile/support/index.html. Теперь страница одна
+     и та же для ПК и мобильного — просто на узком экране левая колонка со
+     списком тредов скрыта (список уже есть отдельной страницей), а сама
+     переписка занимает всю ширину. */
+  @media (max-width:980px){
+    .ch-shell{grid-template-columns:1fr;height:auto;min-height:calc(100vh - 200px);border-radius:20px}
+    .ch-list{display:none}
+    .ch-head{padding:16px 18px}
+    .ch-body{padding:18px}
+    .ch-msg{max-width:88%}
+    .ch-info{width:100%}
+    .ch-rate{width:100%}
+    .ch-compose,.ch-closed-banner{padding:12px 14px 16px}
+  }
+
   .lb{position:fixed;inset:0;z-index:9800;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center;padding:30px;cursor:zoom-out}
   .lb.show{display:flex}
   .lb img{max-width:100%;max-height:100%;border-radius:14px}
 </style>
 </head>
 <body>
-<script src="/profile/assets/sidebar.js" data-page="support" data-back="/profile/support" data-back-label="К тикетам" data-title="Чат с командой"></script>
+<script src="/profile/assets/sidebar.js" data-page="support" data-back="/profile/support/" data-back-label="К тикетам" data-title="Чат с командой"></script>
 
 <div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
 
@@ -170,7 +186,7 @@
       <div class="ch-list-head">
         <div class="ch-list-top">
           <h2>Тикеты</h2>
-          <a class="cab-btn primary sm" href="support-new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Новый</a>
+          <a class="cab-btn primary sm" href="/profile/support/new"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Новый</a>
         </div>
         <div class="cab-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="chSearch" placeholder="Поиск" autocomplete="off"></div>
         <div class="ch-tabs" id="chTabs">
@@ -300,7 +316,7 @@ function renderMain(keepScroll){
     box.innerHTML = `<div class="ch-empty"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
       <h3>${tickets.length ? 'Выберите тикет' : 'Тикетов пока нет'}</h3>
       <p>${tickets.length ? 'Откройте диалог слева, чтобы прочитать переписку.' : 'Напишите нам — поможем с любым вопросом по проекту, оплате или сайту.'}</p>
-      <a class="cab-btn primary" href="support-new">Новый тикет</a></div>`;
+      <a class="cab-btn primary" href="/profile/support/new">Новый тикет</a></div>`;
     return;
   }
   // Фоновое обновление не должно сбивать набор текста: запоминаем фокус и позицию курсора
@@ -327,19 +343,24 @@ function renderMain(keepScroll){
       <button class="cab-btn ghost sm ch-info-btn" data-act="toggle-info">Детали</button>
     </div>
     <div class="ch-body" id="chBody">${body}</div>
+    ${t.status === 'done' ? `
+    <div class="ch-closed-banner">
+      <div class="ch-closed-title">Тикет закрыт</div>
+      <p>Написать сюда больше нельзя. Если вопрос не решён или появился новый — создайте новый тикет.</p>
+      <a class="cab-btn dark sm" href="/profile/support/new?topic=${encodeURIComponent(t.topic || '')}">Создать новый тикет</a>
+    </div>` : `
     <div class="ch-compose">
       <div class="ch-pending" id="chPending"></div>
       <div class="ch-row">
         <button type="button" class="ch-ic ch-attach" data-act="attach" title="Прикрепить файл"><svg viewBox="0 0 24 24"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
-        <textarea id="chInput" rows="1" placeholder="${t.status === 'done' ? 'Написать ещё — тикет откроется снова' : 'Написать сообщение…'}"></textarea>
+        <textarea id="chInput" rows="1" placeholder="Написать сообщение…"></textarea>
         <button type="button" class="ch-ic ch-send" id="chSend" data-act="send" title="Отправить"><svg viewBox="0 0 24 24"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg></button>
       </div>
       <div class="ch-hint">Enter — отправить, Shift+Enter — новая строка. Файлы можно перетащить в чат или вставить из буфера.</div>
       <input type="file" id="chFile" multiple accept="${ACCEPT}" style="display:none">
-    </div>`;
+    </div>`}`;
   const inp = $('chInput');
-  inp.value = drafts[t.id] || '';
-  autosize(inp);
+  if (inp) { inp.value = drafts[t.id] || ''; autosize(inp); }
   renderPending();
   const b = $('chBody');
   if (keepScroll && !wasBottom) b.scrollTop = prevTop; else b.scrollTop = b.scrollHeight;
@@ -369,14 +390,14 @@ function renderInfo(){
         <div><span class="k">Тема</span><b>${esc(t.topic || '—')}</b></div>
         <div><span class="k">Приоритет</span><b>${PRIO[t.priority] || '—'}</b></div>
         <div><span class="k">Создан</span><b>${new Date(t.createdAt).toLocaleDateString('ru', { day:'numeric', month:'long' })}</b></div>
-        ${o ? `<div><span class="k">Заказ</span><a href="orders?id=${encodeURIComponent(o.id)}">${esc(o.siteDomain || '№ ' + o.id.slice(0,8).toUpperCase())}</a></div>` : (t.orderLabel ? `<div><span class="k">Заказ</span><b>${esc(orderName(t))}</b></div>` : '')}
+        ${o ? `<div><span class="k">Заказ</span><a href="/profile/orders?id=${encodeURIComponent(o.id)}">${esc(o.siteDomain || '№ ' + o.id.slice(0,8).toUpperCase())}</a></div>` : (t.orderLabel ? `<div><span class="k">Заказ</span><b>${esc(orderName(t))}</b></div>` : '')}
         ${t.rating ? `<div><span class="k">Оценка</span><b style="color:var(--amber);letter-spacing:1px">${'★'.repeat(t.rating)}</b></div>` : ''}
       </div>
     </div>
     ${imgs.length ? `<div><h4>Изображения · ${imgs.length}</h4><div class="ch-media">${imgs.map(m => `<img src="${esc(m.imageUrl)}" alt="" data-lb="1">`).join('')}</div></div>` : ''}
     ${fls.length ? `<div><h4>Файлы · ${fls.length}</h4><div class="ch-flist">${fls.map(m => `<a href="${fileHref(t, m)}" target="_blank" rel="noopener">${ICON_FILE}<span>${esc(m.file.name)}</span><small>${fmtSize(m.file.size)}</small></a>`).join('')}</div></div>` : ''}
     ${!imgs.length && !fls.length ? '<div><h4>Вложения</h4><div style="font-size:14px;color:var(--text-faint)">В переписке пока нет файлов</div></div>' : ''}
-    ${t.status === 'done' ? `<a class="cab-btn ghost sm" href="support-new?topic=${encodeURIComponent(t.topic || '')}">Создать новый тикет</a>` : ''}`;
+    ${t.status === 'done' ? `<a class="cab-btn ghost sm" href="/profile/support/new?topic=${encodeURIComponent(t.topic || '')}">Создать новый тикет</a>` : ''}`;
 }
 
 // ───────────── действия ─────────────
@@ -389,7 +410,7 @@ async function openTicket(id, opts = {}){
   const t = tickets.find(x => x.id === id); if (!t) return;
   if (activeId && $('chInput')) drafts[activeId] = $('chInput').value;
   activeId = id; pending = [];
-  history.replaceState(null, '', 'support-chat?id=' + encodeURIComponent(id));
+  history.replaceState(null, '', '/profile/support/chat?id=' + encodeURIComponent(id));
   const bt = $('pgBackTitle'); if (bt) bt.textContent = t.subject || 'Чат с командой';
   renderList();
   await loadMessages(id);
@@ -404,7 +425,8 @@ async function openTicket(id, opts = {}){
 
 async function send(){
   const t = active(); if (!t || sending) return;
-  const inp = $('chInput'); const text = inp.value.trim();
+  const inp = $('chInput'); if (!inp) return; // тикет закрыт — поля ввода уже нет в DOM
+  const text = inp.value.trim();
   if (!text && !pending.length) return;
   sending = true; $('chSend').disabled = true;
   const queue = [...pending];
@@ -417,7 +439,6 @@ async function send(){
       catch(e) { toast(`«${att.name}»: ${e.message}`, 'error'); }
     }
     pending = []; drafts[t.id] = '';
-    if (t.status === 'done') t.status = 'open';   // сервер переоткрывает тикет при новом сообщении
     t.updatedAt = new Date().toISOString();
     renderList(); renderMain(false); renderInfo();
     $('chInput')?.focus();
@@ -530,7 +551,7 @@ async function poll(){
 (async function init(){
   let user = null;
   try { const r = await fetch(`${API}/auth/me`, { credentials:'include' }); if (r.ok) user = await r.json(); } catch(e) {}
-  if (!user) { window.location.href = '../auth'; return; }
+  if (!user) { window.location.href = '/auth'; return; }
   $('loadingScreen').style.display = 'none';
   $('sbContent').style.display = 'block';
 
@@ -553,7 +574,7 @@ async function poll(){
 })();
 </script>
 
-<script src="../GEOBLOCK.js"></script>
-<script type="module" src="../maintenance.js"></script>
+<script src="/GEOBLOCK.js"></script>
+<script type="module" src="/maintenance.js"></script>
 </body>
 </html>

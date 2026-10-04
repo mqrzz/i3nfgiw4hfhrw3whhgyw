@@ -293,6 +293,7 @@
                             <li><a href="${base}terms">Соглашение</a></li>
                             <li><a href="https://antviz.ru/obrabotka-pd">Обработка ПД</a></li>
                             <li><a href="${base}oferta">Публичная оферта</a></li>
+                            <li><a href="${base}pricelist">Прейскурант</a></li>
                             <li><a href="${base}requisites">Реквизиты</a></li>
                         </ul>
                     </div>

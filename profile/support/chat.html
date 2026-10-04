@@ -14,16 +14,11 @@
 <link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
 <link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
 <style>
-  /* #sbContent .cab-page в cabinet.css задаёт padding-bottom:40px с более высокой
-     специфичностью (там есть #id) — просто "body .cab-page{...}" её не перебивает.
-     Чат — единственная страница, где список сообщений должен скроллиться САМ,
-     а не вся страница целиком, поэтому убираем оба нижних отступа этим же по силе селектором. */
   #sbContent .cab-page{padding-bottom:0}
   body .sb-content{padding-bottom:24px}
 
   .ch-shell{position:relative;display:grid;grid-template-columns:320px minmax(0,1fr);height:calc(100vh - 150px);min-height:560px;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);box-shadow:var(--shadow-sm);overflow:hidden}
 
-  /* ── левая колонка: диалоги ── */
   .ch-list{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--stroke)}
   .ch-list-head{padding:22px 20px 14px;display:flex;flex-direction:column;gap:14px}
   .ch-list-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -52,7 +47,6 @@
   .ch-chip.done{background:var(--green)}
   .ch-none{padding:36px 16px;text-align:center;color:var(--text-faint);font-size:14px}
 
-  /* ── центр: переписка ── */
   .ch-main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
   .ch-head{display:flex;align-items:center;gap:16px;padding:20px 28px;border-bottom:1px solid var(--stroke)}
   .ch-head-info{flex:1;min-width:0}
@@ -125,7 +119,6 @@
   .ch-empty h3{font-size:21px;font-weight:600;color:var(--text);margin-bottom:8px}
   .ch-empty p{font-size:15px;max-width:380px;line-height:1.55;margin-bottom:22px}
 
-  /* ── правая колонка: детали ── */
   .ch-info{display:flex;flex-direction:column;gap:22px;min-height:0;overflow-y:auto;padding:24px;background:var(--card);border-left:1px solid var(--stroke);position:absolute;top:0;right:0;bottom:0;width:340px;transform:translateX(102%);visibility:hidden;transition:transform .25s var(--spring),visibility 0s .25s;z-index:6}
   .ch-info.is-open{transform:none;visibility:visible;box-shadow:var(--shadow-lg);transition:transform .25s var(--spring),visibility 0s}
   .ch-info-close{align-self:flex-end}
@@ -149,13 +142,6 @@
     .ch-info-btn,.ch-info-close{display:none}
   }
 
-  /* ── мобильная раскладка ──
-     Раньше на телефоне этот файл вообще не открывался — сразу редиректил
-     обратно на список (см. снятый выше скрипт), а чат жил в отдельной
-     выезжающей панели на profile/support/index.html. Теперь страница одна
-     и та же для ПК и мобильного — просто на узком экране левая колонка со
-     списком тредов скрыта (список уже есть отдельной страницей), а сама
-     переписка занимает всю ширину. */
   @media (max-width:980px){
     .ch-shell{grid-template-columns:1fr;height:auto;min-height:calc(100vh - 200px);border-radius:20px}
     .ch-list{display:none}
@@ -181,7 +167,6 @@
 <div class="cab-page">
   <div class="ch-shell" id="chShell">
 
-    <!-- диалоги -->
     <section class="ch-list">
       <div class="ch-list-head">
         <div class="ch-list-top">
@@ -198,13 +183,11 @@
       <div class="ch-items" id="chItems"></div>
     </section>
 
-    <!-- переписка -->
     <section class="ch-main" id="chMain">
       <div class="ch-drop">Отпустите файлы, чтобы прикрепить</div>
       <div id="chMainInner" style="display:flex;flex-direction:column;flex:1;min-height:0"></div>
     </section>
 
-    <!-- детали -->
     <aside class="ch-info" id="chInfo"></aside>
   </div>
 </div>
@@ -226,9 +209,9 @@ const safeImg = u => typeof u === 'string' && /^data:image\/(png|jpe?g|webp|gif)
 const PRIO = { low:'Низкий', medium:'Средний', high:'Высокий' };
 
 let tickets = [], orders = [], activeId = null;
-let messages = {};            // ticketId -> [...]
-let drafts = {};              // ticketId -> текст черновика
-let pending = [];             // подготовленные вложения для отправки
+let messages = {};
+let drafts = {};
+let pending = [];
 let filter = 'all', query = '';
 let sending = false, pollTimer = null;
 
@@ -260,7 +243,6 @@ async function api(method, path, body){
   return d;
 }
 
-// ───────────── список ─────────────
 function renderList(){
   let list = tickets.filter(t => filter === 'all' || t.status === filter);
   if (query) list = list.filter(t => [t.subject, t.topic, t.orderLabel].join(' ').toLowerCase().includes(query));
@@ -276,7 +258,6 @@ function renderList(){
   }).join('') : `<div class="ch-none">${query || filter !== 'all' ? 'Ничего не найдено' : 'Тикетов пока нет'}</div>`;
 }
 
-// ───────────── переписка ─────────────
 const ICON_FILE = '<svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>';
 const STAR = '<svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
 
@@ -319,7 +300,6 @@ function renderMain(keepScroll){
       <a class="cab-btn primary" href="/profile/support/new">Новый тикет</a></div>`;
     return;
   }
-  // Фоновое обновление не должно сбивать набор текста: запоминаем фокус и позицию курсора
   const ae = document.activeElement;
   const hadFocus = ae && ae.id === 'chInput';
   const selStart = hadFocus ? ae.selectionStart : 0, selEnd = hadFocus ? ae.selectionEnd : 0;
@@ -374,7 +354,6 @@ function renderPending(){
   box.innerHTML = pending.map((f, i) => `<div class="ch-pend">${f.kind === 'image' ? `<img src="${f.dataUrl}" alt="">` : ''}<span>${esc(f.name)}</span><button data-rm="${i}" aria-label="Убрать"><svg viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button></div>`).join('');
 }
 
-// ───────────── детали ─────────────
 function renderInfo(){
   const t = active(); const el = $('chInfo');
   if (!t) { el.innerHTML = ''; return; }
@@ -400,7 +379,6 @@ function renderInfo(){
     ${t.status === 'done' ? `<a class="cab-btn ghost sm" href="/profile/support/new?topic=${encodeURIComponent(t.topic || '')}">Создать новый тикет</a>` : ''}`;
 }
 
-// ───────────── действия ─────────────
 async function loadMessages(id){
   try { messages[id] = await api('GET', `/tickets/${encodeURIComponent(id)}/messages`); }
   catch(e) { messages[id] = messages[id] || []; }
@@ -425,7 +403,7 @@ async function openTicket(id, opts = {}){
 
 async function send(){
   const t = active(); if (!t || sending) return;
-  const inp = $('chInput'); if (!inp) return; // тикет закрыт — поля ввода уже нет в DOM
+  const inp = $('chInput'); if (!inp) return;
   const text = inp.value.trim();
   if (!text && !pending.length) return;
   sending = true; $('chSend').disabled = true;
@@ -467,7 +445,6 @@ async function submitRating(){
   } catch(e) { toast(e.message || 'Не удалось сохранить оценку', 'error'); }
 }
 
-// ───────────── события ─────────────
 $('chItems').addEventListener('click', e => { const b = e.target.closest('.ch-item'); if (b) openTicket(b.dataset.id, { noFocus: false }); });
 $('chSearch').addEventListener('input', e => { query = e.target.value.trim().toLowerCase(); renderList(); });
 $('chTabs').addEventListener('click', e => {
@@ -507,7 +484,6 @@ $('chInfo').addEventListener('click', e => {
 $('lb').addEventListener('click', () => { $('lb').classList.remove('show'); $('lbImg').src = ''; });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { $('lb').classList.remove('show'); $('chInfo').classList.remove('is-open'); } });
 
-// drag & drop + вставка из буфера
 const main = $('chMain');
 let dragDepth = 0;
 main.addEventListener('dragenter', e => { if (e.dataTransfer?.types?.includes('Files') && active()) { dragDepth++; main.classList.add('is-drag'); } });
@@ -520,9 +496,6 @@ document.addEventListener('paste', e => {
   if (imgs.length) { e.preventDefault(); addFiles(imgs); }
 });
 
-// ───────────── обновление в фоне ─────────────
-// Список тикетов лёгкий (без сообщений) — по нему видим, что в открытом диалоге появился ответ,
-// и только тогда подтягиваем сообщения.
 async function poll(){
   if (document.visibilityState !== 'visible' || sending) return;
   try {
@@ -535,7 +508,7 @@ async function poll(){
         const keep = { _rating: cur._rating, _ratingComment: cur._ratingComment };
         const wasActive = f.id === activeId;
         Object.assign(cur, f, keep);
-        if (wasActive) cur.read = true;   // открытый диалог считаем прочитанным
+        if (wasActive) cur.read = true;
       } else tickets.push(f);
     });
     if (changedActive) {
@@ -547,7 +520,6 @@ async function poll(){
   } catch(e) {}
 }
 
-// ───────────── старт ─────────────
 (async function init(){
   let user = null;
   try { const r = await fetch(`${API}/auth/me`, { credentials:'include' }); if (r.ok) user = await r.json(); } catch(e) {}

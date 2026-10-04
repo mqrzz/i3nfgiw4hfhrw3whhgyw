@@ -114,7 +114,6 @@
   <div class="shell">
     <div class="cab-page">
 
-      <!-- SCREEN 1: LIST -->
       <div class="screen active" id="screenList">
         <div class="pg-head"><div class="pg-head-main"><div class="pg-title">Обслуживание</div></div></div>
 
@@ -152,7 +151,6 @@
         <div class="ti-list" id="ticketsList"><div class="cab-empty"><h3>Загрузка…</h3></div></div>
       </div>
 
-      <!-- SCREEN 2: TICKET DETAIL -->
       <div class="screen" id="screenTicket">
         <div class="t-topbar">
           <button class="cab-btn ghost sm" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Назад</button>
@@ -427,9 +425,6 @@ function renderSupports(){
 async function loadTickets(){
   try{
     const resp = await fetch(`${API}/service-tickets/admin/all`, { credentials:'include' });
-    // ВАЖНО: если запрос не удался — НЕ затираем текущий allTickets пустым
-    // списком, иначе любая временная ошибка на опросе на секунду рисует
-    // "заявок нет", хотя они никуда не девались.
     if(!resp.ok) return;
     const list = await resp.json();
     allTickets=list.sort((a,b)=>{
@@ -471,9 +466,6 @@ window.doLogout=async()=>{
   }).catch(()=>{});
 
   await loadTickets();renderTickets();
-  // Обновляем список каждые 30с. Если в этот момент открыта заявка — не
-  // перерисовываем её целиком, иначе стирался бы недописанный ответ в поле
-  // ввода. Обновляем только статус-пилюлю и бейдж срочности.
   setInterval(async()=>{
     await loadTickets();renderTickets();
     if(selectedId){

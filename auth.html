@@ -53,7 +53,6 @@
     transition: padding .6s var(--ease);
   }
 
-  /* ===== Левая панель — промо (десктоп) ===== */
   .side-panel{
     display:none;
     position:relative;
@@ -83,7 +82,6 @@
   .side-panel-inner{position:relative; z-index:1; transition: opacity .45s ease, transform .5s var(--ease);}
   @media(min-width:961px){ .side-panel{display:flex} }
 
-  /* Шаг > email — панель уезжает влево и схлопывается, карточка центрируется */
   .page-wrap.focused .side-panel{
     max-width:0;
     flex-basis:0;
@@ -116,12 +114,10 @@
   .side-stat b{ display:block; font-size:1.4rem; font-weight:700; letter-spacing:-0.02em; }
   .side-stat span{ display:block; color:rgba(255,255,255,.5); font-size:.78rem; margin-top:.15rem; }
 
-  /* На мобилке промо-панель не показываем вообще */
   @media(max-width:960px){
     .side-panel{ display:none !important; }
   }
 
-  /* ===== Карточка ===== */
   @keyframes cardIn{ from{opacity:0; transform:translateY(14px) scale(.98);} to{opacity:1; transform:translateY(0) scale(1);} }
   .card{
     position:relative;
@@ -171,7 +167,6 @@
   }
   .tab.active{ color:var(--ink); }
 
-  /* ===== Многошаговая форма — кросс-фейд между шагами ===== */
   .steps-stage{ position:relative; }
   .step-view{
     display:none;
@@ -289,6 +284,8 @@
   }
   .consent-row label{ font-size:.83rem; color:var(--ink-soft); line-height:1.45; }
   .consent-row a{ color:var(--ink); }
+  .ya-note{ font-size:.78rem; color:var(--ink-soft); line-height:1.4; margin:.5rem 0 0; }
+  .ya-note a{ color:var(--ink); }
 
   .toast{
     position:fixed; left:50%; bottom:26px; transform:translate(-50%,20px);
@@ -339,7 +336,6 @@
 
     <div class="steps-stage">
 
-      <!-- ШАГ 1: email/имя, выбор способа -->
       <div class="step-view active" id="step-identify">
         <h1>Добро пожаловать</h1>
         <p class="sub">Войдите или создайте аккаунт</p>
@@ -354,6 +350,7 @@
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#FC3F1D"/><path d="M13.1 6.6h-1.4c-2 0-3 1-3 2.5 0 1.7 1 2.3 2.4 3.2l1.2.8-3.5 5.1H6.6l3.1-4.5c-1.8-1.2-2.8-2.4-2.8-4.5 0-2.6 1.9-4.2 4.9-4.2H15v13.2h-1.9V6.6z" fill="#fff"/></svg>
           Продолжить с Яндекс ID
         </button>
+          <p class="ya-note">Нажимая «Продолжить с Яндекс ID», вы даёте <a href="/obrabotka-pd" target="_blank" rel="noopener">согласие на обработку персональных данных</a>.</p>
         <button class="btn-outline" onclick="startPasskeyLogin()" type="button" id="passkeyLoginBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
           Войти с ключом доступа
@@ -384,15 +381,13 @@
           </div>
           <div class="consent-row">
             <input type="checkbox" id="r-consent"/>
-            <label for="r-consent">Я согласен(-на) на <a href="https://antviz.ru/obrabotka-pd" target="_blank" rel="noopener">обработку персональных данных</a></label>
+            <label for="r-consent">Даю <a href="/obrabotka-pd" target="_blank" rel="noopener">согласие на обработку персональных данных</a> (<a href="/privacy" target="_blank" rel="noopener">политика конфиденциальности</a>)</label>
           </div>
           <div class="cf-turnstile" id="turnstile-register" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onRegisterVerified" data-expired-callback="onRegisterExpired" data-error-callback="onRegisterCaptchaError"></div>
           <button class="btn-main" id="registerBtn" onclick="doRegisterStart()" type="button" disabled>Создать аккаунт</button>
         </div>
       </div>
 
-      <!-- ШАГ 2: код с почты -->
-      <!-- ШАГ 1.5: выбор способа входа (после email, до отправки чего-либо) -->
       <div class="step-view" id="step-choose">
         <div class="back-row">
           <button class="back-btn" onclick="goToIdentify()" type="button">
@@ -442,7 +437,6 @@
         </div>
       </div>
 
-      <!-- ШАГ 2b: код из Authenticator -->
       <div class="step-view" id="step-totp">
         <div class="back-row">
           <button class="back-btn" onclick="goBack()" type="button">
@@ -463,7 +457,6 @@
         </div>
       </div>
 
-      <!-- ШАГ 2c: резервный код -->
       <div class="step-view" id="step-recovery">
         <div class="back-row">
           <button class="back-btn" onclick="goBack()" type="button">
@@ -497,11 +490,6 @@
   const API = 'https://antviz.ru/api';
   const pageWrap = document.getElementById('pageWrap');
 
-  // ── Уже залогинен? Проверяем куку сессии до показа формы входа,
-  // чтобы не мигать формой у тех, кто и так внутри аккаунта.
-  // На медленной сети (мобильный интернет) этот запрос может подвиснуть —
-  // тогда форма всё равно должна появиться, а не держать пустой экран
-  // бесконечно, поэтому ждём не дольше 2.5с.
   (async function checkExistingSession(){
     try{
       const ctrl = new AbortController();
@@ -510,9 +498,9 @@
       clearTimeout(timer);
       if(resp.ok){
         window.location.replace('/profile.html');
-        return; // страница уже уходит, дальше ничего не рисуем
+        return;
       }
-    }catch(e){ /* сеть недоступна или не успели за отведённое время — просто показываем форму входа */ }
+    }catch(e){ }
     document.body.classList.remove('auth-checking');
   })();
 
@@ -557,7 +545,6 @@
     }
   }
 
-  // ── Привязка Telegram, если открыто как Mini App ──
   async function linkTelegramIfInApp(){
     const tg = window.Telegram?.WebApp;
     const initData = tg?.initData;
@@ -573,7 +560,6 @@
     }catch(e){ console.error('linkTelegramIfInApp:', e); }
   }
 
-  // ── 6 отдельных ячеек кода ──
   function setupCodeBoxes(containerId, hiddenInputId, onSubmit){
     const container = document.getElementById(containerId);
     const hidden = document.getElementById(hiddenInputId);
@@ -618,7 +604,6 @@
   setupCodeBoxes('code-boxes','code-value', ()=>submitCode());
   setupCodeBoxes('totp-boxes','totp-value', ()=>submitTotp());
 
-  // ── Табы ──
   window.switchTab=function(tab){
     document.querySelectorAll('.tab').forEach((b,i)=>b.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='register')));
     document.getElementById('panel-login').style.display = tab==='login' ? 'block' : 'none';
@@ -627,18 +612,11 @@
     document.getElementById('passkeyLoginBtn').style.display = tab==='login' ? 'flex' : 'none';
   };
 
-  // ── Переходы между шагами: панель слева уезжает, карточка центрируется ──
   let currentStep = 'identify';
   let stepHistory = [];
-  let flow = 'login'; // 'login' | 'register'
+  let flow = 'login';
   let pendingEmail = '';
 
-  // Раньше .steps-stage мгновенно меняла высоту (display:none → block),
-  // и карточка, центрированная через align-items:center, резко прыгала
-  // на новую позицию в момент переключения шага — особенно заметно на
-  // ПК, где панель слева ещё едет 0.6s, а высота уже скакнула. Плавно
-  // анимируем саму высоту контейнера шагов (FLIP: замеряем высоту до,
-  // применяем смену шага, замеряем высоту после, анимируем от старой к новой).
   function animateStageHeight(applyChange){
     const stage = document.querySelector('.steps-stage');
     if(!stage){ applyChange(); return; }
@@ -648,7 +626,7 @@
     stage.style.transition = 'none';
     stage.style.overflow = 'hidden';
     stage.style.height = oldH + 'px';
-    void stage.offsetHeight; // форсируем reflow, чтобы браузер зафиксировал стартовую высоту
+    void stage.offsetHeight;
     stage.style.transition = 'height .45s var(--ease)';
     stage.style.height = newH + 'px';
     const cleanup = () => {
@@ -690,7 +668,6 @@
     });
   };
 
-  // ── Яндекс ──
   window.startYandex = function(){
     const isRegisterTab = document.getElementById('tabsWrap').classList.contains('reg');
     if(isRegisterTab && !document.getElementById('r-consent').checked){
@@ -701,7 +678,6 @@
     window.location.href = `${API}/auth/yandex/start`;
   };
 
-  // ── Passkey (дискаверабл вход, без email) ──
   function b64urlToBuf(s){
     s = s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length%4) s+='=';
     const bin = atob(s); const buf = new Uint8Array(bin.length);
@@ -773,7 +749,6 @@
     }
   };
 
-  // ── Логин: шаг 1 → отправка кода ──
   let _loginCaptchaOk = false, _regCaptchaOk = false;
   window.onLoginVerified = async function(token){
     const r = await verifyCaptcha(token);
@@ -809,7 +784,6 @@
     finally{ setBtnState('loginBtn','Проверяем…','Продолжить', false); }
   };
 
-  // ── Реально отправить код на почту (либо сразу, либо по кнопке «Получить код на почту») ──
   window.sendLoginCode = async function(){
     setBtnState('chooseEmailBtn','Отправляем…','Получить код на почту', true);
     try{
@@ -824,7 +798,6 @@
     finally{ setBtnState('chooseEmailBtn','Отправляем…','Получить код на почту', false); }
   };
 
-  // ── Регистрация: шаг 1 → отправка кода ──
   window.onRegisterVerified = async function(token){
     const r = await verifyCaptcha(token);
     _regCaptchaOk = r.ok;
@@ -850,7 +823,7 @@
     if(!ok) return;
     setBtnState('registerBtn','Отправляем код…','Создать аккаунт', true);
     try{
-      await apiPost('/auth/register', { name, email });
+      await apiPost('/auth/register', { name, email, consent: true });
       pendingEmail = email; flow='register';
       document.getElementById('codeEmailLabel').textContent = email;
       document.getElementById('codeTitle').textContent = 'Подтвердите email';
@@ -862,7 +835,6 @@
     finally{ setBtnState('registerBtn','Отправляем код…','Создать аккаунт', false); }
   };
 
-  // ── Подтверждение кода с почты (и для входа, и для регистрации) ──
   window.submitCode = async function(){
     const code = document.getElementById('code-value').value;
     if(code.length!==6) return;
@@ -904,14 +876,13 @@
     const btn = document.getElementById('resendBtn');
     btn.disabled = true;
     try{
-      if(flow==='register') await apiPost('/auth/register', { name: document.getElementById('r-name').value.trim(), email: pendingEmail });
+      if(flow==='register') await apiPost('/auth/register', { name: document.getElementById('r-name').value.trim(), email: pendingEmail, consent: true });
       else await apiPost('/auth/login/send-code', { email: pendingEmail });
       toast('Код отправлен повторно','success');
       startResendCooldown(60);
     }catch(e){ toast(e.message,'error'); btn.disabled = false; }
   };
 
-  // ── TOTP вместо кода с почты ──
   window.submitTotp = async function(){
     const token = document.getElementById('totp-value').value;
     if(token.length!==6) return;
@@ -927,7 +898,6 @@
     }
   };
 
-  // ── Резервный код ──
   window.submitRecovery = async function(){
     const code = document.getElementById('recovery-input').value.trim();
     document.getElementById('err-recovery').textContent='';
@@ -939,7 +909,6 @@
     }catch(e){ document.getElementById('err-recovery').textContent = e.message; }
   };
 
-  // ── Ротатор фраз в левой панели ──
   (function(){
     const el = document.getElementById('sideRotator');
     if(!el) return;
@@ -960,7 +929,6 @@
     }, 2400);
   })();
 
-  // ── Ошибка возврата от Яндекса (?yandex_error=...) ──
   (function(){
     const params = new URLSearchParams(location.search);
     const err = params.get('yandex_error');
@@ -974,7 +942,6 @@
     toast(messages[err] || messages.unknown, 'error');
   })();
 
-  // ── Ошибка возврата по магической ссылке (?magic_error=...) ──
   (function(){
     const params = new URLSearchParams(location.search);
     const err = params.get('magic_error');

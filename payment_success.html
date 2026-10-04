@@ -275,10 +275,6 @@
 <script type="module">
   const API = 'https://antviz.ru/api';
   const CHECK_URL = 'https://api-lac-six-78.vercel.app/api/checkPayment';
-  // ЮKасса шлёт вебхук не мгновенно — обычно за несколько секунд, но иногда
-  // дольше. Раньше здесь ждали всего 8×1.5с=12 секунд, из-за чего страница
-  // объявляла "оплата не подтверждена" даже когда платёж дальше проходил
-  // успешно (просто чуть позже, чем сдавалась эта страница).
   const POLL_ATTEMPTS = 24;
   const POLL_DELAY_MS = 2500;
 
@@ -333,10 +329,6 @@
 
     const token = await getServiceToken();
     if (!token) {
-      // ВАЖНО: раньше при любом сбое здесь сразу показывалась пугающая
-      // "Оплата не подтверждена" — хотя причина могла быть во временной
-      // ошибке на сервере (см. requireAuth.js), а не в реальном разлогине
-      // или проблеме с самим платежом. Пробуем ещё раз перед тем как сдаться.
       await sleep(POLL_DELAY_MS);
       const retryToken = await getServiceToken();
       if (!retryToken) {
@@ -368,7 +360,6 @@
           return;
         }
       } catch {
-        // сетевая ошибка — просто пробуем ещё раз
       }
       if (attempt < POLL_ATTEMPTS - 1) await sleep(POLL_DELAY_MS);
     }

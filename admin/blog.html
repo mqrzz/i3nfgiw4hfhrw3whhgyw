@@ -46,7 +46,6 @@
   .ai-desc{font-size:13.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:6px}
   .ai-meta{font-size:12px;color:var(--text-faint);display:flex;gap:8px;align-items:center}
 
-  /* ===== РЕДАКТОР (общий для статей/новостей/обновлений) ===== */
   .e-topbar{display:flex;align-items:center;gap:14px;margin-bottom:18px}
   .e-title{font-size:19px;font-weight:500;letter-spacing:-.02em;flex:1}
   .e-form{display:flex;flex-direction:column;gap:18px;max-width:720px}
@@ -150,7 +149,6 @@
 <div id="sbContent" style="display:none"><div class="shell"><div class="cab-page">
   
 
-    <!-- LIST (статьи / новости) -->
     <div class="screen active" id="screenList">
       
         <div class="section-switch" id="sectionSwitch">
@@ -188,7 +186,6 @@
       
     </div>
 
-    <!-- EDITOR: статья/новость -->
     <div class="screen" id="screenEditor">
       
         <div class="e-topbar">
@@ -289,7 +286,6 @@
       
     </div>
 
-    <!-- LIST: обновления -->
     <div class="screen" id="screenUpdatesList">
       
         <div class="section-switch">
@@ -319,7 +315,6 @@
       
     </div>
 
-    <!-- EDITOR: обновление -->
     <div class="screen" id="screenUpdateEditor">
       
         <div class="e-topbar">
@@ -458,7 +453,6 @@ window.selectIcon=function(key){
   if(opt) document.getElementById('lpIco').innerHTML=opt.innerHTML;
 };
 
-/* ===== СЧЁТЧИКИ СИМВОЛОВ + ЖИВОЕ ПРЕВЬЮ КАРТОЧКИ ===== */
 window.updateCounters=function(){
   const title=document.getElementById('fTitle').value;
   const desc=document.getElementById('fDescription').value;
@@ -498,7 +492,6 @@ window.updateChecklist=function(){
     </div>`).join('');
 };
 
-/* ===== ДУБЛИРОВАНИЕ ===== */
 window.duplicateItem=function(){
   if(!editingSlug)return;
   const dupTitle=document.getElementById('fTitle').value+' (копия)';
@@ -511,7 +504,7 @@ window.duplicateItem=function(){
   document.getElementById('editorTitle').textContent='Новая статья (копия)';
   document.getElementById('deleteBtn').style.display='none';
   document.getElementById('duplicateBtn').style.display='none';
-  document.getElementById('cloneFromGroup').style.display='none'; // структура уже известна — копируем ту же самую
+  document.getElementById('cloneFromGroup').style.display='none';
   document.getElementById('slugGroup').style.display='';
   document.getElementById('fTitle').value=dupData.title;
   document.getElementById('fSlug').value=slugify(dupData.title);
@@ -522,15 +515,14 @@ window.duplicateItem=function(){
   document.getElementById('fExcerpt').value=dupData.excerpt;
   document.getElementById('fOgImage').value=dupData.ogImage;
   document.getElementById('fBody').value=dupData.bodyHtml;
-  document.getElementById('fDraft').checked=true; // копию безопаснее начинать как черновик
+  document.getElementById('fDraft').checked=true;
   selectIcon(dupData.icon);
-  window._duplicateCloneFrom=dupData.cloneFromSlug; // используем как cloneFrom при сохранении, форму клонирования не показываем
+  window._duplicateCloneFrom=dupData.cloneFromSlug;
   updateCoverPreview(); updateReadingTime(); updateCounters();
   document.getElementById('statusRow').style.display='none';
   toast('Копия готова к правкам — не забудь поменять адрес (slug)','info');
 };
 
-/* ===== СТАТУС СБОРКИ + ССЫЛКА НА САЙТ ===== */
 async function loadBuildStatus(slug){
   const row=document.getElementById('statusRow');
   if(!slug){row.style.display='none';return;}
@@ -550,7 +542,6 @@ async function loadBuildStatus(slug){
   }catch(e){dot.className='status-dot unknown';text.textContent='Не удалось проверить статус';}
 }
 
-/* ===== АВТОСОХРАНЕНИЕ ЧЕРНОВИКА В БРАУЗЕРЕ (на случай закрытия вкладки) ===== */
 function autosaveKey(){return `blogAutosave:${currentSection}:${editingSlug||'new'}`;}
 function collectAutosave(){
   return {

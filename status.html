@@ -77,7 +77,6 @@
   a{color:inherit; text-decoration:none;}
   .wrap{max-width:840px; margin:0 auto; padding:0 24px;}
 
-  /* Top row: logo + theme toggle only */
   .top-row{
     display:flex; align-items:center; justify-content:space-between;
     padding:36px 0 0;
@@ -101,7 +100,6 @@
   html[data-theme="dark"] .theme-toggle .icon-sun{display:none;}
   html[data-theme="dark"] .theme-toggle .icon-moon{display:block;}
 
-  /* Hero / overall status */
   .hero{
     padding:28px 0 40px;
   }
@@ -152,7 +150,6 @@
   }
   .rss-link:hover{color:var(--text-dim);}
 
-  /* Services */
   .section-label{
     font-family:var(--font-display); font-weight:600; font-size:13px;
     text-transform:uppercase; letter-spacing:0.08em; color:var(--text-faint);
@@ -203,7 +200,6 @@
     font-size:12px; color:var(--text-faint);
   }
 
-  /* Shared floating tooltip (JS-positioned, clamped to viewport) */
   #bar-tooltip{
     position:fixed; z-index:999; background:var(--bg-elevated); border:1px solid var(--border);
     color:var(--text); font-size:11px; padding:6px 10px; border-radius:8px; white-space:nowrap;
@@ -211,7 +207,6 @@
   }
   #bar-tooltip.show{opacity:1;}
 
-  /* Incidents */
   .incident-day{margin-bottom:32px;}
   .incident-date{
     font-family:var(--font-display); font-weight:600; font-size:14px;
@@ -317,7 +312,6 @@
 
   .page-end-spacer{height:56px;}
 
-  /* Modal */
   .modal-overlay{
     position:fixed; inset:0; background:rgba(5,7,6,0.7); backdrop-filter:blur(4px);
     display:flex; align-items:center; justify-content:center; z-index:50;
@@ -411,7 +405,6 @@
 
   <div class="section-label">Сервисы</div>
   <div class="services" id="services">
-    <!-- rows injected by JS -->
   </div>
 
   <div id="scheduled-incidents-section" style="display:none;">
@@ -456,18 +449,11 @@
 </div>
 
 <script>
-  // ---- Logo (provided mark + "Статус" appended as real outlined vector paths — same
-  //      display face as the rest of the page (Geologica Bold), NOT live <text>.
-  //      Note: the "Antviz" mark itself is custom-drawn artwork, not set type, so an
-  //      exact stylistic match isn't possible — this uses the site's own type system
-  //      instead, converted to paths so it's still true vector, not a font dependency.)
 
-  // ---- API ----
   const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
     ? 'http://localhost:3000/api'
     : 'https://antviz.ru/api';
 
-  // ---- Theme toggle (persisted) ----
   const root = document.documentElement;
   function applyTheme(theme){
     if(theme === 'dark'){ root.setAttribute('data-theme', 'dark'); }
@@ -488,8 +474,6 @@
     ok: 'Все системы работают', degraded: 'Наблюдается замедление',
     maint: 'Идут плановые работы', partial: 'Частичный сбой сервисов', major: 'Серьёзные перебои в работе'
   };
-  // Формулировка баннера: если проблема ровно у одного сервиса — называем его прямо,
-  // не пишем "серьёзные перебои" на весь сайт из-за одного упавшего сервиса.
   function buildOverallLabel(overall, affectedNames){
     if(overall === 'ok' || affectedNames.length === 0) return overallLabels.ok;
     if(affectedNames.length === 1) return `Проблема с сервисом «${affectedNames[0]}»`;
@@ -502,7 +486,6 @@
   };
   const severityBadgeClass = { degraded: 'maint', partial: 'major', major: 'major', maint: 'maint' };
 
-  // ---- Shared floating tooltip for uptime bars, clamped to viewport ----
   const tooltip = document.getElementById('bar-tooltip');
   document.addEventListener('mouseover', (e) => {
     const bar = e.target.closest('.bar');
@@ -515,9 +498,6 @@
     if(e.target.closest('.bar')) tooltip.classList.remove('show');
   });
 
-  // Клик по дню на полоске аптайма (только для админа) — очистить данные за этот
-  // день, если день покрашен из-за ошибки в настройках мониторинга, а не реального
-  // сбоя. После очистки день станет "нет данных" и снова зелёным.
   document.addEventListener('click', async (e) => {
     const bar = e.target.closest('.bar[data-admin-day]');
     if(!bar) return;
@@ -634,17 +614,14 @@
     const scheduled = incidents.filter(i => i.group === 'scheduled');
     const history = incidents.filter(i => i.group === 'history');
 
-    // "Сейчас" — активные проблемы, прямо под баннером, без группировки по дате
     const activeSection = document.getElementById('active-incidents-section');
     document.getElementById('active-incidents').innerHTML = active.map(buildIncidentCardHtml).join('');
     activeSection.style.display = active.length > 0 ? 'block' : 'none';
 
-    // "Запланировано" — будущие технические работы
     const scheduledSection = document.getElementById('scheduled-incidents-section');
     document.getElementById('scheduled-incidents').innerHTML = scheduled.map(buildIncidentCardHtml).join('');
     scheduledSection.style.display = scheduled.length > 0 ? 'block' : 'none';
 
-    // "История" — закрытые, сгруппированы по календарному дню, как раньше
     if(history.length === 0){
       empty.style.display = 'block';
     } else {
@@ -666,9 +643,6 @@
 
   let currentServices = [];
 
-  // silent=true пропускает перерисовку админ-панели — используется для фонового
-  // автообновления раз в минуту, чтобы не затирать форму, если админ прямо сейчас
-  // что-то там заполняет (именно это раньше "само снимало" галочку override).
   async function loadStatus(silent){
     try{
       const resp = await fetch(`${API_BASE}/status`);
@@ -688,7 +662,7 @@
       renderServices(data.services);
       renderIncidents(data.incidents);
       lastIncidentsForAdmin = data.incidents;
-      if(!silent) renderAdminPanel(); // перерисовываем только после явного действия админа, не в фоне
+      if(!silent) renderAdminPanel();
     } catch(err){
       console.error('Не удалось загрузить статус:', err);
       document.querySelector('.status-text h1').textContent = 'Не удалось загрузить статус';
@@ -696,10 +670,6 @@
     }
   }
 
-  // Динамический фавикон — рисуем цветную точку поверх твоей иконки (img/favicon.png),
-  // цвет = реальный статус (зелёная точка, если всё ок, иначе цвет проблемы), точка
-  // мигает (плавно гаснет/загорается) — никаких доп. картинок, просто перерисовываем
-  // canvas каждые полсекунды с разной прозрачностью точки.
   let faviconBaseImg = null;
   let faviconColor = '#1ede7b';
   let faviconBlinkPhase = 0;
@@ -714,14 +684,11 @@
     const ctx = canvas.getContext('2d');
     if(img) ctx.drawImage(img, 0, 0, size, size);
 
-    // мигание точки: прозрачность колеблется по синусоиде между ~35% и 100%
     faviconBlinkPhase += 0.35;
     const alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(faviconBlinkPhase));
 
     const r = size * 0.22, cx = size - r - 6, cy = size - r - 6;
 
-    // расходящееся кольцо — та же идея, что @keyframes pulse-ring на самой странице:
-    // растёт от точки наружу и одновременно гаснет, затем цикл начинается заново
     faviconRingPhase = (faviconRingPhase + 0.045) % 1;
     const ringR = r * (1 + faviconRingPhase * 1.8);
     const ringAlpha = (1 - faviconRingPhase) * 0.55;
@@ -729,7 +696,6 @@
     ctx.strokeStyle = faviconColor; ctx.lineWidth = 2.5;
     ctx.globalAlpha = ringAlpha; ctx.stroke(); ctx.globalAlpha = 1;
 
-    // белая подложка под точкой, чтобы не сливалась с фоном иконки
     ctx.beginPath(); ctx.arc(cx, cy, r + 3, 0, Math.PI * 2); ctx.fillStyle = '#fff'; ctx.fill();
     ctx.globalAlpha = alpha;
     ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = faviconColor; ctx.fill();
@@ -749,20 +715,19 @@
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => { faviconBaseImg = img; startFaviconBlink(); };
-    img.onerror = () => { startFaviconBlink(); }; // файла нет/не загрузился — мигаем хотя бы одной точкой
+    img.onerror = () => { startFaviconBlink(); };
     img.src = 'img/favicon.png';
   }
 
   function startFaviconBlink(){
     if(faviconTimer) return;
     drawFavicon();
-    faviconTimer = setInterval(drawFavicon, 120); // ~плавное мигание, не резкое togglе
+    faviconTimer = setInterval(drawFavicon, 120);
   }
 
   loadStatus();
-  setInterval(() => loadStatus(true), 60 * 1000); // фон: только данные, без перерисовки форм админки
+  setInterval(() => loadStatus(true), 60 * 1000);
 
-  // ---- Подписка (реальный POST на сервер) ----
   function openModal(){
     document.getElementById('modal-overlay').classList.add('open');
     document.getElementById('modal-form').classList.remove('hidden');
@@ -770,21 +735,16 @@
     document.getElementById('sub-email').style.borderColor = '';
     if(window.turnstile){
       const w = document.getElementById('turnstile-subscribe');
-      if(w.dataset.rendered) turnstile.reset(w); // виджет уже рендерился — просто сброс
+      if(w.dataset.rendered) turnstile.reset(w);
     }
   }
   function closeModal(){
     document.getElementById('modal-overlay').classList.remove('open');
   }
   function onSubscribeCaptchaVerified(){ document.getElementById('turnstile-subscribe').dataset.rendered = '1'; }
-  function onSubscribeCaptchaExpired(){ /* просто станет невалидным, повторно возьмём при сабмите */ }
+  function onSubscribeCaptchaExpired(){ }
   function onSubscribeCaptchaError(){ console.warn('Turnstile: ошибка виджета на подписке'); }
 
-  // Тот же принцип, что и на странице входа/регистрации: если сервис проверки капчи
-  // недоступен (сеть/таймаут) — не блокируем пользователя, пропускаем без капчи.
-  // Настоящая проверка капчи теперь на бэкенде (см. verifyTurnstile в routes/status.js),
-  // не через сторонний Vercel-прокси — тот был "мягким" (пропускал при недоступности),
-  // а тут капча обязательна: без валидного токена подписка не пройдёт.
 
   async function confirmSubscribe(){
     const emailInput = document.getElementById('sub-email');
@@ -794,8 +754,6 @@
       return;
     }
 
-    // Без пройденной капчи не отправляем вообще — это реальная блокировка,
-    // не мягкая проверка. Сервер всё равно перепроверит токен ещё раз сам.
     const cfToken = window.turnstile ? turnstile.getResponse(document.getElementById('turnstile-subscribe')) : null;
     if(!cfToken){
       alert('Пройдите проверку капчи');
@@ -837,13 +795,6 @@
     if(e.target.id === 'modal-overlay') closeModal();
   });
 
-  // ════════════════════════════════════════════════════════════
-  // Админ-панель: видна только если ты залогинен в аккаунт с ролью
-  // admin (проверяем через ту же cookie-сессию, что и на остальном
-  // сайте, GET /api/auth/me). Отсюда можно завести инцидент, добавить
-  // обновление в таймлайн или поменять статус сервиса вручную —
-  // без захода в базу.
-  // ════════════════════════════════════════════════════════════
   let isAdmin = false;
 
   async function checkAdmin(){
@@ -855,20 +806,12 @@
       if(isAdmin){
         await loadAdminServicesRaw();
         renderAdminPanel();
-        // Раньше панель управления стояла последней в DOM — после всей истории
-        // инцидентов, и до неё приходилось листать всю страницу. Переносим её
-        // сразу под hero-баннер, ещё до списка сервисов — админка теперь видна
-        // без скролла.
         const panel = document.getElementById('admin-panel');
         const hero = document.querySelector('.hero');
         if(panel && hero) hero.insertAdjacentElement('afterend', panel);
-        // Если /api/status успел отрисоваться РАНЬШЕ, чем подтвердилось админство —
-        // полоски аптайма отрисовались ещё без кликабельных админ-дней. Перерисовываем
-        // список сервисов той же (уже загруженной) датой, без нового запроса на сервер.
         if(currentServices.length) renderServices(currentServices);
       }
     } catch(err){
-      // не залогинен / нет доступа к API с этого домена — просто не показываем панель
     }
   }
   checkAdmin();
@@ -878,7 +821,7 @@
     try{
       const resp = await fetch(`${API_BASE}/status/services`, { credentials: 'include' });
       if(resp.ok) adminServicesRaw = await resp.json();
-    } catch(err){ /* тихо, панель просто покажет пусто */ }
+    } catch(err){ }
   }
 
   function renderAdminPanel(){
@@ -1032,7 +975,6 @@
       }
     }
 
-    // ── Новый инцидент ──
     panel.querySelector('#admin-incident-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       try{
@@ -1049,7 +991,6 @@
       } catch(err){ showMsg(err.message, false); }
     });
 
-    // ── Вкладка "Сервисы": статус + настройка проверки, единым списком ──
     const svcList = panel.querySelector('#admin-services-list');
     svcList.innerHTML = currentServices.map(s => {
       const raw = adminServicesRaw.find(r => r.id === s.id) || {};
@@ -1139,7 +1080,6 @@
       });
     });
 
-    // ── Вкладка "Инциденты": список карточками, действия прямо на карточке ──
     const incList = panel.querySelector('#admin-incidents-list');
     const sorted = [...lastIncidentsForAdmin].sort((a, b) => {
       if((a.status === 'resolved') !== (b.status === 'resolved')) return a.status === 'resolved' ? 1 : -1;

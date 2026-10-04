@@ -1,24 +1,3 @@
-/**
- * admin-shell.js — общий каркас админки Antviz, на тех же токенах и
- * компонентах, что и личный кабинет (cabinet-base.css + cabinet.css).
- * <script src="/profile/assets/admin-shell.js" data-page="reviews"></script>
- *
- * Раньше у админки был свой отдельный "Vantage"-дизайн (m-panel26.js —
- * плавающая светлая капсула без тёмной темы, свои токены на каждой
- * странице). Теперь админка — часть той же системы, что и /profile/*:
- * постоянный сайдбар слева на ПК (со сворачиванием и тёмной/светлой
- * темой), плавающая нижняя капсула на мобильных — 1-в-1 архитектура
- * profile/assets/sidebar.js, просто с другим списком разделов.
- *
- * Разделы и бейджи — те же, что были в m-panel26.js: специально оставил
- * ЛИТЕРАЛЬНЫЕ id="navBadge…" (а не data-badge-key, как в клиентском
- * sidebar.js) — каждая admin-страница уже сама пишет в эти id
- * (document.getElementById('navBadgeOrders')…), переучивать 10+ файлов
- * на новый способ простановки бейджей смысла не было.
- *
- * Каждая страница оборачивает свой контент в <div id="sbContent">…</div> —
- * ровно как в клиентском кабинете.
- */
 (function () {
   const script = document.currentScript;
   const page = script ? (script.getAttribute('data-page') || '') : '';
@@ -207,7 +186,6 @@
     }).join('');
     document.body.appendChild(bottomNav);
 
-    // Мобильная капсула — та же цифра неудобна в 38px иконке, показываем точкой
     if (bottomItems.some(i => i.badge)) {
       const mo = new MutationObserver(() => {
         bottomNav.querySelectorAll('[data-bnav-dot-for]').forEach(a => {

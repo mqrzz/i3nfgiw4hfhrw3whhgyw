@@ -1,24 +1,13 @@
-/**
- * sessions.js — «Устройства и сеансы» (Antviz)
- *
- * Раньше это был клиентский модуль, который сам вёл список сеансов в
- * Firestore (генерировал sessionId в localStorage, спрашивал геолокацию
- * по IP, писал устройство/браузер в БД). Теперь сервер сам создаёт и ведёт
- * запись сеанса при каждом входе (см. /api/auth/login, /api/auth/register/verify) —
- * этот файл стал тонким REST-клиентом поверх /api/sessions.
- */
 
 const API = 'https://antviz.ru/api';
 
-/* ───────────────────── Список активных сеансов ───────────────────── */
 
 export async function listSessions(){
   const resp = await fetch(`${API}/sessions`, { credentials: 'include' });
   if(!resp.ok) throw new Error('Не удалось загрузить список сеансов');
-  return resp.json(); // [{ id, device_name, ip_address, last_active_at, created_at, is_current }]
+  return resp.json();
 }
 
-/* ───────────────────── Завершение сеансов ───────────────────── */
 
 export async function endSession(sessionId){
   const resp = await fetch(`${API}/sessions/${sessionId}`, { method: 'DELETE', credentials: 'include' });
@@ -32,7 +21,6 @@ export async function endAllOtherSessions(){
   return resp.json();
 }
 
-/* ───────────────────── Человекочитаемое «время назад» ───────────────────── */
 
 export function timeAgo(date){
   if(!date) return '—';
@@ -54,10 +42,6 @@ function pluralRu(n, one, few, many){
   return many;
 }
 
-/* ───────────────────── Иконка устройства по строке device_name ─────────────────────
- * Сервер формирует device_name как "Браузер на ОС" (например "Chrome на Windows"),
- * а не структурированный enum — определяем иконку по вхождению подстроки.
- */
 export function deviceIconSVG(deviceName){
   const s = (deviceName || '').toLowerCase();
   if(s.includes('iphone') || (s.includes('ios') && !s.includes('ipad'))){
@@ -85,26 +69,8 @@ export function endSessionIconSVG(){
   return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke-linecap="round" stroke-linejoin="round"/><polyline points="16,17 21,12 16,7" stroke-linecap="round" stroke-linejoin="round"/><line x1="21" y1="12" x2="9" y2="12" stroke-linecap="round"/></svg>`;
 }
 
-/* ───────────────────── Временные заглушки для обратной совместимости ─────────────────────
- * Пока profile.html, tickets.html, sites.html, notifications.html, orders.html,
- * support.html не переведены с Firebase Auth на новый API (это следующий шаг),
- * они по-прежнему импортируют эти два имени. Сервер теперь сам отслеживает
- * активность сеанса при каждом запросе к API, поэтому touchSession() — no-op,
- * оставлена только чтобы не ломать импорт на страницах, ещё не переписанных.
- * Удалить, когда все 6 страниц будут переведены на requireAuth() через API.
- */
-export async function touchSession(){ /* сервер сам отслеживает last_active_at при каждом запросе к API */ }
+export async function touchSession(){ }
 
-/* ───────────────────── Разлог при завершении сеанса с другого устройства ─────────────────────
- * Раньше (на Firestore) это был realtime onSnapshot — обрыв сессии на другом
- * устройстве кидал пользователя обратно на /auth.html мгновенно, без каких-либо
- * действий с его стороны. У нового REST-API нет push-канала до браузера, поэтому
- * здесь — пуллинг: раз в intervalMs дёргаем /auth/me (он уже требует валидную,
- * не отозванную сессию), и если сервер ответил 401 — сессию отозвали (кнопкой
- * "Завершить сеанс" с другого устройства/вкладки, или админ забанил) — зовём
- * onRevoked(). Не мгновенно, как раньше, но без него страница держала
- * пользователя залогиненным визуально до следующего его собственного клика.
- */
 export function watchSessionRevocation(onRevoked, intervalMs = 20000){
   if (typeof onRevoked !== 'function') return () => {};
   const timer = setInterval(async () => {
@@ -114,7 +80,7 @@ export function watchSessionRevocation(onRevoked, intervalMs = 20000){
         clearInterval(timer);
         onRevoked();
       }
-    }catch(e){ /* сеть недоступна — не считаем это разлогином, ждём следующего тика */ }
+    }catch(e){ }
   }, intervalMs);
   return () => clearInterval(timer);
 }

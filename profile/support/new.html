@@ -141,7 +141,7 @@ import { ACCEPT, MAX_FILES, prepareFile, attachmentPayload, fmtSize } from '/pro
 const API = 'https://antviz.ru/api';
 let userOrders = [];
 let allTickets = [];
-let files = [];        // подготовленные вложения
+let files = [];
 let priority = 'medium';
 let sending = false;
 
@@ -151,7 +151,6 @@ function toast(msg, type='info'){ const t=$('toast'); t.textContent=msg; t.class
 function siteTypeLabel(t){ if(t==='static')return 'Статический сайт'; if(t==='dynamic')return 'Сайт с серверной частью'; return t||''; }
 function orderLabel(o){ return (o.siteDomain || ('№ '+o.id.slice(0,8).toUpperCase())) + ' · ' + (siteTypeLabel(o.siteType)||'Сайт'); }
 
-// ── Подсказки по теме ──
 const HINTS = {
   'Техническая проблема': { title:'Как решить быстрее', tips:['Опишите, что делали и что пошло не так','Приложите скриншот или запись экрана с ошибкой','Укажите адрес страницы и браузер'] },
   'Вопрос по оплате':     { title:'По оплате', tips:['Выберите заказ, по которому вопрос','Если платили сами — приложите чек или скриншот платежа','Квитанции по всем платежам уже собраны в разделе «Платежи»'], cta:{label:'Открыть платежи', href:'payments'} },
@@ -167,7 +166,6 @@ function renderHint(){
     ${h.cta ? `<a class="cab-btn ghost sm" href="${h.cta.href}" style="margin-top:20px">${esc(h.cta.label)}</a>` : ''}`;
 }
 
-// ── Похожие тикеты (по словам из заголовка) ──
 function renderSimilar(){
   const words = $('ntSubject').value.toLowerCase().split(/[^a-zа-яё0-9]+/i).filter(w => w.length > 3);
   const box = $('ntSimilar');
@@ -181,7 +179,6 @@ function renderSimilar(){
   box.style.display = 'block';
 }
 
-// ── Вложения ──
 const ICON_FILE = '<svg viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>';
 function renderFiles(){
   $('ntFiles').innerHTML = files.map((f,i) => `<div class="nt-file">
@@ -210,7 +207,6 @@ document.addEventListener('paste', e => {
   if (imgs.length) { e.preventDefault(); addFiles(imgs); }
 });
 
-// ── Форма ──
 $('ntPrio').addEventListener('click', e => {
   const b = e.target.closest('button[data-p]'); if (!b) return;
   priority = b.dataset.p;
@@ -238,7 +234,6 @@ $('ntForm').addEventListener('submit', async e => {
   const btn = $('ntSubmit'); btn.disabled = true; btn.textContent = 'Отправка…';
   const orderId = $('ntOrder').value || null;
   const linked = orderId ? userOrders.find(o => o.id === orderId) : null;
-  // Первое вложение уходит вместе с тикетом (картинка приоритетнее), остальные — следующими сообщениями
   const order = [...files].sort((a, b) => (a.kind === 'image' ? 0 : 1) - (b.kind === 'image' ? 0 : 1));
   const [first, ...rest] = order;
   try {
@@ -259,7 +254,6 @@ $('ntForm').addEventListener('submit', async e => {
   }
 });
 
-// ── Старт ──
 (async function init(){
   let user = null;
   try { const r = await fetch(`${API}/auth/me`, { credentials:'include' }); if (r.ok) user = await r.json(); } catch(e) {}

@@ -6,7 +6,6 @@
 <title>Уведомления — Antviz</title>
 <link rel="icon" href="../img/favicon.png" type="image/png"/>
 <script>
-  // Читаем сохранённую тему до отрисовки — тот же ключ, что и на остальных страницах кабинета
   try{
     var t = localStorage.getItem('antviz-theme');
     if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
@@ -57,7 +56,6 @@
   .app{display:flex;justify-content:center;}
   .content{width:100%;max-width:640px;padding:4px 0 40px;display:flex;flex-direction:column;gap:20px;animation:fadeUp .3s ease;}
 
-  /* ===== topbar — идентичен profile.html/support.html ===== */
   .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 4px 8px;gap:10px;}
   .topbar-right{display:flex;gap:10px;}
   .icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;transition:transform .15s var(--spring),background .15s;}
@@ -70,7 +68,6 @@
   #menuBtnMobile{display:flex;}
   @media (min-width:981px){ #menuBtnMobile{display:none;} }
 
-  /* ===== hero ===== */
   .hero{background:var(--card);border-radius:var(--r32);padding:24px;border:1px solid var(--stroke);box-shadow:var(--shadow-md);display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
   .hero-title{font-size:19px;font-weight:600;display:flex;align-items:center;gap:10px;}
   .hero-sub{font-size:13px;color:var(--text-dim);margin-top:4px;}
@@ -106,7 +103,6 @@
     .empty-state p{font-size:14.5px;}
   }
 
-  /* ===== toolbar ===== */
   .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:0 4px;}
   .tabs{display:inline-flex;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r20);padding:4px;gap:2px;overflow-x:auto;max-width:100%;}
   .tab{border:none;background:transparent;color:var(--text-dim);font-family:inherit;font-size:12.5px;font-weight:500;padding:8px 14px;border-radius:var(--r16);cursor:pointer;transition:background .15s,color .15s,transform .15s var(--spring);white-space:nowrap;}
@@ -115,7 +111,6 @@
   .tab.is-active{background:var(--green);color:#0d1210;}
   .count-label{font-size:12px;color:var(--text-faint);flex-shrink:0;padding-right:4px;white-space:nowrap;}
 
-  /* ===== notification list ===== */
   .card{background:var(--card);border-radius:var(--r24);padding:8px 20px;border:1px solid var(--stroke);box-shadow:var(--shadow-sm);}
   .notif-row{all:unset;display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--stroke);cursor:pointer;width:100%;font-family:inherit;animation:fadeUp .2s ease both;}
   .notif-list-inner .notif-row:last-child{border-bottom:none;}
@@ -153,7 +148,6 @@
   html[data-theme="light"] .toast.error,html[data-theme="light"] .toast.info{background:rgba(255,255,255,0.72);}
   #sbContent{padding-bottom:60px;}
 
-  /* ===== ПК: список по дням + боковая панель фильтров ===== */
   .notif-day{display:none}
   .nf-side{display:none}
   .notif-icon.system{background:var(--card-elevated);color:var(--text-dim);border:1px solid var(--stroke)}
@@ -270,7 +264,7 @@
 
   </div>
 </div>
-</div><!-- /sbContent -->
+</div>
 
 <div class="toast" id="toast"></div>
 
@@ -296,8 +290,6 @@ function fmtTime(ts){
   return d.toLocaleDateString('ru',{day:'numeric',month:'long'})+' · '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
 }
 
-// Монохромные иконки-линии (fill=none/stroke=currentColor) — цвет задаёт .notif-icon.<type>,
-// это тот же принцип, что и цветные мини-иконки статистики в profile.html.
 const ICONS = {
   system: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>',
   order: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>',
@@ -359,7 +351,6 @@ function render(){
     const b = document.getElementById(id);
     if(b){ b.style.display = unreadCount ? 'inline-flex' : 'none'; b.textContent = unreadCount; }
   });
-  // счётчики в боковой панели фильтров (ПК)
   const cnt = { all: allNotifs.length, unread: unreadCount };
   ['order','support','service','system'].forEach(t => cnt[t] = allNotifs.filter(n => (n.type||'system') === t).length);
   document.querySelectorAll('[data-cnt]').forEach(el => el.textContent = cnt[el.dataset.cnt] ?? 0);
@@ -438,7 +429,6 @@ async function loadNotifications(){
 </script>
 
 <script>
-// ── тема (общая для всех страниц кабинета через localStorage) ──
 (function(){
   const btn=document.getElementById('themeToggle');
   if(!btn) return;

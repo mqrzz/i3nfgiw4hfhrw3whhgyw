@@ -1,13 +1,3 @@
-/**
- * palette.js — поиск по кабинету (Ctrl/⌘+K), подключается из sidebar.js.
- *
- * Ищет по разделам кабинета, заказам, проектам, тикетам поддержки и заявкам
- * на обслуживание + быстрые действия (новый заказ, новый тикет, тема, выход).
- * Данные тянет лениво при первом открытии (те же эндпоинты, что и страницы
- * кабинета) и кэширует на минуту. Ничего не пишет и не меняет.
- *
- * Управление: ↑ ↓ — выбор, Enter — открыть, Esc — закрыть.
- */
 (function () {
   if (window.__antvizPalette) return;
   window.__antvizPalette = true;
@@ -41,7 +31,7 @@
     { t: 'Настройки',        s: 'Профиль, безопасность, каналы',     href: '/profile/settings',      k: 'настройки безопасность пароль 2fa telegram сеансы' },
   ];
 
-  let data = null;       // { orders, tickets, services }
+  let data = null;
   let loadedAt = 0;
   let loading = null;
   let root = null, input = null, listEl = null;
@@ -214,7 +204,6 @@
     const all = collect();
     let res;
     if (!q.length) {
-      // Без запроса: разделы, действия и последние заказы/тикеты
       const order = ['Разделы', 'Действия', 'Заказы', 'Тикеты'];
       res = [];
       order.forEach(g => {

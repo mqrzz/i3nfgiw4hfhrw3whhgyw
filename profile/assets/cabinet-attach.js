@@ -1,9 +1,3 @@
-// cabinet-attach.js — подготовка вложений для тикетов поддержки (общий модуль
-// для страниц support-new и support-chat).
-//   • картинки (png/jpg/webp/gif) сжимаются в браузере и уходят как imageUrl — как и раньше;
-//   • остальные файлы (pdf, zip, документы офиса, txt/csv…) уходят как file {name, dataUrl}
-//     и хранятся на сервере отдельно от текста сообщения.
-// Лимиты продублированы на сервере (routes/tickets.js): файл ≤ 8 МБ.
 
 export const MAX_FILES = 5;
 export const MAX_FILE_BYTES = 8 * 1024 * 1024;
@@ -41,7 +35,7 @@ function compressImage(file) {
       const c = document.createElement('canvas');
       c.width = width; c.height = height;
       const ctx = c.getContext('2d');
-      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, height); // прозрачные png → белый фон
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, width, height);
       ctx.drawImage(img, 0, 0, width, height);
       URL.revokeObjectURL(url);
       resolve(c.toDataURL('image/jpeg', 0.85));
@@ -51,7 +45,6 @@ function compressImage(file) {
   });
 }
 
-// Возвращает { kind:'image'|'file', name, size, mime, dataUrl } или бросает Error с текстом для пользователя
 export async function prepareFile(file) {
   const ext = extOf(file.name);
   const isImg = /^image\/(png|jpeg|webp|gif)$/.test(file.type);
@@ -68,7 +61,6 @@ export async function prepareFile(file) {
   return { kind: 'file', name: file.name, size: file.size, mime: file.type || 'application/octet-stream', dataUrl };
 }
 
-// Тело для POST /tickets и POST /tickets/:id/messages из подготовленного вложения
 export function attachmentPayload(att) {
   if (!att) return {};
   return att.kind === 'image' ? { imageUrl: att.dataUrl } : { file: { name: att.name, dataUrl: att.dataUrl } };

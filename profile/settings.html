@@ -6,9 +6,6 @@
 <title>Настройки — Antviz</title>
 <link rel="icon" href="../img/favicon.png" type="image/png">
 <script>
-  // Читаем сохранённую тему до отрисовки — тот же ключ, что и на всех
-  // страницах кабинета, поэтому если тема переключена в профиле,
-  // здесь она подхватится сама, без отдельного переключателя.
   try{
     var t = localStorage.getItem('antviz-theme');
     if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
@@ -96,7 +93,6 @@
   #menuBtnMobile{display:flex;}
   @media (min-width:981px){ #menuBtnMobile{display:none;} }
 
-  /* ШАПКА ПРОФИЛЯ */
   .hero{background:var(--card);border-radius:var(--r32);padding:24px;border:1px solid var(--stroke);box-shadow:var(--shadow-md);display:flex;align-items:center;gap:16px;}
   .avatar{width:52px;height:52px;border-radius:50%;background:var(--surface2);box-shadow:inset 0 0 0 1px var(--stroke-strong);display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--text);font-size:18px;flex-shrink:0;}
   .hero-id{flex:1;min-width:0;}
@@ -106,7 +102,6 @@
   .section-head{padding:4px 4px 0;}
   .section-eyebrow{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-faint);}
 
-  /* КАРТОЧКИ */
   .card{background:var(--card);border-radius:var(--r24);padding:20px;border:1px solid var(--stroke);box-shadow:var(--shadow-sm);}
   .card-head{display:flex;align-items:center;gap:14px;margin-bottom:18px;}
   .card-icon{width:40px;height:40px;border-radius:var(--r12);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-dim);}
@@ -124,7 +119,6 @@
   .field-input::placeholder{color:var(--text-faint);}
   .field-foot{display:flex;justify-content:flex-end;margin-top:16px;}
 
-  /* КНОПКИ */
   .btn{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;border-radius:var(--r16);font-family:inherit;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:background .15s,border-color .15s,color .15s,transform .15s var(--spring);white-space:nowrap;}
   .btn:active{transform:scale(.96);}
   .btn svg{width:15px;height:15px;}
@@ -140,8 +134,6 @@
   .btn-danger-solid:hover{opacity:.88;}
   .btn:disabled{opacity:.5;cursor:default;transform:none;}
 
-  /* СПОСОБ ВХОДА */
-
   .divider-label{font-size:11px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-faint);margin:20px 0 14px;padding-top:20px;border-top:1px solid var(--stroke);font-weight:600;}
 
   .alert{display:flex;align-items:flex-start;gap:10px;border-radius:var(--r14);padding:13px 16px;font-size:13px;line-height:1.5;background:var(--card-elevated);border:1px solid var(--stroke);border-left:2px solid transparent;color:var(--text-dim);}
@@ -155,7 +147,6 @@
   .reset-form.visible{display:block;}
   .reset-hint{font-size:13px;color:var(--text-dim);margin-bottom:16px;line-height:1.5;}
 
-  /* СЕАНСЫ */
   .sessions-head-row{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px;}
   .sessions-list{display:flex;flex-direction:column;}
   .session-row{display:flex;align-items:center;gap:14px;padding:14px 2px;border-bottom:1px solid var(--stroke);flex-wrap:wrap;}
@@ -174,17 +165,12 @@
   .sessions-empty,.sessions-loading{color:var(--text-faint);font-size:13px;padding:6px 2px;}
   @media(max-width:560px){.session-end-btn{width:100%;justify-content:center;}}
 
-  /* ОПАСНАЯ ЗОНА */
   .danger-item{border-bottom:1px solid var(--stroke);}
   .danger-item:last-child{border-bottom:none;}
   .danger-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:16px 0;}
   .danger-row h4{font-size:14px;font-weight:500;margin-bottom:3px;}
   .danger-row p{font-size:12px;color:var(--text-dim);}
 
-  /* МОДАЛЬНОЕ ОКНО ПО ЦЕНТРУ (удаление аккаунта, Authenticator, резервный код) */
-  /* z-index:300 (как было) проигрывал нижней мобильной навигации sidebar.js (.sb-bottom-nav,
-     z-index:850) — на телефоне панель с иконками просвечивала поверх этого модального окна.
-     Остальные модалки в кабинете (orders.html, support.html) используют 9500+ — выравниваем сюда же. */
   .modal-overlay{
     position:fixed; inset:0; z-index:9600;
     background:rgba(6,8,7,.6); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
@@ -218,7 +204,6 @@
   .delete-pop-head strong{display:block;font-size:20px;font-weight:800;letter-spacing:-0.02em;margin-bottom:5px;}
   .delete-pop-head span{display:block;font-size:15px;color:var(--text-dim);line-height:1.5;}
 
-  /* ЯЧЕЙКИ КОДА — 1-в-1 с auth.html (.code-boxes/.code-box), только цвета из тёмной палитры */
   .code-boxes{ display:flex; gap:8px; justify-content:center; margin-bottom:6px; }
   .code-box{
     width:44px; height:54px;
@@ -234,13 +219,10 @@
   .code-box.filled{ background:var(--card-elevated); border-color:var(--text); }
   .code-box.err{ border-color:var(--red); }
 
-  /* КАПСУЛЫ — только внутри модалок безопасности/удаления (не весь кабинет) */
   .modal-box .btn{
     border-radius:999px; padding:16px 20px; font-size:17px; font-weight:700;
     justify-content:center;
   }
-  /* Кнопки ВНУТРИ строки способа входа — это не форма-submit, а компактное
-     действие сбоку от иконки+текста, как .method-btn на welcome.html — маленькие */
   .method-row .btn, .passkey-row .btn{
     padding:8px 15px; font-size:13px; font-weight:700; width:auto;
   }
@@ -250,7 +232,6 @@
   .modal-box .field-label{ font-size:12px; margin-bottom:8px; }
   .passkey-row{ background:var(--surface2); border:1px solid var(--stroke); border-radius:16px; padding:12px 16px; margin-bottom:8px; }
 
-  /* СТРОКА СПОСОБА ВХОДА — 1-в-1 с .method-row из welcome.html/auth.html, только цвета из тёмной палитры */
   .method-row{
     display:flex; align-items:center; gap:12px;
     background:var(--surface2); border-radius:18px; padding:14px 16px; margin-bottom:10px;
@@ -295,7 +276,6 @@
     .session-title{font-size:14px;}
     .session-meta{font-size:13px;}
 
-    /* тот же десктопный масштаб — для модалок и центра безопасности */
     .danger-row h4{font-size:15px;}
     .danger-row p{font-size:13px;}
     .card-icon{width:44px;height:44px;}
@@ -319,7 +299,6 @@
     .modal-box .btn{ padding:14px 18px; font-size:15px; }
   }
 
-  /* ===== ПК: раскладка настроек в 2 колонки + переключатели каналов уведомлений ===== */
   .notify-matrix{display:flex;flex-direction:column}
   .notify-row{display:grid;grid-template-columns:minmax(0,1fr) 84px 84px;align-items:center;gap:8px;padding:14px 0;border-bottom:1px solid var(--stroke)}
   .notify-row:last-child{border-bottom:none}
@@ -379,7 +358,6 @@
     .notify-name span{font-size:13.5px}
     .notify-row{grid-template-columns:minmax(0,1fr) 100px 100px;padding:18px 0}
 
-    /* опасная зона: два действия рядом */
     #sec-danger{display:grid;grid-template-columns:1fr 1fr;column-gap:24px;row-gap:0}
     #sec-danger .card-head{grid-column:1 / -1}
     #sec-danger .danger-item{border:1px solid var(--stroke);border-radius:var(--r24);padding:6px 26px;background:var(--card-elevated)}
@@ -456,7 +434,6 @@
 
     <div class="section-head mob-only"><div class="section-eyebrow">Настройки аккаунта</div></div>
 
-    <!-- ПРОФИЛЬ -->
     <section class="card" id="sec-profile">
       <div class="card-head">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg></div>
@@ -481,7 +458,6 @@
     </section>
 
 
-    <!-- ВХОД И БЕЗОПАСНОСТЬ -->
     <section class="card" id="sec-access">
       <div class="card-head">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="3"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
@@ -496,7 +472,6 @@
       </div>
     </section>
 
-    <!-- ЦЕНТР БЕЗОПАСНОСТИ: на ПК — по центру, на мобильных — во весь экран -->
     <div class="modal-overlay" id="securityCenterOverlay" onclick="if(event.target===this) closeSecurityCenter()">
       <div class="modal-box security-center-box">
         <div class="security-center-head">
@@ -506,7 +481,7 @@
           </button>
         </div>
 
-        <div id="authMethodRow"><!-- filled by JS: email --></div>
+        <div id="authMethodRow"></div>
 
         <div class="method-row">
           <div class="method-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="#FC3F1D"/><path d="M13.1 6.6h-1.4c-2 0-3 1-3 2.5 0 1.7 1 2.3 2.4 3.2l1.2.8-3.5 5.1H6.6l3.1-4.5c-1.8-1.2-2.8-2.4-2.8-4.5 0-2.6 1.9-4.2 4.9-4.2H15v13.2h-1.9V6.6z" fill="#fff"/></svg></div>
@@ -596,7 +571,6 @@
       </div>
     </div>
 
-    <!-- УВЕДОМЛЕНИЯ: каналы по типам событий -->
     <section class="card" id="sec-notify">
       <div class="card-head">
         <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg></div>
@@ -611,7 +585,6 @@
       <div class="notify-foot" id="notifyFoot"></div>
     </section>
 
-    <!-- TELEGRAM -->
     <section class="card" id="sec-telegram">
       <div class="card-head">
         <div class="card-icon"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8.287 5.906q-1.168.486-4.666 2.01-.567.225-.595.442c-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294q.39.01.868-.32 3.269-2.206 3.374-2.23c.05-.012.12-.026.166.016s.042.12.037.141c-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8 8 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629q.14.092.27.187c.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.4 1.4 0 0 0-.013-.315.34.34 0 0 0-.114-.217.53.53 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09"/></svg></div>
@@ -638,7 +611,6 @@
       </div>
     </section>
 
-    <!-- УСТРОЙСТВА И СЕАНСЫ -->
     <section class="card" id="sec-sessions">
       <div class="sessions-head-row">
         <div class="card-head" style="margin-bottom:0">
@@ -657,7 +629,6 @@
       </div>
     </section>
 
-    <!-- ОПАСНАЯ ЗОНА -->
     <section class="card" id="sec-danger" style="border-color:var(--red-dim)">
       <div class="card-head">
         <div class="card-icon" style="background:var(--red-dim);color:var(--red);"><svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" fill="none"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
@@ -706,15 +677,14 @@
 
   </div>
 </div>
-</div><!-- /cabinet -->
-</div><!-- /sbContent -->
+</div>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script type="module">
 const API = 'https://antviz.ru/api';
 
-// Ячейки кода — 1-в-1 с auth.html: по цифре на поле, автопереход, backspace, paste, стрелки
 function setupCodeBoxes(containerId, hiddenInputId, onSubmit){
   const container = document.getElementById(containerId);
   const hidden = document.getElementById(hiddenInputId);
@@ -760,7 +730,6 @@ setupCodeBoxes('deleteCodeBoxes','deleteCodeInput', ()=>window.confirmDeleteAcco
 setupCodeBoxes('totpDisableBoxes','totpDisableInput', ()=>window.confirmTotpDisable?.());
 setupCodeBoxes('recoveryRegenBoxes','recoveryRegenInput', ()=>window.confirmRecoveryRegen?.());
 
-// Юзернейм бота — заменить после создания в BotFather
 const TG_BOT_USERNAME = 'antviz_bot';
 
 window.linkTelegram = async function(){
@@ -882,7 +851,6 @@ function renderSecuritySummary(){
 window.openSecurityCenter = function(){ document.getElementById('securityCenterOverlay').classList.add('show'); };
 window.closeSecurityCenter = function(){ document.getElementById('securityCenterOverlay').classList.remove('show'); };
 
-// ── Яндекс ──
 function renderYandexRow(){
   const linked = security?.yandexLinked;
   document.getElementById('yandexStatusText').textContent = linked ? 'Подключён' : 'Не подключён';
@@ -905,7 +873,6 @@ window.handleYandexAction = async function(){
   }
 };
 
-// ── Passkey ──
 function renderPasskeyRows(){
   const list = document.getElementById('passkeyList');
   const passkeys = security?.passkeys || [];
@@ -954,7 +921,6 @@ window.removePasskey = async function(id){
   }catch(e){ toast(e.message,'error'); }
 };
 
-// ── Authenticator (TOTP) ──
 function renderTotpRow(){
   const on = security?.totpEnabled;
   document.getElementById('totpStatusText').textContent = on ? 'Включён' : 'Отключён — рекомендуем подключить';
@@ -1019,14 +985,11 @@ window.confirmTotpDisable = async function(){
     toast('Authenticator отключён','success');
   }catch(e){ toast(e.message,'error'); document.getElementById('totpDisableBoxes')._markErr?.(); }
 };
-// ── Резервный код ──
 function renderRecoveryRow(){
   const issued = security?.recoveryCodeIssued;
   document.getElementById('recoveryStatusText').textContent = issued ? 'Выпущен, хранится у вас' : 'Не выпущен';
   document.getElementById('recoveryActionBtn').textContent = issued ? 'Перевыпустить' : 'Выпустить';
 }
-// Если 2FA включена — просим код (резервный код может её обойти, дополнительно подтверждаем).
-// Если 2FA выключена — выпускаем сразу, без модалки.
 window.handleRecoveryAction = async function(){
   if(security?.totpEnabled){
     document.getElementById('recoveryRegenTitle').textContent = security.recoveryCodeIssued ? 'Перевыпустить резервный код' : 'Выпустить резервный код';
@@ -1136,8 +1099,6 @@ window.saveSettings=async function(){
   }catch(e){toast(e.message,'error');}
 };
 
-// Смена пароля убрана — входа по паролю больше нет,
-// способы входа теперь управляются через loadSecurityOverview() выше.
 
 window.doLogout=async function(){
   try{ await apiCall('POST', '/auth/logout'); }catch(e){}
@@ -1168,7 +1129,6 @@ document.addEventListener('click',e=>{
   if(wrap && !wrap.contains(e.target) && !isDeleteBtn) closeDeleteModal();
 });
 
-// ── Удаление аккаунта: email-подтверждение → запрос кода → ввод кода ──
 window.requestDeleteCode=async function(){
   if(!currentUser) return;
   if(document.getElementById('deleteConfirmInput').value.trim()!==currentUser.email){
@@ -1209,14 +1169,13 @@ window.confirmDeleteAccount=async function(){
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape') closeDeleteModal();});
 
-// ── Настройки каналов уведомлений (Telegram / e-mail по типам событий) ──
 const NOTIFY_ROWS = [
   { key:'order',   name:'Заказы',       sub:'Статусы, оплата, сдача проекта' },
   { key:'support', name:'Поддержка',    sub:'Ответы команды в чате и тикетах' },
   { key:'service', name:'Обслуживание', sub:'Заявки на правки и срок подписки' },
   { key:'system',  name:'Новости',      sub:'Сообщения и рассылки от студии' },
 ];
-let notifyState = null; // { prefs, telegramLinked, email }
+let notifyState = null;
 let notifySaveTimer = null;
 
 function renderNotifyPrefs(){
@@ -1275,9 +1234,6 @@ document.addEventListener('change', e => {
   if(!user){ window.location.href='../auth'; return; }
   currentUser = user;
 
-  // Показать гайд «Как устроен вход», если человек ещё не видел ТЕКУЩУЮ версию.
-  // AUTH_GUIDE_VERSION поднимаете на 1 при любом значимом изменении в способах
-  // входа — тогда гайд покажется снова даже тем, кто уже смотрел старую версию.
   const AUTH_GUIDE_VERSION = '1';
   const seenGuideVersion = localStorage.getItem('antviz_auth_guide_seen');
   if(seenGuideVersion !== AUTH_GUIDE_VERSION){
@@ -1333,7 +1289,6 @@ document.addEventListener('change', e => {
 </script>
 
 <script>
-// ── тема (общая для всех страниц кабинета через localStorage) ──
 (function(){
   const btn=document.getElementById('themeToggle');
   if(!btn) return;
@@ -1347,8 +1302,6 @@ document.addEventListener('change', e => {
 </script>
 
 <script>
-// ── ПК: подсветка активного раздела в липких табах настроек ──
-// Контейнер прокрутки (.sb-content) создаёт sidebar.js уже после разбора страницы, поэтому ищем его на load.
 window.addEventListener('load', function(){
   const tabs = document.querySelectorAll('#setTabs .cab-tab');
   const root = document.querySelector('.sb-content');
@@ -1356,13 +1309,12 @@ window.addEventListener('load', function(){
   const map = [];
   tabs.forEach(t => { const el = document.getElementById((t.getAttribute('href')||'').slice(1)); if(el) map.push([el, t]); });
   function setActive(tab){ tabs.forEach(t => t.classList.toggle('is-active', t === tab)); }
-  let lockUntil = 0;   // после клика по табу не перебиваем выбор, пока идёт плавная прокрутка
+  let lockUntil = 0;
   function update(){
     if(Date.now() < lockUntil) return;
     const top = root.getBoundingClientRect().top;
     let cur = map.length ? map[0][1] : null;
     map.forEach(([el, tab]) => { if(el.getBoundingClientRect().top - top <= 200) cur = tab; });
-    // у самого низа страницы последние секции не дотянутся до верха — подсвечиваем последнюю
     if(root.scrollTop > 0 && root.scrollTop + root.clientHeight >= root.scrollHeight - 4 && map.length) cur = map[map.length-1][1];
     setActive(cur);
   }

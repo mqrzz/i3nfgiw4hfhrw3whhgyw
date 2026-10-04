@@ -1,66 +1,28 @@
-/**
- * sidebar.js — общая боковая панель личного кабинета Antviz.
- * <script src="../sidebar.js" data-page="profile"></script>
- *
- * Подключается на всех страницах кабинета: profile, orders, sites,
- * support, tickets, notifications, settings. На ПК (≥981px) рисует
- * постоянный сайдбар слева с разделами и бейджами (активные заказы /
- * непрочитанные сообщения / истекающее обслуживание / непрочитанные
- * уведомления). На мобильных скрыт — там навигация через капсулу
- * nav.js (бургер) и обычный скролл страницы, без верхнего back-bar —
- * его каждая страница убирает сама.
- *
- * Подключается к уже существующему Firebase App той же логикой, что и
- * nav.js — ждёт getApps().length, не делает свой initializeApp(). 
- *
- * Каждая страница оборачивает свой контент в <div id="sbContent">...</div>
- * — sidebar.js найдёт этот узел и обернёт его вместе с собой в общий
- * флекс-контейнер. Если узел не найден — сайдбар просто вставляется
- * первым элементом body (страница сама отвечает за свою раскладку).
- */
 (function () {
   const script = document.currentScript;
   const page   = script ? (script.getAttribute('data-page') || '') : '';
-  // Вложенные страницы (создание тикета, чат) — в меню отдельным пунктом не живут:
-  // data-page подсвечивает родительский раздел, а data-back показывает в верхней
-  // панели ПК кнопку «назад» вместо хлебных крошек.
   const backHref  = script ? (script.getAttribute('data-back') || '') : '';
   const backLabel = script ? (script.getAttribute('data-back-label') || 'Назад') : '';
   const pageTitle = script ? (script.getAttribute('data-title') || '') : '';
   const scriptBase = script && script.src ? script.src.replace(/sidebar\.js.*$/, '') : '/';
-  const depth  = (window.location.pathname.replace(/\/+$/, '').match(/\//g) || []).length - 1;
-  const b      = depth > 0 ? '../' : '';
+  const b      = '/';
 
-  // Логотип-вордмарк antviz инлайн-SVG (currentColor) — красится под тему
-  // через CSS (.sb-brand-logo{ color:var(--text) }), тёмная/светлая версия
-  // не нужна отдельным файлом, это один и тот же путь, просто цвет разный.
   const LOGO_SVG = `<svg class="sb-brand-logo" viewBox="0 0 1692 484" xmlns="http://www.w3.org/2000/svg" fill="none" aria-hidden="true"><g transform="translate(0,484) scale(0.1,-0.1)" fill="currentColor"><path d="M13107 4247 c-49 -14 -128 -91 -161 -155 -54 -106 -25 -237 70 -321 92 -81 177 -99 275 -60 164 64 227 226 151 391 -16 35 -40 73 -53 85 -62 56 -197 85 -282 60z"/><path d="M7857 3914 c-4 -4 -7 -505 -7 -1113 0 -1051 1 -1111 19 -1196 20 -93 63 -209 99 -267 11 -18 34 -55 51 -83 112 -186 306 -327 536 -391 l100 -28 444 -4 c277 -2 447 0 453 6 14 14 12 411 -3 428 -9 11 -76 14 -361 14 -322 0 -356 2 -439 21 -154 37 -281 131 -344 254 -77 152 -78 161 -82 788 -3 419 -1 562 8 573 9 12 81 14 430 14 247 0 428 4 443 10 l26 10 0 213 c0 152 -3 216 -12 225 -9 9 -121 12 -444 12 -335 0 -435 3 -441 13 -4 6 -10 122 -13 257 l-5 245 -226 3 c-124 1 -228 -1 -232 -4z"/><path d="M2090 3388 c-19 -5 -63 -15 -97 -22 -34 -7 -119 -42 -190 -76 -115 -57 -137 -73 -223 -156 -90 -88 -105 -109 -164 -234 -11 -25 -27 -52 -33 -61 -7 -8 -20 -38 -29 -65 -54 -169 -64 -279 -64 -696 0 -277 4 -379 15 -450 15 -85 60 -232 85 -275 5 -10 15 -29 20 -43 17 -40 58 -104 105 -164 44 -56 195 -172 283 -217 84 -43 175 -73 266 -89 65 -11 1114 -12 1276 -1 90 6 95 7 98 30 2 13 -6 36 -17 52 -12 15 -21 31 -21 35 0 4 -15 30 -34 58 -18 28 -57 96 -85 151 -29 55 -58 103 -64 107 -7 4 -226 8 -487 8 -439 0 -481 2 -548 20 -168 44 -316 187 -347 332 -4 18 -11 38 -15 43 -17 23 -21 105 -21 443 1 330 3 363 22 432 24 85 39 121 73 168 69 94 122 135 231 179 l70 28 680 0 680 0 5 -1045 c3 -575 6 -1046 8 -1047 1 -2 105 -3 231 -3 195 0 232 2 245 16 14 14 16 143 16 1273 0 964 -3 1260 -12 1269 -15 15 -1903 15 -1958 0z"/><path d="M5310 3390 c-132 -28 -199 -55 -328 -133 -84 -51 -163 -129 -245 -243 -74 -103 -121 -256 -143 -469 -21 -193 -17 -1681 4 -1702 19 -19 445 -19 460 0 8 9 12 275 15 847 3 763 5 840 21 895 35 119 130 236 230 285 124 61 137 62 679 58 l492 -4 63 -28 c124 -54 198 -122 258 -239 47 -89 47 -94 51 -971 2 -582 7 -834 14 -843 16 -18 449 -19 467 -1 9 9 12 208 12 833 0 857 2 815 -40 1021 -28 134 -93 272 -181 383 -80 99 -162 166 -269 217 -41 20 -84 41 -95 47 -11 6 -36 14 -55 18 -19 3 -62 14 -95 23 -52 14 -136 16 -670 15 -335 -1 -626 -5 -645 -9z"/><path d="M9603 3385 c-6 -18 15 -68 106 -245 133 -260 538 -1068 567 -1130 16 -36 61 -126 98 -200 38 -74 77 -153 87 -175 10 -22 60 -128 112 -235 53 -107 127 -262 166 -345 39 -82 79 -166 88 -185 l18 -35 229 -3 c198 -2 231 0 247 14 17 15 67 112 184 359 31 66 61 127 66 135 5 8 18 33 28 55 10 22 42 90 70 150 28 61 56 119 63 130 27 46 148 294 148 303 0 5 25 56 55 113 31 57 69 133 86 169 27 58 140 289 272 555 25 50 68 135 96 190 134 264 181 369 170 382 -9 10 -67 13 -263 13 -138 0 -256 -4 -262 -8 -18 -12 -194 -360 -194 -384 0 -7 -13 -38 -29 -68 -91 -177 -127 -252 -191 -391 -40 -84 -96 -210 -127 -279 -30 -69 -58 -133 -63 -142 -39 -71 -149 -298 -155 -318 -9 -32 -122 -264 -152 -312 -13 -21 -30 -38 -37 -38 -13 0 -124 214 -216 415 -17 39 -71 151 -120 250 -193 395 -241 495 -298 620 -33 72 -71 150 -86 175 -14 25 -30 55 -35 67 -6 12 -33 70 -62 130 -28 59 -69 145 -90 189 -21 45 -46 85 -55 88 -8 3 -128 6 -265 6 -215 0 -250 -2 -256 -15z"/><path d="M12966 3384 c-14 -14 -16 -142 -16 -1265 0 -843 3 -1257 10 -1270 10 -18 23 -19 233 -19 160 0 226 3 235 12 9 9 12 306 12 1275 0 1238 0 1262 -19 1273 -12 6 -104 10 -230 10 -177 0 -212 -2 -225 -16z"/><path d="M14043 3393 c-16 -6 -18 -419 -3 -443 8 -13 101 -16 702 -20 671 -5 693 -6 696 -24 2 -10 -3 -23 -11 -27 -8 -5 -41 -41 -73 -81 -33 -40 -111 -136 -174 -213 -133 -161 -205 -251 -308 -379 -41 -50 -90 -109 -110 -131 -21 -22 -64 -74 -97 -116 -111 -142 -189 -240 -295 -366 -58 -69 -129 -157 -158 -195 -29 -38 -82 -106 -117 -151 -35 -45 -82 -105 -105 -134 l-40 -52 0 -109 c0 -91 3 -111 16 -116 9 -3 536 -6 1173 -6 887 0 1160 3 1169 12 17 17 17 409 0 426 -9 9 -199 12 -795 12 -657 0 -783 2 -783 14 0 7 24 41 53 74 146 169 252 295 309 369 110 142 220 276 269 328 26 28 67 75 91 106 57 75 272 330 337 399 28 30 51 58 51 61 0 10 257 321 322 390 13 14 52 59 85 100 l61 75 0 87 c1 65 -3 90 -14 102 -14 13 -141 15 -1127 14 -612 0 -1118 -3 -1124 -6z"/></g></svg>`;
 
   const CSS = `
     :root{
       --sb-w: 260px;
       --sb-gap: 16px;
-      --cab-max: 1480px; /* общая ширина рабочей области на ПК — для всех страниц кабинета */
+      --cab-max: 1480px;
     }
 
-    /* Страница снова обычная — скроллится целиком, футер (подключается
-       отдельным footer.js на каждой странице) остаётся в нормальном
-       потоке документа под sb-shell. */
     html, body{ margin:0; background:var(--bg, var(--card-elevated,#eceef1)); }
 
-    /* App-frame: серая рамка на весь экран. Сайдбар — часть этой рамки
-       (тот же фон, без своей карточки), рабочая область — единственный
-       элемент, который визуально выделяется. */
     .sb-shell{
       display:flex; align-items:stretch;
       height:100vh; width:100%;
     }
 
-    /* Сайдбар — отдельная плавающая панель, та же оформа, что и
-       рабочая область (свой фон, бордер, скругление), с таким же
-       зазором от рамки сверху/снизу/слева, что и у .sb-content
-       справа/сверху/снизу. Прилипает при скролле страницы
-       (position:sticky). */
     .sb-nav{
       position:sticky; top:0; flex-shrink:0;
       width:var(--sb-w); height:calc(100vh - var(--sb-gap) * 2);
@@ -74,25 +36,16 @@
     }
     .sb-nav::-webkit-scrollbar{ width:0; }
 
-    /* Лого/выход на главную сайта — раньше эту роль играла плавающая
-       капсула nav.js, на десктопе в кабинете она теперь скрыта. */
     .sb-brand{
       display:flex; align-items:center;
       padding:8px 10px 20px; margin-bottom:8px;
       border-bottom:1px solid var(--border, var(--stroke,#dfe3e8));
       text-decoration:none;
     }
-    /* Вордмарк вместо favicon+текста — currentColor берёт цвет из
-       --text, поэтому логотип сам следует за темой (тёмный на светлой,
-       белый на тёмной), без отдельного файла под каждую тему. */
     .sb-brand-logo{ height:30px; width:auto; flex-shrink:0; color:var(--text,#191b1e); display:block; }
     .sb-brand-row{ display:flex; align-items:center; gap:6px; padding:4px 4px 20px; margin-bottom:8px; border-bottom:1px solid var(--border, var(--stroke,#dfe3e8)); }
     .sb-brand-row .sb-brand{ padding:4px 6px; margin:0; border:none; flex:1; min-width:0; }
 
-    /* Кнопка сворачивания текста — иконка-переключатель рядом с лого.
-       Специально крупнее остальных элементов сайдбара — это главный
-       переключатель режима, должен бросаться в глаза и легко ловиться
-       курсором/пальцем. */
     .sb-collapse-btn{
       display:flex; align-items:center; justify-content:center;
       width:48px; height:48px; flex-shrink:0;
@@ -129,12 +82,6 @@
     .sb-link.is-active .sb-link-ico:not([class*="sb-c-"]){ background:var(--text,#191b1e); color:var(--green,#1ede7b); box-shadow:0 8px 18px -8px rgba(25,27,30,.4); }
     .sb-link-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-    /* Раньше у каждого пункта меню был свой акцентный градиент (blue/green/
-       teal/purple/orange/pink/yellow/indigo) — чисто декоративно, без
-       смысловой нагрузки, из-за чего меню выглядело "разноцветным".
-       Теперь только один сдержанный нейтральный стиль на все пункты
-       (см. .sb-link-ico выше — фон/hover/active уже заданы токенами),
-       кроме "Выйти", где красный — осмысленный акцент на опасное действие. */
     .sb-link-ico[class*="sb-c-"]{ color:#fff; }
     .sb-link-ico[class*="sb-c-"] svg{ stroke:#fff; }
     .sb-link:hover .sb-link-ico[class*="sb-c-"]{ transform:scale(1.06); box-shadow:0 8px 16px -6px rgba(25,27,30,.35); }
@@ -152,8 +99,6 @@
     .sb-link.danger .sb-link-ico:not([class*="sb-c-"]){ color:#d95a48; }
     .sb-link.danger:hover .sb-link-ico:not([class*="sb-c-"]){ background:rgba(232,99,79,.1); }
 
-    /* Свёрнутое состояние — только иконки. Переключается кнопкой у
-       лого, состояние держится в localStorage (см. JS ниже). */
     .sb-nav.is-collapsed{ width:84px; padding-left:10px; padding-right:10px; }
     .sb-nav.is-collapsed .sb-brand-row{ justify-content:center; padding-left:0; padding-right:0; }
     .sb-nav.is-collapsed .sb-brand{ display:none; }
@@ -163,17 +108,12 @@
     .sb-nav.is-collapsed .sb-collapse-btn .sb-ico-expand{ display:flex; }
     .sb-nav{ transition:width .18s ease; }
 
-    /* Бейдж в свёрнутом виде — превращается в маленькую точку поверх
-       иконки вместо цифры (иначе некуда её помещать). */
     .sb-nav.is-collapsed .sb-badge{
       position:absolute; top:4px; right:15px;
       width:9px; height:9px; min-width:0; padding:0; border-radius:50%;
       font-size:0; line-height:0; overflow:hidden;
     }
 
-    /* Кастомная подсказка при наведении на иконку в свёрнутом виде —
-       рисуется одним общим элементом, позиционируется через JS
-       (position:fixed), чтобы не обрезаться overflow сайдбара. */
     .sb-tooltip{
       position:fixed; top:0; left:0; z-index:60;
       background:var(--text,#191b1e); color:#fff;
@@ -184,9 +124,6 @@
     }
     .sb-tooltip.is-visible{ opacity:1; }
 
-    /* Приветственная плашка при первом заходе — объясняет назначение
-       кнопки. Показывается один раз (флаг в localStorage), закрывается
-       крестиком или сама через 20 секунд. */
     .sb-brand-row{ position:relative; }
     .sb-collapse-hint{
       position:absolute; top:100%; right:0; margin-top:10px; width:216px;
@@ -212,11 +149,6 @@
     }
     .sb-collapse-hint-close:hover{ background:var(--bg2, var(--card-elevated,#eceef1)); color:var(--text,#191b1e); }
 
-    /* Рабочая область — плавающая панель приложения: отступы от рамки
-       сверху/справа/снизу, вплотную к сайдбару слева, скругления по
-       всем углам, собственный (не рамочный) фон. Читаемый максимум
-       держит внутренний .shell, чтобы текст не растягивался на
-       сверхширoких мониторах. */
     .sb-content{
       flex:1; min-width:0;
       height:calc(100vh - var(--sb-gap) * 2);
@@ -230,9 +162,6 @@
     }
     .sb-content > .shell{ max-width:var(--cab-max); margin:0 auto; }
 
-    /* ── Верхняя панель ПК: хлебные крошки / «назад» слева, поиск и инструменты
-       справа. Заменяет отдельный .topbar на каждой странице (на ПК он скрыт).
-       Липкая — не уезжает при прокрутке. ── */
     .pg-bar{
       display:none;
       position:sticky; top:0; z-index:40;
@@ -297,7 +226,6 @@
     .pg-tool .sun{ display:none; }
     html[data-theme="light"] .pg-tool .moon{ display:none; }
     html[data-theme="light"] .pg-tool .sun{ display:block; }
-    /* узкое окно ПК (981–1200px): панель не ломается — поиск сжимается до иконки, крошки короче */
     @media (min-width:981px) and (max-width:1200px){
       .pg-bar{ padding-left:32px; padding-right:32px; margin-left:-32px; margin-right:-32px; }
       .pg-search{ min-width:0; width:44px; padding:0; justify-content:center; }
@@ -310,24 +238,14 @@
       background:var(--green,#1ede7b); border:2px solid var(--card, #fff); display:none;
     }
 
-    /* На десктопе капсула nav.js больше не нужна — её роль (профиль,
-       уведомления, выход) уже покрывает сайдбар, а переход на главную
-       сайта теперь через .sb-brand. На мобильных сайдбар скрыт, поэтому
-       капсула возвращается как единственная навигация. */
     .antviz-nav{ display:none; }
 
-    /* nav.js всегда добавляет body{padding-top:104px} под свою плавающую
-       капсулу — на десктопе кабинета капсула скрыта (см. выше), но сам
-       паддинг остаётся, если его не отменить явно. Отменяем только на
-       десктопе: на мобильных капсула видима и паддинг под неё нужен. */
     @media (min-width:981px) and (max-width:1200px){
       .sb-content{ padding-left:32px; padding-right:32px; }
     }
     @media (min-width:981px){
       body{ padding-top:0 !important; }
       .pg-bar{ display:block; }
-      /* Старый topbar каждой страницы (дом / тема / колокольчик) — на ПК заменён
-         верхней панелью выше; на мобильных остаётся как был. */
       .sb-content .topbar{ display:none !important; }
     }
 
@@ -343,12 +261,6 @@
       }
     }
 
-    /* Мобильное нижнее меню — плавающая капсула как в мокапе (не во всю
-       ширину экрана, с отступами по бокам). Только на мобильных, ПК не
-       трогает. Пункты — те же NAV_ITEMS, что и в десктопном сайдбаре,
-       без "Новый заказ" (он уже есть на главной) и без "Выйти" (переезжает
-       в настройки, только на мобильных). Тема — через var(--card)/
-       var(--green)/var(--stroke) страницы, свой JS для темы не нужен. */
     .sb-bottom-nav{
       display:none;
       position:fixed; bottom:16px; left:50%; transform:translateX(-50%);
@@ -445,14 +357,11 @@
       existingContent.parentNode.insertBefore(shell, existingContent);
       shell.appendChild(existingContent);
     } else {
-      // Нет размеченного контейнера — просто вставляем сайдбар первым
-      // элементом в body, страница сама отвечает за свою раскладку.
       document.body.insertBefore(shell, document.body.firstChild);
     }
 
     const navEl = document.getElementById('sbNav');
 
-    // --- Верхняя панель ПК (крошки/назад + поиск + инструменты) ---
     const contentEl = document.querySelector('.sb-content');
     if (contentEl) {
       const isMac = /Mac|iPhone|iPad/i.test(navigator.platform || navigator.userAgent || '');
@@ -488,7 +397,6 @@
       contentEl.addEventListener('scroll', () => bar.classList.toggle('is-stuck', contentEl.scrollTop > 4), { passive: true });
     }
 
-    // Переключатель темы — общий для всех кнопок [data-theme-toggle] (та же localStorage-ключ, что и на страницах)
     document.querySelectorAll('[data-theme-toggle]').forEach(btn => btn.addEventListener('click', () => {
       const cur = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
       const next = cur === 'light' ? 'dark' : 'light';
@@ -496,7 +404,6 @@
       try { localStorage.setItem('antviz-theme', next); } catch (e) {}
     }));
 
-    // Поиск по кабинету (Ctrl/⌘+K) — отдельный файл, грузится один раз
     if (!window.__antvizPaletteLoading) {
       window.__antvizPaletteLoading = true;
       const ps = document.createElement('script');
@@ -505,9 +412,6 @@
       document.head.appendChild(ps);
     }
 
-    // --- Мобильное нижнее меню: плавающая капсула, отдельно от .sb-shell.
-    //     "Новый заказ" не дублируем (он уже на главной), "Выйти" сюда
-    //     не выносим (мобильный логаут — в настройках, отдельная задача).
     const bottomItems = NAV_ITEMS.filter(i => !i.sep && i.key !== 'order' && !i.logout);
     const bottomNav = document.createElement('nav');
     bottomNav.className = 'sb-bottom-nav';
@@ -525,7 +429,6 @@
       return nowCollapsed;
     }
 
-    // --- Приветственная подсказка при первом заходе ---
     let hintTimer = null;
     function dismissHint() {
       const hint = document.getElementById('sbCollapseHint');
@@ -544,14 +447,12 @@
       });
     }
 
-    // --- Кнопка сворачивания + двойной клик по лого ---
     document.getElementById('sbCollapseBtn')?.addEventListener('click', toggleCollapse);
     document.querySelector('.sb-brand')?.addEventListener('dblclick', (e) => {
       e.preventDefault();
       toggleCollapse();
     });
 
-    // --- Клавиатурный шорткат Ctrl/Cmd+B ---
     document.addEventListener('keydown', (e) => {
       const tag = (e.target && e.target.tagName) || '';
       if (tag === 'INPUT' || tag === 'TEXTAREA' || e.target?.isContentEditable) return;
@@ -561,7 +462,6 @@
       }
     });
 
-    // --- Кастомные подсказки при наведении на иконки в свёрнутом виде ---
     const tooltip = document.createElement('div');
     tooltip.className = 'sb-tooltip';
     document.body.appendChild(tooltip);
@@ -597,9 +497,6 @@
     });
   }
 
-  // Бейджи по реальным данным. "tickets" (заявки на доработку/service_tickets)
-  // оставлен на 0 — в схеме БД у этой таблицы вообще нет поля "прочитано",
-  // считать оттуда нечего, придумывать цифру не буду.
   async function watchBadges(user) {
     setBadge('tickets', 0, null);
     try {
@@ -616,14 +513,10 @@
       }
       if (ordersResp.ok) {
         const orders = await ordersResp.json();
-        // "Ожидает доплаты" (status 6) — единственное реально требующее
-        // внимания клиента состояние заказа, которое можно однозначно
-        // определить по имеющимся данным.
         setBadge('orders', orders.filter(o => o.status === 6).length, 'orange');
       }
       if (chatResp.ok) {
         const chats = await chatResp.json();
-        // read у тикета = увидел ли КЛИЕНТ последний ответ (см. tickets.js, toClientTicket)
         setBadge('support', chats.filter(t => t.read === false).length, null);
       }
     } catch (e) {

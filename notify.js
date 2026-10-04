@@ -1,58 +1,31 @@
-/**
- * notify.js — всплывающее объявление личного кабинета Antviz
- *
- * Подключение (на любой странице кабинета):
- *   <script src="notify.js"></script>
- * И всё. Больше ничего вставлять не нужно — текст и настройки ниже, в этом файле.
- *
- * ═══════════════════════════════════════════════════════════════
- *  ЧТО МЕНЯТЬ, КОГДА НУЖНО ПОКАЗАТЬ НОВОЕ ОБЪЯВЛЕНИЕ — СМОТРИ НИЖЕ
- * ═══════════════════════════════════════════════════════════════
- */
 
 const NOTIFY_CONFIG = {
-  // id — "метка версии". Меняешь текст/буллеты ниже — обязательно
-  // поменяй и id (например 'whitelist-2026-07' -> 'whitelist-2026-08'),
-  // иначе те, кто уже нажал «Не показывать снова», не увидят обновление.
   id: 'tg-bot-1',
 
-  eyebrow: 'Новое',                      // маленький бейдж сверху ('' — чтобы убрать)
-  title: 'У нас появился Telegram-бот',   // крупный заголовок
+  eyebrow: 'Новое',
+  title: 'У нас появился Telegram-бот',
 
-  // Буллеты слева, как на референсе. icon: 'bell' | 'status' | 'zap' | 'check'
   bullets: [
     { icon: 'bell', text: 'Подключите уведомления — они будут приходить прямо в Telegram, как только что-то меняется по вашему заказу.' },
     { icon: 'status', text: 'Смотрите статусы заказов в реальном времени, не заходя в личный кабинет.' },
     { icon: 'zap', text: 'В боте много других полезных функций — постепенно будем добавлять ещё.' }
   ],
 
-  // Текст-подсказка под буллетами (можно оставить пустым '')
   footnote: '',
 
-  primaryText: 'Подключить в настройках',                // текст тёмной кнопки
-  primaryHref: 'https://antviz.ru/profile/settings',                     // если нужна ссылка вместо простого закрытия — впиши сюда URL
+  primaryText: 'Подключить в настройках',
+  primaryHref: 'https://antviz.ru/profile/settings',
 
-  dontShowAgainText: 'Не показывать снова', // текстовая кнопка-ссылка под основной кнопкой ('' или null — убрать)
+  dontShowAgainText: 'Не показывать снова',
 
-  // persist управляет тем, что делает КРЕСТИК и кнопка "Понятно":
-  //   false    — просто закрывают окно, при следующей загрузке страницы оно появится снова.
-  //              (Кнопка "Не показывать снова" всё равно работает и запоминает навсегда.)
-  //   'session'— закрытие прячет окно до конца вкладки браузера (снова покажется в новой вкладке).
-  //   'local'  — закрытие запоминает навсегда, как и кнопка "Не показывать снова".
-  //
-  // Сейчас стоит false — окно будет всплывать при каждой загрузке страницы, пока
-  // пользователь сам не нажмёт "Не показывать снова". Удобно, пока объявление актуально.
   persist: false,
 
-  delay: 400                             // задержка перед появлением, в миллисекундах
+  delay: 400
 };
 
-/* ═══════════════════════════════════════════════════════════════
- *  Дальше — код самого компонента, трогать не нужно
- * ═══════════════════════════════════════════════════════════════ */
 (function () {
-  const STORAGE_PREFIX = 'antviz_notify_seen_';       // постоянный флаг (кнопка "Не показывать снова")
-  const SESSION_PREFIX = 'antviz_notify_session_';    // временный флаг (persist:'session')
+  const STORAGE_PREFIX = 'antviz_notify_seen_';
+  const SESSION_PREFIX = 'antviz_notify_session_';
 
   const ICONS = {
     bell: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
@@ -61,8 +34,6 @@ const NOTIFY_CONFIG = {
     check: '<circle cx="12" cy="12" r="10"/><path d="M8 12l2.5 2.5L16 9"/>'
   };
 
-  // Иконка для правой (тёмной) панели — настоящий логотип Telegram
-  // (Bootstrap Icons, bi-telegram), перекрашенный в фирменный градиент.
   const PANEL_ICON = `
     <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -186,7 +157,6 @@ const NOTIFY_CONFIG = {
   function seenKey(id) { return STORAGE_PREFIX + id; }
   function sessionKey(id) { return SESSION_PREFIX + id; }
 
-  // Постоянный флаг (ставится ТОЛЬКО кнопкой "Не показывать снова")
   function isDismissedForever(id) {
     try { return localStorage.getItem(seenKey(id)) === '1'; } catch (e) { return false; }
   }
@@ -194,13 +164,12 @@ const NOTIFY_CONFIG = {
     try { localStorage.setItem(seenKey(id), '1'); } catch (e) {}
   }
 
-  // Флаг обычного закрытия — поведение зависит от persist
   function isClosedByPersist(id, persist) {
     if (persist === 'local') return isDismissedForever(id);
     if (persist === 'session') {
       try { return sessionStorage.getItem(sessionKey(id)) === '1'; } catch (e) { return false; }
     }
-    return false; // persist:false — обычное закрытие ничего не запоминает
+    return false;
   }
   function markClosedByPersist(id, persist) {
     if (persist === 'local') { markDismissedForever(id); return; }
@@ -289,7 +258,5 @@ const NOTIFY_CONFIG = {
     reset
   };
 
-  // Автозапуск: сразу показываем объявление, настроенное в NOTIFY_CONFIG выше.
-  // Если объявление сейчас не нужно вообще — закомментируй строку ниже (поставь // перед ней).
   window.AntvizNotify.show(NOTIFY_CONFIG);
 })();

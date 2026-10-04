@@ -6,10 +6,6 @@
     let currentUser = null, authReady = false;
     let maintOn = null, banData = null, banChecked = false;
 
-    // ===== Кэш в sessionStorage — для бана: он почти всегда отсутствует,
-    // незачем дёргать API на каждом переходе между страницами.
-    // Тех.работы НЕ кэшируем — статус должен подхватываться сразу же
-    // при обычной перезагрузке страницы, без ожидания TTL.
     const BAN_KEY = 'antviz_ban_status';
     const BAN_TTL_OFF = 60 * 1000;
     const BAN_TTL_ON  = 15 * 1000;
@@ -32,8 +28,6 @@
       return new Date(ban.until).toLocaleDateString('ru', { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    // ===== Тех.работы — управляются файлом-флагом на сервере
-    // (touch/rm .maintenance в папке бэкенда), проверяем через API.
     (async () => {
       try {
         const resp = await fetch(`${API}/maintenance-status`);
@@ -43,7 +37,6 @@
       render();
     })();
 
-    // ===== Бан — только для авторизованных
     try {
       const meResp = await fetch(`${API}/auth/me`, { credentials: 'include' });
       currentUser = meResp.ok ? await meResp.json() : null;
@@ -71,8 +64,6 @@
     function render() {
       if (!authReady || maintOn === null) return;
 
-      // Тех.работы важнее бана — если сайт лежит для всех, экран бана не нужен.
-      // Админу оверлей тех.работ не показываем — ему нужно видеть сайт как есть.
       if (maintOn && !(currentUser && currentUser.role === 'admin')) {
         removeBan();
         renderMaint();
@@ -80,7 +71,7 @@
       }
       removeMaint();
 
-      if (!banChecked) return; // ещё не знаем статус бана — не мигаем оверлеем
+      if (!banChecked) return;
       renderBan();
     }
 
@@ -193,11 +184,6 @@
     function renderBan() {
       const banned = !!banData;
       if (banned && !bo) {
-        // Раньше тут был signOut(auth) при показе бана — но это триггерило
-        // auth-listener'ы на других страницах (у некоторых при user=null стоит
-        // редирект на "/"), и редирект сносил только что показанный оверлей
-        // раньше, чем пользователь успевал его увидеть. Сам оверлей ниже уже
-        // полностью блокирует страницу — signOut для этого не нужен.
 
         const style = document.createElement('style');
         style.textContent = `

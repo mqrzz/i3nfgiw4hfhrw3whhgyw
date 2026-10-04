@@ -103,6 +103,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 .form-card p.form-sub svg{width:15px;height:15px;flex-shrink:0;fill:var(--muted)}
 
 .field{margin-bottom:22px}
+.ent-consent{display:flex;align-items:flex-start;gap:10px;margin:18px 0 14px;font-size:13.5px;line-height:1.5;color:var(--muted);cursor:pointer}.ent-consent input{margin-top:3px;width:16px;height:16px;accent-color:var(--green);flex:none}.ent-consent a{color:var(--text);text-decoration:underline}
 .field-label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:10px}
 .field-label svg{width:13px;height:13px;stroke:var(--muted);stroke-width:1.8;fill:none;stroke-linecap:round;stroke-linejoin:round}
 .field-label .req{color:var(--green-d);text-transform:none;letter-spacing:0}
@@ -352,6 +353,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:
 
         <div class="cf-turnstile" id="turnstile-ent" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onEntVerified" data-expired-callback="onEntExpired" data-error-callback="onEntCaptchaError"></div>
 
+        <label class="ent-consent"><input type="checkbox" id="fConsent"><span>Даю <a href="/obrabotka-pd" target="_blank" rel="noopener">согласие на обработку персональных данных</a> (<a href="/privacy" target="_blank" rel="noopener">политика конфиденциальности</a>)</span></label>
+
+
         <button type="submit" class="btn btn-green btn-lg" id="entSubmitBtn">Отправить заявку</button>
         <p class="submit-note"><svg viewBox="0 0 16 16" style="fill:var(--muted);stroke:none"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.23.05-.012.12-.026.166.016.047.041.042.12.037.141-.03.129-1.227 1.241-1.846 1.817-.193.18-.33.307-.358.336a8.154 8.154 0 0 1-.188.186c-.38.366-.664.64.015 1.088.327.216.589.393.85.571.284.194.568.387.936.629.093.06.183.125.27.187.331.236.63.448.997.414.214-.02.435-.22.547-.82.265-1.417.786-4.486.906-5.751a1.426 1.426 0 0 0-.013-.315.337.337 0 0 0-.114-.217.526.526 0 0 0-.31-.093c-.3.005-.763.166-2.984 1.09z"/></svg>Ответим в Telegram, если недоступен — на почту</p>
       </form>
@@ -439,6 +443,7 @@ document.getElementById('entForm').addEventListener('submit', async (e)=>{
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const PHONE_RE = /^\+?[\d\s\-()]{10,20}$/;
   const TG_RE = /^@?[a-zA-Z]\w{4,31}$/;
+  if(!document.getElementById('fConsent').checked){ toast('Нужно дать согласие на обработку персональных данных','error'); return; }
   if(!EMAIL_RE.test(email)){ toast('Проверьте email — похоже, в нём опечатка','error'); return; }
   if(!TG_RE.test(telegramUsername)){ toast('Telegram: только буквы, цифры и подчёркивания, 5–32 символа (например, @ivanov)','error'); return; }
   if(phone && !PHONE_RE.test(phone)){ toast('Проверьте номер телефона','error'); return; }
@@ -460,7 +465,7 @@ document.getElementById('entForm').addEventListener('submit', async (e)=>{
       credentials:'include',
       body: JSON.stringify({
         name, company: document.getElementById('fCompany').value.trim() || null,
-        telegramUsername, email,
+        telegramUsername, email, consent: true,
         phone: phone || null,
         projectType: document.getElementById('fType').value.trim() || null,
         description,

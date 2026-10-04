@@ -368,6 +368,8 @@
     .pulse::before{animation:none;}
     *{transition:none !important;}
   }
+
+.modal .sub-consent{display:flex;align-items:flex-start;gap:10px;margin:2px 0 16px;font-size:13px;line-height:1.45;color:var(--text-dim,#6b7280);cursor:pointer;text-align:left}.modal .sub-consent input{width:16px;height:16px;padding:0;margin:2px 0 0;flex:none;border-radius:4px;accent-color:var(--accent)}.modal .sub-consent span{flex:1;min-width:0}.modal .sub-consent a{color:var(--text);text-decoration:underline}
 </style>
 </head>
 <body>
@@ -432,6 +434,7 @@
       <p>Будем присылать письмо при изменении статуса сервисов и новых инцидентах.</p>
       <input type="email" id="sub-email" placeholder="you@example.com">
       <div class="cf-turnstile" id="turnstile-subscribe" data-sitekey="0x4AAAAAADsZsKfyIeKi6Yr-" data-theme="light" data-size="normal" data-callback="onSubscribeCaptchaVerified" data-expired-callback="onSubscribeCaptchaExpired" data-error-callback="onSubscribeCaptchaError"></div>
+      <label class="sub-consent"><input type="checkbox" id="sub-consent"><span>Даю <a href="/obrabotka-pd" target="_blank" rel="noopener">согласие на обработку персональных данных</a></span></label>
       <div class="modal-actions">
         <button class="btn-cancel" onclick="closeModal()">Отмена</button>
         <button class="btn-confirm" onclick="confirmSubscribe()">Подписаться</button>
@@ -754,7 +757,8 @@
       return;
     }
 
-    const cfToken = window.turnstile ? turnstile.getResponse(document.getElementById('turnstile-subscribe')) : null;
+if(!document.getElementById('sub-consent').checked){ alert('Нужно дать согласие на обработку персональных данных'); return; }
+      const cfToken = window.turnstile ? turnstile.getResponse(document.getElementById('turnstile-subscribe')) : null;
     if(!cfToken){
       alert('Пройдите проверку капчи');
       return;
@@ -769,17 +773,17 @@
       const resp = await fetch(`${API_BASE}/status/subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, cfToken })
+        body: JSON.stringify({ email, cfToken, consent: true })
       });
       const data = await resp.json();
       if(!resp.ok) throw new Error(data.error || 'Не удалось подписаться');
       document.getElementById('modal-form').classList.add('hidden');
       if(data.alreadySubscribed){
         document.getElementById('modal-success-title').textContent = 'Вы уже подписаны';
-        document.getElementById('modal-success-text').textContent = 'Этот email уже получает уведомления о статусе — проверьте почту.';
+        document.getElementById('modal-success-text').textContent = 'Этот email уже получает уведомления о статусе.';
       } else {
-        document.getElementById('modal-success-title').textContent = 'Готово';
-        document.getElementById('modal-success-text').textContent = 'Мы отправим письмо на указанный адрес при изменении статуса.';
+        document.getElementById('modal-success-title').textContent = 'Подтвердите подписку';
+        document.getElementById('modal-success-text').textContent = 'Мы отправили письмо со ссылкой. Нажмите на неё, и уведомления о статусе начнут приходить. Если письма нет, загляните в «Спам».';
       }
       document.getElementById('modal-success').classList.add('show');
     } catch(err){

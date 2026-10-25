@@ -92,7 +92,7 @@
         'void main(){vec2 uv=gl_FragCoord.xy/r;vec2 q=uv*vec2(r.x/r.y,1.)*1.7+(m-.5)*.18;float tt=t*.05;' +
         'vec2 w=vec2(fbm(q+tt),fbm(q+vec2(5.2,1.3)-tt));float f=fbm(q+2.4*w+vec2(0.,tt*1.6));' +
         'float flip=smoothstep(.05,.5,p);float bias=mix(uv.x*.8+uv.y*.7-.35,.5+.25*sin(uv.x*3.+tt),smoothstep(.3,.95,p));bias=mix(bias,uv.x*.5+(1.-uv.y)*.2+.15,flip*(1.-smoothstep(.3,.9,p)));' +
-        'float v=smoothstep(.34,.98,f*1.1+bias*.5-.3-.2*smoothstep(.25,.6,p)-.34*smoothstep(.6,.95,p));'+
+        'float v=smoothstep(.34,.98,f*1.1+bias*.5-.3-.2*smoothstep(.25,.6,p)+.5*smoothstep(.6,.95,p));'+
         'vec3 white=vec3(.93,.96,1.),light=vec3(.6,.77,1.),blue=vec3(0.,.4,1.);' +
         'vec3 col=mix(white,light,smoothstep(0.,.5,v));col=mix(col,blue,smoothstep(.42,.95,v));' +
         'float bot=smoothstep(.5,0.,uv.y)*(1.-smoothstep(.12,.4,p));col=mix(col,vec3(.97,.98,1.),bot*.92);' +
@@ -123,7 +123,7 @@
       canvas.height = Math.max(2, Math.round(view.clientHeight * s));
       gl.viewport(0, 0, canvas.width, canvas.height);
     }
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', function () { resize(); if (s3) s3.resize(); });
     resize();
 
     window.addEventListener('pointermove', function (e) {
@@ -152,6 +152,160 @@
       if (hint) hint.classList.toggle('is-off', prog > 0.03);
     }
 
+
+    var s3 = null;
+    function init3d() {
+      var T = window.THREE;
+      var c = document.createElement('canvas');
+      c.className = 'c3d';
+      c.setAttribute('aria-hidden', 'true');
+      view.insertBefore(c, ph1);
+      var renderer = new T.WebGLRenderer({ canvas: c, alpha: true, antialias: true, powerPreference: 'low-power' });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+      renderer.setClearColor(0x000000, 0);
+      var scene = new T.Scene();
+      var camera = new T.PerspectiveCamera(32, 1, 0.1, 100);
+      camera.position.z = 16;
+
+      var envScene = new T.Scene();
+      var dome = new T.Mesh(new T.SphereGeometry(30, 32, 16), new T.ShaderMaterial({
+        side: T.BackSide,
+        vertexShader: 'varying vec3 v;void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+        fragmentShader: 'varying vec3 v;void main(){float h=normalize(v).y;vec3 c=mix(vec3(.28,.5,.95),vec3(.86,.92,1.),smoothstep(-.7,.2,h));c=mix(c,vec3(1.),smoothstep(.2,1.,h));gl_FragColor=vec4(c,1.);}'
+      }));
+      envScene.add(dome);
+      [[0, 14, 6, 24, 3], [-16, 4, 2, 3, 14], [16, 2, 4, 3, 12], [0, -6, 14, 20, 2]].forEach(function (b) {
+        var m = new T.Mesh(new T.PlaneGeometry(b[3], b[4]), new T.MeshBasicMaterial({ color: new T.Color(2.4, 2.4, 2.4), side: T.DoubleSide }));
+        m.position.set(b[0], b[1], b[2]);
+        m.lookAt(0, 0, 0);
+        envScene.add(m);
+      });
+      var pm = new T.PMREMGenerator(renderer);
+      scene.environment = pm.fromScene(envScene, 0.03).texture;
+      var key = new T.DirectionalLight(0xffffff, 0.5);
+      key.position.set(4, 6, 8);
+      scene.add(key);
+
+      var ribMat = new T.MeshPhysicalMaterial({ color: 0xe3eaf7, roughness: 0.14, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.1, transparent: true, opacity: 0.74, side: T.DoubleSide, envMapIntensity: 0.85 });
+      var N = 90, rib = [], widths = [118, 92, 66];
+      var world = new T.Group();
+      scene.add(world);
+      for (var i = 0; i < 3; i++) {
+        var g = new T.BufferGeometry();
+        g.setAttribute('position', new T.BufferAttribute(new Float32Array((N + 1) * 6), 3));
+        var idx = [];
+        for (var s = 0; s < N; s++) { var a = s * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+        g.setIndex(idx);
+        var m = new T.Mesh(g, ribMat.clone());
+        m.frustumCulled = false;
+        world.add(m);
+        rib.push(m);
+      }
+
+      var pillsGroup = new T.Group();
+      scene.add(pillsGroup);
+      var pillCols = [0xb9c3da, 0x1f4fd8, 0x3d78dc], pillMeshes = [];
+      pillCols.forEach(function (col) {
+        var pmesh = new T.Mesh(new T.BufferGeometry(), new T.MeshPhysicalMaterial({ color: col, roughness: 0.26, metalness: 0.04, clearcoat: 1, clearcoatRoughness: 0.12, envMapIntensity: 0.9 }));
+        pillsGroup.add(pmesh);
+        pillMeshes.push(pmesh);
+      });
+
+      var W = 1, H = 1, visW = 1, visH = 1, ready = false;
+      var P = new T.Vector3(), Q = new T.Vector3(), tan = new T.Vector3(), wv = new T.Vector3(), nrm = new T.Vector3();
+      var ez = new T.Vector3(0, 0, 1);
+
+      function resize() {
+        W = view.clientWidth; H = view.clientHeight;
+        renderer.setSize(W, H, false);
+        camera.aspect = W / H;
+        camera.updateProjectionMatrix();
+        visH = 2 * camera.position.z * Math.tan(T.MathUtils.degToRad(camera.fov / 2));
+        visW = visH * camera.aspect;
+        var r = pillsEl.getBoundingClientRect(), vr = view.getBoundingClientRect();
+        var px = function (x) { return (x - vr.left - W / 2) / W * visW; };
+        var py = function (y) { return -(y - vr.top - H / 2) / H * visH; };
+        var hs = [[0.12, 0.76, 0.13], [0, 1, 0.5], [0.26, 0.56, 0.87]];
+        var thick = 0.26 * r.height / H * visH;
+        pillMeshes.forEach(function (mm, k) {
+          var wW = hs[k][1] * r.width / W * visW;
+          mm.geometry.dispose();
+          var cg = new T.CapsuleGeometry(thick / 2, Math.max(0.01, wW - thick), 12, 32);
+          cg.rotateZ(Math.PI / 2);
+          mm.geometry = cg;
+          mm.userData.base = [px(r.left + (hs[k][0] + hs[k][1] / 2) * r.width), py(r.top + hs[k][2] * r.height)];
+        });
+        ready = true;
+      }
+      resize();
+
+      function bez(p0, p1, p2, p3, t, out) {
+        var u = 1 - t, a = u * u * u, b = 3 * u * u * t, c2 = 3 * u * t * t, d = t * t * t;
+        out.set(a * p0[0] + b * p1[0] + c2 * p2[0] + d * p3[0], a * p0[1] + b * p1[1] + c2 * p2[1] + d * p3[1], 0);
+      }
+
+      function render(p, now, ms, intro) {
+        if (!ready) return;
+        var k = smooth(0.18, 0.46, p);
+        var vis = (1 - smooth(0.6, 0.8, p)) * intro;
+        world.rotation.y = (ms.x - 0.5) * 0.22;
+        world.rotation.x = -(ms.y - 0.5) * 0.12;
+        for (var i = 0; i < 3; i++) {
+          var mesh = rib[i];
+          mesh.visible = vis > 0.01;
+          mesh.material.opacity = 0.74 * vis;
+          if (!mesh.visible) continue;
+          var pts = A[i].map(function (a, j) {
+            var bb = B[i][j];
+            var w = Math.sin(now * 0.0005 + i * 1.7 + j) * (j === 0 || j === 3 ? 10 : 36);
+            var x = lerp(a[0], bb[0], k) + (j && j < 3 ? Math.cos(now * 0.0004 + i + j) * 18 : 0);
+            var y = lerp(a[1], bb[1], k) + w;
+            return [(x - 720) / 1440 * visW, -(y - 450) / 900 * visH];
+          });
+          var half = widths[i] / 900 * visH / 2;
+          var pos = mesh.geometry.attributes.position.array;
+          for (var s = 0; s <= N; s++) {
+            var t = s / N;
+            bez(pts[0], pts[1], pts[2], pts[3], t, P);
+            bez(pts[0], pts[1], pts[2], pts[3], Math.min(1, t + 0.01), Q);
+            var t0 = Math.max(0, t - 0.01);
+            bez(pts[0], pts[1], pts[2], pts[3], t0, nrm);
+            tan.subVectors(Q, nrm).normalize();
+            P.z = Math.sin(t * Math.PI * 1.6 + now * 0.0006 + i * 2.1) * 1.1 - i * 0.4;
+            wv.crossVectors(tan, ez).normalize();
+            var th = Math.sin(t * 5 + now * 0.0005 + i * 1.3) * 0.95;
+            nrm.crossVectors(tan, wv);
+            var cx = Math.cos(th), sx = Math.sin(th);
+            var wx = wv.x * cx + nrm.x * sx, wy = wv.y * cx + nrm.y * sx, wz = wv.z * cx + nrm.z * sx;
+            pos[s * 6] = P.x - wx * half; pos[s * 6 + 1] = P.y - wy * half; pos[s * 6 + 2] = P.z - wz * half;
+            pos[s * 6 + 3] = P.x + wx * half; pos[s * 6 + 4] = P.y + wy * half; pos[s * 6 + 5] = P.z + wz * half;
+          }
+          mesh.geometry.attributes.position.needsUpdate = true;
+          mesh.geometry.computeVertexNormals();
+        }
+        var sc = smooth(0.66, 0.9, p);
+        pillsGroup.visible = sc > 0.01;
+        if (pillsGroup.visible) {
+          pillsGroup.scale.setScalar(0.4 + 0.6 * sc);
+          pillsGroup.rotation.y = (ms.x - 0.5) * 0.7;
+          pillsGroup.rotation.x = -(ms.y - 0.5) * 0.35 + (1 - sc) * 0.5;
+          pillMeshes.forEach(function (mm, q) {
+            mm.position.set(mm.userData.base[0], mm.userData.base[1] + Math.sin(now * 0.0009 + q * 1.8) * 0.12, 0);
+            mm.position.sub(new T.Vector3(0, 0, 0));
+            mm.material.opacity = 1;
+          });
+          var cy = (pillMeshes[1].userData.base[1]);
+          pillsGroup.position.set(0, cy, 0);
+          pillMeshes.forEach(function (mm) { mm.position.y -= cy; });
+        }
+        renderer.render(scene, camera);
+      }
+      return { render: render, resize: resize };
+    }
+    if (window.THREE && !reduce && gl) {
+      try { s3 = init3d(); view.classList.add('has3d'); } catch (e) { s3 = null; }
+    }
+
     var running = true, t0 = performance.now();
     function frame(now) {
       if (running) {
@@ -159,7 +313,8 @@
         mouse.y += (mouse.ty - mouse.y) * 0.05;
         measure();
         applyPhases();
-        ribbons(prog, now);
+        if (!s3) ribbons(prog, now);
+        if (s3) s3.render(prog, now, mouse, smooth(0, 1, (now - t0) / 1600));
         if (gl) {
           gl.uniform2f(uni.r, canvas.width, canvas.height);
           gl.uniform1f(uni.t, (now - t0) / 1000);
@@ -271,6 +426,10 @@
       send.href = 'https://t.me/' + user + '?text=' + encodeURIComponent(text);
     };
     ta.addEventListener('input', update);
+    var agree = $('[data-agree]', brief);
+    var gate = function () { send.setAttribute('aria-disabled', agree.checked ? 'false' : 'true'); };
+    agree.addEventListener('change', gate);
+    gate();
     update();
   }
 

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Отзывы — Antviz Admin</title>
+<link rel="icon" href="../img/favicon.png"/>
+<script>
+  try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
+<style>
+  .rv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+  .rc{background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r24);padding:22px 24px;transition:border-color .15s;animation:cabFadeUp .2s ease both}
+  .rc:hover{border-color:var(--stroke-strong)}
+  .rc.off{opacity:.55;border-style:dashed}
+  .rc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .rc-name{font-size:15px;font-weight:500;letter-spacing:-.01em;margin-bottom:5px}
+  .rc-stars{font-size:15px;color:var(--amber);letter-spacing:.05em}
+  .rc-date{font-size:12.5px;color:var(--text-faint);margin-top:2px}
+  .rc-text{font-size:14.5px;color:var(--text-dim);line-height:1.6;margin-bottom:16px}
+  .rc-order{font-size:12.5px;color:var(--blue);margin-bottom:14px;display:inline-block}
+  .rc-actions{display:flex;gap:8px}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+<div id="sbContent" style="display:none">
+  <div class="shell">
+    <div class="cab-page">
+      <div class="pg-head">
+        <div class="pg-head-main">
+          <div class="pg-title">Отзывы клиентов</div>
+          <div class="pg-sub">Управляйте видимостью отзывов на сайте</div>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div class="stat"><div class="stat-label">Всего</div><div class="stat-value" id="heroTotal">—</div></div>
+        <div class="stat"><div class="stat-label">Средняя оценка</div><div class="stat-value" id="heroAvg">—</div></div>
+        <div class="stat"><div class="stat-label">Видимых на сайте</div><div class="stat-value" id="heroVisible">—</div></div>
+      </div>
+
+      <div class="cab-toolbar">
+        <div class="cab-tabs" id="tabRow">
+          <button class="cab-tab is-active" onclick="switchFilter('all',this)">Все</button>
+          <button class="cab-tab" onclick="switchFilter('visible',this)">Опубликованные</button>
+          <button class="cab-tab" onclick="switchFilter('hidden',this)">Скрытые</button>
+        </div>
+      </div>
+
+      <div id="reviewsList"><div class="cab-empty"><h3>Загрузка…</h3></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const API = 'https://antviz.ru/api';
+
+let allReviews=[], currentFilter='all';
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function fmtDate(ts){if(!ts)return'—';return new Date(ts).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function stars(n){return'★'.repeat(n)+'☆'.repeat(5-n);}
+
+window.doLogout=async()=>{
+  try{ await fetch(`${API}/auth/logout`, { method:'POST', credentials:'include' }); }catch(e){}
+  window.location.href='/';
+};
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('#tabRow .cab-tab').forEach(b=>b.classList.remove('is-active'));btn.classList.add('is-active');renderReviews();};
+
+function renderReviews(){
+  const el=document.getElementById('reviewsList');
+  let list=allReviews;
+  if(currentFilter==='visible') list=list.filter(r=>!r.hidden);
+  else if(currentFilter==='hidden') list=list.filter(r=>r.hidden);
+  const total=allReviews.length;
+  const avg=total?allReviews.reduce((s,r)=>s+(r.stars||0),0)/total:0;
+  const visible=allReviews.filter(r=>!r.hidden).length;
+  document.getElementById('heroTotal').textContent=total;
+  document.getElementById('heroAvg').textContent=total?avg.toFixed(1):'—';
+  document.getElementById('heroVisible').textContent=visible;
+  if(!list.length){el.innerHTML=`<div class="cab-empty"><h3>Нет отзывов</h3></div>`;return;}
+  el.innerHTML=`<div class="rv-grid">${list.map(r=>`
+    <div class="rc${r.hidden?' off':''}">
+      <div class="rc-top">
+        <div>
+          <div class="rc-name">${esc(r.clientName||'Аноним')}</div>
+          <div class="rc-stars">${stars(r.stars||0)}</div>
+          <div class="rc-date">${fmtDate(r.createdAt)}</div>
+        </div>
+        <span class="cab-badge ${r.hidden?'':'green'}">${r.hidden?'Скрыт':'Опубликован'}</span>
+      </div>
+      <div class="rc-text">${esc(r.text||'Без текста')}</div>
+      ${r.orderId?`<div class="rc-order">Заказ №${r.orderId.slice(0,8).toUpperCase()}</div>`:''}
+      <div class="rc-actions">
+        <button class="cab-btn ${r.hidden?'primary':'ghost'} sm" onclick="toggleReview('${r.id}',${!r.hidden})"><svg viewBox="0 0 24 24">${r.hidden?'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>':'<path d="M17.94 17.94A10.94 10.94 0 0112 20c-7 0-11-8-11-8a21.6 21.6 0 015.06-6.06M9.9 4.24A10.4 10.4 0 0112 4c7 0 11 8 11 8a21.4 21.4 0 01-2.16 3.19"/><path d="M1 1l22 22"/>'}</svg>${r.hidden?'Опубликовать':'Скрыть'}</button>
+        <button class="cab-btn danger sm" onclick="deleteReview('${r.id}')"><svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>Удалить</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+window.toggleReview=async(id,hidden)=>{
+  try{
+    const resp = await fetch(`${API}/reviews/${id}`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ hidden }),
+    });
+    if(!resp.ok) throw new Error();
+    const r=allReviews.find(x=>x.id===id); if(r) r.hidden=hidden;
+    toast(hidden?'Скрыт':'Опубликован ✓',hidden?'info':'success');
+    renderReviews();
+  }catch(e){ toast('Ошибка','error'); }
+};
+window.deleteReview=async id=>{
+  if(!confirm('Удалить отзыв?'))return;
+  try{
+    const resp = await fetch(`${API}/reviews/${id}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    allReviews=allReviews.filter(r=>r.id!==id);
+    toast('Удалён','info');
+    renderReviews();
+  }catch(e){ toast('Ошибка удаления','error'); }
+};
+
+(async function initReviewsPage(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  document.getElementById('loadingScreen').style.display='none';
+  if(user.role!=='admin'){window.location.href='/';return;}
+  document.getElementById('sbContent').style.display='block';
+  fetch(`${API}/orders/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(orders=>{
+    const n=orders.filter(o=>o.refundStatus==='requested').length;
+    const b=document.getElementById('navBadgeOrders');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+  fetch(`${API}/enterprise/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(apps=>{
+    const n=apps.filter(a=>a.status==='new').length;
+    const b=document.getElementById('navBadgeEnterprise');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+
+  try{
+    const resp = await fetch(`${API}/reviews/admin/all`, { credentials:'include' });
+    allReviews = resp.ok ? await resp.json() : [];
+  }catch(e){ allReviews=[]; }
+  renderReviews();
+})();
+</script>
+<script src="/profile/assets/admin-shell.js" data-page="reviews" data-title="Отзывы"></script>
+<script src="../GEOBLOCK.js"></script>
+<script src="../maintenance.js"></script>
+</body>
+</html>

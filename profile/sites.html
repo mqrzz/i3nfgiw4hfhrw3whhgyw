@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Мои проекты — Antviz</title>
+  <link rel="icon" href="../img/favicon.png" type="image/png"/>
+  <script>
+    try{
+      var t = localStorage.getItem('antviz-theme');
+      if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t);
+    }catch(e){}
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#101113;
+  --card:#191b1e;
+  --card-elevated:#1e2124;
+  --surface2:#26282c;
+  --stroke:#2a2d31;
+  --stroke-strong:rgba(255,255,255,0.12);
+  --text:#f4f5f6;
+  --text-dim:#9a9da2;
+  --text-faint:#65686d;
+  --green:#1ede7b;
+  --green-dim:rgba(30,222,123,0.14);
+  --green-text:#1ede7b;
+  --blue:#4d9fff;
+  --blue-dim:rgba(77,159,255,0.14);
+  --amber:#ffb74d;
+  --amber-dim:rgba(255,183,77,0.14);
+  --violet:#a78bfa;
+  --violet-dim:rgba(167,139,250,0.16);
+  --shadow-sm:0 1px 2px rgba(0,0,0,0.3), 0 2px 8px rgba(0,0,0,0.22);
+  --shadow-md:0 2px 4px rgba(0,0,0,0.28), 0 12px 28px rgba(0,0,0,0.38);
+  --shadow-lg:0 8px 16px rgba(0,0,0,0.32), 0 30px 60px rgba(0,0,0,0.5);
+  --shadow:var(--shadow-md);
+  --spring:cubic-bezier(.32,1.4,.5,1);
+  --r64:64px;--r40:40px;--r32:32px;--r24:24px;--r20:20px;--r16:16px;--r14:14px;--r12:12px;
+
+  --bg2:var(--card-elevated);--bg3:var(--card-elevated);
+  --line:var(--stroke);--line-strong:var(--stroke);
+  --ink:var(--text);--ink-dim:var(--text-dim);--ink-faint:var(--text-faint);
+  --accent:var(--green);--accent-h:var(--green);--accent-d:var(--green-text);--accent-wash:var(--green-dim);
+  --warn:var(--amber);--warn-wash:var(--amber-dim);
+  --dark:var(--card-elevated);--dark2:var(--stroke);
+  --sh1:var(--shadow-sm);--sh2:var(--shadow-md);
+  --font:'Geologica','Inter','Arial',sans-serif;
+}
+html[data-theme="light"]{
+  --bg:#eef0f2;
+  --card:#ffffff;
+  --card-elevated:#f7f8f9;
+  --surface2:#eef0f2;
+  --stroke:#e6e8eb;
+  --stroke-strong:rgba(15,17,20,0.13);
+  --text:#15171a;
+  --text-dim:#6b6f76;
+  --text-faint:#9a9da2;
+  --green-dim:rgba(18,184,102,0.12);
+  --green-text:#0fa860;
+  --blue-dim:rgba(77,159,255,0.12);
+  --amber-dim:rgba(230,150,40,0.14);
+  --violet:#8b7bf7;--violet-dim:rgba(139,123,247,.12);
+  --shadow-sm:0 1px 2px rgba(20,20,25,0.04), 0 2px 6px rgba(20,20,25,0.05);
+  --shadow-md:0 2px 4px rgba(20,20,25,0.04), 0 16px 32px rgba(20,20,25,0.09);
+  --shadow-lg:0 8px 16px rgba(20,20,25,0.06), 0 30px 60px rgba(20,20,25,0.16);
+  --shadow:var(--shadow-md);
+}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-weight:400;letter-spacing:-.03em;line-height:1.5;min-height:100vh;-webkit-font-smoothing:antialiased;overflow-x:hidden;transition:background .2s ease,color .2s ease}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes rowIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+.loading-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+.spinner{width:26px;height:26px;border:2px solid var(--stroke);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+.loading-text{color:var(--text-faint);font-size:12px}
+
+.app{display:flex;justify-content:center}
+.shell{width:100%;max-width:640px;min-width:0;animation:fadeUp .25s ease}
+@media(min-width:981px){
+  .shell{max-width:1240px}
+  .page-hero{padding:40px}
+  .page-hero-eyebrow{font-size:13px}
+  .page-hero-title{font-size:32px}
+  .page-hero-sub{font-size:16px;margin-top:6px}
+  .btn{font-size:14px;padding:13px 22px}
+  .btn-sm{font-size:13px;padding:11px 18px}
+  .sites-grid{gap:22px}
+  .site-card{padding:34px}
+  .site-card-head{margin-bottom:22px;gap:16px}
+  .site-favicon-wrap{width:64px;height:64px;border-radius:var(--r20)}
+  .site-favicon-wrap img{width:36px;height:36px}
+  .site-favicon-wrap svg{width:32px;height:32px}
+  .site-domain{font-size:24px;margin-bottom:24px}
+  .site-meta-list{gap:13px;margin-bottom:22px}
+  .site-meta-chip{font-size:15px;gap:14px}
+  .site-meta-ico{width:36px;height:36px}
+  .site-meta-ico svg{width:16px;height:16px}
+  .site-status-pill{font-size:12.5px;padding:8px 15px}
+  .support-banner{font-size:14.5px;padding:16px 18px;gap:14px}
+  .support-banner svg{width:18px;height:18px}
+  .site-actions{gap:12px}
+  .empty{padding:110px 16px}
+  .empty-ico-wrap{width:88px;height:88px}
+  .empty-ico-wrap svg{width:42px;height:42px}
+  .empty h3{font-size:20px}
+  .empty p{font-size:14.5px}
+}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 4px 20px 8px;gap:10px}
+.topbar-right{display:flex;gap:10px}
+.icon-btn{width:46px;height:46px;border-radius:var(--r14);background:var(--card);border:1px solid var(--stroke);box-shadow:var(--shadow-sm);display:flex;align-items:center;justify-content:center;color:var(--text-dim);position:relative;cursor:pointer;flex-shrink:0;text-decoration:none;padding:0;font:inherit;transition:transform .15s var(--spring),background .15s}
+.icon-btn:active{transform:scale(.92);background:var(--surface2)}
+.icon-btn .dot{position:absolute;top:9px;right:10px;width:7px;height:7px;border-radius:50%;background:var(--green);display:none}
+.icon-btn svg{width:21px;height:21px}
+.icon-btn .sun{display:none}
+html[data-theme="light"] .icon-btn .moon{display:none}
+html[data-theme="light"] .icon-btn .sun{display:block}
+#menuBtnMobile{display:flex}
+@media (min-width:981px){ #menuBtnMobile{display:none} }
+
+.page-hero{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:24px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;box-shadow:var(--shadow-md)}
+.page-hero-eyebrow{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px}
+.page-hero-title{font-size:23px;font-weight:600;letter-spacing:-.03em;line-height:1.15;color:var(--text)}
+.page-hero-title em{font-style:normal;color:var(--green-text)}
+.page-hero-sub{color:var(--text-dim);font-size:13px;margin-top:3px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;text-align:center;gap:8px;font-family:var(--font);font-weight:600;text-decoration:none;cursor:pointer;border:none;border-radius:var(--r16);padding:12px 20px;font-size:13px;letter-spacing:-.01em;transition:background .12s,border-color .12s,color .12s,opacity .15s,transform .15s var(--spring);min-width:0}
+.btn:active{transform:scale(.96)}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn-green{background:var(--green);color:#0d1210}
+.btn-green:hover{opacity:.9}
+.btn-ghost{background:var(--card-elevated);border:1px solid var(--stroke);color:var(--text-dim)}
+.btn-ghost:hover{border-color:var(--green);color:var(--green-text)}
+.btn-outline{background:transparent;border:1px solid var(--stroke);color:var(--text-dim)}
+.btn-outline:hover{border-color:var(--text-dim);color:var(--text);background:var(--card-elevated)}
+.btn-sm{padding:10px 16px;font-size:12px;border-radius:var(--r14)}
+
+.sites-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;min-width:0}
+.sites-grid>*{min-width:0}
+
+.site-card{background:var(--card);border:1px solid var(--stroke);border-radius:var(--r32);padding:24px;display:flex;flex-direction:column;min-width:0;animation:rowIn .25s ease both;box-shadow:var(--shadow-sm);transition:border-color .15s,box-shadow .15s}
+.site-card:hover{border-color:var(--text-faint);box-shadow:var(--shadow-md)}
+
+.site-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:18px}
+.site-favicon-wrap{width:52px;height:52px;border-radius:var(--r16);background:linear-gradient(135deg,#4eea94,#149955);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;box-shadow:0 8px 18px -8px rgba(20,153,85,.4)}
+.site-favicon-wrap img{width:30px;height:30px;object-fit:contain}
+.site-favicon-wrap svg{width:26px;height:26px;stroke:#fff;stroke-width:1.6;fill:none}
+.site-status-pill{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:6px 12px;border-radius:var(--r20);white-space:nowrap;flex-shrink:0}
+.site-status-pill.is-live{background:var(--card-elevated);color:var(--text-dim)}
+.site-status-pill.support{background:var(--green-dim);color:var(--green-text)}
+
+.site-domain{font-size:19px;font-weight:600;letter-spacing:-.02em;color:var(--text);margin-bottom:18px;word-break:break-word;overflow-wrap:anywhere;min-width:0}
+
+.site-meta-list{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;min-width:0}
+.site-meta-chip{font-size:13px;color:var(--text-dim);font-weight:400;display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+.site-meta-ico{width:30px;height:30px;border-radius:var(--r12);background:var(--card-elevated);border:1px solid var(--stroke);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.site-meta-ico svg{width:14px;height:14px;stroke-width:1.9;fill:none;flex-shrink:0}
+.mic-blue svg{stroke:var(--blue)}
+.mic-green svg{stroke:var(--green-text)}
+.mic-amber svg{stroke:var(--amber)}
+.mic-violet svg{stroke:var(--violet)}
+.site-meta-text{min-width:0;overflow-wrap:anywhere}
+a.site-meta-chip{transition:color .12s}
+a.site-meta-chip:hover{color:var(--text)}
+a.site-meta-chip:hover .site-meta-ico{border-color:var(--violet)}
+
+.support-banner{display:flex;align-items:flex-start;gap:12px;border-radius:var(--r16);padding:14px 16px;margin-bottom:18px;font-size:13px;line-height:1.5;min-width:0}
+.support-banner svg{width:16px;height:16px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;fill:none;flex-shrink:0;margin-top:1px}
+.support-banner.is-on{background:var(--green-dim);color:var(--green-text)}
+.support-banner.is-on svg{stroke:var(--green-text)}
+.support-banner.is-off{background:var(--amber-dim);color:var(--amber)}
+.support-banner.is-off svg{stroke:var(--amber)}
+.support-banner strong{color:inherit;font-weight:600}
+.support-banner span{color:var(--text-dim)}
+
+.site-actions{display:flex;gap:10px;margin-top:auto;flex-wrap:wrap;min-width:0}
+.site-actions .btn{flex:1 1 140px;min-width:0}
+
+.empty{text-align:center;padding:80px 16px}
+.empty-ico{margin-bottom:20px;display:flex;justify-content:center}
+.empty-ico-wrap{width:72px;height:72px;border-radius:var(--r20);background:linear-gradient(135deg,#4eea94,#149955);display:flex;align-items:center;justify-content:center;box-shadow:0 10px 22px -10px rgba(20,153,85,.4)}
+.empty-ico-wrap svg{width:34px;height:34px;stroke:#fff;stroke-width:1.4;fill:none}
+.empty h3{font-size:17px;font-weight:600;color:var(--text);margin-bottom:8px;letter-spacing:-.01em}
+.empty p{font-size:13px;color:var(--text-dim);margin-bottom:22px;font-weight:400;line-height:1.5}
+
+@media(max-width:900px){
+  .page-hero{padding:22px}
+  .page-hero-title{font-size:19px}
+}
+@media(max-width:600px){
+  .page-hero{padding:20px;flex-direction:column;align-items:flex-start}
+  .page-hero-title{font-size:18px}
+  .site-card{padding:20px}
+  .site-actions{flex-direction:column}
+  .site-actions .btn{flex:1 1 auto}
+  .site-favicon-wrap{width:46px;height:46px;border-radius:var(--r14)}
+  .site-favicon-wrap svg{width:22px;height:22px}
+  .site-favicon-wrap img{width:26px;height:26px}
+}
+#sbContent{padding-bottom:80px}
+  
+@media(min-width:981px){
+  .btn{font-size:14px;padding:13px 22px}
+  .btn-sm{font-size:13px;padding:11px 18px}
+  .sites-grid{gap:22px}
+  .site-card{padding:34px}
+  .site-card-head{margin-bottom:22px;gap:16px}
+  .site-favicon-wrap{width:64px;height:64px;border-radius:var(--r20)}
+  .site-favicon-wrap img{width:36px;height:36px}
+  .site-favicon-wrap svg{width:32px;height:32px}
+  .site-domain{font-size:24px;margin-bottom:24px}
+  .site-meta-list{gap:13px;margin-bottom:22px}
+  .site-meta-chip{font-size:15px;gap:14px}
+  .site-meta-ico{width:36px;height:36px}
+  .site-meta-ico svg{width:16px;height:16px}
+  .site-status-pill{font-size:12.5px;padding:8px 15px}
+  .support-banner{font-size:14.5px;padding:16px 18px;gap:14px}
+  .support-banner svg{width:18px;height:18px}
+  .site-actions{gap:12px}
+  .empty{padding:110px 16px}
+  .empty-ico-wrap{width:88px;height:88px}
+  .empty-ico-wrap svg{width:42px;height:42px}
+  .empty h3{font-size:20px}
+  .empty p{font-size:14.5px}
+}
+.sites-tools{display:none}
+.site-status-pill.warn{background:var(--amber-dim);color:var(--amber)}
+@media(min-width:981px){
+  .sites-tools{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .sites-tools .cab-tabs{flex-shrink:0}
+  .sites-grid{grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:24px}
+  .site-card{padding:32px}
+  .site-favicon-wrap{background:var(--text);box-shadow:none;width:60px;height:60px}
+  .site-favicon-wrap svg{stroke:var(--green)}
+  .site-domain{font-size:23px;margin-bottom:22px}
+  .site-actions .btn{font-size:14px;padding:13px 18px}
+  #sbContent{padding-bottom:0}
+}
+</style>
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
+</head>
+<body>
+<script src="/profile/assets/sidebar.js" data-page="sites"></script>
+
+<div class="loading-screen" id="loadingScreen">
+  <div class="spinner"></div>
+</div>
+
+<div id="sbContent" style="display:none">
+<div class="app"><div class="shell" id="appWrap">
+
+  <div class="topbar">
+    <button class="icon-btn" id="menuBtnMobile" aria-label="Меню" title="Меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+    </button>
+    <div class="topbar-right">
+      <a class="icon-btn" href="../profile" title="В кабинет">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/></svg>
+      </a>
+      <div class="icon-btn" id="themeToggle" title="Сменить тему">
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/><line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/><line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/></svg>
+      </div>
+      <a class="icon-btn" href="notifications" title="Уведомления">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+        <span class="dot" id="notifDot"></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="pg-head">
+    <div class="pg-head-main">
+      <h1 class="pg-title">Мои <em>проекты</em></h1>
+      <p class="pg-sub">Запущенные сайты и боты: ссылка, срок обслуживания и быстрые действия.</p>
+    </div>
+    <div class="pg-actions">
+      <a href="../order" class="cab-btn primary"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Новый заказ</a>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>Проектов</div><div class="stat-value" id="stSites">—</div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94z"/></svg>С обслуживанием</div><div class="stat-value" id="stSup">—</div></div>
+    <div class="stat"><div class="stat-label"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Истекает за 7 дней</div><div class="stat-value" id="stExp">—</div></div>
+    <div class="stat is-accent"><div class="stat-label"><svg viewBox="0 0 24 24"><path d="M12 8v4"/><path d="M12 16h.01"/><circle cx="12" cy="12" r="10"/></svg>Без обслуживания</div><div class="stat-value" id="stNoSup">—</div></div>
+  </div>
+
+  <div class="sites-tools">
+    <div class="cab-tabs" id="siteTabs">
+      <button class="cab-tab is-active" data-f="all">Все</button>
+      <button class="cab-tab" data-f="sup">С обслуживанием</button>
+      <button class="cab-tab" data-f="nosup">Без обслуживания</button>
+    </div>
+    <div class="cab-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input type="text" id="siteSearch" placeholder="Поиск по домену" autocomplete="off"></div>
+  </div>
+
+  <div class="page-hero mob-only">
+    <div>
+      <div class="page-hero-eyebrow">Личный кабинет</div>
+      <div class="page-hero-title">Мои <em>проекты</em></div>
+      <div class="page-hero-sub">Все запущенные проекты в одном месте</div>
+    </div>
+    <a href="../order" class="btn btn-ghost">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      Новый заказ
+    </a>
+  </div>
+
+  <div class="sites-grid" id="sitesGrid">
+    <div style="padding:32px;color:var(--ink-faint);font-size:13px;grid-column:1/-1">Загрузка...</div>
+  </div>
+
+</div></div>
+</div>
+
+<script type="module">
+const API = 'https://antviz.ru/api';
+import { touchSession, watchSessionRevocation } from './sessions.js?v=4';
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fmtDate(ts){if(!ts)return'—';const d=ts.toDate?ts.toDate():new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+function siteTypeLabel(t){if(t==='static')return'Статический сайт';if(t==='dynamic')return'Сайт с серверной частью';return t||'';}
+
+function siteCard(o){
+  const botHandle = o.botUsername || o.botLink || null;
+  const href = o.siteUrl ? (o.siteUrl.match(/^https?:\/\//) ? o.siteUrl : 'https://'+o.siteUrl)
+    : (o.siteDomain ? 'https://'+o.siteDomain
+    : (botHandle ? (botHandle.match(/^https?:\/\//) ? botHandle : 'https://t.me/'+botHandle.replace(/^@|^https?:\/\/t\.me\//i,''))
+    : (o.projectUrl || null)));
+  const pagesCount = o.sitePages ? parseInt(o.sitePages,10) : null;
+  const repoHref = o.siteRepo ? (o.siteRepo.match(/^https?:\/\//) ? o.siteRepo : 'https://github.com/'+o.siteRepo.replace(/^\/+/,'')) : null;
+  const isBotLike = !!o.botUsername || /бот|bot|telegram|тг[\s-]?бот|миниап|mini\s?app/i.test(o.siteType||'');
+
+  const hasSupport = o.supportActive && o.supportExpiresAt && new Date(o.supportExpiresAt) > new Date();
+  const daysLeft = hasSupport ? Math.ceil((new Date(o.supportExpiresAt) - new Date()) / 86400000) : null;
+  const statusPill = hasSupport
+    ? (daysLeft <= 7
+        ? `<span class="site-status-pill warn">Осталось ${daysLeft} дн.</span>`
+        : `<span class="site-status-pill support">Обслуживание до ${fmtDate(o.supportExpiresAt)}</span>`)
+    : `<span class="site-status-pill is-live">Запущен</span>`;
+
+  const supportBanner = hasSupport
+    ? `<div class="support-banner is-on"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span><strong>Обслуживание подключено</strong> — отправляйте заявки на правки и доработки в любой момент.</span></div>`
+    : `<div class="support-banner is-off"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><span><strong>Обслуживание не подключено</strong> — от 500 ₽/мес, до 5 правок в месяц. Можно и без подписки — разовая правка от 350 ₽.</span></div>`;
+
+  const botIcon = `<svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>`;
+  const globeIcon = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`;
+
+  return `<div class="site-card">
+    <div class="site-card-head">
+      <div class="site-favicon-wrap">
+        ${o.siteFaviconUrl ? `<img src="${o.siteFaviconUrl}" alt=""/>` : (isBotLike ? botIcon : globeIcon)}
+      </div>
+      ${statusPill}
+    </div>
+    <div class="site-domain">${esc(o.siteDomain || (o.botUsername ? '@'+o.botUsername : ('№ '+o.id.slice(0,8).toUpperCase())))}</div>
+    <div class="site-meta-list">
+      <span class="site-meta-chip"><span class="site-meta-ico mic-blue"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="site-meta-text">${fmtDate(o.createdAt)}</span></span>
+      <span class="site-meta-chip"><span class="site-meta-ico mic-green"><svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg></span><span class="site-meta-text">${esc(siteTypeLabel(o.siteType)||'Проект')} · ${esc(o.tariff||o.package||'')}</span></span>
+      ${pagesCount ? `<span class="site-meta-chip"><span class="site-meta-ico mic-amber"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="site-meta-text">${pagesCount} стр.</span></span>` : ''}
+      ${repoHref ? `<a href="${repoHref}" target="_blank" rel="noopener" class="site-meta-chip"><span class="site-meta-ico mic-violet"><svg viewBox="0 0 24 24"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg></span><span class="site-meta-text">Код на GitHub</span></a>` : ''}
+    </div>
+    ${supportBanner}
+    <div class="site-actions">
+      ${href ? `<a href="${href}" target="_blank" rel="noopener" class="btn btn-green btn-sm"><svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Открыть</a>` : ''}
+      <a href="tickets?order=${o.id}" class="btn btn-outline btn-sm">${hasSupport ? 'Заявка на правки' : 'Подключить обслуживание'}</a>
+      <a href="support?order=${o.id}" class="btn btn-outline btn-sm">Вопрос по проекту</a>
+    </div>
+  </div>`;
+}
+
+function render(orders){
+  const el = document.getElementById('sitesGrid');
+  if(!orders.length){
+    el.innerHTML = `<div class="empty" style="grid-column:1/-1">
+      <div class="empty-ico"><div class="empty-ico-wrap"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg></div></div>
+      <h3>Здесь появятся ваши проекты</h3>
+      <p>Как только проект будет завершён и сдан — он отобразится здесь со ссылкой и всеми деталями</p>
+      <a href="../order" class="btn btn-green btn-sm">Оформить заказ</a>
+    </div>`;
+    return;
+  }
+  el.innerHTML = orders.map(siteCard).join('');
+}
+
+let allSites = [], siteFilter = 'all', siteQuery = '';
+const isSup = o => !!(o.supportActive && o.supportExpiresAt && new Date(o.supportExpiresAt) > new Date());
+function siteName(o){ return (o.siteDomain || (o.botUsername ? '@'+o.botUsername : ('№ '+o.id.slice(0,8).toUpperCase()))); }
+function renderSiteStats(){
+  const set=(id,v)=>{const n=document.getElementById(id);if(n)n.textContent=v;};
+  const sup = allSites.filter(isSup);
+  set('stSites', allSites.length);
+  set('stSup', sup.length);
+  set('stExp', sup.filter(o => (new Date(o.supportExpiresAt) - new Date()) / 86400000 <= 7).length);
+  set('stNoSup', allSites.length - sup.length);
+}
+function applySites(){
+  let list = allSites.filter(o => siteFilter === 'all' || (siteFilter === 'sup' ? isSup(o) : !isSup(o)));
+  if (siteQuery) list = list.filter(o => siteName(o).toLowerCase().includes(siteQuery));
+  if (!list.length && allSites.length) {
+    document.getElementById('sitesGrid').innerHTML = '<div class="empty" style="grid-column:1/-1"><h3>Ничего не найдено</h3><p>Попробуйте другой фильтр или запрос</p></div>';
+    return;
+  }
+  render(list);
+}
+document.getElementById('siteTabs')?.addEventListener('click', e => {
+  const b = e.target.closest('.cab-tab'); if (!b) return;
+  siteFilter = b.dataset.f;
+  document.querySelectorAll('#siteTabs .cab-tab').forEach(x => x.classList.toggle('is-active', x === b));
+  applySites();
+});
+document.getElementById('siteSearch')?.addEventListener('input', e => { siteQuery = e.target.value.trim().toLowerCase(); applySites(); });
+
+(async function initSites(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials: 'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){ window.location.href='../auth'; return; }
+
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('sbContent').style.display='block';
+
+  let orders = [];
+  try{
+    const resp2 = await fetch(`${API}/orders`, { credentials: 'include' });
+    if(resp2.ok) orders = await resp2.json();
+  }catch(e){ console.error('sites orders:', e); }
+  allSites = orders.filter(o => o.status === 5);
+  renderSiteStats();
+  applySites();
+
+  touchSession();
+  watchSessionRevocation(() => { window.location.href = '/auth.html'; });
+})();
+</script>
+
+<script>
+(function(){
+  const btn=document.getElementById('themeToggle');
+  if(!btn) return;
+  btn.addEventListener('click', ()=>{
+    const cur=document.documentElement.getAttribute('data-theme')==='light' ? 'light' : 'dark';
+    const next = cur==='light' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('antviz-theme', next); }catch(e){}
+  });
+})();
+</script>
+
+<script src="../GEOBLOCK.js"></script>
+<script type="module" src="../maintenance.js"></script>
+</body>
+</html>

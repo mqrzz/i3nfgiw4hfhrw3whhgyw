@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Чаты — Antviz Admin</title>
+<link rel="icon" href="../img/favicon.png"/>
+<script>
+  try{ var t = localStorage.getItem('antviz-theme'); if(t === 'light' || t === 'dark') document.documentElement.setAttribute('data-theme', t); }catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/profile/assets/cabinet-base.css?v=1">
+<link rel="stylesheet" href="/profile/assets/cabinet.css?v=3">
+<link rel="stylesheet" href="/profile/assets/admin-extra.css?v=1">
+<style>
+  .screen{display:none}
+  .screen.active{display:block;animation:cabFadeUp .2s ease both}
+
+  .ti-list{display:flex;flex-direction:column;gap:10px}
+  .ti{display:flex;gap:16px;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r16);padding:18px 20px;cursor:pointer;transition:border-color .15s}
+  .ti:hover{border-color:var(--stroke-strong)}
+  .ti-avatar{width:44px;height:44px;border-radius:50%;background:var(--card-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-faint)}
+  .ti-avatar svg{width:21px;height:21px;stroke:currentColor;stroke-width:1.7;fill:none}
+  .ti-body{flex:1;min-width:0}
+  .ti-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:5px}
+  .ti-subj{font-size:15px;font-weight:500;display:flex;align-items:center;gap:8px;min-width:0}
+  .ti-subj-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .ti-prev{font-size:13.5px;color:var(--text-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
+  .ti-meta{font-size:12.5px;color:var(--text-faint);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .ti-order-tag{font-size:11px;font-weight:500;color:var(--blue);background:var(--blue-dim);padding:.16rem .5rem;border-radius:6px;flex-shrink:0}
+  .unread{width:8px;height:8px;border-radius:50%;background:var(--red);flex-shrink:0;animation:pulse 1.5s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .empty-l{text-align:center;padding:60px 16px;color:var(--text-faint);font-size:14px}
+  .pri-high{color:var(--red);font-weight:500}
+  .pri-medium{color:var(--amber);font-weight:500}
+  .pri-low{color:var(--text-faint)}
+
+  .t-topbar{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .t-info-top{display:flex;align-items:flex-start;gap:16px;margin-bottom:16px}
+  .t-avatar{width:52px;height:52px;border-radius:50%;background:var(--card-elevated);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--text-faint)}
+  .t-avatar svg{width:24px;height:24px;stroke:currentColor;stroke-width:1.7;fill:none}
+  .t-who{flex:1;min-width:0}
+  .t-subj{font-size:19px;font-weight:500;letter-spacing:-.02em;margin-bottom:4px}
+  .t-user-row{font-size:13.5px;color:var(--text-faint);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .t-status-toggle{flex-shrink:0}
+  .status-pill{display:inline-flex;align-items:center;gap:7px;padding:.5rem .9rem;border-radius:99px;font-size:13px;font-weight:500;border:none;cursor:pointer}
+  .status-pill .dot{width:7px;height:7px;border-radius:50%}
+  .status-pill.open{background:var(--blue-dim);color:var(--blue)}.status-pill.open .dot{background:var(--blue)}
+  .status-pill.done{background:var(--card-elevated);color:var(--text-faint)}.status-pill.done .dot{background:var(--text-faint)}
+  .t-info-grid{display:flex;flex-wrap:wrap;gap:10px 28px;border-top:1px solid var(--stroke);padding-top:14px}
+  .t-info-item{display:flex;flex-direction:column;gap:3px}
+  .t-info-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text-faint);font-weight:500}
+  .t-info-val{font-size:14px;color:var(--text)}
+  .t-order-link{color:var(--green-text);text-decoration:none;font-weight:500}
+
+  .chat-msgs{display:flex;flex-direction:column;gap:6px;margin:20px 0;max-height:62vh;min-height:120px;overflow-y:auto;padding-right:4px}
+  .msg-wrap{display:flex;flex-direction:column;margin-bottom:4px}
+  .msg-divider{font-size:12px;color:var(--text-faint);text-align:center;padding:14px 0 10px;font-weight:500}
+  .msg-label{font-size:12px;font-weight:500;margin-bottom:5px;color:var(--text-faint)}
+  .msg-label.sup{color:var(--green-text);text-align:right}
+  .msg{padding:13px 17px;border-radius:var(--r16);max-width:78%;font-size:14.5px;line-height:1.55;word-break:break-word}
+  .msg.usr{background:var(--card-elevated);color:var(--text);align-self:flex-start;border:1px solid var(--stroke)}
+  .msg.sup{background:var(--green-dim);color:var(--green-text);align-self:flex-end}
+  .msg-time{font-size:11px;color:var(--text-faint);display:block;margin-top:7px}
+  .msg-img{max-width:220px;max-height:220px;border-radius:var(--r14);display:block;margin-top:9px;cursor:pointer;object-fit:cover}
+  .msg-file{display:flex;align-items:center;gap:9px;margin-top:9px;padding:9px 12px;border-radius:var(--r14);background:rgba(0,0,0,.06);color:inherit;text-decoration:none;font-size:13px;font-weight:500}
+  .msg-file:hover{background:rgba(0,0,0,.1)}
+  .msg-file small{display:block;font-weight:400;opacity:.65;font-size:11.5px}
+
+  .composer-card{background:var(--card-elevated);border:1px solid var(--stroke);border-radius:var(--r24);overflow:hidden}
+  .composer-card:focus-within{border-color:var(--green)}
+  .composer-ta{width:100%;background:none;border:none;outline:none;resize:none;font-family:inherit;font-size:14.5px;color:var(--text);padding:16px 18px 8px;min-height:24px;max-height:160px;line-height:1.5}
+  .composer-toolbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px 10px}
+  .composer-attach{display:flex;align-items:center;justify-content:center;background:var(--card);border:1px solid var(--stroke);color:var(--text-faint);width:40px;height:40px;border-radius:50%;cursor:pointer;flex-shrink:0}
+  .composer-attach:hover,.composer-attach.has-file{background:var(--green-dim);color:var(--green-text);border-color:var(--green)}
+  .composer-attach svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}
+
+  .kebab-wrap{position:relative;flex-shrink:0}
+  .kebab-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border-radius:var(--r16);box-shadow:var(--shadow-lg);border:1px solid var(--stroke);padding:10px;width:200px;z-index:60;opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .15s,transform .15s}
+  .kebab-menu.show{opacity:1;pointer-events:all;transform:none}
+
+  .c-form{display:flex;flex-direction:column;gap:18px;max-width:640px}
+  .dropzone{border:1.5px dashed var(--stroke-strong);border-radius:var(--r16);padding:30px 16px;text-align:center;color:var(--text-faint);cursor:pointer;transition:border-color .15s,background .15s;display:flex;flex-direction:column;align-items:center;gap:9px}
+  .dropzone:hover,.dropzone.drag{border-color:var(--green);background:var(--green-dim)}
+  .dropzone svg{width:23px;height:23px;stroke:var(--text-faint);stroke-width:1.6;fill:none}
+  .dropzone-text{font-size:14px}
+  .dropzone-sub{font-size:12px;color:var(--text-faint)}
+  .dz-file{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--stroke);border-radius:var(--r14);padding:.7rem .95rem;font-size:14px;margin-top:10px}
+  .dz-file img{width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0}
+  .dz-file .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .dz-file .rm{background:none;border:none;color:var(--text-faint);cursor:pointer;width:24px;height:24px;flex-shrink:0}
+  .dz-file .rm svg{width:15px;height:15px;stroke:currentColor;stroke-width:2}
+
+  .lightbox{position:fixed;inset:0;z-index:1000;background:rgba(10,12,16,.92);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+  .lightbox.show{opacity:1;pointer-events:all}
+  .lightbox img{max-width:90vw;max-height:90vh;border-radius:var(--r16);object-fit:contain}
+  .lb-x{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:50%;cursor:pointer;font-size:16px}
+  @media(max-width:760px){.msg{max-width:90%}}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div></div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('show')">
+  <button class="lb-x">✕</button>
+  <img id="lbImg" src="" alt=""/>
+</div>
+
+<div id="sbContent" style="display:none">
+  <div class="shell">
+    <div class="cab-page">
+
+      <div class="screen active" id="screenList">
+        <div class="pg-head">
+          <div class="pg-head-main"><div class="pg-title">Чаты</div></div>
+          <div class="pg-actions"><button class="cab-btn primary" onclick="openCreateTicket()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Создать тикет</button></div>
+        </div>
+        <div class="cab-toolbar">
+          <div class="cab-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input type="text" id="listSearch" placeholder="Поиск по чатам…" oninput="filterList()"/></div>
+          <div class="cab-tabs" id="segRow">
+            <button class="cab-tab is-active" data-f="open" onclick="switchFilter('open',this)">Открытые <span id="cnt-open">0</span></button>
+            <button class="cab-tab" data-f="done" onclick="switchFilter('done',this)">Закрытые <span id="cnt-done">0</span></button>
+          </div>
+        </div>
+        <div class="ti-list" id="ticketsList"><div class="empty-l">Загрузка…</div></div>
+      </div>
+
+      <div class="screen" id="screenTicket">
+        <div class="t-topbar">
+          <button class="cab-btn ghost sm" onclick="showScreen('list')"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Назад</button>
+          <span style="flex:1"></span>
+          <div class="kebab-wrap">
+            <button class="cab-btn ghost sm" onclick="toggleKebab()"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+            <div class="kebab-menu" id="kebabMenu"><button class="cab-btn danger" style="width:100%;justify-content:center" onclick="deleteTicket()">Удалить тикет</button></div>
+          </div>
+        </div>
+
+        <div class="cab-card" style="margin-bottom:18px">
+          <div class="t-info-top">
+            <div class="t-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+            <div class="t-who"><div class="t-subj" id="chatSubject">—</div><div class="t-user-row" id="chatUserRow"></div></div>
+            <div class="t-status-toggle"><button class="status-pill open" id="statusToggle" onclick="toggleStatus()"><span class="dot"></span><span id="statusToggleLabel">Открыт</span></button></div>
+          </div>
+          <div class="t-info-grid" id="tInfoGrid"></div>
+        </div>
+
+        <div class="chat-msgs" id="chatMsgs"></div>
+
+        <div class="composer-card">
+          <textarea class="composer-ta" id="chatInp" rows="1" placeholder="Введите сообщение…" onkeydown="onKey(event)" oninput="autoResize(this)"></textarea>
+          <div class="composer-toolbar">
+            <label class="composer-attach" id="attachBtn" title="Прикрепить изображение">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              <input type="file" id="fileInp" accept="image/*" style="display:none" onchange="onChatFilePicked()"/>
+            </label>
+            <button class="cab-btn primary sm" onclick="sendReply()">Отправить<svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="screen" id="screenCreate">
+        <div class="t-topbar">
+          <button class="cab-btn ghost sm" onclick="closeCreateTicket()"><svg viewBox="0 0 24 24"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>Назад</button>
+        </div>
+        <div class="pg-head"><div class="pg-head-main"><div class="pg-title">Создание тикета</div></div></div>
+        <div class="c-form">
+          <div class="cab-field"><label class="cab-label">Пользователь</label><select class="cab-select" id="ticketUser"><option value="">Выберите пользователя…</option></select></div>
+          <div class="cab-field"><label class="cab-label">Тема обращения</label><input class="cab-input" id="ticketSubject" type="text" placeholder="Кратко опишите проблему…"/></div>
+          <div class="cab-field"><label class="cab-label">Категория</label>
+            <select class="cab-select" id="ticketTopic">
+              <option value="">Выберите категорию</option>
+              <option value="Техническая проблема">Техническая проблема</option>
+              <option value="Вопрос по оплате">Вопрос по оплате</option>
+              <option value="Изменение дизайна">Изменение дизайна</option>
+              <option value="Ошибка на сайте">Ошибка на сайте</option>
+              <option value="Другое">Другое</option>
+            </select>
+          </div>
+          <div class="cab-field"><label class="cab-label">Приоритет</label>
+            <select class="cab-select" id="ticketPriority"><option value="low">Низкий</option><option value="medium" selected>Средний</option><option value="high">Высокий</option></select>
+          </div>
+          <div class="cab-field"><label class="cab-label">Описание</label><textarea class="cab-textarea" id="ticketMessage" placeholder="Подробно опишите ситуацию…" rows="5"></textarea></div>
+          <div class="cab-field">
+            <label class="cab-label">Вложения <span style="text-transform:none;letter-spacing:0;color:var(--text-faint)">(необязательно)</span></label>
+            <div class="dropzone" id="dropzone" onclick="document.getElementById('ticketFile').click()">
+              <svg viewBox="0 0 24 24"><path d="M16 16l-4-4-4 4"/><path d="M12 12v9"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+              <div class="dropzone-text">Загрузить файл или перетащите сюда</div>
+              <div class="dropzone-sub">PNG, JPG до 4 МБ</div>
+              <input type="file" id="ticketFile" accept="image/*" style="display:none" onchange="onTicketFilePicked(this.files[0])"/>
+            </div>
+            <div id="ticketFilePreview"></div>
+          </div>
+          <button class="cab-btn primary" style="width:100%;justify-content:center" onclick="createTicket()">Создать тикет</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+const API = 'https://antviz.ru/api';
+
+let allTickets=[], selectedId=null, currentFilter='open', ticketFileData=null;
+
+async function notifyClient(uid,title,text,button){
+  if(!uid)return;
+  try{
+    await fetch(`${API}/notifications/broadcast`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ target: uid, title, text, type: 'support', buttonText: button?.text, buttonUrl: button?.url }),
+    });
+  }catch(err){console.error('Не удалось уведомить клиента:',err);}
+}
+
+function toast(m,t='info'){const el=document.getElementById('toast');el.textContent=m;el.className=`toast ${t} show`;setTimeout(()=>el.className='toast',3400);}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtDT(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function fmtDTFull(ts){if(!ts)return'—';const d=new Date(ts);return d.toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'});}
+function fmtTime(ts){if(!ts)return'';const d=new Date(ts);const now=new Date();if(d>=new Date(now.getFullYear(),now.getMonth(),now.getDate()))return d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});return d.toLocaleDateString('ru',{day:'numeric',month:'short'})+' '+d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});}
+function statusLabel(s){return s==='done'?'Закрыт':'Открыт';}
+function priLabel(p){return p==='high'?'<span class="pri-high">Высокий</span>':p==='medium'?'<span class="pri-medium">Средний</span>':'<span class="pri-low">Низкий</span>';}
+
+window.showScreen=function(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const map={list:'screenList',ticket:'screenTicket',create:'screenCreate'};
+  document.getElementById(map[name]).classList.add('active');
+  document.getElementById('kebabMenu')?.classList.remove('show');
+};
+
+window.toggleKebab=()=>{document.getElementById('kebabMenu').classList.toggle('show');};
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('kebabMenu');
+  if(menu && menu.classList.contains('show') && !menu.contains(e.target) && !e.target.closest('.kebab-wrap .icon-btn')) menu.classList.remove('show');
+});
+
+window.switchFilter=(f,btn)=>{currentFilter=f;document.querySelectorAll('.seg-btn').forEach(b=>b.classList.toggle('active',b===btn));renderList();};
+window.filterList=()=>renderList();
+
+function updateCounts(){
+  document.getElementById('cnt-open').textContent=allTickets.filter(t=>t.status!=='done').length;
+  document.getElementById('cnt-done').textContent=allTickets.filter(t=>t.status==='done').length;
+}
+
+function renderList(){
+  const q=(document.getElementById('listSearch').value||'').toLowerCase();
+  let list=allTickets.filter(t=>{
+    const st = t.status==='done' ? 'done' : 'open';
+    if(st!==currentFilter)return false;
+    if(q)return(t.subject||'').toLowerCase().includes(q)||(t.userName||'').toLowerCase().includes(q)||(t.topic||'').toLowerCase().includes(q);
+    return true;
+  });
+  updateCounts();
+  const openCount=allTickets.filter(t=>t.status!=='done').length;
+  const badge=document.getElementById('navBadgeChats');
+  if(badge){badge.style.display=openCount?'':'none';badge.textContent=openCount;}
+  const el=document.getElementById('ticketsList');
+  if(!list.length){el.innerHTML=`<div class="empty-l">${allTickets.length?'Ничего не найдено':'Тикетов пока нет'}</div>`;return;}
+  el.innerHTML=list.map(t=>{
+    const unread=t.status!=='done'&&!t.adminRead;
+    return`<div class="ti" onclick="selectTicket('${t.id}')">
+      <div class="ti-avatar"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+      <div class="ti-body">
+        <div class="ti-top">
+          <div class="ti-subj">${unread?'<span class="unread"></span>':''}<span class="ti-subj-text">${esc(t.subject||'Без темы')}</span></div>
+          ${t.priority?priLabel(t.priority):''}
+        </div>
+        ${t._lastMsg?`<div class="ti-prev">${esc(t._lastMsg)}</div>`:''}
+        <div class="ti-meta">${t.orderLabel?`<span class="ti-order-tag">${esc(t.orderLabel)}</span>`:''}<span>${esc(t.userName||'—')}</span><span>·</span><span>${fmtDT(t.updatedAt||t.createdAt)}</span></div>
+      </div>
+    </div>`;}).join('');
+}
+
+window.selectTicket=async function(id){
+  selectedId=id;
+  const ticket=allTickets.find(t=>t.id===id);if(!ticket)return;
+  showScreen('ticket');
+
+  document.getElementById('chatSubject').textContent=(`${ticket.topic||''} · ${ticket.subject||''}`).replace(/^ · /,'')||'Без темы';
+  document.getElementById('chatUserRow').innerHTML=`<span>${esc(ticket.userEmail||'—')}</span>`;
+  applyStatusToggle(ticket.status);
+
+  const grid=document.getElementById('tInfoGrid');
+  grid.innerHTML=`
+    <div class="t-info-item"><span class="t-info-label">Пользователь</span><span class="t-info-val">${esc(ticket.userName||'—')}</span></div>
+    <div class="t-info-item"><span class="t-info-label">Создан</span><span class="t-info-val">${fmtDT(ticket.createdAt)}</span></div>
+    <div class="t-info-item"><span class="t-info-label">Приоритет</span><span class="t-info-val">${ticket.priority?priLabel(ticket.priority):'—'}</span></div>
+    ${ticket.rating?`<div class="t-info-item"><span class="t-info-label">Оценка клиента</span><span class="t-info-val">${'★'.repeat(ticket.rating)}${'☆'.repeat(5-ticket.rating)}${ticket.ratingComment?` · ${esc(ticket.ratingComment)}`:''}</span></div>`:''}
+    ${ticket.orderId?`<div class="t-info-item"><span class="t-info-label">Заказ</span><a class="t-info-val t-order-link" href="/admin/orders?id=${ticket.orderId}" target="_blank" rel="noopener">${esc(ticket.orderLabel||'Открыть заказ')} ↗</a></div>`:''}
+  `;
+
+  fetch(`${API}/tickets/${id}/admin-read`, { method:'PATCH', credentials:'include' }).catch(()=>{});
+  ticket.adminRead=true;renderList();
+
+  document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:.86rem;padding:36px">Загрузка…</div>';
+  try{
+    const resp = await fetch(`${API}/tickets/${id}/messages`, { credentials:'include' });
+    const msgs = resp.ok ? await resp.json() : [];
+    renderChat(msgs);
+    const last=msgs[msgs.length-1];
+    if(last)ticket._lastMsg=last.text||'';
+    renderList();
+  }catch(e){
+    document.getElementById('chatMsgs').innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:.86rem;padding:36px">Не удалось загрузить сообщения</div>';
+  }
+};
+
+function applyStatusToggle(status){
+  const btn=document.getElementById('statusToggle');
+  const isDone=status==='done';
+  btn.classList.toggle('open',!isDone);
+  btn.classList.toggle('done',isDone);
+  document.getElementById('statusToggleLabel').textContent=statusLabel(status);
+}
+
+function renderChat(msgs){
+  const el=document.getElementById('chatMsgs');
+  if(!msgs.length){el.innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:.86rem;padding:36px">Нет сообщений</div>';return;}
+  let html='',lastDate=null;
+  msgs.forEach(m=>{
+    const d=m.createdAt?new Date(m.createdAt):new Date();
+    const ds=fmtDTFull(d);
+    if(lastDate!==ds){html+=`<div class="msg-divider">${ds}</div>`;lastDate=ds;}
+    const isUser=m.sender==='user';
+    const tkt=allTickets.find(t=>t.id===selectedId);
+    html+=`<div class="msg-wrap">
+      <div class="msg-label ${isUser?'usr':'sup'}">${isUser?esc(tkt?.userName||'Клиент'):'Поддержка'}</div>
+      <div class="msg ${isUser?'usr':'sup'}">
+        ${esc(m.text)}
+        ${m.imageUrl?`<img class="msg-img" src="${esc(m.imageUrl)}" alt="" onclick="showLightbox(this.src)"/>`:''}
+        ${m.file?`<a class="msg-file" href="${API}/tickets/${selectedId}/messages/${m.id}/file" target="_blank" rel="noopener"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg><span>${esc(m.file.name)}<small>${m.file.size?Math.max(1,Math.round(m.file.size/1024))+' КБ':''}</small></span></a>`:''}
+        <span class="msg-time">${fmtTime(m.createdAt)}</span>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;el.scrollTop=el.scrollHeight;
+}
+
+window.sendReply=async function(){
+  if(!selectedId)return;
+  const inp=document.getElementById('chatInp');const text=inp.value.trim();
+  if(!text)return toast('Напишите сообщение','error');
+  inp.value='';inp.style.height='auto';
+  try{
+    const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ text, asAdmin: true }),
+    });
+    if(!resp.ok) throw new Error('Ошибка отправки');
+    const t=allTickets.find(x=>x.id===selectedId);
+    if(t){ t._lastMsg=text; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
+    const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
+    if(msgsResp.ok) renderChat(await msgsResp.json());
+    if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке',text,{text:'Открыть чат',url:'https://antviz.ru/profile/support/chat?id='+selectedId,webApp:true});
+    renderList();
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.onChatFilePicked=function(){
+  const inp=document.getElementById('fileInp');
+  if(inp.files[0])document.getElementById('attachBtn').classList.add('has-file');
+  window.sendImg();
+};
+
+window.sendImg=async function(){
+  if(!selectedId)return;
+  const inp=document.getElementById('fileInp');const file=inp.files[0];if(!file){document.getElementById('attachBtn').classList.remove('has-file');return;}
+  if(file.size>4*1024*1024){document.getElementById('attachBtn').classList.remove('has-file');return toast('Файл слишком большой (макс. 4 МБ)','error');}
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const resp = await fetch(`${API}/tickets/${selectedId}/messages`, {
+        method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+        body: JSON.stringify({ text:'Изображение', imageUrl:e.target.result, asAdmin: true }),
+      });
+      if(!resp.ok) throw new Error();
+      const t=allTickets.find(x=>x.id===selectedId);
+      if(t){ t._lastMsg='Изображение'; t.status='open'; t.adminRead=true; applyStatusToggle('open'); }
+      const msgsResp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
+      if(msgsResp.ok) renderChat(await msgsResp.json());
+      if(t?.uid)await notifyClient(t.uid,'💬 Новый ответ в поддержке','Вам отправили изображение',{text:'Открыть чат',url:'https://antviz.ru/profile/support/chat?id='+selectedId,webApp:true});
+      toast('Изображение отправлено ✓','success');
+      renderList();
+    }catch(e){toast('Ошибка','error');}
+    inp.value='';document.getElementById('attachBtn').classList.remove('has-file');
+  };
+  reader.readAsDataURL(file);
+};
+
+window.toggleStatus=async function(){
+  if(!selectedId)return;
+  const t=allTickets.find(x=>x.id===selectedId); if(!t)return;
+  const next = t.status==='done' ? 'open' : 'done';
+  try{
+    const resp = await fetch(`${API}/tickets/${selectedId}/status`, {
+      method:'PATCH', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ status: next }),
+    });
+    if(!resp.ok) throw new Error();
+    t.status=next; applyStatusToggle(next);
+    toast(next==='done'?'Тикет закрыт ✓':'Тикет снова открыт ✓','success');
+    renderList();
+  }catch(e){toast('Ошибка','error');}
+};
+
+window.deleteTicket=async function(){
+  if(!selectedId||!confirm('Удалить тикет и все сообщения?'))return;
+  try{
+    const resp = await fetch(`${API}/tickets/${selectedId}`, { method:'DELETE', credentials:'include' });
+    if(!resp.ok) throw new Error();
+    allTickets=allTickets.filter(t=>t.id!==selectedId);
+    toast('Тикет удалён','info');selectedId=null;
+    showScreen('list');
+    renderList();
+  }catch(e){toast('Ошибка','error');}
+};
+
+window.openCreateTicket=async function(){
+  showScreen('create');
+  try{
+    const resp = await fetch(`${API}/users`, { credentials:'include' });
+    if(!resp.ok) throw new Error();
+    const users = await resp.json();
+    const sel=document.getElementById('ticketUser');
+    sel.innerHTML='<option value="">Выберите пользователя...</option>';
+    users.forEach(u=>{sel.innerHTML+=`<option value="${u.id}">${esc(u.displayName||u.id)}${u.email?' · '+esc(u.email):''}</option>`;});
+    ['ticketTopic','ticketSubject','ticketMessage'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('ticketPriority').value='medium';
+    ticketFileData=null;
+    document.getElementById('ticketFilePreview').innerHTML='';
+    document.getElementById('dropzone').style.display='flex';
+  }catch(e){toast('Ошибка загрузки пользователей: '+e.message,'error');}
+};
+window.closeCreateTicket=function(){showScreen('list');};
+
+window.onTicketFilePicked=function(file){
+  if(!file)return;
+  if(file.size>4*1024*1024){toast('Файл слишком большой (макс. 4 МБ)','error');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{
+    ticketFileData=e.target.result;
+    document.getElementById('dropzone').style.display='none';
+    document.getElementById('ticketFilePreview').innerHTML=`<div class="dz-file"><img src="${ticketFileData}"/><span class="name">${esc(file.name)}</span><button class="rm" type="button" onclick="clearTicketFile()"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>`;
+  };
+  reader.readAsDataURL(file);
+};
+window.clearTicketFile=function(){ticketFileData=null;document.getElementById('ticketFile').value='';document.getElementById('ticketFilePreview').innerHTML='';document.getElementById('dropzone').style.display='flex';};
+
+const dz=document.getElementById('dropzone');
+if(dz){
+  ['dragover','dragenter'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add('drag');}));
+  ['dragleave','drop'].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove('drag');}));
+  dz.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)window.onTicketFilePicked(f);});
+}
+
+window.createTicket=async function(){
+  const uid=document.getElementById('ticketUser').value;
+  const topic=document.getElementById('ticketTopic').value.trim();
+  const subject=document.getElementById('ticketSubject').value.trim();
+  const message=document.getElementById('ticketMessage').value.trim();
+  const priority=document.getElementById('ticketPriority').value;
+  if(!uid)return toast('Выберите пользователя','error');
+  if(!subject)return toast('Введите тему обращения','error');
+  if(!message)return toast('Введите описание','error');
+  try{
+    const resp = await fetch(`${API}/tickets/admin/create`, {
+      method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+      body: JSON.stringify({ userId: uid, topic: topic||'Общий вопрос', subject, message, priority }),
+    });
+    if(!resp.ok){ const d=await resp.json().catch(()=>({})); throw new Error(d.error||'Ошибка'); }
+    const ticket = await resp.json();
+    if(ticketFileData){
+      try{
+        await fetch(`${API}/tickets/${ticket.id}/messages`, {
+          method:'POST', headers:{'Content-Type':'application/json'}, credentials:'include',
+          body: JSON.stringify({ text:'Вложение', imageUrl: ticketFileData, asAdmin: true }),
+        });
+      }catch(e){console.error('Не удалось прикрепить файл:',e);}
+    }
+    allTickets=[ticket, ...allTickets];renderList();
+    await notifyClient(uid,'💬 Новый тикет от поддержки',`Сообщаем вам, что сотрудник службы поддержки создал тикет «${subject}». Просим вас перейти в раздел "Чат с командой".`);
+    toast('Тикет создан и пользователь уведомлён ✅','success');
+    showScreen('list');
+  }catch(e){toast('Ошибка: '+e.message,'error');}
+};
+
+window.onKey=function(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendReply();}};
+window.autoResize=function(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,140)+'px';};
+window.showLightbox=function(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('show');};
+
+async function loadTicketsList(){
+  try{
+    const resp = await fetch(`${API}/tickets/admin/all`, { credentials:'include' });
+    if(!resp.ok) return;
+    const incoming = await resp.json();
+    incoming.forEach(t=>{const old=allTickets.find(x=>x.id===t.id);t._lastMsg=old?._lastMsg;});
+    allTickets=incoming;renderList();
+  }catch(e){ console.error('loadTicketsList:', e); }
+}
+
+(async function initAdminChats(){
+  let user = null;
+  try{
+    const resp = await fetch(`${API}/auth/me`, { credentials:'include' });
+    if(resp.ok) user = await resp.json();
+  }catch(e){}
+
+  if(!user){document.getElementById('loadingScreen').style.display='none';window.location.href='/';return;}
+  document.getElementById('loadingScreen').style.display='none';
+  if(user.role!=='admin'){window.location.href='/';return;}
+  document.getElementById('sbContent').style.display='block';
+
+  fetch(`${API}/enterprise/admin/all`, { credentials:'include' }).then(r=>r.ok?r.json():[]).then(apps=>{
+    const n=apps.filter(a=>a.status==='new').length;
+    const b=document.getElementById('navBadgeEnterprise');
+    if(b){b.style.display=n?'':'none';b.textContent=n;}
+  }).catch(()=>{});
+
+  await loadTicketsList();
+  setInterval(loadTicketsList, 15000);
+
+  let _lastChatSig = null;
+  setInterval(async()=>{
+    if(!selectedId)return;
+    try{
+      const resp = await fetch(`${API}/tickets/${selectedId}/messages`, { credentials:'include' });
+      if(!resp.ok) return;
+      const msgs = await resp.json();
+      const sig = msgs.length + ':' + (msgs[msgs.length-1]?.id || '');
+      if (sig === _lastChatSig) return;
+      _lastChatSig = sig;
+      renderChat(msgs);
+    }catch(e){}
+  }, 5000);
+})();
+</script>
+<script src="/profile/assets/admin-shell.js" data-page="chats" data-title="Чаты"></script>
+<script src="../GEOBLOCK.js"></script>
+<script src="../maintenance.js"></script>
+</body>
+</html>

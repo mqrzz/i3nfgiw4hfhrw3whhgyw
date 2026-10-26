@@ -6,13 +6,20 @@
   var lerp = function (a, b, t) { return a + (b - a) * t; };
   var smooth = function (a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 
+  var lenis = null;
+  if (window.Lenis && !reduce) {
+    lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 1, anchors: { offset: -96 } });
+    window.__lenis = lenis;
+    var rafL = function (t) { lenis.raf(t); requestAnimationFrame(rafL); };
+    requestAnimationFrame(rafL);
+  }
   var isl = $('[data-isl]');
-  var mega = $('#mega');
-  var navSvc = $('.nav-svc');
+  var panels = $$('.mega');
+  var navBtns = $$('[data-panel]');
   var scrim = $('[data-scrim]');
-  var dock = $('[data-dock]');
   var dockBtn = $('.dock-btn');
   var sheet = $('#dock-sheet');
+  var hideT = null;
 
   function onHeader() {
     if (isl) isl.classList.toggle('is-solid', window.scrollY > 40);
@@ -20,15 +27,17 @@
   window.addEventListener('scroll', onHeader, { passive: true });
   onHeader();
 
-  function setMega(open) {
-    if (!mega) return;
-    if (open) mega.hidden = false;
-    requestAnimationFrame(function () {
-      mega.classList.toggle('is-open', open);
-      navSvc.setAttribute('aria-expanded', open);
-      scrim.classList.toggle('is-on', open);
+  function openPanel(id) {
+    clearTimeout(hideT);
+    var any = !!id;
+    panels.forEach(function (m) {
+      var on = m.id === id;
+      if (on) m.hidden = false;
+      requestAnimationFrame(function () { m.classList.toggle('is-open', on); });
+      if (!on) setTimeout(function () { if (!m.classList.contains('is-open')) m.hidden = true; }, 600);
     });
-    if (!open) setTimeout(function () { if (!mega.classList.contains('is-open')) mega.hidden = true; }, 600);
+    navBtns.forEach(function (b) { b.setAttribute('aria-expanded', b.dataset.panel === id); });
+    if (scrim) scrim.classList.toggle('is-on', any);
   }
   function setDock(open) {
     if (!sheet) return;
@@ -37,34 +46,36 @@
     dockBtn.innerHTML = open ? dockBtn.dataset.close : dockBtn.dataset.open;
     scrim.classList.toggle('is-on', open);
   }
-  if (navSvc) {
-    navSvc.addEventListener('click', function () { setMega(navSvc.getAttribute('aria-expanded') !== 'true'); });
-    var hoverT;
+  if (isl) {
     var hov = window.matchMedia('(hover:hover)').matches;
+    navBtns.forEach(function (b) {
+      b.addEventListener('click', function () { openPanel(!hov && b.getAttribute('aria-expanded') === 'true' ? null : b.dataset.panel); });
+      if (hov) b.addEventListener('pointerenter', function () { openPanel(b.dataset.panel); });
+    });
     if (hov) {
-      navSvc.addEventListener('pointerenter', function () { clearTimeout(hoverT); setMega(true); });
-      isl.addEventListener('pointerleave', function () { hoverT = setTimeout(function () { setMega(false); }, 220); });
-      isl.addEventListener('pointerenter', function () { clearTimeout(hoverT); });
+      isl.addEventListener('pointerleave', function () { hideT = setTimeout(function () { openPanel(null); }, 240); });
+      isl.addEventListener('pointerenter', function () { clearTimeout(hideT); });
+      $$('.isl .nav a').forEach(function (a) { a.addEventListener('pointerenter', function () { openPanel(null); }); });
     }
-    $$('.mega .mt').forEach(function (t) {
+    $$('#mega .mt').forEach(function (t) {
       var show = function () {
         var i = t.dataset.i;
-        $$('.pv', mega).forEach(function (p) { p.classList.toggle('is-on', p.dataset.i === i); });
+        $$('.pv', isl).forEach(function (p) { p.classList.toggle('is-on', p.dataset.i === i); });
       };
       t.addEventListener('pointerenter', show);
       t.addEventListener('focus', show);
     });
   }
   if (dockBtn) dockBtn.addEventListener('click', function () { setDock(dockBtn.getAttribute('aria-expanded') !== 'true'); });
-  if (scrim) scrim.addEventListener('click', function () { setMega(false); setDock(false); });
-  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') { setMega(false); setDock(false); } });
+  if (scrim) scrim.addEventListener('click', function () { openPanel(null); setDock(false); });
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') { openPanel(null); setDock(false); } });
   document.addEventListener('click', function (e) {
-    if (mega && mega.classList.contains('is-open') && !e.target.closest('[data-isl]')) setMega(false);
+    if (isl && !e.target.closest('[data-isl]')) openPanel(null);
   });
   $$('.dock-sheet a').forEach(function (a) { a.addEventListener('click', function () { setDock(false); }); });
   var lastY = window.scrollY;
   window.addEventListener('scroll', function () {
-    if (Math.abs(window.scrollY - lastY) > 80) { setMega(false); lastY = window.scrollY; }
+    if (Math.abs(window.scrollY - lastY) > 80) { openPanel(null); lastY = window.scrollY; }
   }, { passive: true });
 
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (es) {
@@ -393,7 +404,8 @@
         if (sticky()) {
           var r = strack.getBoundingClientRect();
           var total = r.height - window.innerHeight * 0.7;
-          window.scrollTo({ top: window.scrollY + r.top + total * ((i + 0.5) / items.length), behavior: reduce ? 'auto' : 'smooth' });
+          var ty = window.scrollY + r.top + total * ((i + 0.5) / items.length);
+          if (lenis) lenis.scrollTo(ty); else window.scrollTo({ top: ty, behavior: reduce ? 'auto' : 'smooth' });
         }
         setSvc(i);
       });
@@ -404,8 +416,16 @@
     onSvc();
   }
 
-  $$('.case').forEach(function (c, i, all) {
-    c.addEventListener('focus', function () { all.forEach(function (o) { o.classList.remove('is-on'); }); });
+  var caseList = $$('.case-list');
+  caseList.forEach(function (list) {
+    var cs = $$('.case', list);
+    if (!cs.some(function (c) { return $('.prev', c); })) return;
+    var act = function (c) { cs.forEach(function (o) { o.classList.toggle('is-on', o === c); }); };
+    act(cs[0]);
+    cs.forEach(function (c) {
+      c.addEventListener('pointerenter', function () { act(c); });
+      c.addEventListener('focus', function () { act(c); });
+    });
   });
 
   $$('.faq details').forEach(function (d) {
@@ -426,6 +446,22 @@
       }
     });
   });
+
+  var fq = $('[data-faq-search]');
+  if (fq) {
+    var fitems = $$('.faqs details');
+    var fcnt = $('.bcount');
+    fq.addEventListener('input', function () {
+      var q = fq.value.trim().toLowerCase(), n = 0;
+      fitems.forEach(function (d) {
+        var ok = !q || d.textContent.toLowerCase().indexOf(q) > -1;
+        d.hidden = !ok;
+        if (ok) n++;
+      });
+      $$('.faqs section').forEach(function (s) { s.hidden = !$$('details', s).some(function (d) { return !d.hidden; }); });
+      if (fcnt) fcnt.textContent = q ? 'Найдено вопросов: ' + n : '';
+    });
+  }
 
   var lb = $('.lightbox');
   if (lb) {
@@ -539,6 +575,63 @@
       var done = function () { $('span', cp).textContent = 'Ссылка скопирована'; setTimeout(function () { $('span', cp).textContent = 'Скопировать ссылку'; }, 2000); };
       if (navigator.clipboard) navigator.clipboard.writeText(location.href).then(done, done); else done();
     });
+  }
+
+
+  var calc = $('[data-calc]');
+  if (calc && window.ANTVIZ_PRICES) {
+    var P = window.ANTVIZ_PRICES, main = $('.calc-main', calc);
+    var state = { type: P.types[0].id, opts: {}, rush: false };
+    var fmt = function (n) { return Math.round(n).toLocaleString('ru-RU').replace(/\u00a0/g, ' '); };
+    var round = function (n) { return Math.round(n / 1000) * 1000; };
+    var html = '<section class="calc-step"><h2><span>1</span>Что нужно сделать</h2><div class="copts copts--one" role="radiogroup" aria-label="Тип проекта">' +
+      P.types.map(function (t) { return '<button type="button" class="copt" role="radio" data-type="' + t.id + '"><b>' + t.name + '</b><small>' + t.note + '</small></button>'; }).join('') + '</div></section>' +
+      '<section class="calc-step"><h2><span>2</span>Что добавить</h2><div class="copts">' +
+      P.options.map(function (o) { return '<button type="button" class="copt" aria-pressed="false" data-opt="' + o.id + '"><b>' + o.name + '</b><small>+ ' + fmt(o.price) + ' ' + P.currency + '</small></button>'; }).join('') + '</div></section>' +
+      '<section class="calc-step"><h2><span>3</span>Сроки</h2><div class="copts" role="radiogroup" aria-label="Сроки"><button type="button" class="copt" role="radio" data-rush="0"><b>Обычные</b><small>Без наценки</small></button><button type="button" class="copt" role="radio" data-rush="1"><b>Срочно</b><small>+ ' + Math.round((P.rush - 1) * 100) + '% к стоимости</small></button></div></section>';
+    main.insertAdjacentHTML('afterbegin', html);
+    var lowEl = $('[data-low]', calc), highEl = $('[data-high]', calc), list = $('[data-list]', calc);
+    $('[data-cur]', calc).textContent = P.currency;
+    var cur = { low: 0, high: 0 }, raf = null;
+    var tween = function (to) {
+      var from = { low: cur.low, high: cur.high }, t0 = performance.now();
+      cancelAnimationFrame(raf);
+      var step = function (now) {
+        var k = clamp((now - t0) / 500, 0, 1), e = 1 - Math.pow(1 - k, 3);
+        cur.low = lerp(from.low, to.low, e); cur.high = lerp(from.high, to.high, e);
+        lowEl.textContent = fmt(cur.low); highEl.textContent = fmt(cur.high);
+        if (k < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    };
+    var chosen = function () {
+      var t = P.types.filter(function (x) { return x.id === state.type; })[0];
+      var os = P.options.filter(function (o) { return state.opts[o.id]; });
+      var sum = t.base + os.reduce(function (a, o) { return a + o.price; }, 0);
+      if (state.rush) sum *= P.rush;
+      return { t: t, os: os, low: round(sum), high: round(sum * P.spread) };
+    };
+    var send = $('[data-send]', calc), agree = $('[data-agree]', calc);
+    var render = function () {
+      var c = chosen();
+      $$('[data-type]', calc).forEach(function (b) { b.setAttribute('aria-checked', b.dataset.type === state.type); });
+      $$('[data-opt]', calc).forEach(function (b) { b.setAttribute('aria-pressed', !!state.opts[b.dataset.opt]); });
+      $$('[data-rush]', calc).forEach(function (b) { b.setAttribute('aria-checked', (b.dataset.rush === '1') === state.rush); });
+      list.innerHTML = '<li><span>' + c.t.name + '</span><span>от ' + fmt(c.t.base) + ' ' + P.currency + '</span></li>' + c.os.map(function (o) { return '<li><span>' + o.name + '</span><span>+ ' + fmt(o.price) + '</span></li>'; }).join('') + (state.rush ? '<li><span>Срочно</span><span>+ ' + Math.round((P.rush - 1) * 100) + '%</span></li>' : '');
+      tween(c);
+      var text = 'Здравствуйте! Прикинул стоимость на сайте.\nЧто нужно: ' + c.t.name + (c.os.length ? '\nДобавить: ' + c.os.map(function (o) { return o.name.toLowerCase(); }).join(', ') : '') + '\nСроки: ' + (state.rush ? 'срочно' : 'обычные') + '\nОриентир: ' + fmt(c.low) + ' — ' + fmt(c.high) + ' ' + P.currency + '\nХочу обсудить.';
+      send.href = 'https://t.me/' + calc.dataset.user + '?text=' + encodeURIComponent(text);
+    };
+    calc.addEventListener('click', function (e) {
+      var b = e.target.closest('button.copt');
+      if (!b) return;
+      if (b.dataset.type) state.type = b.dataset.type;
+      else if (b.dataset.opt) state.opts[b.dataset.opt] = !state.opts[b.dataset.opt];
+      else if (b.dataset.rush) state.rush = b.dataset.rush === '1';
+      render();
+    });
+    agree.addEventListener('change', function () { send.setAttribute('aria-disabled', agree.checked ? 'false' : 'true'); });
+    render();
   }
 
   var cursor = $('.cursor');

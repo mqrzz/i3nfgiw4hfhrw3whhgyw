@@ -8,7 +8,7 @@
 
   var lenis = null;
   if (window.Lenis && !reduce) {
-    lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 1, anchors: { offset: -96 } });
+    lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.12, touchInertiaMultiplier: 28, anchors: { offset: -96 } });
     window.__lenis = lenis;
     var rafL = function (t) { lenis.raf(t); requestAnimationFrame(rafL); };
     requestAnimationFrame(rafL);
@@ -32,9 +32,15 @@
     var any = !!id;
     panels.forEach(function (m) {
       var on = m.id === id;
-      if (on) m.hidden = false;
-      requestAnimationFrame(function () { m.classList.toggle('is-open', on); });
-      if (!on) setTimeout(function () { if (!m.classList.contains('is-open')) m.hidden = true; }, 600);
+      if (on) {
+        m.hidden = false;
+        m.classList.add('is-open');
+        m.style.height = m.firstElementChild.offsetHeight + 'px';
+      } else if (m.classList.contains('is-open')) {
+        m.classList.remove('is-open');
+        m.style.height = '0px';
+        setTimeout(function () { if (!m.classList.contains('is-open')) m.hidden = true; }, 600);
+      }
     });
     navBtns.forEach(function (b) { b.setAttribute('aria-expanded', b.dataset.panel === id); });
     if (scrim) scrim.classList.toggle('is-on', any);
@@ -73,6 +79,7 @@
     if (isl && !e.target.closest('[data-isl]')) openPanel(null);
   });
   $$('.dock-sheet a').forEach(function (a) { a.addEventListener('click', function () { setDock(false); }); });
+  window.addEventListener('resize', function () { openPanel(null); });
   var lastY = window.scrollY;
   window.addEventListener('scroll', function () {
     if (Math.abs(window.scrollY - lastY) > 80) { openPanel(null); lastY = window.scrollY; }
@@ -416,37 +423,6 @@
     onSvc();
   }
 
-  var caseList = $$('.case-list');
-  caseList.forEach(function (list) {
-    var cs = $$('.case', list);
-    if (!cs.some(function (c) { return $('.prev', c); })) return;
-    var act = function (c) { cs.forEach(function (o) { o.classList.toggle('is-on', o === c); }); };
-    act(cs[0]);
-    cs.forEach(function (c) {
-      c.addEventListener('pointerenter', function () { act(c); });
-      c.addEventListener('focus', function () { act(c); });
-    });
-  });
-
-  $$('.faq details').forEach(function (d) {
-    var ans = $('.ans', d);
-    var summary = $('summary', d);
-    if (d.open) ans.style.height = 'auto';
-    summary.addEventListener('click', function (e) {
-      e.preventDefault();
-      if (!d.open) {
-        d.open = true;
-        ans.style.height = '0px';
-        requestAnimationFrame(function () { ans.style.height = ans.scrollHeight + 'px'; });
-        ans.addEventListener('transitionend', function f() { ans.style.height = 'auto'; ans.removeEventListener('transitionend', f); });
-      } else {
-        ans.style.height = ans.scrollHeight + 'px';
-        requestAnimationFrame(function () { ans.style.height = '0px'; });
-        ans.addEventListener('transitionend', function f() { d.open = false; ans.removeEventListener('transitionend', f); });
-      }
-    });
-  });
-
   var fq = $('[data-faq-search]');
   if (fq) {
     var fitems = $$('.faqs details');
@@ -465,17 +441,38 @@
 
   var lb = $('.lightbox');
   if (lb) {
-    var lbi = document.createElement('img'); lbi.alt = ''; lb.appendChild(lbi);
-    $$('[data-zoom]').forEach(function (a) {
+    var zooms = $$('[data-zoom]');
+    var lbi = document.createElement('img');
+    lbi.alt = '';
+    lb.appendChild(lbi);
+    var idx = 0;
+    var prevB = $('.lb-prev', lb), nextB = $('.lb-next', lb), cntE = $('.lb-count', lb);
+    var show = function (i) {
+      idx = (i + zooms.length) % zooms.length;
+      lbi.src = zooms[idx].getAttribute('href');
+      cntE.textContent = zooms.length > 1 ? (idx + 1) + ' / ' + zooms.length : '';
+      prevB.hidden = nextB.hidden = zooms.length < 2;
+    };
+    zooms.forEach(function (a, i) {
       a.addEventListener('click', function (e) {
         e.preventDefault();
-        lbi.src = a.getAttribute('href');
+        show(i);
         lb.classList.add('is-open');
+        if (lenis) lenis.stop();
       });
     });
-    var close = function () { lb.classList.remove('is-open'); };
-    lb.addEventListener('click', close);
-    window.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    var close = function () { lb.classList.remove('is-open'); if (lenis) lenis.start(); };
+    lb.addEventListener('click', function (e) {
+      if (e.target.closest('.lb-prev')) show(idx - 1);
+      else if (e.target.closest('.lb-next')) show(idx + 1);
+      else close();
+    });
+    window.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('is-open')) return;
+      if (e.key === 'Escape') close();
+      if (e.key === 'ArrowRight') show(idx + 1);
+      if (e.key === 'ArrowLeft') show(idx - 1);
+    });
   }
 
   var brief = $('[data-brief]');
@@ -632,6 +629,58 @@
     });
     agree.addEventListener('change', function () { send.setAttribute('aria-disabled', agree.checked ? 'false' : 'true'); });
     render();
+  }
+
+
+  $$('[data-chk]').forEach(function (box) {
+    var key = 'antviz-chk-' + box.dataset.chk;
+    var inputs = $$('input', box), bar = $('.chk-bar i', box), pct = $('.chk-pct', box), done = $('.chk-done', box);
+    var saved = [];
+    try { saved = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) { saved = []; }
+    inputs.forEach(function (inp, i) { inp.checked = saved.indexOf(i) > -1; });
+    var upd = function () {
+      var n = inputs.filter(function (x) { return x.checked; }).length;
+      var p = n / inputs.length;
+      bar.style.transform = 'scaleX(' + p + ')';
+      pct.textContent = Math.round(p * 100) + '%';
+      done.hidden = n !== inputs.length;
+      try { localStorage.setItem(key, JSON.stringify(inputs.map(function (x, i) { return x.checked ? i : -1; }).filter(function (i) { return i > -1; }))); } catch (e) {}
+    };
+    inputs.forEach(function (inp) { inp.addEventListener('change', upd); });
+    upd();
+  });
+
+  var rd = $('[data-reader]');
+  if (rd) rd.addEventListener('click', function () {
+    var on = document.body.classList.toggle('reader');
+    rd.setAttribute('aria-pressed', on);
+    $('span', rd).textContent = on ? 'Светлая тема' : 'Режим чтения';
+  });
+
+  var postEl = $('.post');
+  if (postEl) {
+    var tip = document.createElement('a');
+    tip.className = 'share-tip';
+    tip.target = '_blank';
+    tip.rel = 'noopener';
+    tip.innerHTML = $('.tgi') ? '' : '';
+    tip.textContent = 'Поделиться в Telegram';
+    document.body.appendChild(tip);
+    var hideTip = function () { tip.classList.remove('is-on'); };
+    document.addEventListener('mouseup', function () {
+      setTimeout(function () {
+        var s = window.getSelection();
+        var t = s ? s.toString().trim() : '';
+        if (t.length < 12 || !s.anchorNode || !postEl.contains(s.anchorNode)) { hideTip(); return; }
+        var r = s.getRangeAt(0).getBoundingClientRect();
+        tip.style.left = (r.left + r.width / 2 + window.scrollX) + 'px';
+        tip.style.top = (r.top + window.scrollY - 6) + 'px';
+        tip.href = 'https://t.me/share/url?url=' + encodeURIComponent(location.href) + '&text=' + encodeURIComponent('«' + t.slice(0, 280) + '»');
+        tip.classList.add('is-on');
+      }, 10);
+    });
+    document.addEventListener('mousedown', function (e) { if (!e.target.closest('.share-tip')) hideTip(); });
+    window.addEventListener('scroll', hideTip, { passive: true });
   }
 
   var cursor = $('.cursor');

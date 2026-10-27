@@ -8,7 +8,7 @@
 
   var lenis = null;
   if (window.Lenis && !reduce) {
-    lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.12, touchInertiaMultiplier: 28, anchors: { offset: -96 } });
+    lenis = new window.Lenis({ lerp: 0.085, wheelMultiplier: 1, syncTouch: true, syncTouchLerp: 0.14, touchInertiaMultiplier: 110, touchMultiplier: 1.4, anchors: { offset: -96 } });
     window.__lenis = lenis;
     var rafL = function (t) { lenis.raf(t); requestAnimationFrame(rafL); };
     requestAnimationFrame(rafL);
@@ -21,8 +21,17 @@
   var sheet = $('#dock-sheet');
   var hideT = null;
 
+  var lastScroll = window.scrollY;
   function onHeader() {
-    if (isl) isl.classList.toggle('is-solid', window.scrollY > 40);
+    if (!isl) return;
+    var y = window.scrollY;
+    isl.classList.toggle('is-solid', y > 40);
+    var open = $$('.mega.is-open').length > 0;
+    if (!open) {
+      if (y > 240 && y > lastScroll + 6) isl.classList.add('is-hidden');
+      else if (y < lastScroll - 6 || y <= 240) isl.classList.remove('is-hidden');
+    }
+    lastScroll = y;
   }
   window.addEventListener('scroll', onHeader, { passive: true });
   onHeader();
@@ -422,6 +431,25 @@
     setSvc(0);
     onSvc();
   }
+
+  $$('.faq details').forEach(function (d) {
+    var ans = $('.ans', d);
+    var summary = $('summary', d);
+    if (d.open) ans.style.height = 'auto';
+    summary.addEventListener('click', function (e) {
+      e.preventDefault();
+      if (!d.open) {
+        d.open = true;
+        ans.style.height = '0px';
+        requestAnimationFrame(function () { ans.style.height = ans.scrollHeight + 'px'; });
+        ans.addEventListener('transitionend', function f() { ans.style.height = 'auto'; ans.removeEventListener('transitionend', f); });
+      } else {
+        ans.style.height = ans.scrollHeight + 'px';
+        requestAnimationFrame(function () { ans.style.height = '0px'; });
+        ans.addEventListener('transitionend', function f() { d.open = false; ans.removeEventListener('transitionend', f); });
+      }
+    });
+  });
 
   var fq = $('[data-faq-search]');
   if (fq) {

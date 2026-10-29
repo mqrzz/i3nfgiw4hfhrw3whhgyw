@@ -21,17 +21,8 @@
   var sheet = $('#dock-sheet');
   var hideT = null;
 
-  var lastScroll = window.scrollY;
   function onHeader() {
-    if (!isl) return;
-    var y = window.scrollY;
-    isl.classList.toggle('is-solid', y > 40);
-    var open = $$('.mega.is-open').length > 0;
-    if (!open) {
-      if (y > 240 && y > lastScroll + 6) isl.classList.add('is-hidden');
-      else if (y < lastScroll - 6 || y <= 240) isl.classList.remove('is-hidden');
-    }
-    lastScroll = y;
+    if (isl) isl.classList.toggle('is-solid', window.scrollY > 40);
   }
   window.addEventListener('scroll', onHeader, { passive: true });
   onHeader();
@@ -679,11 +670,18 @@
   });
 
   var rd = $('[data-reader]');
-  if (rd) rd.addEventListener('click', function () {
-    var on = document.body.classList.toggle('reader');
-    rd.setAttribute('aria-pressed', on);
-    $('span', rd).textContent = on ? 'Светлая тема' : 'Режим чтения';
-  });
+  if (rd) {
+    var setDark = function (on) {
+      document.body.classList.toggle('reader', on);
+      rd.setAttribute('aria-pressed', on);
+      $('span', rd).textContent = on ? 'Светлая тема' : 'Тёмная тема';
+      try { localStorage.setItem('antviz-dark', on ? '1' : '0'); } catch (e) {}
+    };
+    var saved = false;
+    try { saved = localStorage.getItem('antviz-dark') === '1'; } catch (e) {}
+    if (saved) setDark(true);
+    rd.addEventListener('click', function () { setDark(!document.body.classList.contains('reader')); });
+  }
 
   var postEl = $('.post');
   if (postEl) {

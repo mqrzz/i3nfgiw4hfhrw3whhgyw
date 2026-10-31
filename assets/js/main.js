@@ -145,9 +145,9 @@
         'vec2 w=vec2(fbm(q+tt),fbm(q+vec2(5.2,1.3)-tt));float f=fbm(q+2.4*w+vec2(0.,tt*1.6));' +
         'float flip=smoothstep(.05,.5,p);float bias=mix(uv.x*.8+uv.y*.7-.35,.5+.25*sin(uv.x*3.+tt),smoothstep(.3,.95,p));bias=mix(bias,uv.x*.5+(1.-uv.y)*.2+.15,flip*(1.-smoothstep(.3,.9,p)));' +
         'float v=smoothstep(.34,.98,f*1.1+bias*.5-.3-.2*smoothstep(.25,.6,p)+.5*smoothstep(.6,.95,p));'+
-        'vec3 white=vec3(.93,.96,1.),light=vec3(.6,.77,1.),blue=vec3(0.,.4,1.);' +
+        'vec3 white=vec3(1.,.95,.88),light=vec3(1.,.70,.42),blue=vec3(.42,.12,.70);' +
         'vec3 col=mix(white,light,smoothstep(0.,.5,v));col=mix(col,blue,smoothstep(.42,.95,v));' +
-        'float bot=smoothstep(.5,0.,uv.y)*(1.-smoothstep(.12,.4,p));col=mix(col,vec3(.97,.98,1.),bot*.92);' +
+        'float bot=smoothstep(.5,0.,uv.y)*(1.-smoothstep(.12,.4,p));col=mix(col,vec3(1.,.97,.92),bot*.92);' +
         'col+=(h(gl_FragCoord.xy+fract(t))-.5)*.035;gl_FragColor=vec4(col,1.);}';
       var mk = function (type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
       prgm = gl.createProgram();
@@ -223,7 +223,7 @@
       var dome = new T.Mesh(new T.SphereGeometry(30, 32, 16), new T.ShaderMaterial({
         side: T.BackSide,
         vertexShader: 'varying vec3 v;void main(){v=position;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-        fragmentShader: 'varying vec3 v;void main(){float h=normalize(v).y;vec3 c=mix(vec3(.28,.5,.95),vec3(.86,.92,1.),smoothstep(-.7,.2,h));c=mix(c,vec3(1.),smoothstep(.2,1.,h));gl_FragColor=vec4(c,1.);}'
+        fragmentShader: 'varying vec3 v;void main(){float h=normalize(v).y;vec3 c=mix(vec3(.95,.42,.10),vec3(1.,.89,.78),smoothstep(-.7,.2,h));c=mix(c,vec3(1.),smoothstep(.2,1.,h));gl_FragColor=vec4(c,1.);}'
       }));
       envScene.add(dome);
       [[0, 14, 6, 24, 3], [-16, 4, 2, 3, 14], [16, 2, 4, 3, 12], [0, -6, 14, 20, 2]].forEach(function (b) {
@@ -238,7 +238,7 @@
       key.position.set(4, 6, 8);
       scene.add(key);
 
-      var ribMat = new T.MeshPhysicalMaterial({ color: 0xe3eaf7, roughness: 0.14, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.1, transparent: true, opacity: 0.74, side: T.DoubleSide, envMapIntensity: 0.85 });
+      var ribMat = new T.MeshPhysicalMaterial({ color: 0xfff0e0, roughness: 0.14, metalness: 0, clearcoat: 1, clearcoatRoughness: 0.1, transparent: true, opacity: 0.74, side: T.DoubleSide, envMapIntensity: 0.85 });
       var N = 90, rib = [], widths = [118, 92, 66];
       var world = new T.Group();
       scene.add(world);
@@ -256,7 +256,7 @@
 
       var pillsGroup = new T.Group();
       scene.add(pillsGroup);
-      var pillCols = [0xb9c3da, 0x1f4fd8, 0x3d78dc], pillMeshes = [];
+      var pillCols = [0xffd9b8, 0x6a2fb0, 0xff8a2a], pillMeshes = [];
       pillCols.forEach(function (col) {
         var pmesh = new T.Mesh(new T.BufferGeometry(), new T.MeshPhysicalMaterial({ color: col, roughness: 0.26, metalness: 0.04, clearcoat: 1, clearcoatRoughness: 0.12, envMapIntensity: 0.9 }));
         pillsGroup.add(pmesh);

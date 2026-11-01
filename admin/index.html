@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Antviz · админка</title>
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:Unbounded;font-weight:800;src:url(/assets/fonts/unbounded-cyrillic-800-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:Unbounded;font-weight:800;src:url(/assets/fonts/unbounded-latin-800-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215}
+@font-face{font-family:"Golos Text";font-weight:400;src:url(/assets/fonts/golos-text-cyrillic-400-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos Text";font-weight:400;src:url(/assets/fonts/golos-text-latin-400-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215}
+@font-face{font-family:"Golos Text";font-weight:600;src:url(/assets/fonts/golos-text-cyrillic-600-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos Text";font-weight:600;src:url(/assets/fonts/golos-text-latin-600-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215}
+@font-face{font-family:"Golos Text";font-weight:700;src:url(/assets/fonts/golos-text-cyrillic-700-normal.woff2) format("woff2");unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Golos Text";font-weight:700;src:url(/assets/fonts/golos-text-latin-700-normal.woff2) format("woff2");unicode-range:U+0000-00FF,U+0131,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215}
+:root{--blue:#06f;--b2:#99c2ff;--b1:#dce9ff;--ink:#0b0b0d;--gray:#6e6a70;--sf:#f2f2f4;--line:#0b0b0d1a;--ok:#0a9a4a;--bad:#d6334a;--display:Unbounded,"Golos Text",system-ui,sans-serif;--sans:"Golos Text",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--ease:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:var(--sf);color:var(--ink);font:17px/1.45 var(--sans);-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
+svg.i{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.05em;margin:0}
+.lg{display:flex;align-items:center;gap:10px;font:800 21px var(--display);letter-spacing:-.05em}.lg svg{width:32px;height:32px;fill:var(--blue)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 24px;border-radius:18px;background:var(--blue);color:#fff;font-weight:700;font-size:17px;transition:filter .2s}
+.btn:hover{filter:brightness(1.1)}.btn.g{background:#fff;color:var(--ink);box-shadow:0 0 0 1px var(--line)}.btn.g:hover{background:var(--b1);filter:none}.btn.sm{height:42px;padding:0 16px;font-size:15px;border-radius:14px}
+.btn[disabled]{opacity:.5;cursor:default}
+/* вход */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:radial-gradient(60% 70% at 85% 10%,#b9d3ff,#0000 70%),linear-gradient(#fff,#f6f9ff)}
+.card{background:#fff;border-radius:32px;box-shadow:0 0 0 1px var(--line);padding:30px}
+.login .card{width:min(460px,100%);padding:36px;box-shadow:0 30px 80px #0b0b0d1f,0 0 0 1px var(--line)}
+.login h1{font-size:30px;margin:18px 0 8px}.login p{color:var(--gray);margin:0 0 22px}
+.inp{width:100%;height:58px;border-radius:18px;border:0;background:var(--sf);padding:0 18px;font-size:18px;font-weight:600;outline:2px solid transparent}.inp:focus{outline-color:var(--blue)}
+.err{min-height:22px;margin:12px 0 0;color:var(--bad);font-size:15px;font-weight:600}
+.codes{display:flex;gap:8px}.codes input{flex:1;min-width:0;height:64px;text-align:center;border-radius:16px;border:0;background:var(--sf);font:800 26px var(--display);outline:2px solid transparent}.codes input:focus{outline-color:var(--blue)}
+/* приложение */
+.app{display:none;min-height:100vh}.app.on{display:grid;grid-template-columns:270px minmax(0,1fr)}
+.side{position:sticky;top:0;height:100vh;padding:22px 18px;display:flex;flex-direction:column;gap:6px;background:#fff;box-shadow:1px 0 0 var(--line)}
+.side .lg{padding:4px 10px 18px}
+.nav{display:flex;align-items:center;gap:14px;height:54px;padding:0 16px;border-radius:18px;font-weight:700;color:#3a373b;text-align:left;width:100%;transition:background .2s}
+.nav:hover{background:var(--sf)}.nav.on{background:var(--b1);color:var(--blue)}
+.side .sp{flex:1}.user{padding:14px 12px;font-size:15px;color:var(--gray)}
+.main{padding:clamp(18px,3vw,40px);max-width:1400px;width:100%;min-width:0}
+.head{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+.head h1{font-size:clamp(28px,3.4vw,44px)}.head p{margin:6px 0 0;color:var(--gray)}
+.seg{display:flex;gap:6px;padding:6px;background:#fff;border-radius:20px;box-shadow:0 0 0 1px var(--line)}
+.seg button{height:44px;padding:0 18px;border-radius:14px;font-weight:700;font-size:16px;color:#3a373b;white-space:nowrap}.seg button.on{background:var(--ink);color:#fff}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.kpi{padding:24px}.kpi small{display:block;font-size:15px;font-weight:600;color:var(--gray)}
+.kpi b{display:block;font:800 clamp(32px,3.4vw,46px)/1 var(--display);letter-spacing:-.06em;margin:12px 0 10px}
+.dl{font-weight:700;font-size:15px}.dl.up{color:var(--ok)}.dl.down{color:var(--bad)}.dl.flat{color:var(--gray)}
+.grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+.card h3{font-size:20px;margin-bottom:18px}
+.chart{display:flex;align-items:flex-end;gap:8px;height:260px}
+.col{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:8px}
+.col i{display:block;width:100%;border-radius:10px;background:var(--b2);min-height:4px;transition:height .6s var(--ease),background .2s}
+.col:hover i{background:var(--blue)}.col.today i{background:var(--blue)}
+.col small{font-size:13px;color:var(--gray);font-weight:600;white-space:nowrap}
+.rows{display:flex;flex-direction:column;gap:14px}
+.row .t{display:flex;justify-content:space-between;gap:12px;font-weight:600;font-size:16px;margin-bottom:8px}.row .t span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.row .t b{font-variant-numeric:tabular-nums}
+.bar{height:10px;border-radius:6px;background:var(--sf);overflow:hidden}.bar i{display:block;height:100%;border-radius:6px;background:var(--blue);transition:width .6s var(--ease)}
+.dev{display:flex;height:18px;border-radius:9px;overflow:hidden;margin-bottom:16px;background:var(--sf)}.dev i{display:block;height:100%}
+.leg{display:flex;flex-wrap:wrap;gap:8px 18px;font-weight:600;font-size:15px}.leg span{display:flex;gap:8px;align-items:center}.leg em{width:12px;height:12px;border-radius:4px;display:inline-block}
+.tbl{width:100%;border-collapse:collapse;font-size:16px}.tbl th{text-align:left;font-size:14px;color:var(--gray);font-weight:600;padding:0 12px 12px}.tbl td{padding:16px 12px;border-top:1px solid var(--line);vertical-align:middle}
+.tbl td.n,.tbl th.n{text-align:right;font-variant-numeric:tabular-nums}.tbl .nm{font-weight:700}.tbl .sl{color:var(--gray);font-size:14px}
+.code{font:800 17px var(--display);letter-spacing:.02em}
+.chip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:12px;font-weight:700;font-size:14px;background:var(--sf)}.chip.ok{background:#dcf6e7;color:#067a3a}.chip.wait{background:var(--b1);color:var(--blue)}
+.empty{padding:28px 0;color:var(--gray);text-align:center}
+.note{margin-top:18px;font-size:15px;color:var(--gray);max-width:760px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);padding:14px 22px;border-radius:16px;background:var(--ink);color:#fff;font-weight:600;opacity:0;pointer-events:none;transition:.3s var(--ease);z-index:50}.toast.on{opacity:1;transform:translateX(-50%)}
+@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.grid,.grid3{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:860px){.app.on{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;padding:12px;gap:6px;align-items:center}.side .lg{padding:0 8px;width:100%}.side .sp,.side .user{display:none}.nav{flex:1;min-width:130px;height:48px;justify-content:center}.chart{height:200px}.col small{font-size:11px}}
+@media(max-width:520px){.seg button{padding:0 11px;font-size:15px}.nav{min-width:90px;padding:0 10px}.kpis{grid-template-columns:minmax(0,1fr)}.tbl{font-size:14px}.col small:nth-child(odd){display:none}}
+</style>
+</head>
+<body>
+<section class="login" id="login" style="display:none"><div class="card">
+  <div class="lg"><svg viewBox="0 0 64 64"><rect x="10" y="6" width="50" height="12" rx="6" opacity=".6"/><rect y="26" width="64" height="12" rx="6"/><rect x="18" y="46" width="38" height="12" rx="6" opacity=".35"/></svg>antviz</div>
+  <h1 id="lgT">Вход в админку</h1><p id="lgP">Введите почту администратора, мы отправим код.</p>
+  <div id="s1"><input class="inp" id="email" type="email" placeholder="you@antviz.ru" autocomplete="email"><div class="err" id="e1"></div><button class="btn" id="send" style="width:100%;margin-top:8px">Получить код</button></div>
+  <div id="s2" style="display:none"><div class="codes" id="codes"></div><div class="err" id="e2"></div><button class="btn" id="verify" style="width:100%;margin-top:8px">Войти</button><button class="btn g" id="back" style="width:100%;margin-top:10px">Другая почта</button></div>
+</div></section>
+<div class="app" id="app">
+  <aside class="side"><div class="lg"><svg viewBox="0 0 64 64"><rect x="10" y="6" width="50" height="12" rx="6" opacity=".6"/><rect y="26" width="64" height="12" rx="6"/><rect x="18" y="46" width="38" height="12" rx="6" opacity=".35"/></svg>antviz</div>
+    <button class="nav on" data-t="overview"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 21v-6" /> <path d="M12 21V3" /> <path d="M19 21V9" /></svg>Обзор</button>
+    <button class="nav" data-t="blog"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" /> <path d="M14 2v5a1 1 0 0 0 1 1h5" /> <path d="M10 9H8" /> <path d="M16 13H8" /> <path d="M16 17H8" /></svg>Блог</button>
+    <button class="nav" data-t="visitors"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /> <path d="M16 3.128a4 4 0 0 1 0 7.744" /> <path d="M22 21v-2a4 4 0 0 0-3-3.87" /> <circle cx="9" cy="7" r="4" /></svg>Посетители</button>
+    <div class="sp"></div><div class="user" id="who"></div>
+    <button class="nav" id="logout"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="m16 17 5-5-5-5" /> <path d="M21 12H9" /> <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /></svg>Выйти</button>
+  </aside>
+  <main class="main"><div id="view"></div></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+'use strict';
+const TITLES={"/": "Главная", "/uslugi/": "Услуги студии Antviz", "/uslugi/vnedrenie-ii/": "Внедрение нейросетей и ИИ в бизнес", "/uslugi/razrabotka-sajtov/": "Разработка сайтов для бизнеса под ключ", "/uslugi/redizajn-i-dorabotka/": "Редизайн и доработка существующего сайта", "/uslugi/seo-prodvizhenie/": "SEO и продвижение сайтов", "/uslugi/razrabotka-prilozhenij/": "Разработка мобильных приложений для бизнеса", "/uslugi/vnedrenie-crm/": "CRM и системы учёта под ваши процессы", "/uslugi/telegram-boty/": "Разработка Telegram-ботов для бизнеса", "/process/": "Как мы работаем", "/voprosy/": "Частые вопросы", "/kontakty/": "Контакты студии Antviz", "/blog/": "Блог студии Antviz: сайты, боты, автоматизация", "/blog/soglasie-na-obrabotku-personalnyh-dannyh/": "Согласие на обработку персональных данных: что изменилось с 1 сентября 2025 года", "/blog/telegram-bot-ili-prilozhenie/": "Telegram-бот или мобильное приложение: что выбрать бизнесу", "/blog/my-otkrylis/": "Мы открылись: чем занимается Antviz и как с нами работать", "/blog/sajt-i-crm/": "Как связать сайт и CRM: пять рабочих сценариев", "/blog/nuzhen-li-lichnyj-kabinet/": "Нужен ли вашему сайту личный кабинет", "/blog/kak-vybrat-podryadchika/": "Как выбрать подрядчика на сайт: десять вопросов перед стартом", "/blog/chek-list-zapuska-sajta/": "Чек-лист запуска сайта: что проверить перед публикацией", "/blog/mobilnaya-versiya-sajta/": "Мобильная версия сайта: почему начинать нужно с телефона", "/blog/ii-assistent-dlya-podderzhki/": "ИИ-ассистент для поддержки: с чего начать", "/blog/oplata-na-sajte/": "Оплата на сайте и в Telegram: карты, СБП, подписки и счета", "/blog/lending-ili-sajt/": "Лендинг или многостраничный сайт: как выбрать", "/blog/skorost-sajta/": "Скорость сайта: что действительно влияет на заявки", "/blog/qr-vhod-na-meropriyatiya/": "QR-вход на мероприятие: как устроена система пропусков", "/blog/skolko-stoit-sajt/": "Сколько стоит сайт: из чего складывается цена", "/blog/kak-podgotovit-brief/": "Как подготовить бриф, чтобы получить точную оценку", "/blog/zapis-klientov-bez-administratora/": "Запись клиентов без администратора: как работает онлайн-запись", "/blog/mini-apps-v-telegram/": "Mini Apps в Telegram: что это и кому подходят", "/kejsy/": "Кейсы студии Antviz", "/kejsy/antviz-platforma/": "Сайт с личным кабинетом и админкой", "/kejsy/qr-propuska-bassejn/": "QR-пропуска для соревнований в бассейне", "/kejsy/ii-assistent-podderzhki/": "ИИ-ассистент поддержки для интернет-магазина", "/kejsy/internet-magazin/": "Интернет-магазин одежды", "/kejsy/crm-uchet/": "CRM и учёт заявок", "/kejsy/mini-app-dostavka/": "Mini App для кофейни: меню, корзина, оплата", "/kejsy/sajt-dlya-kofejni/": "Сайт для кофейни", "/kejsy/bot-zapisi/": "Telegram-бот записи для салона", "/bez-ii-dizajna/": "Почему мы не делаем ИИ-дизайн", "/dokumenty/politika-konfidencialnosti/": "Политика конфиденциальности", "/dokumenty/oferta/": "Публичная оферта", "/dokumenty/soglasie/": "Согласие на обработку персональных данных", "/o-studii/": "О студии Antviz", "/ceny/": "Цены на разработку сайтов, ботов и приложений"};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=n=>Number(n||0).toLocaleString('ru');
+let tab='overview',days=14,data=null,visitors=null,open=null,timer=null;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2600)}
+async function api(path,opt){const r=await fetch('/api'+path,Object.assign({credentials:'same-origin',headers:{'Content-Type':'application/json'}},opt||{}));let j=null;try{j=await r.json()}catch(e){}if(!r.ok){const e=new Error((j&&j.error)||'Ошибка '+r.status);e.status=r.status;throw e}return j}
+/* ---- вход ---- */
+const codes=$('#codes');codes.innerHTML=Array.from({length:6},(_,i)=>'<input inputmode="numeric" maxlength="1" autocomplete="'+(i?'off':'one-time-code')+'">').join('');
+const ci=[...codes.querySelectorAll('input')];
+ci.forEach((el,i)=>{el.addEventListener('input',()=>{el.value=el.value.replace(/\D/g,'');if(el.value&&ci[i+1])ci[i+1].focus();if(ci.every(x=>x.value))$('#verify').click()});el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&ci[i-1])ci[i-1].focus()});el.addEventListener('paste',e=>{const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);if(t.length>1){e.preventDefault();t.split('').forEach((c,k)=>ci[k]&&(ci[k].value=c));ci[Math.min(t.length,5)].focus();if(t.length===6)$('#verify').click()}})});
+$('#send').onclick=async()=>{const email=$('#email').value.trim();$('#e1').textContent='';if(!email){$('#e1').textContent='Введите почту';return}const b=$('#send');b.disabled=true;try{await api('/auth/login/send-code',{method:'POST',body:JSON.stringify({email})});$('#s1').style.display='none';$('#s2').style.display='block';$('#lgT').textContent='Код из письма';$('#lgP').textContent='Отправили на '+email+'. Он действует 10 минут.';ci[0].focus()}catch(e){$('#e1').textContent=e.message}b.disabled=false};
+$('#email').addEventListener('keydown',e=>{if(e.key==='Enter')$('#send').click()});
+$('#back').onclick=()=>{$('#s2').style.display='none';$('#s1').style.display='block';$('#lgT').textContent='Вход в админку';$('#lgP').textContent='Введите почту администратора, мы отправим код.';ci.forEach(x=>x.value='')};
+$('#verify').onclick=async()=>{const code=ci.map(x=>x.value).join('');$('#e2').textContent='';if(code.length<6)return;const b=$('#verify');b.disabled=true;try{await api('/auth/login/verify-code',{method:'POST',body:JSON.stringify({email:$('#email').value.trim(),code})});location.reload()}catch(e){$('#e2').textContent=e.message;ci.forEach(x=>x.value='');ci[0].focus()}b.disabled=false};
+$('#logout').onclick=async()=>{try{await api('/auth/logout',{method:'POST'})}catch(e){}location.reload()};
+/* ---- данные ---- */
+function title(p){if(TITLES[p])return TITLES[p];return p}
+function delta(cur,prev){if(!prev&&!cur)return '<span class="dl flat">без изменений</span>';if(!prev)return '<span class="dl up">новые данные</span>';const d=Math.round((cur-prev)/prev*100);if(d===0)return '<span class="dl flat">как в прошлый раз</span>';return '<span class="dl '+(d>0?'up':'down')+'">'+(d>0?'+':'−')+Math.abs(d)+'% к прошлому периоду</span>'}
+function bars(list,key,val,fmt){const max=Math.max(1,...list.map(x=>x[val]));return list.length?'<div class="rows">'+list.map(x=>'<div class="row"><div class="t"><span>'+esc(fmt?fmt(x):x[key])+'</span><b>'+nf(x[val])+'</b></div><div class="bar"><i style="width:'+Math.max(3,x[val]/max*100)+'%"></i></div></div>').join('')+'</div>':'<div class="empty">Пока нет данных</div>'}
+function pager(){return '<div class="seg" id="seg">'+[7,14,30,90].map(d=>'<button data-d="'+d+'" class="'+(d===days?'on':'')+'">'+d+' дн.</button>').join('')+'</div>'}
+function viewOverview(){const d=data,t=d.totals,pv=d.prev;const max=Math.max(1,...d.series.map(x=>x.views));
+  const dev=d.devices,tot=dev.reduce((s,x)=>s+x.views,0)||1,col={mobile:'#0066ff',desktop:'#0b0b0d',tablet:'#99c2ff'},nm={mobile:'Телефон',desktop:'Компьютер',tablet:'Планшет'};
+  return '<div class="head"><div><h1>Обзор</h1><p>Статистика сайта за последние '+d.days+' дн. без cookie. IP-адреса хранятся 90 дней.</p></div>'+pager()+'</div>'+
+  '<div class="kpis"><div class="card kpi"><small>Просмотры страниц</small><b>'+nf(t.views)+'</b>'+delta(t.views,pv.views)+'</div><div class="card kpi"><small>Посетители</small><b>'+nf(t.visitors)+'</b><span class="dl flat">считаются заново каждый день</span></div><div class="card kpi"><small>Нажатия на Telegram</small><b>'+nf(t.tg)+'</b>'+delta(t.tg,pv.tg)+'</div><div class="card kpi"><small>Дочитали статью</small><b>'+nf(t.reads)+'</b>'+delta(t.reads,pv.reads)+'</div></div>'+
+  '<div class="grid"><div class="card"><h3>Просмотры по дням</h3><div class="chart">'+d.series.map((x,i)=>'<div class="col'+(i===d.series.length-1?' today':'')+'" title="'+esc(x.day)+': '+x.views+' просмотров, '+x.visitors+' посетителей, '+x.tg+' нажатий на Telegram"><i style="height:'+Math.max(2,x.views/max*100)+'%"></i><small>'+x.day.slice(8)+(d.series.length<=16?'.'+x.day.slice(5,7):'')+'</small></div>').join('')+'</div></div>'+
+  '<div class="card"><h3>Устройства</h3><div class="dev">'+dev.map(x=>'<i style="width:'+x.views/tot*100+'%;background:'+(col[x.device]||'#ccc')+'"></i>').join('')+'</div><div class="leg">'+dev.map(x=>'<span><em style="background:'+(col[x.device]||'#ccc')+'"></em>'+(nm[x.device]||x.device)+' '+Math.round(x.views/tot*100)+'%</span>').join('')+'</div><h3 style="margin-top:30px">Откуда приходят</h3>'+bars(d.refs,'ref','views')+'</div></div>'+
+  '<div class="grid3"><div class="card"><h3>Популярные страницы</h3>'+bars(d.pages,'path','views',x=>title(x.path))+'</div><div class="card"><h3>Что нажимали в Telegram</h3>'+bars(d.tgWhere,'label','clicks',x=>x.label+' · '+title(x.path))+'</div><div class="card"><h3>География</h3>'+bars(d.geo,'country','views',x=>cn(x.country)+(x.city?' · '+x.city:''))+'</div></div>'}
+const cn=c=>{if(!c||c==='??')return 'Неизвестно';try{return new DisplayNames(['ru'],{type:'region'}).of(c)}catch(e){return c}};
+const DisplayNames=Intl.DisplayNames;
+function ago(s){const m=Math.round((Date.now()-new Date(s))/60000);if(m<1)return 'только что';if(m<60)return m+' мин назад';const h=Math.round(m/60);if(h<24)return h+' ч назад';return Math.round(h/24)+' дн. назад'}
+const dv={mobile:'Телефон',desktop:'Компьютер',tablet:'Планшет'};
+function viewVisitors(){const v=visitors||[];return '<div class="head"><div><h1>Посетители</h1><p>Кто заходил на сайт: адрес, откуда и что смотрел. Нажмите на строку, чтобы увидеть путь по сайту. IP хранится 90 дней.</p></div>'+pager()+'</div><div class="card">'+(v.length?'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Откуда</th><th>IP</th><th>Устройство</th><th>Источник</th><th class="n">Страниц</th><th class="n">Telegram</th><th>Последний заход</th></tr></thead><tbody>'+v.map(x=>'<tr class="vr" data-ip="'+esc(x.ip)+'" style="cursor:pointer"><td class="nm">'+esc(cn(x.country)+(x.city?' · '+x.city:''))+'</td><td class="code" style="font-size:15px">'+esc(x.ip)+'</td><td>'+esc(dv[x.device]||x.device||'')+'</td><td>'+esc(x.ref||'прямой заход')+'</td><td class="n">'+nf(x.views)+'</td><td class="n">'+nf(x.tg)+'</td><td>'+ago(x.last_seen)+'<div class="sl">'+esc(title(x.last_path||''))+'</div></td></tr>'+(open&&open.ip===x.ip?'<tr><td colspan="7" style="background:var(--sf);border-radius:18px">'+(open.rows.length?'<div class="rows" style="gap:8px;padding:6px 4px">'+open.rows.map(e=>'<div style="display:flex;gap:14px;font-size:15px"><span class="sl" style="min-width:120px">'+new Date(e.ts).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})+'</span><span>'+(e.kind==='pv'?'Страница':e.kind==='tg'?'Нажал Telegram':'Дочитал')+': <b>'+esc(e.kind==='tg'?(e.extra||'кнопка'):title(e.path))+'</b></span></div>').join('')+'</div>':'<div class="empty">Нет данных</div>')+'</td></tr>':'')).join('')+'</tbody></table></div>':'<div class="empty">За период ещё нет заходов с сохранённым IP.</div>')+'</div>'}
+function viewBlog(){const b=data.blog;return '<div class="head"><div><h1>Блог</h1><p>Что читают и что приводит к обращению.</p></div>'+pager()+'</div><div class="card">'+(b.length?'<table class="tbl"><thead><tr><th>Статья</th><th class="n">Просмотры</th><th class="n">Дочитали</th><th class="n">Telegram</th></tr></thead><tbody>'+b.map(x=>'<tr><td><div class="nm">'+esc(title(x.path))+'</div><div class="sl">'+esc(x.path)+'</div></td><td class="n">'+nf(x.views)+'</td><td class="n">'+nf(x.reads)+(x.views?' <span class="sl">('+Math.round(x.reads/x.views*100)+'%)</span>':'')+'</td><td class="n">'+nf(x.tg)+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">Статей с просмотрами за период пока нет.</div>')+'</div><p class="note">«Дочитали» засчитывается, когда посетитель долистал статью до 80%. Нажатия на Telegram считаются по всем кнопкам и ссылкам внутри статьи.</p>'}
+function render(){const v=$('#view');if(tab==='overview'&&data)v.innerHTML=viewOverview();else if(tab==='blog'&&data)v.innerHTML=viewBlog();else if(tab==='visitors')v.innerHTML=viewVisitors();document.querySelectorAll('.nav[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===tab))}
+async function load(){try{const [s,vs]=await Promise.all([api('/admin-stats/summary?days='+days),api('/admin-stats/visitors?days='+days)]);data=s;visitors=vs;open=null;render()}catch(e){if(e.status===401||e.status===403){location.reload();return}toast(e.message)}}
+document.addEventListener('click',async e=>{const n=e.target.closest('.nav[data-t]');if(n){tab=n.dataset.t;render();return}const vr=e.target.closest('.vr');if(vr){const ip=vr.dataset.ip;if(open&&open.ip===ip){open=null;render();return}try{open={ip,rows:await api('/admin-stats/visitor?ip='+encodeURIComponent(ip))};render()}catch(er){toast(er.message)}return}const s=e.target.closest('#seg button');if(s){days=+s.dataset.d;await load();return}});
+(async function init(){let me=null;try{me=await api('/auth/me')}catch(e){}
+  if(!me||me.role!=='admin'){$('#login').style.display='grid';return}
+  $('#app').classList.add('on');$('#who').textContent=me.email||me.displayName||'';await load();timer=setInterval(()=>{if(!document.hidden)load()},60000)})();
+</script>
+</body>
+</html>

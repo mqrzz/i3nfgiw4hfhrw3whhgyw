@@ -110,7 +110,7 @@
     opt = opt || {};
     let me;
     try { me = await UZ.api('/me'); } catch (e) {
-      if (e.status === 401) { location.replace(B + '/app/login?next=' + encodeURIComponent(location.pathname)); return null; }
+      if (e.status === 401) { location.replace(B + '/app/login?next=' + encodeURIComponent(B && location.pathname.indexOf(B + '/') === 0 ? location.pathname.slice(B.length) : location.pathname)); return null; }
       document.body.innerHTML = '<div class="auth"><div class="card"><h1>' + esc(t('err.generic')) + '</h1><p class="lead2">' + esc(e.message) + '</p><button class="btn" onclick="location.reload()">' + esc(t('retry')) + '</button></div></div>'; return null;
     }
     UZ.me = me;

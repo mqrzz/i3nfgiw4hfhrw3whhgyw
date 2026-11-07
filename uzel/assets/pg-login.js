@@ -1,6 +1,6 @@
 (function(){
 const {$,$$,esc,t,api,ic,B}=UZ;
-const next=(()=>{const n=new URLSearchParams(location.search).get('next');return n&&/^\/[A-Za-z0-9\/_\-.?=&]*$/.test(n)&&!n.startsWith('//')?n:null})();
+const next=(()=>{let n=new URLSearchParams(location.search).get('next');if(n&&B&&n.indexOf(B+'/')===0)n=n.slice(B.length);return n&&/^\/app(\/[A-Za-z0-9_\-.]*)*(\?[A-Za-z0-9_\-.=&]*)?$/.test(n)&&!/\/app\/(login|start)/.test(n)?n:null})();
 document.title=t('login.title')+' · '+t('brand');
 document.body.className='auth-body';
 document.body.innerHTML='<div class="split">'+UZ.showcase()+'<main class="formside"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><a class="lg" href="'+B+'/">'+UZ.LOGO+t('brand')+'</a><div class="seg" id="lg"><button data-l="ru" class="'+(UZ.lang==='ru'?'on':'')+'">RU</button><button data-l="en" class="'+(UZ.lang==='en'?'on':'')+'">EN</button></div></div>'+

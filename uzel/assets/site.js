@@ -29,3 +29,20 @@ $$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=$(a.getAttr
 // язык: запоминаем выбор
 $$('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('uzel_lang',a.dataset.l)}catch(e){}}));
 })();
+
+;/* geserd-footer */
+(function(){var R=Math.PI/180,rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function eob(x){var c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)}
+function cl(x){return Math.min(1,Math.max(0,x))}
+document.querySelectorAll('.gs-foot').forEach(function(f){
+var m=f.querySelector('.gs-mark'),core=m.querySelector('circle'),A=[].map.call(m.querySelectorAll('path'),function(p){return{p:p,a:+p.dataset.a,l:+p.dataset.l}}),
+t0=null,ang=0,tg=0,sm=0;
+if(rm)return;
+if('IntersectionObserver' in window){new IntersectionObserver(function(e,o){if(e[0].isIntersecting){t0=performance.now();o.disconnect()}},{threshold:.3}).observe(f)}else t0=performance.now();
+f.addEventListener('mousemove',function(e){var r=m.getBoundingClientRect();ang=Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2));tg=1});
+f.addEventListener('mouseleave',function(){tg=0});
+function draw(u){sm+=(tg-sm)*.08;core.setAttribute('r',Math.max(0,5*eob(cl((u-.1)/.5))));
+A.forEach(function(o,i){var p=cl((u-.2-.035*((i*7)%12))/.75),s=p>0?eob(p):0;
+if(p>=1){s*=1+.03*Math.sin(u*1.6-i*.52);s*=1+.22*sm*Math.pow(Math.max(0,Math.cos(o.a*R-ang)),2)}
+o.p.setAttribute('d','M50 50L'+(50+Math.cos(o.a*R)*o.l*s).toFixed(2)+' '+(50+Math.sin(o.a*R)*o.l*s).toFixed(2))})}
+draw(0);(function tick(now){if(t0!==null)draw((now-t0)/1000);requestAnimationFrame(tick)})(0)})})();

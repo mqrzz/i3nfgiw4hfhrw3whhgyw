@@ -734,3 +734,84 @@
     });
   }
 })();
+
+;/* geserd-footer */
+(function(){var R=Math.PI/180,rm=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+function eob(x){var c=1.70158,d=c+1;return 1+d*Math.pow(x-1,3)+c*Math.pow(x-1,2)}
+function cl(x){return Math.min(1,Math.max(0,x))}
+document.querySelectorAll('.gs-foot').forEach(function(f){
+var m=f.querySelector('.gs-mark'),core=m.querySelector('circle'),A=[].map.call(m.querySelectorAll('path'),function(p){return{p:p,a:+p.dataset.a,l:+p.dataset.l}}),
+t0=null,ang=0,tg=0,sm=0;
+if(rm)return;
+if('IntersectionObserver' in window){new IntersectionObserver(function(e,o){if(e[0].isIntersecting){t0=performance.now();o.disconnect()}},{threshold:.3}).observe(f)}else t0=performance.now();
+f.addEventListener('mousemove',function(e){var r=m.getBoundingClientRect();ang=Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2));tg=1});
+f.addEventListener('mouseleave',function(){tg=0});
+function draw(u){sm+=(tg-sm)*.08;core.setAttribute('r',Math.max(0,5*eob(cl((u-.1)/.5))));
+A.forEach(function(o,i){var p=cl((u-.2-.035*((i*7)%12))/.75),s=p>0?eob(p):0;
+if(p>=1){s*=1+.03*Math.sin(u*1.6-i*.52);s*=1+.22*sm*Math.pow(Math.max(0,Math.cos(o.a*R-ang)),2)}
+o.p.setAttribute('d','M50 50L'+(50+Math.cos(o.a*R)*o.l*s).toFixed(2)+' '+(50+Math.sin(o.a*R)*o.l*s).toFixed(2))})}
+draw(0);(function tick(now){if(t0!==null)draw((now-t0)/1000);requestAnimationFrame(tick)})(0)})})();
+
+;/* site-forms */
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var t0 = Date.now();
+  var NET = 'Не удалось отправить. Проверьте соединение или напишите нам в Telegram.';
+  function post(url, body) {
+    return fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { ok: r.ok, j: j }; }); });
+  }
+  function showErr(box, text) { box.textContent = text; box.hidden = !text; }
+
+  // заявка на странице «Контакты»
+  var brief = $('[data-brief]');
+  if (brief && $('[data-submit]', brief)) {
+    var btn = $('[data-submit]', brief), agree = $('[data-agree]', brief), err = $('[data-err]', brief), busy = false;
+    var gate = function () { btn.setAttribute('aria-disabled', agree.checked && !busy ? 'false' : 'true'); };
+    agree.addEventListener('change', function () { gate(); if (agree.checked) showErr(err, ''); });
+    gate();
+    btn.addEventListener('click', function () {
+      if (busy) return;
+      var name = $('[name=name]', brief).value.trim(), contact = $('[name=contact]', brief).value.trim(), msg = $('textarea', brief).value.trim();
+      if (name.length < 2) return showErr(err, 'Укажите, как к вам обращаться');
+      if (contact.length < 3) return showErr(err, 'Оставьте почту, телефон или Telegram, чтобы мы могли ответить');
+      if (msg.length < 10) return showErr(err, 'Опишите задачу хотя бы в паре предложений');
+      if (!agree.checked) return showErr(err, 'Отметьте согласие на обработку персональных данных');
+      showErr(err, ''); busy = true; btn.setAttribute('aria-busy', 'true'); gate();
+      var services = $$('.chip[aria-pressed=true]', brief).map(function (c) { return c.textContent.trim(); });
+      post('/api/site/request', { name: name, contact: contact, message: msg, services: services, consent: true, t: Date.now() - t0, page: location.pathname, website: $('[name=website]', brief).value })
+        .then(function (r) {
+          if (r.ok && r.j.ok) { brief.classList.add('is-sent'); $('[data-ok]', brief).hidden = false; $('[data-ok]', brief).scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+          else showErr(err, (r.j && r.j.error) || NET);
+        })
+        .catch(function () { showErr(err, NET); })
+        .then(function () { busy = false; btn.removeAttribute('aria-busy'); gate(); });
+    });
+  }
+
+  // подписка на блог
+  $$('[data-subscribe]').forEach(function (form) {
+    var btn = $('button[type=submit]', form), agree = $('[data-agree]', form), err = $('[data-err]', form), ok = $('[data-ok]', form), busy = false;
+    var gate = function () { btn.setAttribute('aria-disabled', agree.checked && !busy ? 'false' : 'true'); };
+    agree.addEventListener('change', function () { gate(); if (agree.checked) showErr(err, ''); });
+    gate();
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (busy) return;
+      var email = $('[name=email]', form).value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showErr(err, 'Введите корректную почту');
+      if (!agree.checked) return showErr(err, 'Отметьте согласие на обработку персональных данных');
+      showErr(err, ''); busy = true; btn.setAttribute('aria-busy', 'true'); gate();
+      post('/api/site/blog-subscribe', { email: email, consent: true, page: location.pathname, website: $('[name=website]', form).value })
+        .then(function (r) {
+          if (r.ok && r.j.ok) {
+            if (r.j.alreadySubscribed) { $('[data-ok-t]', form).textContent = 'Вы уже подписаны'; $('[data-ok-p]', form).textContent = 'Новые статьи будут приходить на этот адрес.'; }
+            $('.subs-row', form).hidden = true; $('.agree', form).hidden = true; ok.hidden = false;
+          } else showErr(err, (r.j && r.j.error) || NET);
+        })
+        .catch(function () { showErr(err, NET); })
+        .then(function () { busy = false; btn.removeAttribute('aria-busy'); gate(); });
+    });
+  });
+})();

@@ -12,9 +12,9 @@ async function api(path,opt){const r=await fetch('/api'+path,Object.assign({cred
 const codes=$('#codes');codes.innerHTML=Array.from({length:6},(_,i)=>'<input inputmode="numeric" maxlength="1" autocomplete="'+(i?'off':'one-time-code')+'">').join('');
 const ci=[...codes.querySelectorAll('input')];
 ci.forEach((el,i)=>{el.addEventListener('input',()=>{el.value=el.value.replace(/\D/g,'');if(el.value&&ci[i+1])ci[i+1].focus();if(ci.every(x=>x.value))$('#verify').click()});el.addEventListener('keydown',e=>{if(e.key==='Backspace'&&!el.value&&ci[i-1])ci[i-1].focus()});el.addEventListener('paste',e=>{const t=(e.clipboardData.getData('text')||'').replace(/\D/g,'').slice(0,6);if(t.length>1){e.preventDefault();t.split('').forEach((c,k)=>ci[k]&&(ci[k].value=c));ci[Math.min(t.length,5)].focus();if(t.length===6)$('#verify').click()}})});
-$('#send').onclick=async()=>{const email=$('#email').value.trim();$('#e1').textContent='';if(!email){$('#e1').textContent='Введите почту';return}const b=$('#send');b.disabled=true;try{await api('/auth/login/send-code',{method:'POST',body:JSON.stringify({email})});$('#s1').style.display='none';$('#s2').style.display='block';$('#lgT').textContent='Код из письма';$('#lgP').textContent='Отправили на '+email+'. Он действует 10 минут.';ci[0].focus()}catch(e){$('#e1').textContent=e.message}b.disabled=false};
+$('#send').onclick=async()=>{const email=$('#email').value.trim();$('#e1').textContent='';if(!email){$('#e1').textContent='Введите почту';return}const b=$('#send');b.disabled=true;try{await api('/auth/login/admin-check',{method:'POST',body:JSON.stringify({email})});await api('/auth/login/send-code',{method:'POST',body:JSON.stringify({email})});$('#s1').style.display='none';$('#s2').style.display='block';$('#lgT').textContent='Код из письма';$('#lgP').textContent='Отправили на '+email+'. Он действует 10 минут.';ci[0].focus()}catch(e){$('#e1').textContent=e.message}b.disabled=false};
 $('#email').addEventListener('keydown',e=>{if(e.key==='Enter')$('#send').click()});
-$('#back').onclick=()=>{$('#s2').style.display='none';$('#s1').style.display='block';$('#lgT').textContent='Вход в админку';$('#lgP').textContent='Введите почту администратора, мы отправим код.';ci.forEach(x=>x.value='')};
+$('#back').onclick=()=>{$('#s2').style.display='none';$('#s1').style.display='block';$('#lgT').textContent='Вход в панель администрирования';$('#lgP').textContent='Введите почту администратора, мы отправим код.';ci.forEach(x=>x.value='')};
 $('#verify').onclick=async()=>{const code=ci.map(x=>x.value).join('');$('#e2').textContent='';if(code.length<6)return;const b=$('#verify');b.disabled=true;try{await api('/auth/login/verify-code',{method:'POST',body:JSON.stringify({email:$('#email').value.trim(),code})});location.reload()}catch(e){$('#e2').textContent=e.message;ci.forEach(x=>x.value='');ci[0].focus()}b.disabled=false};
 $('#logout').onclick=async()=>{try{await api('/auth/logout',{method:'POST'})}catch(e){}location.reload()};
 /* ---- данные ---- */
@@ -82,6 +82,7 @@ async function uzAct(act,id,x,y){if(act==='more'){uzLimit+=30;await loadUzel();r
 
 // ---------- Заявки с сайта и подписчики блога ----------
 let rq=null,rqSt='',rqQ='',rqLimit=30,sb=null,sbQ='',sbLimit=30,bc={title:'',url:'https://antviz.ru/blog/',excerpt:''};
+let bm='article',bh={subject:'',html:''},bhPrev=false;
 const RQ_LBL={new:'Новая',in_work:'В работе',done:'Готово',spam:'Спам'};
 const RQ_CLS={new:'red',in_work:'gray',done:'green',spam:'gray'};
 const moreB=(n,l,k)=>n>=l?'<div style="text-align:center;margin-top:14px"><button class="btn sm g" data-site="'+k+'">Показать ещё</button></div>':'';
@@ -103,11 +104,19 @@ function viewSubs(){
   const H='Подписчики блога';if(!sb)return uzHead(H,'Кто подписан на новые статьи.')+'<div class="card"><div class="empty">Загрузка…</div></div>';
   if(sb.error)return uzHead(H,'')+'<div class="card"><div class="empty">'+esc(sb.error)+'</div></div><p class="note">Если здесь ошибка 404, бэкенд на сервере ещё не обновлён.</p>';
   const d=x=>x?new Date(x).toLocaleDateString('ru'):'';
-  const form='<div class="card" style="margin-bottom:20px"><h3>Разослать новую статью</h3><p class="hint2">Письмо получат только подтвердившие подписку. В каждом письме есть ссылка «Отписаться».</p>'+
+  const modeSeg='<div class="seg" style="margin:4px 0 16px"><button data-site="bm:article" class="'+(bm==='article'?'on':'')+'">Новая статья</button><button data-site="bm:html" class="'+(bm==='html'?'on':'')+'">Свой HTML</button></div>';
+  const artBody=`<p class="hint2">Письмо в оформлении Antviz: заголовок, короткое описание и кнопка «Читать статью». В каждом письме есть ссылка «Отписаться».</p>`+
     '<div class="bcf"><label>Заголовок письма<input class="inp" data-bc="title" maxlength="150" value="'+esc(bc.title)+'" placeholder="Например: Как выбрать подрядчика"></label>'+
     '<label>Ссылка на статью<input class="inp" data-bc="url" maxlength="200" value="'+esc(bc.url)+'" placeholder="https://antviz.ru/blog/..."></label>'+
     '<label>Короткое описание<textarea class="inp" data-bc="excerpt" maxlength="500" rows="3" placeholder="Две-три строки о том, что внутри">'+esc(bc.excerpt)+'</textarea></label></div>'+
-    '<div class="acts" style="margin-top:14px"><button class="btn sm g" data-site="bctest">Отправить тест мне</button><button class="btn sm" data-site="bcsend">Разослать '+nf(sb.confirmed)+' подписчикам</button></div></div>';
+    '<div class="acts" style="margin-top:14px"><button class="btn sm g" data-site="bctest">Отправить тест мне</button><button class="btn sm" data-site="bcsend">Разослать '+nf(sb.confirmed)+' подписчикам</button></div>';
+  const prevDoc=String(bh.html).replace(/\{\{\s*unsubscribe\s*\}\}/gi,'#').replace(/\{\{\s*email\s*\}\}/gi,'you@example.com');
+  const htmlBody=`<p class="hint2">Вставьте готовый HTML письма. В коде можно писать <b>{{unsubscribe}}</b> (ссылка отписки) и <b>{{email}}</b> (адрес получателя). Если ссылки отписки в коде нет, она добавится в конец сама. Плашка «Sent with Geserd» тоже добавляется в конец автоматически. Картинки в письме должны быть по полным https-ссылкам.</p>`+
+    '<div class="bcf"><label>Тема письма<input class="inp" data-bh="subject" maxlength="150" value="'+esc(bh.subject)+'" placeholder="Тема, которую увидят в почте"></label>'+
+    '<label>HTML-код письма<textarea class="inp code" data-bh="html" rows="12" spellcheck="false" placeholder="<!doctype html>...">'+esc(bh.html)+'</textarea></label></div>'+
+    (bhPrev?'<iframe class="hprev" sandbox="" srcdoc="'+esc(prevDoc)+'" title="Предпросмотр письма"></iframe>':'')+
+    '<div class="acts" style="margin-top:14px"><button class="btn sm g" data-site="hprev">'+(bhPrev?'Скрыть предпросмотр':'Предпросмотр')+'</button><button class="btn sm g" data-site="htest">Отправить тест мне</button><button class="btn sm" data-site="hsend">Разослать '+nf(sb.confirmed)+' подписчикам</button></div>';
+  const form='<div class="card" style="margin-bottom:20px"><h3>Рассылка подписчикам</h3>'+modeSeg+(bm==='html'?htmlBody:artBody)+'</div>';
   const tb=sb.items.length?'<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Адрес</th><th>Статус</th><th>Откуда</th><th>Дата</th><th></th></tr></thead><tbody>'+sb.items.map(r=>'<tr><td><div class="nm">'+esc(r.email)+'</div></td><td>'+(r.confirmed_at?'<span class="pill green">подтверждён</span>':'<span class="pill gray">ждёт подтверждения</span>')+'</td><td class="sl">'+esc(r.source||'')+'</td><td class="sl">'+d(r.created_at)+'</td><td><button class="btn sm g bad" data-site="sdel:'+r.id+'">Удалить</button></td></tr>').join('')+'</tbody></table></div>'+moreB(sb.items.length,sbLimit,'smore'):'<div class="empty">'+(sbQ?'Ничего не найдено':'Подписчиков пока нет')+'</div>';
   return uzHead(H,'Кто подписан на новые статьи блога.')+'<div class="kpis" style="margin-bottom:20px;grid-template-columns:repeat(2,minmax(0,1fr))">'+kp('Подтверждено',sb.confirmed)+kp('Ждут подтверждения',sb.pending)+'</div>'+form+
     '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap"><h3 style="margin:0">Адреса</h3><a class="btn sm g" href="/api/admin-stats/blog-subscribers.csv">Скачать CSV</a></div><input class="srch" id="sbq" placeholder="Поиск по адресу" value="'+esc(sbQ)+'">'+tb+'</div>'}
@@ -118,12 +127,17 @@ async function loadSite(){
   if(tab==='subscribers'){try{sb=await api('/admin-stats/blog-subscribers?limit='+sbLimit+'&q='+encodeURIComponent(sbQ))}catch(e){sb={error:e.status===404?'Подписки ещё не подключены на сервере (ошибка 404).':e.message}}}
   if(tab==='requests'||tab==='subscribers'){const a=document.activeElement,id=a&&a.id,pos=a&&a.selectionStart;render();if(id){const el=document.getElementById(id);if(el){el.focus();try{el.setSelectionRange(pos,pos)}catch(e){}}}}}
 async function siteAct(act,a,b){
+  if(act==='bm'){bm=a==='html'?'html':'article';return render()}if(act==='hprev'){bhPrev=!bhPrev;return render()}
   if(act==='more'){rqLimit+=30;return loadSite()}if(act==='smore'){sbLimit+=30;return loadSite()}
   if(act==='st'){rqSt=a||'';rqLimit=30;return loadSite()}
   try{
     if(act==='set'){await api('/admin-stats/requests/'+a,{method:'POST',body:JSON.stringify({status:b})});toast('Готово')}
     else if(act==='del'){if(!confirm('Удалить заявку безвозвратно?'))return;await api('/admin-stats/requests/'+a+'/delete',{method:'POST',body:'{}'});toast('Удалено')}
     else if(act==='sdel'){if(!confirm('Удалить адрес из рассылки?'))return;await api('/admin-stats/blog-subscribers/'+a+'/delete',{method:'POST',body:'{}'});toast('Удалено')}
+    else if(act==='htest'||act==='hsend'){const test=act==='htest';
+      if(!test&&!confirm('Отправить это письмо всем подтверждённым подписчикам ('+nf(sb&&sb.confirmed)+')? Отменить будет нельзя.'))return;
+      const r=await api('/admin-stats/blog-subscribers/send-html',{method:'POST',body:JSON.stringify({subject:bh.subject,html:bh.html,test})});
+      toast(test?'Тестовое письмо отправлено вам':'Рассылка запущена: '+nf(r.sent)+' писем');return}
     else if(act==='bctest'||act==='bcsend'){const test=act==='bctest';
       if(!test&&!confirm('Отправить письмо всем подтверждённым подписчикам ('+nf(sb&&sb.confirmed)+')? Отменить будет нельзя.'))return;
       const r=await api('/admin-stats/blog-subscribers/send',{method:'POST',body:JSON.stringify(Object.assign({},bc,{test}))});
@@ -131,7 +145,7 @@ async function siteAct(act,a,b){
     await loadSite()}catch(e){toast(e.message)}}
 document.addEventListener('click',e=>{const x=e.target.closest('[data-site]');if(!x)return;const [a,b,c]=x.dataset.site.split(':');siteAct(a,b,c)});
 document.addEventListener('change',async e=>{const t=e.target;if(t.dataset&&t.dataset.rqnote){try{await api('/admin-stats/requests/'+t.dataset.rqnote,{method:'POST',body:JSON.stringify({note:t.value})});toast('Заметка сохранена')}catch(er){toast(er.message)}}});
-let siteT;document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.bc){bc[t.dataset.bc]=t.value;return}
+let siteT;document.addEventListener('input',e=>{const t=e.target;if(t.dataset&&t.dataset.bc){bc[t.dataset.bc]=t.value;return}if(t.dataset&&t.dataset.bh){bh[t.dataset.bh]=t.value;return}
   if(t.id==='sq'||t.id==='sbq'){if(t.id==='sq'){rqQ=t.value;rqLimit=30}else{sbQ=t.value;sbLimit=30}clearTimeout(siteT);siteT=setTimeout(loadSite,350)}
   if(t.dataset&&t.dataset.rqnote){t.style.height='auto';t.style.height=t.scrollHeight+'px'}});
 function render(){const v=$('#view');if(tab==='overview'&&data)v.innerHTML=viewOverview();else if(tab==='blog'&&data)v.innerHTML=viewBlog();else if(tab==='visitors')v.innerHTML=viewVisitors();else if(tab==='uzel')v.innerHTML=viewUzelHome();else if(tab==='uzel-pages')v.innerHTML=viewUzelPages();else if(tab==='uzel-users')v.innerHTML=viewUzelUsers();else if(tab==='requests')v.innerHTML=viewRequests();else if(tab==='subscribers')v.innerHTML=viewSubs();document.querySelectorAll('.nav[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===tab))}

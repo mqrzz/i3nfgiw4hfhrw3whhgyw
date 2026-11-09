@@ -1,12 +1,7 @@
 (async function(){
 const {$,$$,esc,t,api,ic,B}=UZ;
+if(new URLSearchParams(location.search).get('paid')){location.replace(B+'/app/paid');return}
 let me=await UZ.boot('plan',{wide:true});if(!me)return;
-if(new URLSearchParams(location.search).get('paid')){
- try{const r=await api('/me/plan/check',{method:'POST'});const fresh=await api('/me');me=Object.assign(me,fresh);UZ.me=me;
-  UZ.toast(r.credited?t('pl.paid'):t('pl.pending'));
- }catch(e){UZ.toast(e.message,true)}
- history.replaceState(null,'',location.pathname);
-}
 const cur=me.plan.code,pr=me.plan.prices,rank={free:0,pro:1,business:2};
 let per='year';
 const price=(tier)=>tier==='free'?0:Math.round(+pr[tier+'_'+per].amount);
@@ -28,8 +23,9 @@ function card(tier){
 function draw(){
  $('#pl').innerHTML='<div style="display:flex;justify-content:center;margin-bottom:22px"><div class="seg" id="pp"><button data-p="month" class="'+(per==='month'?'on':'')+'">'+esc(t('pl.month'))+'</button><button data-p="year" class="'+(per==='year'?'on':'')+'">'+esc(t('pl.year'))+'</button></div></div><div class="plans3">'+['free','pro','business'].map(card).join('')+'</div>';
  $('#pp').onclick=e=>{const b=e.target.closest('[data-p]');if(b){per=b.dataset.p;draw()}};
- $$('[data-buy]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{const r=await api('/me/plan/checkout',{method:'POST',body:{plan:b.dataset.buy+'_'+per}});if(r.url)location.href=r.url}catch(er){UZ.toast(er.message,true)}b.disabled=false});
+ $$('[data-buy]').forEach(b=>b.onclick=async()=>{if(cur==='pro'&&b.dataset.buy==='business'&&until&&!await UZ.confirm({title:t('pl.up.t'),text:t('pl.up.s',until),ok:t('pl.upgrade')}))return;b.disabled=true;try{const r=await api('/me/plan/checkout',{method:'POST',body:{plan:b.dataset.buy+'_'+per}});if(r.url)location.href=r.url}catch(er){UZ.toast(er.message,true)}b.disabled=false});
 }
 $('#view').innerHTML=UZ.head(t('nav.plan'),t('pl.sub'))+'<div id="pl"></div><div class="card" style="margin-top:20px"><h2>'+esc(t('pl.sub.h'))+'</h2><p class="sub2">'+esc(t('pl.sub.s'))+'</p></div>';
 draw();
+
 })();

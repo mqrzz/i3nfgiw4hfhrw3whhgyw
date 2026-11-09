@@ -27,7 +27,7 @@ $('#bgs').onclick=e=>{const b=e.target.closest('[data-g]');if(!b)return;S.bg=b.d
 $('#ths').onclick=async e=>{const b=e.target.closest('[data-t]');if(!b)return;const k=b.dataset.t;
  if(!allowed.includes(k)){if(await UZ.confirm({title:t('ds.pro'),text:t('ds.pro.s'),ok:t('plans.see')}))location.href=B+'/app/plan';return}
  S.theme=k;draw();tr.check()};
-const needBiz=async()=>{if(await UZ.confirm({title:t('ds.pro'),text:t('ds.accent.pro'),ok:t('plans.see')}))location.href=B+'/app/plan'};
+const needBiz=async()=>{if(await UZ.confirm({title:t('ds.biz'),text:t('ds.accent.pro'),ok:t('plans.see')}))location.href=B+'/app/plan'};
 $('#acc').onclick=async e=>{if(e.target.closest('#cc'))return;const b=e.target.closest('[data-c]'),r=e.target.closest('#ar');if(!b&&!r)return;if(!biz){needBiz();return}S.accent=r?'':b.dataset.c;draw();tr.check()};
 $('#acc').addEventListener('input',e=>{if(e.target.id==='cc'){if(!biz){needBiz();return}S.accent=e.target.value;$('#pvb').innerHTML=prev();tr.check()}});
 $('#acc').addEventListener('change',e=>{if(e.target.id==='cc')draw()});

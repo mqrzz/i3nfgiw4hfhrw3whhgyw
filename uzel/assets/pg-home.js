@@ -41,7 +41,7 @@ const hero='<section class="hm-hero"><div class="hl"><span class="pill hp '+(liv
 /* ---- график ---- */
 function chartCard(){
   const seg='<div class="seg" id="rng">'+[7,14].concat(pro?[30]:[]).map(n=>'<button data-n="'+n+'"'+(n===14?' class="on"':'')+'>'+esc(t('hm.d',n))+'</button>').join('')+'</div>';
-  return '<div class="card c-chart"><div class="chh"><h2>'+esc(t('hm.chart'))+'</h2>'+seg+'</div><div class="ck3" id="ck3"></div><div id="chbox"></div></div>';
+  return '<div class="card c-chart"><div class="chh"><h2>'+ic('chart-line','hic')+esc(t('hm.chart'))+'</h2>'+seg+'</div><div class="ck3" id="ck3"></div><div id="chbox"></div></div>';
 }
 function smooth(pts){let d='M'+pts[0][0].toFixed(1)+' '+pts[0][1].toFixed(1);for(let i=1;i<pts.length;i++){const a=pts[i-1],b=pts[i],mx=(a[0]+b[0])/2;d+=' C'+mx.toFixed(1)+' '+a[1].toFixed(1)+' '+mx.toFixed(1)+' '+b[1].toFixed(1)+' '+b[0].toFixed(1)+' '+b[1].toFixed(1);}return d;}
 let cache={14:series0};
@@ -67,7 +67,7 @@ function drawChart(n){
     xh.style.opacity=d1.style.opacity=d2.style.opacity=tp.style.opacity=1;};
   cv.addEventListener('pointermove',mv);cv.addEventListener('pointerdown',mv);cv.addEventListener('pointerleave',hide);
 }
-function fd(s){return new Date(s+'T00:00:00').toLocaleDateString(UZ.lang==='en'?'en':'ru',{day:'numeric',month:'short'});}
+function fd(s){return new Date(s+'T00:00:00').toLocaleDateString(UZ.lang,{day:'numeric',month:'short'});}
 
 /* ---- заявки ---- */
 function reqCard(){
@@ -76,32 +76,32 @@ function reqCard(){
   let body;
   if(leads.length)body='<div class="rl">'+leads.slice(0,3).map(l=>'<a class="ri'+(l.read?'':' nw')+'" href="'+B+'/app/form"><span class="cav" style="background:'+UZ.gradient(l.name||l.contact)+'">'+esc(UZ.initials(l.name||l.contact))+'</span><span class="rt"><b>'+esc(l.name||l.contact)+'</b><em>'+esc(l.message||l.contact)+'</em></span><small>'+esc(UZ.ago(l.created_at))+'</small></a>').join('')+'</div><a class="btn g sm wfull" href="'+B+'/app/form">'+esc(t('hm.req.all'))+ic('chevron-right')+'</a>';
   else body='<div class="empty rempty">'+ic('inbox')+'<b>'+esc(t('hm.req.none'))+'</b><p>'+esc(t('hm.req.none.s'))+'</p>'+(fOn?'':'<a class="btn sm" href="'+B+'/app/form">'+esc(t('hm.req.on'))+'</a>')+'</div>';
-  return '<div class="card c-req"><div class="chh"><h2>'+esc(t('hm.req'))+'</h2>'+(nw?'<span class="pill bad">'+esc(t('hm.req.n',nw))+'</span>':'')+'</div>'+body+'</div>';
+  return '<div class="card c-req"><div class="chh"><h2>'+ic('inbox','hic')+esc(t('hm.req'))+'</h2>'+(nw?'<span class="pill bad">'+esc(t('hm.req.n',nw))+'</span>':'')+'</div>'+body+'</div>';
 }
 /* ---- топ ссылок ---- */
 function topCard(){
   const L=st?st.links:[];let body;
   if(!L.length)body='<div class="empty">'+esc(t('hm.top.none'))+'</div>';
-  else{const m=Math.max(...L.map(x=>x.clicks),1);const row=(x,i)=>'<div class="r'+(i>=5?' ex':'')+'"><span>'+esc(x.title)+'</span><div class="meter"><i style="width:'+Math.max(6,x.clicks/m*100)+'%"></i></div><em>'+nf(x.clicks)+'</em></div>';
+  else{const m=Math.max(...L.map(x=>x.clicks),1);const row=(x,i)=>'<div class="r'+(i>=5?' ex':'')+'"><span>'+ic('link')+esc(x.title)+'</span><div class="meter"><i style="width:'+Math.max(6,x.clicks/m*100)+'%"></i></div><em>'+nf(x.clicks)+'</em></div>';
     body='<div class="rows" id="tl">'+L.slice(0,12).map(row).join('')+'</div>'+(L.length>5?'<button class="btn g sm wfull" id="tm">'+esc(t('hm.more'))+ic('chevron-down')+'</button>':'');}
-  return '<div class="card c-top"><div class="chh"><h2>'+esc(t('hm.top'))+'</h2></div>'+body+'</div>';
+  return '<div class="card c-top"><div class="chh"><h2>'+ic('flame','hic')+esc(t('hm.top'))+'</h2></div>'+body+'</div>';
 }
 /* ---- источники ---- */
 function srcCard(){
   const R=st?st.refs:[],D=st?st.devices:[];let body='';
   if(!R.length)body='<div class="empty">'+esc(t('hm.src.none'))+'</div>';
-  else{const m=Math.max(...R.map(x=>x.views),1);body='<div class="rows">'+R.slice(0,5).map(x=>'<div class="r"><span>'+esc(x.ref==='Прямые заходы'?t('st.direct'):x.ref)+'</span><div class="meter"><i style="width:'+Math.max(6,x.views/m*100)+'%"></i></div><em>'+nf(x.views)+'</em></div>').join('')+'</div>';
+  else{const m=Math.max(...R.map(x=>x.views),1);body='<div class="rows">'+R.slice(0,5).map(x=>'<div class="r"><span>'+UZ.srcIc(x.ref)+esc(x.ref==='Прямые заходы'?t('st.direct'):x.ref)+'</span><div class="meter"><i style="width:'+Math.max(6,x.views/m*100)+'%"></i></div><em>'+nf(x.views)+'</em></div>').join('')+'</div>';
     const tv=D.reduce((s,x)=>s+x.views,0),mob=D.filter(x=>x.device==='mobile').reduce((s,x)=>s+x.views,0),mp=tv?Math.round(mob/tv*100):0;
     if(tv)body+='<div class="dev"><div class="db"><i style="width:'+mp+'%"></i></div><div class="dl2"><span>'+ic('smartphone')+esc(t('hm.mob'))+' '+mp+'%</span><span>'+ic('monitor')+esc(t('hm.pc'))+' '+(100-mp)+'%</span></div></div>';}
-  return '<div class="card c-src"><div class="chh"><h2>'+esc(t('hm.src'))+'</h2></div>'+body+'</div>';
+  return '<div class="card c-src"><div class="chh"><h2>'+ic('compass','hic')+esc(t('hm.src'))+'</h2></div>'+body+'</div>';
 }
 /* ---- чек-лист ---- */
 function todoCard(){
   if(done===todo.length)return '';
   const ring='<div class="ring"><svg viewBox="0 0 84 84"><circle cx="42" cy="42" r="34" fill="none" stroke="#dce9ff" stroke-width="9"/><circle cx="42" cy="42" r="34" fill="none" stroke="#06f" stroke-width="9" stroke-linecap="round" stroke-dasharray="'+C+'" stroke-dashoffset="'+(C*(1-pct/100))+'"/></svg><b>'+pct+'%</b></div>';
-  return '<div class="card c-todo"><div class="prog">'+ring+'<div><h2>'+esc(t('hm.todo'))+'</h2><p class="sub2">'+esc(t('hm.todo.s',done,todo.length))+'</p></div></div><div class="todo">'+todo.map(x=>'<a class="'+(x[0]?'done':'')+'" href="'+B+x[2]+'"><span class="ck">'+ic('check')+'</span><span>'+esc(t(x[1]))+'</span></a>').join('')+'</div></div>';
+  return '<div class="card c-todo"><div class="prog">'+ring+'<div><h2>'+ic('list-checks','hic')+esc(t('hm.todo'))+'</h2><p class="sub2">'+esc(t('hm.todo.s',done,todo.length))+'</p></div></div><div class="todo">'+todo.map(x=>'<a class="'+(x[0]?'done':'')+'" href="'+B+x[2]+'"><span class="ck">'+ic('check')+'</span><span>'+esc(t(x[1]))+'</span></a>').join('')+'</div></div>';
 }
-const promo=pro?'':'<div class="promo"><div style="flex:1 1 260px"><h2>'+esc(t('home.pro'))+'</h2><p>'+esc(t('home.pro.s'))+'</p></div><a class="btn" href="'+B+'/app/plan">'+esc(t('home.pro.btn'))+'</a></div>';
+const promo=pro?'':'<div class="promo"><div style="flex:1 1 260px"><h2>'+ic('crown','hic')+esc(t('home.pro'))+'</h2><p>'+esc(t('home.pro.s'))+'</p></div><a class="btn" href="'+B+'/app/plan">'+esc(t('home.pro.btn'))+'</a></div>';
 
 const todoFirst=fresh&&done<todo.length;
 const row2=todoFirst?todoCard()+reqCard():chartCard()+reqCard();
@@ -133,7 +133,7 @@ async function qrPoster(){
 $('#qr').onclick=async()=>{
   if(!live){UZ.toast(t('home.draft'),true);return;}
   const m=document.createElement('div');m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');
-  m.innerHTML='<div class="box qrb"><h3>'+esc(t('hm.qr'))+'</h3><p>'+esc(t('hm.qr.s'))+'</p><div class="qrp"><span class="spin"></span></div><div class="acts"><button class="btn g" data-c>'+esc(t('hm.close'))+'</button><button class="btn" id="qdl" disabled>'+ic('download')+esc(t('hm.dl'))+'</button></div><a class="qsv" href="/api/uzel/qr/'+esc(p.slug)+'?dl=1" download>'+esc(t('hm.dl.svg'))+'</a></div>';
+  m.innerHTML='<div class="box qrb"><h3>'+ic('qr-code','hic')+esc(t('hm.qr'))+'</h3><p>'+esc(t('hm.qr.s'))+'</p><div class="qrp"><span class="spin"></span></div><div class="acts"><button class="btn g" data-c>'+esc(t('hm.close'))+'</button><button class="btn" id="qdl" disabled>'+ic('download')+esc(t('hm.dl'))+'</button></div><a class="qsv" href="/api/uzel/qr/'+esc(p.slug)+'?dl=1" download>'+esc(t('hm.dl.svg'))+'</a></div>';
   const cl=()=>{m.remove();document.removeEventListener('keydown',kd);};const kd=e=>{if(e.key==='Escape')cl();};
   m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-c]'))cl();});document.addEventListener('keydown',kd);document.body.appendChild(m);
   try{const cv=await qrPoster();const box=$('.qrp',m);box.innerHTML='';const im=new Image();im.alt='QR';im.src=cv.toDataURL('image/png');box.appendChild(im);

@@ -8,7 +8,7 @@ const price=(tier)=>tier==='free'?0:Math.round(+pr[tier+'_'+per].amount);
 const L={free:me.plan.free,pro:me.plan.pro,business:me.plan.businessLimits};
 const rows=[['pl.f.links',t=>L[t].links],['pl.f.themes',t=>L[t].themes.length],['pl.f.stats',t=>L[t].statsDays],['pl.f.form',()=>1],['pl.f.sched',t=>t!=='free'],['pl.f.badge',t=>t!=='free'],['pl.f.csv',t=>t!=='free'],['pl.f.accent',t=>t==='business'],['pl.f.sub',t=>t!=='free']];
 const li=(tier)=>rows.map(r=>{const v=r[1](tier);return '<li class="'+(v?'':'no')+'">'+ic(v?'check':'x')+'<span>'+esc(t(r[0],v))+'</span></li>'}).join('');
-const until=me.plan.until?new Date(me.plan.until).toLocaleDateString(UZ.lang==='en'?'en':'ru',{day:'numeric',month:'long',year:'numeric'}):null;
+const until=me.plan.until?new Date(me.plan.until).toLocaleDateString(UZ.lang,{day:'numeric',month:'long',year:'numeric'}):null;
 function card(tier){
  const name=tier==='free'?'Free':tier==='pro'?'Pro':t('pl.business'),who=t('pl.who.'+(tier==='business'?'biz':tier));
  const mine=cur===tier,lower=rank[cur]>rank[tier];
@@ -25,7 +25,7 @@ function draw(){
  $('#pp').onclick=e=>{const b=e.target.closest('[data-p]');if(b){per=b.dataset.p;draw()}};
  $$('[data-buy]').forEach(b=>b.onclick=async()=>{if(cur==='pro'&&b.dataset.buy==='business'&&until&&!await UZ.confirm({title:t('pl.up.t'),text:t('pl.up.s',until),ok:t('pl.upgrade')}))return;b.disabled=true;try{const r=await api('/me/plan/checkout',{method:'POST',body:{plan:b.dataset.buy+'_'+per}});if(r.url)location.href=r.url}catch(er){UZ.toast(er.message,true)}b.disabled=false});
 }
-$('#view').innerHTML=UZ.head(t('nav.plan'),t('pl.sub'))+'<div id="pl"></div><div class="card" style="margin-top:20px"><h2>'+esc(t('pl.sub.h'))+'</h2><p class="sub2">'+esc(t('pl.sub.s'))+'</p></div>';
+$('#view').innerHTML=UZ.head(t('nav.plan'),t('pl.sub'))+'<div id="pl"></div><div class="card" style="margin-top:20px"><h2>'+ic('credit-card','hic')+esc(t('pl.sub.h'))+'</h2><p class="sub2">'+esc(t('pl.sub.s'))+'</p></div>';
 draw();
 
 })();

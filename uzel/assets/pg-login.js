@@ -3,11 +3,11 @@ const {$,$$,esc,t,api,ic,B}=UZ;
 const next=(()=>{let n=new URLSearchParams(location.search).get('next');if(n&&B&&n.indexOf(B+'/')===0)n=n.slice(B.length);return n&&/^\/app(\/[A-Za-z0-9_\-.]*)*(\?[A-Za-z0-9_\-.=&]*)?$/.test(n)&&!/\/app\/(login|start)/.test(n)?n:null})();
 document.title=t('login.title')+' · '+t('brand');
 document.body.className='auth-body';
-document.body.innerHTML='<div class="split">'+UZ.showcase()+'<main class="formside"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><a class="lg" href="'+B+'/">'+UZ.LOGO+t('brand')+'</a><div class="seg" id="lg"><button data-l="ru" class="'+(UZ.lang==='ru'?'on':'')+'">RU</button><button data-l="en" class="'+(UZ.lang==='en'?'on':'')+'">EN</button></div></div>'+
+document.body.innerHTML='<div class="split">'+UZ.showcase()+'<main class="formside"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><a class="lg" href="'+B+'/">'+UZ.LOGO+t('brand')+'</a><select class="lsel" id="lg" aria-label="Language">'+UZ.LANGS.map(x=>'<option value="'+x[0]+'"'+(UZ.lang===x[0]?' selected':'')+'>'+x[1]+'</option>').join('')+'</select></div>'+
 '<h1 id="h">'+esc(t('login.h1'))+'</h1><p class="lead2" id="p">'+esc(t('login.p'))+'</p>'+
 '<div id="s1"><label class="sr" for="email">Email</label><input class="inp" id="email" type="email" inputmode="email" placeholder="you@mail.com" autocomplete="email" autocapitalize="off" spellcheck="false"><div class="err" id="e1" role="alert"></div><button class="btn" id="send" style="width:100%;margin-top:6px">'+esc(t('login.get'))+'</button><p class="hint" style="text-align:center;margin-top:16px">'+t('login.terms',B)+'</p></div>'+
 '<div id="s2" style="display:none"><div class="codes" id="codes"></div><div class="err" id="e2" role="alert"></div><button class="btn" id="verify" style="width:100%;margin-top:6px">'+esc(t('login.enter'))+'</button><button class="btn g" id="back" style="width:100%;margin-top:10px">'+esc(t('login.other'))+'</button><p class="hint" id="rs" style="text-align:center;margin-top:14px"></p></div></div></main></div>';
-$('#lg').onclick=e=>{const b=e.target.closest('[data-l]');if(b)UZ.setLang(b.dataset.l)};
+$('#lg').onchange=e=>UZ.setLang(e.target.value);
 const codes=$('#codes');codes.innerHTML=Array.from({length:6},(_,i)=>'<input inputmode="numeric" maxlength="1" aria-label="'+(i+1)+'" autocomplete="'+(i?'off':'one-time-code')+'">').join('');
 const ci=$$('input',codes);
 ci.forEach((el,i)=>{

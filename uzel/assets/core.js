@@ -8,17 +8,24 @@
   const $$ = UZ.$$ = (s, r) => [...(r || document).querySelectorAll(s)];
   const esc = UZ.esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const ic = UZ.ic = (n, cls) => (IC[n] || '').replace('class="i"', 'class="i' + (cls ? ' ' + cls : '') + '"');
-  const nf = UZ.nf = (n) => Number(n || 0).toLocaleString(UZ.lang === 'en' ? 'en' : 'ru');
+UZ.srcIc=(r)=>{const h=String(r||'').toLowerCase();if(/^метка:|^tag:/.test(h))return UZ.ic('tag');if(h.indexOf('instagram')>-1)return UZ.ic('b-instagram');if(h==='t.me'||h.indexOf('telegram')>-1)return UZ.ic('b-telegram');if(h.indexOf('vk.com')>-1||h.indexOf('vk.ru')>-1)return UZ.ic('b-vk');if(h.indexOf('youtube')>-1||h==='youtu.be')return UZ.ic('b-youtube');if(h.indexOf('tiktok')>-1)return UZ.ic('b-tiktok');if(h==='x.com'||h.indexOf('twitter')>-1)return UZ.ic('b-x');if(h.indexOf('discord')>-1)return UZ.ic('b-discord');if(h.indexOf('whatsapp')>-1||h==='wa.me')return UZ.ic('b-whatsapp');if(r==='Прямые заходы'||h==='direct')return UZ.ic('mouse-pointer-click');return UZ.ic('globe')};
+  UZ.LANGS = [['en', 'English'], ['ru', 'Русский'], ['es', 'Español'], ['de', 'Deutsch'], ['fr', 'Français'], ['pt', 'Português'], ['it', 'Italiano'], ['pl', 'Polski'], ['tr', 'Türkçe'], ['uk', 'Українська']];
+  const SUP = UZ.LANGS.map((x) => x[0]);
 
   /* ---------- язык ---------- */
   const urlLang = new URLSearchParams(location.search).get('lang');
-  if (urlLang === 'ru' || urlLang === 'en') { try { localStorage.setItem('uzel_lang', urlLang); } catch (e) {} }
+  if (SUP.includes(urlLang)) { try { localStorage.setItem('uzel_lang', urlLang); } catch (e) {} }
   let stored = null; try { stored = localStorage.getItem('uzel_lang'); } catch (e) {}
-  UZ.lang = stored === 'en' ? 'en' : 'ru';
+  const nav = String(navigator.language || 'en').slice(0, 2).toLowerCase();
+  UZ.lang = SUP.includes(stored) ? stored : (SUP.includes(nav) ? nav : 'en');
   UZ.setLang = (l) => { try { localStorage.setItem('uzel_lang', l); } catch (e) {} location.reload(); };
+  // файл языка грузим до скриптов страницы; нет файла: показываем английский
+  if (UZ.lang !== 'ru' && UZ.lang !== 'en' && (window.I18N_FILES || []).includes(UZ.lang)) document.write('<script src="' + (window.UZ_BASE || '') + '/assets/i18n-' + UZ.lang + '.js"><\/script>');
+  const nf = UZ.nf = (n) => Number(n || 0).toLocaleString(UZ.lang);
   UZ.t = (k, ...a) => {
     const d = window.I18N || {};
     let v = d[UZ.lang] && d[UZ.lang][k];
+    if (v === undefined) v = d.en && d.en[k];
     if (v === undefined) v = d.ru && d.ru[k];
     if (v === undefined) return k;
     return typeof v === 'function' ? v(...a) : v;
@@ -62,7 +69,7 @@
   });
   UZ.gradient = (name) => { let h = 0; for (const c of String(name)) h = (h * 31 + c.charCodeAt(0)) % 360; return 'linear-gradient(135deg,hsl(' + h + ',85%,62%),hsl(' + ((h + 40) % 360) + ',85%,58%))'; };
   UZ.initials = (name) => { const p = String(name || '').trim().split(/\s+/).filter(Boolean); return ((p[0] || '?')[0] + (p[1] ? p[1][0] : '')).toUpperCase(); };
-  UZ.ago = (s) => { const m = Math.round((Date.now() - new Date(s)) / 60000); if (m < 1) return t('ago.now'); if (m < 60) return t('ago.min', m); const h = Math.round(m / 60); if (h < 24) return t('ago.h', h); return new Date(s).toLocaleDateString(UZ.lang === 'en' ? 'en' : 'ru', { day: 'numeric', month: 'short' }); };
+  UZ.ago = (s) => { const m = Math.round((Date.now() - new Date(s)) / 60000); if (m < 1) return t('ago.now'); if (m < 60) return t('ago.min', m); const h = Math.round(m / 60); if (h < 24) return t('ago.h', h); return new Date(s).toLocaleDateString(UZ.lang, { day: 'numeric', month: 'short' }); };
   UZ.debounce = (fn, ms) => { let x; return (...a) => { clearTimeout(x); x = setTimeout(() => fn(...a), ms); }; };
 
   /* ---------- мини-страница (превью) ---------- */

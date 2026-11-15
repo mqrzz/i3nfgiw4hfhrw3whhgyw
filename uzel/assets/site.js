@@ -12,7 +12,7 @@ $$('.rv').forEach(el=>io?io.observe(el):el.classList.add('in'));
 $$('form.claim').forEach(f=>{
  const inp=$('input',f);
  inp.addEventListener('input',()=>{inp.value=inp.value.toLowerCase().replace(/[^a-z0-9-]/g,'')});
- f.addEventListener('submit',e=>{e.preventDefault();const v=inp.value.trim();location.href=B+'/app/login'+(v?'?slug='+encodeURIComponent(v):'')});
+ f.addEventListener('submit',e=>{e.preventDefault();const v=inp.value.trim();location.href=B+'/app/login?lang='+encodeURIComponent(document.documentElement.lang||'')+(v?'&slug='+encodeURIComponent(v):'')});
  // подсказка в поле: листаем примеры
  const ex=(inp.dataset.ex||'').split(',').filter(Boolean);if(ex.length&&!matchMedia('(prefers-reduced-motion:reduce)').matches){let i=0;setInterval(()=>{if(document.activeElement!==inp&&!inp.value){i=(i+1)%ex.length;inp.placeholder=ex[i]}},2200)}
 });
@@ -28,6 +28,10 @@ if(demo){
 $$('a[href^="#"]').forEach(a=>a.addEventListener('click',e=>{const t=$(a.getAttribute('href'));if(t){e.preventDefault();window.scrollTo({top:t.getBoundingClientRect().top+scrollY-90,behavior:'smooth'})}}));
 // язык: запоминаем выбор
 $$('.lang a').forEach(a=>a.addEventListener('click',()=>{try{localStorage.setItem('uzel_lang',a.dataset.l)}catch(e){}}));
+// выпадающий список языков
+$$('.lang.dd').forEach(d=>{const b=$('.ldb',d);if(!b)return;b.onclick=e=>{e.stopPropagation();const on=d.classList.toggle('open');b.setAttribute('aria-expanded',on)};document.addEventListener('click',e=>{if(!d.contains(e.target)){d.classList.remove('open');b.setAttribute('aria-expanded','false')}})});
+// страница на языке X: кабинет открываем на том же языке
+try{const pl=document.documentElement.lang;if(pl&&/^(en|ru|es|de|fr|pt|it|pl|tr|uk)$/.test(pl)&&document.body.classList.contains('site'))localStorage.setItem('uzel_lang',pl)}catch(e){}
 })();
 
 ;/* geserd-footer */

@@ -112,7 +112,7 @@ $('#view').innerHTML=hero+'<div class="hg"><div class="r2">'+row2+'</div><div cl
 /* ---- поведение ---- */
 $('#cp').onclick=()=>UZ.copy(url);
 async function qrPoster(){
-  const en=UZ.lang==='en',W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
+  const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;const g=cv.getContext('2d');
   try{await Promise.all([document.fonts.load('800 60px Unbounded'),document.fonts.load('600 30px "Golos Text"')]);}catch(e){}
   const svg=await (await fetch('/api/uzel/qr/'+encodeURIComponent(p.slug))).text();
   const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));});
@@ -120,9 +120,9 @@ async function qrPoster(){
   const rr=(x,y,w,h,r)=>{g.beginPath();g.roundRect(x,y,w,h,r);};
   g.fillStyle='#ffffff';
   [[10,6,50,12,.6],[0,26,64,12,1],[18,46,38,12,.35]].forEach(([x,y,w,h,o])=>{g.globalAlpha=o;rr(84+x*1.1,78+y*1.1,w*1.1,h*1.1,7);g.fill();});g.globalAlpha=1;
-  g.font='800 46px Unbounded, sans-serif';g.textBaseline='middle';g.fillText(en?'uzel':'узел',84+64*1.1+22,128);
+  g.font='800 46px Unbounded, sans-serif';g.textBaseline='middle';g.fillText(t('brand'),84+64*1.1+22,128);
   g.textBaseline='alphabetic';g.font='800 74px Unbounded, sans-serif';g.fillStyle='#fff';
-  const head=en?['Scan to','open the page']:['Наведите камеру,','чтобы открыть'];g.fillText(head[0],84,300);g.fillText(head[1],84,388);
+  const head=[t('hm.qr.l1'),t('hm.qr.l2')];g.fillText(head[0],84,300);g.fillText(head[1],84,388);
   g.save();g.shadowColor='#00000066';g.shadowBlur=60;g.shadowOffsetY=24;g.fillStyle='#fff';rr(140,450,800,800,56);g.fill();g.restore();
   g.drawImage(img,180,490,720,720);
   g.fillStyle='#fff';g.font='800 44px Unbounded, sans-serif';

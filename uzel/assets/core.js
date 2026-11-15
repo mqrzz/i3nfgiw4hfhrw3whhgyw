@@ -18,7 +18,7 @@ UZ.srcIc=(r)=>{const h=String(r||'').toLowerCase();if(/^метка:|^tag:/.test(
   let stored = null; try { stored = localStorage.getItem('uzel_lang'); } catch (e) {}
   const nav = String(navigator.language || 'en').slice(0, 2).toLowerCase();
   UZ.lang = SUP.includes(stored) ? stored : (SUP.includes(nav) ? nav : 'en');
-  UZ.setLang = (l) => { try { localStorage.setItem('uzel_lang', l); } catch (e) {} location.reload(); };
+  UZ.setLang = (l) => { try { localStorage.setItem('uzel_lang', l); sessionStorage.setItem('uzel_lang_ask', '1'); } catch (e) {} location.reload(); };
   // файл языка грузим до скриптов страницы; нет файла: показываем английский
   if (UZ.lang !== 'ru' && UZ.lang !== 'en' && (window.I18N_FILES || []).includes(UZ.lang)) document.write('<script src="' + (window.UZ_BASE || '') + '/assets/i18n-' + UZ.lang + '.js"><\/script>');
   const nf = UZ.nf = (n) => Number(n || 0).toLocaleString(UZ.lang);
@@ -75,14 +75,15 @@ UZ.srcIc=(r)=>{const h=String(r||'').toLowerCase();if(/^метка:|^tag:/.test(
   /* ---------- мини-страница (превью) ---------- */
   const THEME_LIST = ['light', 'dark', 'blue', 'warm', 'mint', 'sunset', 'graphite', 'lilac'];
   UZ.THEMES = THEME_LIST;
+  UZ.PVL = { en: { call: 'Call', mail: 'Email', route: 'Directions', send: 'Send' }, ru: { call: 'Позвонить', mail: 'Написать', route: 'Как добраться', send: 'Отправить' }, es: { call: 'Llamar', mail: 'Escribir', route: 'Cómo llegar', send: 'Enviar' }, de: { call: 'Anrufen', mail: 'Schreiben', route: 'Route', send: 'Senden' }, fr: { call: 'Appeler', mail: 'Écrire', route: 'Itinéraire', send: 'Envoyer' }, pt: { call: 'Ligar', mail: 'Escrever', route: 'Como chegar', send: 'Enviar' }, it: { call: 'Chiama', mail: 'Scrivi', route: 'Indicazioni', send: 'Invia' }, pl: { call: 'Zadzwoń', mail: 'Napisz', route: 'Dojazd', send: 'Wyślij' }, tr: { call: 'Ara', mail: 'Yaz', route: 'Yol tarifi', send: 'Gönder' }, uk: { call: 'Подзвонити', mail: 'Написати', route: 'Як дістатися', send: 'Надіслати' } };
   UZ.pv = (p, scale) => {
-    const ext = p.ext || {}, L = UZ.lang === 'en' ? { call: 'Call', mail: 'Email', route: 'Directions', send: 'Send' } : { call: 'Позвонить', mail: 'Написать', route: 'Как добраться', send: 'Отправить' };
+    const ext = p.ext || {}, L = UZ.PVL[UZ.lang] || UZ.PVL.en;
     const av = p.avatar ? '<img src="/api/uzel/media/' + esc(p.avatar) + '" alt="" style="width:100%;height:100%;object-fit:cover">' : esc(UZ.initials(p.name));
     const soc = (p.socials || []).filter((s) => IC['b-' + s.type]).map((s) => '<a>' + IC['b-' + s.type] + '</a>').join('');
     const info = ext.info || {};
     const ct = [info.phone && ['phone', L.call], info.email && ['mail', L.mail], info.address && ['map-pin', L.route]].filter(Boolean).map((x) => '<a>' + ic(x[0]) + '<span>' + x[1] + '</span></a>').join('');
     const now = Date.now();
-    const lk = (p.links || []).filter((l) => l.enabled !== false && l.title && (!l.from || Date.parse(l.from) <= now) && (!l.to || Date.parse(l.to) > now)).map((l) => l.kind === 'header' ? '<h2 class="hd">' + esc(l.title) + '</h2>' : '<a>' + ic('link') + '<span>' + esc(l.title) + (l.desc ? '<small>' + esc(l.desc) + '</small>' : '') + '</span>' + ic('arrow-up-right', 'ar') + '</a>').join('');
+    const lk = (p.links || []).filter((l) => l.enabled !== false && (l.title || l.text || l.price) && (!l.from || Date.parse(l.from) <= now) && (!l.to || Date.parse(l.to) > now)).map((l) => l.kind === 'header' ? '<h2 class="hd">' + esc(l.title) + '</h2>' : l.kind === 'text' ? '<div class="bx"><b>' + esc(l.title || '') + '</b>' + esc(l.text || '').slice(0, 90) + '</div>' : l.kind === 'faq' ? '<div class="bx fq"><b>' + esc(l.title) + '</b>' + ic('plus') + '</div>' : l.kind === 'price' ? '<div class="bx pr"><span>' + esc(l.title) + '</span><b>' + esc(l.price || '') + '</b></div>' : l.kind === 'video' ? '<div class="bx fq">' + ic('play') + '<b>' + esc(l.title || 'Video') + '</b></div>' : '<a>' + ic(l.kind === 'map' ? 'map-pin' : l.pin ? 'pin' : 'link') + '<span>' + esc(l.title) + (l.desc ? '<small>' + esc(l.desc) + '</small>' : '') + '</span>' + ic('arrow-up-right', 'ar') + '</a>').join('');
     const mu = p.music && p.music.title ? '<a>' + ic('music') + '<span>' + esc(p.music.title) + '</span>' + ic('arrow-up-right', 'ar') + '</a>' : '';
     const fm = ext.form && ext.form.enabled ? '<div class="fm"><h2 class="hd" style="margin:0;font:800 calc(9px*var(--s)) var(--display);text-transform:uppercase;opacity:.6">' + esc(ext.form.title || '') + '</h2><i></i><i></i><b></b></div>' : '';
     let acc = '', accStyle = '';
@@ -93,7 +94,7 @@ UZ.srcIc=(r)=>{const h=String(r||'').toLowerCase();if(/^метка:|^tag:/.test(
 
   /* ---------- витрина слева на экранах входа и создания ---------- */
   UZ.showcase = () => {
-    const en = UZ.lang === 'en';
+    const en = UZ.lang !== 'ru';
     const A = en ? { name: 'Lime Coffee', subtitle: 'Coffee and desserts', theme: 'blue', socials: [{ type: 'instagram' }, { type: 'tiktok' }, { type: 'youtube' }], links: [{ title: 'Menu' }, { title: 'Book a table' }, { title: 'Delivery' }], ext: { shape: 'soft', info: { phone: '1' } } }
       : { name: 'Кофейня «Лайм»', subtitle: 'Кофе и десерты, Казань', theme: 'blue', socials: [{ type: 'instagram' }, { type: 'vk' }, { type: 'tiktok' }], links: [{ title: 'Меню' }, { title: 'Забронировать стол' }, { title: 'Доставка' }], ext: { shape: 'soft', info: { phone: '1' } } };
     const Bp = en ? { name: 'Mikhail Dev', subtitle: 'Frontend developer', theme: 'dark', socials: [{ type: 'github' }, { type: 'telegram' }], links: [{ title: 'My blog' }, { title: 'Open source' }, { title: 'Book a call' }], ext: { shape: 'round' } }
@@ -120,7 +121,20 @@ UZ.srcIc=(r)=>{const h=String(r||'').toLowerCase();if(/^метка:|^tag:/.test(
       if (e.status === 401) { location.replace(B + '/app/login?next=' + encodeURIComponent(B && location.pathname.indexOf(B + '/') === 0 ? location.pathname.slice(B.length) : location.pathname)); return null; }
       document.body.innerHTML = '<div class="auth"><div class="card"><h1>' + esc(t('err.generic')) + '</h1><p class="lead2">' + esc(e.message) + '</p><button class="btn" onclick="location.reload()">' + esc(t('retry')) + '</button></div></div>'; return null;
     }
+    if (me && me.user && me.user.lang !== UZ.lang) { UZ.api('/me/settings', { method: 'PUT', body: { lang: UZ.lang } }).catch(() => {}); }
     UZ.me = me;
+    try {
+      if (sessionStorage.getItem('uzel_lang_ask') === '1' && me.page) {
+        sessionStorage.removeItem('uzel_lang_ask');
+        if (((me.page.ext && me.page.ext.lang) || 'ru') !== UZ.lang) {
+          setTimeout(async () => {
+            if (await UZ.confirm({ title: t('lg.page.t'), text: t('lg.page.s'), ok: t('lg.page.ok'), cancel: t('lg.page.no') })) {
+              try { await UZ.api('/me/settings', { method: 'PUT', body: { pageLang: UZ.lang } }); location.reload(); } catch (e) { UZ.toast(e.message, true); }
+            }
+          }, 600);
+        }
+      }
+    } catch (e) {}
     if (!me.page && !opt.noPage) { location.replace(B + '/app/start'); return null; }
     document.body.className = 'app';
     const unread = me.unread || 0, pro = me.plan.paid;
